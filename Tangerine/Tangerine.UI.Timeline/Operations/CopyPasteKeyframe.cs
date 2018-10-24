@@ -45,9 +45,11 @@ namespace Tangerine.UI.Timeline.Operations
 					continue;
 				}
 				foreach (var animator in animable.Animators) {
+					if (animator.AnimationId != Document.Current.AnimationId) {
+						continue;
+					}
 					foreach (var keyframe in animator.Keys.Where(i => spans.Any(j => j.Contains(i.Frame)))) {
 						list.Add(new RowKeyBinding {
-							AnimationId = animator.AnimationId,
 							Frame = keyframe.Frame - startCol,
 							Property = animator.TargetPropertyPath,
 							Row = row.Index - startRow,
@@ -70,9 +72,6 @@ namespace Tangerine.UI.Timeline.Operations
 
 		[YuzuMember]
 		public string Property { get; set; }
-
-		[YuzuMember]
-		public string AnimationId { get; set; }
 
 		[YuzuMember]
 		public IKeyframe Keyframe { get; set; }
@@ -118,7 +117,7 @@ namespace Tangerine.UI.Timeline.Operations
 					}
 					var keyframe = key.Keyframe.Clone();
 					keyframe.Frame = colIndex;
-					SetKeyframe.Perform(animable, key.Property, key.AnimationId, keyframe);
+					SetKeyframe.Perform(animable, key.Property, Document.Current.AnimationId, keyframe);
 				}
 			});
 		}
@@ -139,6 +138,9 @@ namespace Tangerine.UI.Timeline.Operations
 						continue;
 					}
 					foreach (var animator in animable.Animators.ToList()) {
+						if (animator.AnimationId != Document.Current.AnimationId) {
+							continue;
+						}
 						foreach (var keyframe in animator.Keys.Where(i => spans.Any(j => j.Contains(i.Frame))).ToList()) {
 							RemoveKeyframe.Perform(animator, keyframe.Frame);
 						}
