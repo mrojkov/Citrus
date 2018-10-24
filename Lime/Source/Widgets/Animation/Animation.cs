@@ -106,12 +106,6 @@ namespace Lime
 			}
 		}
 
-		public void RebuildAnimatorCache()
-		{
-			AnimatorCache.Clear();
-			FindAnimators(AnimatorCache);
-		}
-
 		public void Run(string markerId = null)
 		{
 			if (!TryRun(markerId)) {
@@ -131,7 +125,6 @@ namespace Lime
 		public void ApplyAnimators(bool invokeTriggers)
 		{
 			Load();
-			RebuildAnimatorCache();
 			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 
