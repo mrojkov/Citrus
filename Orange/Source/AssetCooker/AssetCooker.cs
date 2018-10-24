@@ -755,6 +755,9 @@ namespace Orange
 		/// </summary>
 		public static bool AreAtlasItemsCompatible(List<AtlasItem> items, AtlasItem item1, AtlasItem item2)
 		{
+			if (item1.CookingRules.GenerateOpacityMask != item2.CookingRules.GenerateOpacityMask) {
+				return false;
+			}
 			if (item1.CookingRules.WrapMode != item2.CookingRules.WrapMode) {
 				return false;
 			}
@@ -838,11 +841,6 @@ namespace Orange
 			}
 		}
 
-		private static bool ShouldGenerateOpacityMasks()
-		{
-			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
-		}
-
 		public static bool AreTextureParamsDefault(ICookingRules rules)
 		{
 			return rules.MinFilter == TextureParams.Default.MinFilter &&
@@ -858,7 +856,7 @@ namespace Orange
 				MinFilter = rules.MinFilter,
 				MagFilter = rules.MagFilter,
 			};
-			
+
 			if (!AreTextureParamsDefault(rules)) {
 				UpscaleTextureIfNeeded(ref texture, rules, false);
 				var isNeedToRewriteTexParams = true;
@@ -874,7 +872,7 @@ namespace Orange
 					DeleteFileFromBundle(textureParamsPath);
 				}
 			}
-			if (ShouldGenerateOpacityMasks()) {
+			if (rules.GenerateOpacityMask) {
 				var maskPath = Path.ChangeExtension(path, ".mask");
 				OpacityMaskCreator.CreateMask(AssetBundle, texture, maskPath);
 			}

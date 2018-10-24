@@ -59,6 +59,7 @@ namespace Orange
 		string TextureAtlas { get; }
 		bool MipMaps { get; }
 		bool HighQualityCompression { get; }
+		bool GenerateOpacityMask { get; }
 		float TextureScaleFactor { get; }
 		PVRFormat PVRFormat { get; }
 		DDSFormat DDSFormat { get; }
@@ -91,6 +92,9 @@ namespace Orange
 
 		[YuzuMember]
 		public bool HighQualityCompression { get; set; }
+
+		[YuzuMember]
+		public bool GenerateOpacityMask { get; set; }
 
 		[YuzuMember]
 		public float TextureScaleFactor { get; set; }
@@ -190,6 +194,7 @@ namespace Orange
 				TextureAtlas = null,
 				MipMaps = false,
 				HighQualityCompression = false,
+				GenerateOpacityMask = false,
 				TextureScaleFactor = 1.0f,
 				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC2 : PVRFormat.PVRTC4,
 				DDSFormat = DDSFormat.DXTi,
@@ -224,6 +229,7 @@ namespace Orange
 		public string TextureAtlas => EffectiveRules.TextureAtlas;
 		public bool MipMaps => EffectiveRules.MipMaps;
 		public bool HighQualityCompression => EffectiveRules.HighQualityCompression;
+		public bool GenerateOpacityMask => EffectiveRules.GenerateOpacityMask;
 		public float TextureScaleFactor => EffectiveRules.TextureScaleFactor;
 		public PVRFormat PVRFormat => EffectiveRules.PVRFormat;
 		public DDSFormat DDSFormat => EffectiveRules.DDSFormat;
@@ -616,6 +622,9 @@ namespace Orange
 					break;
 				case "HighQualityCompression":
 					rules.HighQualityCompression = ParseBool(words[1]);
+					break;
+				case "GenerateOpacityMask":
+					rules.GenerateOpacityMask = ParseBool(words[1]);
 					break;
 				case "PVRFormat":
 					rules.PVRFormat = ParsePVRFormat(words[1]);
