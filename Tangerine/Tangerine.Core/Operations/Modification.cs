@@ -52,12 +52,14 @@ namespace Tangerine.Core.Operations
 			{
 				op.Save(new Backup { Value = op.Property.GetValue(op.Obj, null) });
 				op.Property.SetValue(op.Obj, op.Value, null);
+				PropertyAttributes<TangerineOnPropertySetAttribute>.Get(op.Obj.GetType(), op.Property.Name)?.Invoke(op.Obj);
 			}
 
 			protected override void InternalUndo(SetProperty op)
 			{
 				var v = op.Restore<Backup>().Value;
 				op.Property.SetValue(op.Obj, v, null);
+				PropertyAttributes<TangerineOnPropertySetAttribute>.Get(op.Obj.GetType(), op.Property.Name)?.Invoke(op.Obj);
 			}
 		}
 	}

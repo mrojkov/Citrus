@@ -17,7 +17,10 @@ namespace Lime
 
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
+#if TANGERINE
 		[TangerineKeyframeColor(15)]
+		[TangerineOnPropertySet(nameof(OnSetTextureViaTangerine))]
+#endif // TANGERINE
 		public override sealed ITexture Texture
 		{
 			get { return texture; }
@@ -30,6 +33,13 @@ namespace Lime
 			}
 		}
 
+#if TANGERINE
+		private void OnSetTextureViaTangerine()
+		{
+			TileSize = (Vector2)texture.ImageSize;
+		}
+#endif // TANGERINE
+
 		protected override void DiscardMaterial()
 		{
 			material = null;
@@ -37,7 +47,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(16)]
-		public Vector2 TileRatio { get; set; }
+		public Vector2 TileSize { get; set; }
 
 		[YuzuMember]
 		[TangerineKeyframeColor(17)]
@@ -47,13 +57,47 @@ namespace Lime
 		[TangerineKeyframeColor(18)]
 		public bool TileRounding { get; set; }
 
+#if TANGERINE
+		[TangerineInspect]
+		public bool IsTiledAlongX
+		{
+			get => TileSize.X != 0.0f;
+			set
+			{
+				if (value) {
+					TileSize = new Vector2(savedTileSizeX, TileSize.Y);
+				} else {
+					savedTileSizeX = TileSize.X;
+					TileSize = new Vector2(0.0f, TileSize.Y);
+				}
+			}
+		}
+
+		[TangerineInspect]
+		public bool IsTiledAlongY
+		{
+			get => TileSize.Y != 0.0f;
+			set {
+				if (value) {
+					TileSize = new Vector2(TileSize.X, savedTileSizeY);
+				} else {
+					savedTileSizeY = TileSize.Y;
+					TileSize = new Vector2(TileSize.X, 0.0f);
+				}
+			}
+		}
+
+		private float savedTileSizeX;
+		private float savedTileSizeY;
+#endif // TANGERINE
+
 		public IMaterial CustomMaterial { get; set; }
 
 		public TiledImage()
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileRatio = Vector2.One;
+			TileSize = Vector2.Zero;
 			HitTestMethod = HitTestMethod.Contents;
 			var texture = new SerializableTexture();
 			Texture = texture;
@@ -63,7 +107,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			TileOffset = Vector2.Zero;
-			TileRatio = Vector2.One;
+			TileSize = Vector2.Zero;
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
@@ -100,9 +144,12 @@ namespace Lime
 				size.Y = -size.Y;
 			}
 			if (localPoint.X >= 0 && localPoint.Y >= 0 && localPoint.X < size.X && localPoint.Y < size.Y) {
-				int u = (int)(Texture.ImageSize.Width * (localPoint.X / size.X));
-				int v = (int)(Texture.ImageSize.Height * (localPoint.Y / size.Y));
-				return !Texture.IsTransparentPixel(u, v);
+				var UV1 = CalcUV1();
+				float u = TileOffset.X + (UV1.X - TileOffset.X) * (localPoint.X / size.X);
+				float v = TileOffset.Y + (UV1.Y - TileOffset.Y) * (localPoint.Y / size.Y);
+				int tu = (int)(Texture.ImageSize.Width * u);
+				int tv = (int)(Texture.ImageSize.Height * v);
+				return !Texture.IsTransparentPixel(tu, tv);
 			} else {
 				return false;
 			}
@@ -115,14 +162,7 @@ namespace Lime
 			if (material == null) {
 				material = WidgetMaterial.GetInstance(blending, shader, 1);
 			}
-			var UV1 = new Vector2 {
-				X = Size.X / texture.ImageSize.Width * TileRatio.X + TileOffset.X,
-				Y = Size.Y / texture.ImageSize.Height * TileRatio.Y + TileOffset.Y
-			};
-			if (TileRounding) {
-				UV1.X = (float)Math.Truncate(UV1.X);
-				UV1.Y = (float)Math.Truncate(UV1.Y);
-			}
+			var UV1 = CalcUV1();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.CaptureRenderState(this);
 			ro.Texture = Texture;
@@ -133,6 +173,20 @@ namespace Lime
 			ro.Position = ContentPosition;
 			ro.Size = ContentSize;
 			return ro;
+		}
+
+		private Vector2 CalcUV1()
+		{
+			var UV1 = new Vector2 {
+				X = TileSize.X == 0.0f ? 1.0f : Size.X / TileSize.X,
+				Y = TileSize.Y == 0.0f ? 1.0f : Size.Y / TileSize.Y
+			};
+			if (TileRounding) {
+				UV1.X = (float)Math.Round(UV1.X);
+				UV1.Y = (float)Math.Round(UV1.Y);
+			}
+			UV1 += TileOffset;
+			return UV1;
 		}
 
 		public bool IsNotRenderTexture()

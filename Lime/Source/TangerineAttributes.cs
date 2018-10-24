@@ -112,6 +112,24 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+	public sealed class TangerineOnPropertySetAttribute : Attribute
+	{
+		private readonly string methodName;
+
+		public TangerineOnPropertySetAttribute(string methodName)
+		{
+			this.methodName = methodName;
+		}
+
+		public void Invoke(object o)
+		{
+			var type = o.GetType();
+			var fn = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+			fn.Invoke(o, new object[] { });
+		}
+	}
+
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 	public sealed class TangerineVisualHintGroupAttribute : Attribute
 	{

@@ -93,7 +93,7 @@ namespace Lime
 			".dds", ".pvr", ".jpg", ".png"
 #endif
 		};
-		
+
 		private uint handle;
 		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
@@ -175,18 +175,18 @@ namespace Lime
 						Console.WriteLine("Can not open file '{0}':\n{1}", path, e);
 						continue;
 					}
-				
+
 					using (stream) {
 						LoadImageHelper(stream, createReloader: false);
 					}
-				
+
 					LoadTextureParams(path);
 
 					var maskPath = path + ".mask";
 					if (AssetBundle.Current.FileExists(maskPath)) {
 						OpacityMask = new OpacityMask(maskPath);
 					}
-				
+
 					// Update audio buffers if the audio system performs in the main thread.
 					AudioSystem.Update();
 
@@ -212,7 +212,7 @@ namespace Lime
 					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
 
 			LoadImage(pixels, 128, 128);
-			
+
 			IsStubTexture = true;
 			reloader = new TextureStubReloader();
 		}
@@ -220,7 +220,7 @@ namespace Lime
 		public void LoadImage(byte[] data)
 		{
 			IsStubTexture = false;
-			
+
 			using (var stream = new MemoryStream(data)) {
 				LoadImage(stream);
 			}
@@ -298,25 +298,25 @@ namespace Lime
 		public void LoadImage(Color4[] pixels, int width, int height)
 		{
 			IsStubTexture = false;
-			
+
 			reloader = new TexturePixelArrayReloader(pixels, width, height);
 
 			MemoryUsed = 4 * width * height;
 			ImageSize = new Size(width, height);
 			SurfaceSize = ImageSize;
 			uvRect = new Rectangle(0, 0, 1, 1);
-			
+
 			Window.Current.InvokeOnRendering(() => {
 				var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
 				var pointer = pinnedArray.AddrOfPinnedObject();
-				
+
 				PrepareOpenGLTexture();
 				GL.ActiveTexture(TextureUnit.Texture0);
 				GL.BindTexture(TextureTarget.Texture2D, handle);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pointer);
 				PlatformRenderer.MarkTextureSlotAsDirty(0);
 				PlatformRenderer.CheckErrors();
-				
+
 				pinnedArray.Free();
 			});
 		}
@@ -355,7 +355,7 @@ namespace Lime
 		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
 		{
 			IsStubTexture = false;
-			
+
 			Window.Current.InvokeOnRendering(() => {
 				PrepareOpenGLTexture();
 				GL.ActiveTexture(TextureUnit.Texture0);
@@ -452,6 +452,20 @@ namespace Lime
 			if (OpacityMask != null) {
 				int x1 = x * OpacityMask.Width / ImageSize.Width;
 				int y1 = y * OpacityMask.Height / ImageSize.Height;
+				if (TextureParams.WrapModeU == TextureWrapMode.Repeat) {
+					x1 = Math.Abs(x1 % OpacityMask.Width);
+				} else if (TextureParams.WrapModeU == TextureWrapMode.MirroredRepeat) {
+					x1 = (x1 / OpacityMask.Width) % 2 == 0
+						? Math.Abs(x1 % OpacityMask.Width)
+						: OpacityMask.Width - Math.Abs(x1 % OpacityMask.Width);
+				}
+				if (TextureParams.WrapModeV == TextureWrapMode.Repeat) {
+					y1 = Math.Abs(y1 % OpacityMask.Height);
+				} else if (TextureParams.WrapModeV == TextureWrapMode.MirroredRepeat) {
+					y1 = (y1 / OpacityMask.Height) % 2 == 0
+						? Math.Abs(y1 % OpacityMask.Height)
+						: OpacityMask.Height - Math.Abs(y1 % OpacityMask.Height);
+				}
 				return !OpacityMask.TestPixel(x1, y1);
 			}
 			return false;
