@@ -176,6 +176,9 @@ namespace Lime
 				return;
 			}
 			var srcAnimation = model.FirstAnimation;
+			if (srcAnimation == null) {
+				return;
+			}
 			foreach (var animationData in Animations) {
 				var animation = new Lime.Animation {
 					Id = animationData.Name
