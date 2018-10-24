@@ -112,12 +112,12 @@ namespace Lime
 		}
 	}
 
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-	public sealed class TangerineOnSetAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+	public sealed class TangerineOnPropertySetAttribute : Attribute
 	{
 		private readonly string methodName;
 
-		public TangerineOnSetAttribute(string methodName)
+		public TangerineOnPropertySetAttribute(string methodName)
 		{
 			this.methodName = methodName;
 		}

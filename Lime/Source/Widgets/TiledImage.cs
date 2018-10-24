@@ -19,7 +19,7 @@ namespace Lime
 		[YuzuSerializeIf(nameof(IsNotRenderTexture))]
 #if TANGERINE
 		[TangerineKeyframeColor(15)]
-		[TangerineOnSet(nameof(OnSetTextureViaTangerine))]
+		[TangerineOnPropertySet(nameof(OnSetTextureViaTangerine))]
 #endif // TANGERINE
 		public override sealed ITexture Texture
 		{
