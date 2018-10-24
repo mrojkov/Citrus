@@ -1146,6 +1146,9 @@ namespace Orange
 		private static void ExportModelAnimations(Model3D model, string pathPrefix, AssetAttributes assetAttributes, byte[] cookingRulesSHA1)
 		{
 			foreach (var animation in model.Animations) {
+				if (animation.IsLegacy) {
+					continue;
+				}
 				var pathWithoutExt = pathPrefix + animation.Id;
 				var path = pathWithoutExt + ".ant";
 				var data = animation.GetData();

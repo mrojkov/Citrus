@@ -116,6 +116,9 @@ namespace Tangerine.Core
 					var fbxFullPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, fbxPath);
 					var model = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget, new Dictionary<string, Orange.CookingRules>()).Model;
 					foreach (var animation in model.Animations) {
+						if (animation.IsLegacy) {
+							continue;
+						}
 						var animationPathWithoutExt = animationPathPrefix + animation.Id;
 						var animationPath = animationPathWithoutExt + ".ant";
 						animation.ContentsPath = animationPathWithoutExt;
