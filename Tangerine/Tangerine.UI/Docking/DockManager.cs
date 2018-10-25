@@ -385,7 +385,7 @@ namespace Tangerine.UI.Docking
 					title => titleLabel.Text = title
 				);
 				closeButton.Clicked += () => {
-					placement.Placements[tabbedWidget.ActiveTabIndex].Hidden = true;
+					placement.Placements.Where(p => !p.Hidden).ElementAt(tabbedWidget.ActiveTabIndex).Hidden = true;
 					Refresh();
 				};
 				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
