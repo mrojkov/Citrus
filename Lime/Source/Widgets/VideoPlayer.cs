@@ -64,7 +64,7 @@ namespace Lime
 
 		public void SeekTo(float time)
 		{
-			decoder.SeekTo((int)(time * 1000));
+			decoder.SeekTo(time);
 		}
 
 		public override void Dispose()

@@ -25,7 +25,7 @@ namespace Lime
 		{
 		}
 
-		public void SeekTo(int time)
+		public void SeekTo(float time)
 		{
 
 		}

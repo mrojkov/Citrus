@@ -304,7 +304,7 @@ namespace Lime
 			} while (Looped && !token.IsCancellationRequested);
 		}
 
-		public void SeekTo(int time)
+		public void SeekTo(float time)
 		{
 
 		}

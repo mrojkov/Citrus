@@ -322,9 +322,9 @@ namespace Lime
 			hasMoreItemsInQueue.Set();
 		}
 
-		public void SeekTo(int timeInMs)
+		public void SeekTo(int time)
 		{
-			startTime = timeInMs * 1000;
+			startTime = (long)(time * 1000000);
 			videoExtractor?.SeekTo(startTime, MediaExtractorSeekTo.ClosestSync);
 			audioExtractor?.SeekTo(startTime, MediaExtractorSeekTo.ClosestSync);
 

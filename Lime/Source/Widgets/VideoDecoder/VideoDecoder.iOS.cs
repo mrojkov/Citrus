@@ -40,6 +40,8 @@ namespace Lime
 
 		private Stopwatch stopwatch = new Stopwatch();
 
+		private float startTime = 0;
+
 		private enum State
 		{
 			Initialized,
@@ -89,7 +91,7 @@ namespace Lime
 			do {
 				if (state == State.Finished) {
 					stopwatch.Restart();
-					player.Seek(CMTime.FromSeconds(0, 1000));
+					player.Seek(CMTime.FromSeconds(startTime, 1000));
 				}
 				stopDecodeCancelationTokenSource = new CancellationTokenSource();
 				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
@@ -131,9 +133,18 @@ namespace Lime
 			Debug.Write("Video player loop ended!");
 		}
 
-		public void SeekTo(int time)
+		public void SeekTo(float time)
 		{
+			startTime = time;
+			player.Seek(CMTime.FromSeconds(startTime, 1000));
+			Debug.Write($"Start time: {startTime}");
 
+			if (state == State.Started) {
+				state = State.Paused;
+				stopwatch.Stop();
+				stopwatch.Reset();
+				stopDecodeCancelationTokenSource.Cancel();
+			}
 		}
 
 		public void Pause()
@@ -163,7 +174,7 @@ namespace Lime
 		public void Update(float delta)
 		{
 			if (state == State.Started) {
-				currentPosition = stopwatch.ElapsedMilliseconds;
+				currentPosition = startTime + stopwatch.ElapsedMilliseconds;
 				checkVideoEvent.Set();
 			}
 		}
