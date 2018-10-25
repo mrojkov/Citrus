@@ -61,20 +61,16 @@ namespace Lime
 			Activity = activity;
 			if (GameView == null) {
 				GameView = new GameView(Activity, Input);
-				GameView.Resize += (s, e) => {
-					// Initialize the application on Resize (not Load) event,
-					// because we may need a valid screen resolution
-					if (gameInitializer != null) {
-						gameInitializer();
-						gameInitializer = null;
-					}
-				};
 			} else {
 				RemoveGameViewFromParent();
 			}
 			ContentView = new RelativeLayout(activity.ApplicationContext);
 			ContentView.AddView(GameView);
 			Activity.SetContentView(ContentView);
+			if (gameInitializer != null) {
+				gameInitializer();
+				gameInitializer = null;
+			}
 			if (Created != null) {
 				Created(Activity, bundle);
 			}
