@@ -145,6 +145,9 @@ namespace Lime
 					if (isMain && lastVideoTime == -1) {
 						Debug.Write($"Extractor time 1: {extractor.SampleTime} Current: {currentPosition}");
 					}
+					if (stopDecodeCancelationTokenSource.IsCancellationRequested) {
+						return;
+					}
 					var sampleSize = extractor.ReadSampleData(inputBuffer, 0);
 					
 					if (sampleSize > 0) {
@@ -237,9 +240,9 @@ namespace Lime
 							Debug.Write("trackIndex <= -1");
 						}
 
+						stopDecodeCancelationToken.ThrowIfCancellationRequested();
 						var outIndex = videoCodec.DequeueOutputBuffer(info, 10000);
 						if (outIndex >= 0) {
-							
 							if (lastVideoTime == -1) {
 								Debug.Write($"Video: {info.PresentationTimeUs} Buffer Count: {videoBufferCount}");
 							}
@@ -325,6 +328,9 @@ namespace Lime
 		public void SeekTo(float time)
 		{
 			startTime = (long)(time * 1000000);
+			if (state == State.Started) {
+				stopDecodeCancelationTokenSource.Cancel();
+			}
 			videoExtractor?.SeekTo(startTime, MediaExtractorSeekTo.ClosestSync);
 			audioExtractor?.SeekTo(startTime, MediaExtractorSeekTo.ClosestSync);
 
@@ -334,7 +340,6 @@ namespace Lime
 				state = State.Paused;
 				stopwatch.Stop();
 				stopwatch.Reset();
-				stopDecodeCancelationTokenSource.Cancel();
 				audio?.Pause();
 				audioCodec.Flush();
 				videoCodec.Flush();
