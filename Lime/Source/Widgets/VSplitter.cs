@@ -86,11 +86,11 @@ namespace Lime
 
 		private void AdjustStretchDelta(float initialHeight, Widget widget, ref float delta)
 		{
-			if (initialHeight + delta <= widget.MinHeight) {
-				delta = widget.MinHeight - initialHeight;
+			if (initialHeight + delta <= widget.EffectiveMinSize.Y) {
+				delta = widget.EffectiveMinSize.Y - initialHeight;
 			}
-			if (initialHeight + delta >= widget.MaxHeight) {
-				delta = widget.MaxHeight - initialHeight;
+			if (initialHeight + delta >= widget.EffectiveMaxSize.Y) {
+				delta = widget.EffectiveMaxSize.Y - initialHeight;
 			}
 		}
 
