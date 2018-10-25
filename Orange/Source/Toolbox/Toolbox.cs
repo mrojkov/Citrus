@@ -116,7 +116,7 @@ namespace Orange
 					n.SetTangerineFlag(tangerineFlag, false);
 				}
 				n.RemoveAnimatorsForExternalAnimations();
-				foreach (var animation in node.Animations) {
+				foreach (var animation in n.Animations) {
 					animation.Frame = 0;
 				}
 				if (n.Folders != null && n.Folders.Count == 0) {
