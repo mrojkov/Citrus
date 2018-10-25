@@ -131,6 +131,11 @@ namespace Lime
 			Debug.Write("Video player loop ended!");
 		}
 
+		public void SeekTo(int time)
+		{
+
+		}
+
 		public void Pause()
 		{
 			if (state == State.Started) {

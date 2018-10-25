@@ -62,6 +62,11 @@ namespace Lime
 			decoder?.Stop();
 		}
 
+		public void SeekTo(float time)
+		{
+			decoder.SeekTo((int)(time * 1000));
+		}
+
 		public override void Dispose()
 		{
 			if (decoder != null) {

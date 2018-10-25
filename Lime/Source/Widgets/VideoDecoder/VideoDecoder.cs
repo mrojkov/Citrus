@@ -25,6 +25,11 @@ namespace Lime
 		{
 		}
 
+		public void SeekTo(int time)
+		{
+
+		}
+
 		public void Stop()
 		{
 		}

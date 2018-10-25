@@ -304,6 +304,11 @@ namespace Lime
 			} while (Looped && !token.IsCancellationRequested);
 		}
 
+		public void SeekTo(int time)
+		{
+
+		}
+
 		public void Stop()
 		{
 			if (state == State.Stoped || state == State.Finished || state == State.Initialized) {
