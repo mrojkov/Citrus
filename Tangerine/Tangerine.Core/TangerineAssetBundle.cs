@@ -11,7 +11,7 @@ namespace Tangerine.Core
 
 		public class CacheMeta
 		{
-			private const string CurrentVersion = "1.3";
+			private const string CurrentVersion = "1.4";
 
 			[YuzuRequired]
 			public string Version { get; set; } = CurrentVersion;
