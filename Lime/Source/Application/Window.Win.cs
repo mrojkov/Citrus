@@ -407,12 +407,15 @@ namespace Lime
 
 		public void ShowModal()
 		{
-			RaiseVisibleChanging(true, true);
-			form.ShowDialog();
-			RaiseVisibleChanging(false, true);
+			using (Context.Activate().Scoped()) {
+				RaiseVisibleChanging(true, true);
+				form.ShowDialog();
+				RaiseVisibleChanging(false, true);
+			};
 		}
 
-		public void Activate() {
+		public void Activate()
+		{
 			form.Activate();
 		}
 
