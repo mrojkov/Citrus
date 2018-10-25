@@ -316,6 +316,7 @@ namespace Lime
 			SelectionStart.IsVisible = SelectionEnd.IsVisible = true;
 			SelectionStart.TextPos = 0;
 			SelectionEnd.TextPos = int.MaxValue;
+			Window.Current.Invalidate();
 		}
 
 		public void DeleteChar()
