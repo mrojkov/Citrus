@@ -1151,6 +1151,7 @@ namespace Orange
 					continue;
 				}
 				var pathWithoutExt = pathPrefix + animation.Id;
+				pathWithoutExt = Animation.FixAntPath(pathWithoutExt);
 				var path = pathWithoutExt + ".ant";
 				var data = animation.GetData();
 				animation.ContentsPath = pathWithoutExt;

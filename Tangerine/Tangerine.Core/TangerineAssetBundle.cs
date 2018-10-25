@@ -122,6 +122,7 @@ namespace Tangerine.Core
 							continue;
 						}
 						var animationPathWithoutExt = animationPathPrefix + animation.Id;
+						animationPathWithoutExt = Animation.FixAntPath(animationPathWithoutExt);
 						var animationPath = animationPathWithoutExt + ".ant";
 						animation.ContentsPath = animationPathWithoutExt;
 						Serialization.WriteObjectToBundle(cacheBundle, animationPath, animation.GetData(), Serialization.Format.Binary, ".ant", AssetAttributes.None, new byte[0]);

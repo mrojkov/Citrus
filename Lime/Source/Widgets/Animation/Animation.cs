@@ -184,6 +184,12 @@ namespace Lime
 			return d;
 		}
 
+		public static string FixAntPath(string path)
+		{
+			path = path.Replace("|", "_");
+			return path;
+		}
+
 		public class AnimationData
 		{
 			[YuzuMember]
@@ -191,6 +197,7 @@ namespace Lime
 
 			public static AnimationData Load(string path)
 			{
+				path = FixAntPath(path);
 				path += ".ant";
 				return Serialization.ReadObject<AnimationData>(path);
 			}
