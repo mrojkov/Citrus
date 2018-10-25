@@ -162,8 +162,9 @@ namespace Tangerine.UI.Docking
 			if (stretch >= 0) {
 				return stretch;
 			}
+			var currentStretch = linearPlacement.Stretches[index];
 			linearPlacement.Stretches[index] *= 0.75f;
-			return linearPlacement.Stretches[index] * 0.25f;
+			return currentStretch * 0.25f;
 		}
 
 		private static void ReplacePlacement(Placement old, LinearPlacement @new, DockSite site, ref float stretch, ref int index)
@@ -314,20 +315,26 @@ namespace Tangerine.UI.Docking
 
 		public virtual void Replace(Placement old, Placement @new) { }
 
-		public Vector2 CalcGlobalSize()
+		public Vector2 CalcGlobalStretch()
 		{
 			var result = Vector2.One;
 			if (Parent == null) {
 				return result;
 			}
 			Parent.SwitchType(onLinearPlacement: linearPlacement => {
-				float stretch = linearPlacement.Stretches[linearPlacement.Placements.IndexOf(this)];
+				var overalStretchOfVisiblePanels = 0f;
+				for (var i = 0; i < linearPlacement.Placements.Count; i++) {
+					if (linearPlacement.Placements[i].AnyVisiblePanel()) {
+						overalStretchOfVisiblePanels += linearPlacement.Stretches[i];
+					}
+				}
+				var stretch = linearPlacement.Stretches[linearPlacement.Placements.IndexOf(this)];
 				result =
 					linearPlacement.Direction == LinearPlacementDirection.Vertical
-					? new Vector2(1, stretch)
-					: new Vector2(stretch, 1);
+					? new Vector2(1, stretch / overalStretchOfVisiblePanels)
+					: new Vector2(stretch / overalStretchOfVisiblePanels, 1);
 			});
-			return Parent.CalcGlobalSize() * result;
+			return Parent.CalcGlobalStretch() * result;
 		}
 
 		public void Unlink()

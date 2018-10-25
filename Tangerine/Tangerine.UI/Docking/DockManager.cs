@@ -421,7 +421,7 @@ namespace Tangerine.UI.Docking
 				var windowPlacement = Model.GetWindowByPlacement(placement);
 				if (windowPlacement.Root.GetPanelPlacements().Count(p => !p.Hidden) > 1) {
 					var wrapper = new WindowPlacement {
-						Size = placement.CalcGlobalSize() * panelWindow.Size
+						Size = placement.CalcGlobalStretch() * panelWindow.Size
 					};
 					placement.Unlink();
 					windowPlacement.Root.RemoveRedundantNodes();
