@@ -494,9 +494,12 @@ namespace Tangerine.UI.Docking
 				MainWindowWidget.Nodes.Add(ToolbarArea);
 			}
 			Splitter currentContainer = new ThemedVSplitter { Anchors = Anchors.LeftRightTopBottom };
+			// Cache window state before resizing. Resizing may trigger Resize Update which in turn
+			// lead to placement state rewriting on first update, because window state change watcher don't has a value.
+			var savedState = root.State;
 			windowWidget.Window.ClientPosition = root.Position;
 			windowWidget.Window.ClientSize = root.Size;
-			windowWidget.Window.State = root.State;
+			windowWidget.Window.State = savedState;
 			windowWidget.Nodes.Add(currentContainer);
 			CreateWidgetForPlacement(currentContainer, root.Root, isMainWindow: MainWindowWidget == windowWidget);
 		}
@@ -570,13 +573,6 @@ namespace Tangerine.UI.Docking
 						Model.Panels.Add(p);
 					}
 				}
-				if (resizeMainWindow && state.WindowPlacements.First().Size != Vector2.Zero) {
-					var mainWindow = Model.MainWindow;
-					MainWindowWidget.Window.ClientSize = mainWindow.Size;
-					MainWindowWidget.Window.ClientPosition = mainWindow.Position;
-					MainWindowWidget.Window.State = mainWindow.State;
-				}
-
 				Model.Panels.AddRange(savedPanels.Except(Model.Panels));
 				ResolveInconsistency();
 			} catch (DockingException e) {
