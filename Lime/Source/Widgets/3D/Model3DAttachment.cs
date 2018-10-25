@@ -262,7 +262,7 @@ namespace Lime
 				startFrame = 0;
 			}
 			if (lastFrame < 0) {
-				lastFrame = srcAnimator.ReadonlyKeys.Count - 1;
+				lastFrame = srcAnimator.ReadonlyKeys[srcAnimator.ReadonlyKeys.Count - 1].Frame;
 			}
 			var startKeyIndex = -1;
 			for (var i = 0; i < srcAnimator.ReadonlyKeys.Count; i++) {
