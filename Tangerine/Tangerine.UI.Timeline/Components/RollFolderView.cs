@@ -158,6 +158,7 @@ namespace Tangerine.UI.Timeline.Components
 			label.Visible = false;
 			editBox.Visible = true;
 			editBox.Text = folder.Id;
+			((WindowWidget)editBox.GetRoot()).Window.Activate();
 			editBox.SetFocus();
 			editBox.Tasks.Add(EditFolderIdTask());
 		}

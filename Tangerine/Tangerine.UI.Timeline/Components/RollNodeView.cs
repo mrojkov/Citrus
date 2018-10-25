@@ -274,6 +274,7 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Visible = true;
 			editBox.Text = nodeData.Node.Id;
 			editBox.SetFocus();
+			((WindowWidget)editBox.GetRoot()).Window.Activate();
 			editBox.Tasks.Add(EditNodeIdTask());
 		}
 

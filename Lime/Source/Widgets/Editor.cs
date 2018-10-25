@@ -516,7 +516,9 @@ namespace Lime
 				}
 				if (FocusableWidget.IsFocused()) {
 					HandleKeys();
-					HandleTextInput();
+					if (Window.Current.Active) {
+						HandleTextInput();
+					}
 				}
 				if (clickGesture.WasRecognized()) {
 					if (!FocusableWidget.IsFocused()) {
