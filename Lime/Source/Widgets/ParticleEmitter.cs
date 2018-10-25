@@ -601,9 +601,6 @@ namespace Lime
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			if (delta == 0.0f) {
-				return;
-			}
 			if (firstUpdate) {
 				firstUpdate = false;
 				const float ModellingStep = 0.04f;

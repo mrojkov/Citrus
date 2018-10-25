@@ -111,6 +111,7 @@ namespace Orange
 		public static Node CreateCloneForSerialization(Node node)
 		{
 			var clone = node.Clone();
+			List<(Node, TangerineFlags)> savedNodesAndTangerineFlags = new List<(Node, TangerineFlags)>();
 			Action<Node> f = (n) => {
 				foreach (var tangerineFlag in ignoredTangerineFlags) {
 					n.SetTangerineFlag(tangerineFlag, false);
@@ -136,12 +137,33 @@ namespace Orange
 				} else if ((n as PointObject)?.SkinningWeights?.IsEmpty() ?? false) {
 					(n as PointObject).SkinningWeights = null;
 				}
+				if (n is ParticleEmitter pe) {
+					pe.ClearParticles();
+				}
+				// Make Sure ParticleModifers' animators are at 0.0f
+				if (n is ParticleModifier pm) {
+					pm.Animators.Apply(0.0);
+				}
+				// saving flags and setting all nodes' flags to shown
+				// to force globally visible on all nodes to ensure advance animation
+				// from Update(0.0f) further will be applied to all nodes
+				savedNodesAndTangerineFlags.Add((n, n.TangerineFlags));
+				n.TangerineFlags &= ~TangerineFlags.Hidden;
+				n.TangerineFlags |= TangerineFlags.Shown;
 			};
 			f(clone);
 			foreach (var n in clone.Descendants) {
 				f(n);
 			}
 			clone.Update(0);
+			foreach (var (n, tangerineFlags) in savedNodesAndTangerineFlags) {
+				n.TangerineFlags = tangerineFlags;
+				// Make Sure ParticleModifers' animators are at 0.0f AGAIN
+				// Since Update(0) could spawn and advance some particle beacuse of ParticleEmitter.TimeShift
+				if (n is ParticleModifier pm) {
+					pm.Animators.Apply(0.0);
+				}
+			}
 			return clone;
 		}
 	}
