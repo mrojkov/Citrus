@@ -11,7 +11,7 @@ namespace Tangerine.UI.Docking
 	{
 		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
-
+		private const float panelMinWidth = 50f;
 		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
 
 		public static DockManager Instance { get; private set; }
@@ -268,7 +268,7 @@ namespace Tangerine.UI.Docking
 			}
 			splitter.DragEnded += () => RefreshDockedSize(placement, splitter);
 			if (requestTitle && !(hasTabBarPlacement && placement.Placements.Count == 1)) {
-				rootWidget = AddTitle(rootWidget, out var closeButton, out var title);
+				rootWidget = WrapWithTitle(rootWidget, out var closeButton, out var title);
 				closeButton.Clicked += () => {
 					placement.HideThisOrDescendantPanels();
 					Refresh();
@@ -280,13 +280,14 @@ namespace Tangerine.UI.Docking
 			container.Nodes.Add(rootWidget);
 		}
 
-		private static Widget AddTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
+		private static Widget WrapWithTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
 		{
 			Widget titleWidget;
 			var result =  new Widget {
 				Id = id,
 				LayoutCell = new LayoutCell(),
 				Layout = new VBoxLayout(),
+				MinWidth = panelMinWidth,
 				Nodes = {
 					(titleWidget = new Widget {
 						Layout = new HBoxLayout(),
@@ -327,7 +328,12 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			if (panel.IsUndockable) {
-				var rootWidget = AddTitle(widget, out var closeButton, out var titleLabel, $"DockPanel<{panel.Id}>");
+				// Wrap widget to clip children.
+				var frame = new Widget {
+					Nodes = { widget }
+				};
+				widget.ExpandToContainerWithAnchors();
+				var rootWidget = WrapWithTitle(frame, out var closeButton, out var titleLabel, $"DockPanel<{panel.Id}>");
 				titleLabel.AddChangeWatcher(() => panel.Title, text => titleLabel.Text = text);
 				closeButton.Clicked += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
@@ -373,7 +379,7 @@ namespace Tangerine.UI.Docking
 				tabbedWidget.ActivateTab(args.NewIndex);
 			};
 			if (requestTitle) {
-				rootWidget = AddTitle(tabbedWidget, out var closeButton, out var titleLabel);
+				rootWidget = WrapWithTitle(tabbedWidget, out var closeButton, out var titleLabel);
 				titleLabel.AddChangeWatcher(
 					() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
 					title => titleLabel.Text = title
@@ -420,8 +426,9 @@ namespace Tangerine.UI.Docking
 				var panelWindow = (WindowWidget)contentWidget.GetRoot();
 				var windowPlacement = Model.GetWindowByPlacement(placement);
 				if (windowPlacement.Root.GetPanelPlacements().Count(p => !p.Hidden) > 1) {
+					var globalSize = placement.CalcGlobalStretch() * panelWindow.Size;
 					var wrapper = new WindowPlacement {
-						Size = placement.CalcGlobalStretch() * panelWindow.Size
+						Size = new Vector2(Mathf.Max(panelMinWidth, globalSize.X), globalSize.Y)
 					};
 					placement.Unlink();
 					windowPlacement.Root.RemoveRedundantNodes();
