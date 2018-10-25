@@ -93,12 +93,14 @@ namespace Tangerine.Core
 			using (var cacheBundle = OpenCacheBundle(AssetBundleFlags.Writable)) {
 				var fbxPath = Path.ChangeExtension(path, "fbx");
 				var fbxExists = base.FileExists(fbxPath);
-				var fbxUpToDate = cacheBundle.FileExists(path) == fbxExists &&
+				var fbxCached = cacheBundle.FileExists(path);
+				var fbxUpToDate = fbxCached == fbxExists &&
 					(!fbxExists || cacheBundle.GetFileLastWriteTime(path) >= base.GetFileLastWriteTime(fbxPath));
 
 				var attachmentPath = Path.ChangeExtension(path, Model3DAttachment.FileExtension);
 				var attachmentExists = base.FileExists(attachmentPath);
-				var attachmentUpToDate = cacheBundle.FileExists(attachmentPath) == attachmentExists &&
+				var attachmentCached = cacheBundle.FileExists(attachmentPath);
+				var attachmentUpToDate = attachmentCached == attachmentExists &&
 					(!attachmentExists || cacheBundle.GetFileLastWriteTime(attachmentPath) >= base.GetFileLastWriteTime(attachmentPath));
 
 				if (fbxUpToDate && attachmentUpToDate) {
@@ -130,13 +132,13 @@ namespace Tangerine.Core
 						}
 					}
 					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
-				} else {
-					cacheBundle.DeleteFile(fbxPath);
+				} else if (fbxCached) {
+					cacheBundle.DeleteFile(path);
 				}
 
 				if (attachmentExists) {
 					cacheBundle.ImportFile(attachmentPath, Stream.Null, 0, ".txt", AssetAttributes.None, new byte[0]);
-				} else {
+				} else if (attachmentCached) {
 					cacheBundle.DeleteFile(attachmentPath);
 				}
 			}
