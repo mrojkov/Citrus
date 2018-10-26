@@ -10,10 +10,10 @@ namespace Lime
 
 	class AnimationWaitPredicate : WaitPredicate
 	{
-		private Node node;
+		private Animation animation;
 
-		public AnimationWaitPredicate(Node node) { this.node = node; }
-		public override bool Evaluate() { return node.DefaultAnimation.IsRunning; }
+		public AnimationWaitPredicate(Animation animation) { this.animation = animation; }
+		public override bool Evaluate() { return animation.IsRunning; }
 	}
 
 	class InputWaitPredicate : WaitPredicate

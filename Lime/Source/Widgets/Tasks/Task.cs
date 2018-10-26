@@ -113,9 +113,11 @@ namespace Lime
 				callStack = new StackEntry { Enumerator = (IEnumerator<object>)result, Caller = callStack };
 				Advance(0);
 			} else if (result is WaitPredicate) {
-				waitPredicate = (WaitPredicate) result;
-			} else if (result is Node) {
-				waitPredicate = WaitForAnimation((Node) result);
+				waitPredicate = (WaitPredicate)result;
+			} else if (result is Node3D node3D) {
+				waitPredicate = node3D.FirstAnimation != null ? WaitForAnimation(node3D.FirstAnimation) : null;
+			} else if (result is Node node) {
+				waitPredicate = WaitForAnimation(node.DefaultAnimation);
 			} else if (result is IEnumerable<object>) {
 				throw new InvalidOperationException("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
 			} else {
@@ -143,9 +145,9 @@ namespace Lime
 		/// <summary>
 		/// Proceeds while specified node is running animation.
 		/// </summary>
-		public static WaitPredicate WaitForAnimation(Node node)
+		public static WaitPredicate WaitForAnimation(Animation animation)
 		{
-			return new AnimationWaitPredicate(node);
+			return new AnimationWaitPredicate(animation);
 		}
 
 		/// <summary>
