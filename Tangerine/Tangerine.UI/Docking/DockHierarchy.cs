@@ -613,10 +613,15 @@ namespace Tangerine.UI.Docking
 		public override void RemovePlacement(Placement placement)
 		{
 			if (Placements.Contains(placement)) {
-				int index = Placements.IndexOf(placement);
+				var index = Placements.IndexOf(placement);
+				var old = Stretches[index];
+				if (index - 1 >= 0) {
+					Stretches[index - 1] += old;
+				} else if (index + 1 <= Stretches.Count - 1) {
+					Stretches[index + 1] += old;
+				}
 				Placements.RemoveAt(index);
 				Stretches.RemoveAt(index);
-				NormalizeStretches();
 			} else {
 				foreach (var p in Placements) {
 					p.RemovePlacement(placement);
@@ -689,17 +694,6 @@ namespace Tangerine.UI.Docking
 				var placement = Placements[0];
 				placement.Unlink();
 				Parent.Replace(this, placement);
-			}
-		}
-
-		public void NormalizeStretches()
-		{
-			if (Stretches.Count == 0) {
-				return;
-			}
-			float total = Stretches.Aggregate((v1, v2) => v1 + v2);
-			for (int i = 0; i < Stretches.Count; ++i) {
-				Stretches[i] /= total;
 			}
 		}
 	}
