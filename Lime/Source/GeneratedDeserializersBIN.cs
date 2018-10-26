@@ -3396,7 +3396,9 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Color4));
-			result.Value.ABGR = d.Reader.ReadUInt32();
+			var tmp1 = new global::Lime.Color4();
+			tmp1.ABGR = d.Reader.ReadUInt32();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Color4(BinaryDeserializer d, ReaderClassDef def)
@@ -3489,22 +3491,24 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Matrix44));
-			result.Value.M11 = d.Reader.ReadSingle();
-			result.Value.M12 = d.Reader.ReadSingle();
-			result.Value.M13 = d.Reader.ReadSingle();
-			result.Value.M14 = d.Reader.ReadSingle();
-			result.Value.M21 = d.Reader.ReadSingle();
-			result.Value.M22 = d.Reader.ReadSingle();
-			result.Value.M23 = d.Reader.ReadSingle();
-			result.Value.M24 = d.Reader.ReadSingle();
-			result.Value.M31 = d.Reader.ReadSingle();
-			result.Value.M32 = d.Reader.ReadSingle();
-			result.Value.M33 = d.Reader.ReadSingle();
-			result.Value.M34 = d.Reader.ReadSingle();
-			result.Value.M41 = d.Reader.ReadSingle();
-			result.Value.M42 = d.Reader.ReadSingle();
-			result.Value.M43 = d.Reader.ReadSingle();
-			result.Value.M44 = d.Reader.ReadSingle();
+			var tmp1 = new global::Lime.Matrix44();
+			tmp1.M11 = d.Reader.ReadSingle();
+			tmp1.M12 = d.Reader.ReadSingle();
+			tmp1.M13 = d.Reader.ReadSingle();
+			tmp1.M14 = d.Reader.ReadSingle();
+			tmp1.M21 = d.Reader.ReadSingle();
+			tmp1.M22 = d.Reader.ReadSingle();
+			tmp1.M23 = d.Reader.ReadSingle();
+			tmp1.M24 = d.Reader.ReadSingle();
+			tmp1.M31 = d.Reader.ReadSingle();
+			tmp1.M32 = d.Reader.ReadSingle();
+			tmp1.M33 = d.Reader.ReadSingle();
+			tmp1.M34 = d.Reader.ReadSingle();
+			tmp1.M41 = d.Reader.ReadSingle();
+			tmp1.M42 = d.Reader.ReadSingle();
+			tmp1.M43 = d.Reader.ReadSingle();
+			tmp1.M44 = d.Reader.ReadSingle();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Matrix44(BinaryDeserializer d, ReaderClassDef def)
@@ -3615,7 +3619,7 @@ namespace GeneratedDeserializersBIN
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
-			dg.ReadIntoStruct(ref result.Value);
+			result.Value = (global::Lime.NumericRange)dg.ReadStruct<global::Lime.NumericRange>();
 		}
 
 		private static object Make_Lime__Keyframe_NumericRange(BinaryDeserializer d, ReaderClassDef def)
@@ -3647,10 +3651,12 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Quaternion));
-			result.Value.X = d.Reader.ReadSingle();
-			result.Value.Y = d.Reader.ReadSingle();
-			result.Value.Z = d.Reader.ReadSingle();
-			result.Value.W = d.Reader.ReadSingle();
+			var tmp1 = new global::Lime.Quaternion();
+			tmp1.X = d.Reader.ReadSingle();
+			tmp1.Y = d.Reader.ReadSingle();
+			tmp1.Z = d.Reader.ReadSingle();
+			tmp1.W = d.Reader.ReadSingle();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Quaternion(BinaryDeserializer d, ReaderClassDef def)
@@ -3744,10 +3750,12 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Thickness));
-			result.Value.Left = d.Reader.ReadSingle();
-			result.Value.Right = d.Reader.ReadSingle();
-			result.Value.Top = d.Reader.ReadSingle();
-			result.Value.Bottom = d.Reader.ReadSingle();
+			var tmp1 = new global::Lime.Thickness();
+			tmp1.Left = d.Reader.ReadSingle();
+			tmp1.Right = d.Reader.ReadSingle();
+			tmp1.Top = d.Reader.ReadSingle();
+			tmp1.Bottom = d.Reader.ReadSingle();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Thickness(BinaryDeserializer d, ReaderClassDef def)
@@ -3779,8 +3787,10 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector2));
-			result.Value.X = d.Reader.ReadSingle();
-			result.Value.Y = d.Reader.ReadSingle();
+			var tmp1 = new global::Lime.Vector2();
+			tmp1.X = d.Reader.ReadSingle();
+			tmp1.Y = d.Reader.ReadSingle();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Vector2(BinaryDeserializer d, ReaderClassDef def)
@@ -3797,9 +3807,11 @@ namespace GeneratedDeserializersBIN
 			result.Frame = d.Reader.ReadInt32();
 			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector3));
-			result.Value.X = d.Reader.ReadSingle();
-			result.Value.Y = d.Reader.ReadSingle();
-			result.Value.Z = d.Reader.ReadSingle();
+			var tmp1 = new global::Lime.Vector3();
+			tmp1.X = d.Reader.ReadSingle();
+			tmp1.Y = d.Reader.ReadSingle();
+			tmp1.Z = d.Reader.ReadSingle();
+			result.Value = tmp1;
 		}
 
 		private static object Make_Lime__Keyframe_Vector3(BinaryDeserializer d, ReaderClassDef def)

@@ -47,7 +47,7 @@ namespace Lime
 
 		[YuzuMember]
 		// Field, not property makes deserialization faster.
-		public T Value;
+		public T Value { get; set; }
 
 		object IKeyframe.Value
 		{
