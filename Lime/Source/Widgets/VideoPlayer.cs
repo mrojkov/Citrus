@@ -22,6 +22,14 @@ namespace Lime
 
 		public VideoPlayerStatus Status => decoder.Status;
 
+		public float CurrentPosition
+		{
+			get => decoder.CurrentPosition;
+			set => decoder.CurrentPosition = value;
+		}
+
+		public float Duration => decoder.Duration;
+
 		public VideoPlayer()
 		{
 			Anchors = Anchors.LeftRight | Anchors.TopBottom;
@@ -60,11 +68,6 @@ namespace Lime
 		public void Stop()
 		{
 			decoder?.Stop();
-		}
-
-		public void SeekTo(float time)
-		{
-			decoder.SeekTo(time);
 		}
 
 		public override void Dispose()

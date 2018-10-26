@@ -17,13 +17,19 @@ namespace Lime
 	public class VideoDecoder : IDisposable
 	{
 		public bool Looped;
-		public double Duration { get; private set; }
+		public float Duration { get; private set; }
 		public int Width { get; private set; }
 		public int Height { get; private set; }
 		public bool HasNewTexture { get; private set; }
 		public ITexture Texture { get => texture; }
 		public Action OnStart;
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+
+		public float CurrentPosition
+		{
+			get => (float)currentPosition;
+			set => SeekTo(value);
+		}
 
 		private Texture2D texture;
 
@@ -76,7 +82,7 @@ namespace Lime
 			var size = videoTracks[0].NaturalSize;
 			Width = (int)size.Width;
 			Height = (int)size.Height;
-			Duration = asset.Duration.Seconds;
+			Duration = (float)asset.Duration.Seconds;
 			stopwatch.Reset();
 			checkVideoEvent = new ManualResetEvent(false);
 			//prepare audio
@@ -133,7 +139,7 @@ namespace Lime
 			Debug.Write("Video player loop ended!");
 		}
 
-		public void SeekTo(float time)
+		private void SeekTo(float time)
 		{
 			startTime = time;
 			player.Seek(CMTime.FromSeconds(startTime, 1000));

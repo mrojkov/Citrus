@@ -105,6 +105,8 @@ namespace Lime
 		public ITexture Texture => texture;
 		public Action OnStart;
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+		public float CurrentPosition { get; set; }
+		public float Duration { get; }
 
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;
@@ -302,11 +304,6 @@ namespace Lime
 					state = State.Finished;
 				}
 			} while (Looped && !token.IsCancellationRequested);
-		}
-
-		public void SeekTo(float time)
-		{
-
 		}
 
 		public void Stop()
