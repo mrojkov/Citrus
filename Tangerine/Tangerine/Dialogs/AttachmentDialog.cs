@@ -87,6 +87,10 @@ namespace Tangerine
 					}
 				}
 			};
+			window.Closed += () => {
+				history = null;
+				UserPreferences.Instance.Load();
+			};
 			cancelButton.Clicked += () => {
 				window.Close();
 				history = null;
