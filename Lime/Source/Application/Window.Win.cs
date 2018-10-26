@@ -407,12 +407,15 @@ namespace Lime
 
 		public void ShowModal()
 		{
-			RaiseVisibleChanging(true, true);
-			form.ShowDialog();
-			RaiseVisibleChanging(false, true);
+			using (Context.Activate().Scoped()) {
+				RaiseVisibleChanging(true, true);
+				form.ShowDialog();
+				RaiseVisibleChanging(false, true);
+			};
 		}
 
-		public void Activate() {
+		public void Activate()
+		{
 			form.Activate();
 		}
 
@@ -543,14 +546,16 @@ namespace Lime
 		private void OnMouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left) {
-				Input.SetKeyState(Key.Mouse0, true);
-				Input.SetKeyState(Key.Touch0, true);
-				if (e.Clicks == 2) {
+				if (e.Clicks == 1) {
+					Input.SetKeyState(Key.Mouse0, true);
+					Input.SetKeyState(Key.Touch0, true);
+				} else if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse0DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Right) {
-				Input.SetKeyState(Key.Mouse1, true);
-				if (e.Clicks == 2) {
+				if (e.Clicks == 1) {
+					Input.SetKeyState(Key.Mouse1, true);
+				} else if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse1DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Middle) {
