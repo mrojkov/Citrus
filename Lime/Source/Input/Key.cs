@@ -21,6 +21,8 @@ namespace Lime
 
 		public bool IsMouseKey() => this >= Mouse0 && this <= Touch3;
 
+		public bool IsDoubleClickKey() => this == Mouse0DoubleClick || this == Mouse1DoubleClick;
+
 		public bool IsModifier() => this >= Shift && this <= Win;
 
 		public bool IsAlphanumeric() => IsLetter() || IsDigit();

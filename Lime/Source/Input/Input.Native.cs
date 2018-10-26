@@ -295,7 +295,7 @@ namespace Lime
 		internal void ClearKeyState(bool clearMouseButtons = true)
 		{
 			for (int k = 0; k < Key.Count; k++) {
-				if (!clearMouseButtons && ((Key)k).IsMouseKey()) {
+				if (!clearMouseButtons && ((Key)k).IsMouseKey() && !((Key)k).IsDoubleClickKey()) {
 					continue;
 				}
 				keys[k].CurrentState = false;

@@ -14,7 +14,7 @@ namespace Lime
 	{
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
-		
+
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
