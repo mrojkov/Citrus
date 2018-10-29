@@ -10,7 +10,7 @@ namespace Lime
 	/// </summary>
 	public class WidgetContext : Context
 	{
-		public static readonly List<Key> NodeCaptureKeys = new List<Key> { Key.Mouse0, Key.Mouse1, Key.Mouse2 };
+		public static readonly List<Key> NodeCaptureKeys = new List<Key> { Key.Mouse0, Key.Mouse1, Key.Mouse2, Key.Mouse0DoubleClick, Key.Mouse1DoubleClick };
 		/// <summary>
 		/// Gets the current global context. The context is set on every window's callback.
 		/// </summary>
