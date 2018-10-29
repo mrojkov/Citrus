@@ -251,6 +251,8 @@ namespace Lime
 		private Vector2 windowedClientSize;
 		private float titleBarHeight;
 		private bool shouldFixFullscreen;
+		private bool needUpdateGLContext = true;
+		private Vector2? positionBeforeResize;
 
 		public IDisplay Display
 		{
@@ -298,7 +300,7 @@ namespace Lime
 			window.WindowShouldClose += OnShouldClose;
 			window.WillClose += OnWillClose;
 			window.DidResize += (s, e) => {
-				View.UpdateGLContext();
+				needUpdateGLContext = true;
 				HandleResize(s, e);
 			};
 			window.WillEnterFullScreen += (sender, e) => {
@@ -323,6 +325,8 @@ namespace Lime
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
+			NSNotificationCenter.DefaultCenter.AddObserver(NSWindow.WillStartLiveResizeNotification, OnWillStartLiveResize);
+			NSNotificationCenter.DefaultCenter.AddObserver(NSWindow.DidEndLiveResizeNotification, OnDidEndLiveResize);
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			View.Update += Update;
@@ -336,6 +340,20 @@ namespace Lime
 					Application.WindowUnderMouse = null;
 				}
 			};
+		}
+
+		private void OnWillStartLiveResize(NSNotification notification)
+		{
+			if (notification.Object == window) {
+				positionBeforeResize = new Vector2((float)window.Frame.X, (float)window.Frame.Y);
+			}
+		}
+
+		private void OnDidEndLiveResize(NSNotification notification)
+		{
+			if (notification.Object == window) {
+				positionBeforeResize = null;
+			}
 		}
 
 		private bool OnShouldClose(NSObject sender)
@@ -440,6 +458,11 @@ namespace Lime
 		{
 			if (invalidated) {
 				fpsCounter.Refresh();
+				// Workaround macOS 10.14 issue: UpdateGLContext should be called on render frame, not on DidResize.
+				if (needUpdateGLContext) {
+					needUpdateGLContext = false;
+					View.UpdateGLContext();
+				}
 				View.MakeCurrent();
 				RaiseRendering();
 				View.SwapBuffers();
@@ -450,6 +473,13 @@ namespace Lime
 		private void HandleResize(object sender, EventArgs e)
 		{
 			RaiseResized(deviceRotated: false);
+			var isZoomed = window.IsZoomed;
+			if (positionBeforeResize.HasValue &&
+				(positionBeforeResize.Value.X != (float)window.Frame.X ||
+				positionBeforeResize.Value.Y != (float)window.Frame.Y)
+			) {
+				RaiseMoved();
+			}
 			Invalidate();
 		}
 

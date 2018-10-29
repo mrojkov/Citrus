@@ -14,7 +14,6 @@ namespace Tangerine
 		public override void Execute()
 		{
 			DockManager.Instance.ImportState(TangerineApp.Instance.DockManagerInitialState.Clone(), resizeMainWindow: false);
-			DockManager.Instance.ResolveAndRefresh();
 		}
 	}
 
@@ -61,7 +60,6 @@ namespace Tangerine
 							new DockManager.State(), fs
 						) as DockManager.State;
 						DockManager.Instance.ImportState(state);
-						DockManager.Instance.ResolveAndRefresh();
 					}
 				}
 				catch (System.Exception e) {

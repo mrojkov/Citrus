@@ -17,28 +17,10 @@ namespace Tangerine.UI.Docking
 		Fill
 	}
 
-	public enum DockSeparator
+	public enum LinearPlacementDirection
 	{
-		None,
 		Vertical,
 		Horizontal
-	}
-
-	public static class DockSiteExtensions
-	{
-		public static DockSeparator GetSeparator(this DockSite site)
-		{
-			switch (site) {
-				case DockSite.Bottom:
-				case DockSite.Top:
-					return DockSeparator.Horizontal;
-				case DockSite.Left:
-				case DockSite.Right:
-					return DockSeparator.Vertical;
-				default:
-					return DockSeparator.None;
-			}
-		}
 	}
 
 	public class DockHierarchy
@@ -70,53 +52,135 @@ namespace Tangerine.UI.Docking
 			return placement;
 		}
 
-		public PanelPlacement AppendPanelToPlacement(Panel panel, SplitPlacement target)
+		public PanelPlacement AppendPanelToPlacement(Panel panel, LinearPlacement target, float stretch)
 		{
 			var placement = new PanelPlacement { Id = panel.Id, Title = panel.Title };
-			if (target.FirstChild == null) {
-				target.FirstChild = placement;
-			} else if (target.SecondChild == null) {
-				target.SecondChild = placement;
-			} else {
-				throw new System.Exception("Unable to append placement to another one; There is no space");
-			}
+			target.Placements.Add(placement);
+			target.Stretches.Add(stretch);
 			Panels.Add(panel);
 			return placement;
 		}
 
-		private void DockPlacementTo(TabBarPlacement placement, TabBarPlacement target)
+		private static void DockPlacementTo(TabBarPlacement placement, TabBarPlacement target)
 		{
 			var placements = placement.Placements.ToList();
+			placements.Reverse();
 			foreach (var panelPlacement in placements) {
 				panelPlacement.Unlink();
-				target.Placements.Add(panelPlacement);
+				target.Placements.Insert(0, panelPlacement);
 			}
 		}
 
-		private void DockPlacementTo(TabBarPlacement placement, PanelPlacement target)
+		private static void DockPlacementTo(TabBarPlacement placement, PanelPlacement target)
 		{
 			var parent = target.Parent;
 			if (parent is TabBarPlacement tabBarPlacement) {
 				DockPlacementTo(placement, tabBarPlacement);
 				return;
 			}
-			if (parent is SplitPlacement splitPlacement) {
-				target.Unlink();
-				placement.Placements.Add(target);
-				splitPlacement.Append(placement);
+			if (parent is LinearPlacement linearPlacement) {
+				int index = linearPlacement.Placements.IndexOf(target);
+				target.Parent = null;
+				placement.Placements.Insert(0, target);
+				linearPlacement.Placements[index] = placement;
 			}
 		}
 
-		private void DockPlacementTo(PanelPlacement placement, PanelPlacement target)
+		private static void DockPlacementTo(PanelPlacement placement, PanelPlacement target)
 		{
 			if (!(target.Parent is TabBarPlacement tabBarPlacement)) {
 				tabBarPlacement = new TabBarPlacement();
-				var parent = (SplitPlacement)target.Parent;
-				target.Unlink();
+				var parent = (LinearPlacement)target.Parent;
+				target.Parent = null;
+				int index = parent.Placements.IndexOf(target);
 				tabBarPlacement.Placements.Add(target);
-				parent.Append(tabBarPlacement);
+				parent.Placements[index] = tabBarPlacement;
 			}
-			tabBarPlacement.Placements.Add(placement);
+			tabBarPlacement.Placements.Insert(0, placement);
+		}
+
+		private void DockPlacementTo(LinearPlacement placement, PanelPlacement target)
+		{
+			var parent = target.Parent;
+			if (parent is TabBarPlacement tabBarPlacement) {
+				DockPlacementTo(placement, tabBarPlacement);
+			}
+			if (parent is LinearPlacement targetLinearPlacement) {
+				DockPlacementTo(placement, targetLinearPlacement);
+			}
+		}
+
+		private void DockPlacementTo(LinearPlacement placement, TabBarPlacement target)
+		{
+			var placements = placement.Placements.ToList();
+			foreach (var p in placements) {
+				DockPlacementTo(p, target, DockSite.Fill, 0);
+			}
+		}
+
+		private static void DockPlacementTo(LinearPlacement placement, LinearPlacement target, int index = 0, float stretch = 0)
+		{
+			if (placement.Direction == target.Direction) {
+				var placements = placement.Placements.ToList();
+				var stretches = placement.Stretches;
+				for (int i = placements.Count - 1; i >= 0; --i) {
+					target.Placements.Insert(index, placements[i]);
+					target.Stretches.Insert(index, stretches[i] * stretch);
+				}
+				return;
+			}
+			if (placement.Placements.Count == 1) {
+				var p = placement.Placements[0];
+				p.Unlink();
+				target.Stretches.Insert(index, stretch);
+				target.Placements.Insert(index, p);
+				return;
+			}
+			target.Placements.Insert(index, placement);
+			target.Stretches.Insert(index, stretch);
+		}
+
+		private static bool CheckPlacement(LinearPlacement placement, DockSite site, out LinearPlacement newPlacement)
+		{
+			newPlacement = placement;
+			if (site == DockSite.Left || site == DockSite.Right) {
+				if (placement.Direction == LinearPlacementDirection.Horizontal) {
+					return true;
+				}
+				newPlacement = new LinearPlacement(LinearPlacementDirection.Horizontal);
+				return false;
+			}
+			if (placement.Direction == LinearPlacementDirection.Vertical) {
+				return true;
+			}
+			newPlacement = new LinearPlacement(LinearPlacementDirection.Vertical);
+			return false;
+		}
+
+		private static float AdjustStretch(LinearPlacement linearPlacement, float stretch, int index)
+		{
+			if (stretch >= 0) {
+				return stretch;
+			}
+			var currentStretch = linearPlacement.Stretches[index];
+			linearPlacement.Stretches[index] *= 0.75f;
+			return currentStretch * 0.25f;
+		}
+
+		private static void ReplacePlacement(Placement old, LinearPlacement @new, DockSite site, ref float stretch, ref int index)
+		{
+			var placement = old;
+			index = site == DockSite.Bottom || site == DockSite.Right ? 1 : 0;
+			stretch = stretch < 0 ? 0.25f : stretch;
+			if (old.Parent != null) {
+				var parentLinearPlacement = (LinearPlacement)old.Parent;
+				parentLinearPlacement.Replace(old, @new);
+			} else {
+				placement = ((LinearPlacement)old).Placements[0];
+				old.Replace(placement, @new);
+			}
+			@new.Placements.Add(placement);
+			@new.Stretches.Add(1 - stretch);
 		}
 
 		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
@@ -124,50 +188,82 @@ namespace Tangerine.UI.Docking
 			if (site == DockSite.Fill) {
 				target.SwitchType(
 					targetPanelPlacement => {
-						if (placement is TabBarPlacement tabBarPlacement) {
-							DockPlacementTo(tabBarPlacement, targetPanelPlacement);
-						}
-						if (placement is PanelPlacement panelPlacement) {
-							DockPlacementTo(panelPlacement, targetPanelPlacement);
+						switch (placement) {
+							case TabBarPlacement tabBarPlacement:
+								DockPlacementTo(tabBarPlacement, targetPanelPlacement);
+								break;
+							case PanelPlacement panelPlacement:
+								DockPlacementTo(panelPlacement, targetPanelPlacement);
+								break;
+							case LinearPlacement linearPlacement:
+								DockPlacementTo(linearPlacement, targetPanelPlacement);
+								break;
 						}
 					},
 					targetTabBarPlacement => {
-						if (placement is TabBarPlacement tabBarPlacement) {
-							DockPlacementTo(tabBarPlacement, targetTabBarPlacement);
-						}
-						if (placement is PanelPlacement panelPlacement) {
-							targetTabBarPlacement.Placements.Add(panelPlacement);
+						switch (placement) {
+							case TabBarPlacement tabBarPlacement:
+								DockPlacementTo(tabBarPlacement, targetTabBarPlacement);
+								break;
+							case PanelPlacement panelPlacement:
+								targetTabBarPlacement.Placements.Insert(0, panelPlacement);
+								break;
+							case LinearPlacement linearPlacement:
+								DockPlacementTo(linearPlacement, targetTabBarPlacement);
+								break;
 						}
 					},
-					targetSplitPlacement => targetSplitPlacement.Append(placement)
+					targetLinearPlacement => {
+						switch (placement) {
+							case LinearPlacement linearPlacement:
+								DockPlacementTo(linearPlacement, targetLinearPlacement);
+								break;
+							case TabBarPlacement _:
+							case PanelPlacement _:
+								targetLinearPlacement.Placements.Add(placement);
+								targetLinearPlacement.Stretches.Add(
+									AdjustStretch(targetLinearPlacement, stretch, targetLinearPlacement.Placements.Count - 1));
+								break;
+						}
+					}
 				);
 				return;
 			}
-			if (target.Parent is TabBarPlacement) {
-				target = target.Parent;
-			}
-			var parent = (SplitPlacement)target.Parent;
-			var splitPlacement = new SplitPlacement();
-			var isFirst = site == DockSite.Left || site == DockSite.Top;
-			var wasFirst = parent.FirstChild == target;
-			target.Unlink();
-			if (isFirst) {
-				splitPlacement.Initialize(placement, target, site.GetSeparator(), stretch);
+			int index = 0;
+			if (!(target is LinearPlacement parent)) {
+				if (target.Parent is TabBarPlacement parentTabBarPlacement) {
+					target = parentTabBarPlacement;
+				}
+				if (!CheckPlacement((LinearPlacement)target.Parent, site, out parent)) {
+					ReplacePlacement(target, parent, site, ref stretch, ref index);
+				} else {
+					index = parent.Placements.IndexOf(target);
+					stretch = AdjustStretch(parent, stretch, index);
+					if (site == DockSite.Right || site == DockSite.Bottom) {
+						++index;
+					}
+				}
 			} else {
-				splitPlacement.Initialize(target, placement, site.GetSeparator(), 1 - stretch);
+				if (!CheckPlacement(parent, site, out var newPlacement)) {
+					ReplacePlacement(parent, newPlacement, site, ref stretch, ref index);
+				} else {
+					if (site == DockSite.Right || site == DockSite.Bottom) {
+						index = parent.Placements.Count;
+					}
+					stretch = AdjustStretch(parent, stretch, index);
+				}
 			}
-			if (wasFirst) {
-				parent.FirstChild = splitPlacement;
+			if (placement is LinearPlacement lPlacement) {
+				DockPlacementTo(lPlacement, parent, index, stretch);
 			} else {
-				parent.SecondChild = splitPlacement;
+				parent.Placements.Insert(index, placement);
+				parent.Stretches.Insert(index, stretch);
 			}
 		}
 
-		public bool IsPanelSingleInWindow(string id) => FindPanelPlacement(id).Root.GetDescendantPanels().Count() == 1;
-
 		public void AddWindow(WindowPlacement placement) => WindowPlacements.Add(placement);
 
-		public void HideWindowPanels(WindowPlacement windowPlacement)
+		public static void HideWindowPanels(WindowPlacement windowPlacement)
 		{
 			windowPlacement.Root.HideThisOrDescendantPanels();
 			windowPlacement.WindowWidget = null;
@@ -189,24 +285,21 @@ namespace Tangerine.UI.Docking
 		public WindowPlacement GetWindowByPlacement(Placement target)
 		{
 			foreach (var p in WindowPlacements) {
-				if (target.IsDescendantOf(p.Root)) {
+				if (target.IsDescendantOf(p.Root) || target == p) {
 					return p;
 				}
 			}
 			return null;
 		}
-
-		public WindowPlacement GetWindowByPlacement(string id) => GetWindowByPlacement(FindPanelPlacement(id));
 	}
 
 	public abstract class Placement
 	{
-
 		public Placement Parent { get; set; }
 
 		public Placement Root => Parent?.Root ?? this;
 
-		public abstract IEnumerable<PanelPlacement> GetDescendantPanels();
+		public abstract IEnumerable<PanelPlacement> GetPanelPlacements();
 
 		public abstract void RemovePlacement(Placement placement);
 
@@ -220,20 +313,28 @@ namespace Tangerine.UI.Docking
 
 		public virtual void RemoveRedundantNodes() { }
 
-		public virtual Vector2 CalcGlobalSize()
+		public virtual void Replace(Placement old, Placement @new) { }
+
+		public Vector2 CalcGlobalStretch()
 		{
 			var result = Vector2.One;
 			if (Parent == null) {
 				return result;
 			}
-			Parent.SwitchType(onSplitPlacememnt: splitPlacement => {
-				var stretch = ((SplitPlacement)Parent).Stretch;
-				if (splitPlacement.FirstChild != this) {
-					stretch = 1f - stretch;
+			Parent.SwitchType(onLinearPlacement: linearPlacement => {
+				var overalStretchOfVisiblePanels = 0f;
+				for (var i = 0; i < linearPlacement.Placements.Count; i++) {
+					if (linearPlacement.Placements[i].AnyVisiblePanel()) {
+						overalStretchOfVisiblePanels += linearPlacement.Stretches[i];
+					}
 				}
-				result = splitPlacement.Separator == DockSeparator.Horizontal ? new Vector2(1, stretch) : new Vector2(stretch, 1);
+				var stretch = linearPlacement.Stretches[linearPlacement.Placements.IndexOf(this)];
+				result =
+					linearPlacement.Direction == LinearPlacementDirection.Vertical
+					? new Vector2(1, stretch / overalStretchOfVisiblePanels)
+					: new Vector2(stretch / overalStretchOfVisiblePanels, 1);
 			});
-			return Parent.CalcGlobalSize() * result;
+			return Parent.CalcGlobalStretch() * result;
 		}
 
 		public void Unlink()
@@ -256,59 +357,75 @@ namespace Tangerine.UI.Docking
 		public void SwitchType(
 			Action<PanelPlacement> onPanelPlacement = null,
 			Action<TabBarPlacement> onTabBarPlacement = null,
-			Action<SplitPlacement> onSplitPlacememnt = null)
-		{
-			if (this is PanelPlacement) {
-				onPanelPlacement?.Invoke(this as PanelPlacement);
-			} else if (this is SplitPlacement) {
-				onSplitPlacememnt?.Invoke(this as SplitPlacement);
-			} else if (this is TabBarPlacement) {
-				onTabBarPlacement?.Invoke(this as TabBarPlacement);
+			Action<LinearPlacement> onLinearPlacement = null
+		) {
+			switch (this)
+			{
+				case PanelPlacement panelPlacement:
+					onPanelPlacement?.Invoke(panelPlacement);
+					break;
+				case LinearPlacement linearPlacement:
+					onLinearPlacement?.Invoke(linearPlacement);
+					break;
+				case TabBarPlacement tabBarPlacement:
+					onTabBarPlacement?.Invoke(tabBarPlacement);
+					break;
 			}
 		}
+
+		public IEnumerable<PanelPlacement> GetVisiblePanelPlacements() =>
+			GetPanelPlacements().Where(panelPlacement => !panelPlacement.Hidden);
 	}
 
-	public class WindowPlacement : SplitPlacement
+	public class WindowPlacement : LinearPlacement
 	{
-		[YuzuMember]
+		[YuzuOptional]
 		public Vector2 Position;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public Vector2 Size;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public WindowState State;
 
 		public WindowWidget WindowWidget;
 
 		public override Placement Clone()
 		{
-			return new WindowPlacement {
+			var result = new WindowPlacement {
 				Position = Position,
 				Size = Size,
 				State = State,
-				FirstChild = FirstChild?.Clone(),
-				SecondChild = SecondChild?.Clone(),
 			};
+			for (int i = 0; i < Placements.Count; ++i) {
+				result.Placements.Add(Placements[i].Clone());
+				result.Stretches.Add(Stretches[i]);
+			}
+			return result;
 		}
+
+		public WindowPlacement() : base(LinearPlacementDirection.Vertical) { }
 	}
 
 	public class PanelPlacement : Placement
 	{
-		[YuzuMember]
+		[YuzuOptional]
 		public string Title;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public string Id;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public bool Hidden;
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels() => new PanelPlacement[] { };
+		public override IEnumerable<PanelPlacement> GetPanelPlacements()
+		{
+			yield return this;
+		}
 
 		public override void RemovePlacement(Placement placement) { }
 
-		public override PanelPlacement FindPanelPlacement(string id) => id == Title ? this : null;
+		public override PanelPlacement FindPanelPlacement(string id) => id == Id ? this : null;
 
 		public override bool AnyVisiblePanel() => !Hidden;
 
@@ -322,91 +439,79 @@ namespace Tangerine.UI.Docking
 		}
 	}
 
-	public class PanelPlacementList : IList<PanelPlacement>
+	public class PlacementList<TPlacement> : IList<TPlacement> where TPlacement : Placement
 	{
-		private readonly TabBarPlacement owner;
-		private readonly List<PanelPlacement> list;
+		private readonly Placement owner;
+		private readonly List<TPlacement> placements = new List<TPlacement>();
 
-		public int Count => list.Count;
-
-		public bool IsReadOnly => false;
-
-		public PanelPlacement this[int index]
+		public PlacementList(Placement owner)
 		{
-			get
-			{
-				return list[index];
-			}
-
-			set
-			{
-				list[index] = value;
-			}
-		}
-
-		public PanelPlacementList(TabBarPlacement owner)
-		{
-			list = new List<PanelPlacement>();
 			this.owner = owner;
 		}
 
-		public int IndexOf(PanelPlacement item) => list.IndexOf(item);
+		public IEnumerator<TPlacement> GetEnumerator() => placements.GetEnumerator();
 
-		public void RemoveAt(int index)
-		{
-			list[index].Unlink();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		public void Add(PanelPlacement item)
+		public void Add(TPlacement item)
 		{
 			CheckBeforeInsertion(item);
-			list.Add(item);
-			item.Parent = owner;
+			placements.Add(item);
+			if (item != null) {
+				item.Parent = owner;
+			}
 		}
 
 		public void Clear()
 		{
-			list.ForEach(p => p.Unlink());
-			list.Clear();
-		}
-
-		public bool Contains(PanelPlacement item) => list.Contains(item);
-
-		public void CopyTo(PanelPlacement[] array, int arrayIndex)
-		{
-			list.Select(p => p.Clone()).ToList().CopyTo(array, arrayIndex);
-		}
-
-		public bool Remove(PanelPlacement item)
-		{
-			if (list.Remove(item)) {
-				item.Parent = null;
-				return true;
+			foreach (var placement in placements) {
+				placement.Parent = null;
 			}
-			return false;
+			placements.Clear();
 		}
 
-		public IEnumerator<PanelPlacement> GetEnumerator() => list.GetEnumerator();
+		public bool Contains(TPlacement item) => placements.Contains(item);
 
-		IEnumerator IEnumerable.GetEnumerator() => list.GetEnumerator();
+		public void CopyTo(TPlacement[] array, int arrayIndex) =>
+			placements.Select(p => p.Clone()).ToList().CopyTo(array, arrayIndex);
 
-		public void Insert(int index, PanelPlacement item)
+		public bool Remove(TPlacement item)
+		{
+			if (!placements.Remove(item)) {
+				return false;
+			}
+			item.Parent = null;
+			return true;
+		}
+
+		public int Count => placements.Count;
+		public bool IsReadOnly => false;
+		public int IndexOf(TPlacement item) => placements.IndexOf(item);
+
+		public void Insert(int index, TPlacement item)
 		{
 			CheckBeforeInsertion(item);
-			list.Insert(index, item);
 			item.Parent = owner;
+			placements.Insert(index, item);
 		}
 
-		public void Clone(TabBarPlacement newOwner)
+		public void RemoveAt(int index)
 		{
-			if (Count > 0) {
-				foreach (var placement in this) {
-					newOwner.Placements.Add((PanelPlacement)placement.Clone());
-				}
+			placements[index].Parent = null;
+			placements.RemoveAt(index);
+		}
+
+		public TPlacement this[int index]
+		{
+			get => placements[index];
+			set {
+				CheckBeforeInsertion(value);
+				value.Parent = owner;
+				placements[index] = value;
 			}
 		}
 
-		private void CheckBeforeInsertion(Placement placement)
+		private static void CheckBeforeInsertion(TPlacement placement)
 		{
 			if (placement?.Parent != null) {
 				throw new System.Exception("Can't adopt a placement twice. Call placement.Unlink() first");
@@ -416,15 +521,15 @@ namespace Tangerine.UI.Docking
 
 	public class TabBarPlacement : Placement
 	{
-		[YuzuMember]
-		public PanelPlacementList Placements { get; private set; }
+		[YuzuOptional]
+		public PlacementList<PanelPlacement> Placements { get; }
 
 		public TabBarPlacement()
 		{
-			Placements = new PanelPlacementList(this);
+			Placements = new PlacementList<PanelPlacement>(this);
 		}
 
-		public override IEnumerable<PanelPlacement> GetDescendantPanels() => Placements;
+		public override IEnumerable<PanelPlacement> GetPanelPlacements() => Placements;
 
 		public override PanelPlacement FindPanelPlacement(string id) => Placements.FirstOrDefault(p => p.Id == id);
 
@@ -437,8 +542,8 @@ namespace Tangerine.UI.Docking
 
 		public override void RemovePlacement(Placement placement)
 		{
-			if (placement is PanelPlacement) {
-				Placements.Remove((PanelPlacement)placement);
+			if (placement is PanelPlacement panelPlacement) {
+				Placements.Remove(panelPlacement);
 			}
 		}
 
@@ -446,8 +551,19 @@ namespace Tangerine.UI.Docking
 		{
 			if (Placements.Count == 0) {
 				Unlink();
-			} else if (Placements.Count == 1) {
-				((SplitPlacement)Parent).Replace(this, Placements.First());
+				return;
+			}
+			if (Placements.Count == 1) {
+				var placement = Placements[0];
+				placement.Unlink();
+				Parent.Replace(this, placement);
+			}
+		}
+
+		public override void Replace(Placement old, Placement @new)
+		{
+			if (old.Parent == this && @new is PanelPlacement newPlacement) {
+				Placements[Placements.IndexOf((PanelPlacement)old)] = newPlacement;
 			}
 		}
 
@@ -456,175 +572,128 @@ namespace Tangerine.UI.Docking
 		public override Placement Clone()
 		{
 			var clone = new TabBarPlacement();
-			Placements.Clone(clone);
+			foreach (var placement in Placements) {
+				clone.Placements.Add((PanelPlacement)placement.Clone());
+			}
 			return clone;
 		}
 	}
 
-	public class SplitPlacement : Placement
+	public class LinearPlacement : Placement
 	{
-		private Placement firstChild;
-		private Placement secondChild;
+		[YuzuOptional]
+		public PlacementList<Placement> Placements { get; }
 
-		[YuzuMember]
-		public DockSeparator Separator;
+		[YuzuOptional]
+		public List<float> Stretches { get; }
 
-		[YuzuMember]
-		public float Stretch = 1;
+		[YuzuOptional]
+		public LinearPlacementDirection Direction { get; set; }
 
-		[YuzuMember]
-		public Placement FirstChild
+		public LinearPlacement()
 		{
-			get
-			{
-				return firstChild;
-			}
+			Placements = new PlacementList<Placement>(this);
+			Stretches = new List<float>();
+		}
 
-			set
-			{
-				CheckBeforeInsertion(firstChild);
-				firstChild = value;
-				if (firstChild != null) {
-					firstChild.Parent = this;
+		public LinearPlacement(LinearPlacementDirection direction) : this()
+		{
+			Direction = direction;
+		}
+
+		public override IEnumerable<PanelPlacement> GetPanelPlacements()
+		{
+			foreach (var placement in Placements) {
+				foreach (var panelPlacement in placement.GetPanelPlacements()) {
+					yield return panelPlacement;
 				}
 			}
 		}
 
-		private void CheckBeforeInsertion(Placement placement)
+		public override void RemovePlacement(Placement placement)
 		{
-			if (placement?.Parent != null) {
-				throw new System.Exception("Can't adopt a placement twice. Call placement.Unlink() first");
-			}
-		}
-
-		[YuzuMember]
-		public Placement SecondChild
-		{
-			get
-			{
-				return secondChild;
-			}
-
-			set
-			{
-				CheckBeforeInsertion(secondChild);
-				secondChild = value;
-				if (secondChild != null) {
-					secondChild.Parent = this;
+			if (Placements.Contains(placement)) {
+				var index = Placements.IndexOf(placement);
+				var old = Stretches[index];
+				if (index - 1 >= 0) {
+					Stretches[index - 1] += old;
+				} else if (index + 1 <= Stretches.Count - 1) {
+					Stretches[index + 1] += old;
 				}
-			}
-		}
-
-
-		public override IEnumerable<PanelPlacement> GetDescendantPanels()
-		{
-			var list = new List<PanelPlacement>();
-			AddDescendantPanels(list, FirstChild);
-			AddDescendantPanels(list, SecondChild);
-			return list;
-		}
-
-		private void AddDescendantPanels(List<PanelPlacement> list, Placement child)
-		{
-			if (child == null) {
-				return;
-			}
-			if (child is PanelPlacement) {
-				list.Add((PanelPlacement)child);
+				Placements.RemoveAt(index);
+				Stretches.RemoveAt(index);
 			} else {
-				list.AddRange(child.GetDescendantPanels());
+				foreach (var p in Placements) {
+					p.RemovePlacement(placement);
+				}
 			}
 		}
 
 		public override PanelPlacement FindPanelPlacement(string id)
 		{
-			return FirstChild?.FindPanelPlacement(id) ?? SecondChild?.FindPanelPlacement(id);
-		}
-
-		public override void RemovePlacement(Placement placement)
-		{
-			if (placement == FirstChild) {
-				FirstChild.Parent = null;
-				FirstChild = null;
-			} else if (placement == SecondChild) {
-				SecondChild.Parent = null;
-				SecondChild = null;
-			} else {
-				FirstChild?.RemovePlacement(placement);
-				SecondChild?.RemovePlacement(placement);
+			foreach (var placement in Placements) {
+				var panel = placement.FindPanelPlacement(id);
+				if (panel != null) {
+					return panel;
+				}
 			}
-		}
-
-		public bool RemovePanel(string panelId)
-		{
-			PanelPlacement panel;
-			(panel = FindPanelPlacement(panelId))?.Unlink();
-			return panel != null;
+			return null;
 		}
 
 		public override void HideThisOrDescendantPanels()
 		{
-			FirstChild?.HideThisOrDescendantPanels();
-			SecondChild?.HideThisOrDescendantPanels();
+			foreach (var placement in Placements) {
+				placement.HideThisOrDescendantPanels();
+			}
 		}
 
-		public void Replace(Placement child, Placement newChild)
+		public override Placement Clone()
 		{
-			if (FirstChild == child) {
-				FirstChild?.Unlink();
-				FirstChild = newChild;
-			} else if (SecondChild == child) {
-				SecondChild?.Unlink();
-				SecondChild = newChild;
+			var result = new LinearPlacement(Direction);
+			for (int i = 0; i < Placements.Count; ++i) {
+				result.Placements.Add(Placements[i].Clone());
+				result.Stretches.Add(Stretches[i]);
+			}
+			return result;
+		}
+
+		public override bool AnyVisiblePanel()
+		{
+			bool result = false;
+			foreach (var placement in Placements) {
+				result |= placement?.AnyVisiblePanel() ?? false;
+			}
+			return result;
+		}
+
+		public override void Replace(Placement old, Placement @new)
+		{
+			if (old.Parent == this) {
+				old.Parent = null;
+				Placements[Placements.IndexOf(old)] = @new;
+			}
+			foreach (var placement in Placements) {
+				placement.Replace(old, @new);
 			}
 		}
 
 		public override void RemoveRedundantNodes()
 		{
-			if (FirstChild == null && SecondChild != null) {
-				ReplaceThisWith(SecondChild);
-			} else if (SecondChild == null && FirstChild != null) {
-				ReplaceThisWith(FirstChild);
-			} else if (FirstChild == null && SecondChild == null) {
-				Parent?.RemovePlacement(this);
+			int index = 0;
+			while (index < Placements.Count) {
+				var placement = Placements[index];
+				placement.RemoveRedundantNodes();
+				if (placement.Parent != null) {
+					++index;
+				}
 			}
-			FirstChild?.RemoveRedundantNodes();
-			SecondChild?.RemoveRedundantNodes();
-		}
-
-		private void ReplaceThisWith(Placement placement) => (Parent as SplitPlacement)?.Replace(this, placement);
-
-		public override bool AnyVisiblePanel() => (FirstChild?.AnyVisiblePanel() ?? false) || (SecondChild?.AnyVisiblePanel() ?? false);
-
-		public override Placement Clone()
-		{
-			return new SplitPlacement {
-				Stretch = Stretch,
-				Separator = Separator,
-				FirstChild = FirstChild?.Clone(),
-				SecondChild = SecondChild?.Clone()
-			};
-		}
-
-		public void Initialize(Placement first, Placement second, DockSeparator separator, float stretch)
-		{
-			FirstChild?.Unlink();
-			SecondChild?.Unlink();
-			FirstChild = first;
-			SecondChild = second;
-			Separator = separator;
-			Stretch = stretch;
-		}
-
-		public void Append(Placement placement)
-		{
-			CheckBeforeInsertion(placement);
-			if (FirstChild == null) {
-				FirstChild = placement;
-			} else if (SecondChild == null) {
-				SecondChild = placement;
-			} else {
-				throw new System.Exception("Unable to append placement to SplitPlacement");
+			if (Placements.Count == 0) {
+				Unlink();
+			}
+			if (Placements.Count == 1 && Parent != null) {
+				var placement = Placements[0];
+				placement.Unlink();
+				Parent.Replace(this, placement);
 			}
 		}
 	}
@@ -638,6 +707,7 @@ namespace Tangerine.UI.Docking
 	{
 		public bool IsUndockable { get; private set; }
 		public readonly Widget ContentWidget;
+		public Widget PanelWidget;
 		public readonly string Id;
 
 		public string Title;

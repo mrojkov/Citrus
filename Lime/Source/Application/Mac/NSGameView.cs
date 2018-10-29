@@ -40,6 +40,10 @@ namespace Lime.Platform
 		public event Action DidMouseEnter;
 		public event Action DidMouseExit;
 
+		private static NSGameView lastEntered;
+		private static NSGameView firstExited;
+		private static NSGameView capturedByMouseView;
+
 		public bool AllowDropFiles
 		{
 			get { return allowDropFiles; }
@@ -78,12 +82,20 @@ namespace Lime.Platform
 
 		public override void MouseEntered(NSEvent theEvent)
 		{
-			DidMouseEnter?.Invoke();
+			if (capturedByMouseView == null) {
+				DidMouseEnter?.Invoke();
+			} else {
+				lastEntered = this;
+			}
 		}
 
 		public override void MouseExited(NSEvent theEvent)
 		{
-			DidMouseExit?.Invoke();
+			if (capturedByMouseView == null) {
+				DidMouseExit?.Invoke();
+			} else if (firstExited == null) {
+				firstExited = this;
+			}
 		}
 
 		public override bool AcceptsFirstMouse(NSEvent theEvent)
@@ -97,9 +109,8 @@ namespace Lime.Platform
 				RemoveTrackingArea(trackingArea);
 				trackingArea.Dispose();
 			}
-			var viewBounds = this.Bounds;
 			var options = NSTrackingAreaOptions.ActiveInActiveApp | NSTrackingAreaOptions.MouseEnteredAndExited;
-			trackingArea = new NSTrackingArea(viewBounds, options, this, null);
+			trackingArea = new NSTrackingArea(Bounds, options, this, null);
 			AddTrackingArea(trackingArea);
 		}
 
@@ -107,6 +118,7 @@ namespace Lime.Platform
 		{
 			input.SetKeyState(Key.Mouse0, true);
 			input.SetKeyState(Key.Touch0, true);
+			capturedByMouseView = this;
 			if (theEvent.ClickCount == 2) {
 				input.SetKeyState(Key.Mouse0DoubleClick, true);
 			}
@@ -137,6 +149,11 @@ namespace Lime.Platform
 		{
 			input.SetKeyState(Key.Mouse0, false);
 			input.SetKeyState(Key.Touch0, false);
+			capturedByMouseView = null;
+			firstExited?.DidMouseExit?.Invoke();
+			lastEntered?.DidMouseEnter?.Invoke();
+			firstExited = null;
+			lastEntered = null;
 			if (theEvent.ClickCount == 2) {
 				input.SetKeyState(Key.Mouse0DoubleClick, false);
 			}

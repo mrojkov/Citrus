@@ -7,10 +7,12 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	public class VSplitter : Splitter
 	{
+		private SeparatorsRenderPresenter separartorRenderer;
+
 		public VSplitter()
 		{
 			Tasks.Add(MainTask());
-			PostPresenter = new SeparatorsRenderPresenter();
+			PostPresenter = separartorRenderer = new SeparatorsRenderPresenter();
 			Layout = new VSplitterLayout();
 		}
 
@@ -35,11 +37,23 @@ namespace Lime
 			var p = new SeparatorsHitTestPresenter();
 			CompoundPostPresenter.Add(p);
 			while (true) {
+				bool isNeedToInvalidate = false;
+				if (separartorRenderer.SeparatorUnderMouse != p.SeparatorUnderMouse) {
+					separartorRenderer.SeparatorUnderMouse = p.SeparatorUnderMouse;
+					isNeedToInvalidate = true;
+				}
 				if (IsMouseOver() && p.SeparatorUnderMouse >= 0) {
 					WidgetContext.Current.MouseCursor = MouseCursor.SizeNS;
 					if (Input.WasMousePressed()) {
+						separartorRenderer.isSeparatorUnderMouseDrag = true;
+						Window.Current.Invalidate();
 						yield return DragSeparatorTask(p.SeparatorUnderMouse);
+						separartorRenderer.isSeparatorUnderMouseDrag = false;
+						isNeedToInvalidate = true;
 					}
+				}
+				if (isNeedToInvalidate) {
+					Window.Current.Invalidate();
 				}
 				yield return null;
 			}
@@ -72,23 +86,30 @@ namespace Lime
 
 		private void AdjustStretchDelta(float initialHeight, Widget widget, ref float delta)
 		{
-			if (initialHeight + delta <= widget.MinHeight) {
-				delta = widget.MinHeight - initialHeight;
+			if (initialHeight + delta <= widget.EffectiveMinSize.Y) {
+				delta = widget.EffectiveMinSize.Y - initialHeight;
 			}
-			if (initialHeight + delta >= widget.MaxHeight) {
-				delta = widget.MaxHeight - initialHeight;
+			if (initialHeight + delta >= widget.EffectiveMaxSize.Y) {
+				delta = widget.EffectiveMaxSize.Y - initialHeight;
 			}
 		}
 
 		class SeparatorsRenderPresenter : SeparatorsRenderPresenterBase
 		{
-			protected override void GetLines(Splitter splitter, List<Vector2> lines)
+			public int SeparatorUnderMouse = -1;
+			public bool isSeparatorUnderMouseDrag;
+
+			protected override void GetLines(Splitter splitter, List<SplitterLine> lines)
 			{
 				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {
 					var w = splitter.Nodes[i + 1].AsWidget;
 					var y = w.Y - splitter.SeparatorWidth * 0.5f;
-					lines.Add(new Vector2(w.X, y));
-					lines.Add(new Vector2(w.X + w.Width, y));
+					lines.Add(new SplitterLine {
+						Start = new Vector2(w.X, y),
+						End = new Vector2(w.X + w.Width, y),
+						State = i == SeparatorUnderMouse ? (isSeparatorUnderMouseDrag ?
+							SplitterLineState.Drag : SplitterLineState.Highlight) : SplitterLineState.Default
+					});
 				}
 			}
 		}

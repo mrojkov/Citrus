@@ -11,7 +11,7 @@ namespace Tangerine.UI.Docking
 	{
 		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
-
+		private const float panelMinWidth = 50f;
 		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
 
 		public static DockManager Instance { get; private set; }
@@ -64,6 +64,8 @@ namespace Tangerine.UI.Docking
 			MainWindowWidget.AddChangeWatcher(
 				() => MainWindowWidget.Window.State,
 				value => Model.WindowPlacements[0].State = value);
+			MainWindowWidget.Components.Add(new RequestedDockingComponent());
+			MainWindowWidget.CompoundPostPresenter.Add(new DockingPresenter());
 		}
 
 		public static void Initialize(Vector2 windowSize)
@@ -77,16 +79,31 @@ namespace Tangerine.UI.Docking
 		public void DockPlacementTo(Placement placement, Placement target, DockSite site, float stretch)
 		{
 			var windowPlacement = Model.GetWindowByPlacement(placement);
+			if (placement == windowPlacement) {
+				if (windowPlacement.Placements.Count == 1) {
+					placement = windowPlacement.Placements[0];
+				} else {
+					var linearPlacement = new LinearPlacement(windowPlacement.Direction);
+					for (var i = 0; i < windowPlacement.Placements.Count; i++) {
+						linearPlacement.Placements.Add(windowPlacement.Placements[i].Clone());
+						linearPlacement.Stretches.Add(windowPlacement.Stretches[i]);
+					}
+					placement = linearPlacement;
+				}
+				windowPlacement.Placements.Clear();
+			}
 			placement.Unlink();
 			Model.DockPlacementTo(placement, target, site, stretch);
-			if (!windowPlacement.Root.GetDescendantPanels().Any()) {
-				Model.RemoveWindow(windowPlacement);
-				CloseWindow(windowPlacement.WindowWidget.Window);
-			} else {
+			if (windowPlacement != null) {
 				windowPlacement.Root.RemoveRedundantNodes();
-				RefreshWindow(windowPlacement);
+				if (!windowPlacement.Root.GetPanelPlacements().Any()) {
+					Model.RemoveWindow(windowPlacement);
+					CloseWindow(windowPlacement.WindowWidget.Window);
+				} else {
+					RefreshWindow(windowPlacement);
+				}
+				RefreshWindow(Model.GetWindowByPlacement(target));
 			}
-			RefreshWindow(Model.GetWindowByPlacement(target));
 		}
 
 		private void SetDropHandler(IWindow window)
@@ -118,9 +135,9 @@ namespace Tangerine.UI.Docking
 			return Model.AddPanel(panel, targetPlacement, site, stretch);
 		}
 
-		public PanelPlacement AppendPanelTo(Panel panel, SplitPlacement targetPlacement)
+		public PanelPlacement AppendPanelTo(Panel panel, LinearPlacement targetPlacement, float stretch = 0.25f)
 		{
-			return Model.AppendPanelToPlacement(panel, targetPlacement);
+			return Model.AppendPanelToPlacement(panel, targetPlacement, stretch);
 		}
 
 		public void ShowPanel(string panelId)
@@ -143,50 +160,47 @@ namespace Tangerine.UI.Docking
 			RefreshWindows();
 		}
 
-		public void ResolveAndRefresh()
-		{
-			ResolveInconsistency();
-			Refresh();
-		}
-
 		private void ResolveInconsistency()
 		{
 			var floatingWindowDefaultSize = new Vector2(200, 300);
 			var descendantPanelsList = GetDescendantPanelPlacements().ToList();
-			// Remove all placements which not refered to existing panels
+			// Remove all placements which don't refer to existing panels
 			foreach (var panel in descendantPanelsList.ToList()) {
-				if (!Model.Panels.Any(p => p.Id == panel.Id)) {
-					var windowPlacement = Model.GetWindowByPlacement(panel);
-					windowPlacement.RemovePanel(panel.Id);
-					descendantPanelsList.Remove(panel);
-					windowPlacement.Root.RemoveRedundantNodes();
-					if (!windowPlacement.GetDescendantPanels().Any()) {
-						Model.WindowPlacements.Remove(windowPlacement);
-					}
+				if (Model.Panels.Any(p => p.Id == panel.Id)) {
+					continue;
+				}
+				var windowPlacement = Model.GetWindowByPlacement(panel);
+				windowPlacement.FindPanelPlacement(panel.Id).Unlink();
+				descendantPanelsList.Remove(panel);
+				windowPlacement.Root.RemoveRedundantNodes();
+				if (!windowPlacement.GetPanelPlacements().Any()) {
+					Model.WindowPlacements.Remove(windowPlacement);
 				}
 			}
 			foreach (var panel in Model.Panels) {
 				// If there is no placement for panel, create new one in new window and hide.
-				if (!descendantPanelsList.Any(placement => placement.Id == panel.Id)) {
-					var windowPlacement = new WindowPlacement {
-						Position = Model.WindowPlacements[0].Position + Model.WindowPlacements[0].Size / 2 - floatingWindowDefaultSize / 2,
-						Size = floatingWindowDefaultSize
-					};
-					var splitPlacement = new SplitPlacement();
-					splitPlacement.Append(new PanelPlacement {
+				if (descendantPanelsList.Any(placement => placement.Id == panel.Id)) {
+					continue;
+				}
+				var windowPlacement = new WindowPlacement {
+					Position = Model.WindowPlacements[0].Position + Model.WindowPlacements[0].Size / 2 - floatingWindowDefaultSize / 2,
+					Size = floatingWindowDefaultSize
+				};
+				windowPlacement.Placements.Add(
+					new PanelPlacement {
 						Title = panel.Title,
 						Id = panel.Id,
 						Hidden = true
-					});
-					windowPlacement.Append(splitPlacement);
-					Model.WindowPlacements.Add(windowPlacement);
-				}
+					}
+				);
+				windowPlacement.Stretches.Add(1);
+				Model.WindowPlacements.Add(windowPlacement);
 			}
 		}
 
 		public IEnumerable<PanelPlacement> GetDescendantPanelPlacements() {
 			foreach (var windowPlacement in Model.WindowPlacements) {
-				foreach (var panelPlacement in windowPlacement.GetDescendantPanels()) {
+				foreach (var panelPlacement in windowPlacement.GetPanelPlacements()) {
 					yield return panelPlacement;
 				}
 			}
@@ -203,14 +217,12 @@ namespace Tangerine.UI.Docking
 
 		private void CreateWindowsIfNecessary()
 		{
-			for (var i = 0; i < Model.WindowPlacements.Count; i++) {
-				var placement = Model.WindowPlacements[i];
+			foreach (var placement in Model.WindowPlacements) {
 				if (!placement.Root.AnyVisiblePanel()) {
 					continue;
 				}
-
 				if (placement.WindowWidget != null) continue;
-				if (i == 0) {
+				if (placement == Model.WindowPlacements[0]) {
 					placement.WindowWidget = MainWindowWidget;
 				} else {
 					CreateFloatingWindow(placement);
@@ -218,45 +230,65 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
-		private void CreateWidgetForPlacement(Splitter container, Placement placement, float stretch = 1, bool isFirst = true)
+		private void CreateWidgetForPlacement(Splitter container, Placement placement, float stretch = 1, bool isMainWindow = false)
 		{
-			var insertAt = isFirst ? 0 : 1;
-			if (container.Nodes.Count == 0) {
-				insertAt = 0;
-			}
 			if (placement == null || !placement.AnyVisiblePanel()) {
 				return;
 			}
+			bool requestTitle = placement is WindowPlacement windowPlacement &&
+				windowPlacement.GetVisiblePanelPlacements().Count() > 1 &&
+				!isMainWindow;
 			placement.SwitchType(
-				panel => CreatePanelWidget(container, panel, stretch, insertAt),
+				panel => CreatePanelWidget(container, panel, stretch),
 				panelGroup => {
-					if (panelGroup.GetDescendantPanels().Count(p => !p.Hidden) == 1) {
-						CreatePanelWidget(container, panelGroup.GetDescendantPanels().First(p => !p.Hidden), stretch, insertAt);
+					if (panelGroup.GetPanelPlacements().Count(p => !p.Hidden) == 1) {
+						CreatePanelWidget(container, panelGroup.GetPanelPlacements().First(p => !p.Hidden), stretch);
 					} else {
-						CreateTabBarWidget(container, panelGroup, stretch, insertAt);
+						CreateTabBarWidget(container, panelGroup, stretch, !requestTitle);
 					}
 				},
-				group => CreateSplitWidget(container, group, stretch, insertAt)
+				group => CreateLinearWidget(container, group, stretch, requestTitle)
 			);
 		}
 
-		private void CreateSplitWidget(Splitter container, SplitPlacement placement, float stretch, int insertAt)
+		private void CreateLinearWidget(Splitter container, LinearPlacement placement, float stretch, bool requestTitle)
 		{
-			var splitter = placement.Separator == DockSeparator.Vertical ? (Splitter)new ThemedHSplitter() : new ThemedVSplitter();
-			splitter.DragEnded += RefreshDockedSize(placement, splitter);
-			container.Stretches.Insert(insertAt, stretch);
-			CreateWidgetForPlacement(splitter, placement.FirstChild, placement.Stretch);
-			CreateWidgetForPlacement(splitter, placement.SecondChild, 1 - placement.Stretch, false);
-			container.Nodes.Insert(insertAt, splitter);
+			var splitter = placement.Direction == LinearPlacementDirection.Vertical
+				? (Splitter)new VSplitter()
+				: new HSplitter();
+			splitter.SeparatorColor = Theme.Colors.SeparatorColor;
+			splitter.SeparatorHighlightColor = Theme.Colors.SeparatorHighlightColor;
+			splitter.SeparatorDragColor = Theme.Colors.SeparatorDragColor;
+			splitter.SeparatorWidth = 5f;
+			splitter.SeparatorActiveAreaWidth = 6f;
+			Widget rootWidget = splitter;
+			bool hasTabBarPlacement = false;
+			for (int i = 0; i < placement.Placements.Count; ++i) {
+				hasTabBarPlacement |= placement.Placements[i] is TabBarPlacement;
+				CreateWidgetForPlacement(splitter, placement.Placements[i], placement.Stretches[i]);
+			}
+			splitter.DragEnded += () => RefreshDockedSize(placement, splitter);
+			if (requestTitle && !(hasTabBarPlacement && placement.Placements.Count == 1)) {
+				rootWidget = WrapWithTitle(rootWidget, out var closeButton, out var title);
+				closeButton.Clicked += () => {
+					placement.HideThisOrDescendantPanels();
+					Refresh();
+				};
+				title.Text = "Tangerine";
+				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
+			}
+			container.Stretches.Add(stretch);
+			container.Nodes.Add(rootWidget);
 		}
 
-		private Widget AddTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
+		private static Widget WrapWithTitle(Widget widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText title, string id = null)
 		{
 			Widget titleWidget;
 			var result =  new Widget {
 				Id = id,
 				LayoutCell = new LayoutCell(),
 				Layout = new VBoxLayout(),
+				MinWidth = panelMinWidth,
 				Nodes = {
 					(titleWidget = new Widget {
 						Layout = new HBoxLayout(),
@@ -273,11 +305,7 @@ namespace Tangerine.UI.Docking
 							})
 						}
 					}),
-					new Frame {
-						Nodes = {
-							widget
-						}
-					}
+					widget
 				}
 			};
 			// Add space between close button and titleWidget right border.
@@ -292,7 +320,7 @@ namespace Tangerine.UI.Docking
 			return result;
 		}
 
-		private void CreatePanelWidget(Splitter container, PanelPlacement placement, float stretch, int insertAt)
+		private void CreatePanelWidget(Splitter container, PanelPlacement placement, float stretch)
 		{
 			var panel = Model.Panels.First(pan => pan.Id == placement.Id);
 			var widget = panel.ContentWidget;
@@ -301,7 +329,12 @@ namespace Tangerine.UI.Docking
 				return;
 			}
 			if (panel.IsUndockable) {
-				var rootWidget = AddTitle(widget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel, $"DockPanel<{panel.Id}>");
+				// Wrap widget to clip children.
+				var frame = new Widget {
+					Nodes = { widget }
+				};
+				widget.ExpandToContainerWithAnchors();
+				var rootWidget = WrapWithTitle(frame, out var closeButton, out var titleLabel, $"DockPanel<{panel.Id}>");
 				titleLabel.AddChangeWatcher(() => panel.Title, text => titleLabel.Text = text);
 				closeButton.Clicked += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
@@ -310,27 +343,63 @@ namespace Tangerine.UI.Docking
 				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, widget);
 				widget = rootWidget;
 			}
-			container.Nodes.Insert(insertAt, widget);
-			container.Stretches.Insert(insertAt, stretch);
+			panel.PanelWidget = widget;
+			container.Nodes.Add(widget);
+			container.Stretches.Add(stretch);
 		}
 
-		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, int insertAt)
+		private void CreateTabBarWidget(Splitter container, TabBarPlacement placement, float stretch, bool requestTitle)
 		{
-			var tabbedWidget = new TabbedWidget() {
-				LayoutCell = new LayoutCell { StretchY = 0 },
-				AllowReordering = true
+			var tabbedWidget = new TabbedWidget {
+				TabBar = new PanelTabBar(),
+				AllowReordering = true,
+				BarPlacement = TabbedWidget.TabBarPlacement.Bottom,
+				PostPresenter = new SyncDelegatePresenter<TabbedWidget>(w => {
+					w.PrepareRendererState();
+					var activeTab = (Tab)w.TabBar.Nodes[w.ActiveTabIndex];
+					var color = ColorTheme.Current.Docking.TabOutline;
+					var a = activeTab.CalcPositionInSpaceOf(w);
+					var start = a * Vector2.Down;
+					var b = a + Vector2.Down * activeTab.ContentHeight;
+					var c = b + activeTab.ContentWidth * Vector2.Right;
+					var d = c - Vector2.Down * activeTab.ContentHeight;
+					var end = start + w.Size * Vector2.Right;
+					Renderer.DrawLine(start, a + Vector2.Right * 0.5f, color);
+					Renderer.DrawLine(a, b, color);
+					Renderer.DrawLine(b + new Vector2(-0.5f, -0.5f), c + new Vector2(0.5f, -0.5f), color);
+					Renderer.DrawLine(c, d, color);
+					Renderer.DrawLine(d + Vector2.Left * 0.5f, end, color);
+				})
 			};
+			Widget rootWidget = tabbedWidget;
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
-			var rootWidget = AddTitle(tabbedWidget, out ThemedTabCloseButton closeButton, out ThemedSimpleText titleLabel);
+			tabbedWidget.TabBar.OnReorder += args => {
+				var item = placement.Placements[args.OldIndex];
+				placement.RemovePlacement(item);
+				placement.Placements.Insert(args.NewIndex, item);
+				tabbedWidget.ActivateTab(args.NewIndex);
+			};
+			if (requestTitle) {
+				rootWidget = WrapWithTitle(tabbedWidget, out var closeButton, out var titleLabel);
+				titleLabel.AddChangeWatcher(
+					() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
+					title => titleLabel.Text = title
+				);
+				closeButton.Clicked += () => {
+					placement.Placements.Where(p => !p.Hidden).ElementAt(tabbedWidget.ActiveTabIndex).Hidden = true;
+					Refresh();
+				};
+				CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
+			}
 			foreach (var panelPlacement in placement.Placements) {
 				var panel = Model.Panels.First(pan => pan.Id == panelPlacement.Id);
 				panel.ContentWidget.Unlink();
 				if (panelPlacement.Hidden) {
 					continue;
 				}
-				var tab = new ThemedTab {
+				var tab = new PanelTab {
 					Text = panel.Id,
-					Closable = true,
+					Closable = false,
 				};
 				tab.Closing += () => {
 					Model.FindPanelPlacement(panel.Id).Hidden = true;
@@ -344,27 +413,11 @@ namespace Tangerine.UI.Docking
 					Nodes = { panel.ContentWidget }
 				}, true);
 				CreateDragBehaviour(panelPlacement, tab, panel.ContentWidget);
+				panel.PanelWidget = rootWidget;
 			}
 			tabbedWidget.ActiveTabIndex = 0;
-			tabbedWidget.TabBar.OnReorder += args => {
-				var item = placement.Placements[args.OldIndex];
-				placement.RemovePlacement(item);
-				placement.Placements.Insert(args.NewIndex, item);
-				tabbedWidget.ActivateTab(args.NewIndex);
-			};
-			titleLabel.AddChangeWatcher(
-				() => ((Tab)tabbedWidget.TabBar.Nodes[tabbedWidget.ActiveTabIndex]).Text,
-				title => titleLabel.Text = title
-			);
-			closeButton.Clicked += () => {
-				foreach (var panelPlacement in placement.Placements) {
-					panelPlacement.Hidden = true;
-				}
-				Refresh();
-			};
-			CreateDragBehaviour(placement, rootWidget.Nodes[0].AsWidget, rootWidget);
-			container.Nodes.Insert(insertAt, rootWidget);
-			container.Stretches.Insert(insertAt, stretch);
+			container.Nodes.Add(rootWidget);
+			container.Stretches.Add(stretch);
 		}
 
 		private void CreateDragBehaviour(Placement placement, Widget inputWidget, Widget contentWidget)
@@ -373,14 +426,16 @@ namespace Tangerine.UI.Docking
 			db.OnUndock += (positionOffset, windowPosition) => {
 				var panelWindow = (WindowWidget)contentWidget.GetRoot();
 				var windowPlacement = Model.GetWindowByPlacement(placement);
-				if (windowPlacement.Root.GetDescendantPanels().Count(p => !p.Hidden) > 1) {
+				if (windowPlacement.Root.GetPanelPlacements().Count(p => !p.Hidden) > 1) {
+					var globalSize = placement.CalcGlobalStretch() * panelWindow.Size;
 					var wrapper = new WindowPlacement {
-						Size = placement.CalcGlobalSize() * panelWindow.Size
+						Size = new Vector2(Mathf.Max(panelMinWidth, globalSize.X), globalSize.Y)
 					};
 					placement.Unlink();
 					windowPlacement.Root.RemoveRedundantNodes();
 					Model.AddWindow(wrapper);
-					wrapper.FirstChild = placement;
+					wrapper.Placements.Add(placement);
+					wrapper.Stretches.Add(1);
 #if MAC
 					wrapper.Position = windowPosition - new Vector2(0, wrapper.Size.Y);
 #else
@@ -414,7 +469,7 @@ namespace Tangerine.UI.Docking
 				var windowPlacement = Model.WindowPlacements.FirstOrDefault(p => p.WindowWidget?.Window == window);
 				if (windowPlacement != null) {
 					windowPlacement.WindowWidget = null;
-					Model.HideWindowPanels(windowPlacement);
+					DockHierarchy.HideWindowPanels(windowPlacement);
 				}
 				return true;
 			};
@@ -446,25 +501,29 @@ namespace Tangerine.UI.Docking
 				ToolbarArea.Unlink();
 				MainWindowWidget.Nodes.Add(ToolbarArea);
 			}
-			Splitter currentContainer = new ThemedHSplitter { Anchors = Anchors.LeftRightTopBottom };
+			Splitter currentContainer = new ThemedVSplitter { Anchors = Anchors.LeftRightTopBottom };
+			// Cache window state before resizing. Resizing may trigger Resize Update which in turn
+			// lead to placement state rewriting on first update, because window state change watcher don't has a value.
+			var savedState = root.State;
 			windowWidget.Window.ClientPosition = root.Position;
 			windowWidget.Window.ClientSize = root.Size;
-			windowWidget.Window.State = root.State;
+			windowWidget.Window.State = savedState;
 			windowWidget.Nodes.Add(currentContainer);
-			CreateWidgetForPlacement(currentContainer, root.Root);
+			CreateWidgetForPlacement(currentContainer, root.Root, isMainWindow: MainWindowWidget == windowWidget);
 		}
 
-		private Action RefreshDockedSize(SplitPlacement placement, Splitter splitter)
+		private static void RefreshDockedSize(LinearPlacement placement, Splitter splitter)
 		{
-			return () => {
-				var overal = Vector2.Zero;
-				foreach (var w in splitter.Nodes) {
-					overal += w.AsWidget.LayoutCell.Stretch;
-				}
-				var first = splitter.Nodes.First().AsWidget.LayoutCell.Stretch;
-				var value = first / overal;
-				placement.Stretch = placement.Separator == DockSeparator.Horizontal ? value.Y : value.X;
-			};
+			for (int i = 0; i < splitter.Nodes.Count; ++i) {
+				var stretch = splitter.Nodes[i].AsWidget.LayoutCell.Stretch;
+				placement.Stretches[i] = placement.Direction == LinearPlacementDirection.Horizontal
+					? stretch.X
+					: stretch.Y;
+			}
+			float total = placement.Stretches.Aggregate((s1, s2) => s1 + s2);
+			for (int i = 0; i < placement.Stretches.Count; ++i) {
+				placement.Stretches[i] /= total;
+			}
 		}
 
 		private void RefreshWindows()
@@ -503,12 +562,12 @@ namespace Tangerine.UI.Docking
 		{
 			try {
 				if (!state.WindowPlacements.Any()) {
-					throw new System.Exception("Unable to import state: the number of windows is zero");
+					throw new DockingException("Unable to import state: the number of windows is zero");
 				}
-				for (var i = 1; i < Model.WindowPlacements.Count; i++) {
-					if (Model.WindowPlacements[i].AnyVisiblePanel()) {
-						Model.WindowPlacements[i].WindowWidget.Nodes.Clear();
-						CloseWindow(Model.WindowPlacements[i].WindowWidget.Window);
+				foreach (var wp in Model.WindowPlacements.Skip(1)) {
+					if (wp.AnyVisiblePanel()) {
+						wp.WindowWidget.Nodes.Clear();
+						CloseWindow(wp.WindowWidget.Window);
 					}
 				}
 				var savedPanels = Model.Panels.ToList();
@@ -516,23 +575,26 @@ namespace Tangerine.UI.Docking
 				Model.Panels.Clear();
 				foreach (var windowPlacement in state.WindowPlacements) {
 					Model.WindowPlacements.Add(windowPlacement);
-					foreach (var panelPlacement in windowPlacement.Root.GetDescendantPanels()) {
+					foreach (var panelPlacement in windowPlacement.Root.GetPanelPlacements()) {
 						var p = savedPanels.FirstOrDefault(i => i.Id == panelPlacement.Title);
 						if (p == null) continue;
 						Model.Panels.Add(p);
 					}
 				}
-				if (resizeMainWindow && state.WindowPlacements.First().Size != Vector2.Zero) {
-					var mainWindow = Model.MainWindow;
-					MainWindowWidget.Window.ClientSize = mainWindow.Size;
-					MainWindowWidget.Window.ClientPosition = mainWindow.Position;
-					MainWindowWidget.Window.State = mainWindow.State;
-				}
-				Model.Panels.AddRange(savedPanels.Except(Model.Panels).ToList());
+				Model.Panels.AddRange(savedPanels.Except(Model.Panels));
+				ResolveInconsistency();
+			} catch (DockingException e) {
+				LoadDefaultLayoutWithWarning(e.Message);
 			} catch {
-				System.Console.WriteLine("Warning: Unable to load dock state from user preferences");
-				CommandQueue.Instance.Add((Command)GenericCommands.DefaultLayout);
+				LoadDefaultLayoutWithWarning("Unable to load dock state from user preferences");
 			}
+			Refresh();
+		}
+
+		private static void LoadDefaultLayoutWithWarning(string message)
+		{
+			System.Console.WriteLine($"Warning: { message }");
+			CommandQueue.Instance.Add((Command)GenericCommands.DefaultLayout);
 		}
 
 		public class State
@@ -546,6 +608,105 @@ namespace Tangerine.UI.Docking
 					WindowPlacements = WindowPlacements.Select(p => p.Clone() as WindowPlacement).ToList()
 				};
 			}
+		}
+
+		[YuzuDontGenerateDeserializer]
+		private class PanelTabBar : TabBar
+		{
+			public PanelTabBar()
+			{
+				Layout = new HBoxLayout();
+				Padding = new Thickness { Bottom = 10f };
+			}
+		}
+
+		[YuzuDontGenerateDeserializer]
+		private class PanelTab : Tab
+		{
+			private const float TabHeight = 20f;
+			private const float TabMaxWidth = 100f;
+			private const float TabMinWidth = 50f;
+			public override bool IsNotDecorated() => false;
+
+			public PanelTab()
+			{
+				MinSize = new Vector2(TabMinWidth, TabHeight);
+				MaxSize = new Vector2(TabMaxWidth, TabHeight);
+				LayoutCell = new LayoutCell(Alignment.LeftTop);
+				Size = MinSize;
+				Layout = new HBoxLayout();
+				var caption = new SimpleText {
+					Id = "TextPresenter",
+					Padding = Theme.Metrics.ControlsPadding,
+					ForceUncutText = false,
+					FontHeight = Theme.Metrics.TextHeight,
+					HAlignment = HAlignment.Center,
+					VAlignment = VAlignment.Center,
+					OverflowMode = TextOverflowMode.Ellipsis,
+					LayoutCell = new LayoutCell(Alignment.Center),
+				};
+				var presenter = new TabPresenter(caption);
+				CompoundPresenter.Add(presenter);
+				DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+					OnRunAnimation = (animation, markerId, animationTimeCorrection) => {
+						presenter.SetState(markerId);
+						return true;
+					}
+				};
+				AddNode(caption);
+				HitTestTarget = true;
+				LateTasks.Add(Theme.MouseHoverInvalidationTask(this));
+				this.AddChangeWatcher(() => Active,
+					isActive => Padding = isActive ? new Thickness { Top = -1f, Bottom = 1f} : new Thickness());
+			}
+
+			private class TabPresenter : SyncCustomPresenter<Widget>
+			{
+				private readonly SimpleText label;
+				private bool active;
+
+				public TabPresenter(SimpleText label) { this.label = label; }
+
+				public void SetState(string state)
+				{
+					CommonWindow.Current.Invalidate();
+					active = state == "Active";
+					label.Color = active ? Theme.Colors.BlackText : Theme.Colors.GrayText;
+				}
+
+				protected override bool InternalPartialHitTest(Widget node, ref HitTestArgs args)
+				{
+					return node.BoundingRectHitTest(args.Point);
+				}
+
+				protected override void InternalRender(Widget widget)
+				{
+					widget.PrepareRendererState();
+					var theme = ColorTheme.Current.Docking;
+					var color = active ? theme.TabBarBackground :
+						widget.IsMouseOverThisOrDescendant() ? theme.TabHighlighted : theme.TabBarBackground;
+					Renderer.DrawRect(widget.ContentPosition, widget.ContentPosition + widget.ContentSize, color);
+				}
+			}
+		}
+
+		private class DockingPresenter : SyncDelegatePresenter<Widget>
+		{
+			public DockingPresenter() : base(Render) { }
+
+			private static void Render(Widget widget)
+			{
+				var comp = widget.Components.Get<RequestedDockingComponent>();
+				if (!comp.Bounds.HasValue) return;
+				widget.PrepareRendererState();
+				Renderer.DrawRectOutline(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline, 2);
+				Renderer.DrawRect(comp.Bounds.Value.A + Vector2.One, comp.Bounds.Value.B - Vector2.One, ColorTheme.Current.Docking.DragRectagleOutline.Transparentify(0.8f));
+			}
+		}
+
+		public class DockingException : Lime.Exception
+		{
+			public DockingException(string message) : base(message) { }
 		}
 	}
 }

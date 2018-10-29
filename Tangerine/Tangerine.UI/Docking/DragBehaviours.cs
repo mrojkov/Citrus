@@ -50,7 +50,7 @@ namespace Tangerine.UI.Docking
 		{
 			ResetDockComponents();
 			if (requestedSite != DockSite.None) {
-				DockManager.Instance.DockPlacementTo(placement, requestedPlacement, requestedSite, 0.25f);
+				DockManager.Instance.DockPlacementTo(placement, requestedPlacement, requestedSite, -1f);
 			}
 			IsActive = false;
 		}
@@ -72,23 +72,25 @@ namespace Tangerine.UI.Docking
 		private void RefreshPlacementAndSite()
 		{
 			var mousePosition = Application.DesktopMousePosition;
+			var offset = positionOffset;
 			if (Application.Platform == PlatformId.Mac) {
-				mousePosition.Y -= windowPlacement.WindowWidget.Window.ClientSize.Y;
+				mousePosition.Y -= windowPlacement.WindowWidget.Window.DecoratedSize.Y;
+				offset.Y = -offset.Y;
 			}
 			ResetDockComponents();
 			var cachedSite = requestedSite;
 			requestedSite = DockSite.None;
-			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - positionOffset;
+			windowPlacement.WindowWidget.Window.ClientPosition = mousePosition - offset;
 			foreach (var p in GetPanels()) {
 				var placement = AppPlacement.FindPanelPlacement(p.Id);
-				var bounds = p.ContentWidget.CalcAABBInWindowSpace();
+				var bounds = p.PanelWidget.CalcAABBInWindowSpace();
 				var winPlacement = DockManager.Instance.Model.GetWindowByPlacement(placement);
 				var requestedDockingComponent = winPlacement.WindowWidget.Components.Get<RequestedDockingComponent>();
 				if (requestedDockingComponent == null) continue;
 				var clientMousePos = winPlacement.WindowWidget.Window.Input.MousePosition;
 				if (!bounds.Contains(clientMousePos)) continue;
 				CalcSiteAndRect(clientMousePos, bounds, out DockSite site, out Rectangle? rect);
-				if (placement.Id == windowPlacement.Root.GetDescendantPanels().First().Id ||
+				if (placement.Id == windowPlacement.Root.GetPanelPlacements().First().Id ||
 					placement.Id == DockManager.DocumentAreaId &&
 					site == DockSite.Fill
 				) {
@@ -177,9 +179,18 @@ namespace Tangerine.UI.Docking
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
-				var pressedPosition = inputWidget.LocalMousePosition();
 				if (input.WasMousePressed()) {
-					if (placement.Root == placement.Parent) {
+					var pressedPosition = inputWidget.LocalMousePosition();
+					var windowPlacement = (WindowPlacement)placement.Root;
+					bool doUndock = windowPlacement != placement &&
+						(placement.Parent != windowPlacement || windowPlacement.Placements.Count > 1);
+					if (!doUndock) {
+						var panelWindow = (WindowWidget)contentWidget.GetRoot();
+						var window = panelWindow.Window;
+						if (window.State == WindowState.Maximized) {
+							window.State = WindowState.Normal;
+							pressedPosition = new Vector2(window.ClientSize.X / 2, 10);
+						}
 						WindowDragBehaviour.CreateFor(placement, pressedPosition);
 					} else {
 						var size = inputWidget.Parent.AsWidget.Size;

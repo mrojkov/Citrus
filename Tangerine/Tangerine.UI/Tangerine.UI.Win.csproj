@@ -64,7 +64,6 @@
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
-    <Compile Include="Docking\DockPresenter.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />

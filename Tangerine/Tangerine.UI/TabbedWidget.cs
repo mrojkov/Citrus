@@ -7,25 +7,45 @@ namespace Tangerine.UI
 {
 	public class TabbedWidget : Widget
 	{
-		public enum TabBarPlacement
+		protected Frame ContentContainer { get; }
+		protected List<Widget> Contents { get; } = new List<Widget>();
+
+		private TabBar tabBar;
+		public TabBar TabBar
 		{
-			Top,
-			Bottom
+			get => tabBar;
+			set
+			{
+				if (tabBar != value) {
+					if (tabBar != null) {
+						tabBar.OnReorder -= TabBar_OnReorder;
+						tabBar.Unlink();
+					}
+					tabBar = value;
+					tabBar.OnReorder += TabBar_OnReorder;
+					PlaceTabBarAndContent(barPlacement);
+				}
+			}
 		}
 
-		protected Frame ContentContainer { get; private set; }
-		protected List<Widget> Contents { get; } = new List<Widget>();
-		public TabBar TabBar { get; protected set; }
+		private TabBarPlacement barPlacement;
+		public TabBarPlacement BarPlacement
+		{
+			get => barPlacement;
+			set
+			{
+				if (barPlacement != value) {
+					barPlacement = value;
+					PlaceTabBarAndContent(barPlacement);
+				}
+			}
+		}
 
 		private int activeTabIndex;
 		public int ActiveTabIndex
 		{
-			get
-			{
-				return activeTabIndex;
-			}
-			set
-			{
+			get => activeTabIndex;
+			set {
 				activeTabIndex = value;
 				ActivateTab(value);
 			}
@@ -33,26 +53,23 @@ namespace Tangerine.UI
 
 		public bool AllowReordering
 		{
-			get { return TabBar.AllowReordering; }
-			set { TabBar.AllowReordering = value; }
+			get => TabBar.AllowReordering;
+			set => TabBar.AllowReordering = value;
 		}
 
-		public TabbedWidget(TabBarPlacement tabBarPlacement = TabBarPlacement.Top)
+		public TabbedWidget()
 		{
 			ContentContainer = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
-			ContentContainer.CompoundPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
-				frame.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, frame.Size, Theme.Colors.GrayBackground);
-			}));
-			ContentContainer.CompoundPostPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
-				frame.PrepareRendererState();
-				Renderer.DrawRectOutline(Vector2.Zero, frame.Size, Theme.Colors.ControlBorder);
-			}));
-			TabBar = new ThemedTabBar();
-			TabBar.OnReorder += TabBar_OnReorder;
 			Layout = new VBoxLayout();
+			TabBar = new TabBar();
+		}
+
+		private void PlaceTabBarAndContent(TabBarPlacement tabBarPlacement)
+		{
+			TabBar.Unlink();
+			ContentContainer.Unlink();
 			if (tabBarPlacement == TabBarPlacement.Top) {
 				Nodes.Add(TabBar);
 				Nodes.Add(ContentContainer);
@@ -62,20 +79,11 @@ namespace Tangerine.UI
 			}
 		}
 
-		private void TabBar_OnReorder(TabBar.ReorderEventArgs args)
+		protected virtual void TabBar_OnReorder(TabBar.ReorderEventArgs args)
 		{
 			var tab = Contents[args.OldIndex];
 			Contents.Remove(tab);
 			Contents.Insert(args.NewIndex, tab);
-		}
-
-		public void AddTab(string name, Widget content, bool isActive = false, bool canClose = false)
-		{
-			var tab = new ThemedTab {
-				Text = name,
-				Closable = canClose
-			};
-			AddTab(tab, content, isActive);
 		}
 
 		public void AddTab(Tab newTab, Widget content, bool isActive = false)
@@ -110,16 +118,46 @@ namespace Tangerine.UI
 			Contents.RemoveAt(index);
 		}
 
-		internal Tab GetById(string tabId)
+		public Tab GetById(string tabId)
 		{
 			return TabBar.Nodes.OfType<Tab>().FirstOrDefault(t => t.Text == tabId);
 		}
 
-		internal int IndexOf(Tab tab)
+		public int IndexOf(Tab tab)
 		{
 			if (TabBar.Nodes.Contains(tab))
 				return TabBar.Nodes.IndexOf(tab);
 			return -1;
+		}
+
+		public enum TabBarPlacement
+		{
+			Top,
+			Bottom
+		}
+	}
+
+	public class ThemedTabbedWidget : TabbedWidget
+	{
+		public ThemedTabbedWidget()
+		{
+			TabBar = new ThemedTabBar();
+			ContentContainer.CompoundPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
+				frame.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, frame.Size, Theme.Colors.GrayBackground);
+			}));
+			ContentContainer.CompoundPostPresenter.Add(new SyncDelegatePresenter<Frame>(frame => {
+				frame.PrepareRendererState();
+				Renderer.DrawRectOutline(Vector2.Zero, frame.Size, Theme.Colors.ControlBorder);
+			}));
+		}
+
+		public void AddTab(string tabName, Widget content, bool isActive = false, bool canClose = false)
+		{
+			AddTab(new ThemedTab {
+				Text = tabName,
+				Closable = canClose
+			}, content, isActive);
 		}
 	}
 }
