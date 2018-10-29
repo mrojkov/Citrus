@@ -179,13 +179,10 @@ namespace Lime
 			}
 		}
 
-		public IEnumerator<object> Start()
+		public async System.Threading.Tasks.Task Start()
 		{
-			if (state == State.Initializing) {
-				yield return null;
-			}
-			if (state == State.Started) {
-				yield break;
+			if (state == State.Initializing || state == State.Started) {
+				return;
 			}
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
 			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
@@ -295,11 +292,7 @@ namespace Lime
 					}
 				}, stopDecodeCancelationToken);
 
-				while (
-					(!processVideo.IsCompleted && !processVideo.IsCanceled && !processVideo.IsFaulted) ||
-					(!processAudio.IsCompleted && !processAudio.IsCanceled && !processAudio.IsFaulted)) {
-					yield return null;
-				};
+				await System.Threading.Tasks.Task.WhenAll(processVideo, processAudio);
 				if (processVideo.IsFaulted) {
 					Debug.Write("Video thread faulted");
 					stopDecodeCancelationTokenSource.Cancel();
@@ -377,26 +370,25 @@ namespace Lime
 		public void Dispose()
 		{
 			stopDecodeCancelationTokenSource.Cancel();
-			Window.Current.InvokeOnRendering(() => {
-				if (videoCodec != null) {
-					videoCodec.Stop();
-					videoCodec.Dispose();
-					videoCodec = null;
-				}
-				if (audioCodec != null) {
-					audioCodec.Stop();
-					audioCodec.Dispose();
-					audioCodec = null;
-				}
-				if (audio != null) {
-					audio.Dispose();
-					audio = null;
-				}
-				videoExtractor?.Dispose();
-				videoExtractor = null;
-				audioExtractor?.Dispose();
-				audioExtractor = null;
-			});
+			
+			if (videoCodec != null) {
+				videoCodec.Stop();
+				videoCodec.Dispose();
+				videoCodec = null;
+			}
+			if (audioCodec != null) {
+				audioCodec.Stop();
+				audioCodec.Dispose();
+				audioCodec = null;
+			}
+			if (audio != null) {
+				audio.Dispose();
+				audio = null;
+			}
+			videoExtractor?.Dispose();
+			videoExtractor = null;
+			audioExtractor?.Dispose();
+			audioExtractor = null;
 		}
 
 		private class SurfaceTextureRenderer

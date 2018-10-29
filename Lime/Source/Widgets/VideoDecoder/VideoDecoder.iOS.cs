@@ -88,10 +88,10 @@ namespace Lime
 			//prepare audio
 		}
 
-		public IEnumerator<object> Start()
+		public async System.Threading.Tasks.Task Start()
 		{
 			if (state == State.Started) {
-				yield break;
+				return;
 			}
 			stopwatch.Start();
 			do {
@@ -132,9 +132,11 @@ namespace Lime
 						}
 					};
 				}, stopDecodeCancelationToken);
-				while (!workTask.IsCompleted && !workTask.IsCanceled && !workTask.IsFaulted) {
-					yield return null;
-				};
+				try {
+					await workTask;
+				} catch (OperationCanceledException e) {
+					Debug.Write("VideoPlayer: work task canceled!");
+				}
 			} while (Looped && state == State.Finished);
 			Debug.Write("Video player loop ended!");
 		}
