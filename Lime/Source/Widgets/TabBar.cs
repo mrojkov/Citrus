@@ -94,12 +94,11 @@ namespace Lime
 		{
 			while (true) {
 				if (AllowReordering) {
-					Tab tab;
-					if (TryGetTabUnderMouse(out tab) && gesture.WasBegan()) {
+					if (TryGetTabUnderMouse(out var tab) && gesture.WasBegan()) {
+						ActivateTab(tab);
 						while (!gesture.WasEnded()) {
-							Tab tabUnderMouse;
-							if (TryGetTabUnderMouse(out tabUnderMouse)) {
-								Swap(tab, tabUnderMouse);
+							if (TryGetTabUnderMouse(out var tabUnderMouse)) {
+								Reorder(Nodes.IndexOf(tab), Nodes.IndexOf(tabUnderMouse));
 							}
 							yield return null;
 						}
@@ -109,29 +108,14 @@ namespace Lime
 			}
 		}
 
-		private void Swap(Tab first, Tab second)
+		private void Reorder(int indexFrom, int indexTo)
 		{
-			if (first == second || second == null) {
-				return;
-			}
-			var tabs = Nodes.OfType<Tab>().ToList();
-			var firstIdx = Nodes.IndexOf(first);
-			var secondIdx = Nodes.IndexOf(second);
-			if (firstIdx < secondIdx) {
-				Reorder(first, secondIdx);
-			} else {
-				Reorder(second, firstIdx);
-			}
+			if (indexFrom == indexTo) return;
+			Nodes.Move(indexFrom, indexTo);
 			OnReorder?.Invoke(new ReorderEventArgs {
-				OldIndex = tabs.IndexOf(first),
-				NewIndex = tabs.IndexOf(second)
+				IndexFrom = indexFrom,
+				IndexTo = indexTo
 			});
-		}
-
-		private void Reorder(Tab tab, int secondIdx)
-		{
-			Nodes.Remove(tab);
-			Nodes.Insert(secondIdx, tab);
 		}
 
 		private bool TryGetTabUnderMouse(out Tab tab)
@@ -148,8 +132,8 @@ namespace Lime
 
 		public class ReorderEventArgs
 		{
-			public int OldIndex { get; set; }
-			public int NewIndex { get; set; }
+			public int IndexFrom { get; set; }
+			public int IndexTo { get; set; }
 		}
 	}
 }

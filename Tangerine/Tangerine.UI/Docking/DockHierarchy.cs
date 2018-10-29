@@ -501,6 +501,13 @@ namespace Tangerine.UI.Docking
 			placements.RemoveAt(index);
 		}
 
+		public void Move(int indexFrom, int indexTo)
+		{
+			var item = placements[indexFrom];
+			placements.RemoveAt(indexFrom);
+			placements.Insert(indexTo, item);
+		}
+
 		public TPlacement this[int index]
 		{
 			get => placements[index];

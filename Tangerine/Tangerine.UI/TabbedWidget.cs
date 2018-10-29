@@ -81,9 +81,12 @@ namespace Tangerine.UI
 
 		protected virtual void TabBar_OnReorder(TabBar.ReorderEventArgs args)
 		{
-			var tab = Contents[args.OldIndex];
-			Contents.Remove(tab);
-			Contents.Insert(args.NewIndex, tab);
+			var item = Contents[args.IndexFrom];
+			Contents.RemoveAt(args.IndexFrom);
+			Contents.Insert(args.IndexTo, item);
+			if (activeTabIndex == args.IndexFrom) {
+				activeTabIndex = args.IndexTo;
+			}
 		}
 
 		public void AddTab(Tab newTab, Widget content, bool isActive = false)
@@ -116,11 +119,6 @@ namespace Tangerine.UI
 		{
 			TabBar.Nodes.RemoveAt(index);
 			Contents.RemoveAt(index);
-		}
-
-		public Tab GetById(string tabId)
-		{
-			return TabBar.Nodes.OfType<Tab>().FirstOrDefault(t => t.Text == tabId);
 		}
 
 		public int IndexOf(Tab tab)
