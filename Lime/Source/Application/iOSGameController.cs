@@ -263,6 +263,10 @@ namespace Lime
 			}
 		}
 
+		public override bool PrefersHomeIndicatorAutoHidden => false;
+
+		public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+
 		private class SoftKeyboard : ISoftKeyboard
 		{
 			GameView view;
