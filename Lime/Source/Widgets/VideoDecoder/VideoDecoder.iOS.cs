@@ -27,13 +27,13 @@ namespace Lime
 
 		public float CurrentPosition
 		{
-			get => (float)currentPosition;
+			get => currentPosition * 0.001f;
 			set => SeekTo(value);
 		}
 
 		private Texture2D texture;
 
-		private double currentPosition;
+		private float currentPosition => startTime + stopwatch.ElapsedMilliseconds;
 		private AVPlayerItem playerItem;
 		private AVPlayer player;
 		private AVPlayerItemVideoOutput videoOutput;
@@ -117,11 +117,11 @@ namespace Lime
 						}
 						var timeForDisplay = default(CMTime);
 						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
-						while (currentPosition < timeForDisplay.Seconds) {
-							checkVideoEvent.WaitOne();
-							checkVideoEvent.Reset();
-							stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						}
+						//while (currentPosition < timeForDisplay.Seconds) {
+						//	checkVideoEvent.WaitOne();
+						//	checkVideoEvent.Reset();
+						//	stopDecodeCancelationToken.ThrowIfCancellationRequested();
+						//}
 						lock (locker) {
 							if (currentPixelBuffer != null) {
 								currentPixelBuffer.Dispose();
@@ -141,8 +141,8 @@ namespace Lime
 
 		private void SeekTo(float time)
 		{
-			startTime = time;
-			player.Seek(CMTime.FromSeconds(startTime, 1000));
+			startTime = time * 1000;
+			player.Seek(CMTime.FromSeconds(time, 1000));
 			Debug.Write($"Start time: {startTime}");
 
 			if (state == State.Started) {
@@ -180,7 +180,6 @@ namespace Lime
 		public void Update(float delta)
 		{
 			if (state == State.Started) {
-				currentPosition = startTime + stopwatch.ElapsedMilliseconds;
 				checkVideoEvent.Set();
 			}
 		}

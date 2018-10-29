@@ -16,7 +16,7 @@ namespace Lime
 		public ITexture Texture => null;
 		public Action OnStart;
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
-		public float CurentPosition { get; set; }
+		public float CurrentPosition { get; set; }
 		public float Duration { get; }
 
 		public VideoDecoder(string path)
