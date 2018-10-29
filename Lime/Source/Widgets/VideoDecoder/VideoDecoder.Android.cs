@@ -94,7 +94,7 @@ namespace Lime
 		public VideoDecoder(string path)
 		{
 			state = State.Initializing;
-			Window.Current.InvokeOnRendering(() => {
+			var initTask = System.Threading.Tasks.Task.Run(() => {
 				try {
 					videoExtractor = new MediaExtractor();
 					videoExtractor.SetDataSource(path);
