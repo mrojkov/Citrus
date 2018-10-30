@@ -23,7 +23,7 @@ namespace Lime
 		public bool HasNewTexture { get; private set; }
 		public ITexture Texture { get => texture; }
 		public Action OnStart;
-		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+		public VideoPlayerStatus Status;
 
 		public float CurrentPosition
 		{
@@ -63,6 +63,8 @@ namespace Lime
 			playerItem = AVPlayerItem.FromUrl(NSUrl.FromString(path));
 			NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notification) => {
 				state = State.Finished;
+				Status = VideoPlayerStatus.Finished;
+				stopwatch.Stop();
 				stopDecodeCancelationTokenSource.Cancel();
 				checkVideoEvent.Set();
 				Debug.Write("Play to end");
@@ -85,7 +87,7 @@ namespace Lime
 			Duration = (float)asset.Duration.Seconds;
 			stopwatch.Reset();
 			checkVideoEvent = new ManualResetEvent(false);
-			//prepare audio
+			Status = VideoPlayerStatus.Playing;
 		}
 
 		public async System.Threading.Tasks.Task Start()
@@ -93,19 +95,19 @@ namespace Lime
 			if (state == State.Started) {
 				return;
 			}
-			stopwatch.Start();
+
 			do {
 				if (state == State.Finished) {
-					stopwatch.Restart();
-					player.Seek(CMTime.FromSeconds(startTime, 1000));
+					SeekTo(0f);
 				}
+
 				stopDecodeCancelationTokenSource = new CancellationTokenSource();
 				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 				player.Play();
 				state = State.Started;
-
+				Status = VideoPlayerStatus.Playing;
 				OnStart?.Invoke();
-
+				stopwatch.Start();
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
 						var time = player.CurrentTime;
@@ -117,11 +119,6 @@ namespace Lime
 						}
 						var timeForDisplay = default(CMTime);
 						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
-						//while (currentPosition < timeForDisplay.Seconds) {
-						//	checkVideoEvent.WaitOne();
-						//	checkVideoEvent.Reset();
-						//	stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						//}
 						lock (locker) {
 							if (currentPixelBuffer != null) {
 								currentPixelBuffer.Dispose();
@@ -130,7 +127,7 @@ namespace Lime
 							currentPixelBuffer = pixelBuffer;
 							HasNewTexture = true;
 						}
-					};
+					}
 				}, stopDecodeCancelationToken);
 				try {
 					await workTask;
@@ -145,20 +142,20 @@ namespace Lime
 		{
 			startTime = time * 1000;
 			player.Seek(CMTime.FromSeconds(time, 1000));
-			Debug.Write($"Start time: {startTime}");
-
 			if (state == State.Started) {
-				state = State.Paused;
-				stopwatch.Stop();
-				stopwatch.Reset();
 				stopDecodeCancelationTokenSource.Cancel();
 			}
+			if (state != State.Finished || time > 0f) {
+				state = State.Paused;
+			}
+			stopwatch.Reset();
 		}
 
 		public void Pause()
 		{
 			if (state == State.Started) {
 				state = State.Paused;
+				Status = VideoPlayerStatus.Paused;
 				stopwatch.Stop();
 				player.Pause();
 				stopDecodeCancelationTokenSource.Cancel();
