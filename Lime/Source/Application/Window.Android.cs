@@ -18,7 +18,7 @@ namespace Lime
 		private Thread renderThread;
 		private ManualResetEvent renderReady = new ManualResetEvent(false);
 		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
-		
+
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
 
@@ -27,7 +27,7 @@ namespace Lime
 
 		private readonly Display display = new Display(WindowManager.DefaultDisplay);
 		private readonly FPSCounter fpsCounter;
-		
+
 		public bool Active { get; private set; }
 		public bool Fullscreen { get { return true; } set {} }
 		public string Title { get; set; }
@@ -99,17 +99,17 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-			
+
 			PixelScale = Resources.System.DisplayMetrics.Density;
-			
+
 			if (AsyncRendering) {
 				renderThread = new Thread(RenderLoop);
 				renderThread.IsBackground = true;
 				renderThread.Start();
 			}
-			
+
 			Application.WindowUnderMouse = this;
-			
+
 			var ccb = new ChoreographerCallback();
 			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
 			ccb.OnFrame += frameTimeNanos => {
@@ -131,7 +131,7 @@ namespace Lime
 			};
 			Choreographer.Instance.PostFrameCallback(ccb);
 		}
-		
+
 		class ChoreographerCallback : Java.Lang.Object, Choreographer.IFrameCallback
 		{
 			public event Action<long> OnFrame;
@@ -142,7 +142,7 @@ namespace Lime
 				OnFrame?.Invoke(frameTimeNanos);
 			}
 		}
-		
+
 		private void RenderLoop()
 		{
 			while (true) {
@@ -160,17 +160,17 @@ namespace Lime
 				renderCompleted.Set();
 			}
 		}
-		
+
 		private void Update(float delta)
 		{
 			UnclampedDelta = delta;
 			delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			Input.ProcessPendingKeyEvents(delta);
 			base.RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.CopyKeysState();
-			Input.ProcessPendingKeyEvents(delta);
 		}
-		
+
 		private void Render()
 		{
 			var gw = ActivityDelegate.Instance.GameView;
@@ -178,7 +178,7 @@ namespace Lime
 			base.RaiseRendering();
 			gw.SwapBuffers();
 		}
-		
+
 		public void Center() {}
 		public void Close() {}
 		public void Invalidate() {}

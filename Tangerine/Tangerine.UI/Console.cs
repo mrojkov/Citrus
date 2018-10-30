@@ -89,7 +89,7 @@ namespace Tangerine.UI
 					Command.Copy.Enabled = true;
 					if (Command.Copy.WasIssued()) {
 						Command.Copy.Consume();
-						Clipboard.Text = textView.Text;
+						Clipboard.Text = textView.DisplayText;
 					}
 				}
 				if (textView.Input.WasKeyPressed(Key.Mouse1)) {

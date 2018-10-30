@@ -12,8 +12,19 @@ namespace Lime
 			WaitSecondPress,
 		};
 
-		private readonly TimeSpan DoubleClickTimeout = TimeSpan.FromSeconds(0.3);
-		private readonly float MaxDistanceBetweenPresses = 5;
+		private readonly TimeSpan DoubleClickTimeout =
+#if WIN
+			TimeSpan.FromMilliseconds(System.Windows.Forms.SystemInformation.DoubleClickTime);
+#else // WIN
+			TimeSpan.FromSeconds(0.3);
+#endif // WIN
+
+		private readonly Size DoubleClickSize =
+#if WIN
+			new Size(System.Windows.Forms.SystemInformation.DoubleClickSize.Width, System.Windows.Forms.SystemInformation.DoubleClickSize.Height);
+#else // WIN
+			new Size(5, 5);
+#endif // WIN
 
 		private State state;
 		private DateTime pressTime;
@@ -35,29 +46,30 @@ namespace Lime
 
 		public DoubleClickGesture(Action recognized = null)
 			: this(0, recognized)
-		{
-		}
+		{ }
 
 		internal protected override void Cancel()
-		{
-		}
+		{ }
 
 		internal protected override void Update(IEnumerable<Gesture> gestures)
 		{
-			if (state != State.Initial && DateTime.Now - pressTime > DoubleClickTimeout) {
+			var now = DateTime.Now;
+			var delta = now - pressTime;
+			if (state != State.Initial && delta > DoubleClickTimeout) {
 				state = State.Initial;
 			}
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
-				pressTime = DateTime.Now;
+				pressTime = now;
 				pressPosition = Input.MousePosition;
 				state = State.FirstPress;
 			}
 			if (state == State.FirstPress && !Input.IsMousePressed(ButtonIndex)) {
 				state = State.WaitSecondPress;
 			}
-			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
+			if (state == State.WaitSecondPress && Input.WasDoubleClickPressed(ButtonIndex)) {
 				state = State.Initial;
-				if (Input.GetNumTouches() == 1 && (Input.MousePosition - pressPosition).Length < MaxDistanceBetweenPresses) {
+				var r = new Rectangle(pressPosition, pressPosition + (Vector2)DoubleClickSize);
+				if (Input.GetNumTouches() == 0 && r.Contains(Input.MousePosition)) {
 					CancelOtherGestures(gestures);
 					recognized.Raise();
 				}

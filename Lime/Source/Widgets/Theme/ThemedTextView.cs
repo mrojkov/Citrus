@@ -64,7 +64,7 @@ namespace Lime
 		private void ProcessTextLine(ref string text, Widget w)
 		{
 			var m = w.Components.Get<TextLineMultiplicity>().Multiplicity;
-			text = m == 1 ? text : $"{text} (x{m})";
+			text = m == 1 ? text : $"{text} ({m})";
 		}
 
 		public bool IsEmpty => lines.Count == 0;
@@ -77,12 +77,30 @@ namespace Lime
 			{
 				var sb = new StringBuilder();
 				foreach (var l in lines) {
-					sb.AppendLine(l.Text);
+					var m = l.Components.Get<TextLineMultiplicity>().Multiplicity;
+					for (int i = 0; i < m; i++) {
+						sb.AppendLine(l.Text);
+					}
 				}
 				return sb.ToString();
 			}
 			set
 			{
+				Clear();
+				Append(value);
+			}
+		}
+
+		public string DisplayText
+		{
+			get {
+				var sb = new StringBuilder();
+				foreach (var l in lines) {
+					sb.AppendLine(l.DisplayText);
+				}
+				return sb.ToString();
+			}
+			set {
 				Clear();
 				Append(value);
 			}

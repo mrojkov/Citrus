@@ -495,11 +495,13 @@ namespace Lime
 			var delta = Mathf.Clamp(UnclampedDelta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
+			if (Active || Input.IsSimulationRunning) {
+				Input.ProcessPendingKeyEvents(delta);
+			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			if (Active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
 			}
 			if (Application.AreAllWindowsInactive()) {

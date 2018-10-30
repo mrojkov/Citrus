@@ -695,11 +695,13 @@ namespace Lime
 			fpsCounter.Refresh();
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
+			if (active || Input.IsSimulationRunning) {
+				Input.ProcessPendingKeyEvents(delta);
+			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			if (active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
