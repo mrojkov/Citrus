@@ -110,7 +110,11 @@ namespace Tangerine.UI.FilesystemView
 		private string GetFirstExistentParentPath(string path)
 		{
 			while (!Directory.Exists(path)) {
-				path = Path.GetDirectoryName(path);
+				var parentDirectory = Path.GetDirectoryName(path);
+				if (parentDirectory == null) {
+					break;
+				}
+				path = parentDirectory;
 			}
 			return path;
 		}
