@@ -546,16 +546,14 @@ namespace Lime
 		private void OnMouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left) {
-				if (e.Clicks == 1) {
-					Input.SetKeyState(Key.Mouse0, true);
-					Input.SetKeyState(Key.Touch0, true);
-				} else if (e.Clicks == 2) {
+				Input.SetKeyState(Key.Mouse0, true);
+				Input.SetKeyState(Key.Touch0, true);
+				if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse0DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Right) {
-				if (e.Clicks == 1) {
-					Input.SetKeyState(Key.Mouse1, true);
-				} else if (e.Clicks == 2) {
+				Input.SetKeyState(Key.Mouse1, true);
+				if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse1DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Middle) {
