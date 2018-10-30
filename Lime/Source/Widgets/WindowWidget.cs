@@ -66,6 +66,11 @@ namespace Lime
 			if (!prevAnyCaptureKeyPressed && anyCaptureKeyPressed) {
 				context.NodeCapturedByMouse = context.NodeUnderMouse;
 			}
+			// Set NodeCapturedByMouse to null if all mouse buttons were released.
+			if (prevAnyCaptureKeyPressed && !anyCaptureKeyPressed) {
+				context.NodeCapturedByMouse = null;
+			}
+			prevAnyCaptureKeyPressed = anyCaptureKeyPressed;
 
 			// Process mouse/touch screen input.
 			context.GestureManager.Process();
@@ -74,12 +79,6 @@ namespace Lime
 			context.MouseCursor = MouseCursor.Default;
 			base.Update(delta);
 			Window.Cursor = context.MouseCursor;
-
-			// Set NodeCapturedByMouse to null if all mouse buttons were released.
-			if (prevAnyCaptureKeyPressed && !anyCaptureKeyPressed) {
-				context.NodeCapturedByMouse = null;
-			}
-			prevAnyCaptureKeyPressed = anyCaptureKeyPressed;
 
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				SetFocus(null);
