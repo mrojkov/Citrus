@@ -116,7 +116,30 @@ namespace Tangerine.Core
 
 				if (fbxExists) {
 					var fbxFullPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, fbxPath);
-					var model = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget, new Dictionary<string, Orange.CookingRules>()).Model;
+					var fbxImporter = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget,
+						new Dictionary<string, Orange.CookingRules>(), applyAttachment: false);
+					var model = fbxImporter.Model;
+					Model3DAttachment attachment;
+					if (!Model3DAttachmentParser.IsAttachmentExists(fbxFullPath)) {
+						attachment = new Model3DAttachment { ScaleFactor = 1 };
+						foreach (var a in model.Animations) {
+							attachment.Animations.Add(new Model3DAttachment.Animation {
+								Name = a.Id,
+								SourceAnimationId = a.Id,
+								StartFrame = 0,
+								LastFrame = -1
+							});
+						}
+					} else {
+						attachment = Model3DAttachmentParser.GetModel3DAttachment(fbxFullPath);
+						// Overwrite source animation ids.
+						attachment.SourceAnimationIds.Clear();
+						foreach (var a in model.Animations) {
+							attachment.SourceAnimationIds.Add(a.Id);
+						}
+						attachment.Apply(model);
+					}
+
 					foreach (var animation in model.Animations) {
 						if (animation.IsLegacy) {
 							continue;
@@ -133,13 +156,16 @@ namespace Tangerine.Core
 						}
 					}
 					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
+				TangerineYuzu.Instance.Value.WriteObjectToBundle(
+						cacheBundle,
+						attachmentPath,
+						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Serialization.Format.Binary, ".txt",
+						AssetAttributes.None, new byte[0]);
 				} else if (fbxCached) {
 					cacheBundle.DeleteFile(path);
 				}
 
-				if (attachmentExists) {
-					cacheBundle.ImportFile(attachmentPath, Stream.Null, 0, ".txt", AssetAttributes.None, new byte[0]);
-				} else if (attachmentCached) {
+				if (!attachmentExists && attachmentCached) {
 					cacheBundle.DeleteFile(attachmentPath);
 				}
 			}

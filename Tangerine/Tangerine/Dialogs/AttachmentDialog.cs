@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
@@ -57,7 +58,7 @@ namespace Tangerine
 			if (history != null) return;
 			history = new DocumentHistory();
 			Button cancelButton;
-			var attachment = new Model3DAttachmentParser().Parse(source.ContentsPath) ?? new Model3DAttachment { ScaleFactor = 1 };
+			var attachment = ReadAttachment(source.ContentsPath + Model3DAttachment.FileExtension);
 			var window = new Window(new WindowOptions {
 				ClientSize = new Vector2(700, 400),
 				FixedSize = false,
@@ -105,7 +106,7 @@ namespace Tangerine
 					// operation to the state when source isn't presented or source content path isn't set.
 					// So check it out before saving.
 					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
-						Model3DAttachmentParser.Save(attachment, System.IO.Path.Combine(Project.Current.AssetsDirectory, source.ContentsPath));
+						SaveAttachment(attachment, source.ContentsPath);
 					}
 				} catch (Lime.Exception e) {
 					new AlertDialog(e.Message).Show();
@@ -136,6 +137,24 @@ namespace Tangerine
 			});
 		}
 
+		private static Model3DAttachment ReadAttachment(string path)
+		{
+			using (var cacheBundle = new PackedAssetBundle(Orange.The.Workspace.TangerineCacheBundle)) {
+				if (cacheBundle.FileExists(path)) {
+					using (var assetStream = cacheBundle.OpenFile(path)){
+						var attachmentFormat = TangerineYuzu.Instance.Value.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(path, assetStream);
+						return Model3DAttachmentParser.GetModel3DAttachment(attachmentFormat, path);
+					}
+				}
+			}
+			return Model3DAttachmentParser.GetModel3DAttachment(new Model3DAttachmentParser.ModelAttachmentFormat {ScaleFactor = 1f}, string.Empty);
+		}
+
+		private static void SaveAttachment(Model3DAttachment attachment, string contentPath)
+		{
+			Model3DAttachmentParser.Save(attachment, Path.Combine(Project.Current.AssetsDirectory, contentPath));
+		}
+
 		private static Widget CreateComponentsPane(Model3DAttachment attachment)
 		{
 			var pane = new ThemedScrollView();
@@ -160,8 +179,7 @@ namespace Tangerine
 
 		private static void CheckErrors(Model3DAttachment attachment, Model3D source)
 		{
-			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count ||
-				attachment.Animations.Any(a => a.Name == source.DefaultAnimation.Id)
+			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count
 			) {
 				throw new Lime.Exception("Animations shouldn't have the same names");
 			}
@@ -205,7 +223,7 @@ namespace Tangerine
 			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
 			pane.Content.AddNode(list);
 			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
-					w => new AnimationRow(w, attachment.Animations), attachment.Animations);
+					w => new AnimationRow(w, attachment), attachment.Animations);
 			widgetFactory.AddHeader(AnimationRow.CreateHeader());
 			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
 				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
@@ -465,8 +483,8 @@ namespace Tangerine
 
 		private class AnimationRow : DeletableRow<Model3DAttachment.Animation>
 		{
-			public AnimationRow(Model3DAttachment.Animation animation, ObservableCollection<Model3DAttachment.Animation> options)
-				: base(animation, options)
+			public AnimationRow(Model3DAttachment.Animation animation, Model3DAttachment attachment)
+				: base(animation, attachment.Animations)
 			{
 				Layout = new VBoxLayout();
 				var expandedButton = new ThemedExpandButton {
@@ -482,6 +500,18 @@ namespace Tangerine
 						animation,
 						nameof(Model3DAttachment.Animation.Name))));
 				animationNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+
+				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+				foreach (var sourceAnimationId in attachment.SourceAnimationIds) {
+					sourceAnimationSelector.Items.Add(new CommonDropDownList.Item(sourceAnimationId));
+				}
+				if (animation.SourceAnimationId == null) {
+					animation.SourceAnimationId = attachment.SourceAnimationIds.FirstOrDefault();
+				}
+				sourceAnimationSelector.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				sourceAnimationSelector.Text = animation.SourceAnimationId;
+				Header.AddNode(sourceAnimationSelector);
+				sourceAnimationSelector.Changed += args => { animation.SourceAnimationId = (string)args.Value; };
 
 				var startFramePropEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
@@ -593,6 +623,12 @@ namespace Tangerine
 						new ThemedSimpleText {
 							Text = "Animation name",
 							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							ForceUncutText = false
+						},
+						new ThemedSimpleText {
+							Text = "Source Animation",
+							MinMaxWidth = AttachmentMetrics.ControlWidth,
 							VAlignment = VAlignment.Center,
 							ForceUncutText = false
 						},
@@ -720,12 +756,12 @@ namespace Tangerine
 						nameof(Marker.Id))));
 				markerIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
 
-				new IntPropertyEditor(
+				var frameEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source.Marker,
 						nameof(Marker.Frame))));
-
+				frameEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
 				var actionPropEditor = new EnumPropertyEditor<MarkerAction>(
 					Decorate(new PropertyEditorParams(
 						Header,
@@ -772,7 +808,7 @@ namespace Tangerine
 						},
 						new ThemedSimpleText {
 							Text = "Frame",
-							MinMaxWidth = 80,
+							MinMaxWidth = AttachmentMetrics.ControlWidth,
 						},
 						new ThemedSimpleText {
 							Text = "Action",

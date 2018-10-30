@@ -4631,6 +4631,11 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
+				result.SourceAnimationId = d.Reader.ReadString();
+				if (result.SourceAnimationId == "" && d.Reader.ReadBoolean()) result.SourceAnimationId = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
 				result.StartFrame = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -4710,13 +4715,26 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
-				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
+				result.SourceAnimationIds = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp12 = d.Reader.ReadInt32();
 				if (tmp12 >= 0) {
-					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+					result.SourceAnimationIds = new global::System.Collections.Generic.List<global::System.String>();
 					while (--tmp12 >= 0) {
-						var tmp13 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-						result.UVAnimations.Add(tmp13);
+						var tmp13 = d.Reader.ReadString();
+						if (tmp13 == "" && d.Reader.ReadBoolean()) tmp13 = null;
+						result.SourceAnimationIds.Add(tmp13);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
+				var tmp14 = d.Reader.ReadInt32();
+				if (tmp14 >= 0) {
+					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+					while (--tmp14 >= 0) {
+						var tmp15 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+						result.UVAnimations.Add(tmp15);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];

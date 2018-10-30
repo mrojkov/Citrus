@@ -20,7 +20,7 @@ namespace Orange
 
 		public Model3D Model { get; private set; }
 
-		public FbxModelImporter(string path, Target target, Dictionary<string, CookingRules> cookingRulesMap)
+		public FbxModelImporter(string path, Target target, Dictionary<string, CookingRules> cookingRulesMap, bool applyAttachment = true)
 		{
 			this.target = target;
 			this.path = path;
@@ -30,7 +30,9 @@ namespace Orange
 			Model = new Model3D();
 			Model.Nodes.Add(ImportNodes(scene.Root));
 			ImportAnimations(scene);
-			new Model3DAttachmentParser().Parse(path, useBundle: false)?.Apply(Model);
+			if (applyAttachment && Model3DAttachmentParser.IsAttachmentExists(path)) {
+				Model3DAttachmentParser.GetModel3DAttachment(path).Apply(Model);
+			}
 			manager.Destroy();
 		}
 
