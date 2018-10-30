@@ -66,10 +66,10 @@ namespace Lime
 			if (state == State.FirstPress && !Input.IsMousePressed(ButtonIndex)) {
 				state = State.WaitSecondPress;
 			}
-			if (state == State.WaitSecondPress && Input.WasDoubleClickPressed(ButtonIndex)) {
+			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Initial;
 				var r = new Rectangle(pressPosition, pressPosition + (Vector2)DoubleClickSize);
-				if (Input.GetNumTouches() == 0 && r.Contains(Input.MousePosition)) {
+				if (Input.GetNumTouches() == 1 && r.Contains(Input.MousePosition)) {
 					CancelOtherGestures(gestures);
 					recognized.Raise();
 				}
