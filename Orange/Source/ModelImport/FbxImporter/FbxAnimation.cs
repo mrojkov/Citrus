@@ -14,9 +14,9 @@ namespace Orange.FbxImporter
 
 		public List<Keyframe<Quaternion>> RotationKeys { get; set; }
 
-		public string AnimationKey { get; set; }
+		public string TargetNodeId { get; set; }
 
-		public string MarkerId { get; set; }
+		public string AnimationStackName { get; set; }
 	}
 
 	public class FbxSceneAnimations
@@ -29,38 +29,29 @@ namespace Orange.FbxImporter
 			if (animationStacksPointer == IntPtr.Zero) return;
 			var strct = animationStacksPointer.ToStruct<SizedArray>();
 			var animationStacks = strct.GetData<AnimationStack>();
-			if (animationStacks.Length == 0)
-				return;
-			for (var stackIndex = 0; stackIndex < animationStacks.Length; stackIndex++) {
-				var layers = animationStacks[stackIndex].Layers.ToStruct<SizedArray>().GetData<AnimationLayer>();
-				if (layers.Length == 0)
-					continue;
-				for (var layerIndex = 0; layerIndex < layers.Length; layerIndex++) {
-					var animations = layers[layerIndex].Animations.ToStruct<SizedArray>().GetData<Animation>();
-					for (var animationIndex = 0; animationIndex < animations.Length; animationIndex++) {
-						var data = new FbxImporter.AnimationData();
-						List.Add(data);
-						// Set animationStack as MarkerId name
-						data.MarkerId = animationStacks[stackIndex].Name;
-						data.AnimationKey = animations[animationIndex].Id;
-						data.PositionKeys = animations[animationIndex].PositionKeys
-							.ToStruct<SizedArray>()
-							.GetData<Keyframe>()
-							.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
-							.ToList();
-
-						data.RotationKeys = animations[animationIndex].RotationKeys
-							.ToStruct<SizedArray>()
-							.GetData<Keyframe>()
-							.Select(key => new Keyframe<Quaternion>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec4>().ToLimeQuaternion()))
-							.ToList();
-
-						data.ScaleKeys = animations[animationIndex].ScaleKeys
-							.ToStruct<SizedArray>()
-							.GetData<Keyframe>()
-							.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
-							.ToList();
-					}
+			if (animationStacks.Length == 0) return;
+			foreach (var animationStack in animationStacks) {
+				var animations = animationStack.Animations.ToStruct<SizedArray>().GetData<Animation>();
+				foreach (var animation in animations) {
+					var data = new AnimationData();
+					List.Add(data);
+					data.AnimationStackName = animationStack.Name;
+					data.TargetNodeId = animation.Id;
+					data.PositionKeys = animation.PositionKeys
+						.ToStruct<SizedArray>()
+						.GetData<Keyframe>()
+						.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
+						.ToList();
+					data.RotationKeys = animation.RotationKeys
+						.ToStruct<SizedArray>()
+						.GetData<Keyframe>()
+						.Select(key => new Keyframe<Quaternion>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec4>().ToLimeQuaternion()))
+						.ToList();
+					data.ScaleKeys = animation.ScaleKeys
+						.ToStruct<SizedArray>()
+						.GetData<Keyframe>()
+						.Select(key => new Keyframe<Vector3>(AnimationUtils.SecondsToFrames(key.Time), key.Data.ToStruct<Vec3>().ToLime()))
+						.ToList();
 				}
 			}
 		}
@@ -76,14 +67,6 @@ namespace Orange.FbxImporter
 
 		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
 		private class AnimationStack
-		{
-			public string Name;
-
-			public IntPtr Layers;
-		}
-
-		[StructLayout(LayoutKind.Sequential, CharSet = ImportConfig.Charset)]
-		private class AnimationLayer
 		{
 			public string Name;
 

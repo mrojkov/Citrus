@@ -86,22 +86,24 @@ namespace Orange
 
 		private Submesh3D ImportSubmesh(FbxSubmesh meshAttribute, FbxImporter.FbxNode node)
 		{
-			var sm = new Submesh3D();
-			sm.Mesh = new Mesh<Mesh3D.Vertex> {
-				Vertices = meshAttribute.Vertices,
-				Indices = meshAttribute.Indices.Select(index => checked((ushort)index)).ToArray(),
-				AttributeLocations = new[] {
-					ShaderPrograms.Attributes.Pos1,
-					ShaderPrograms.Attributes.Color1,
-					ShaderPrograms.Attributes.UV1,
-					ShaderPrograms.Attributes.BlendIndices,
-					ShaderPrograms.Attributes.BlendWeights,
-					ShaderPrograms.Attributes.Normal
-				}
+			var sm = new Submesh3D {
+				Mesh = new Mesh<Mesh3D.Vertex> {
+					Vertices = meshAttribute.Vertices,
+					Indices = meshAttribute.Indices.Select(index => checked((ushort) index)).ToArray(),
+					AttributeLocations = new[] {
+						ShaderPrograms.Attributes.Pos1,
+						ShaderPrograms.Attributes.Color1,
+						ShaderPrograms.Attributes.UV1,
+						ShaderPrograms.Attributes.BlendIndices,
+						ShaderPrograms.Attributes.BlendWeights,
+						ShaderPrograms.Attributes.Normal
+					}
+				},
+				Material = meshAttribute.MaterialIndex != -1
+					? CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target)
+					: FbxMaterial.Default
 			};
 
-			sm.Material = meshAttribute.MaterialIndex != -1 ?
-				CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target) : FbxMaterial.Default;
 
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
@@ -149,10 +151,7 @@ namespace Orange
 
 		private Matrix44 CorrectCameraTransform(Matrix44 origin)
 		{
-			Matrix44 rotationMatrix;
-			Vector3 translation;
-			Vector3 scale;
-			origin.Decompose(out scale, out rotationMatrix, out translation);
+			origin.Decompose(out var scale, out Matrix44 rotationMatrix, out var translation);
 			var newRotation = rotationMatrix.Rotation * CameraPostRotation;
 			return Matrix44.CreateRotation(newRotation) * Matrix44.CreateScale(scale) * Matrix44.CreateTranslation(translation);
 		}
@@ -167,28 +166,39 @@ namespace Orange
 		private void ImportAnimations(FbxScene scene)
 		{
 			foreach (var animation in scene.Animations.List) {
-				var n = Model.TryFind<Node3D>(animation.AnimationKey);
+				var n = Model.TryFind<Node3D>(animation.TargetNodeId);
 				var scaleKeys = Vector3KeyReducer.Default.Reduce(animation.ScaleKeys);
 				if (scaleKeys.Count != 0) {
-					(n.Animators["Scale", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(scaleKeys);
+					GetOrAddAnimator<Vector3Animator>(animation, n, nameof(Node3D.Scale)).Keys.AddRange(scaleKeys);
 				}
 				var rotKeys = QuaternionKeyReducer.Default.Reduce(animation.RotationKeys);
 				if (rotKeys.Count != 0) {
 					if (n is Camera3D) {
 						CorrectCameraAnimationKeys(rotKeys);
 					}
-					(n.Animators["Rotation", animation.MarkerId] as Animator<Quaternion>).Keys.AddRange(rotKeys);
+					GetOrAddAnimator<QuaternionAnimator>(animation, n, nameof(Node3D.Rotation)).Keys.AddRange(rotKeys);
 				}
 				var posKeys = Vector3KeyReducer.Default.Reduce(animation.PositionKeys);
 				if (posKeys.Count != 0) {
-					(n.Animators["Position", animation.MarkerId] as Animator<Vector3>).Keys.AddRange(posKeys);
+					GetOrAddAnimator<Vector3Animator>(animation, n, nameof(Node3D.Position)).Keys.AddRange(posKeys);
 				}
-				if (!Model.Animations.Any(a => a.Id == animation.MarkerId)) {
-					Model.Animations.Add(new Lime.Animation {
-						Id = animation.MarkerId,
+				if (!Model.Animations.Any(a => a.Id == animation.AnimationStackName)) {
+					Model.Animations.Add(new Animation {
+						Id = animation.AnimationStackName,
 					});
 				}
 			}
+		}
+
+		private static T GetOrAddAnimator<T>(AnimationData animation, Node3D n, string propName) where  T: IAnimator, new()
+		{
+			if (n.Animators.TryFind(propName, out var a)) return (T)a;
+			var animator = new T {
+				AnimationId = animation.AnimationStackName,
+				TargetPropertyPath = propName
+			};
+			n.Animators.Add(animator);
+			return animator;
 		}
 	}
 }
