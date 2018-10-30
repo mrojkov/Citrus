@@ -11,6 +11,7 @@ namespace Lime
 		None,
 		Error,
 		Playing,
+		Paused,
 		Finished,
 	}
 
