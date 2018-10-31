@@ -129,7 +129,7 @@ namespace Tangerine
 			};
 			foreach (var pair in commandsDictionary) {
 				commandHandlerList.Connect(pair.Value, new PanelCommandHandler(pair.Key));
-				TangerineMenu.PadsMenu.Add(pair.Value);
+				TangerineMenu.PanelsMenu.Add(pair.Value);
 			}
 			dockManager.AddPanel(inspectorPanel, placement, DockSite.Left);
 			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, placement, DockSite.Right);
