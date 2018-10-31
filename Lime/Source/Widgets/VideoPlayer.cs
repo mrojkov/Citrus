@@ -21,7 +21,7 @@ namespace Lime
 
 		private VideoDecoder decoder;
 
-		public VideoPlayerStatus Status => decoder.Status;
+		public VideoPlayerStatus Status => decoder == null ? VideoPlayerStatus.None : decoder.Status;
 
 		public float CurrentPosition
 		{
