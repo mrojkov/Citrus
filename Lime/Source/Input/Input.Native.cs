@@ -65,10 +65,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
-		public bool IsKeyPressed(Key key)
-		{
-			return keys[key.Code].CurrentState;
-		}
+		public bool IsKeyPressed(Key key) => keys[key.Code].CurrentState;
 
 		public Modifiers GetModifiers()
 		{
@@ -91,18 +88,12 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
-		public bool WasKeyReleased(Key key)
-		{
-			return !keys[key.Code].CurrentState && keys[key.Code].PreviousState;
-		}
+		public bool WasKeyReleased(Key key) => !keys[key.Code].CurrentState && keys[key.Code].PreviousState;
 
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name.
 		/// </summary>
-		public bool WasKeyPressed(Key key)
-		{
-			return keys[key.Code].CurrentState && !keys[key.Code].PreviousState;
-		}
+		public bool WasKeyPressed(Key key) => keys[key.Code].CurrentState && !keys[key.Code].PreviousState;
 
 		public void ConsumeKey(Key key)
 		{
@@ -113,40 +104,13 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name or key event was repeated.
 		/// </summary>
-		public bool WasKeyRepeated(Key key)
-		{
-			return keys[key.Code].Repeated;
-		}
-
-		public bool WasMousePressed()
-		{
-			return WasKeyPressed(GetMouseButtonByIndex(0));
-		}
-
-		public bool WasMouseReleased()
-		{
-			return WasKeyReleased(GetMouseButtonByIndex(0));
-		}
-
-		public bool IsMousePressed()
-		{
-			return IsKeyPressed(GetMouseButtonByIndex(0));
-		}
-
-		public bool WasMousePressed(int button)
-		{
-			return WasKeyPressed(GetMouseButtonByIndex(button));
-		}
-
-		public bool WasMouseReleased(int button)
-		{
-			return WasKeyReleased(GetMouseButtonByIndex(button));
-		}
-
-		public bool IsMousePressed(int button)
-		{
-			return IsKeyPressed(GetMouseButtonByIndex(button));
-		}
+		public bool WasKeyRepeated(Key key) => keys[key.Code].Repeated;
+		public bool WasMousePressed() => WasKeyPressed(GetMouseButtonByIndex(0));
+		public bool WasMouseReleased() => WasKeyReleased(GetMouseButtonByIndex(0));
+		public bool IsMousePressed() => IsKeyPressed(GetMouseButtonByIndex(0));
+		public bool WasMousePressed(int button) => WasKeyPressed(GetMouseButtonByIndex(button));
+		public bool WasMouseReleased(int button) => WasKeyReleased(GetMouseButtonByIndex(button));
+		public bool IsMousePressed(int button) => IsKeyPressed(GetMouseButtonByIndex(button));
 
 		public static Key GetMouseButtonByIndex(int button)
 		{
@@ -156,20 +120,21 @@ namespace Lime
 			return Key.Mouse0 + button;
 		}
 
-		public bool WasTouchBegan(int index)
+		public bool WasDoubleClickPressed(int buttonIndex) => WasKeyPressed(GetDoubleClickByIndex(buttonIndex));
+
+		public static Key GetDoubleClickByIndex(int button)
 		{
-			return WasKeyPressed(GetTouchByIndex(index));
+			switch (button) {
+				case 0: return Key.Mouse0DoubleClick;
+				case 1: return Key.Mouse1DoubleClick;
+				case 2: throw new NotImplementedException($"DoubleClick Key not implemented for mouse button index {button}");
+				default: throw new NotImplementedException($"DoubleClick Key not implemented for mouse button index {button}");
+			}
 		}
 
-		public bool WasTouchEnded(int index)
-		{
-			return WasKeyReleased(GetTouchByIndex(index));
-		}
-
-		public bool IsTouching(int index)
-		{
-			return IsKeyPressed(GetTouchByIndex(index));
-		}
+		public bool WasTouchBegan(int index) => WasKeyPressed(GetTouchByIndex(index));
+		public bool WasTouchEnded(int index) => WasKeyReleased(GetTouchByIndex(index));
+		public bool IsTouching(int index) => IsKeyPressed(GetTouchByIndex(index));
 
 		public static Key GetTouchByIndex(int index)
 		{
@@ -179,15 +144,8 @@ namespace Lime
 			return Key.Touch0 + index;
 		}
 
-		public Vector2 GetDesktopTouchPosition(int index)
-		{
-			return desktopTouchPositions[index];
-		}
-
-		internal void SetDesktopTouchPosition(int index, Vector2 position)
-		{
-			desktopTouchPositions[index] = position;
-		}
+		public Vector2 GetDesktopTouchPosition(int index) => desktopTouchPositions[index];
+		internal void SetDesktopTouchPosition(int index, Vector2 position) => desktopTouchPositions[index] = position;
 
 		public int GetNumTouches()
 		{
@@ -212,10 +170,7 @@ namespace Lime
 
 		private Key currentShortcut = Key.Unknown;
 
-		internal void SetKeyState(Key key, bool value)
-		{
-			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
-		}
+		internal void SetKeyState(Key key, bool value) => keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 
 		internal void ProcessPendingKeyEvents(float delta)
 		{
@@ -339,20 +294,9 @@ namespace Lime
 				}
 			}
 
-			public void SetDesktopMousePosition(Vector2 position)
-			{
-				input.DesktopMousePosition = position;
-			}
-
-			public void SetKeyState(Key key, bool value)
-			{
-				input.SetKeyState(key, value);
-			}
-
-			public void SetWindowUnderMouse(IWindow window)
-			{
-				Application.WindowUnderMouse = window;
-			}
+			public void SetDesktopMousePosition(Vector2 position) => input.DesktopMousePosition = position;
+			public void SetKeyState(Key key, bool value) => input.SetKeyState(key, value);
+			public void SetWindowUnderMouse(IWindow window) => Application.WindowUnderMouse = window;
 
 			public void OnBetweenFrames(float delta)
 			{

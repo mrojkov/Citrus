@@ -591,6 +591,10 @@ namespace Tangerine.UI.FilesystemView
 			if (input.ConsumeKeyPress(Key.Mouse0DoubleClick)) {
 				ScrollView.SetFocus();
 				Open(path);
+				// it's important to return here since Open(path) may take a lot of time
+				// and since it's synchronous we want to cease Mouse0 down handling below
+				// or it will lead to drag behaviour. i.e. if there's a doubleclick event -- dont handle click event, they come both at same frame.
+				return;
 			}
 			if (fsItem.Input.ConsumeKeyRelease(Key.Mouse1)) {
 				ScrollView.SetFocus();

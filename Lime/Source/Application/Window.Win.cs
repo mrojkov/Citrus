@@ -508,9 +508,9 @@ namespace Lime
 		{
 			if (active) {
 				active = false;
-				// Andrey Tyshchenko: clear Input state, the next activated window
-				// will receive KeyDown event and restore Input state
-				Input.ClearKeyState(clearMouseButtons: false);
+				// Clearing key state on deactivate is required so no keys will get stuck.
+				// If, for some reason, you need to transfer key state between windows use InputSimulator to hack it. See docking implementation in Tangerine.
+				Input.ClearKeyState();
 				RaiseDeactivated();
 			}
 		}
@@ -546,16 +546,14 @@ namespace Lime
 		private void OnMouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left) {
-				if (e.Clicks == 1) {
-					Input.SetKeyState(Key.Mouse0, true);
-					Input.SetKeyState(Key.Touch0, true);
-				} else if (e.Clicks == 2) {
+				Input.SetKeyState(Key.Mouse0, true);
+				Input.SetKeyState(Key.Touch0, true);
+				if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse0DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Right) {
-				if (e.Clicks == 1) {
-					Input.SetKeyState(Key.Mouse1, true);
-				} else if (e.Clicks == 2) {
+				Input.SetKeyState(Key.Mouse1, true);
+				if (e.Clicks == 2) {
 					Input.SetKeyState(Key.Mouse1DoubleClick, true);
 				}
 			} else if (e.Button == MouseButtons.Middle) {
@@ -697,11 +695,13 @@ namespace Lime
 			fpsCounter.Refresh();
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
+			if (active || Input.IsSimulationRunning) {
+				Input.ProcessPendingKeyEvents(delta);
+			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			if (active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {

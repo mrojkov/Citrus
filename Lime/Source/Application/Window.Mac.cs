@@ -322,6 +322,9 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
+				// Clearing key state on deactivate is required so no keys will get stuck.
+				// If, for some reason, you need to transfer key state between windows use InputSimulator to hack it. See docking implementation in Tangerine.
+				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
@@ -495,11 +498,13 @@ namespace Lime
 			var delta = Mathf.Clamp(UnclampedDelta, 0, Application.MaxDelta);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
+			if (Active || Input.IsSimulationRunning) {
+				Input.ProcessPendingKeyEvents(delta);
+			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			if (Active || Input.IsSimulationRunning) {
 				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents(delta);
 				Input.TextInput = null;
 			}
 			if (Application.AreAllWindowsInactive()) {

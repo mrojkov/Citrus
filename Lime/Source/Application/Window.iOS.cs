@@ -139,9 +139,9 @@ namespace Lime
 			}
 			UnclampedDelta = (float)e.Time;
 			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			Input.ProcessPendingKeyEvents(delta);
 			RaiseUpdating(delta);
 			Input.CopyKeysState();
-			Input.ProcessPendingKeyEvents(delta);
 			AudioSystem.Update();
 			RaiseSync();
 		}
