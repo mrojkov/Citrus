@@ -1,4 +1,4 @@
-﻿#if !ANDROID && !iOS && !WIN
+#if !ANDROID && !iOS && !WIN
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +16,8 @@ namespace Lime
 		public ITexture Texture => null;
 		public Action OnStart;
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+		public float CurrentPosition { get; set; }
+		public float Duration { get; }
 
 		public VideoDecoder(string path)
 		{

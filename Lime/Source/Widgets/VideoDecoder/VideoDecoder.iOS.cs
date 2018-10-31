@@ -17,17 +17,23 @@ namespace Lime
 	public class VideoDecoder : IDisposable
 	{
 		public bool Looped;
-		public double Duration { get; private set; }
+		public float Duration { get; private set; }
 		public int Width { get; private set; }
 		public int Height { get; private set; }
 		public bool HasNewTexture { get; private set; }
 		public ITexture Texture { get => texture; }
 		public Action OnStart;
-		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+		public VideoPlayerStatus Status;
+
+		public float CurrentPosition
+		{
+			get => currentPosition * 0.001f;
+			set => SeekTo(value);
+		}
 
 		private Texture2D texture;
 
-		private double currentPosition;
+		private float currentPosition => startTime + stopwatch.ElapsedMilliseconds;
 		private AVPlayerItem playerItem;
 		private AVPlayer player;
 		private AVPlayerItemVideoOutput videoOutput;
@@ -39,6 +45,8 @@ namespace Lime
 		private State state = State.Initialized;
 
 		private Stopwatch stopwatch = new Stopwatch();
+
+		private float startTime = 0;
 
 		private enum State
 		{
@@ -55,6 +63,8 @@ namespace Lime
 			playerItem = AVPlayerItem.FromUrl(NSUrl.FromString(path));
 			NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notification) => {
 				state = State.Finished;
+				Status = VideoPlayerStatus.Finished;
+				stopwatch.Stop();
 				stopDecodeCancelationTokenSource.Cancel();
 				checkVideoEvent.Set();
 				Debug.Write("Play to end");
@@ -74,30 +84,30 @@ namespace Lime
 			var size = videoTracks[0].NaturalSize;
 			Width = (int)size.Width;
 			Height = (int)size.Height;
-			Duration = asset.Duration.Seconds;
+			Duration = (float)asset.Duration.Seconds;
 			stopwatch.Reset();
 			checkVideoEvent = new ManualResetEvent(false);
-			//prepare audio
+			Status = VideoPlayerStatus.Playing;
 		}
 
-		public IEnumerator<object> Start()
+		public async System.Threading.Tasks.Task Start()
 		{
 			if (state == State.Started) {
-				yield break;
+				return;
 			}
-			stopwatch.Start();
+
 			do {
 				if (state == State.Finished) {
-					stopwatch.Restart();
-					player.Seek(CMTime.FromSeconds(0, 1000));
+					SeekTo(0f);
 				}
+
 				stopDecodeCancelationTokenSource = new CancellationTokenSource();
 				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 				player.Play();
 				state = State.Started;
-
+				Status = VideoPlayerStatus.Playing;
 				OnStart?.Invoke();
-
+				stopwatch.Start();
 				var workTask = System.Threading.Tasks.Task.Run(() => {
 					while (true) {
 						var time = player.CurrentTime;
@@ -109,11 +119,6 @@ namespace Lime
 						}
 						var timeForDisplay = default(CMTime);
 						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
-						while (currentPosition < timeForDisplay.Seconds) {
-							checkVideoEvent.WaitOne();
-							checkVideoEvent.Reset();
-							stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						}
 						lock (locker) {
 							if (currentPixelBuffer != null) {
 								currentPixelBuffer.Dispose();
@@ -122,19 +127,35 @@ namespace Lime
 							currentPixelBuffer = pixelBuffer;
 							HasNewTexture = true;
 						}
-					};
+					}
 				}, stopDecodeCancelationToken);
-				while (!workTask.IsCompleted && !workTask.IsCanceled && !workTask.IsFaulted) {
-					yield return null;
-				};
+				try {
+					await workTask;
+				} catch (OperationCanceledException e) {
+					Debug.Write("VideoPlayer: work task canceled!");
+				}
 			} while (Looped && state == State.Finished);
 			Debug.Write("Video player loop ended!");
+		}
+
+		private void SeekTo(float time)
+		{
+			startTime = time * 1000;
+			player.Seek(CMTime.FromSeconds(time, 1000));
+			if (state == State.Started) {
+				stopDecodeCancelationTokenSource.Cancel();
+			}
+			if (state != State.Finished || time > 0f) {
+				state = State.Paused;
+			}
+			stopwatch.Reset();
 		}
 
 		public void Pause()
 		{
 			if (state == State.Started) {
 				state = State.Paused;
+				Status = VideoPlayerStatus.Paused;
 				stopwatch.Stop();
 				player.Pause();
 				stopDecodeCancelationTokenSource.Cancel();
@@ -158,7 +179,6 @@ namespace Lime
 		public void Update(float delta)
 		{
 			if (state == State.Started) {
-				currentPosition = stopwatch.ElapsedMilliseconds;
 				checkVideoEvent.Set();
 			}
 		}

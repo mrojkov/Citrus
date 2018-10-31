@@ -105,6 +105,8 @@ namespace Lime
 		public ITexture Texture => texture;
 		public Action OnStart;
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
+		public float CurrentPosition { get; set; }
+		public float Duration { get; }
 
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;
@@ -196,10 +198,10 @@ namespace Lime
 			public Vector2 UV1;
 		}
 
-		public IEnumerator<object> Start()
+		public async System.Threading.Tasks.Task Start()
 		{
 			if (state == State.Started) {
-				yield break;
+				return;
 			}
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
 			var token = stopDecodeCancelationTokenSource.Token;
@@ -288,15 +290,12 @@ namespace Lime
 					}
 				}, token);
 				OnStart?.Invoke();
-				while (!queueTask.IsCompleted && !queueTask.IsCanceled && !queueTask.IsFaulted) {
-					yield return null;
-				};
-				while (
-					(!audioTask.IsCompleted && !audioTask.IsCanceled && !audioTask.IsFaulted) ||
-					(!videoTask.IsCompleted && !videoTask.IsCanceled && !videoTask.IsFaulted))
-				{
-					yield return null;
-				};
+				try {
+					await queueTask;
+					await System.Threading.Tasks.Task.WhenAll(audioTask, videoTask);
+				} catch (System.OperationCanceledException e) {
+					Debug.Write("VideoPlayer: queueTask canceled!");
+				}
 
 				if (!token.IsCancellationRequested) {
 					state = State.Finished;

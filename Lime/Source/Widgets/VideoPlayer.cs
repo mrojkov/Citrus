@@ -11,6 +11,7 @@ namespace Lime
 		None,
 		Error,
 		Playing,
+		Paused,
 		Finished,
 	}
 
@@ -21,6 +22,14 @@ namespace Lime
 		private VideoDecoder decoder;
 
 		public VideoPlayerStatus Status => decoder.Status;
+
+		public float CurrentPosition
+		{
+			get => decoder.CurrentPosition;
+			set => decoder.CurrentPosition = value;
+		}
+
+		public float Duration => decoder.Duration;
 
 		public VideoPlayer()
 		{
@@ -43,13 +52,16 @@ namespace Lime
 
 		public void InitPlayer(string sourcePath)
 		{
+			if (decoder != null) {
+				decoder.Dispose();
+			}
 			decoder = new VideoDecoder(sourcePath);
 		}
 
-		public IEnumerator<object> Start(Action onStart)
+		public void Start(Action onStart)
 		{
 			decoder.OnStart = onStart;
-			yield return decoder.Start();
+			decoder.Start();
 		}
 
 		public void Pause()
