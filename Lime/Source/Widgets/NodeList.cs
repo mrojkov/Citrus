@@ -313,7 +313,7 @@ namespace Lime
 			tmp.NextSibling = (indexTo + 1 < Count) ? list[indexTo + 1] : null;
 			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
-			owner.AsWidget?.Layout.InvalidateArrangement();
+			owner.AsWidget?.Layout.InvalidateConstraintsAndArrangement();
 		}
 
 		private void RefreshFirstChild()
