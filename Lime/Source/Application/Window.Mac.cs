@@ -322,6 +322,9 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
+				// Clearing key state on deactivate is required so no keys will get stuck.
+				// If, for some reason, you need to transfer key state between windows use InputSimulator to hack it. See docking implementation in Tangerine.
+				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
