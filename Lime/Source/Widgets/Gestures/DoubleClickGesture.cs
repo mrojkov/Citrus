@@ -68,7 +68,8 @@ namespace Lime
 			}
 			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Initial;
-				var r = new Rectangle(pressPosition, pressPosition + (Vector2)DoubleClickSize);
+				var halfSize = (Vector2)DoubleClickSize * 0.5f;
+				var r = new Rectangle(pressPosition - halfSize, pressPosition + halfSize);
 				if (Input.GetNumTouches() == 1 && r.Contains(Input.MousePosition)) {
 					CancelOtherGestures(gestures);
 					recognized.Raise();
