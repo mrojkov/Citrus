@@ -110,6 +110,7 @@ namespace Tangerine
 			var documentPanel = new Panel(DockManager.DocumentAreaId, undockable: false);
 			documentPanel.PanelWidget = documentPanel.ContentWidget;
 			var visualHintsPanel = new Panel("Visual Hints");
+			var attachmentPanel = new Panel("Model3D Attachment");
 			var dockManager = DockManager.Instance;
 			new UI.Console(consolePanel);
 			var root = dockManager.Model.WindowPlacements.First();
@@ -126,6 +127,7 @@ namespace Tangerine
 				{ consolePanel.Id, new Command(consolePanel.Title) },
 				{ backupHistoryPanel.Id, new Command(backupHistoryPanel.Title) },
 				{ visualHintsPanel.Id, new Command(visualHintsPanel.Title) },
+				{ attachmentPanel.Id, new Command(attachmentPanel.Title) },
 			};
 			foreach (var pair in commandsDictionary) {
 				commandHandlerList.Connect(pair.Value, new PanelCommandHandler(pair.Key));
@@ -137,6 +139,7 @@ namespace Tangerine
 			dockManager.AddPanel(backupHistoryPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(consolePanel, filesystemPlacement, DockSite.Bottom, 0.3f);
 			dockManager.AddPanel(visualHintsPanel, placement, DockSite.Right, 0.3f).Hidden = true;
+			dockManager.AddPanel(attachmentPanel, placement, DockSite.Bottom, 0.3f).Hidden = true;
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 			documentPanel.ContentWidget.Nodes.Add(dockManager.DocumentArea);
@@ -309,7 +312,8 @@ namespace Tangerine
 						new Panels.HierarchyPanel(searchPanel.ContentWidget),
 						new Panels.BackupHistoryPanel(backupHistoryPanel.ContentWidget),
 						// Use VisualHintsPanel sigleton because we need preserve its state between documents.
-						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel)
+						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel),
+						new AttachmentPanel(attachmentPanel),
 				});
 					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}
@@ -685,11 +689,6 @@ namespace Tangerine
 			h.Connect(TimelineCommands.CreateRotationKeyframe, UI.Timeline.Operations.ToggleRotationKeyframe.Perform);
 			h.Connect(TimelineCommands.CreateScaleKeyframe, UI.Timeline.Operations.ToggleScaleKeyframe.Perform);
 			h.Connect(TimelineCommands.CenterTimelineOnCurrentColumn, new DocumentDelegateCommandHandler(UI.Timeline.Operations.CenterTimelineOnCurrentColumn.Perform));
-			h.Connect(TimelineCommands.ShowModel3DAttachmentDialog, () => {
-				var model = (Model3D)TimelineCommands.ShowModel3DAttachmentDialog.UserData;
-				TimelineCommands.ShowModel3DAttachmentDialog.UserData = null;
-				AttachmentDialog.ShowFor(model);
-			});
 			h.Connect(OrangeCommands.RunConfig, new OrangeCommandHandler(() => new OrangePluginOptionsDialog()));
 			h.Connect(SceneViewCommands.ToggleDisplayRuler, new DisplayRuler());
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());

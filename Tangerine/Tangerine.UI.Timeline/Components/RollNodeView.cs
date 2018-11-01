@@ -332,10 +332,6 @@ namespace Tangerine.UI.Timeline.Components
 				Command.MenuSeparator,
 				GenericCommands.ConvertToButton
 			};
-			if (nodeData.Node is Model3D && nodeData.Node.ContentsPath != null) {
-				TimelineCommands.ShowModel3DAttachmentDialog.UserData = nodeData.Node;
-				menu.Insert(0, TimelineCommands.ShowModel3DAttachmentDialog);
-			}
 
 			if (NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType())) {
 				menu.Insert(6, new Command("Propagate Markers", () => {
