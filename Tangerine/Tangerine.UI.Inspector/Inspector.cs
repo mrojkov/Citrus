@@ -14,12 +14,12 @@ namespace Tangerine.UI.Inspector
 		private static readonly Icon inspectRootDeactivatedTexture;
 
 		private readonly InspectorContent content;
-		private readonly Widget contentWidget;
+		private readonly ThemedScrollView contentWidget;
 
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
-		public readonly ThemedScrollView RootWidget;
+		public readonly Widget RootWidget;
 		public readonly ToolbarView Toolbar;
 		public readonly List<object> Objects;
 
@@ -53,16 +53,15 @@ namespace Tangerine.UI.Inspector
 		public Inspector(Widget panelWidget)
 		{
 			PanelWidget = panelWidget;
-			RootWidget = new ThemedScrollView();
+			RootWidget = new Widget { Layout = new VBoxLayout() };
 			var toolbarArea = new Widget { Layout = new StackLayout(), Padding = new Thickness(4, 0) };
-			contentWidget = new Widget();
-			RootWidget.Content.AddNode(toolbarArea);
-			RootWidget.Content.AddNode(contentWidget);
-			RootWidget.Content.Layout = new VBoxLayout();
+			contentWidget = new ThemedScrollView();
+			RootWidget.AddNode(toolbarArea);
+			RootWidget.AddNode(contentWidget);
+			contentWidget.Content.Layout = new VBoxLayout();
 			Toolbar = new ToolbarView(toolbarArea, GetToolbarLayout());
-			contentWidget.Layout = new VBoxLayout();
 			Objects = new List<object>();
-			content = new InspectorContent(contentWidget) {
+			content = new InspectorContent(contentWidget.Content) {
 				Footer = new Widget { MinHeight = 300.0f },
 				History = Document.Current.History
 			};
@@ -123,7 +122,7 @@ namespace Tangerine.UI.Inspector
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
-			RootWidget.ScrollPosition = RootWidget.MinScrollPosition;
+			contentWidget.ScrollPosition = contentWidget.MinScrollPosition;
 		}
 	}
 }
