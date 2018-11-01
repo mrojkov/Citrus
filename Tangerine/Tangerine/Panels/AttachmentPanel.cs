@@ -142,6 +142,8 @@ namespace Tangerine
 						}
 						if (panelState.AnimationsScrollPosition != 1) {
 							var sv = (content["AnimationsScrollView"] as ThemedScrollView);
+							sv.Update(0.0f);
+							sv.LayoutManager.Layout();
 							sv.ScrollPosition = Mathf.Clamp(panelState.AnimationsScrollPosition, 0, sv.MaxScrollPosition);
 						}
 						break;
