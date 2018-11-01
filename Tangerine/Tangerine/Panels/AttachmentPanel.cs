@@ -48,10 +48,11 @@ namespace Tangerine
 
 		private class PanelState
 		{
-			public int ActiveTabIndex = -1;
+			public static int ActiveTabIndex = 3;
+			public int AnimationsScrollPosition = -1;
 		}
 
-		private static PanelState panelState = new PanelState();
+		private PanelState panelState = new PanelState();
 
 		public AttachmentPanel(Tangerine.UI.Docking.Panel panel)
 		{
@@ -60,6 +61,7 @@ namespace Tangerine
 			Panel = panel;
 			RootWidget.AddChangeWatcher(CalcSelectedRowsHashcode, _ => {
 				// rebuild
+				panelState.AnimationsScrollPosition = (int)((RootWidget.TryFindNode("AnimationsScrollView") as ThemedScrollView)?.ScrollPosition ?? panelState.AnimationsScrollPosition);
 				RootWidget.Nodes.Clear();
 				var rows = Document.Current.Rows;
 				Model3D model3d = null;
@@ -114,19 +116,38 @@ namespace Tangerine
 			return @params;
 		}
 
-		public static Widget Rebuild(Model3D source)
+		public Widget Rebuild(Model3D source)
 		{
 			var attachment = ReadAttachment(source);
 			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
 			content.AddTab("Components", CreateComponentsPane(attachment));
 			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
-			content.AddTab("Animations", CreateAnimationsPane(attachment));
+			var animationsPane = CreateAnimationsPane(attachment);
+			content.AddTab("Animations", animationsPane);
 			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
-			if (panelState.ActiveTabIndex != -1) {
-				content.ActivateTab(panelState.ActiveTabIndex);
+			if (PanelState.ActiveTabIndex != -1) {
+				content.ActivateTab(PanelState.ActiveTabIndex);
 			}
-			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => panelState.ActiveTabIndex = activeTabIndex);
+			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => {
+				PanelState.ActiveTabIndex = activeTabIndex;
+				switch (PanelState.ActiveTabIndex) {
+					case 3: {
+						var t = animationsPane["Container"];
+						foreach (var node in t.Nodes) {
+							if (node is AnimationRow ar) {
+								(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
+								ar.Expand();
+							}
+						}
+						if (panelState.AnimationsScrollPosition != 1) {
+							var sv = (content["AnimationsScrollView"] as ThemedScrollView);
+							sv.ScrollPosition = Mathf.Clamp(panelState.AnimationsScrollPosition, 0, sv.MaxScrollPosition);
+						}
+						break;
+					}
+				}
+			});
 			Button okButton;
 			Widget rootWidget = new Widget {
 				Padding = new Thickness(8),
@@ -258,6 +279,7 @@ namespace Tangerine
 		private static Widget CreateAnimationsPane(Model3DAttachment attachment)
 		{
 			var pane = new ThemedScrollView {
+				Id = "AnimationsScrollView",
 				Padding = new Thickness { Right = 10 },
 			};
 			var list = new Widget {
@@ -538,11 +560,12 @@ namespace Tangerine
 
 		private class AnimationRow : DeletableRow<Model3DAttachment.Animation>
 		{
+			private ThemedExpandButton expandedButton;
 			public AnimationRow(Model3DAttachment.Animation animation, Model3DAttachment attachment)
 				: base(animation, attachment.Animations)
 			{
 				Layout = new VBoxLayout();
-				var expandedButton = new ThemedExpandButton {
+				expandedButton = new ThemedExpandButton {
 					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
 					Anchors = Anchors.Left
 				};
@@ -637,6 +660,8 @@ namespace Tangerine
 				CompoundPresenter.Add(Presenters.StripePresenter);
 			}
 
+			public void Expand() => expandedButton.Expanded = true;
+
 			private void BuildList<TData, TRow>(ObservableCollection<TData> source, Widget container, string title, Func<TData> activator, Widget header) where TRow : DeletableRow<TData>
 			{
 				ThemedExpandButton markersExpandButton;
@@ -644,7 +669,8 @@ namespace Tangerine
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
 					Nodes = {
 						(markersExpandButton = new ThemedExpandButton {
-							MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize)
+							Id = title + "ExpandButton",
+							MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
 						}),
 						new ThemedSimpleText { Text = title },
 					}

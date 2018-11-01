@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace Tangerine.UI
 			Source = source;
 			source.CollectionChanged += OnCollectionChanged;
 			this.rowBuilder = rowBuilder;
-			Container = new Widget { Layout = new VBoxLayout() };
+			Container = new Widget { Id = "Container", Layout = new VBoxLayout() };
 			widgetCache = new Dictionary<TItem, Widget>();
 			Rebuild();
 		}
