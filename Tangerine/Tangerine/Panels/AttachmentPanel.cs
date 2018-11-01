@@ -46,6 +46,13 @@ namespace Tangerine
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
 
+		private class PanelState
+		{
+			public int ActiveTabIndex = -1;
+		}
+
+		private static PanelState panelState = new PanelState();
+
 		public AttachmentPanel(Tangerine.UI.Docking.Panel panel)
 		{
 			RootWidget = new Widget();
@@ -116,6 +123,10 @@ namespace Tangerine
 			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
 			content.AddTab("Animations", CreateAnimationsPane(attachment));
 			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
+			if (panelState.ActiveTabIndex != -1) {
+				content.ActivateTab(panelState.ActiveTabIndex);
+			}
+			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => panelState.ActiveTabIndex = activeTabIndex);
 			Button okButton;
 			Widget rootWidget = new Widget {
 				Padding = new Thickness(8),
