@@ -181,6 +181,9 @@ namespace Lime
 
 		private IMaterial GetMaterial(Widget widget, PostProcessingComponent component)
 		{
+			if (component.CustomMaterial != null) {
+				return component.CustomMaterial;
+			}
 			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader && opaque == component.OpagueRendering) {
 				return material;
 			}

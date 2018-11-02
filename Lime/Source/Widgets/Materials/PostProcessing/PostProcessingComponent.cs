@@ -512,6 +512,8 @@ namespace Lime
 
 		public bool RequiredRefreshSource { get; set; } = true;
 
+		public IMaterial CustomMaterial;
+
 		[TangerineGroup(GroupDebugView)]
 		[TangerineInspect]
 		public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; } = PostProcessingPresenter.DebugViewMode.None;
