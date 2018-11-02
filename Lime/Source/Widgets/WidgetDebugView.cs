@@ -51,6 +51,11 @@ namespace Lime
 
 		public Vector2 Pivot { get { return widget.Pivot; } }
 
+		public ILayout Layout => widget.Layout;
+
+		public Vector2 MinSize => widget.MinSize;
+		public Vector2 MaxSize => widget.MaxSize;
+
 		public WidgetBasis LocalBasis
 		{
 			get
