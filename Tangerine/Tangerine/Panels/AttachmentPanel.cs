@@ -387,21 +387,26 @@ namespace Tangerine
 				Padding = new Thickness(AttachmentMetrics.Spacing);
 				Header = new Widget {
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
+					LayoutCell = new LayoutCell(),
 				};
-				var headerWrapper = new Widget {
-					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
-				};
-				deleteButton = new ThemedDeleteButton {
-					Anchors = Anchors.Right,
-					LayoutCell = new LayoutCell(Alignment.LeftTop),
-				};
+				deleteButton = new ThemedDeleteButton();
 				deleteButton.Clicked += () =>
 					Document.Current.History.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(Source)));
-				headerWrapper.Nodes.Add(Header);
-				headerWrapper.Nodes.Add(new Widget());
-				headerWrapper.Nodes.Add(deleteButton);
+				var deleteButtonWrapper = new Widget {
+					Layout = new HBoxLayout(),
+					Nodes = {
+						Spacer.HFill(),
+						deleteButton,
+					}
+				};
+				Nodes.Add(new Widget() {
+					Layout = new HBoxLayout(),
+					Nodes = {
+						Header,
+						deleteButtonWrapper
+					}
+				});
 				MinMaxHeight = AttachmentMetrics.RowHeight;
-				Nodes.Add(headerWrapper);
 				Presenter = Presenters.StripePresenter;
 			}
 		}
@@ -433,6 +438,7 @@ namespace Tangerine
 				AddChangeWatcher(() => property.Value, (v) => {
 					Nodes.Clear();
 					if (v == null) {
+						Nodes.Add(Spacer.HStretch());
 						Nodes.Add(AddButton);
 					} else {
 						new BlendingPropertyEditor(new PropertyEditorParams(this, obj, propName) {
@@ -579,7 +585,7 @@ namespace Tangerine
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.Name))));
-				animationNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				animationNamePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 				foreach (var sourceAnimationId in attachment.SourceAnimationIds) {
@@ -588,7 +594,7 @@ namespace Tangerine
 				if (animation.SourceAnimationId == null) {
 					animation.SourceAnimationId = attachment.SourceAnimationIds.FirstOrDefault();
 				}
-				sourceAnimationSelector.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				sourceAnimationSelector.AsWidget.MinWidth = 0.0f;
 				sourceAnimationSelector.Text = animation.SourceAnimationId;
 				Header.AddNode(sourceAnimationSelector);
 				sourceAnimationSelector.Changed += args => { animation.SourceAnimationId = (string)args.Value; };
@@ -598,14 +604,14 @@ namespace Tangerine
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.StartFrame))));
-				startFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				startFramePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 
 				var lastFramePropEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.LastFrame))));
-				lastFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				lastFramePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.Animation.Blending)));
 
@@ -660,6 +666,7 @@ namespace Tangerine
 					() => expandedButton.Expanded,
 					(v) => expandableContentWrapper.Visible = v);
 				CompoundPresenter.Add(Presenters.StripePresenter);
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			public void Expand() => expandedButton.Expanded = true;
@@ -705,33 +712,33 @@ namespace Tangerine
 					Nodes = {
 						new ThemedSimpleText {
 							Text = "Animation name",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
 							VAlignment = VAlignment.Center,
-							ForceUncutText = false
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Source Animation",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
 							VAlignment = VAlignment.Center,
-							ForceUncutText = false
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Start Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
 							VAlignment = VAlignment.Center,
-							ForceUncutText = false
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Last Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
 							VAlignment = VAlignment.Center,
-							ForceUncutText = false
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Blending",
-							MinMaxWidth = 80,
 							VAlignment = VAlignment.Center,
-							ForceUncutText = false
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new Widget(),
 					}
@@ -750,8 +757,9 @@ namespace Tangerine
 						Header,
 						source,
 						nameof(Model3DAttachment.NodeData.Id))));
-				nodeIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				nodeIdPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 				Presenter = Presenters.StripePresenter;
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			internal static Widget CreateHeader()
@@ -764,7 +772,9 @@ namespace Tangerine
 					Nodes = {
 						new ThemedSimpleText {
 							Text = "Node Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new Widget(),
 					}
@@ -782,21 +792,22 @@ namespace Tangerine
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.DestMarkerId))));
-				destMarkerPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				destMarkerPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceMarkerPropEditor = new StringPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.SourceMarkerId))));
-				sourceMarkerPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				sourceMarkerPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var blendingOptionEditBox = new BlendingPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.Blending))));
-				blendingOptionEditBox.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				blendingOptionEditBox.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			public static Widget CreateHeader()
@@ -809,15 +820,21 @@ namespace Tangerine
 					Nodes = {
 						new ThemedSimpleText {
 							Text = "Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Source Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Blending Option",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new Widget(),
 					}
@@ -837,21 +854,24 @@ namespace Tangerine
 						Header,
 						Source.Marker,
 						nameof(Marker.Id))));
-				markerIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				markerIdPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var frameEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source.Marker,
 						nameof(Marker.Frame))));
-				frameEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				frameEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				var actionPropEditor = new EnumPropertyEditor<MarkerAction>(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source.Marker,
 						nameof(Marker.Action))));
-				actionPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				actionPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 				var jumpToPropEditor = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
+				jumpToPropEditor.MinSize = Vector2.Zero;
+				jumpToPropEditor.MaxSize = Vector2.PositiveInfinity;
+				jumpToPropEditor.Nodes[0].AsWidget.MinWidth = 0.0f;
 				var previousMarkerId = Source.Marker.Id;
 				jumpToPropEditor.Changed += args => {
 					if ((string)args.Value != Source.Marker.JumpTo) {
@@ -873,8 +893,8 @@ namespace Tangerine
 					previousMarkerId = v;
 				});
 				jumpToPropEditor.Value = Source.Marker.JumpTo;
-				jumpToPropEditor.MinMaxWidth = AttachmentMetrics.ControlWidth;
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.MarkerData.Blending)));
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			public static Widget CreateHeader()
@@ -887,23 +907,33 @@ namespace Tangerine
 					Nodes = {
 						new ThemedSimpleText {
 							Text = "Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Action",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "JumpTo",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new ThemedSimpleText {
 							Text = "Blending",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
+							VAlignment = VAlignment.Center,
+							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+							ForceUncutText = false,
 						},
 						new Widget(),
 					}
@@ -1052,7 +1082,7 @@ namespace Tangerine
 			{
 				editor = editorParams.NumericEditBoxFactory();
 				editor.Step = 1f;
-				editor.MinMaxWidth = 80;
+				editor.MinWidth = 0.0f;
 				editor.LayoutCell = new LayoutCell(Alignment.Center);
 				EditorContainer.AddNode(editor);
 				var current = CoalescedPropertyValue();
