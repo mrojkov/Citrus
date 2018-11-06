@@ -91,6 +91,7 @@ namespace Tangerine.Core
 		private void CheckFbx(string path)
 		{
 			using (var cacheBundle = OpenCacheBundle(AssetBundleFlags.Writable)) {
+				Model3DAttachment attachment = null;
 				var fbxPath = Path.ChangeExtension(path, "fbx");
 				var fbxExists = base.FileExists(fbxPath);
 				var fbxCached = cacheBundle.FileExists(path);
@@ -119,18 +120,7 @@ namespace Tangerine.Core
 					var fbxImporter = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget,
 						new Dictionary<string, Orange.CookingRules>(), applyAttachment: false);
 					var model = fbxImporter.Model;
-					Model3DAttachment attachment;
-					if (!Model3DAttachmentParser.IsAttachmentExists(fbxFullPath)) {
-						attachment = new Model3DAttachment { ScaleFactor = 1 };
-						foreach (var a in model.Animations) {
-							attachment.Animations.Add(new Model3DAttachment.Animation {
-								Name = a.Id,
-								SourceAnimationId = a.Id,
-								StartFrame = 0,
-								LastFrame = -1
-							});
-						}
-					} else {
+					if (attachmentExists) {
 						attachment = Model3DAttachmentParser.GetModel3DAttachment(fbxFullPath);
 						// Overwrite source animation ids.
 						attachment.SourceAnimationIds.Clear();
@@ -156,16 +146,18 @@ namespace Tangerine.Core
 						}
 					}
 					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
-				TangerineYuzu.Instance.Value.WriteObjectToBundle(
-						cacheBundle,
-						attachmentPath,
-						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Serialization.Format.Binary, ".txt",
-						AssetAttributes.None, new byte[0]);
+
 				} else if (fbxCached) {
 					cacheBundle.DeleteFile(path);
 				}
 
-				if (!attachmentExists && attachmentCached) {
+				if (attachmentExists) {
+					TangerineYuzu.Instance.Value.WriteObjectToBundle(
+						cacheBundle,
+						attachmentPath,
+						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Serialization.Format.Binary, ".txt",
+						AssetAttributes.None, new byte[0]);
+				} else if (attachmentCached) {
 					cacheBundle.DeleteFile(attachmentPath);
 				}
 			}

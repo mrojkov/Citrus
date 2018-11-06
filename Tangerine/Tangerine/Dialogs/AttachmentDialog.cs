@@ -58,7 +58,7 @@ namespace Tangerine
 			if (history != null) return;
 			history = new DocumentHistory();
 			Button cancelButton;
-			var attachment = ReadAttachment(source.ContentsPath + Model3DAttachment.FileExtension);
+			var attachment = ReadAttachment(source);
 			var window = new Window(new WindowOptions {
 				ClientSize = new Vector2(700, 400),
 				FixedSize = false,
@@ -137,8 +137,9 @@ namespace Tangerine
 			});
 		}
 
-		private static Model3DAttachment ReadAttachment(string path)
+		private static Model3DAttachment ReadAttachment(Model3D source)
 		{
+			var path = source.ContentsPath + Model3DAttachment.FileExtension;
 			using (var cacheBundle = new PackedAssetBundle(Orange.The.Workspace.TangerineCacheBundle)) {
 				if (cacheBundle.FileExists(path)) {
 					using (var assetStream = cacheBundle.OpenFile(path)){
@@ -147,7 +148,17 @@ namespace Tangerine
 					}
 				}
 			}
-			return Model3DAttachmentParser.GetModel3DAttachment(new Model3DAttachmentParser.ModelAttachmentFormat {ScaleFactor = 1f}, string.Empty);
+			var attachment = new Model3DAttachment { ScaleFactor = 1 };
+			foreach (var a in source.Animations) {
+				attachment.Animations.Add(new Model3DAttachment.Animation {
+					Name = a.Id,
+					SourceAnimationId = a.Id,
+					StartFrame = 0,
+					LastFrame = -1
+				});
+				attachment.SourceAnimationIds.Add(a.Id);
+			}
+			return attachment;
 		}
 
 		private static void SaveAttachment(Model3DAttachment attachment, string contentPath)
@@ -179,9 +190,18 @@ namespace Tangerine
 
 		private static void CheckErrors(Model3DAttachment attachment, Model3D source)
 		{
-			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count
-			) {
+			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count) {
 				throw new Lime.Exception("Animations shouldn't have the same names");
+			}
+
+			var errorAnim = attachment.Animations.FirstOrDefault(a =>
+				new HashSet<string>(a.Markers.Select(m => m.Marker.Id)).Count() != a.Markers.Count);
+			if (errorAnim != null) {
+				throw new Lime.Exception($"Markers in '{ errorAnim.Name }' animation shouldn't have the same ids");
+			}
+
+			if (new HashSet<string>(attachment.MeshOptions.Select(a => a.Id)).Count != attachment.MeshOptions.Count) {
+				throw new Lime.Exception("Mesh options shouldn't have the same node ids");
 			}
 
 			if (new HashSet<string>(attachment.NodeComponents.Select(a => a.NodeId)).Count != attachment.NodeComponents.Count) {
