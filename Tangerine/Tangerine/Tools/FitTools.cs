@@ -49,7 +49,7 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0f);
+				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0.0f);
 			}
 		}
 	}
@@ -81,7 +81,7 @@ namespace Tangerine
 			var container = (Widget)Core.Document.Current.Container;
 			foreach (var widget in Core.Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Size), container.Size);
-				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0);
+				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Rotation), 0.0f);
 				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Pivot * container.Size);
 				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Scale), Vector2.One);
 				Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Anchors), Anchors.LeftRightTopBottom);
