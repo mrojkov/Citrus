@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using OpenTK.Graphics;
@@ -496,9 +498,20 @@ namespace Lime
 			}
 		}
 
+		[DllImport("user32.dll")]
+		static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
+
+		private static List<Keys> systemKeys = Enum.GetValues(typeof(Keys)).Cast<Keys>().ToList();
+
 		private void OnActivated(object sender, EventArgs e)
 		{
 			if (!active) {
+				foreach (var systemKey in systemKeys) {
+					var translatedKey = TranslateKey(systemKey);
+					if (translatedKey != Key.Unknown) {
+						Input.SetKeyState(translatedKey, (GetAsyncKeyState(systemKey) & 0x8000) != 0);
+					}
+				}
 				active = true;
 				RaiseActivated();
 			}
@@ -909,7 +922,16 @@ namespace Lime
 					return Key.KeypadMinus;
 				case Keys.Divide:
 					return Key.KeypadDivide;
-
+				case Keys.LButton:
+					return Key.Mouse0;
+				case Keys.RButton:
+					return Key.Mouse1;
+				case Keys.MButton:
+					return Key.Mouse2;
+				case Keys.XButton1:
+					return Key.MouseBack;
+				case Keys.XButton2:
+					return Key.MouseForward;
 				default:
 					return Key.Unknown;
 			}
