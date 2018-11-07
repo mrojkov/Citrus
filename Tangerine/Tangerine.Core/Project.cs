@@ -144,14 +144,25 @@ namespace Tangerine.Core
 			if (Current == Null) {
 				return true;
 			}
+			var modifiedDocuments = documents.Where(d => d.IsModified).ToList();
+			foreach (var d in modifiedDocuments) {
+				if (!d.Close()) {
+					return false;
+				}
+			}
 			fsWatcher?.Dispose();
 			fsWatcher = null;
 			UserPreferences.Documents.Clear();
+			foreach (var d in documents) {
+				UserPreferences.Documents.Add(d.Path);
+			}
+			foreach (var d in modifiedDocuments) {
+				CloseDocument(d, true);
+			}
 			var closingDocuments = documents.ToList();
 			Document.SetCurrent(null);
 			documents.Clear();
 			foreach (var doc in closingDocuments) {
-				UserPreferences.Documents.Add(doc.Path);
 				if (!CloseDocument(doc)) {
 					return false;
 				}
@@ -231,11 +242,11 @@ namespace Tangerine.Core
 				UserPreferences.RecentDocuments.RemoveAt(UserPreferences.RecentDocuments.Count - 1);
 		}
 
-		public bool CloseDocument(Document doc)
+		public bool CloseDocument(Document doc, bool force = false)
 		{
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
-			if (doc.Close()) {
+			if (force || doc.Close()) {
 				documents.Remove(doc);
 				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
