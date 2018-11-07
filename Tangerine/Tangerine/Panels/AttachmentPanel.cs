@@ -710,40 +710,25 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Animation name",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Source Animation",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Start Frame",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Last Frame",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Blending",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
+						CreateLabel("Animation name"),
+						CreateLabel("Source Animation"),
+						CreateLabel("Start Frame"),
+						CreateLabel("Last Frame"),
+						CreateLabel("Blending"),
 						new Widget(),
 					}
 				};
 			}
+		}
+
+		private static ThemedSimpleText CreateLabel(string text)
+		{
+			return new ThemedSimpleText {
+				Text = text,
+				VAlignment = VAlignment.Center,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+				ForceUncutText = false,
+			};
 		}
 
 		private class NodeRow : DeletableRow<Model3DAttachment.NodeData>
@@ -770,12 +755,7 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Node Id",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
+						CreateLabel("Node Id"),
 						new Widget(),
 					}
 				};
@@ -818,24 +798,9 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Marker Id",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Source Marker Id",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Blending Option",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
+						CreateLabel("Marker Id"),
+						CreateLabel("Source Marker Id"),
+						CreateLabel("Blending Option"),
 						new Widget(),
 					}
 				};
@@ -905,36 +870,11 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Marker Id",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Frame",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Action",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "JumpTo",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
-						new ThemedSimpleText {
-							Text = "Blending",
-							VAlignment = VAlignment.Center,
-							LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
-							ForceUncutText = false,
-						},
+						CreateLabel("Marker Id"),
+						CreateLabel("Frame"),
+						CreateLabel("Action"),
+						CreateLabel("JumpTo"),
+						CreateLabel("Blending"),
 						new Widget(),
 					}
 				};
@@ -1093,6 +1033,7 @@ namespace Tangerine
 						editor.Text = current.GetValue().Frames.ToString();
 					}
 				};
+				editor.MaxWidth = float.PositiveInfinity;
 				editor.AddChangeWatcher(current, v => editor.Text = v?.Frames.ToString() ?? "0");
 			}
 		}
