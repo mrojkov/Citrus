@@ -13,6 +13,7 @@ namespace Lime
 
 		public readonly ObservableCollection<MeshOption> MeshOptions = new ObservableCollection<MeshOption>();
 		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
+		public readonly List<string> SourceAnimationIds = new List<string>();
 		public readonly ObservableCollection<NodeComponentCollection> NodeComponents = new ObservableCollection<NodeComponentCollection>();
 		public readonly ObservableCollection<NodeRemoval> NodeRemovals = new ObservableCollection<NodeRemoval>();
 
@@ -31,6 +32,7 @@ namespace Lime
 			public string Name { get; set; }
 			public int StartFrame { get; set; } = 0;
 			public int LastFrame { get; set; } = -1;
+			public string SourceAnimationId { get; set; }
 			public ObservableCollection<MarkerData> Markers = new ObservableCollection<MarkerData>();
 			public ObservableCollection<NodeData> Nodes = new ObservableCollection<NodeData>();
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
@@ -181,53 +183,78 @@ namespace Lime
 			if (Animations.Count == 0) {
 				return;
 			}
-			var srcAnimation = model.FirstAnimation;
-			if (srcAnimation == null) {
-				return;
-			}
-			var newAnimators = new List<NodeAndAnimator>();
-			foreach (var animationData in Animations) {
-				var id = animationData.Name;
-				if (id == "Default") {
-					id = srcAnimation.Id;
-				}
-				var animation = new Lime.Animation {
-					Id = id
-				};
-				model.Animations.Add(animation);
 
-				var nodes = GetAnimationNodes(model, animationData).ToList();
-				var anims = nodes.SelectMany(n => n.Animators).ToList();
-				foreach (var node in GetAnimationNodes(model, animationData)) {
-					foreach (var animator in node.Animators) {
-						if (animator.AnimationId == srcAnimation.Id) {
-							var newAnimator = animator.Clone();
-							animator.AnimationId = animation.Id;
-							CopyKeys(animator, newAnimator, animationData.StartFrame, animationData.LastFrame);
-							newAnimators.Add(new NodeAndAnimator {
-								Node = node,
-								Animator = newAnimator
-							});
+			var newAnimators = new List<NodeAndAnimator>();
+			var newAnimations = new List<Lime.Animation>();
+			var animationsToReduce = new Dictionary<string, (int, int)>();
+			foreach (var animation in Animations) {
+				if (!model.Animations.TryFind(animation.SourceAnimationId, out var srcAnimation)) {
+					if (string.IsNullOrEmpty(animation.SourceAnimationId)) {
+						// If no source animation id is present, it means that model attachment has obsolete format.
+						srcAnimation = model.FirstAnimation;
+						// Check if the animation has been deleted but attachment hasn't been modified after that.
+						if (srcAnimation == null) {
+#if TANGERINE
+							Console.WriteLine($"Attachment3D Warning: skip '{ animation.Name }' animation applying. Source Fbx file have no animation data.");
+#endif // TANGERINE
+							continue;
+						}
+					} else {
+#if TANGERINE
+						Console.WriteLine($"Attachment3D Warning: source animation '{ animation.SourceAnimationId }' not found");
+#endif // TANGERINE
+						continue;
+					}
+				}
+
+				var animationId = animation.Name;
+				// TODO: Replace 'Default' animation with its source animation id in all referring to Lime projects.
+				if (animationId == "Default") {
+					animationId = srcAnimation.Id;
+				}
+
+				var newAnimation = srcAnimation;
+				if (animationId != animation.SourceAnimationId && !string.IsNullOrEmpty(animation.SourceAnimationId)) {
+					newAnimation = new Lime.Animation {
+						Id = animationId
+					};
+					newAnimations.Add(newAnimation);
+					model.Animations.Add(newAnimation);
+					foreach (var node in GetAnimationNodes(model, animation)) {
+						foreach (var animator in node.Animators) {
+							if (animator.AnimationId == srcAnimation.Id) {
+								var newAnimator = animator.Clone();
+								animator.AnimationId = newAnimation.Id;
+								CopyKeys(animator, newAnimator, animation.StartFrame, animation.LastFrame);
+								if (newAnimator.Keys.Count > 0) {
+									newAnimators.Add(new NodeAndAnimator {
+										Node = node,
+										Animator = newAnimator
+									});
+								}
+							}
 						}
 					}
+				} else {
+					animationsToReduce.Add(newAnimation.Id, (animation.StartFrame, animation.LastFrame));
 				}
 
 				var animationBlending = new AnimationBlending() {
-					Option = animationData.Blending
+					Option = animation.Blending
 				};
 
-				foreach (var markerData in animationData.Markers) {
-					animation.Markers.AddOrdered(markerData.Marker.Clone());
-					if (markerData.Blending != null) {
+				foreach (var data in animation.Markers) {
+					newAnimation.Markers.AddOrdered(data.Marker.Clone());
+					if (data.Blending != null) {
 						animationBlending.MarkersOptions.Add(
-							markerData.Marker.Id,
+							data.Marker.Id,
 							new MarkerBlending {
-								Option = markerData.Blending
+								Option = data.Blending
 							});
 					}
 				}
 
-				foreach (var markersBlendings in animationData.MarkersBlendings) {
+				foreach (var markersBlendings in animation.MarkersBlendings) {
 					if (!animationBlending.MarkersOptions.ContainsKey(markersBlendings.DestMarkerId)) {
 						animationBlending.MarkersOptions.Add(markersBlendings.DestMarkerId, new MarkerBlending());
 					}
@@ -236,49 +263,36 @@ namespace Lime
 				}
 
 				if (animationBlending.Option != null || animationBlending.MarkersOptions.Count > 0) {
-					model.Components.GetOrAdd<AnimationBlender>().Options.Add(animation.Id ?? "", animationBlending);
+					model.Components.GetOrAdd<AnimationBlender>().Options.Add(newAnimation.Id ?? "", animationBlending);
 				}
+
+				foreach (var i in newAnimators) {
+					i.Node.Animators.Add(i.Animator);
+				}
+				newAnimators.Clear();
 			}
 
-			var srcAnimators = new List<IAnimator>();
-			srcAnimation.FindAnimators(srcAnimators);
-			foreach (var i in srcAnimators) {
-				i.Owner.Animators.Remove(i);
-			}
-
-			model.Animations.Remove(srcAnimation);
-
-			foreach (var i in newAnimators) {
-				i.Node.Animators.Add(i.Animator);
+			foreach (var animation in model.Animations.Except(newAnimations)) {
+				var srcAnimators = new List<IAnimator>();
+				animation.FindAnimators(srcAnimators);
+				if (animationsToReduce.Keys.Contains(animation.Id)) {
+					animation.FindAnimators(srcAnimators);
+					srcAnimators.ForEach(a => ReduceKeys(a, animationsToReduce[animation.Id].Item1, animationsToReduce[animation.Id].Item2));
+					foreach (var animator in srcAnimators.Where(a => a.Keys.Count == 0)) {
+						animator.Owner.Animators.Remove(animator);
+					}
+				} else {
+					foreach (var animator in srcAnimators) {
+						animator.Owner.Animators.Remove(animator);
+					}
+					model.Animations.Remove(animation);
+				}
 			}
 		}
 
 		private static void CopyKeys(IAnimator srcAnimator, IAnimator dstAnimator, int startFrame, int lastFrame)
 		{
-			if (srcAnimator.ReadonlyKeys.Count == 0) {
-				return;
-			}
-			if (startFrame < 0) {
-				startFrame = 0;
-			}
-			if (lastFrame < 0) {
-				lastFrame = srcAnimator.ReadonlyKeys[srcAnimator.ReadonlyKeys.Count - 1].Frame;
-			}
-			var startKeyIndex = -1;
-			for (var i = 0; i < srcAnimator.ReadonlyKeys.Count; i++) {
-				if (startFrame <= srcAnimator.ReadonlyKeys[i].Frame) {
-					startKeyIndex = i;
-					break;
-				}
-			}
-			var lastKeyIndex = -1;
-			for (var i = srcAnimator.ReadonlyKeys.Count - 1; i >= 0; i--) {
-				if (lastFrame >= srcAnimator.ReadonlyKeys[i].Frame) {
-					lastKeyIndex = i;
-					break;
-				}
-			}
-			if (startKeyIndex == -1 || lastKeyIndex == -1) {
+			if (!GetEffectiveKeyRange(srcAnimator, startFrame, lastFrame, out var startKeyIndex, out var lastKeyIndex)) {
 				return;
 			}
 			if (startFrame != srcAnimator.ReadonlyKeys[startKeyIndex].Frame) {
@@ -292,6 +306,48 @@ namespace Lime
 			}
 		}
 
+		private static void ReduceKeys(IAnimator animator, int startFrame, int lastFrame)
+		{
+			if (!GetEffectiveKeyRange(animator, startFrame, lastFrame, out var startKeyIndex, out var lastKeyIndex)) {
+				return;
+			}
+			var readonlyKeys = animator.ReadonlyKeys;
+			for (var i = 0; i < startKeyIndex; i++) {
+				animator.Keys.Remove(readonlyKeys[i]);
+			}
+			for (var i = readonlyKeys.Count - 1; i > lastKeyIndex; i--) {
+				animator.Keys.Remove(readonlyKeys[i]);
+			}
+		}
+
+		private static bool GetEffectiveKeyRange(IAnimator animator, int startFrame, int lastFrame, out int startKeyIndex, out int lastKeyIndex)
+		{
+			startKeyIndex = -1;
+			lastKeyIndex = -1;
+			if (animator.ReadonlyKeys.Count == 0) {
+				return false;
+			}
+			if (startFrame < 0) {
+				startFrame = 0;
+			}
+			if (lastFrame < 0) {
+				lastFrame = animator.ReadonlyKeys[animator.ReadonlyKeys.Count - 1].Frame;
+			}
+			for (var i = 0; i < animator.ReadonlyKeys.Count; i++) {
+				if (startFrame <= animator.ReadonlyKeys[i].Frame) {
+					startKeyIndex = i;
+					break;
+				}
+			}
+			for (var i = animator.ReadonlyKeys.Count - 1; i >= 0; i--) {
+				if (lastFrame >= animator.ReadonlyKeys[i].Frame) {
+					lastKeyIndex = i;
+					break;
+				}
+			}
+			return !(startKeyIndex == -1 || lastKeyIndex == -1);
+		}
+
 		private void ProcessNodeRemovals(Node3D model)
 		{
 			var nodes = NodeRemovals.SelectMany(removal => model.Descendants.Where(node => string.Equals(removal.NodeId, node.Id))).ToList();
@@ -300,27 +356,31 @@ namespace Lime
 			}
 		}
 
-		private void OverrideAnimation(Node node, Lime.Animation srcAnimation, Lime.Animation dstAnimation)
+		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation attachmentAnimation)
 		{
-			var srcAnimationName = node.Animators.FirstOrDefault()?.AnimationId ?? srcAnimation.Id;
-			foreach (var srcAnimator in node.Animators) {
-				srcAnimator.AnimationId = dstAnimation.Id;
+			if (attachmentAnimation.Nodes.Count > 0) {
+				var nodeList = new List<Node>();
+				foreach (var attachmentNode in attachmentAnimation.Nodes.Distinct()) {
+					var node = model.TryFindNode(attachmentNode.Id);
+					if (node == null) {
+						Console.WriteLine($"Attachment3D Warning: Undable to add \"{ attachmentNode.Id }\" to the list of animable nodes. Node not found");
+						continue;
+					}
+					nodeList.Add(node);
+				}
+				return nodeList;
 			}
-#if TANGERINE
-			if (srcAnimationName != srcAnimation.Id) {
-				Console.WriteLine($"Warning: animation \"{ dstAnimation.Id }\" overriding \"{ srcAnimationName }\" at { node.Id } node");
-			}
-#endif // TANGERINE
-		}
-
-		private IEnumerable<Node> GetAnimationNodes(Node3D model, Animation animationData)
-		{
-			if (animationData.Nodes.Count > 0) {
-				return animationData.Nodes.Distinct().Select(n => model.FindNode(n.Id));
-			}
-			if (animationData.IgnoredNodes.Count > 0) {
-				var ignoredNodes = new HashSet<Node>(animationData.IgnoredNodes.Select(n => model.FindNode(n.Id)));
-				return model.Descendants.Where(i => !ignoredNodes.Contains(i));
+			if (attachmentAnimation.IgnoredNodes.Count > 0) {
+				var nodeList = new List<Node>();
+				foreach (var nodeData in attachmentAnimation.IgnoredNodes.Distinct()) {
+					var node = model.TryFindNode(nodeData.Id);
+					if (node == null) {
+						Console.WriteLine($"Attachment3D Warning: Undable to add \"{ nodeData.Id }\" to the list ignored for animation nodes. Node not found");
+						continue;
+					}
+					nodeList.Add(node);
+				}
+				return model.Descendants.Where(i => !nodeList.Contains(i));
 			}
 			return model.Descendants;
 		}
@@ -345,6 +405,9 @@ namespace Lime
 		{
 			[YuzuMember]
 			public Dictionary<string, MeshOptionFormat> MeshOptions = null;
+
+			[YuzuMember]
+			public List<string> SourceAnimationIds = null;
 
 			[YuzuMember]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
@@ -429,6 +492,9 @@ namespace Lime
 			[YuzuMember]
 			public int? Blending = null;
 
+			[YuzuMember]
+			public string SourceAnimationId = null;
+
 			public bool ShouldSerializeStartFrame() => StartFrame > 0;
 			public bool ShouldSerializeLastFrame() => LastFrame >= 0;
 		}
@@ -460,27 +526,29 @@ namespace Lime
 			public int? Blending = null;
 		}
 
-		public Model3DAttachment Parse(string modelPath, bool useBundle = true)
+		private static string GetAttachmentPath(string modelPath)
 		{
-			modelPath = AssetPath.CorrectSlashes(
-				Path.Combine(Path.GetDirectoryName(modelPath) ?? "",
-				Path.GetFileNameWithoutExtension(AssetPath.CorrectSlashes(modelPath) ?? "")
-			));
-			var attachmentPath = modelPath + Model3DAttachment.FileExtension;
-			try {
-				ModelAttachmentFormat modelAttachmentFormat;
-				if (useBundle) {
-					if (!AssetBundle.Current.FileExists(attachmentPath)) {
-						return null;
-					}
-					modelAttachmentFormat = Serialization.ReadObject<ModelAttachmentFormat>(attachmentPath);
-				} else {
-					if (!File.Exists(attachmentPath)) {
-						return null;
-					}
-					modelAttachmentFormat = Serialization.ReadObjectFromFile<ModelAttachmentFormat>(attachmentPath);
-				}
+			return AssetPath.CorrectSlashes(Path.ChangeExtension(modelPath, Model3DAttachment.FileExtension));
+		}
 
+		public static bool IsAttachmentExists(string modelPath)
+		{
+			return File.Exists(GetAttachmentPath(modelPath));
+		}
+
+		public static ModelAttachmentFormat ReadModelAttachmentFormat(string modelPath)
+		{
+			return Serialization.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath));
+		}
+
+		public static Model3DAttachment GetModel3DAttachment(string modelPath)
+		{
+			return GetModel3DAttachment(ReadModelAttachmentFormat(modelPath), modelPath);
+		}
+
+		public static Model3DAttachment GetModel3DAttachment(ModelAttachmentFormat modelAttachmentFormat, string modelPath)
+		{
+			try {
 				var attachment = new Model3DAttachment {
 					ScaleFactor = modelAttachmentFormat.ScaleFactor
 				};
@@ -518,12 +586,23 @@ namespace Lime
 					}
 				}
 
+				if (modelAttachmentFormat.SourceAnimationIds != null) {
+					foreach (var sourceAnimationId in modelAttachmentFormat.SourceAnimationIds) {
+						attachment.SourceAnimationIds.Add(sourceAnimationId);
+					}
+				}
+
 				if (modelAttachmentFormat.Animations != null) {
 					foreach (var animationFormat in modelAttachmentFormat.Animations) {
+						var sourceAnimationId = modelAttachmentFormat.SourceAnimationIds == null ||
+							modelAttachmentFormat.SourceAnimationIds.Any(id => id == animationFormat.Key)
+								? null
+								: modelAttachmentFormat.SourceAnimationIds.FirstOrDefault();
 						var animation = new Model3DAttachment.Animation {
 							Name = animationFormat.Key,
 							StartFrame = animationFormat.Value.StartFrame,
-							LastFrame = animationFormat.Value.LastFrame
+							LastFrame = animationFormat.Value.LastFrame,
+							SourceAnimationId = sourceAnimationId
 						};
 
 						if (animationFormat.Value.Markers != null) {
@@ -573,7 +652,7 @@ namespace Lime
 							animation.Nodes = new ObservableCollection<Model3DAttachment.NodeData>(
 								animationFormat.Value.Nodes.Select(n => new Model3DAttachment.NodeData { Id = n }));
 						}
-
+						animation.SourceAnimationId = animationFormat.Value.SourceAnimationId;
 						if (animationFormat.Value.IgnoredNodes != null && animationFormat.Value.IgnoredNodes.Count > 0) {
 							if (animation.Nodes.Count > 0) {
 								throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Name);
@@ -601,10 +680,10 @@ namespace Lime
 		public static void Save(Model3DAttachment attachment, string path)
 		{
 			var attachmentPath = path + ".Attachment.txt";
-			Serialization.WriteObjectToFile(attachmentPath, CreateFromModel3DAttachment(attachment), Serialization.Format.JSON);
+			Serialization.WriteObjectToFile(attachmentPath, ConvertToModelAttachmentFormat(attachment), Serialization.Format.JSON);
 		}
 
-		private static ModelAttachmentFormat CreateFromModel3DAttachment(Model3DAttachment attachment)
+		public static ModelAttachmentFormat ConvertToModelAttachmentFormat(Model3DAttachment attachment)
 		{
 			var origin = new ModelAttachmentFormat();
 			origin.ScaleFactor = attachment.ScaleFactor;
@@ -613,6 +692,9 @@ namespace Lime
 			}
 			if (attachment.Animations.Count > 0) {
 				origin.Animations = new Dictionary<string, ModelAnimationFormat>();
+			}
+			if (attachment.SourceAnimationIds.Count > 0) {
+				origin.SourceAnimationIds = new List<string>();
 			}
 			if (attachment.NodeComponents.Count > 0) {
 				origin.NodeComponents = new Dictionary<string, ModelComponentsFormat>();
@@ -651,11 +733,15 @@ namespace Lime
 				origin.NodeRemovals.Add(removal.NodeId);
 			}
 
+			foreach (var sourceAnimationId in attachment.SourceAnimationIds) {
+				origin.SourceAnimationIds.Add(sourceAnimationId);
+			}
 			foreach (var animation in attachment.Animations) {
 				var animationFormat = new ModelAnimationFormat {
 					StartFrame = animation.StartFrame,
 					LastFrame = animation.LastFrame,
 					Markers = new Dictionary<string, ModelMarkerFormat>(),
+					SourceAnimationId = animation.SourceAnimationId
 				};
 				foreach (var markerData in animation.Markers) {
 					var markerFormat = new ModelMarkerFormat {

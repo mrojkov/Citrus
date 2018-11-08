@@ -17,7 +17,7 @@ namespace Tangerine.Core.Operations
 			if (!NodeCompositionValidator.CanHaveChildren(container.GetType())) {
 				return false;
 			}
-			if (!string.IsNullOrEmpty(container.ContentsPath)) {
+			if (!string.IsNullOrEmpty(container.ContentsPath) && Project.Current.DocumentExists(container.ContentsPath)) {
 				OpenExternalScene(container.ContentsPath);
 			} else {
 				ChangeContainer(container, selectFirstNode);

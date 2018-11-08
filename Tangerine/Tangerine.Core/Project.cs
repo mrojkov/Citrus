@@ -515,5 +515,13 @@ namespace Tangerine.Core
 		}
 
 		public static bool operator !=(Project lhs, Project rhs) => !(lhs == rhs);
+
+		public bool DocumentExists(string path)
+		{
+			if (string.IsNullOrEmpty(path)) {
+				return false;
+			}
+			return GetFullPath(AssetPath.CorrectSlashes(path), out var fullPath) && File.Exists(fullPath);
+		}
 	}
 }

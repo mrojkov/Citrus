@@ -77,7 +77,7 @@ namespace Orange.FbxImporter
 					Indices = new int[newSize],
 					Vertices = new Mesh3D.Vertex[newSize],
 					Normals = new Vector3[newSize],
-					Bones = bones.ToArray(),
+					Bones = bones,
 				};
 
 				for (var j = 0; j < submesh.Vertices.Length; j++) {
