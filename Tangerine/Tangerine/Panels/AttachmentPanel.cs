@@ -46,6 +46,19 @@ namespace Tangerine
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
 
+		private class AttachmentDocument
+		{
+			public Model3DAttachment Attachment;
+			public DocumentHistory History = new DocumentHistory();
+			public AttachmentDocument()
+			{ }
+		}
+
+		private static string model3DContentsPath;
+		private static DocumentHistory history => model3DContentsPath != null ? documents[model3DContentsPath].History : null;
+
+		private static Dictionary<string, AttachmentDocument> documents = new Dictionary<string, AttachmentDocument>();
+
 		private class PanelState
 		{
 			public static int ActiveTabIndex = 3;
@@ -57,11 +70,41 @@ namespace Tangerine
 		public AttachmentPanel(Tangerine.UI.Docking.Panel panel)
 		{
 			RootWidget = new Widget();
+			RootWidget.HitTestTarget = true;
 			RootWidget.Layout = new VBoxLayout();
 			Panel = panel;
+			RootWidget.Input.AcceptMouseThroughDescendants = true;
+			RootWidget.Tasks.AddLoop(() => {
+				if (
+					RootWidget.Input.WasKeyPressed(Key.Mouse0) ||
+					RootWidget.Input.WasKeyPressed(Key.Mouse1)
+				) {
+					RootWidget.SetFocus();
+				}
+				if (!Widget.Focused.SameOrDescendantOf(RootWidget) || history == null) {
+					return;
+				}
+				if (!Command.Undo.IsConsumed()) {
+					Command.Undo.Enabled = history.CanUndo();
+					if (Command.Undo.WasIssued()) {
+						Command.Undo.Consume();
+						history.Undo();
+					}
+				}
+				if (!Command.Redo.IsConsumed()) {
+					Command.Redo.Enabled = history.CanRedo();
+					if (Command.Redo.WasIssued()) {
+						Command.Redo.Consume();
+						history.Redo();
+					}
+				}
+			});
+			RootWidget.AddChangeWatcher(() => model3DContentsPath, path => RefreshPanelTitle());
+			RootWidget.AddChangeWatcher(() => history?.IsDocumentModified ?? null, _ => RefreshPanelTitle());
 			RootWidget.AddChangeWatcher(CalcSelectedRowsHashcode, _ => {
 				// rebuild
 				panelState.AnimationsScrollPosition = (int)((RootWidget.TryFindNode("AnimationsScrollView") as ThemedScrollView)?.ScrollPosition ?? panelState.AnimationsScrollPosition);
+				model3DContentsPath = null;
 				RootWidget.Nodes.Clear();
 				var rows = Document.Current.Rows;
 				Model3D model3d = null;
@@ -80,6 +123,15 @@ namespace Tangerine
 					RootWidget.PushNode(Rebuild(model3d));
 				}
 			});
+		}
+
+		private void RefreshPanelTitle()
+		{
+			if (model3DContentsPath != null) {
+				Panel.Title = $"Model3D Attachment : {model3DContentsPath} {(history.IsDocumentModified ? "(*)" : "")}";
+			} else {
+				Panel.Title = $"Model3D Attachment";
+			}
 		}
 
 		private static int CalcSelectedRowsHashcode()
@@ -110,15 +162,26 @@ namespace Tangerine
 		private static IPropertyEditorParams Decorate(PropertyEditorParams @params, bool displayLabel = false)
 		{
 			@params.ShowLabel = displayLabel;
-			@params.History = Document.Current.History;
+			@params.History = history;
 			@params.PropertySetter = SetProperty;
-			@params.NumericEditBoxFactory = () => new InspectorContent.TransactionalNumericEditBox(Document.Current.History);
+			@params.NumericEditBoxFactory = () => new InspectorContent.TransactionalNumericEditBox(history);
 			return @params;
 		}
 
 		public Widget Rebuild(Model3D source)
 		{
-			var attachment = ReadAttachment(source);
+			model3DContentsPath = source.ContentsPath;
+			AttachmentDocument doc = null;
+			if (!documents.TryGetValue(model3DContentsPath, out doc)) {
+				documents.Add(model3DContentsPath, doc = new AttachmentDocument());
+			}
+			if (!doc.History.IsDocumentModified) {
+				doc.Attachment = null;
+			}
+			if (doc.Attachment == null) {
+				doc.Attachment = ReadAttachment(source);
+			}
+			var attachment = doc.Attachment;
 			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
 			content.AddTab("Components", CreateComponentsPane(attachment));
@@ -174,6 +237,7 @@ namespace Tangerine
 					// So check it out before saving.
 					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
 						SaveAttachment(attachment, source.ContentsPath);
+						history.AddSavePoint();
 					}
 				} catch (Lime.Exception e) {
 					new AlertDialog(e.Message).Show();
@@ -225,7 +289,7 @@ namespace Tangerine
 				w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
 			widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
 			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
-				Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.NodeComponents,
 					attachment.NodeComponents.Count,
 					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
@@ -268,7 +332,7 @@ namespace Tangerine
 				w => new NodeRemovalRow(w, attachment.NodeRemovals), attachment.NodeRemovals);
 			widgetFactory.AddHeader(NodeRemovalRow.CreateHeader());
 			widgetFactory.AddFooter(NodeRemovalRow.CreateFooter(() => {
-				Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.NodeRemovals,
 					attachment.NodeRemovals.Count,
 					new Model3DAttachment.NodeRemoval { NodeId = "NodeRemoval" }
@@ -293,7 +357,7 @@ namespace Tangerine
 					w => new AnimationRow(w, attachment), attachment.Animations);
 			widgetFactory.AddHeader(AnimationRow.CreateHeader());
 			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
-				Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.Animations,
 					attachment.Animations.Count,
 					new Model3DAttachment.Animation { Name = "Animation", }
@@ -316,7 +380,7 @@ namespace Tangerine
 				w => new MeshRow(w, attachment.MeshOptions), attachment.MeshOptions);
 			widgetFactory.AddHeader(MeshRow.CreateHeader());
 			widgetFactory.AddFooter(MeshRow.CreateFooter(() => {
-				Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.MeshOptions,
 					attachment.MeshOptions.Count,
 					new Model3DAttachment.MeshOption { Id = "MeshOption" }
@@ -391,7 +455,7 @@ namespace Tangerine
 				};
 				deleteButton = new ThemedDeleteButton();
 				deleteButton.Clicked += () =>
-					Document.Current.History.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(Source)));
+					history.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(Source)));
 				var deleteButtonWrapper = new Widget {
 					Layout = new HBoxLayout(),
 					Nodes = {
@@ -426,13 +490,13 @@ namespace Tangerine
 				AddButton = new ThemedAddButton {
 					Anchors = Anchors.Center,
 					Clicked = () =>
-						Document.Current.History.DoTransaction(
+						history.DoTransaction(
 							() => Core.Operations.SetProperty.Perform(obj, propName, new BlendingOption())),
 					LayoutCell = new LayoutCell { Alignment = Alignment.Center }
 				};
 				RemoveButton = new ThemedTabCloseButton {
 					Clicked = () =>
-						Document.Current.History.DoTransaction(() => Core.Operations.SetProperty.Perform(obj, propName, null))
+						history.DoTransaction(() => Core.Operations.SetProperty.Perform(obj, propName, null))
 				};
 				Nodes.Add(AddButton);
 				AddChangeWatcher(() => property.Value, (v) => {
@@ -443,7 +507,7 @@ namespace Tangerine
 					} else {
 						new BlendingPropertyEditor(new PropertyEditorParams(this, obj, propName) {
 							ShowLabel = false,
-							History = Document.Current.History,
+							History = history,
 							PropertySetter = SetProperty
 						});
 						Nodes.Add(RemoveButton);
@@ -696,7 +760,7 @@ namespace Tangerine
 					w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source);
 				widgetFactory.AddHeader(header);
 				widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
-					Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(source, source.Count, activator()));
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(source, source.Count, activator()));
 				}));
 				list.Components.Add(widgetFactory);
 				this.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
@@ -840,7 +904,7 @@ namespace Tangerine
 				var previousMarkerId = Source.Marker.Id;
 				jumpToPropEditor.Changed += args => {
 					if ((string)args.Value != Source.Marker.JumpTo) {
-						Document.Current.History.DoTransaction(() => Core.Operations.SetProperty.Perform(Source.Marker, nameof(Marker.JumpTo), args.Value));
+						history.DoTransaction(() => Core.Operations.SetProperty.Perform(Source.Marker, nameof(Marker.JumpTo), args.Value));
 					}
 				};
 				Header.AddNode(jumpToPropEditor);
@@ -947,7 +1011,7 @@ namespace Tangerine
 					foreach (var type in validComponents.Except(GetExceptedTypes(source))) {
 						ICommand command = new Command(CamelCaseToLabel(type.Name), () => {
 							var constructor = type.GetConstructor(Type.EmptyTypes);
-							Document.Current.History.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+							history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 								source, source.Count, constructor.Invoke(new object[] { })));
 						});
 						menu.Add(command);
@@ -1003,10 +1067,10 @@ namespace Tangerine
 					IgnorePadding = true
 				};
 				var content = new InspectorContent(container) {
-					History = Document.Current.History
+					History = history
 				};
 				content.OnComponentRemove += c => {
-					Document.Current.History.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(c)));
+					history.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(c)));
 				};
 				Nodes.Add(container);
 				content.BuildForObjects(new List<object> { source });
