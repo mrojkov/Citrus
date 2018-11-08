@@ -69,11 +69,12 @@ namespace Tangerine
 
 		public AttachmentPanel(Tangerine.UI.Docking.Panel panel)
 		{
-			RootWidget = new Widget();
-			RootWidget.HitTestTarget = true;
-			RootWidget.Layout = new VBoxLayout();
+			RootWidget = new Widget {
+				HitTestTarget = true,
+				Layout = new VBoxLayout(),
+			};
+			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
 			Panel = panel;
-			RootWidget.Input.AcceptMouseThroughDescendants = true;
 			RootWidget.Tasks.AddLoop(() => {
 				if (
 					RootWidget.Input.WasKeyPressed(Key.Mouse0) ||
@@ -81,22 +82,22 @@ namespace Tangerine
 				) {
 					RootWidget.SetFocus();
 				}
-				if (!Widget.Focused.SameOrDescendantOf(RootWidget) || history == null) {
+				if (Widget.Focused != RootWidget || history == null) {
 					return;
 				}
 				if (!Command.Undo.IsConsumed()) {
 					Command.Undo.Enabled = history.CanUndo();
 					if (Command.Undo.WasIssued()) {
-						Command.Undo.Consume();
 						history.Undo();
 					}
+					Command.Undo.Consume();
 				}
 				if (!Command.Redo.IsConsumed()) {
 					Command.Redo.Enabled = history.CanRedo();
 					if (Command.Redo.WasIssued()) {
-						Command.Redo.Consume();
 						history.Redo();
 					}
+					Command.Redo.Consume();
 				}
 			});
 			RootWidget.AddChangeWatcher(() => model3DContentsPath, path => RefreshPanelTitle());
@@ -175,9 +176,6 @@ namespace Tangerine
 			if (!documents.TryGetValue(model3DContentsPath, out doc)) {
 				documents.Add(model3DContentsPath, doc = new AttachmentDocument());
 			}
-			if (!doc.History.IsDocumentModified) {
-				doc.Attachment = null;
-			}
 			if (doc.Attachment == null) {
 				doc.Attachment = ReadAttachment(source);
 			}
@@ -243,7 +241,6 @@ namespace Tangerine
 					new AlertDialog(e.Message).Show();
 				}
 			};
-			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			return rootWidget;
 		}
 
