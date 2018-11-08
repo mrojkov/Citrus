@@ -8,9 +8,9 @@ namespace Lime
 	public interface IAnimator : IDisposable
 	{
 		IAnimationHost Owner { get; set; }
-
-		IAnimable Animable { get; set; }
-
+#if TANGERINE
+		IAnimable Animable { get; }
+#endif // TANGERINE
 		IAnimator Next { get; set; }
 
 		IAnimator Clone();
@@ -69,7 +69,19 @@ namespace Lime
 	public class Animator<T> : IAnimator
 	{
 		public IAnimationHost Owner { get; set; }
-		public IAnimable Animable { get; set; }
+#if TANGERINE
+		public IAnimable Animable
+		{
+			get
+			{
+				if (animable == null && !IsZombie) {
+					Bind();
+				}
+				return animable;
+			}
+		}
+		private IAnimable animable;
+#endif // TANGERINE
 		public IAnimator Next { get; set; }
 
 		private double minTime;
@@ -168,7 +180,9 @@ namespace Lime
 		{
 			var clone = (Animator<T>)MemberwiseClone();
 			clone.setter = null;
-			clone.Animable = null;
+#if TANGERINE
+			clone.animable = null;
+#endif // TANGERINE
 			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.Next = null;
@@ -182,7 +196,9 @@ namespace Lime
 		{
 			IsZombie = false;
 			setter = null;
-			Animable = null;
+#if TANGERINE
+			animable = null;
+#endif // TANGERINE
 		}
 
 		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
@@ -221,18 +237,20 @@ namespace Lime
 
 		private void Bind()
 		{
-			var (p, animable, index) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
+			var (p, a, index) = AnimationUtils.GetPropertyByPath(Owner, TargetPropertyPath);
 			var mi = p.Info?.GetSetMethod();
-			IsZombie = animable == null || mi == null || p.Info.PropertyType != typeof(T) || animable is IList list && index >= list.Count;
+			IsZombie = a == null || mi == null || p.Info.PropertyType != typeof(T) || a is IList list && index >= list.Count;
 			if (IsZombie) {
 				return;
 			}
-			Animable = animable;
+#if TANGERINE
+			animable = a;
+#endif // TANGERINE
 			IsTriggerable = p.Triggerable;
 			if (index == -1) {
-				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), animable, mi);
+				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), a, mi);
 			} else {
-				var indexedSetter = (IndexedSetterDelegate)Delegate.CreateDelegate(typeof(IndexedSetterDelegate), animable, mi);
+				var indexedSetter = (IndexedSetterDelegate)Delegate.CreateDelegate(typeof(IndexedSetterDelegate), a, mi);
 				setter = (v) => {
 					indexedSetter(index, v);
 				};

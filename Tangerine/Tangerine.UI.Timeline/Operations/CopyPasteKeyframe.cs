@@ -107,17 +107,17 @@ namespace Tangerine.UI.Timeline.Operations
 					if (rowIndex >= Document.Current.Rows.Count || colIndex < 0) {
 						continue;
 					}
-					var animable = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimationHost;
-					if (animable == null) {
+					var animationHost = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimationHost;
+					if (animationHost == null) {
 						continue;
 					}
-					var property = animable.GetType().GetProperty(key.Property);
-					if (property == null) {
+					var (pd, _, _) = AnimationUtils.GetPropertyByPath(animationHost, key.Property);
+					if (pd.Info == null) {
 						continue;
 					}
 					var keyframe = key.Keyframe.Clone();
 					keyframe.Frame = colIndex;
-					SetKeyframe.Perform(animable, key.Property, Document.Current.AnimationId, keyframe);
+					SetKeyframe.Perform(animationHost, key.Property, Document.Current.AnimationId, keyframe);
 				}
 			});
 		}

@@ -45,7 +45,7 @@ namespace Tangerine.UI.Timeline.Operations
 							}
 							var destRowComponents = Document.Current.Rows[destRow].Components;
 							var destNode = destRowComponents.Get<NodeRow>()?.Node ?? destRowComponents.Get<PropertyRow>()?.Node;
-							if (destNode == null || !ArePropertiesCompatible(node, destNode, a.TargetPropertyPath)) {
+							if (destNode == null || !ArePropertyPathsCompatible(node, destNode, a.TargetPropertyPath)) {
 								continue;
 							}
 							if (k.Frame + offset.X >= 0) {
@@ -75,11 +75,11 @@ namespace Tangerine.UI.Timeline.Operations
 			return row >= 0 && row < Document.Current.Rows.Count;
 		}
 
-		static bool ArePropertiesCompatible(object object1, object object2, string property)
+		static bool ArePropertyPathsCompatible(IAnimationHost object1, IAnimationHost object2, string property)
 		{
-			var t1 = object1.GetType().GetProperty(property)?.PropertyType;
-			var t2 = object2.GetType().GetProperty(property)?.PropertyType;
-			return t1 != null && t1 == t2;
+			var (pd1, _, _) = AnimationUtils.GetPropertyByPath(object1, property);
+			var (pd2, _, _) = AnimationUtils.GetPropertyByPath(object2, property);
+			return pd1.Info != null && pd1.Info.PropertyType == pd2.Info?.PropertyType;
 		}
 	}
 }
