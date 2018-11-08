@@ -13,7 +13,7 @@ namespace Tangerine
 	static class TangerineMenu
 	{
 		public static readonly List<ICommand> CreateNodeCommands = new List<ICommand>();
-		public static IMenu PadsMenu;
+		public static IMenu PanelsMenu;
 		public static Menu overlaysMenu;
 		public static Menu rulerMenu;
 		private static IMenu resolution;
@@ -27,7 +27,7 @@ namespace Tangerine
 
 		static TangerineMenu()
 		{
-			PadsMenu = new Menu();
+			PanelsMenu = new Menu();
 		}
 
 		public static void Create()
@@ -170,7 +170,7 @@ namespace Tangerine
 						GenericCommands.LoadLayout,
 						GenericCommands.DefaultLayout,
 					})),
-					new Command("Pads", PadsMenu),
+					new Command("Panels", PanelsMenu),
 					new Command("Resolution", resolution),
 					Command.MenuSeparator,
 					new Command("Overlays", overlaysMenu),

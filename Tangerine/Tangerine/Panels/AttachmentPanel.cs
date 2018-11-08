@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Lime;
 using Tangerine.Core;
 using Tangerine.UI;
+using Tangerine.UI.Docking;
 using Tangerine.UI.Inspector;
 
 namespace Tangerine
@@ -39,87 +40,50 @@ namespace Tangerine
 		public const float ExpandContentPadding = ExpandButtonSize + Spacing;
 	}
 
-	public class AttachmentDialog
+	public class AttachmentPanel : IDocumentView
 	{
-		private static DocumentHistory history;
+		public static AttachmentPanel Instance;
+		public readonly Panel Panel;
+		public readonly Widget RootWidget;
 
-		private static IPropertyEditorParams Decorate(PropertyEditorParams @params, bool displayLabel = false)
+		private class AttachmentDocument
 		{
-			@params.ShowLabel = displayLabel;
-			@params.History = history;
-			@params.PropertySetter = SetProperty;
-			@params.NumericEditBoxFactory = () => new InspectorContent.TransactionalNumericEditBox(history);
-			return @params;
+			public Model3DAttachment Attachment;
+			public DocumentHistory History = new DocumentHistory();
+			public AttachmentDocument()
+			{ }
 		}
 
-		public static void ShowFor(Model3D source)
+		private static string model3DContentsPath;
+		private static DocumentHistory history => model3DContentsPath != null ? documents[model3DContentsPath].History : null;
+
+		private static Dictionary<string, AttachmentDocument> documents = new Dictionary<string, AttachmentDocument>();
+
+		private class PanelState
 		{
-			// Do not show others attachment dialogs if one is already present
-			if (history != null) return;
-			history = new DocumentHistory();
-			Button cancelButton;
-			var attachment = ReadAttachment(source);
-			var window = new Window(new WindowOptions {
-				ClientSize = new Vector2(700, 400),
-				FixedSize = false,
-				Title = "Attachment3D",
-				MinimumDecoratedSize = new Vector2(500, 300),
-			});
-			var content = new ThemedTabbedWidget();
-			content.AddTab("General", CreateGeneralPane(attachment), true);
-			content.AddTab("Components", CreateComponentsPane(attachment));
-			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
-			content.AddTab("Animations", CreateAnimationsPane(attachment));
-			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
-			Button okButton;
-			WindowWidget rootWidget = new ThemedInvalidableWindowWidget(window) {
-				Padding = new Thickness(8),
-				Layout = new VBoxLayout(),
-				Nodes = {
-					content,
-					new Widget {
-						Layout = new HBoxLayout { Spacing = 8 },
-						LayoutCell = new LayoutCell(Alignment.RightCenter),
-						Padding = new Thickness { Top = 5 },
-						Nodes = {
-							(okButton = new ThemedButton { Text = "Ok" }),
-							(cancelButton = new ThemedButton { Text = "Cancel" }),
-						}
-					}
+			public static int ActiveTabIndex = 3;
+			public int AnimationsScrollPosition = -1;
+		}
+
+		private PanelState panelState = new PanelState();
+
+		public AttachmentPanel(Tangerine.UI.Docking.Panel panel)
+		{
+			RootWidget = new Widget();
+			RootWidget.HitTestTarget = true;
+			RootWidget.Layout = new VBoxLayout();
+			Panel = panel;
+			RootWidget.Input.AcceptMouseThroughDescendants = true;
+			RootWidget.Tasks.AddLoop(() => {
+				if (
+					RootWidget.Input.WasKeyPressed(Key.Mouse0) ||
+					RootWidget.Input.WasKeyPressed(Key.Mouse1)
+				) {
+					RootWidget.SetFocus();
 				}
-			};
-			window.Closed += () => {
-				history = null;
-				UserPreferences.Instance.Load();
-			};
-			cancelButton.Clicked += () => {
-				window.Close();
-				history = null;
-				UserPreferences.Instance.Load();
-			};
-			okButton.Clicked += () => {
-				try {
-					CheckErrors(attachment, source);
-					window.Close();
-					history = null;
-					// Since attachment dialog not present as modal window, document can be rolled back with "undo"
-					// operation to the state when source isn't presented or source content path isn't set.
-					// So check it out before saving.
-					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
-						SaveAttachment(attachment, source.ContentsPath);
-					}
-				} catch (Lime.Exception e) {
-					new AlertDialog(e.Message).Show();
+				if (!Widget.Focused.SameOrDescendantOf(RootWidget) || history == null) {
+					return;
 				}
-			};
-			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-			rootWidget.LateTasks.AddLoop(() => {
-				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
-					window.Close();
-					UserPreferences.Instance.Load();
-				}
-			});
-			rootWidget.Tasks.AddLoop(() => {
 				if (!Command.Undo.IsConsumed()) {
 					Command.Undo.Enabled = history.CanUndo();
 					if (Command.Undo.WasIssued()) {
@@ -135,6 +99,152 @@ namespace Tangerine
 					}
 				}
 			});
+			RootWidget.AddChangeWatcher(() => model3DContentsPath, path => RefreshPanelTitle());
+			RootWidget.AddChangeWatcher(() => history?.IsDocumentModified ?? null, _ => RefreshPanelTitle());
+			RootWidget.AddChangeWatcher(CalcSelectedRowsHashcode, _ => {
+				// rebuild
+				panelState.AnimationsScrollPosition = (int)((RootWidget.TryFindNode("AnimationsScrollView") as ThemedScrollView)?.ScrollPosition ?? panelState.AnimationsScrollPosition);
+				model3DContentsPath = null;
+				RootWidget.Nodes.Clear();
+				var rows = Document.Current.Rows;
+				Model3D model3d = null;
+				foreach (var r in rows) {
+					if (r.Selected) {
+						var nr = r.Components.Get<Core.Components.NodeRow>();
+						if (nr != null && nr.Node is Model3D m3d) {
+							if (model3d != null) {
+								return;
+							}
+							model3d = m3d;
+						}
+					}
+				}
+				if (model3d != null && !string.IsNullOrEmpty(model3d.ContentsPath)) {
+					RootWidget.PushNode(Rebuild(model3d));
+				}
+			});
+		}
+
+		private void RefreshPanelTitle()
+		{
+			if (model3DContentsPath != null) {
+				Panel.Title = $"Model3D Attachment : {model3DContentsPath} {(history.IsDocumentModified ? "(*)" : "")}";
+			} else {
+				Panel.Title = $"Model3D Attachment";
+			}
+		}
+
+		private static int CalcSelectedRowsHashcode()
+		{
+			var r = 0;
+			if (Document.Current.InspectRootNode) {
+				var rootNode = Document.Current.RootNode;
+				r ^= rootNode.GetHashCode();
+				foreach (var component in rootNode.Components) {
+					r ^= component.GetHashCode();
+				}
+			} else {
+				foreach (var row in Document.Current.Rows) {
+					if (row.Selected) {
+						r ^= row.GetHashCode();
+						var node = row.Components.Get<Core.Components.NodeRow>()?.Node;
+						if (node != null) {
+							foreach (var component in node.Components) {
+								r ^= component.GetHashCode();
+							}
+						}
+					}
+				}
+			}
+			return r;
+		}
+
+		private static IPropertyEditorParams Decorate(PropertyEditorParams @params, bool displayLabel = false)
+		{
+			@params.ShowLabel = displayLabel;
+			@params.History = history;
+			@params.PropertySetter = SetProperty;
+			@params.NumericEditBoxFactory = () => new InspectorContent.TransactionalNumericEditBox(history);
+			return @params;
+		}
+
+		public Widget Rebuild(Model3D source)
+		{
+			model3DContentsPath = source.ContentsPath;
+			AttachmentDocument doc = null;
+			if (!documents.TryGetValue(model3DContentsPath, out doc)) {
+				documents.Add(model3DContentsPath, doc = new AttachmentDocument());
+			}
+			if (!doc.History.IsDocumentModified) {
+				doc.Attachment = null;
+			}
+			if (doc.Attachment == null) {
+				doc.Attachment = ReadAttachment(source);
+			}
+			var attachment = doc.Attachment;
+			var content = new ThemedTabbedWidget();
+			content.AddTab("General", CreateGeneralPane(attachment), true);
+			content.AddTab("Components", CreateComponentsPane(attachment));
+			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
+			var animationsPane = CreateAnimationsPane(attachment);
+			content.AddTab("Animations", animationsPane);
+			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
+			if (PanelState.ActiveTabIndex != -1) {
+				content.ActivateTab(PanelState.ActiveTabIndex);
+			}
+			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => {
+				PanelState.ActiveTabIndex = activeTabIndex;
+				switch (PanelState.ActiveTabIndex) {
+					case 3: {
+						var t = animationsPane["Container"];
+						foreach (var node in t.Nodes) {
+							if (node is AnimationRow ar) {
+								(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
+								ar.Expand();
+							}
+						}
+						if (panelState.AnimationsScrollPosition != 1) {
+							var sv = (content["AnimationsScrollView"] as ThemedScrollView);
+							sv.Update(0.0f);
+							sv.LayoutManager.Layout();
+							sv.ScrollPosition = Mathf.Clamp(panelState.AnimationsScrollPosition, 0, sv.MaxScrollPosition);
+						}
+						break;
+					}
+				}
+			});
+			Button okButton;
+			Widget rootWidget = new Widget {
+				Padding = new Thickness(8),
+				Layout = new VBoxLayout(),
+				Nodes = {
+					content,
+					new Widget {
+						Layout = new HBoxLayout { Spacing = 8 },
+						LayoutCell = new LayoutCell(Alignment.RightCenter),
+						Padding = new Thickness { Top = 5 },
+						Nodes = {
+							(okButton = new ThemedButton { Text = "Apply" }),
+						}
+					}
+				}
+			};
+			okButton.Clicked += () => {
+				try {
+					CheckErrors(attachment, source);
+					// Since attachment dialog not present as modal window, document can be rolled back with "undo"
+					// operation to the state when source isn't presented or source content path isn't set.
+					// So check it out before saving.
+					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
+						SaveAttachment(attachment, source.ContentsPath);
+						history.AddSavePoint();
+					}
+				} catch (Lime.Exception e) {
+					new AlertDialog(e.Message).Show();
+				}
+			};
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			return rootWidget;
 		}
 
 		private static Model3DAttachment ReadAttachment(Model3D source)
@@ -235,6 +345,7 @@ namespace Tangerine
 		private static Widget CreateAnimationsPane(Model3DAttachment attachment)
 		{
 			var pane = new ThemedScrollView {
+				Id = "AnimationsScrollView",
 				Padding = new Thickness { Right = 10 },
 			};
 			var list = new Widget {
@@ -297,6 +408,18 @@ namespace Tangerine
 			Core.Operations.SetProperty.Perform(obj, propertyname, value);
 		}
 
+		public void Detach()
+		{
+			Instance = null;
+			RootWidget.Unlink();
+		}
+
+		public void Attach()
+		{
+			Instance = this;
+			Panel.ContentWidget.PushNode(RootWidget);
+		}
+
 		private class DeletableRow<T> : Widget
 		{
 			protected T Source { get; }
@@ -328,21 +451,26 @@ namespace Tangerine
 				Padding = new Thickness(AttachmentMetrics.Spacing);
 				Header = new Widget {
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
+					LayoutCell = new LayoutCell(),
 				};
-				var headerWrapper = new Widget {
-					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
-				};
-				deleteButton = new ThemedDeleteButton {
-					Anchors = Anchors.Right,
-					LayoutCell = new LayoutCell(Alignment.LeftTop),
-				};
+				deleteButton = new ThemedDeleteButton();
 				deleteButton.Clicked += () =>
 					history.DoTransaction(() => Core.Operations.RemoveFromList.Perform(sourceCollection, sourceCollection.IndexOf(Source)));
-				headerWrapper.Nodes.Add(Header);
-				headerWrapper.Nodes.Add(new Widget());
-				headerWrapper.Nodes.Add(deleteButton);
+				var deleteButtonWrapper = new Widget {
+					Layout = new HBoxLayout(),
+					Nodes = {
+						Spacer.HFill(),
+						deleteButton,
+					}
+				};
+				Nodes.Add(new Widget() {
+					Layout = new HBoxLayout(),
+					Nodes = {
+						Header,
+						deleteButtonWrapper
+					}
+				});
 				MinMaxHeight = AttachmentMetrics.RowHeight;
-				Nodes.Add(headerWrapper);
 				Presenter = Presenters.StripePresenter;
 			}
 		}
@@ -374,6 +502,7 @@ namespace Tangerine
 				AddChangeWatcher(() => property.Value, (v) => {
 					Nodes.Clear();
 					if (v == null) {
+						Nodes.Add(Spacer.HStretch());
 						Nodes.Add(AddButton);
 					} else {
 						new BlendingPropertyEditor(new PropertyEditorParams(this, obj, propName) {
@@ -503,11 +632,12 @@ namespace Tangerine
 
 		private class AnimationRow : DeletableRow<Model3DAttachment.Animation>
 		{
+			private ThemedExpandButton expandedButton;
 			public AnimationRow(Model3DAttachment.Animation animation, Model3DAttachment attachment)
 				: base(animation, attachment.Animations)
 			{
 				Layout = new VBoxLayout();
-				var expandedButton = new ThemedExpandButton {
+				expandedButton = new ThemedExpandButton {
 					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
 					Anchors = Anchors.Left
 				};
@@ -519,7 +649,7 @@ namespace Tangerine
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.Name))));
-				animationNamePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				animationNamePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 				foreach (var sourceAnimationId in attachment.SourceAnimationIds) {
@@ -528,7 +658,7 @@ namespace Tangerine
 				if (animation.SourceAnimationId == null) {
 					animation.SourceAnimationId = attachment.SourceAnimationIds.FirstOrDefault();
 				}
-				sourceAnimationSelector.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				sourceAnimationSelector.AsWidget.MinWidth = 0.0f;
 				sourceAnimationSelector.Text = animation.SourceAnimationId;
 				Header.AddNode(sourceAnimationSelector);
 				sourceAnimationSelector.Changed += args => { animation.SourceAnimationId = (string)args.Value; };
@@ -538,14 +668,14 @@ namespace Tangerine
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.StartFrame))));
-				startFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				startFramePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 
 				var lastFramePropEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						animation,
 						nameof(Model3DAttachment.Animation.LastFrame))));
-				lastFramePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				lastFramePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.Animation.Blending)));
 
@@ -600,7 +730,10 @@ namespace Tangerine
 					() => expandedButton.Expanded,
 					(v) => expandableContentWrapper.Visible = v);
 				CompoundPresenter.Add(Presenters.StripePresenter);
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
+
+			public void Expand() => expandedButton.Expanded = true;
 
 			private void BuildList<TData, TRow>(ObservableCollection<TData> source, Widget container, string title, Func<TData> activator, Widget header) where TRow : DeletableRow<TData>
 			{
@@ -609,7 +742,8 @@ namespace Tangerine
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
 					Nodes = {
 						(markersExpandButton = new ThemedExpandButton {
-							MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize)
+							Id = title + "ExpandButton",
+							MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
 						}),
 						new ThemedSimpleText { Text = title },
 					}
@@ -640,40 +774,25 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Animation name",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Source Animation",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Start Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Last Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Blending",
-							MinMaxWidth = 80,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
+						CreateLabel("Animation name"),
+						CreateLabel("Source Animation"),
+						CreateLabel("Start Frame"),
+						CreateLabel("Last Frame"),
+						CreateLabel("Blending"),
 						new Widget(),
 					}
 				};
 			}
+		}
+
+		private static ThemedSimpleText CreateLabel(string text)
+		{
+			return new ThemedSimpleText {
+				Text = text,
+				VAlignment = VAlignment.Center,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
+				ForceUncutText = false,
+			};
 		}
 
 		private class NodeRow : DeletableRow<Model3DAttachment.NodeData>
@@ -687,8 +806,9 @@ namespace Tangerine
 						Header,
 						source,
 						nameof(Model3DAttachment.NodeData.Id))));
-				nodeIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				nodeIdPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 				Presenter = Presenters.StripePresenter;
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			internal static Widget CreateHeader()
@@ -699,10 +819,7 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Node Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-						},
+						CreateLabel("Node Id"),
 						new Widget(),
 					}
 				};
@@ -719,21 +836,22 @@ namespace Tangerine
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.DestMarkerId))));
-				destMarkerPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				destMarkerPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceMarkerPropEditor = new StringPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.SourceMarkerId))));
-				sourceMarkerPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				sourceMarkerPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var blendingOptionEditBox = new BlendingPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source,
 						nameof(Model3DAttachment.MarkerBlendingData.Blending))));
-				blendingOptionEditBox.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				blendingOptionEditBox.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			public static Widget CreateHeader()
@@ -744,18 +862,9 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Source Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Blending Option",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-						},
+						CreateLabel("Marker Id"),
+						CreateLabel("Source Marker Id"),
+						CreateLabel("Blending Option"),
 						new Widget(),
 					}
 				};
@@ -774,21 +883,24 @@ namespace Tangerine
 						Header,
 						Source.Marker,
 						nameof(Marker.Id))));
-				markerIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				markerIdPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var frameEditor = new IntPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source.Marker,
 						nameof(Marker.Frame))));
-				frameEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				frameEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				var actionPropEditor = new EnumPropertyEditor<MarkerAction>(
 					Decorate(new PropertyEditorParams(
 						Header,
 						Source.Marker,
 						nameof(Marker.Action))));
-				actionPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				actionPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 				var jumpToPropEditor = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
+				jumpToPropEditor.MinSize = Vector2.Zero;
+				jumpToPropEditor.MaxSize = Vector2.PositiveInfinity;
+				jumpToPropEditor.Nodes[0].AsWidget.MinWidth = 0.0f;
 				var previousMarkerId = Source.Marker.Id;
 				jumpToPropEditor.Changed += args => {
 					if ((string)args.Value != Source.Marker.JumpTo) {
@@ -810,8 +922,8 @@ namespace Tangerine
 					previousMarkerId = v;
 				});
 				jumpToPropEditor.Value = Source.Marker.JumpTo;
-				jumpToPropEditor.MinMaxWidth = AttachmentMetrics.ControlWidth;
 				Header.AddNode(new BlendingCell(Source, nameof(Model3DAttachment.MarkerData.Blending)));
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			public static Widget CreateHeader()
@@ -822,26 +934,11 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Marker Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Frame",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Action",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-						},
-						new ThemedSimpleText {
-							Text = "JumpTo",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-						},
-						new ThemedSimpleText {
-							Text = "Blending",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-						},
+						CreateLabel("Marker Id"),
+						CreateLabel("Frame"),
+						CreateLabel("Action"),
+						CreateLabel("JumpTo"),
+						CreateLabel("Blending"),
 						new Widget(),
 					}
 				};
@@ -989,7 +1086,7 @@ namespace Tangerine
 			{
 				editor = editorParams.NumericEditBoxFactory();
 				editor.Step = 1f;
-				editor.MinMaxWidth = 80;
+				editor.MinWidth = 0.0f;
 				editor.LayoutCell = new LayoutCell(Alignment.Center);
 				EditorContainer.AddNode(editor);
 				var current = CoalescedPropertyValue();
@@ -1000,6 +1097,7 @@ namespace Tangerine
 						editor.Text = current.GetValue().Frames.ToString();
 					}
 				};
+				editor.MaxWidth = float.PositiveInfinity;
 				editor.AddChangeWatcher(current, v => editor.Text = v?.Frames.ToString() ?? "0");
 			}
 		}

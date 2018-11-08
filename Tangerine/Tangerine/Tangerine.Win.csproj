@@ -44,6 +44,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -55,7 +58,7 @@
   <ItemGroup>
     <Compile Include="AlignPreferences.cs" />
     <Compile Include="CommandHandlers.cs" />
-    <Compile Include="Dialogs\AttachmentDialog.cs" />
+    <Compile Include="Panels\AttachmentPanel.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\OrangePluginOptionsDialog.cs" />
@@ -140,6 +143,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Documentation\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
