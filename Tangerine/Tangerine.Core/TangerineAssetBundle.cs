@@ -92,19 +92,41 @@ namespace Tangerine.Core
 		{
 			using (var cacheBundle = OpenCacheBundle(AssetBundleFlags.Writable)) {
 				Model3DAttachment attachment = null;
+				Orange.FbxModelImporter fbxImporter = null;
 				var fbxPath = Path.ChangeExtension(path, "fbx");
 				var fbxExists = base.FileExists(fbxPath);
 				var fbxCached = cacheBundle.FileExists(path);
 				var fbxUpToDate = fbxCached == fbxExists &&
 					(!fbxExists || cacheBundle.GetFileLastWriteTime(path) >= base.GetFileLastWriteTime(fbxPath));
 
+				var fbxFullPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, fbxPath);
 				var attachmentPath = Path.ChangeExtension(path, Model3DAttachment.FileExtension);
 				var attachmentExists = base.FileExists(attachmentPath);
 				var attachmentCached = cacheBundle.FileExists(attachmentPath);
 				var attachmentUpToDate = attachmentCached == attachmentExists &&
 					(!attachmentExists || cacheBundle.GetFileLastWriteTime(attachmentPath) >= base.GetFileLastWriteTime(attachmentPath));
+				var shouldInvalidateCache = false;
+				// If the attachment is up to date but needs to import source animations ids.
+				if (fbxExists && attachmentExists && attachmentUpToDate) {
+					try {
+						Model3DAttachmentParser.ModelAttachmentFormat cachedAttachmentFormat;
+						using (var stream = cacheBundle.OpenFile(attachmentPath)) {
+							cachedAttachmentFormat =
+								TangerineYuzu.Instance.Value.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(
+									attachmentPath, stream);
+						}
+						if (cachedAttachmentFormat.SourceAnimationIds == null) {
+							fbxImporter = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget,
+								new Dictionary<string, Orange.CookingRules>(), applyAttachment: false);
+							shouldInvalidateCache = fbxImporter.Model.Animations.Count > 0;
+						}
+					} catch {
+						// If the cache of attachment is corrupted just invalidate it.
+						shouldInvalidateCache = true;
+					}
+				}
 
-				if (fbxUpToDate && attachmentUpToDate) {
+				if (fbxUpToDate && attachmentUpToDate && !shouldInvalidateCache) {
 					return;
 				}
 
@@ -116,9 +138,10 @@ namespace Tangerine.Core
 				}
 
 				if (fbxExists) {
-					var fbxFullPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, fbxPath);
-					var fbxImporter = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget,
-						new Dictionary<string, Orange.CookingRules>(), applyAttachment: false);
+					if (fbxImporter == null) {
+						fbxImporter = new Orange.FbxModelImporter(fbxFullPath, Orange.The.Workspace.ActiveTarget,
+							new Dictionary<string, Orange.CookingRules>(), applyAttachment: false);
+					}
 					var model = fbxImporter.Model;
 					if (attachmentExists) {
 						attachment = Model3DAttachmentParser.GetModel3DAttachment(fbxFullPath);
