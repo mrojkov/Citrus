@@ -34,21 +34,13 @@ namespace Lime
 			widget.LateTasks.AddLoop(HandleFocusSwitchWithKeyboard);
 		}
 
-		public static KeyboardFocusScope GetEnclosingScope(Widget widget)
-		{
-			return widget.Ancestors.OfType<Widget>().Select(i => i.FocusScope).FirstOrDefault(i => i != null);
-		}
-
-		public Widget GetFirstFocusable()
-		{
-			return GetTabTraversables(Widget).FirstOrDefault();
-		}
+		public static KeyboardFocusScope GetEnclosingScope(Widget widget) => widget.Ancestors.OfType<Widget>().Select(i => i.FocusScope).FirstOrDefault(i => i != null);
 
 		private void HandleSetFocusOnMousePress()
 		{
 			var focused = Widget.Focused;
 			if (FocusOnMousePress && Widget.Input.WasMousePressed()) {
-				if (focused == null || !focused.SameOrDescendantOf(Widget) || !focused.GloballyVisible) {
+				if (focused == null || !focused.SameOrDescendantOf(Widget) || !focused.LocalHitTest(focused.Input.MousePosition) || !focused.GloballyVisible) {
 					Widget.SetFocus();
 				}
 			}
@@ -91,10 +83,8 @@ namespace Lime
 			}
 		}
 
-		private bool CanRegainFocus()
-		{
-			return lastFocused != null && lastFocused.GloballyVisible && lastFocused.DescendantOf(Widget);
-		}
+		public Widget GetFirstFocusable() => GetTabTraversables(Widget).FirstOrDefault();
+		private bool CanRegainFocus() => lastFocused != null && lastFocused.GloballyVisible && lastFocused.DescendantOf(Widget);
 
 		private static IEnumerable<Widget> GetTabTraversables(Widget root)
 		{
