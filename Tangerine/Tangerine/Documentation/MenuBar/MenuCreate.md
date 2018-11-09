@@ -32,6 +32,6 @@
 * ![Spline3D](@Icons\Node\Lime.Spline3D.png) **[Spline3D](@Node.3D.Spline3D.Spline3D)**
 * ![SplinePoint3D](@Icons\Node\Lime.SplinePoint3D.png) **[SplinePoint3D](@Node.3D.Spline3D.SplinePoint3D)**
 * ![SplineGear3D](@Icons\Node\Lime.SplineGear3D.png) **[SplineGear3D](@Node.3D.Spline3D.SplineGear3D)**
-* ![Polyline](@Icons\Node\Lime.Polyline.png) **[Polyline](@Node.Polyline)**
-* ![PolylinePoint](@Icons\Node\Lime.PolylinePoint.png) **[PolylinePoint](@Node.PolylinePoint)**
+* ![Polyline](@Icons\Node\Lime.Polyline.png) **[Polyline](@Node.Polyline.Polyline)**
+* ![PolylinePoint](@Icons\Node\Lime.PolylinePoint.png) **[PolylinePoint](@Node.Polyline.PolylinePoint)**
 * ![TiledImage](@Icons\Node\Lime.TiledImage.png) **[TiledImage](@Node.Image.TiledImage)**
