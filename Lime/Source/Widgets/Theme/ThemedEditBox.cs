@@ -89,7 +89,12 @@ namespace Lime
 				}
 			};
 			LateTasks.Add(Task.Repeat(() => {
-				dragGesture.Recognized += () => Tasks.Add(SpinByDragTask(dragGesture));
+				dragGesture.Recognized += () => {
+					if (Focused != null && !this.SameOrDescendantOf(Focused)) {
+						Focused.RevokeFocus();
+					}
+					Tasks.Add(SpinByDragTask(dragGesture));
+				};
 				Editor.ClickableWidget.Gestures.Insert(0, dragGesture);
 				return false;
 			}));
