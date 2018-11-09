@@ -76,12 +76,6 @@ namespace Tangerine
 			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
 			Panel = panel;
 			RootWidget.Tasks.AddLoop(() => {
-				if (
-					RootWidget.Input.WasKeyPressed(Key.Mouse0) ||
-					RootWidget.Input.WasKeyPressed(Key.Mouse1)
-				) {
-					RootWidget.SetFocus();
-				}
 				if (Widget.Focused != RootWidget || history == null) {
 					return;
 				}

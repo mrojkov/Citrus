@@ -811,7 +811,7 @@ namespace Lime
 		{
 			if (IsFocused()) {
 				var scope = KeyboardFocusScope.GetEnclosingScope(this);
-				SetFocus(scope != null ? scope.Widget : null);
+				SetFocus(scope?.Widget);
 			}
 		}
 
@@ -831,7 +831,6 @@ namespace Lime
 			if (Focused == value) {
 				return;
 			}
-
 			Focused = value;
 			Application.InvalidateWindows();
 		}
