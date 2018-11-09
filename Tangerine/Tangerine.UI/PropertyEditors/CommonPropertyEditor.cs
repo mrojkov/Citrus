@@ -55,18 +55,17 @@ namespace Tangerine.UI
 
 		IEnumerator<object> ManageLabelTask()
 		{
+			var clickGesture0 = new ClickGesture(0, () => {
+				PropertyLabel.SetFocus();
+			});
+			var clickGesture1 = new ClickGesture(1, () => {
+				PropertyLabel.SetFocus();
+				ShowPropertyContextMenu();
+			});
+			PropertyLabel.Gestures.Add(clickGesture0);
+			PropertyLabel.Gestures.Add(clickGesture1);
 			while (true) {
-				var popupMenu = PropertyLabel.Input.WasMouseReleased(1);
-				if (popupMenu || PropertyLabel.Input.WasMouseReleased(0)) {
-					PropertyLabel.SetFocus();
-				}
 				PropertyLabel.Color = PropertyLabel.IsFocused() ? Theme.Colors.KeyboardFocusBorder : Theme.Colors.BlackText;
-				if (popupMenu) {
-					// Wait until the label actually change its color.
-					yield return null;
-					yield return null;
-					ShowPropertyContextMenu();
-				}
 				if (PropertyLabel.IsFocused()) {
 					if (Command.Copy.WasIssued()) {
 						Command.Copy.Consume();
