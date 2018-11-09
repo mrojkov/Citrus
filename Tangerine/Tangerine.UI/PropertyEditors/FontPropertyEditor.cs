@@ -21,12 +21,14 @@ namespace Tangerine.UI
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
-			selector.Text = GetFontName(CoalescedPropertyValue().GetValue());
+
+			var current = CoalescedPropertyValue().GetValue();
+			selector.Text = current.IsUndefined ? GetFontName(current.Value) : ManyValuesText;
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
-				selector.Text = GetFontName(i);
+				selector.Text = i.IsUndefined ? GetFontName(i.Value) : ManyValuesText;
 			});
 		}
 

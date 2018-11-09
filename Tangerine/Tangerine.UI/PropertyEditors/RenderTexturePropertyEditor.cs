@@ -14,9 +14,9 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v =>
-				editor.Text = v == null ?
+				editor.Text = v.Value == null ?
 					"RenderTexture (null)" :
-					$"RenderTexture ({v.ImageSize.Width}x{v.ImageSize.Height})"
+					$"RenderTexture ({v.Value.ImageSize.Width}x{v.Value.ImageSize.Height})"
 			);
 		}
 	}

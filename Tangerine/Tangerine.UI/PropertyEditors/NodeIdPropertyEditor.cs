@@ -27,7 +27,7 @@ namespace Tangerine.UI
 				}
 			}));
 			editor.Submitted += SetValue;
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
 		}
 
 		private void SetValue(string value)
@@ -37,7 +37,7 @@ namespace Tangerine.UI
 			} else {
 				SetProperty(editor.Text);
 			}
-			editor.Text = CoalescedPropertyValue().GetValue();
+			editor.Text = SameValues() ? PropertyValue(EditorParams.Objects.First()).GetValue() : ManyValuesText;
 		}
 
 		protected virtual bool IsValid(string value)

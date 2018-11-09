@@ -18,7 +18,7 @@ namespace Tangerine.UI
 
 		private void SetValue(Shortcut value)
 		{
-			var oldValue = CoalescedPropertyValue().GetValue();
+			var oldValue = CoalescedPropertyValue().GetValue().Value;
 			SetProperty(value);
 			if (value != oldValue) {
 				PropertyChanged?.Invoke();
@@ -32,8 +32,8 @@ namespace Tangerine.UI
 			editor.Updated += Updated;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
-				var text = v.ToString();
-				editor.Text = v.Main != Key.Unknown ? text : text.Replace("Unknown", "");
+				var text = v.Value.ToString();
+				editor.Text = v.IsUndefined ? v.Value.Main != Key.Unknown ? text : text.Replace("Unknown", "") : ManyValuesText;
 			});
 			editor.IsReadOnly = true;
 			editor.TextWidget.Tasks.Clear();
@@ -52,8 +52,8 @@ namespace Tangerine.UI
 			ContainerWidget.Tasks.Add(ManageFocusTask());
 
 			var value = CoalescedPropertyValue().GetValue();
-			main = value.Main;
-			modifiers = value.Modifiers;
+			main = value.Value.Main;
+			modifiers = value.Value.Modifiers;
 			flatFillPresenter = new WidgetFlatFillPresenter(Theme.Colors.GrayBackground);
 			ContainerWidget.CompoundPresenter.Add(flatFillPresenter);
 		}

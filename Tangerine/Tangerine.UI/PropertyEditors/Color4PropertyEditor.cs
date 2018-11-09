@@ -30,8 +30,8 @@ namespace Tangerine.UI
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding = panel.Widget.Padding + new Thickness(right: 12.0f);
 			panel.Widget.Tasks.Add(currentColor.Consume(v => {
-				if (panel.Color != v) {
-					panel.Color = v;
+				if (panel.Color != v.Value) {
+					panel.Color = v.Value;
 				}
 				Changed?.Invoke();
 			}));
@@ -50,10 +50,16 @@ namespace Tangerine.UI
 				EditorParams.History?.EndTransaction();
 			};
 			colorBox.Clicked += () => Expanded = !Expanded;
-			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
+			var currentColorString = currentColor.Select(i => i.Value.ToString(Color4.StringPresentation.Dec));
 			editor.Submitted += text => SetComponent(text, currentColorString);
 			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
-			editor.AddChangeWatcher(() => editor.Text, value => CheckEditorText(value, editor));
+			editor.AddChangeWatcher(() => editor.Text, value => {
+				if (SameValues()) {
+					CheckEditorText(value, editor);
+				} else {
+					editor.Text = ManyValuesText;
+				}
+			});
 		}
 
 		private static void CheckEditorText(string value, EditBox editor)
@@ -73,14 +79,14 @@ namespace Tangerine.UI
 				SetProperty(newColor);
 			}
 			else {
-				editor.Text = currentColorString.GetValue();
+				editor.Text = SameValues() ? currentColorString.GetValue() : ManyValuesText;
 			}
 		}
 
 		public override void Submit()
 		{
 			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
-			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
+			var currentColorString = currentColor.Select(i => i.Value.ToString(Color4.StringPresentation.Dec));
 			SetComponent(editor.Text, currentColorString);
 		}
 
@@ -95,7 +101,7 @@ namespace Tangerine.UI
 
 		class ColorBoxButton : Button
 		{
-			public ColorBoxButton(IDataflowProvider<Color4> colorProvider)
+			public ColorBoxButton(IDataflowProvider<CoalescedValue<Color4>> colorProvider)
 			{
 				Nodes.Clear();
 				Size = MinMaxSize = new Vector2(25, Theme.Metrics.DefaultButtonSize.Y);
@@ -109,7 +115,7 @@ namespace Tangerine.UI
 						var checkPos = new Vector2(widget.Width / 2 + ((i == 1) ? widget.Width / 4 : 0), i * checkSize.Y);
 						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
 					}
-					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value);
+					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value.Value);
 					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
 				});
 			}

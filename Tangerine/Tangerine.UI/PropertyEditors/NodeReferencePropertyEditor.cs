@@ -16,8 +16,10 @@ namespace Tangerine.UI
 			editor = editorParams.EditBoxFactory();
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
-			editor.Submitted += text => SetComponent(text);
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v?.Id);
+			editor.Submitted += SetComponent;
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
+				editor.Text = v.IsUndefined ? v.Value?.Id: ManyValuesText;
+			});
 		}
 
 		void SetComponent(string text)

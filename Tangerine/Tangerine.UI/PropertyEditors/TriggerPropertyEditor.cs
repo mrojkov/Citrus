@@ -26,7 +26,7 @@ namespace Tangerine.UI
 					}
 				}
 			}
-			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v);
+			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsUndefined ? v.Value : ManyValuesText);
 		}
 
 		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
@@ -35,7 +35,7 @@ namespace Tangerine.UI
 				return;
 			var newTrigger = (string)args.Value;
 			var currentTriggers = CoalescedPropertyValue().GetValue();
-			if (string.IsNullOrWhiteSpace(currentTriggers) || args.Index < 0) {
+			if (string.IsNullOrWhiteSpace(currentTriggers.Value) || args.Index < 0) {
 				// Keep existing and remove absent triggers after hand input.
 				var availableTriggers = new HashSet<string>(comboBox.Items.Select(item => item.Text));
 				var setTrigger = string.Join(
@@ -46,8 +46,11 @@ namespace Tangerine.UI
 						Where(el => availableTriggers.Contains(el)).
 						Distinct(new TriggerStringComparer())
 				);
-
-				SetProperty(setTrigger.Length == 0 ? null : setTrigger);
+				if (setTrigger.Length == 0) {
+					comboBox.Text = currentTriggers.IsUndefined ? currentTriggers.Value : ManyValuesText;
+					return;
+				}
+				SetProperty(setTrigger);
 				if (setTrigger != newTrigger) {
 					comboBox.Text = setTrigger;
 				}
@@ -57,7 +60,7 @@ namespace Tangerine.UI
 			var added = false;
 			string newMarker, newAnimation;
 			SplitTrigger(newTrigger, out newMarker, out newAnimation);
-			foreach (var trigger in currentTriggers.Split(',').Select(i => i.Trim())) {
+			foreach (var trigger in currentTriggers.Value.Split(',').Select(i => i.Trim())) {
 				string marker, animation;
 				SplitTrigger(trigger, out marker, out animation);
 				if (animation == newAnimation) {

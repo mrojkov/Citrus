@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.ExpressionParser;
@@ -25,23 +26,23 @@ namespace Tangerine.UI
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, currentZ.GetValue());
-			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.ToString("0.###"));
-			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.ToString("0.###"));
-			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.ToString("0.###"));
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
-		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					SetProperty<Vector3>((current) => {
+					SetProperty<Vector3>(current => {
 						current[component] = (float)newValue;
 						return current;
 					});
 				});
 				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.ToString("0.###");
+				editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 

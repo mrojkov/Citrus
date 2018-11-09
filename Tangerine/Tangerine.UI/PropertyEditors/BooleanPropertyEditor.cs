@@ -13,12 +13,12 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(checkBox);
 			EditorContainer.AddNode(Spacer.HStretch());
 			checkBox.Changed += args => {
-				if (args.ChangedByUser)
-				{
+				if (args.ChangedByUser) {
 					SetProperty(args.Value);
 				}
 			};
-			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.Checked = v);
+			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.State = v.IsUndefined
+				? v.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked : CheckBoxState.Indeterminate);
 		}
 	}
 }

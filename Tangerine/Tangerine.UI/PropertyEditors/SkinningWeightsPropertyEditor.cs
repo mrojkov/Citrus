@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 
@@ -43,20 +45,24 @@ namespace Tangerine.UI
 					}
 				});
 				ExpandableContent.AddNode(wrapper);
-				SetLink(i, CoalescedPropertyValue(new SkinningWeights()));
+				var j = i;
+				SetLink(i, CoalescedPropertyComponentValue(sw => sw[j].Index), CoalescedPropertyComponentValue(sw => sw[j].Weight));
 			}
 		}
 
-		private void SetLink(int idx, IDataflowProvider<SkinningWeights> provider)
+		private void SetLink(int idx, IDataflowProvider<CoalescedValue<int>> indexProvider, IDataflowProvider<CoalescedValue<float>> weightProvider)
 		{
-			var currentValue = provider.GetValue();
-			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentValue);
-			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentValue);
-			indexEditors[idx].AddChangeWatcher(provider, v => indexEditors[idx].Text = v[idx].Index.ToString());
-			weigthsEditors[idx].AddChangeWatcher(provider, v => weigthsEditors[idx].Text = v[idx].Weight.ToString("0.###"));
+			var currentIndexValue = indexProvider.GetValue();
+			var currentWeightValue = weightProvider.GetValue();
+			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentIndexValue);
+			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentWeightValue);
+			indexEditors[idx].AddChangeWatcher(indexProvider,
+				v => indexEditors[idx].Text = v.IsUndefined ? v.Value.ToString() : ManyValuesText);
+			weigthsEditors[idx].AddChangeWatcher(weightProvider,
+				v => weigthsEditors[idx].Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
-		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
+		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, CoalescedValue<int> prevValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -70,11 +76,11 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = sw[idx].Index.ToString();
+				editor.Text = prevValue.IsUndefined ? prevValue.Value.ToString() : ManyValuesText;
 			}
 		}
 
-		private void SetWeightValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, SkinningWeights sw)
+		private void SetWeightValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, CoalescedValue<float> prevWeight)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -88,7 +94,7 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = sw[idx].Weight.ToString("0.###");
+				editor.Text = prevWeight.IsUndefined ? prevWeight.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 	}

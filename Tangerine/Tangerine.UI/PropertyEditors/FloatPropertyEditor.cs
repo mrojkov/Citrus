@@ -14,22 +14,22 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(editor);
 			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
-			editor.Submitted += text => SetComponent(text, current);
-			editor.AddChangeWatcher(current, v => editor.Text = v.ToString("0.###"));
+			editor.Submitted += text => SetComponent(text, current.GetValue());
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
-		public void SetComponent(string text, IDataflowProvider<float> current)
+		public void SetComponent(string text, CoalescedValue<float> current)
 		{
 			if (Parser.TryParse(text, out double newValue)) {
 				SetProperty((float)newValue);
 			}
-			editor.Text = current.GetValue().ToString("0.###");
+			editor.Text = current.IsUndefined ? current.Value.ToString("0.###") : ManyValuesText;
 		}
 
 		public override void Submit()
 		{
 			var current = CoalescedPropertyValue();
-			SetComponent(editor.Text, current);
+			SetComponent(editor.Text, current.GetValue());
 		}
 	}
 }

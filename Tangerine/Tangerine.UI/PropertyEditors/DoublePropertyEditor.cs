@@ -16,10 +16,12 @@ namespace Tangerine.UI
 			editor.Submitted += text => {
 				if (Parser.TryParse(text, out double newValue)) {
 					SetProperty(newValue);
+				} else {
+					var currentValue = current.GetValue();
+					editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 				}
-				editor.Text = current.GetValue().ToString("0.###");
 			};
-			editor.AddChangeWatcher(current, v => editor.Text = v.ToString("0.###"));
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 	}
 }
