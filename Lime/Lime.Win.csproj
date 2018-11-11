@@ -145,7 +145,7 @@
     </Reference>
     <Reference Include="MFDecoder, Version=1.0.6621.19204, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MFDecoder\MFDecoder.dll</HintPath>
+      <HintPath>..\3rdParty\MFDecoder\MFDecoder.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
