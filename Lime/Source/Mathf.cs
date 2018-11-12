@@ -20,20 +20,26 @@ namespace Lime
 
 		public static float Min(float x, float y) => (x < y) ? x : y;
 
-		public static float Abs(float x)
-		{
-			return Math.Abs(x);
-		}
+		/// <summary>
+		/// Returns absolute value of <paramref name="v"/>. Equals to -<paramref name="v"/> if <paramref name="v"/> less than 0 or <paramref name="v"/> otherwise.
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static float Abs(float v) => Math.Abs(v);
 
-		public static float Abs(Vector2 x)
-		{
-			return x.Length;
-		}
+		/// <summary>
+		///  Returns <see cref="Vector2"/> with absolute values of corresponding components of <paramref name="v"/>
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static Vector2 Abs(Vector2 v) => new Vector2(Abs(v.X), Abs(v.Y));
 
-		public static float Abs(Vector3 x)
-		{
-			return x.Length;
-		}
+		/// <summary>
+		///  Returns <see cref="Vector3"/> with absolute values of corresponding components of <paramref name="v"/>
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static Vector3 Abs(Vector3 v) => new Vector3(Abs(v.X), Abs(v.Y), Abs(v.Z));
 
 		public static int Sign(float x) => Math.Sign(x);
 
