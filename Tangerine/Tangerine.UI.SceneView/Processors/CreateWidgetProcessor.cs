@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Yuzu;
 
 namespace Tangerine.UI.SceneView
 {
 	public class CreateWidgetProcessor : ITaskProvider
 	{
-		SceneView sv => SceneView.Instance;
+		private SceneView sv => SceneView.Instance;
 
 		public IEnumerator<object> Task()
 		{
@@ -44,8 +45,7 @@ namespace Tangerine.UI.SceneView
 					var presenter = new SyncDelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						var t2 = container.CalcTransitionToSpaceOf(sv.Frame);
-						DrawRectOutline(rect.A, (rect.A + rect.B) / 2, t2);
-						DrawRectOutline(rect.A, rect.B, t2);
+						DrawCreateWidgetGizmo(rect.A, rect.B, t2);
 					});
 					sv.Frame.CompoundPostPresenter.Add(presenter);
 					using (Document.Current.History.BeginTransaction()) {
@@ -74,13 +74,17 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		static void DrawRectOutline(Vector2 a, Vector2 b, Matrix32 t)
+		private static void DrawCreateWidgetGizmo(Vector2 a, Vector2 b, Matrix32 t)
 		{
 			var c = ColorTheme.Current.SceneView.MouseSelection;
 			Renderer.DrawLine(a * t, new Vector2(b.X, a.Y) * t, c, 1, LineCap.Square);
 			Renderer.DrawLine(new Vector2(b.X, a.Y) * t, b * t, c, 1, LineCap.Square);
 			Renderer.DrawLine(b * t, new Vector2(a.X, b.Y) * t, c, 1, LineCap.Square);
 			Renderer.DrawLine(new Vector2(a.X, b.Y) * t, a * t, c, 1, LineCap.Square);
+			var midX = (a.X + b.X) * 0.5f;
+			var midY = (a.Y + b.Y) * 0.5f;
+			Renderer.DrawLine(new Vector2(midX, a.Y) * t, new Vector2(midX, b.Y) * t, c, 1, LineCap.Square);
+			Renderer.DrawLine(new Vector2(a.X, midY) * t, new Vector2(b.X, midY) * t, c, 1, LineCap.Square);
 		}
 	}
 }
