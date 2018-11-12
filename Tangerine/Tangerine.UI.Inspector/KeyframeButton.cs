@@ -96,6 +96,9 @@ namespace Tangerine.UI.Inspector
 				if (wasClicked) {
 					Document.Current.History.DoTransaction(() => {
 						SetKeyframe(!kf.HasValue);
+						if (!kf.HasValue) {
+							SetKeyFunction(KeyFunction.Linear);
+						}
 					});
 				}
 				if (wasRightClicked) {
@@ -107,6 +110,7 @@ namespace Tangerine.UI.Inspector
 					} else {
 						Document.Current.History.DoTransaction(() => {
 							SetKeyframe(true);
+							SetKeyFunction(KeyFunction.Linear);
 						});
 					}
 				}
