@@ -1,21 +1,19 @@
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI.Inspector
 {
-	class KeyframeDataflow : IDataflow<IKeyframe>
+	internal class KeyframeDataflow : IDataflow<IKeyframe>
 	{
-		readonly object obj;
-		readonly string propertyPath;
+		private readonly object obj;
+		private readonly string propertyPath;
 
-		int animatorCollectionVersion = int.MinValue;
-		int animatorVersion = int.MinValue;
-		int animationFrame = int.MinValue;
-		string animationId;
-		IAnimator animator;
+		private int animatorCollectionVersion = int.MinValue;
+		private int animatorVersion = int.MinValue;
+		private int animationFrame = int.MinValue;
+		private string animationId;
+		private IAnimator animator;
 
 		public IKeyframe Value { get; private set; }
 		public bool GotValue { get; private set; }
@@ -41,8 +39,7 @@ namespace Tangerine.UI.Inspector
 		public void Poll()
 		{
 			GotValue = false;
-			var animationHost = obj as IAnimationHost;
-			if (animationHost == null) {
+			if (!(obj is IAnimationHost animationHost)) {
 				return;
 			}
 			if ((GotValue |= Document.Current.AnimationFrame != animationFrame)) {
@@ -67,15 +64,8 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		IAnimator FindAnimator()
-		{
-			IAnimator animator;
-			return (obj as IAnimationHost).Animators.TryFind(propertyPath, out animator, Document.Current.AnimationId) ? animator : null;
-		}
+		private IAnimator FindAnimator() => (obj as IAnimationHost).Animators.TryFind(propertyPath, out IAnimator animator, Document.Current.AnimationId) ? animator : null;
 
-		IKeyframe FindKeyframe()
-		{
-			return FindAnimator()?.ReadonlyKeys.GetByFrame(Document.Current.AnimationFrame);
-		}
+		private IKeyframe FindKeyframe() => FindAnimator()?.ReadonlyKeys.GetByFrame(Document.Current.AnimationFrame);
 	}
 }

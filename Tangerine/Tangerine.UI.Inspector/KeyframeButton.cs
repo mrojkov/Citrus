@@ -8,20 +8,20 @@ namespace Tangerine.UI.Inspector
 {
 	public class KeyframeButton : Button
 	{
-		readonly Image image;
-		readonly Image fillImage;
-		readonly Image outlintImage;
-		private static string[] iconNames = new[] { "Linear", "Step", "Catmullrom", "Loop" };
-		private List<ITexture> fillTextures = new List<ITexture>();
-		private List<ITexture> outlineTextures = new List<ITexture>();
+		private readonly Image image;
+		private readonly Image fillImage;
+		private readonly Image outlintImage;
+		private static readonly string[] iconNames = new[] { "Linear", "Step", "Catmullrom", "Loop" };
+		private readonly List<ITexture> fillTextures = new List<ITexture>();
+		private readonly List<ITexture> outlineTextures = new List<ITexture>();
 		private ClickGesture rightClickGesture;
-		KeyFunction function;
-		bool @checked;
+		private KeyFunction function;
+		private bool @checked;
 
 		public Color4 KeyColor { get; set; }
 		public bool Checked
 		{
-			get { return @checked; }
+			get => @checked;
 			set
 			{
 				@checked = value;
@@ -63,15 +63,15 @@ namespace Tangerine.UI.Inspector
 			Nodes.Add(fillImage);
 			Nodes.Add(image);
 			Layout = new StackLayout();
-			this.PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
+			PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
 			Awoke += Awake;
 		}
 	}
 
-	class KeyframeButtonBinding : ITaskProvider
+	internal class KeyframeButtonBinding : ITaskProvider
 	{
-		readonly IPropertyEditorParams editorParams;
-		readonly KeyframeButton button;
+		private readonly IPropertyEditorParams editorParams;
+		private readonly KeyframeButton button;
 
 		public KeyframeButtonBinding(IPropertyEditorParams editorParams, KeyframeButton button)
 		{
@@ -83,8 +83,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var keyFunctionFlow = KeyframeDataflow.GetProvider(editorParams, i => i?.Function).DistinctUntilChanged().GetDataflow();
 			while (true) {
-				KeyFunction? kf;
-				keyFunctionFlow.Poll(out kf);
+				keyFunctionFlow.Poll(out var kf);
 				button.Checked = kf.HasValue;
 				if (kf.HasValue) {
 					button.SetKeyFunction(kf.Value);
@@ -101,7 +100,7 @@ namespace Tangerine.UI.Inspector
 				}
 				if (wasRightClicked) {
 					if (kf.HasValue) {
-						var nextKeyFunction = NextKeyFunction(kf.GetValueOrDefault());
+						var nextKeyFunction = GetNextKeyFunction(kf.GetValueOrDefault());
 						Document.Current.History.DoTransaction(() => {
 							SetKeyFunction(nextKeyFunction);
 						});
@@ -115,21 +114,17 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private static KeyFunction[] nextKeyFunction = {
+		private static readonly KeyFunction[] nextKeyFunction = {
 			KeyFunction.Spline, KeyFunction.ClosedSpline,
 			KeyFunction.Steep, KeyFunction.Linear
 		};
 
-		private static KeyFunction NextKeyFunction(KeyFunction value)
-		{
-			return nextKeyFunction[(int)value];
-		}
+		private static KeyFunction GetNextKeyFunction(KeyFunction value) => nextKeyFunction[(int)value];
 
 		internal void SetKeyFunction(KeyFunction value)
 		{
 			foreach (var animable in editorParams.RootObjects.OfType<IAnimationHost>()) {
-				IAnimator animator;
-				if (animable.Animators.TryFind(editorParams.PropertyPath, out animator, Document.Current.AnimationId)) {
+				if (animable.Animators.TryFind(editorParams.PropertyPath, out var animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
 					keyframe.Function = value;
 					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
@@ -137,7 +132,7 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		void SetKeyframe(bool value)
+		private void SetKeyframe(bool value)
 		{
 			int currentFrame = Document.Current.AnimationFrame;
 
