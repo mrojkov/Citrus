@@ -30,12 +30,20 @@ namespace Lime
 		/// <summary>
 		/// Left-top corner of this rectangle.
 		/// </summary>
-		public Vector2 A { get { return new Vector2(AX, AY); } set { AX = value.X; AY = value.Y; } }
+		public Vector2 A
+		{
+			get => new Vector2(AX, AY);
+			set { AX = value.X; AY = value.Y; }
+		}
 
 		/// <summary>
 		/// Right-bottom corner of this rectangle.
 		/// </summary>
-		public Vector2 B { get { return new Vector2(BX, BY); } set { BX = value.X; BY = value.Y; } }
+		public Vector2 B
+		{
+			get => new Vector2(BX, BY);
+			set { BX = value.X; BY = value.Y; }
+		}
 
 		public Rectangle(float left, float top, float right, float bottom)
 		{
@@ -53,52 +61,53 @@ namespace Lime
 			BY = b.Y;
 		}
 
-		public static explicit operator IntRectangle(Rectangle value)
-		{
-			return new IntRectangle((int)value.Left, (int)value.Top, (int)value.Right, (int)value.Bottom);
-		}
+		public static explicit operator IntRectangle(Rectangle value) => new IntRectangle((int)value.Left, (int)value.Top, (int)value.Right, (int)value.Bottom);
 
-		public override bool Equals(object obj)
-		{
-			return obj is Rectangle && Equals((Rectangle)obj);
-		}
+		public override bool Equals(object obj) => obj is Rectangle rectangle && Equals(rectangle);
 
-		public bool Equals(Rectangle other)
-		{
-			return A.Equals(other.A) && B.Equals(other.B);
-		}
+		public bool Equals(Rectangle other) => A.Equals(other.A) && B.Equals(other.B);
 
-		public static bool operator ==(Rectangle lhs, Rectangle rhs)
-		{
-			return lhs.Equals(rhs);
-		}
+		public static bool operator ==(Rectangle lhs, Rectangle rhs) => lhs.Equals(rhs);
 
-		public static bool operator !=(Rectangle lhs, Rectangle rhs)
-		{
-			return !lhs.Equals(rhs);
-		}
+		public static bool operator !=(Rectangle lhs, Rectangle rhs) => !lhs.Equals(rhs);
 
 		public float Width
 		{
-			get { return BX - AX; }
-			set { BX = AX + value; }
+			get => BX - AX;
+			set => BX = AX + value;
 		}
 
 		public float Height
 		{
-			get { return BY - AY; }
-			set { BY = AY + value; }
+			get => BY - AY;
+			set => BY = AY + value;
 		}
 
-		public float Left { get { return AX; } set { AX = value; } }
+		public float Left
+		{
+			get => AX;
+			set => AX = value;
+		}
 
-		public float Top { get { return AY; } set { AY = value; } }
+		public float Top
+		{
+			get => AY;
+			set => AY = value;
+		}
 
-		public float Right { get { return BX; } set { BX = value; } }
+		public float Right
+		{
+			get => BX;
+			set => BX = value;
+		}
 
-		public float Bottom { get { return BY; } set { BY = value; } }
+		public float Bottom
+		{
+			get => BY;
+			set => BY = value;
+		}
 
-		public Vector2 Center { get { return (A + B) / 2; } }
+		public Vector2 Center => (A + B) / 2;
 
 		/// <summary>
 		/// Returns this rectangle with swapped coordinates
@@ -114,22 +123,30 @@ namespace Lime
 			get
 			{
 				var rect = this;
-				if (Width < 0) {
-					rect.AX = BX;
-					rect.BX = AX;
-				}
-				if (Height < 0) {
-					rect.AY = BY;
-					rect.BY = AY;
-				}
+				rect.Normalize();
 				return rect;
 			}
 		}
 
-		public bool Contains(Vector2 value)
+		/// <summary>
+		/// Swaps rectangle coordinates of borders if width or height is negative.
+		/// </summary>
+		/// <remarks>
+		/// Width or height can be negative if coordinates of borders are mixed up.
+		/// After execution of this method given rectangle's width and height
+		/// are guaranteed to be positive.
+		/// </remarks>
+		public void Normalize()
 		{
-			return AX < BX ? CheckContains(value, A, B) : CheckContains(value, B, A);
+			if (Width < 0) {
+				(AX, BX) = (BX, AX);
+			}
+			if (Height < 0) {
+				(AY, BY) = (BY, AY);
+			}
 		}
+
+		public bool Contains(Vector2 value) => AX < BX ? CheckContains(value, A, B) : CheckContains(value, B, A);
 
 		private static bool CheckContains(Vector2 value, Vector2 a, Vector2 b)
 		{
@@ -158,78 +175,56 @@ namespace Lime
 		/// <summary>
 		/// Creates a new <see cref="Rectangle"/> that covers both of two other rectangles.
 		/// </summary>
-		public static Rectangle Bounds(Rectangle value1, Rectangle value2)
-		{
-			return new Rectangle(
-				Mathf.Min(value1.Left, value2.Left),
-				Mathf.Min(value1.Top, value2.Top),
-				Mathf.Max(value1.Right, value2.Right),
-				Mathf.Max(value1.Bottom, value2.Bottom)
-			);
-		}
+		public static Rectangle Bounds(Rectangle value1, Rectangle value2) => new Rectangle(
+			Mathf.Min(value1.Left, value2.Left),
+			Mathf.Min(value1.Top, value2.Top),
+			Mathf.Max(value1.Right, value2.Right),
+			Mathf.Max(value1.Bottom, value2.Bottom)
+		);
 
 		/// <summary>
 		/// Creates a new <see cref="Rectangle"/> that includes
 		/// the specified <see cref="Vector2"/>.
 		/// </summary>
-		public Rectangle IncludingPoint(Vector2 value)
-		{
-			return new Rectangle(
-				Mathf.Min(value.X, Left),
-				Mathf.Min(value.Y, Top),
-				Mathf.Max(value.X, Right),
-				Mathf.Max(value.Y, Bottom)
-			);
-		}
+		public Rectangle IncludingPoint(Vector2 value) => new Rectangle(
+			Mathf.Min(value.X, Left),
+			Mathf.Min(value.Y, Top),
+			Mathf.Max(value.X, Right),
+			Mathf.Max(value.Y, Bottom)
+		);
 
-		public Rectangle ExpandedBy(Thickness padding)
-		{
-			return new Rectangle(
-				Left - padding.Left,
-				Top - padding.Top,
-				Right + padding.Right,
-				Bottom + padding.Bottom
-			);
-		}
+		public Rectangle ExpandedBy(Thickness padding) => new Rectangle(
+			Left - padding.Left,
+			Top - padding.Top,
+			Right + padding.Right,
+			Bottom + padding.Bottom
+		);
 
-		public Rectangle ShrinkedBy(Thickness padding) =>
-			new Rectangle(
-				Left + padding.Left,
-				Top + padding.Top,
-				Right - padding.Right,
-				Bottom - padding.Bottom
-			);
+		public Rectangle ShrinkedBy(Thickness padding) => new Rectangle(
+			Left + padding.Left,
+			Top + padding.Top,
+			Right - padding.Right,
+			Bottom - padding.Bottom
+		);
 
 		/// <summary>
 		/// Returns the string representation of this <see cref="Rectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".
 		/// </summary>
-		public override string ToString()
-		{
-			return string.Format("{0}, {1}, {2}, {3}", AX, AY, BX, BY);
-		}
+		public override string ToString() => $"{AX}, {AY}, {BX}, {BY}";
 
-		public override int GetHashCode()
-		{
-			return A.GetHashCode() ^ B.GetHashCode();
-		}
+		public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode();
 
 		/// <summary>
 		/// Applies the transformation matrix to this <see cref="Rectangle"/>.
 		/// </summary>
-		public Rectangle Transform(Matrix32 value)
-		{
-			return new Rectangle(A * value, B * value);
-		}
+		public Rectangle Transform(Matrix32 value) => new Rectangle(A * value, B * value);
 
-		public Quadrangle ToQuadrangle()
-		{
-			return new Quadrangle {
-				V1 = A,
-				V2 = new Vector2(BX, AY),
-				V3 = B,
-				V4 = new Vector2(AX, BY)
-			};
-		}
+		public Quadrangle ToQuadrangle() => new Quadrangle {
+			V1 = A,
+			V2 = new Vector2(BX, AY),
+			V3 = B,
+			V4 = new Vector2(AX, BY)
+		};
 	}
 }
