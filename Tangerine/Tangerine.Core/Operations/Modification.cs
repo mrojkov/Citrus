@@ -291,6 +291,7 @@ namespace Tangerine.Core.Operations
 				public IKeyframe Keyframe;
 				public bool AnimatorExists;
 				public IAnimator Animator;
+				public object ValueWhenNoAnimator;
 			}
 
 			protected override void InternalRedo(SetKeyframe op)
@@ -302,10 +303,13 @@ namespace Tangerine.Core.Operations
 					bool animatorExists =
 						op.AnimationHost.Animators.Any(a => a.TargetPropertyPath == op.PropertyPath && a.AnimationId == op.AnimationId);
 					animator = op.AnimationHost.Animators[op.PropertyPath, op.AnimationId];
+					var (propertyData, animable, index) = AnimationUtils.GetPropertyByPath(op.AnimationHost, op.PropertyPath);
+					var value = index == -1 ? propertyData.Info.GetValue(animable) : propertyData.Info.GetValue(animable, new object [] { index });
 					op.Save(new Backup {
 						AnimatorExists = animatorExists,
 						Animator = animator,
-						Keyframe = animator.Keys.GetByFrame(op.Keyframe.Frame)
+						Keyframe = animator.Keys.GetByFrame(op.Keyframe.Frame),
+						ValueWhenNoAnimator = !animatorExists ? value : null,
 					});
 				} else {
 					animator = backup.Animator;
@@ -334,6 +338,12 @@ namespace Tangerine.Core.Operations
 				}
 				if (!b.AnimatorExists || b.Animator.Keys.Count == 0) {
 					op.AnimationHost.Animators.Remove(b.Animator);
+					var (propertyData, animable, index) = AnimationUtils.GetPropertyByPath(op.AnimationHost, op.PropertyPath);
+					if (index == -1) {
+						propertyData.Info.SetValue(animable, b.ValueWhenNoAnimator);
+					} else {
+						propertyData.Info.SetValue(animable, b.ValueWhenNoAnimator, new object[] {index});
+					}
 				}
 				b.Animator.ResetCache();
 				if (b.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
