@@ -39,12 +39,9 @@ namespace Lime
 
 		public bool Completed => callStack == null;
 
-		public override string ToString()
-		{
-			return Completed ? "Completed" : callStack.Enumerator.GetType().ToString();
-		}
+		public override string ToString() => Completed ? "Completed" : callStack.Enumerator.GetType().ToString();
 
-		public Type InitialEnumeratorType { get; private set; }
+		public Type InitialEnumeratorType { get; }
 
 		/// <summary>
 		/// Advances task to the next step of enumerator.
@@ -128,35 +125,23 @@ namespace Lime
 		/// <summary>
 		/// Proceeds while specified predicate returns true.
 		/// </summary>
-		public static WaitPredicate WaitWhile(Func<bool> predicate)
-		{
-			return new BooleanWaitPredicate(predicate);
-		}
+		public static WaitPredicate WaitWhile(Func<bool> predicate) => new BooleanWaitPredicate(predicate);
 
 		/// <summary>
 		/// Proceeds while specified predicate returns true. Argument of the predicate is
 		/// time, that accumulates on Advance.
 		/// </summary>
-		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
-		{
-			return new TimeWaitPredicate(timePredicate);
-		}
+		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate) => new TimeWaitPredicate(timePredicate);
 
 		/// <summary>
 		/// Proceeds while specified node is running animation.
 		/// </summary>
-		public static WaitPredicate WaitForAnimation(Animation animation)
-		{
-			return new AnimationWaitPredicate(animation);
-		}
+		public static WaitPredicate WaitForAnimation(Animation animation) => new AnimationWaitPredicate(animation);
 
 		/// <summary>
 		/// Proceeds while there is no keystroke on the current window.
 		/// </summary>
-		public static WaitPredicate WaitForInput()
-		{
-			return InputWaitPredicate.Instance;
-		}
+		public static WaitPredicate WaitForInput() => InputWaitPredicate.Instance;
 
 		/// <summary>
 		/// Proceeds asynchronously in separate thread. Returns null while specified action is incomplete.
@@ -173,10 +158,7 @@ namespace Lime
 		/// <summary>
 		/// Creates a new Task executing all provided enumerators in sequential order
 		/// </summary>
-		public static Task Sequence(params IEnumerator<object>[] args)
-		{
-			return new Task(args.Cast<object>().GetEnumerator());
-		}
+		public static Task Sequence(params IEnumerator<object>[] args) => new Task(args.Cast<object>().GetEnumerator());
 
 		/// <summary>
 		/// Returns a sequence of numbers, interpolated as sine in specified time period.
