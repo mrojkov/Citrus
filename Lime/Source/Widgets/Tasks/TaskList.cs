@@ -78,10 +78,7 @@ namespace Lime
 			return task;
 		}
 
-		public Task AddLoop(Action action, object tag = null)
-		{
-			return Add(ActionLoop(action));
-		}
+		public Task AddLoop(Action action, object tag = null) => Add(ActionLoop(action), tag);
 
 		private static IEnumerator<object> ActionLoop(Action action)
 		{
