@@ -224,7 +224,7 @@ namespace Lime
 
 		public static Viewport Viewport
 		{
-			private get { return viewport; }
+			get { return viewport; }
 			set {
 				MainRenderList.Flush();
 				viewport = value;

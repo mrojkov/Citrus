@@ -98,13 +98,6 @@ namespace Lime
 			}
 		}
 
-		private WindowRect CalculateScissorRectangle(Widget widget)
-		{
-			var root = (WindowWidget)WidgetContext.Current.Root;
-			var aabb = widget.CalcAABBInViewportSpace(root.GetViewport(), root.GetProjection());
-			return (WindowRect)aabb;
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender || !ClipRegionTest(chain.ClipRegion)) {
@@ -185,20 +178,20 @@ namespace Lime
 			ro.RenderTexture = renderTexture;
 			ro.FrameSize = Size;
 			ro.ScissorTest = ro.StencilTest = false;
+			var clipBy = ClipByWidget ?? this;
 			var clipRegion = RenderChain.DefaultClipRegion;
+			ro.ClipByLocalToWorld = clipBy.LocalToWorldTransform;
+			ro.ClipBySize = clipBy.Size;
 			if (renderTexture != null) {
 				// TODO: Implement clipping, for now disable it.
 				clipRegion = RenderChain.DefaultClipRegion;
 				if (GetTangerineFlag(TangerineFlags.DisplayContent)) {
 					ro.ScissorTest = true;
-					ro.ScissorRect = CalculateScissorRectangle(ClipByWidget ?? this);
 				}
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				ro.ScissorTest = true;
-				ro.ScissorRect = CalculateScissorRectangle(ClipByWidget ?? this);
 				clipRegion = CalcGlobalBoundingRect();
 			} else if (ClipChildren == ClipMethod.StencilTest) {
-				var clipBy = ClipByWidget ?? this;
 				ro.StencilTest = true;
 				ro.StencilRect = new Rectangle(clipBy.ContentPosition, clipBy.ContentPosition + clipBy.ContentSize);
 				clipRegion = RenderChain.DefaultClipRegion;
@@ -219,7 +212,8 @@ namespace Lime
 			public ITexture RenderTexture;
 			public Vector2 FrameSize;
 			public bool ScissorTest;
-			public WindowRect ScissorRect;
+			public Matrix32 ClipByLocalToWorld;
+			public Vector2 ClipBySize;
 			public bool StencilTest;
 			public Rectangle StencilRect;
 
@@ -271,11 +265,40 @@ namespace Lime
 				}
 			}
 
+			private WindowRect CalculateScissorRectangle(Vector2 size, WindowRect viewport, Matrix44 wvp)
+			{
+				var v1 = wvp.ProjectVector(new Vector2(0, 0));
+				var v2 = wvp.ProjectVector(new Vector2(size.X, 0));
+				var v3 = wvp.ProjectVector(new Vector2(size.X, size.Y));
+				var v4 = wvp.ProjectVector(new Vector2(0, size.Y));
+
+				var min = v1;
+				min = Vector2.Min(min, v2);
+				min = Vector2.Min(min, v3);
+				min = Vector2.Min(min, v4);
+
+				var max = v1;
+				max = Vector2.Max(max, v2);
+				max = Vector2.Max(max, v3);
+				max = Vector2.Max(max, v4);
+
+				min = (Vector2)viewport.Origin + (min + Vector2.One) * (Vector2)viewport.Size * Vector2.Half;
+				max = (Vector2)viewport.Origin + (max + Vector2.One) * (Vector2)viewport.Size * Vector2.Half;
+
+				return new WindowRect {
+					X = min.X.Round(),
+					Y = min.Y.Round(),
+					Width = (max - min).X.Round(),
+					Height = (max - min).Y.Round()
+				};
+			}
+
 			private void RenderWithScissorTest()
 			{
+				var rect = CalculateScissorRectangle(ClipBySize, Renderer.Viewport.Bounds, (Matrix44)(ClipByLocalToWorld * Renderer.Transform2) * Renderer.FixupWVP(Renderer.Projection));
 				Renderer.PushState(RenderState.ScissorState);
 				try {
-					Renderer.SetScissorState(new ScissorState(ScissorRect), intersectWithCurrent: true);
+					Renderer.SetScissorState(new ScissorState(rect), intersectWithCurrent: true);
 					Objects.Render();
 				} finally {
 					Renderer.PopState();
