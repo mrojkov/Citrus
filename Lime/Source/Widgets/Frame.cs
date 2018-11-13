@@ -267,10 +267,23 @@ namespace Lime
 
 			private WindowRect CalculateScissorRectangle(Vector2 size, WindowRect viewport, Matrix44 wvp)
 			{
-				var v1 = wvp.ProjectVector(new Vector2(0, 0));
-				var v2 = wvp.ProjectVector(new Vector2(size.X, 0));
-				var v3 = wvp.ProjectVector(new Vector2(size.X, size.Y));
-				var v4 = wvp.ProjectVector(new Vector2(0, size.Y));
+				var t1 = wvp.TransformVector(new Vector4(0, 0, 0, 1));
+				var t2 = wvp.TransformVector(new Vector4(size.X, 0, 0, 1));
+				var t3 = wvp.TransformVector(new Vector4(size.X, size.Y, 0, 1));
+				var t4 = wvp.TransformVector(new Vector4(0, size.Y, 0, 1));
+
+				if (Mathf.Abs(t1.W) < Mathf.ZeroTolerance ||
+					Mathf.Abs(t2.W) < Mathf.ZeroTolerance ||
+					Mathf.Abs(t3.W) < Mathf.ZeroTolerance ||
+					Mathf.Abs(t4.W) < Mathf.ZeroTolerance
+				) {
+					return new WindowRect();
+				}
+
+				var v1 = (Vector2)(t1 / t1.W);
+				var v2 = (Vector2)(t2 / t2.W);
+				var v3 = (Vector2)(t3 / t3.W);
+				var v4 = (Vector2)(t4 / t4.W);
 
 				var min = v1;
 				min = Vector2.Min(min, v2);
