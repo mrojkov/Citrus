@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline.Components
 		protected readonly NodeRow nodeData;
 		protected readonly Widget widget;
 		protected readonly SimpleText label;
+		protected readonly Widget editBoxContainer;
 		protected readonly EditBox editBox;
 		protected readonly Image nodeIcon;
 		protected readonly ToolbarButton enterButton;
@@ -47,8 +48,9 @@ namespace Tangerine.UI.Timeline.Components
 				VAlignment = VAlignment.Center,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
 			};
-			editBox = new ThemedEditBox {
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
+			editBoxContainer = new Widget {
+				Layout = new HBoxLayout(),
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue),
 			};
 			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node.GetType())) {
 				HitTestTarget = true,
@@ -96,7 +98,7 @@ namespace Tangerine.UI.Timeline.Components
 					nodeIcon,
 					Spacer.HSpacer(3),
 					label,
-					editBox,
+					editBoxContainer,
 					linkIndicatorButtonContainer,
 					(Widget)enterButton ?? (Widget)Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					lockAnimationButton,
@@ -104,12 +106,26 @@ namespace Tangerine.UI.Timeline.Components
 					lockButton,
 				}
 			};
+
+			var nodeIdPropertyEditor = new NodeIdPropertyEditor(new PropertyEditorParams(
+				editBoxContainer,
+				new [] { nodeData.Node },
+				new[] { nodeData.Node },
+				NodeData.Node.GetType(),
+				nameof(Node.Id),
+				nameof(Node.Id)) {
+				ShowLabel = false,
+				History = Document.Current.History,
+				PropertySetter = (obj, propertyName, value) => Core.Operations.SetProperty.Perform(obj, propertyName, value),
+			});
+			editBox = nodeIdPropertyEditor.EditorContainer.Nodes[0] as EditBox;
+
 			widget.Components.Add(new AwakeBehavior());
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			editBox.Visible = false;
+			editBoxContainer.Visible = false;
 			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
 			widget.Gestures.Add(new DoubleClickGesture(() => {
 				Document.Current.History.DoTransaction(() => {
@@ -271,29 +287,27 @@ namespace Tangerine.UI.Timeline.Components
 		public void Rename()
 		{
 			label.Visible = false;
-			editBox.Visible = true;
-			editBox.Text = nodeData.Node.Id;
+			editBoxContainer.Visible = true;
+			// refresh edit box text, since dataflows for coalesced property value wont refresh it when editBox is invisible
+			editBox.Text = NodeData.Node.Id;
 			editBox.SetFocus();
-			((WindowWidget)editBox.GetRoot()).Window.Activate();
-			editBox.Tasks.Add(EditNodeIdTask());
+			((WindowWidget)editBoxContainer.GetRoot()).Window.Activate();
+			editBoxContainer.Tasks.Add(EditNodeIdTask());
 		}
 
 		IEnumerator<object> EditNodeIdTask()
 		{
-			var initialText = editBox.Text;
 			while (editBox.IsFocused()) {
 				yield return null;
 				if (!row.Selected) {
 					editBox.RevokeFocus();
 				}
 			}
-			editBox.Visible = false;
+			// Update editBox once to allow Editor catch focus change and call Submit
+			// It wont work by itself, since we're hiding editBox and invisible editBox will not update
+			editBox.Update(0.0f);
+			editBoxContainer.Visible = false;
 			label.Visible = true;
-			if (editBox.Text != initialText) {
-				Document.Current.History.DoTransaction(() => {
-					Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
-				});
-			}
 		}
 
 		void ShowPropertyContextMenu()

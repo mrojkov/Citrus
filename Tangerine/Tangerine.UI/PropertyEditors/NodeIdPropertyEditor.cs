@@ -26,7 +26,7 @@ namespace Tangerine.UI
 					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
 				}
 			}));
-			editor.Submitted += text => SetValue(text);
+			editor.Submitted += SetValue;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v);
 		}
 
@@ -43,17 +43,16 @@ namespace Tangerine.UI
 		protected virtual bool IsValid(string value)
 		{
 			foreach (var c in value) {
-				if (!ValidChars.Contains(c)) {
+				if (!validChars.Contains(c)) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		private static readonly List<char> ValidChars =
+		private static readonly char [] validSpecialSymbols = { '_', '.', '>', '@', '[', ']', '#' };
+		private static readonly List<char> validChars =
 			Enumerable.Range(1, 128).Select(i => (char)i).
-			Where(c =>
-				char.IsLetterOrDigit(c) ||
-				c == '_' || c == '.' || c == '>' || c == '@' || c == '[' || c == ']' || c == '#').ToList();
+			Where(c => char.IsLetterOrDigit(c) || validSpecialSymbols.Contains(c)).ToList();
 	}
 }
