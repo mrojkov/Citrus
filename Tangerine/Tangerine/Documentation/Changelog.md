@@ -1,6 +1,12 @@
+##### Changelog (12.11.2018 - 13.11.2018)
+
+* Разворачиваемые списки больше не сворачиваются при смене кадра [CIT-764](https://gitlab.game-forest.com:2000/browse/CIT-764)
+* Теперь по клику в любое доступное место можно снять фокус с текущего активного текстового/числового поля [CIT-792](https://gitlab.game-forest.com:2000/browse/CIT-792)
+* MFDecoder убран из движка в 3rdparty [CIT-879](https://gitlab.game-forest.com:2000/browse/CIT-879)
+
 ##### Changelog (01.11.2018 - 9.11.2018)
 
-* Переработан интерфейс работы с Attachment3D. Теперь он вызывается как панель (View -> Panels -> Model3D Attachment). [CIT-744](https://gitlab.game-forest.com:2000/browse/CIT-744)
+* Переработан интерфейс работы с Attachment3D. Теперь он вызывается как панель (View -> Panels -> Model3D Attachment) [CIT-744](https://gitlab.game-forest.com:2000/browse/CIT-744)
 * Добавлен выбор источника анимации при использовании Model3D.
 По-умолчанию теперь будут импортироваться все анимации из fbx модели (раньше импортировалась только одна). Следовательно, можно создавать разные анимации вместо размещения всех анимаций на одном таймлайне. В 3DAttachment можно явно указать, какую анимацию нужно перегрузить [CIT-795](https://gitlab.game-forest.com:2000/browse/CIT-795)
 
