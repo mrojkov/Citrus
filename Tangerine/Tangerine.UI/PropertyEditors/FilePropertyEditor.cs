@@ -9,7 +9,8 @@ namespace Tangerine.UI
 {
 	public abstract class FilePropertyEditor<T> : ExpandablePropertyEditor<T>
 	{
-		private class PrefixData {
+		private class PrefixData
+		{
 			public string Prefix { get; set; }
 		}
 
@@ -102,15 +103,9 @@ namespace Tangerine.UI
 
 		protected abstract T StringToValueConverter(string path);
 
-		public void SetComponent(string text)
-		{
-			SetFilePath(text);
-		}
+		public void SetComponent(string text) => SetFilePath(text);
 
-		public override void Submit()
-		{
-			SetFilePath(editor.Text);
-		}
+		public override void Submit() => SetFilePath(editor.Text);
 
 		private void SetFilePath(string path)
 		{
@@ -134,10 +129,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		protected override void Copy()
-		{
-			Clipboard.Text = editor.Text;
-		}
+		protected override void Copy() => Clipboard.Text = editor.Text;
 
 		protected override void Paste()
 		{
@@ -158,12 +150,10 @@ namespace Tangerine.UI
 			return true;
 		}
 
+		private static readonly char[] validSymbols = { '\\', '/', '_', '.', '!', '-' };
 		private static readonly IReadOnlyList<char> validchars =
 			Enumerable.Range(1, 128).Select(i => (char)i).
-			Where(c =>
-				char.IsLetterOrDigit(c) ||
-				c == '\\' || c == '/' ||
-				c == '_' || c == '.' || c == '!').ToList();
+			Where(c => char.IsLetterOrDigit(c) || validSymbols.Contains(c)).ToList();
 
 		protected virtual IEnumerable<char> ValidChars => validchars;
 
