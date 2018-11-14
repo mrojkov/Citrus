@@ -220,6 +220,7 @@ namespace Lime
 
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(Widget))]
+	[MutuallyExclusiveDerivedComponents]
 	public class LayoutConstraints : NodeComponent
 	{
 		public new Widget Owner
