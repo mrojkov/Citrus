@@ -1,4 +1,4 @@
 # Tangerine Docs
-Choose your destiny:
+Выберите раздел:
 * [Пользовательский интерфейс (UI)](@UI)
 * [Настройки (Preferences)](@Prefs)
