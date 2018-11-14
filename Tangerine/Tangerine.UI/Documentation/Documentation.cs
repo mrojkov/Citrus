@@ -12,6 +12,8 @@ namespace Tangerine.UI
 
 		public static string MarkdownDocumentationPath { get; set; } =
 			Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Documentation");
+		public static string ImagesPath { get; set; } =
+			Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName, "Documentation", "Images");
 		public static string HtmlDocumentationPath { get; set; } =
 			Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DocumentationCache");
 		public static string StyleSheetPath { get; set; } = "file:///" + Path.Combine(MarkdownDocumentationPath, "stylesheet.css");
@@ -33,6 +35,9 @@ namespace Tangerine.UI
 			string path = Path.Combine(HtmlDocumentationPath, Path.Combine(pageName.Split('.'))).Replace('\\', '/');
 			return path + DocExtension;
 		}
+
+		public static string GetImagePath(string ImageName) =>
+			Path.Combine(ImagesPath, ImageName).Replace('\\', '/');
 
 		public static void Init()
 		{
@@ -67,6 +72,11 @@ namespace Tangerine.UI
 		{
 			string source = Path.Combine(MarkdownDocumentationPath, directoryPath);
 			var sourceDirectory = new DirectoryInfo(source);
+
+			if (directoryPath == "Images") {
+				return;
+}
+
 			string destination = Path.Combine(HtmlDocumentationPath, directoryPath);
 			if (!Directory.Exists(destination)) {
 				Directory.CreateDirectory(destination);

@@ -1,1 +1,4 @@
-# This is start page #
+# Tangerine Docs
+Выберите раздел:
+* [Пользовательский интерфейс (UI)](@UI)
+* [Настройки (Preferences)](@Prefs)

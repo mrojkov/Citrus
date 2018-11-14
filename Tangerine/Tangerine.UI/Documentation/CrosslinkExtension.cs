@@ -23,14 +23,19 @@ namespace Tangerine.UI
 		private bool TryLinkInlineRenderer(HtmlRenderer renderer, LinkInline linkInline)
 		{
 			if (
-				linkInline.IsImage ||
 				linkInline.IsAutoLink ||
 				linkInline.Url == null ||
 				!linkInline.Url.StartsWith("@")
 			) {
 				return false;
 			}
-			linkInline.Url = "file:///" + Documentation.GetDocPath(linkInline.Url.TrimStart('@'));
+
+			if (linkInline.IsImage)
+			{
+				linkInline.Url = "file:///" + Documentation.GetImagePath(linkInline.Url.TrimStart('@'));
+			} else {
+				linkInline.Url = "file:///" + Documentation.GetDocPath(linkInline.Url.TrimStart('@'));
+			}
 			renderer.Write(linkInline);
 			return true;
 		}

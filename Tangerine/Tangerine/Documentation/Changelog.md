@@ -83,3 +83,14 @@
 * Добавлена возможность изменять префикс во множественном выделении виджетов [CIT-699](https://gitlab.game-forest.com:2000/browse/CIT-699)
 * Реализована функция Timeshift для ParticleEmitter (аналогично HotStudio) [CIT-708](https://gitlab.game-forest.com:2000/browse/CIT-708 )
 * Исправлено множество багов и недоработок
+
+##### Changelog (11.08.2018 - 1.10.2018)
+* Теперь Orange Launcher регенерирует бинарные десериалайзеры Yuzu [CIT-110](https://gitlab.game-forest.com:2000/browse/CIT-110)
+* Добавлена обводка для маркеров на таймлайне [CIT-713](https://gitlab.game-forest.com:2000/browse/CIT-713)
+* Добавлена возможность работы с аниматорами на таймлайне [CIT-720](https://gitlab.game-forest.com:2000/browse/CIT-720)
+* Реализован ListPropertyEditor (редактор полей типа List<T>) [CIT-750](https://gitlab.game-forest.com:2000/browse/CIT-750)
+* Для текста теперь можно указать PathPropertyEditor [CIT-765](https://gitlab.game-forest.com:2000/browse/CIT-765)
+* Недостающие цвета в конфиге теперь берутся из текущей темы [CIT-766](https://gitlab.game-forest.com:2000/browse/CIT-766)
+* При запуске редактора неиспользуемые сцены не грузятся до их открытия [CIT-790](https://gitlab.game-forest.com:2000/browse/CIT-790)
+* Изменена индикация изменений на сцене [CIT-796](https://gitlab.game-forest.com:2000/browse/CIT-796)
+* Исправлено множество багов и недоработок
