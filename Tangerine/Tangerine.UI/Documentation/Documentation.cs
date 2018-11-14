@@ -37,7 +37,7 @@ namespace Tangerine.UI
 		}
 
 		public static string GetImagePath(string ImageName) =>
-			Path.Combine(ImagesPath, Path.Combine(ImageName.Replace('\\', '/')));
+			Path.Combine(ImagesPath, ImageName).Replace('\\', '/');
 
 		public static void Init()
 		{
@@ -75,7 +75,7 @@ namespace Tangerine.UI
 
 			if (directoryPath == "Images") {
 				return;
-			}
+}
 
 			string destination = Path.Combine(HtmlDocumentationPath, directoryPath);
 			if (!Directory.Exists(destination)) {

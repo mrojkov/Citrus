@@ -2,6 +2,7 @@ using Markdig;
 using Markdig.Renderers;
 using Markdig.Renderers.Html.Inlines;
 using Markdig.Syntax.Inlines;
+using System.IO;
 
 namespace Tangerine.UI
 {

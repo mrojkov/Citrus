@@ -13,6 +13,6 @@
 
 Линейки по краям экрана можно отключить сочетанием клавиш `Ctrl + Alt + R`
 
-В окно Viewport работает *drag & drop* для текстур, что позволяет создавать "на лету" [Image](), [Tiled Image](), [Distortion Mesh](), [Nine Grid]()
+В окно Viewport работает *drag & drop* для текстур, что позволяет создавать "на лету" [Image](@Node.Image.Image), [Tiled Image](@Node.Image.TiledImage), [Distortion Mesh](@Node.Image.DistortionMesh), [Nine Grid](@Node.Image.NineGrid)
 
 Снизу окна вьюпорта есть строка статуса, где можно изменять отзум на активной сцене и вкл/выкл. панель Visual Hints.
