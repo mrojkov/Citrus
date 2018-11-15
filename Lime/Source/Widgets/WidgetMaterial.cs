@@ -15,6 +15,7 @@ namespace Lime
 
 		public static readonly IMaterial Diffuse = GetInstance(Blending.Alpha, ShaderId.Diffuse, 0);
 
+		public string Id { get; set; }
 		public int PassCount { get; private set; }
 
 		public static WidgetMaterial GetInstance(Blending blending, ShaderId shader, int numTextures, bool premulAlpha = false)
@@ -74,6 +75,7 @@ namespace Lime
 		private ShaderParams shaderParams;
 		private BlendState blendState;
 		float colorIndex;
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		private ColorfulTextMaterial(Blending blending, int styleIndex)

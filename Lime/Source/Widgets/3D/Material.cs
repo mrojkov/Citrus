@@ -4,6 +4,7 @@ namespace Lime
 {
 	public interface IMaterial
 	{
+		string Id { get; set; }
 		int PassCount { get; }
 		void Apply(int pass);
 		IMaterial Clone();

@@ -1120,6 +1120,7 @@ namespace Lime
 
 	public class DashedLineMaterial : IMaterial
 	{
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public static readonly DashedLineMaterial Instance = new DashedLineMaterial();

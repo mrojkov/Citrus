@@ -119,7 +119,7 @@ namespace Orange
 		public CommonMaterial CreateLimeMaterial(FbxMaterial material, string modelPath, Target target)
 		{
 			var commonMaterial = new CommonMaterial {
-				Name = material.Name
+				Id = material.Name
 			};
 			if (!string.IsNullOrEmpty(material.Path)) {
 				var tex = CreateSerializableTexture(modelPath, material.Path);

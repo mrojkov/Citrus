@@ -379,6 +379,7 @@ namespace Lime
 
 			public float Strength { get; set; } = 1f;
 
+			public string Id { get; set; }
 			public int PassCount => 1;
 
 			public YUVtoRGBMaterial()

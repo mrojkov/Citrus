@@ -19,8 +19,8 @@ namespace Lime
 		private bool skinEnabled;
 		private FogMode fogMode;
 
-		[YuzuMember]
-		public string Name { get; set; }
+		[YuzuMember("Name")]
+		public string Id { get; set; }
 
 		[YuzuMember]
 		public Color4 DiffuseColor { get; set; }
@@ -148,7 +148,7 @@ namespace Lime
 		public IMaterial Clone()
 		{
 			return new CommonMaterial {
-				Name = Name,
+				Id = Id,
 				DiffuseColor = DiffuseColor,
 				FogMode = FogMode,
 				FogColor = FogColor,

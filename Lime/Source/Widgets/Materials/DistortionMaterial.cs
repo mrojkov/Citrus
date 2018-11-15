@@ -19,6 +19,7 @@ namespace Lime
 		public float Blue { get; set; } = -1f;
 		public bool Opaque { get; set; }
 
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public DistortionMaterial() : this(Blending.Alpha) { }

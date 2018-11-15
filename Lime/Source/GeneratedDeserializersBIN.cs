@@ -2102,8 +2102,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (9 == fd.OurIndex) {
-				result.Name = d.Reader.ReadString();
-				if (result.Name == "" && d.Reader.ReadBoolean()) result.Name = null;
+				result.Id = d.Reader.ReadString();
+				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (10 == fd.OurIndex) {

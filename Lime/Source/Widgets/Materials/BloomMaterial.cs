@@ -12,6 +12,7 @@ namespace Lime
 		public float BrightThreshold { get; set; } = 1f;
 		public Vector3 InversedGammaCorrection { get; set; } = Vector3.One;
 
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public BloomMaterial()
