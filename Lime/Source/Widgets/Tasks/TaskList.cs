@@ -28,17 +28,15 @@ namespace Lime
 
 		public TaskList() { }
 
-		public TaskList(Node node)
-		{
-			Node = node;
-		}
+		public TaskList(Node node) => Node = node;
 
 		/// <summary>
 		/// Currently processing TaskList.
 		/// </summary>
-		public static TaskList Current {
-			get { return current; }
-			private set { current = value; }
+		public static TaskList Current
+		{
+			get => current;
+			private set => current = value;
 		}
 
 		/// <summary>
@@ -68,10 +66,7 @@ namespace Lime
 		/// <summary>
 		/// Stops all tasks with specified tag (null is also a tag).
 		/// </summary>
-		public void StopByTag(object tag)
-		{
-			Stop(t => t.Tag == tag);
-		}
+		public void StopByTag(object tag) => Stop(t => t.Tag == tag);
 
 		/// <summary>
 		/// Adds task to the end of this list.
@@ -83,10 +78,7 @@ namespace Lime
 			return task;
 		}
 
-		public Task AddLoop(Action action, object tag = null)
-		{
-			return Add(ActionLoop(action));
-		}
+		public Task AddLoop(Action action, object tag = null) => Add(ActionLoop(action), tag);
 
 		private static IEnumerator<object> ActionLoop(Action action)
 		{
@@ -103,18 +95,12 @@ namespace Lime
 			return task;
 		}
 
-		public List<Task> AddConcurrent(params IEnumerator<object>[] args)
-		{
-			return args.Select(e => Add(e)).ToList();
-		}
+		public List<Task> AddConcurrent(params IEnumerator<object>[] args) => args.Select(e => Add(e)).ToList();
 
 		/// <summary>
 		/// Adds task to the end of this list.
 		/// </summary>
-		public Task Add(Func<IEnumerator<object>> e, object tag = null)
-		{
-			return Add(e(), tag);
-		}
+		public Task Add(Func<IEnumerator<object>> e, object tag = null) => Add(e(), tag);
 
 		public bool AnyTagged(object tag)
 		{
