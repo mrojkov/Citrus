@@ -101,7 +101,7 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private static IEnumerable<Type> GetTypes(IEnumerable<object> objects)
+		public static IEnumerable<Type> GetTypes(IEnumerable<object> objects)
 		{
 			var types = new List<Type>();
 			foreach (var o in objects) {

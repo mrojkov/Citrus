@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using Tangerine.Core;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Tangerine.UI.Inspector
 
 		private readonly InspectorContent content;
 		private readonly ThemedScrollView contentWidget;
+
+		private HashSet<Type> prevTypes { get; set; } = new HashSet<Type>();
 
 		public static Inspector Instance { get; private set; }
 
@@ -119,10 +122,17 @@ namespace Tangerine.UI.Inspector
 
 		private void Rebuild()
 		{
-			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
+			var prevMax = contentWidget.MaxScrollPosition;
+			var nodes = Document.Current.InspectRootNode
+				? new[] {Document.Current.RootNode}
+				: Document.Current.SelectedNodes().ToArray();
+			var types = new HashSet<Type>(InspectorContent.GetTypes(nodes));
+			content.BuildForObjects(nodes);
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
-			contentWidget.ScrollPosition = contentWidget.MinScrollPosition;
+			if (contentWidget.MaxScrollPosition > prevMax || !types.SetEquals(prevTypes))
+				contentWidget.ScrollPosition = contentWidget.MinScrollPosition;
+			prevTypes = types;
 		}
 	}
 }

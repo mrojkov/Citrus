@@ -49,7 +49,7 @@ namespace Lime
 			return (host, prevIndex);
 		}
 
-		public static (PropertyData, IAnimable, int) GetPropertyByPath(IAnimationHost host, string propertyPath)
+		public static (PropertyData PropertyData, IAnimable Animable, int Index) GetPropertyByPath(IAnimationHost host, string propertyPath)
 		{
 			PropertyData result = PropertyData.Empty;
 			int prevIndex;

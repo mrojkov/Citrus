@@ -16,70 +16,46 @@ namespace Lime
 		public const float DegToRad = Pi / 180;
 		public const float RadToDeg = 180 / Pi;
 
-		public static float Max(float x, float y)
-		{
-			return (x > y) ? x : y;
-		}
+		public static float Max(float x, float y) => (x > y) ? x : y;
 
-		public static float Min(float x, float y)
-		{
-			return (x < y) ? x : y;
-		}
+		public static float Min(float x, float y) => (x < y) ? x : y;
 
-		public static float Abs(float x)
-		{
-			return Math.Abs(x);
-		}
+		/// <summary>
+		/// Returns absolute value of <paramref name="v"/>. Equals to -<paramref name="v"/> if <paramref name="v"/> less than 0 or <paramref name="v"/> otherwise.
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static float Abs(float v) => Math.Abs(v);
 
-		public static float Abs(Vector2 x)
-		{
-			return x.Length;
-		}
+		/// <summary>
+		///  Returns <see cref="Vector2"/> with absolute values of corresponding components of <paramref name="v"/>
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static Vector2 Abs(Vector2 v) => new Vector2(Abs(v.X), Abs(v.Y));
 
-		public static float Abs(Vector3 x)
-		{
-			return x.Length;
-		}
+		/// <summary>
+		///  Returns <see cref="Vector3"/> with absolute values of corresponding components of <paramref name="v"/>
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static Vector3 Abs(Vector3 v) => new Vector3(Abs(v.X), Abs(v.Y), Abs(v.Z));
 
-		public static int Sign(float x)
-		{
-			return Math.Sign(x);
-		}
+		public static int Sign(float x) => Math.Sign(x);
 
-		public static Vector2 Sign(Vector2 x)
-		{
-			return new Vector2(Sign(x.X), Sign(x.Y));
-		}
+		public static Vector2 Sign(Vector2 x) => new Vector2(Sign(x.X), Sign(x.Y));
 
-		public static float Cos(float radians)
-		{
-			return (float)Math.Cos(radians);
-		}
+		public static float Cos(float radians) => (float)Math.Cos(radians);
 
-		public static float Sin(float radians)
-		{
-			return (float)Math.Sin(radians);
-		}
+		public static float Sin(float radians) => (float)Math.Sin(radians);
 
-		public static float Atan2(Vector2 v)
-		{
-			return (float)Math.Atan2(v.Y, v.X);
-		}
+		public static float Atan2(Vector2 v) => (float)Math.Atan2(v.Y, v.X);
 
-		public static float Atan2(float y, float x)
-		{
-			return (float)Math.Atan2(y, x);
-		}
+		public static float Atan2(float y, float x) => (float)Math.Atan2(y, x);
 
-		public static float Asin(float v)
-		{
-			return (float)Math.Asin(v);
-		}
+		public static float Asin(float v) => (float)Math.Asin(v);
 
-		public static float Acos(float v)
-		{
-			return (float)Math.Acos(v);
-		}
+		public static float Acos(float v) => (float)Math.Acos(v);
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
@@ -113,45 +89,21 @@ namespace Lime
 			return angle - 180;
 		}
 
-		public static float Sqr(float x)
-		{
-			return x * x;
-		}
+		public static float Sqr(float x) => x * x;
 
-		public static float Sqrt(float x)
-		{
-			return (float)Math.Sqrt(x);
-		}
+		public static float Sqrt(float x) => (float)Math.Sqrt(x);
 
-		public static float Dist2(Vector2 a, Vector2 b)
-		{
-			return Sqr(a.X - b.X) + Sqr(a.Y - b.Y);
-		}
+		public static float Dist2(Vector2 a, Vector2 b) => Sqr(a.X - b.X) + Sqr(a.Y - b.Y);
 
-		public static float Log(float x)
-		{
-			return (float)Math.Log(x);
-		}
+		public static float Log(float x) => (float)Math.Log(x);
 
-		public static float Pow(float x, float y)
-		{
-			return (float)Math.Pow(x, y);
-		}
+		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
 
-		public static float Lerp(float amount, float value1, float value2)
-		{
-			return value1 + (value2 - value1) * amount;
-		}
+		public static float Lerp(float amount, float value1, float value2) => value1 + (value2 - value1) * amount;
 
-		public static Vector2 Lerp(float amount, Vector2 value1, Vector2 value2)
-		{
-			return value1 + (value2 - value1) * amount;
-		}
+		public static Vector2 Lerp(float amount, Vector2 value1, Vector2 value2) => value1 + (value2 - value1) * amount;
 
-		public static Vector3 Lerp(float amount, Vector3 value1, Vector3 value2)
-		{
-			return value1 + (value2 - value1) * amount;
-		}
+		public static Vector3 Lerp(float amount, Vector3 value1, Vector3 value2) => value1 + (value2 - value1) * amount;
 
 		/// <summary>
 		/// Returns a random floating-point number that is within a specified range and produced by specified generator.
@@ -161,15 +113,9 @@ namespace Lime
 		/// <param name="max">The exclusive upper bound of the random number returned.</param>
 		/// <returns>A single-precision floating point number that is greater than or equal to min,
 		/// and less than max.</returns>
-		public static float RandomFloat(this System.Random rng, float min, float max)
-		{
-			return rng.RandomFloat() * (max - min) + min;
-		}
+		public static float RandomFloat(this System.Random rng, float min, float max) => rng.RandomFloat() * (max - min) + min;
 
-		public static double RandomDouble(this System.Random rng, double min, double max)
-		{
-			return rng.NextDouble() * (max - min) + min;
-		}
+		public static double RandomDouble(this System.Random rng, double min, double max) => rng.NextDouble() * (max - min) + min;
 
 		public static float CalcDistanceToSegment(Vector2 start, Vector2 end, Vector2 point)
 		{
@@ -191,25 +137,13 @@ namespace Lime
 		/// <param name="max">The exclusive upper bound of the random number returned.</param>
 		/// <returns>A single-precision floating point number that is greater than or equal to min,
 		/// and less than max.</returns>
-		public static float RandomFloat(float min, float max)
-		{
-			return RandomGenerator.RandomFloat(min, max);
-		}
+		public static float RandomFloat(float min, float max) => RandomGenerator.RandomFloat(min, max);
 
-		public static double RandomDouble(double min, double max)
-		{
-			return RandomGenerator.RandomDouble(min, max);
-		}
+		public static double RandomDouble(double min, double max) => RandomGenerator.RandomDouble(min, max);
 
-		public static bool RandomBool(this System.Random rng)
-		{
-			return rng.RandomInt(2) == 0;
-		}
+		public static bool RandomBool(this System.Random rng) => rng.RandomInt(2) == 0;
 
-		public static bool RandomBool()
-		{
-			return RandomGenerator.RandomBool();
-		}
+		public static bool RandomBool() => RandomGenerator.RandomBool();
 
 		/// <summary>
 		/// Returns a random integer that is within a specified range and produced by specified generator.
@@ -221,10 +155,7 @@ namespace Lime
 		/// <returns>A 32-bit signed integer greater than or equal to min and not greater than max;
 		/// that is, the range of return values includes both min and max.
 		/// If max equals min or (min - 1), min is returned.</returns>
-		public static int RandomInt(this System.Random rng, int min, int max)
-		{
-			return rng.RandomInt(max - min + 1) + min;
-		}
+		public static int RandomInt(this System.Random rng, int min, int max) => rng.RandomInt(max - min + 1) + min;
 
 		/// <summary>
 		/// Returns a random integer that is within a specified range.
@@ -235,20 +166,11 @@ namespace Lime
 		/// <returns>A 32-bit signed integer greater than or equal to min and not greater than max;
 		/// that is, the range of return values includes both min and max.
 		/// If max equals min or (min - 1), min is returned.</returns>
-		public static int RandomInt(int min, int max)
-		{
-			return RandomGenerator.RandomInt(min, max);
-		}
+		public static int RandomInt(int min, int max) => RandomGenerator.RandomInt(min, max);
 
-		public static T RandomOf<T>(this System.Random rng, params T[] objects)
-		{
-			return objects[rng.RandomInt(objects.Length)];
-		}
+		public static T RandomOf<T>(this System.Random rng, params T[] objects) => objects[rng.RandomInt(objects.Length)];
 
-		public static T RandomOf<T>(params T[] objects)
-		{
-			return RandomGenerator.RandomOf(objects);
-		}
+		public static T RandomOf<T>(params T[] objects) => RandomGenerator.RandomOf(objects);
 
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng = null)
 		{
@@ -272,10 +194,7 @@ namespace Lime
 		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than maxValue;
 		/// that is, the range of return values ordinarily includes 0 but not maxValue.
 		/// However, if maxValue equals 0, maxValue is returned.</returns>
-		public static int RandomInt(this System.Random rng, int maxValue)
-		{
-			return rng.Next(maxValue);
-		}
+		public static int RandomInt(this System.Random rng, int maxValue) => rng.Next(maxValue);
 
 		/// <summary>
 		/// Returns a non-negative random integer that is less than the specified maximum.
@@ -285,10 +204,7 @@ namespace Lime
 		/// <returns>A 32-bit signed integer that is greater than or equal to 0, and less than maxValue;
 		/// that is, the range of return values ordinarily includes 0 but not maxValue.
 		/// However, if maxValue equals 0, maxValue is returned.</returns>
-		public static int RandomInt(int maxValue)
-		{
-			return RandomGenerator.RandomInt(maxValue);
-		}
+		public static int RandomInt(int maxValue) => RandomGenerator.RandomInt(maxValue);
 
 		/// <summary>
 		/// Returns a random floating-point number that is greater than or equal to 0.0, and less than 1.0 and
@@ -299,10 +215,7 @@ namespace Lime
 		/// and less than 1.0.</returns>
 		/// <remarks>The actual upper bound of the random number returned by this method is 0.99999999999999978.
 		/// </remarks>
-		public static float RandomFloat(this System.Random rng)
-		{
-			return (float)rng.NextDouble();
-		}
+		public static float RandomFloat(this System.Random rng) => (float)rng.NextDouble();
 
 		/// <summary>
 		/// Returns a random floating-point number that is greater than or equal to 0.0, and less than 1.0.
@@ -311,10 +224,7 @@ namespace Lime
 		/// and less than 1.0.</returns>
 		/// <remarks>The actual upper bound of the random number returned by this method is 0.99999999999999978.
 		/// </remarks>
-		public static float RandomFloat()
-		{
-			return RandomGenerator.RandomFloat();
-		}
+		public static float RandomFloat() => RandomGenerator.RandomFloat();
 
 		public static float NormalRandom(this System.Random rng, float median, float dispersion)
 		{
@@ -326,70 +236,37 @@ namespace Lime
 				Sin(2.0f * Pi * rng.RandomFloat());
 		}
 
-		public static float NormalRandom(float median, float dispersion)
-		{
-			return RandomGenerator.NormalRandom(median, dispersion);
-		}
+		public static float NormalRandom(float median, float dispersion) => RandomGenerator.NormalRandom(median, dispersion);
 
-		public static float UniformRandom(this System.Random rng, float median, float dispersion)
-		{
-			return median + (rng.RandomFloat() - 0.5f) * dispersion;
-		}
+		public static float UniformRandom(this System.Random rng, float median, float dispersion) => median + (rng.RandomFloat() - 0.5f) * dispersion;
 
-		public static float UniformRandom(float median, float dispersion)
-		{
-			return RandomGenerator.UniformRandom(median, dispersion);
-		}
+		public static float UniformRandom(float median, float dispersion) => RandomGenerator.UniformRandom(median, dispersion);
 
-		public static bool InRange(float x, float upper, float lower)
-		{
-			return lower <= x && x <= upper;
-		}
+		public static bool InRange(float x, float upper, float lower) => lower <= x && x <= upper;
 
-		public static float Clamp(float value, float min, float max)
-		{
-			return (value < min) ? min : (value > max ? max : value);
-		}
+		public static float Clamp(float value, float min, float max) => (value < min) ? min : (value > max ? max : value);
 
-		public static int Clamp(int value, int min, int max)
-		{
-			return (value < min) ? min : (value > max ? max : value);
-		}
+		public static int Clamp(int value, int min, int max) => (value < min) ? min : (value > max ? max : value);
 
-		public static double Clamp(double value, double min, double max)
-		{
-			return (value < min) ? min : (value > max ? max : value);
-		}
+		public static double Clamp(double value, double min, double max) => (value < min) ? min : (value > max ? max : value);
 
-		public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max)
-		{
-			return new Vector2(
-				Clamp(value.X, min.X, max.X),
-				Clamp(value.Y, min.Y, max.Y)
-			);
-		}
+		public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max) => new Vector2(
+			Clamp(value.X, min.X, max.X),
+			Clamp(value.Y, min.Y, max.Y)
+		);
 
-		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
-		{
-			return new Vector2(
-				HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
-				HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y));
-		}
+		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1) => new Vector2(
+			HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
+			HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y));
 
-		public static Vector2 HermiteSplineDerivative(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
-		{
-			return new Vector2(
-				HermiteSplineDerivative(t, p0.X, m0.X, p1.X, m1.X),
-				HermiteSplineDerivative(t, p0.Y, m0.Y, p1.Y, m1.Y));
-		}
+		public static Vector2 HermiteSplineDerivative(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1) => new Vector2(
+			HermiteSplineDerivative(t, p0.X, m0.X, p1.X, m1.X),
+			HermiteSplineDerivative(t, p0.Y, m0.Y, p1.Y, m1.Y));
 
-		public static Vector3 HermiteSpline(float t, Vector3 p0, Vector3 m0, Vector3 p1, Vector3 m1)
-		{
-			return new Vector3(
-				HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
-				HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y),
-				HermiteSpline(t, p0.Z, m0.Z, p1.Z, m1.Z));
-		}
+		public static Vector3 HermiteSpline(float t, Vector3 p0, Vector3 m0, Vector3 p1, Vector3 m1) => new Vector3(
+			HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
+			HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y),
+			HermiteSpline(t, p0.Z, m0.Z, p1.Z, m1.Z));
 
 		public static float HermiteSpline(float t, float p0, float m0, float p1, float m1)
 		{
@@ -408,22 +285,16 @@ namespace Lime
 				(3 * t2 - 2 * t) * m1;
 		}
 
-		public static Vector2 CatmullRomSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
-		{
-			return new Vector2(
-				CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
-				CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
-			);
-		}
+		public static Vector2 CatmullRomSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) => new Vector2(
+			CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
+			CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
+		);
 
-		public static Vector3 CatmullRomSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
-		{
-			return new Vector3(
-				CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
-				CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
-				CatmullRomSpline(t, p0.Z, p1.Z, p2.Z, p3.Z)
-			);
-		}
+		public static Vector3 CatmullRomSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) => new Vector3(
+			CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
+			CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
+			CatmullRomSpline(t, p0.Z, p1.Z, p2.Z, p3.Z)
+		);
 
 		public static float CatmullRomSpline(float t, float p0, float p1, float p2, float p3)
 		{
@@ -435,22 +306,16 @@ namespace Lime
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 
-		public static Vector3 BezierSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
-		{
-			return new Vector3 {
-				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
-				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
-				Z = BezierSpline(t, p0.Z, p1.Z, p2.Z, p3.Z),
-			};
-		}
+		public static Vector3 BezierSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) => new Vector3 {
+			X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+			Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
+			Z = BezierSpline(t, p0.Z, p1.Z, p2.Z, p3.Z),
+		};
 
-		public static Vector2 BezierSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
-		{
-			return new Vector2 {
-				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
-				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
-			};
-		}
+		public static Vector2 BezierSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) => new Vector2 {
+			X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+			Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
+		};
 
 		public static float BezierSpline(float t, float p0, float p1, float p2, float p3)
 		{
@@ -462,20 +327,14 @@ namespace Lime
 			return oneMinusT3 * p0 + 3 * t * oneMinusT2 * p1 + 3 * t2 * oneMinusT * p2 + t3 * p3;
 		}
 
-		public static Vector3 BezierTangent(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
-		{
-			return new Vector3(
-				BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
-				BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y),
-				BezierTangent(t, p0.Z, p1.Z, p2.Z, p3.Z));
-		}
+		public static Vector3 BezierTangent(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) => new Vector3(
+			BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
+			BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y),
+			BezierTangent(t, p0.Z, p1.Z, p2.Z, p3.Z));
 
-		public static Vector2 BezierTangent(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
-		{
-			return new Vector2(
-				BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
-				BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y));
-		}
+		public static Vector2 BezierTangent(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) => new Vector2(
+			BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
+			BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y));
 
 		public static float BezierTangent(float t, float p0, float p1, float p2, float p3)
 		{
