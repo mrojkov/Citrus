@@ -14,6 +14,15 @@ namespace Lime
 		public int Stride { get; private set; }
 
 		public byte[] Data { get; private set; }
+
+		public OpacityMask(int width, int height)
+		{
+			Width = width;
+			Height = width;
+			Stride = (Width + 7) / 8;
+			Data = new byte[Stride * Height];
+		}
+
 		public OpacityMask(string path)
 		{
 			using (var stream = AssetBundle.Current.OpenFileLocalized(path)) {
