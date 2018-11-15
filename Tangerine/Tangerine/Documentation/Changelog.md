@@ -1,3 +1,13 @@
+##### Changelog 15.11.2018
+
+* Теперь позиция скролла в Inspector сохраняется при выборе однотипного виджета [CIT-882](https://gitlab.game-forest.com:2000/browse/CIT-882)
+* Реализован проброс параметра `tag` в `TaskList.AddLoop` [CIT-904](https://gitlab.game-forest.com:2000/browse/CIT-904)
+
+Багфиксы:
+
+* Исправлена ошибка, позволяющая создать виджет с отрицательными значениями параметра Size [CIT-896](https://gitlab.game-forest.com:2000/browse/CIT-896)
+* Исправлена ошибка, не позволяющая возвращать исходные значения параметра (после Undo), если они были изменены через Paste Keyframes [CIT-903](https://gitlab.game-forest.com:2000/browse/CIT-903)
+
 ##### Changelog 14.11.2018
 * Добавлена документация по редактору. Теперь узнать информацию по Tangerine можно, вызвав Help -> View Help `Ctrl + F1` (на данный момент работает только на платформе Win) [CIT-798](https://gitlab.game-forest.com:2000/browse/CIT-798)
 
