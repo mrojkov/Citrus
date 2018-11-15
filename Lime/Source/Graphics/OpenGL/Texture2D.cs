@@ -26,9 +26,16 @@ namespace Lime
 
 		class TextureStubReloader : TextureReloader
 		{
+			private readonly bool transparent;
+
+			public TextureStubReloader(bool transparent)
+			{
+				this.transparent = transparent;
+			}
+
 			public override void Reload(Texture2D texture)
 			{
-				texture.LoadStubImage();
+				texture.LoadStubImage(transparent);
 			}
 		}
 
@@ -85,6 +92,8 @@ namespace Lime
 		#endregion
 
 		public delegate void TextureMissingDelegate(string path);
+
+		public static bool IsStubTextureTransparent;
 
 		private static readonly string[] AffordableTextureFileExtensions = {
 #if iOS || ANDROID
@@ -195,26 +204,34 @@ namespace Lime
 
 				Console.WriteLine("Missing texture '{0}'", path);
 				onTextureMissing?.Invoke(path);
-				LoadStubImage();
+				LoadStubImage(!path.IsNullOrWhiteSpace());
 			} finally {
 				reloader = new TextureBundleReloader(path);
 			}
 		}
 
-		internal void LoadStubImage()
+		internal void LoadStubImage(bool transparent)
 		{
+			const int side = 128;
+
 			TextureParams = TextureParams.Default;
-			OpacityMask = null;
+			OpacityMask = transparent? new OpacityMask(side, side) : null;
 
-			var pixels = new Color4[128 * 128];
-			for (int i = 0; i < 128; i++)
-				for (int j = 0; j < 128; j++)
-					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-
-			LoadImage(pixels, 128, 128);
+			var pixels = new Color4[side * side];
+			for (int i = 0; i < side; i++) {
+				for (int j = 0; j < side; j++) {
+					pixels[i * side + j] =
+						transparent
+							? Color4.Transparent
+							: ((i + (j & ~7)) & 8) == 0
+								? Color4.Blue
+								: Color4.White;
+				}
+			}
+			LoadImage(pixels, side, side);
 
 			IsStubTexture = true;
-			reloader = new TextureStubReloader();
+			reloader = new TextureStubReloader(transparent);
 		}
 
 		public void LoadImage(byte[] data)

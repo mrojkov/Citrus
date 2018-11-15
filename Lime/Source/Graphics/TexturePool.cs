@@ -84,7 +84,7 @@ namespace Lime
 			
 			if (string.IsNullOrEmpty(path)) {
 				texture = new Texture2D();
-				((Texture2D) texture).LoadStubImage();
+				((Texture2D) texture).LoadStubImage(false);
 				return texture;
 			}
 			
