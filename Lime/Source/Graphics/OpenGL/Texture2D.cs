@@ -218,15 +218,16 @@ namespace Lime
 			OpacityMask = transparent? new OpacityMask(side, side) : null;
 
 			var pixels = new Color4[side * side];
-			for (int i = 0; i < side; i++)
-			for (int j = 0; j < side; j++)
-				pixels[i * side + j] =
-					transparent
-						? Color4.Transparent
-						: ((i + (j & ~7)) & 8) == 0
-							? Color4.Blue
-							: Color4.White;
-
+			for (int i = 0; i < side; i++) {
+				for (int j = 0; j < side; j++) {
+					pixels[i * side + j] =
+						transparent
+							? Color4.Transparent
+							: ((i + (j & ~7)) & 8) == 0
+								? Color4.Blue
+								: Color4.White;
+				}
+			}
 			LoadImage(pixels, side, side);
 
 			IsStubTexture = true;
