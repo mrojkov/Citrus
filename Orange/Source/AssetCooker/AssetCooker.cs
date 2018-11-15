@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using Lime;
+using Orange.FbxImporter;
 
 namespace Orange
 {
@@ -1110,7 +1111,15 @@ namespace Orange
 			SyncUpdated(".fbx", ".t3d", (srcPath, dstPath) => {
 				var cookingRules = cookingRulesMap[srcPath];
 				var compression = cookingRules.ModelCompression;
-				var model = new FbxModelImporter(srcPath, The.Workspace.ActiveTarget, cookingRulesMap).Model;
+				Model3D model;
+				var options = new FbxImportOptions {
+					Path = srcPath,
+					Target = The.Workspace.ActiveTarget,
+					CookingRulesMap = cookingRulesMap
+				};
+				using (var fbxImporter = new FbxModelImporter(options)) {
+					model = fbxImporter.LoadModel();
+				}
 				AssetAttributes assetAttributes;
 				switch (compression) {
 					case ModelCompression.None:

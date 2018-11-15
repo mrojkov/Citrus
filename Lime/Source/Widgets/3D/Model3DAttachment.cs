@@ -13,9 +13,9 @@ namespace Lime
 
 		public readonly ObservableCollection<MeshOption> MeshOptions = new ObservableCollection<MeshOption>();
 		public readonly ObservableCollection<Animation> Animations = new ObservableCollection<Animation>();
-		public readonly List<string> SourceAnimationIds = new List<string>();
 		public readonly ObservableCollection<NodeComponentCollection> NodeComponents = new ObservableCollection<NodeComponentCollection>();
 		public readonly ObservableCollection<NodeRemoval> NodeRemovals = new ObservableCollection<NodeRemoval>();
+		public readonly ObservableCollection<MaterialRemap> Materials = new ObservableCollection<MaterialRemap>();
 
 		public float ScaleFactor { get; set; }
 
@@ -69,13 +69,37 @@ namespace Lime
 			public string NodeId { get; set; }
 		}
 
+		public class MaterialRemap
+		{
+			[YuzuMember]
+			[TangerineIgnore]
+			public string SourceName { get; set; }
+
+			[YuzuMember]
+			public IMaterial Material { get; set; }
+		}
+
 		public void Apply(Node3D model)
 		{
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessComponents(model);
 			ProcessNodeRemovals(model);
+			ProcessMaterials(model);
 			ApplyScaleFactor(model);
+		}
+
+		private void ProcessMaterials(Node3D model)
+		{
+			var submeshes = model.Descendants.OfType<Mesh3D>().SelectMany(m => m.Submeshes);
+			foreach (var submesh in submeshes) {
+				if (submesh.Material != null) {
+					var materialDescriptor = Materials.FirstOrDefault(d => d.SourceName == submesh.Material.Id);
+					if (materialDescriptor != null) {
+						submesh.Material = materialDescriptor.Material.Clone();
+					}
+				}
+			}
 		}
 
 		private void ProcessComponents(Node3D model)
@@ -407,7 +431,12 @@ namespace Lime
 			public Dictionary<string, MeshOptionFormat> MeshOptions = null;
 
 			[YuzuMember]
-			public List<string> SourceAnimationIds = null;
+			[Obsolete]
+			public List<string> SourceAnimationIds
+			{
+				get => null;
+				set { }
+			}
 
 			[YuzuMember]
 			public Dictionary<string, ModelAnimationFormat> Animations = null;
@@ -423,6 +452,9 @@ namespace Lime
 
 			[YuzuMember]
 			public float ScaleFactor = 1f;
+
+			[YuzuMember]
+			public List<Model3DAttachment.MaterialRemap> Materials = null;
 		}
 
 		public class MeshOptionFormat
@@ -541,6 +573,11 @@ namespace Lime
 			return Serialization.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath));
 		}
 
+		public static ModelAttachmentFormat ReadModelAttachmentFromFile(string modelPath)
+		{
+			return Serialization.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath));
+		}
+
 		public static Model3DAttachment GetModel3DAttachment(string modelPath)
 		{
 			return GetModel3DAttachment(ReadModelAttachmentFormat(modelPath), modelPath);
@@ -586,23 +623,19 @@ namespace Lime
 					}
 				}
 
-				if (modelAttachmentFormat.SourceAnimationIds != null) {
-					foreach (var sourceAnimationId in modelAttachmentFormat.SourceAnimationIds) {
-						attachment.SourceAnimationIds.Add(sourceAnimationId);
+				if (modelAttachmentFormat.Materials != null) {
+					foreach (var material in modelAttachmentFormat.Materials) {
+						attachment.Materials.Add(material);
 					}
 				}
 
 				if (modelAttachmentFormat.Animations != null) {
 					foreach (var animationFormat in modelAttachmentFormat.Animations) {
-						var sourceAnimationId = modelAttachmentFormat.SourceAnimationIds == null ||
-							modelAttachmentFormat.SourceAnimationIds.Any(id => id == animationFormat.Key)
-								? null
-								: modelAttachmentFormat.SourceAnimationIds.FirstOrDefault();
 						var animation = new Model3DAttachment.Animation {
 							Name = animationFormat.Key,
 							StartFrame = animationFormat.Value.StartFrame,
 							LastFrame = animationFormat.Value.LastFrame,
-							SourceAnimationId = sourceAnimationId
+							SourceAnimationId = null
 						};
 
 						if (animationFormat.Value.Markers != null) {
@@ -693,14 +726,14 @@ namespace Lime
 			if (attachment.Animations.Count > 0) {
 				origin.Animations = new Dictionary<string, ModelAnimationFormat>();
 			}
-			if (attachment.SourceAnimationIds.Count > 0) {
-				origin.SourceAnimationIds = new List<string>();
-			}
 			if (attachment.NodeComponents.Count > 0) {
 				origin.NodeComponents = new Dictionary<string, ModelComponentsFormat>();
 			}
 			if (attachment.NodeRemovals.Count > 0) {
 				origin.NodeRemovals = new List<string>();
+			}
+			if (attachment.Materials.Count > 0) {
+				origin.Materials = new List<Model3DAttachment.MaterialRemap>();
 			}
 			foreach (var meshOption in attachment.MeshOptions) {
 				var meshOptionFormat = new MeshOptionFormat {
@@ -733,8 +766,9 @@ namespace Lime
 				origin.NodeRemovals.Add(removal.NodeId);
 			}
 
-			foreach (var sourceAnimationId in attachment.SourceAnimationIds) {
-				origin.SourceAnimationIds.Add(sourceAnimationId);
+
+			foreach (var material in attachment.Materials) {
+				origin.Materials.Add(material);
 			}
 			foreach (var animation in attachment.Animations) {
 				var animationFormat = new ModelAnimationFormat {

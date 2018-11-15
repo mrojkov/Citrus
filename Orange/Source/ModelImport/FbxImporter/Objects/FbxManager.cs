@@ -23,9 +23,9 @@ namespace Orange.FbxImporter
 		}
 
 		[HandleProcessCorruptedStateExceptions]
-		public FbxScene LoadScene(string fileName)
+		public FbxScene LoadScene(FbxImportOptions options)
 		{
-			var native = FbxManagerLoadScene(NativePtr, new StringBuilder(fileName));
+			var native = FbxManagerLoadScene(NativePtr, new StringBuilder(options.Path));
 			if (native == IntPtr.Zero) {
 				throw new FbxImportException("An error has occured while loading scene");
 			}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,23 +42,26 @@ namespace Tangerine.UI
 			}
 		}
 
-		protected virtual void OnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			int idx;
 			switch (e.Action) {
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					idx = e.NewStartingIndex;
+				case NotifyCollectionChangedAction.Add:
+					var idx = e.NewStartingIndex;
 					foreach (TItem item in e.NewItems) {
 						var row = rowBuilder(item);
 						widgetCache.Add(item, row);
 						Container.Nodes.Insert(idx++, row);
 					}
 					break;
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case NotifyCollectionChangedAction.Remove:
 					foreach (TItem item in e.OldItems) {
 						Container.Nodes.Remove(widgetCache[item]);
 						widgetCache.Remove(item);
 					}
+					break;
+				case NotifyCollectionChangedAction.Reset:
+					widgetCache.Clear();
+					Container.Nodes.Clear();
 					break;
 			}
 		}

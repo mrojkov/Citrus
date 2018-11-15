@@ -4547,6 +4547,31 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__Model3DAttachment__MaterialRemap(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Model3DAttachment.MaterialRemap)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Material = (global::Lime.IMaterial)dg.ReadObject<global::Lime.IMaterial>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.SourceName = d.Reader.ReadString();
+				if (result.SourceName == "" && d.Reader.ReadBoolean()) result.SourceName = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__Model3DAttachment__MaterialRemap(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.Model3DAttachment.MaterialRemap();
+			Read_Lime__Model3DAttachment__MaterialRemap(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Model3DAttachmentParser__MeshOptionFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)obj;
@@ -4670,71 +4695,83 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
+				result.Materials = (global::System.Collections.Generic.List<global::Lime.Model3DAttachment.MaterialRemap>)null;
 				var tmp4 = d.Reader.ReadInt32();
 				if (tmp4 >= 0) {
-					result.MeshOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+					result.Materials = new global::System.Collections.Generic.List<global::Lime.Model3DAttachment.MaterialRemap>();
 					while (--tmp4 >= 0) {
-						var tmp5 = d.Reader.ReadString();
-						if (tmp5 == "" && d.Reader.ReadBoolean()) tmp5 = null;
-						var tmp6 = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
-						result.MeshOptions.Add(tmp5, tmp6);
+						var tmp5 = (global::Lime.Model3DAttachment.MaterialRemap)dg.ReadObject<global::Lime.Model3DAttachment.MaterialRemap>();
+						result.Materials.Add(tmp5);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
-				var tmp7 = d.Reader.ReadInt32();
-				if (tmp7 >= 0) {
-					result.NodeComponents = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
-					while (--tmp7 >= 0) {
-						var tmp8 = d.Reader.ReadString();
-						if (tmp8 == "" && d.Reader.ReadBoolean()) tmp8 = null;
-						var tmp9 = (global::Lime.Model3DAttachmentParser.ModelComponentsFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
-						result.NodeComponents.Add(tmp8, tmp9);
+				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
+				var tmp6 = d.Reader.ReadInt32();
+				if (tmp6 >= 0) {
+					result.MeshOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+					while (--tmp6 >= 0) {
+						var tmp7 = d.Reader.ReadString();
+						if (tmp7 == "" && d.Reader.ReadBoolean()) tmp7 = null;
+						var tmp8 = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+						result.MeshOptions.Add(tmp7, tmp8);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
-				var tmp10 = d.Reader.ReadInt32();
-				if (tmp10 >= 0) {
-					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
-					while (--tmp10 >= 0) {
-						var tmp11 = d.Reader.ReadString();
-						if (tmp11 == "" && d.Reader.ReadBoolean()) tmp11 = null;
-						result.NodeRemovals.Add(tmp11);
+				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
+				var tmp9 = d.Reader.ReadInt32();
+				if (tmp9 >= 0) {
+					result.NodeComponents = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
+					while (--tmp9 >= 0) {
+						var tmp10 = d.Reader.ReadString();
+						if (tmp10 == "" && d.Reader.ReadBoolean()) tmp10 = null;
+						var tmp11 = (global::Lime.Model3DAttachmentParser.ModelComponentsFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
+						result.NodeComponents.Add(tmp10, tmp11);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.ScaleFactor = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (6 == fd.OurIndex) {
-				result.SourceAnimationIds = (global::System.Collections.Generic.List<global::System.String>)null;
+				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp12 = d.Reader.ReadInt32();
 				if (tmp12 >= 0) {
-					result.SourceAnimationIds = new global::System.Collections.Generic.List<global::System.String>();
+					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
 					while (--tmp12 >= 0) {
 						var tmp13 = d.Reader.ReadString();
 						if (tmp13 == "" && d.Reader.ReadBoolean()) tmp13 = null;
-						result.SourceAnimationIds.Add(tmp13);
+						result.NodeRemovals.Add(tmp13);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (6 == fd.OurIndex) {
+				result.ScaleFactor = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (7 == fd.OurIndex) {
-				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
+				result.SourceAnimationIds = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp14 = d.Reader.ReadInt32();
 				if (tmp14 >= 0) {
-					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+					result.SourceAnimationIds = new global::System.Collections.Generic.List<global::System.String>();
 					while (--tmp14 >= 0) {
-						var tmp15 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
-						result.UVAnimations.Add(tmp15);
+						var tmp15 = d.Reader.ReadString();
+						if (tmp15 == "" && d.Reader.ReadBoolean()) tmp15 = null;
+						result.SourceAnimationIds.Add(tmp15);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (8 == fd.OurIndex) {
+				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
+				var tmp16 = d.Reader.ReadInt32();
+				if (tmp16 >= 0) {
+					result.UVAnimations = new global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+					while (--tmp16 >= 0) {
+						var tmp17 = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)dg.ReadObject<global::Lime.Model3DAttachmentParser.UVAnimationFormat>();
+						result.UVAnimations.Add(tmp17);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
@@ -9800,6 +9837,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)] = Read_Lime__Mesh_Mesh3D__Vertex;
 			readCache[typeof(global::Lime.Mesh3D)] = Read_Lime__Mesh3D;
 			readCache[typeof(global::Lime.Model3D)] = Read_Lime__Model3D;
+			readCache[typeof(global::Lime.Model3DAttachment.MaterialRemap)] = Read_Lime__Model3DAttachment__MaterialRemap;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.MeshOptionFormat)] = Read_Lime__Model3DAttachmentParser__MeshOptionFormat;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelAnimationFormat)] = Read_Lime__Model3DAttachmentParser__ModelAnimationFormat;
 			readCache[typeof(global::Lime.Model3DAttachmentParser.ModelAttachmentFormat)] = Read_Lime__Model3DAttachmentParser__ModelAttachmentFormat;
@@ -9967,6 +10005,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Mesh3D.BlendWeights)] = Make_Lime__Mesh3D__BlendWeights;
 			makeCache[typeof(global::Lime.Mesh3D.Vertex)] = Make_Lime__Mesh3D__Vertex;
 			makeCache[typeof(global::Lime.Model3D)] = Make_Lime__Model3D;
+			makeCache[typeof(global::Lime.Model3DAttachment.MaterialRemap)] = Make_Lime__Model3DAttachment__MaterialRemap;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.MeshOptionFormat)] = Make_Lime__Model3DAttachmentParser__MeshOptionFormat;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelAnimationFormat)] = Make_Lime__Model3DAttachmentParser__ModelAnimationFormat;
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.ModelAttachmentFormat)] = Make_Lime__Model3DAttachmentParser__ModelAttachmentFormat;

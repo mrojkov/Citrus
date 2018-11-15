@@ -7,6 +7,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Tangerine.UI.Inspector
 {
@@ -19,11 +20,13 @@ namespace Tangerine.UI.Inspector
 		public event Action<NodeComponent> OnComponentRemove;
 		public DocumentHistory History { get; set; }
 		public Widget Footer { get; set; }
+		public readonly IReadOnlyList<IPropertyEditor> ReadonlyEditors;
 
 		public InspectorContent(Widget widget)
 		{
 			this.widget = widget;
 			editors = new List<IPropertyEditor>();
+			ReadonlyEditors = new ReadOnlyCollection<IPropertyEditor>(editors);
 		}
 
 		public void BuildForObjects(IEnumerable<object> objects)
