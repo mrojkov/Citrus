@@ -14,7 +14,7 @@ namespace Tangerine.Core
 
 		public class CacheMeta
 		{
-			private const string CurrentVersion = "1.5";
+			private const string CurrentVersion = "1.6";
 
 			[YuzuRequired]
 			public string Version { get; set; } = CurrentVersion;
@@ -125,10 +125,13 @@ namespace Tangerine.Core
 						foreach (var animation in model.Animations) {
 							meta.SourceAnimationIds.Add(animation.Id);
 						}
-						var submeshes = model.Descendants.OfType<Mesh3D>().SelectMany(m => m.Submeshes);
-						foreach (var submesh3D in submeshes) {
-							if (meta.SourceMaterials.All(m => m.Id != submesh3D.Material.Id)) {
-								meta.SourceMaterials.Add(submesh3D.Material);
+
+						foreach (var mesh in model.Descendants.OfType<Mesh3D>()) {
+							meta.MeshIds.Add(mesh.Id);
+							foreach (var submesh3D in mesh.Submeshes) {
+								if (meta.SourceMaterials.All(m => m.Id != submesh3D.Material.Id)) {
+									meta.SourceMaterials.Add(submesh3D.Material);
+								}
 							}
 						}
 						TangerineYuzu.Instance.Value.WriteObjectToBundle(
@@ -245,5 +248,8 @@ namespace Tangerine.Core
 
 		[YuzuMember]
 		public ObservableCollection<string> SourceAnimationIds = new ObservableCollection<string>();
+
+		[YuzuMember]
+		public ObservableCollection<string> MeshIds = new ObservableCollection<string>();
 	}
 }

@@ -63,6 +63,7 @@ namespace Tangerine
 		private static Dictionary<string, AttachmentDocument> documents = new Dictionary<string, AttachmentDocument>();
 		private readonly ObservableCollection<IMaterial> sourceMaterials = new ObservableCollection<IMaterial>();
 		private readonly ObservableCollection<string> sourceAnimationIds = new ObservableCollection<string>();
+		private readonly ObservableCollection<Model3DAttachment.MeshOption> meshOptions = new ObservableCollection<Model3DAttachment.MeshOption>();
 
 		private class PanelState
 		{
@@ -251,13 +252,14 @@ namespace Tangerine
 			} else {
 				meta = doc.Meta;
 			}
-			InvalidateSourceMaterialsAndAnimations(meta);
+
+			SyncSources(meta, attachment);
 			var isFirstInvoke = true;
 			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
 			var materialsPane = CreateMaterialsRemapPane(attachment);
 			content.AddTab("Materials Remap", materialsPane);
-			content.AddTab("Mesh Options", CreateMeshOptionsPane(attachment));
+			content.AddTab("Mesh Options", CreateMeshOptionsPane());
 			var animationsPane = CreateAnimationsPane(attachment);
 			content.AddTab("Animations", animationsPane);
 			content.AddTab("Node Removals", CreateNodeRemovalsPane(attachment));
@@ -318,6 +320,16 @@ namespace Tangerine
 					// operation to the state when source isn't presented or source content path isn't set.
 					// So check it out before saving.
 					if (source.DescendantOf(Document.Current.RootNode) && source.ContentsPath != null) {
+						attachment.MeshOptions.Clear();
+						foreach (var meshOption in meshOptions) {
+							if (meshOption.Opaque == default &&
+							    meshOption.HitTestTarget == default &&
+							    meshOption.CullMode == CullMode.Front
+							) {
+								continue;
+							}
+							attachment.MeshOptions.Add(meshOption);
+						}
 						SaveAttachment(attachment, source.ContentsPath);
 						history.AddSavePoint();
 					}
@@ -328,15 +340,25 @@ namespace Tangerine
 			return rootWidget;
 		}
 
-		private void InvalidateSourceMaterialsAndAnimations(Model3DAttachmentMeta meta)
+		private void SyncSources(Model3DAttachmentMeta meta, Model3DAttachment attachment)
 		{
 			sourceAnimationIds.Clear();
 			sourceMaterials.Clear();
+			meshOptions.Clear();
 			foreach (var animationId in meta.SourceAnimationIds) {
 				sourceAnimationIds.Add(animationId);
 			}
 			foreach (var material in meta.SourceMaterials) {
 				sourceMaterials.Add(material.Clone());
+			}
+			foreach (var meshId in meta.MeshIds) {
+				var opt = attachment.MeshOptions.FirstOrDefault(mo => mo.Id == meshId);
+				meshOptions.Add(opt ?? new Model3DAttachment.MeshOption { Id = meshId, CullMode = CullMode.Front });
+			}
+			foreach (var meshOption in attachment.MeshOptions.ToList()) {
+				if (!meta.MeshIds.Contains(meshOption.Id)) {
+					attachment.MeshOptions.Remove(meshOption);
+				}
 			}
 		}
 
@@ -666,7 +688,7 @@ namespace Tangerine
 			return pane;
 		}
 
-		private static Widget CreateMeshOptionsPane(Model3DAttachment attachment)
+		private Widget CreateMeshOptionsPane()
 		{
 			var pane = new ThemedScrollView();
 			pane.Content.Padding = new Thickness { Right = 10 };
@@ -675,16 +697,8 @@ namespace Tangerine
 			};
 			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
 			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MeshOption>(
-				w => new MeshRow(w, attachment.MeshOptions), attachment.MeshOptions);
+			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MeshOption>(w => new MeshRow(w), meshOptions);
 			widgetFactory.AddHeader(MeshRow.CreateHeader());
-			widgetFactory.AddFooter(MeshRow.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-					attachment.MeshOptions,
-					attachment.MeshOptions.Count,
-					new Model3DAttachment.MeshOption { Id = "MeshOption" }
-				));
-			}));
 			list.Components.Add(widgetFactory);
 			return pane;
 		}
@@ -723,6 +737,25 @@ namespace Tangerine
 		{
 			Default,
 			Warning
+		}
+
+		public class CommonRow<T> : Widget
+		{
+			protected T Source { get; }
+			protected Widget Header { get; }
+
+			protected CommonRow(T source)
+			{
+				Source = source;
+				Padding = new Thickness(AttachmentMetrics.Spacing);
+				Header = new Widget {
+					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
+					LayoutCell = new LayoutCell(),
+				};
+				Nodes.Add(Header);
+				MinMaxHeight = AttachmentMetrics.RowHeight;
+				Presenter = Presenters.StripePresenter;
+			}
 		}
 
 		public class DeletableRow<T> : Widget
@@ -900,40 +933,42 @@ namespace Tangerine
 			}
 		}
 
-		private class MeshRow : DeletableRow<Model3DAttachment.MeshOption>
+		private class MeshRow : CommonRow<Model3DAttachment.MeshOption>
 		{
-			public MeshRow(Model3DAttachment.MeshOption mesh, ObservableCollection<Model3DAttachment.MeshOption> options) : base(mesh, options)
+			public MeshRow(Model3DAttachment.MeshOption mesh) : base(mesh)
 			{
-				Layout = new VBoxLayout();
+				Layout = new HBoxLayout();
 				Padding = new Thickness(AttachmentMetrics.Spacing);
-				var meshIdPropEditor = new StringPropertyEditor(
-					Decorate(new PropertyEditorParams(
-						Header,
-						mesh,
-						nameof(Model3DAttachment.MeshOption.Id))));
-				meshIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
-
+				var label = new ThemedSimpleText(mesh.Id);
+				Header.AddNode( new Widget {
+					Nodes = { label },
+					MinWidth = 0f,
+					MaxWidth = float.PositiveInfinity
+				});
+				label.ExpandToContainerWithAnchors();
 				var cullModePropEditor = new EnumPropertyEditor<CullMode>(
 					Decorate(new PropertyEditorParams(
 						Header,
 						mesh,
 						nameof(Model3DAttachment.MeshOption.CullMode))));
-				cullModePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
-
+				cullModePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
+				cullModePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				var opaquePropEditor = new BooleanPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						mesh,
 						nameof(Model3DAttachment.MeshOption.Opaque))));
-				opaquePropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
-
+				opaquePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
+				opaquePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				var hitPropEditor = new BooleanPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						mesh,
 						nameof(Model3DAttachment.MeshOption.HitTestTarget))));
-				hitPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.ControlWidth;
+				hitPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
+				hitPropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				CompoundPresenter.Add(Presenters.StripePresenter);
+				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
 
 			internal static Widget CreateHeader()
@@ -944,31 +979,10 @@ namespace Tangerine
 					MinMaxHeight = 20,
 					Presenter = Presenters.HeaderPresenter,
 					Nodes = {
-						new ThemedSimpleText {
-							Text = "Node Id",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Cull Mode",
-							MinMaxWidth = AttachmentMetrics.EditorWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Opaque",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new ThemedSimpleText {
-							Text = "Hit Test Target",
-							MinMaxWidth = AttachmentMetrics.ControlWidth,
-							VAlignment = VAlignment.Center,
-							ForceUncutText = false
-						},
-						new Widget(),
+						CreateLabel("Node Id"),
+						CreateLabel("Cull Mode"),
+						CreateLabel("Opaque"),
+						CreateLabel("Hit Test Target"),
 					}
 				};
 			}
