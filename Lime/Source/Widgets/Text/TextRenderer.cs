@@ -371,7 +371,7 @@ namespace Lime.Text
 					word.Start == 0 &&
 					t.Length > 0 &&
 					t[word.Start] > ' ' &&
-					GetLastChar(texts[words[i - 1].TextIndex]) > ' ';
+					GetLastChar(texts[fittedWords[i - 1].TextIndex]) > ' ';
 				if (isLongerThanWidth && isTextOrBullet && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
