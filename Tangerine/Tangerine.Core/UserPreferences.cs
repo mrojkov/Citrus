@@ -38,7 +38,13 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
-			TangerineYuzu.Instance.Value.WriteObjectToFile(GetPath(), this, Serialization.Format.JSON);
+			// .ToList() crashes, so using iteration
+			var sortedComponents = new List<Component>();
+			foreach (var c in this) {
+				sortedComponents.Add(c);
+			}
+			sortedComponents.Sort((a, b) => String.Compare(a.GetType().FullName, b.GetType().FullName, StringComparison.Ordinal));
+			TangerineYuzu.Instance.Value.WriteObjectToFile(GetPath(), sortedComponents, Serialization.Format.JSON);
 		}
 
 		public static string GetPath()
