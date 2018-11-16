@@ -16,12 +16,25 @@ namespace Orange
 		{
 			dictionary = new LocalizationDictionary();
 			ExtractTexts();
-			CleanupAndSaveDictionary(GetFileName());
+			foreach (var name in GetFileNames()) {
+				CleanupAndSaveDictionary(name);
+			}
 		}
 
 		private static string GetFileName()
 		{
 			return Path.ChangeExtension("Dictionary.txt", CreateSerializer().GetFileExtension());
+		}
+
+		private static IEnumerable<string> GetFileNames()
+		{
+			var files = Directory.GetFiles(
+				The.Workspace.AssetsDirectory,
+				"*" + CreateSerializer().GetFileExtension(),
+				SearchOption.TopDirectoryOnly);
+			return files
+				.Select(f => Path.GetFileName(f))
+				.Where(f => Path.GetFileName(f).StartsWith("Dictionary"));
 		}
 
 		private void CleanupAndSaveDictionary(string path)
