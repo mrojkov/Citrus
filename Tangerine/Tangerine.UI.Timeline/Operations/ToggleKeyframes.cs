@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline.Operations
 			Document.Current.History.DoTransaction(() => {
 				bool hasKey = false;
 				bool hasNoKey = false;
-				var nodes = Document.Current.SelectedNodes().Editable().OfType<T>();
+				var nodes = Document.Current.SelectedNodes().Editable().OfType<T>().ToList();
 				foreach (var node in nodes) {
 					if (node.Animators.TryFind(propertyName, out var animator, Document.Current.AnimationId)) {
 						bool thisHasKey = animator.ReadonlyKeys.Any(i => i.Frame == Document.Current.AnimationFrame);
