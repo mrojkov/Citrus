@@ -28,6 +28,7 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		public event Action<IOperation> PerformingOperation;
+		public event Action ModifiedStateChanged;
 
 		public static void AddOperationProcessorTypes(IEnumerable<Type> types)
 		{
@@ -201,9 +202,13 @@ namespace Tangerine.Core
 
 		private void RefreshModifiedStatus()
 		{
+			var previousModifiedState = IsDocumentModified;
 			IsDocumentModified = saveIndex < 0 || (saveIndex <= currentIndex ?
 				AnyChangingOperationWithinRange(saveIndex, currentIndex) :
 				AnyChangingOperationWithinRange(currentIndex, saveIndex));
+			if (previousModifiedState != IsDocumentModified) {
+				ModifiedStateChanged?.Invoke();
+			}
 		}
 
 		private bool AnyChangingOperationWithinRange(int start, int end)
