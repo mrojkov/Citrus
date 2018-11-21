@@ -21,6 +21,8 @@ using static Android.Media.MediaCodec;
 
 namespace Lime
 {
+	using Tasks = System.Threading.Tasks;
+
 	public class VideoDecoder : IDisposable
 	{
 		public int Width => videoFormat.GetInteger(MediaFormat.KeyWidth);
@@ -66,6 +68,9 @@ namespace Lime
 		private object videoExtractorLock = new object();
 		private object audioExtractorLock = new object();
 
+		private Tasks.Task processVideo;
+		private Tasks.Task processAudio;
+
 		private State state;
 
 		private enum State
@@ -94,7 +99,7 @@ namespace Lime
 		public VideoDecoder(string path)
 		{
 			state = State.Initializing;
-			var initTask = System.Threading.Tasks.Task.Run(() => {
+			var initTask = Tasks.Task.Run(() => {
 				try {
 					videoExtractor = new MediaExtractor();
 					videoExtractor.SetDataSource(path);
@@ -136,7 +141,7 @@ namespace Lime
 						AudioTrackMode.Stream
 					);
 				} catch {
-					Lime.Debug.Write("Init audio track");
+					Debug.Write("Init audio track");
 					Status = VideoPlayerStatus.Error;
 					return;
 				}
@@ -179,7 +184,7 @@ namespace Lime
 			}
 		}
 
-		public async System.Threading.Tasks.Task Start()
+		public void Start()
 		{
 			if (state == State.Initializing || state == State.Started) {
 				return;
@@ -187,118 +192,125 @@ namespace Lime
 			stopDecodeCancelationTokenSource = new CancellationTokenSource();
 			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
 
-			do {
-				if (state == State.Finished) {
-					SeekTo(0f);
-				}
+			if (state == State.Finished) {
+				SeekTo(0f);
+			}
 
-				if (state == State.Initialized) {
-					videoCodec?.Start();
-					audioCodec?.Start();
-				}
-				audio?.Play();
-				state = State.Started;
-				Status = VideoPlayerStatus.Playing;
+			if (state == State.Initialized) {
+				videoCodec?.Start();
+				audioCodec?.Start();
+			}
+			audio?.Play();
+			state = State.Started;
+			Status = VideoPlayerStatus.Playing;
 
-				var processVideo = System.Threading.Tasks.Task.Run(() => {
-					var info = new BufferInfo();
-					var eosReceived = videoCodec == null;
-					var hasInput = audioCodec != null;
-					lastVideoTime = -1;
-					while (!eosReceived) {
-						stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						var trackIndex = videoExtractor.SampleTrackIndex;
-						if (trackIndex > -1 && hasInput) {
-							lock (videoExtractorLock) {
-								ExtractAndQueueSample(videoExtractor, videoCodec, ref hasInput);
-							}
-						} else {
-							SignEndOfStream(videoCodec, ref hasInput);
-							Debug.Write("trackIndex <= -1");
-						}
 
-						stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						var outIndex = videoCodec.DequeueOutputBuffer(info, 10000);
-						if (outIndex >= 0) {
-							OnStart?.Invoke();
-							OnStart = null;
+			var factory = new Tasks.TaskFactory(stopDecodeCancelationToken);
+			processVideo = factory.StartNew(
+				ProcessVideo,
+				stopDecodeCancelationToken,
+				Tasks.TaskCreationOptions.LongRunning,
+				Tasks.TaskScheduler.Default
+			);
 
-							while (lastVideoTime != -1 && (currentPosition < info.PresentationTimeUs)) {
-								Thread.Sleep(10);
-								if (stopDecodeCancelationToken.IsCancellationRequested) {
-									if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
-										eosReceived = true;
-									}
-									videoCodec.ReleaseOutputBuffer(outIndex, false);
-								}
-								stopDecodeCancelationToken.ThrowIfCancellationRequested();
-							}
-							videoCodec.ReleaseOutputBuffer(outIndex, true);
-							lastVideoTime = info.PresentationTimeUs;
-							stopwatch.Start();
-							HasNewTexture = true;
-						}
+			processAudio = factory.StartNew(
+				ProcessAudio,
+				stopDecodeCancelationToken,
+				Tasks.TaskCreationOptions.LongRunning,
+				Tasks.TaskScheduler.Default
+			);
+		}
 
-						if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
-							eosReceived = true;
-						}
+		private void ProcessVideo()
+		{
+			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
+			var info = new BufferInfo();
+			var eosReceived = videoCodec == null;
+			var hasInput = audioCodec != null;
+			lastVideoTime = -1;
+			while (!eosReceived) {
+				stopDecodeCancelationToken.ThrowIfCancellationRequested();
+				var trackIndex = videoExtractor.SampleTrackIndex;
+				if (trackIndex > -1 && hasInput) {
+					lock (videoExtractorLock) {
+						ExtractAndQueueSample(videoExtractor, videoCodec, ref hasInput);
 					}
-				}, stopDecodeCancelationToken);
+				} else {
+					SignEndOfStream(videoCodec, ref hasInput);
+					Debug.Write("trackIndex <= -1");
+				}
 
+				stopDecodeCancelationToken.ThrowIfCancellationRequested();
+				var outIndex = videoCodec.DequeueOutputBuffer(info, 10000);
+				if (outIndex >= 0) {
+					OnStart?.Invoke();
+					OnStart = null;
 
-				var processAudio = System.Threading.Tasks.Task.Run(() => {
-					var eosReceived = audioCodec == null;
-					var info = new BufferInfo();
-					var hasInput = audioCodec != null;
-					lastAudioTime = -1;
-					while (!eosReceived) {
-						stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						var trackIndex = audioExtractor.SampleTrackIndex;
-						if (trackIndex > -1 && hasInput) {
-							lock (audioExtractorLock) {
-								ExtractAndQueueSample(audioExtractor, audioCodec, ref hasInput);
+					while (lastVideoTime != -1 && (currentPosition < info.PresentationTimeUs)) {
+						Thread.Sleep(10);
+						if (stopDecodeCancelationToken.IsCancellationRequested) {
+							if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+								eosReceived = true;
 							}
-						} else {
-							SignEndOfStream(audioCodec, ref hasInput);
-							Debug.Write("trackIndex <= -1");
+							videoCodec.ReleaseOutputBuffer(outIndex, false);
 						}
 						stopDecodeCancelationToken.ThrowIfCancellationRequested();
-						var outIndex = audioCodec.DequeueOutputBuffer(info, 10000);
-						if (outIndex >= 0) {
-							var buffer = audioCodec.GetOutputBuffer(outIndex);
-							lastAudioTime = info.PresentationTimeUs;
-							while (currentPosition < lastAudioTime || lastVideoTime == -1) {
-								Thread.Sleep(10);
-								if (stopDecodeCancelationToken.IsCancellationRequested) {
-									audioCodec.ReleaseOutputBuffer(outIndex, false);
-									if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
-										eosReceived = true;
-									}
-									stopDecodeCancelationToken.ThrowIfCancellationRequested();
-								}
-							}
-							if (!MuteAudio) {
-								audio.Write(buffer.Duplicate(), info.Size, WriteMode.Blocking);
-							}
+					}
+					videoCodec.ReleaseOutputBuffer(outIndex, true);
+					lastVideoTime = info.PresentationTimeUs;
+					stopwatch.Start();
+					HasNewTexture = true;
+				}
+
+				if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+					eosReceived = true;
+				}
+			}
+		}
+
+		private void ProcessAudio()
+		{
+			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
+			var eosReceived = audioCodec == null;
+			var info = new BufferInfo();
+			var hasInput = audioCodec != null;
+			lastAudioTime = -1;
+			while (!eosReceived) {
+				stopDecodeCancelationToken.ThrowIfCancellationRequested();
+				var trackIndex = audioExtractor.SampleTrackIndex;
+				if (trackIndex > -1 && hasInput) {
+					lock (audioExtractorLock) {
+						ExtractAndQueueSample(audioExtractor, audioCodec, ref hasInput);
+					}
+				} else {
+					SignEndOfStream(audioCodec, ref hasInput);
+					Debug.Write("trackIndex <= -1");
+				}
+				stopDecodeCancelationToken.ThrowIfCancellationRequested();
+				var outIndex = audioCodec.DequeueOutputBuffer(info, 10000);
+				if (outIndex >= 0) {
+					var buffer = audioCodec.GetOutputBuffer(outIndex);
+					lastAudioTime = info.PresentationTimeUs;
+					while (currentPosition < lastAudioTime || lastVideoTime == -1) {
+						Thread.Sleep(10);
+						if (stopDecodeCancelationToken.IsCancellationRequested) {
 							audioCodec.ReleaseOutputBuffer(outIndex, false);
-						}
-
-						if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
-							eosReceived = true;
+							if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+								eosReceived = true;
+							}
+							stopDecodeCancelationToken.ThrowIfCancellationRequested();
 						}
 					}
-				}, stopDecodeCancelationToken);
-
-				await System.Threading.Tasks.Task.WhenAll(processVideo, processAudio);
-				if (processVideo.IsFaulted) {
-					Debug.Write("Video thread faulted");
-					stopDecodeCancelationTokenSource.Cancel();
-				} else if (state == State.Started) {
-					state = State.Finished;
-					Status = VideoPlayerStatus.Finished;
+					if (!MuteAudio) {
+						audio.Write(buffer.Duplicate(), info.Size, WriteMode.Blocking);
+					}
+					audioCodec.ReleaseOutputBuffer(outIndex, false);
 				}
-				stopwatch.Stop();
-			} while (Looped && !stopDecodeCancelationToken.IsCancellationRequested);
+
+				if (info.Flags.HasFlag(MediaCodecBufferFlags.EndOfStream)) {
+					eosReceived = true;
+				}
+			}
 		}
 
 		private void SeekTo(float time)
@@ -314,8 +326,8 @@ namespace Lime
 			}
 			try {
 				audio?.Pause();
-				audioCodec.Flush();
-				videoCodec.Flush();
+				audioCodec?.Flush();
+				videoCodec?.Flush();
 				lock (videoExtractorLock) {
 					videoExtractor?.SeekTo(startTime, MediaExtractorSeekTo.ClosestSync);
 				}
@@ -354,6 +366,24 @@ namespace Lime
 
 		public void Update(float delta)
 		{
+			if (state == State.Started) {
+				if (processVideo.IsCompletedSuccessfully && processAudio.IsCompletedSuccessfully) {
+					state = State.Finished;
+					Status = VideoPlayerStatus.Finished;
+					stopwatch.Stop();
+				} else if (
+					processVideo.IsFaulted ||
+					processVideo.IsCanceled ||
+					processVideo.IsCompleted ||
+					processAudio.IsFaulted ||
+					processAudio.IsCanceled ||
+					processAudio.IsCompleted
+					) {
+					Debug.Write("Some thread faulted");
+					stopDecodeCancelationTokenSource.Cancel();
+					stopwatch.Stop();
+				}
+			}
 		}
 
 		public void UpdateTexture()
@@ -366,15 +396,19 @@ namespace Lime
 
 		public void Dispose()
 		{
-			stopDecodeCancelationTokenSource.Cancel();
+			Stop();
 			
 			if (videoCodec != null) {
-				videoCodec.Stop();
+				if (state == State.Started) {
+					videoCodec.Stop();
+				}
 				videoCodec.Dispose();
 				videoCodec = null;
 			}
 			if (audioCodec != null) {
-				audioCodec.Stop();
+				if (state == State.Started) {
+					audioCodec.Stop();
+				}
 				audioCodec.Dispose();
 				audioCodec = null;
 			}
@@ -386,6 +420,7 @@ namespace Lime
 			videoExtractor = null;
 			audioExtractor?.Dispose();
 			audioExtractor = null;
+			stopDecodeCancelationTokenSource.Dispose();
 		}
 
 		private class SurfaceTextureRenderer
