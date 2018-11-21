@@ -195,7 +195,7 @@ namespace Lime
 					return start.Position * Size;
 
 				float segLength = ((end.Position - start.Position) * Size).Length;
-				if (segStart <= polylineLengthFromBeginning && polylineLengthFromBeginning < segStart + segLength) {
+				if (segStart <= polylineLengthFromBeginning && polylineLengthFromBeginning <= segStart + segLength) {
 					return InterpolateDerivative(start, end, (polylineLengthFromBeginning - segStart) / segLength);
 				}
 				segStart += segLength;

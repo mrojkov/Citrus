@@ -91,13 +91,13 @@
     <Compile Include="Panels\BackupHistoryPanel.cs" />
     <Compile Include="Panels\HierarchyPanel.cs" />
     <Compile Include="Panels\TreeView.cs" />
+    <Compile Include="Panels\AttachmentPanel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dialogs\SaveRulerDialog.cs" />
-    <Compile Include="Dialogs\AttachmentDialog.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
     <Compile Include="Dialogs\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
