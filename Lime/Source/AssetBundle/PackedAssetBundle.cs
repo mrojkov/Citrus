@@ -515,12 +515,11 @@ namespace Lime
 
 		public override IEnumerable<string> EnumerateFiles(string path = null)
 		{
-			if (path != null) {
-				throw new NotImplementedException();
+			foreach (var file in index) {
+				if (path == null || file.Key.StartsWith(path)) {
+					yield return file.Key;
+				}
 			}
-			var files = new string[index.Keys.Count];
-			index.Keys.CopyTo(files, 0);
-			return files;
 		}
 
 		internal Stream AllocStream()
