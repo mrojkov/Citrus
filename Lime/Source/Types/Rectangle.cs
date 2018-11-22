@@ -110,6 +110,15 @@ namespace Lime
 		public Vector2 Center => (A + B) / 2;
 
 		/// <summary>
+		/// Creates a new <see cref="Rectangle"/> that has coordinates
+		/// of this rectangle shifted by specified value.
+		/// </summary>
+		public Rectangle OffsetBy(Vector2 value)
+		{
+			return new Rectangle(A + value, B + value);
+		}
+
+		/// <summary>
 		/// Returns this rectangle with swapped coordinates
 		/// of borders if width or height is negative.
 		/// </summary>
