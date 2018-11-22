@@ -144,7 +144,7 @@ namespace Lime
 	{
 		public new Widget Owner { get => (Widget)base.Owner; set => base.Owner = value; }
 
-		[TangerineIgnore]
+		[TangerineInspect]
 		[YuzuMember]
 		public Alignment Alignment
 		{
@@ -160,14 +160,14 @@ namespace Lime
 
 		private Alignment alignment;
 
-		[TangerineInspect]
+		[TangerineIgnore]
 		public HAlignment HorizontalAlignment
 		{
 			get => Alignment.X;
 			set { Alignment = new Alignment { X = value, Y = Alignment.Y }; }
 		}
 
-		[TangerineInspect]
+		[TangerineIgnore]
 		public VAlignment VerticalAlignment
 		{
 			get => Alignment.Y;
