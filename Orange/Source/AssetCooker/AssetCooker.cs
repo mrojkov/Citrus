@@ -303,7 +303,7 @@ namespace Orange
 
 		private static void DeleteOrphanedTextureParams()
 		{
-			foreach (var path in AssetBundle.EnumerateFiles()) {
+			foreach (var path in AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(".texture", StringComparison.OrdinalIgnoreCase)) {
 					var origImageFile = Path.ChangeExtension(path, GetPlatformTextureExtension());
 					if (!AssetBundle.FileExists(origImageFile)) {
@@ -315,7 +315,7 @@ namespace Orange
 
 		private static void DeleteOrphanedMasks()
 		{
-			foreach (var maskPath in AssetBundle.EnumerateFiles()) {
+			foreach (var maskPath in AssetBundle.EnumerateFiles().ToList()) {
 				if (maskPath.EndsWith(".mask", StringComparison.OrdinalIgnoreCase)) {
 					var origImageFile = Path.ChangeExtension(maskPath, GetPlatformTextureExtension());
 					if (!AssetBundle.FileExists(origImageFile)) {
@@ -439,7 +439,7 @@ namespace Orange
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {
 				assetFiles.Add(fileInfo.Path);
 			}
-			foreach (var path in AssetBundle.EnumerateFiles()) {
+			foreach (var path in AssetBundle.EnumerateFiles().ToList()) {
 				// Ignoring texture atlases
 				if (path.StartsWith("Atlases")) {
 					continue;
@@ -1046,7 +1046,7 @@ namespace Orange
 			}
 			var atlasChainsToRebuild = new HashSet<string>();
 			// Figure out atlas chains to rebuild
-			foreach (var atlasPartPath in AssetBundle.EnumerateFiles()) {
+			foreach (var atlasPartPath in AssetBundle.EnumerateFiles().ToList()) {
 				if (!atlasPartPath.EndsWith(".atlasPart", StringComparison.OrdinalIgnoreCase))
 					continue;
 
@@ -1136,7 +1136,7 @@ namespace Orange
 
 		private static void DeleteModelExternalAnimations(string pathPrefix)
 		{
-			foreach (var path in AssetBundle.EnumerateFiles()) {
+			foreach (var path in AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(".ant") && path.StartsWith(pathPrefix)) {
 					AssetBundle.DeleteFile(path);
 					Console.WriteLine("- " + path);
