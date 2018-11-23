@@ -11,8 +11,6 @@ namespace Tangerine.UI
 	{
 		public DropDownList Selector { get; }
 
-		private static Dictionary<Type, List<Type>> derivedTypesCache = new Dictionary<Type,List<Type>>();
-
 		public InstancePropertyEditor(IPropertyEditorParams editorParams, Action<Widget> OnValueChanged) : base(editorParams)
 		{
 			Selector = editorParams.DropDownListFactory();
@@ -20,7 +18,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Selector);
 			var propertyType = typeof(T);
 			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
-			var propertyMetaItem = meta.Items.Where(i => i.Name == editorParams.PropertyName).FirstOrDefault();
+			var propertyMetaItem = meta.Items.FirstOrDefault(i => i.Name == editorParams.PropertyName);
 			if (propertyMetaItem != null) {
 				var defaultValue = propertyMetaItem.GetValue(meta.Default);
 				var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert")) {
@@ -34,24 +32,7 @@ namespace Tangerine.UI
 			if (!propertyType.IsInterface) {
 				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
 			}
-			// TODO: invalidate cache on loading new assemblies at runtime
-			if (!derivedTypesCache.TryGetValue(propertyType, out List<Type> derivedTypes)) {
-				derivedTypes = new List<Type>();
-				foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-					var assignables = assembly
-						.GetTypes()
-						.Where(t =>
-							!t.IsInterface &&
-							t.GetCustomAttribute<TangerineIgnoreAttribute>(false) == null &&
-							t != propertyType &&
-							propertyType.IsAssignableFrom(t));
-					foreach (var type in assignables) {
-						derivedTypes.Add(type);
-					}
-				}
-				derivedTypesCache.Add(propertyType, derivedTypes);
-			}
-			foreach (var t in derivedTypes) {
+			foreach (var t in DerivedTypesCache.GetDerivedTypesFor(propertyType)) {
 				Selector.Items.Add(new CommonDropDownList.Item(t.Name, t));
 			}
 			Selector.Changed += a => {
@@ -70,6 +51,36 @@ namespace Tangerine.UI
 					Selector.Text = ManyValuesText;
 				}
 			});
+		}
+
+		private static class DerivedTypesCache
+		{
+			private static Dictionary<Type, HashSet<Type>> cache = new Dictionary<Type, HashSet<Type>>();
+
+			static DerivedTypesCache()
+			{
+				Project.Opening += _ => cache.Clear();
+			}
+
+			public static IEnumerable<Type> GetDerivedTypesFor(Type propertyType)
+			{
+				if (!cache.TryGetValue(propertyType, out HashSet<Type> derivedTypes)) {
+					cache.Add(propertyType, derivedTypes = new HashSet<Type>());
+					foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+						var types = assembly
+							.GetTypes()
+							.Where(t =>
+								!t.IsInterface &&
+								t.GetCustomAttribute<TangerineIgnoreAttribute>(false) == null &&
+								t != propertyType &&
+								propertyType.IsAssignableFrom(t)).ToList();
+							foreach (var type in types) {
+								derivedTypes.Add(type);
+							}
+					}
+				}
+				return derivedTypes;
+			}
 		}
 	}
 }
