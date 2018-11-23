@@ -22,7 +22,7 @@ namespace Orange.FbxImporter
 			var nodeCount = FbxNodeGetChildCount(NativePtr);
 			var materialsCount = FbxNodeGetMaterialCount(NativePtr);
 
-			Name = FbxNodeGetName(NativePtr).PtrToString();
+			Name = FbxNodeGetName(NativePtr);
 			Materials = new FbxMaterial[materialsCount];
 			for (int i = 0; i < materialsCount; i++) {
 				Materials[i] = new FbxMaterial(FbxNodeGetMaterial(NativePtr, i));
@@ -51,8 +51,8 @@ namespace Orange.FbxImporter
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr FbxNodeGetLocalTransform(IntPtr node);
 
-		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr FbxNodeGetName(IntPtr node);
+		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl, CharSet = ImportConfig.Charset)]
+		private static extern string FbxNodeGetName(IntPtr node);
 
 		[DllImport(ImportConfig.LibName, CallingConvention = CallingConvention.Cdecl)]
 		private static extern int FbxNodeGetMaterialCount(IntPtr node);
