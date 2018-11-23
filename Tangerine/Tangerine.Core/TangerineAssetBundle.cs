@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Lime;
 using Yuzu;
 
@@ -44,7 +45,7 @@ namespace Tangerine.Core
 		public void CleanupBundle()
 		{
 			using (var cacheBundle = OpenCacheBundle(AssetBundleFlags.Writable)) {
-				foreach (var path in cacheBundle.EnumerateFiles()) {
+				foreach (var path in cacheBundle.EnumerateFiles().ToList()) {
 					cacheBundle.DeleteFile(path);
 				}
 				TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, AssetAttributes.None, new byte[0]);
@@ -131,7 +132,7 @@ namespace Tangerine.Core
 				}
 
 				var animationPathPrefix = Orange.Toolbox.ToUnixSlashes(Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "@");
-				foreach (var assetPath in cacheBundle.EnumerateFiles()) {
+				foreach (var assetPath in cacheBundle.EnumerateFiles().ToList()) {
 					if (assetPath.EndsWith(".ant") && assetPath.StartsWith(animationPathPrefix)) {
 						cacheBundle.DeleteFile(assetPath);
 					}

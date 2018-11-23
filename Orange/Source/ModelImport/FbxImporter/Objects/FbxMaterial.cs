@@ -32,7 +32,7 @@ namespace Orange.FbxImporter
 				Name = material.Name;
 				WrapModeU = (Lime.TextureWrapMode)material.WrapModeU;
 				WrapModeV = (Lime.TextureWrapMode)material.WrapModeV;
-				DiffuseColor = material.ColorDiffuse.ToLimeColor();
+				DiffuseColor = material.ColorDiffuse.ToStruct<Vec4>().ToLimeColor();
 			}
 
 		}
@@ -63,7 +63,7 @@ namespace Orange.FbxImporter
 
 			public string Name;
 
-			public Vec4 ColorDiffuse;
+			public IntPtr ColorDiffuse;
 		}
 
 		#endregion
