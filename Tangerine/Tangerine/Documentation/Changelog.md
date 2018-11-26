@@ -1,3 +1,7 @@
+##### Changelog 26.11.2018
+
+* Исправлена ошибка, приводящая к крашу, если была использована модель .fbx c частотой кадров 30 fps [CIT-947](https://gitlab.game-forest.com:2000/browse/CIT-947)
+
 ##### Changelog 22.11.2018
 
 * Исправлена ошибка в SplineGear, приводящая к неверному просчету анимации при использовании AlongPathOrientation [CIT-905](https://gitlab.game-forest.com:2000/browse/CIT-905)
