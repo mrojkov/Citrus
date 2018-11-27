@@ -25,7 +25,7 @@ namespace Lime
 	{
 		private uint handle;
 		private uint framebuffer;
-		private uint depthBuffer;
+		private uint depthStencilBuffer;
 
 		private readonly Size size = new Size(0, 0);
 		private readonly Rectangle uvRect;
@@ -104,9 +104,9 @@ namespace Lime
 				TextureTarget.Texture2D,
 				handle,
 				level: 0);
+			AttachRenderBuffer(FramebufferSlot.StencilAttachment, (RenderbufferInternalFormat)All.Depth24Stencil8Oes, out depthStencilBuffer);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			AttachRenderBuffer(FramebufferSlot.DepthAttachment, RenderbufferInternalFormat.DepthComponent16, out depthBuffer);
 			Renderer.Clear(Color4.Black);
 			PlatformRenderer.MarkTextureSlotAsDirty(0);
 			PlatformRenderer.BindFramebuffer(oldFramebuffer);
@@ -122,6 +122,7 @@ namespace Lime
 			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, format, size.Width, size.Height);
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachement, RenderbufferTarget.Renderbuffer, handle);
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+			PlatformRenderer.CheckErrors();
 		}
 
 		public Size ImageSize {
@@ -161,7 +162,7 @@ namespace Lime
 				});
 				handle = 0;
 			}
-			DeleteRenderBuffer(ref depthBuffer);
+			DeleteRenderBuffer(ref depthStencilBuffer);
 		}
 
 		private void DeleteRenderBuffer(ref uint renderBuffer)
