@@ -246,10 +246,12 @@ namespace Lime
 						RenderState.Projection |
 						RenderState.DepthState |
 						RenderState.ScissorState |
+						RenderState.StencilState |
 						RenderState.CullMode |
 						RenderState.Transform2);
 					try {
 						Renderer.ScissorState = ScissorState.ScissorDisabled;
+						Renderer.StencilState = StencilState.Default;
 						Renderer.Viewport = new Viewport(0, 0, RenderTexture.ImageSize.Width, RenderTexture.ImageSize.Height);
 						Renderer.Clear(new Color4(0, 0, 0, 0));
 						Renderer.World = Renderer.View = Matrix44.Identity;
