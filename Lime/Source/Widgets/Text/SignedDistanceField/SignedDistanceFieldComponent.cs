@@ -7,22 +7,66 @@ namespace Lime
 	[AllowedComponentOwnerTypes(typeof(Widget))]
 	class SignedDistanceFieldComponent : NodeBehavior
 	{
-		private const string GroupFont = "01. Font";
-		private const float MinimumContrast = 0f;
-		private const float MaximumContrast = 100f;
+		private const string GroupFont = "01. Face";
+		private const string GroupOutline = "02. Outline";
+		private const float MinimumSoftness = 0f;
+		private const float MaximumSoftness = 1f;
+		private const float MinimumDilate = -0.5f;
+		private const float MaximumDilate = 0.5f;
+		private const float MinimumThickness = 0f;
+		private const float MaximumThickness = 1f;
 
 		internal SignedDistanceFieldMaterial SDFMaterial { get; private set; } = new SignedDistanceFieldMaterial();
+		internal SDFOutlineMaterial OutlineMaterial { get; private set; } = new SDFOutlineMaterial();
 
 		private SDFPresenter presenter = new SDFPresenter();
 		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
-		private float contrast = 5f;
+		private float softness = 0f;
+		private float outlineSoftness = 0f;
+		private float dilate = 0f;
+		private float thickness = 0f;
 
-		[TangerineInspect]
+		[YuzuMember]
 		[TangerineGroup(GroupFont)]
-		public float Contrast
+		public float Softness
 		{
-			get => contrast;
-			set => contrast = Mathf.Clamp(value, MinimumContrast, MaximumContrast);
+			get => softness;
+			set => softness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFont)]
+		public float Dilate
+		{
+			get => dilate;
+			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFont)]
+		public Color4 FaceColor { get; set; } = new Color4(255, 255, 255, 255);
+
+		[YuzuMember]
+		[TangerineGroup(GroupOutline)]
+		public bool OutlineEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupOutline)]
+		public Color4 OutlineColor { get; set; } = new Color4(0, 0, 0, 255);
+
+		[YuzuMember]
+		[TangerineGroup(GroupOutline)]
+		public float Thickness
+		{
+			get => thickness;
+			set => thickness = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
+		}
+		[YuzuMember]
+		[TangerineGroup(GroupOutline)]
+		public float OutlineSoftness
+		{
+			get => outlineSoftness;
+			set => outlineSoftness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
 		}
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)

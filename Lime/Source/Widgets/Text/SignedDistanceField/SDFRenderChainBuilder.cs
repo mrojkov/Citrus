@@ -23,6 +23,6 @@ namespace Lime
 			}
 		}
 
-		public IRenderChainBuilder Clone(Node newOwner) => new PostProcessingRenderChainBuilder { Owner = (Widget)newOwner };
+		public IRenderChainBuilder Clone(Node newOwner) => new SDFRenderChainBuilder { Owner = (Widget)newOwner };
 	}
 }

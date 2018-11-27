@@ -13,12 +13,14 @@ namespace Lime
 		private bool opaque;
 		private SDFRenderAction.Buffer sourceTextureBuffer;
 		private SDFRenderActionMain.Buffer SDFBuffer;
+		private SDFRenderActionOutline.Buffer OutlineBuffer;
 
 		public SDFPresenter()
 		{
 			renderActions = new SDFRenderAction[] {
 				new SDFRenderActionTextureBuilder(),
 				new SDFRenderActionMain(),
+				new SDFRenderActionOutline(),
 				new SDFRenderActionTextureRender(),
 			};
 		}
@@ -48,6 +50,9 @@ namespace Lime
 			if (SDFBuffer?.Size != bufferSize) {
 				SDFBuffer = new SDFRenderActionMain.Buffer(bufferSize);
 			}
+			if (OutlineBuffer?.Size != bufferSize) {
+				OutlineBuffer = new SDFRenderActionOutline.Buffer(bufferSize);
+			}
 			ro.RenderActions = renderActions;
 			ro.Material = GetMaterial(widget, component);
 			ro.LocalToWorldTransform = widget.LocalToWorldTransform;
@@ -60,7 +65,15 @@ namespace Lime
 			ro.SourceTextureScaling = sourceTextureScaling;
 			ro.SDFBuffer = SDFBuffer;
 			ro.SDFMaterial = component.SDFMaterial;
-			ro.Contrast = component.Contrast;
+			ro.Softness = component.Softness;
+			ro.Dilate = component.Dilate;
+			ro.FaceColor = component.FaceColor;
+			ro.OutlineMaterial = component.OutlineMaterial;
+			ro.OutlineBuffer = OutlineBuffer;
+			ro.OutlineColor = component.OutlineColor;
+			ro.Thickness = component.Thickness;
+			ro.OutlineSoftness = component.OutlineSoftness;
+			ro.OutlineEnabled = component.OutlineEnabled;
 			
 			return ro;
 		}
@@ -69,7 +82,7 @@ namespace Lime
 		{
 			blending = widget.GlobalBlending;
 			shader = widget.GlobalShader;
-			opaque = true;
+			opaque = false;
 			var isOpaqueRendering = opaque && blending == Blending.Inherited;
 			return material = WidgetMaterial.GetInstance(!isOpaqueRendering ? blending : Blending.Opaque, shader, 1);
 		}

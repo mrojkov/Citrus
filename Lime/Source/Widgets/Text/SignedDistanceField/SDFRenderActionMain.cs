@@ -14,8 +14,9 @@ namespace Lime
 		public override void Do(SDFRenderObject ro)
 		{
 			ro.PrepareOffscreenRendering(ro.Size);
-			ro.SDFMaterial.Contrast = ro.Contrast;
-			ro.RenderToTexture(ro.SDFBuffer.Texture, ro.ProcessedTexture, ro.SDFMaterial, Color4.White, Color4.Zero);
+			ro.SDFMaterial.Softness = ro.Softness;
+			ro.SDFMaterial.Dilate = ro.Dilate;
+			ro.RenderToTexture(ro.SDFBuffer.Texture, ro.SourceTextureBuffer.Texture, ro.SDFMaterial, ro.FaceColor, Color4.Zero);
 			ro.CurrentBufferSize = (Vector2)ro.SDFBuffer.Size;
 			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 
@@ -26,18 +27,18 @@ namespace Lime
 
 		internal new class Buffer : SDFRenderAction.Buffer
 		{
-			private float contrast;
+			private float softness;
 
 			public Buffer(Size size) : base(size) { }
 
 			public bool EqualRenderParameters(SDFRenderObject ro) =>
 				!IsDirty &&
-				contrast == ro.Contrast;
+				softness == ro.Softness;
 
 			public void SetRenderParameters(SDFRenderObject ro)
 			{
 				IsDirty = false;
-				contrast = ro.Contrast;
+				softness = ro.Softness;
 			}
 		}
 	}

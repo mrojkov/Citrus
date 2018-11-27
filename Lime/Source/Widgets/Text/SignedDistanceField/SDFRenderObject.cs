@@ -29,11 +29,18 @@ namespace Lime
 		public bool MarkBuffersAsDirty;
 		public SDFRenderAction.Buffer SourceTextureBuffer;
 		public float SourceTextureScaling;
-		public bool OpagueRendering;
 
 		public SDFRenderActionMain.Buffer SDFBuffer;
 		public SignedDistanceFieldMaterial SDFMaterial;
-		public float Contrast;
+		public float Softness;
+		public float Dilate;
+		public Color4 FaceColor;
+		public SDFRenderActionOutline.Buffer OutlineBuffer;
+		public SDFOutlineMaterial OutlineMaterial;
+		public float Thickness;
+		public float OutlineSoftness;
+		public bool OutlineEnabled;
+		public Color4 OutlineColor;
 
 		protected override void OnRelease()
 		{
@@ -42,6 +49,8 @@ namespace Lime
 			Material = null;
 			SDFBuffer = null;
 			SDFMaterial = null;
+			OutlineBuffer = null;
+			OutlineMaterial = null;
 		}
 
 		public override void Render()

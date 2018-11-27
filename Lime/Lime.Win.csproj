@@ -312,10 +312,12 @@
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
+    <Compile Include="Source\Widgets\Text\Materials\SDFOutlineMaterial.cs" />
     <Compile Include="Source\Widgets\Text\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFPresenter.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionOutline.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionTextureBuilder.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionTextureRender.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />

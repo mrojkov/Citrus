@@ -3,38 +3,38 @@ using System.Text;
 
 namespace Lime
 {
-	public class SignedDistanceFieldMaterial : IMaterial
+	public class SDFOutlineMaterial : IMaterial
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
 		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
+		private readonly ShaderParamKey<float> thicknessKey;
 		private readonly ShaderParamKey<float> softnessKey;
-		private readonly ShaderParamKey<float> dilateKey;
 
+		public float Thickness { get; set; } = 0f;
 		public float Softness { get; set; } = 0f;
-		public float Dilate { get; set; } = 0f;
 
 		public int PassCount => 1;
 
-		public SignedDistanceFieldMaterial() : this(Blending.Alpha) { }
+		public SDFOutlineMaterial() : this(Blending.Alpha) { }
 
-		public SignedDistanceFieldMaterial(Blending blending)
+		public SDFOutlineMaterial(Blending blending)
 		{
 			this.blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
+			thicknessKey = shaderParams.GetParamKey<float>("thickness");
 			softnessKey = shaderParams.GetParamKey<float>("softness");
-			dilateKey = shaderParams.GetParamKey<float>("dilate");
 		}
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(softnessKey, Softness);
-			shaderParams.Set(dilateKey, 0.5f - Dilate);
+			shaderParams.Set(thicknessKey, Thickness);
+			shaderParams.Set(softnessKey, Softness * 100f);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
-			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance());
+			PlatformRenderer.SetShaderProgram(SDFOutlineShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
@@ -42,14 +42,13 @@ namespace Lime
 
 		public IMaterial Clone()
 		{
-			return new SignedDistanceFieldMaterial(blending) {
-				Softness = Softness,
-				Dilate = Dilate,
+			return new SDFOutlineMaterial(blending) {
+				Thickness = Thickness,
 			};
 		}
 	}
 
-	public class SDFShaderProgram : ShaderProgram
+	public class SDFOutlineShaderProgram : ShaderProgram
 	{
 		private const string VertexShader = @"
 			attribute vec4 inPos;
@@ -73,40 +72,28 @@ namespace Lime
 			varying lowp vec2 texCoords1;
 			uniform lowp sampler2D tex1;
 
+			uniform lowp float thickness;
 			uniform lowp float softness;
-			uniform lowp float dilate;
-
-			void main() {
-				lowp vec4 color = texture2D(tex1, texCoords1);
-				lowp vec3 c = color.xxx;
-				gl_FragColor = vec4((c-dilate)*softness, 1.0);
-			}";
-
-		private const string FragmentShaderSmooth = @"
-			varying lowp vec4 color;
-			varying lowp vec2 texCoords1;
-			uniform lowp sampler2D tex1;
-
-			uniform lowp float softness;
-			uniform lowp float dilate;
 
 			void main() {
 				lowp float c = texture2D(tex1, texCoords1).r;
-				lowp float alpha = smoothstep(.5-softness, .5+softness, c);
-				gl_FragColor = vec4(color.rgb, alpha * color.a);
+				lowp float c1 = (c - (.5 - thickness)) * softness;
+				lowp float c2 = 1. - (c - .5) * softness;
+				lowp float res = mix(c1, c2, (c-.5)*softness);
+				gl_FragColor = vec4(color.rgb, color.a * res);
 			}";
 
-		private static SDFShaderProgram instance;
+		private static SDFOutlineShaderProgram instance;
 
-		public static SDFShaderProgram GetInstance() => instance ?? (instance = new SDFShaderProgram());
+		public static SDFOutlineShaderProgram GetInstance() => instance ?? (instance = new SDFOutlineShaderProgram());
 
-		private SDFShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+		private SDFOutlineShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
 
 		private static Shader[] CreateShaders()
 		{
 			return new Shader[] {
 				new VertexShader(VertexShader),
-				new FragmentShader(FragmentShaderSmooth)
+				new FragmentShader(FragmentShader)
 			};
 		}
 	}
