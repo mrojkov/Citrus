@@ -10,12 +10,9 @@ namespace Lime
 		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
-		private readonly ShaderParamKey<Vector2> stepKey;
-		private readonly ShaderParamKey<Vector3> sharpnessKey;
+		private readonly ShaderParamKey<float> contrastKey;
 
-		public float Strength { get; set; } = 5f;
-		public float Limit { get; set; } = 0.1f;
-		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
+		public float Contrast { get; set; } = 30f;
 
 		public int PassCount => 1;
 
@@ -26,16 +23,14 @@ namespace Lime
 			this.blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
-			stepKey = shaderParams.GetParamKey<Vector2>("step");
-			sharpnessKey = shaderParams.GetParamKey<Vector3>("uSharpness");
+			contrastKey = shaderParams.GetParamKey<float>("contrast");
 		}
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(stepKey, Step);
-			shaderParams.Set(sharpnessKey, new Vector3(Strength, Strength * 0.25f, Limit));
+			shaderParams.Set(contrastKey, Contrast);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
-			PlatformRenderer.SetShaderProgram(SharpenShaderProgram.GetInstance());
+			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
@@ -43,10 +38,8 @@ namespace Lime
 
 		public IMaterial Clone()
 		{
-			return new SharpenMaterial(blending) {
-				Strength = Strength,
-				Limit = Limit,
-				Step = Step
+			return new SignedDistanceFieldMaterial(blending) {
+				Contrast = Contrast
 			};
 		}
 	}
@@ -55,32 +48,40 @@ namespace Lime
 	{
 		private const string VertexShader = @"
 			attribute vec4 inPos;
-			attribute vec4 inColor;
 			attribute vec2 inTexCoords1;
 
 			uniform mat4 matProjection;
 
-			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
 
 			void main()
 			{
 				gl_Position = matProjection * inPos;
-				color = inColor;
 				texCoords1 = inTexCoords1;
 			}";
 
 		private const string FragmentShader = @"
-			varying lowp vec4 color;
 			varying lowp vec2 texCoords1;
-
 			uniform lowp sampler2D tex1;
+
 			uniform lowp float contrast;
 
 			void main() {
 				lowp vec3 c = texture2D(tex1, texCoords1).xxx;
 				gl_FragColor = vec4((c-0.5)*contrast,1.0);
-			";
+			}";
+
+		private const string FragmentShaderSmooth = @"
+			varying lowp vec2 texCoords1;
+			uniform lowp sampler2D tex1;
+
+			uniform lowp float contrast;
+
+			void main() {
+				lowp vec3 c = texture2D(tex1, texCoords1).xxx;
+				lowp vec3 res = smoothstep(.5-contrast, .5+contrast, c);
+				gl_FragColor = vec4(res,1.0);
+			}";
 
 		private static SDFShaderProgram instance;
 
