@@ -32,6 +32,13 @@ namespace Lime
 		public float OutlineSoftness;
 		public bool OutlineEnabled;
 		public Color4 OutlineColor;
+		public SDFUnderlayMaterialProvider UnderlayMaterialProvider;
+		public SDFUnderlayMaterial UnderlayMaterial => UnderlayMaterialProvider.Material;
+		public Vector2 UnderlayOffset;
+		public float UnderlaySoftness;
+		public float UnderlayDilate;
+		public bool UnderlayEnabled;
+		public Color4 UnderlayColor;
 
 		protected override void OnRelease()
 		{
@@ -40,6 +47,7 @@ namespace Lime
 			Material = null;
 			SDFMaterialProvider = null;
 			OutlineMaterialProvider = null;
+			UnderlayMaterialProvider = null;
 		}
 
 		public override void Render()

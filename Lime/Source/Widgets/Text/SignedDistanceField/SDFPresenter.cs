@@ -15,6 +15,7 @@ namespace Lime
 		public SDFPresenter()
 		{
 			renderActions = new SDFRenderAction[] {
+				new SDFRenderActionUnderlay(),
 				new SDFRenderActionMain(),
 				new SDFRenderActionOutline(),
 			};
@@ -62,7 +63,13 @@ namespace Lime
 			ro.Thickness = component.Thickness;
 			ro.OutlineSoftness = component.OutlineSoftness;
 			ro.OutlineEnabled = component.OutlineEnabled;
-			
+			ro.UnderlayMaterialProvider = component.UnderlayMaterialProvider;
+			ro.UnderlayColor = component.UnderlayColor;
+			ro.UnderlayDilate = component.UnderlayDilate;
+			ro.UnderlaySoftness = component.UnderlaySoftness;
+			ro.UnderlayOffset = component.UnderlayOffset;
+			ro.UnderlayEnabled = component.UnderlayEnabled;
+
 			return ro;
 		}
 

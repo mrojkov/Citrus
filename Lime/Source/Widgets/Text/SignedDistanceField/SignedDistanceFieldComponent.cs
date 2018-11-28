@@ -8,15 +8,17 @@ namespace Lime
 	{
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
+		private const string GroupUnderlay = "02. Underlay";
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 1f;
 		private const float MinimumDilate = -0.5f;
 		private const float MaximumDilate = 0.5f;
 		private const float MinimumThickness = 0f;
-		private const float MaximumThickness = 1f;
+		private const float MaximumThickness = 0.5f;
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
 		internal SDFOutlineMaterialProvider OutlineMaterialProvider { get; private set; } = new SDFOutlineMaterialProvider();
+		internal SDFUnderlayMaterialProvider UnderlayMaterialProvider { get; private set; } = new SDFUnderlayMaterialProvider();
 
 		private SDFPresenter presenter = new SDFPresenter();
 		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
@@ -24,6 +26,9 @@ namespace Lime
 		private float outlineSoftness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
+		private float underlaySoftness = 0f;
+		private float underlayDilate = 0f;
+		private Vector2 underlayOffset = new Vector2();
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]
@@ -56,12 +61,45 @@ namespace Lime
 			get => thickness;
 			set => thickness = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
 		}
+
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
 		public float OutlineSoftness
 		{
 			get => outlineSoftness;
 			set => outlineSoftness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupUnderlay)]
+		public bool UnderlayEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupUnderlay)]
+		public Color4 UnderlayColor { get; set; } = new Color4(0, 0, 0, 255);
+
+		[YuzuMember]
+		[TangerineGroup(GroupUnderlay)]
+		public Vector2 UnderlayOffset
+		{
+			get => underlayOffset;
+			set => underlayOffset = value;
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupUnderlay)]
+		public float UnderlaySoftness
+		{
+			get => underlaySoftness;
+			set => underlaySoftness = value;
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupUnderlay)]
+		public float UnderlayDilate
+		{
+			get => underlayDilate;
+			set => underlayDilate = value;
 		}
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
