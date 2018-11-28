@@ -204,7 +204,7 @@ namespace Lime
 
 				Console.WriteLine("Missing texture '{0}'", path);
 				onTextureMissing?.Invoke(path);
-				LoadStubImage(!path.IsNullOrWhiteSpace());
+				LoadStubImage(IsStubTextureTransparent && !path.IsNullOrWhiteSpace());
 			} finally {
 				reloader = new TextureBundleReloader(path);
 			}
