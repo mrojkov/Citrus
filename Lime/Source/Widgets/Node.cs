@@ -350,7 +350,7 @@ namespace Lime
 						return a;
 					}
 				}
-				a = new Animation() { IsLegacy = true };
+				a = new Animation() { Id = null, IsLegacy = true };
 				Animations.Add(a);
 				return a;
 			}
