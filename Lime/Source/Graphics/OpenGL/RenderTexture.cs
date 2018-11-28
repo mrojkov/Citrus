@@ -104,7 +104,9 @@ namespace Lime
 				TextureTarget.Texture2D,
 				handle,
 				level: 0);
-			AttachRenderBuffer(FramebufferSlot.StencilAttachment, (RenderbufferInternalFormat)All.Depth24Stencil8Oes, out depthStencilBuffer);
+			AttachRenderBuffer(
+				new[] { FramebufferSlot.DepthAttachment, FramebufferSlot.StencilAttachment },
+				(RenderbufferInternalFormat)All.Depth24Stencil8Oes, out depthStencilBuffer);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			Renderer.Clear(Color4.Black);
@@ -113,14 +115,16 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
-		private void AttachRenderBuffer(FramebufferSlot attachement, RenderbufferInternalFormat format, out uint handle)
+		private void AttachRenderBuffer(FramebufferSlot[] attachments, RenderbufferInternalFormat format, out uint handle)
 		{
 			var t = new uint[1];
 			GL.GenRenderbuffers(1, t);
 			handle = t[0];
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, handle);
 			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, format, size.Width, size.Height);
-			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachement, RenderbufferTarget.Renderbuffer, handle);
+			foreach (var a in attachments) {
+				GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, a, RenderbufferTarget.Renderbuffer, handle);
+			}
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
 			PlatformRenderer.CheckErrors();
 		}
