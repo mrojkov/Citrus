@@ -3,8 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterComponent]
-	//[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
-	[AllowedComponentOwnerTypes(typeof(Widget))]
+	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
 	class SignedDistanceFieldComponent : NodeBehavior
 	{
 		private const string GroupFont = "01. Face";
@@ -16,8 +15,8 @@ namespace Lime
 		private const float MinimumThickness = 0f;
 		private const float MaximumThickness = 1f;
 
-		internal SignedDistanceFieldMaterial SDFMaterial { get; private set; } = new SignedDistanceFieldMaterial();
-		internal SDFOutlineMaterial OutlineMaterial { get; private set; } = new SDFOutlineMaterial();
+		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
+		internal SDFOutlineMaterialProvider OutlineMaterialProvider { get; private set; } = new SDFOutlineMaterialProvider();
 
 		private SDFPresenter presenter = new SDFPresenter();
 		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
@@ -41,10 +40,6 @@ namespace Lime
 			get => dilate;
 			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
 		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupFont)]
-		public Color4 FaceColor { get; set; } = new Color4(255, 255, 255, 255);
 
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
@@ -107,7 +102,8 @@ namespace Lime
 			var clone = (SignedDistanceFieldComponent)base.Clone();
 			clone.presenter = (SDFPresenter)presenter.Clone();
 			clone.renderChainBuilder = (SDFRenderChainBuilder)renderChainBuilder.Clone(null);
-			clone.SDFMaterial = (SignedDistanceFieldMaterial)SDFMaterial.Clone();
+			clone.SDFMaterialProvider = (SDFMaterialProvider)SDFMaterialProvider.Clone();
+			clone.OutlineMaterialProvider = (SDFOutlineMaterialProvider)OutlineMaterialProvider.Clone();
 			return clone;
 		}
 	}

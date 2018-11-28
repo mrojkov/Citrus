@@ -13,16 +13,10 @@ namespace Lime
 
 		public override void Do(SDFRenderObject ro)
 		{
-			ro.PrepareOffscreenRendering(ro.Size);
 			ro.SDFMaterial.Softness = ro.Softness;
 			ro.SDFMaterial.Dilate = ro.Dilate;
-			ro.RenderToTexture(ro.SDFBuffer.Texture, ro.SourceTextureBuffer.Texture, ro.SDFMaterial, ro.FaceColor, Color4.Zero);
-			ro.CurrentBufferSize = (Vector2)ro.SDFBuffer.Size;
-			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
-
-			ro.SDFBuffer.SetRenderParameters(ro);
-			ro.MarkBuffersAsDirty = true;
-			ro.ProcessedTexture = ro.SDFBuffer.Texture;
+			ro.SDFMaterial.Color = ro.Color;
+			ro.RenderSpriteList(ro.SDFMaterialProvider);
 		}
 
 		internal new class Buffer : SDFRenderAction.Buffer

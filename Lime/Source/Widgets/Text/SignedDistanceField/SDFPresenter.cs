@@ -18,10 +18,8 @@ namespace Lime
 		public SDFPresenter()
 		{
 			renderActions = new SDFRenderAction[] {
-				new SDFRenderActionTextureBuilder(),
 				new SDFRenderActionMain(),
 				new SDFRenderActionOutline(),
-				new SDFRenderActionTextureRender(),
 			};
 		}
 
@@ -35,6 +33,17 @@ namespace Lime
 			var ro = RenderObjectPool<SDFRenderObject>.Acquire();
 			try {
 				component.GetOwnerRenderObjects(renderChain, ro.Objects);
+				foreach (var item in ro.Objects) {
+					var simpleTextRO = item as SimpleText.RenderObject;
+					if (simpleTextRO != null) {
+						ro.FaceColor = simpleTextRO.Color;
+						ro.SpriteList = simpleTextRO.SpriteList;
+					} else {
+						var richTextRO = item as RichText.RenderObject;
+						ro.FaceColor = richTextRO.Color;
+						ro.SpriteList = richTextRO.SpriteList;
+					}
+				}
 			} finally {
 				renderChain.Clear();
 			}
@@ -64,11 +73,10 @@ namespace Lime
 			ro.SourceTextureBuffer = sourceTextureBuffer;
 			ro.SourceTextureScaling = sourceTextureScaling;
 			ro.SDFBuffer = SDFBuffer;
-			ro.SDFMaterial = component.SDFMaterial;
+			ro.SDFMaterialProvider = component.SDFMaterialProvider;
 			ro.Softness = component.Softness;
 			ro.Dilate = component.Dilate;
-			ro.FaceColor = component.FaceColor;
-			ro.OutlineMaterial = component.OutlineMaterial;
+			ro.OutlineMaterialProvider = component.OutlineMaterialProvider;
 			ro.OutlineBuffer = OutlineBuffer;
 			ro.OutlineColor = component.OutlineColor;
 			ro.Thickness = component.Thickness;

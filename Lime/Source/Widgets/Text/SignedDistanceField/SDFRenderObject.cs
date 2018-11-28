@@ -18,6 +18,7 @@ namespace Lime
 		public Vector2 CurrentBufferSize;
 
 		public readonly RenderObjectList Objects = new RenderObjectList();
+		public SpriteList SpriteList;
 		public SDFRenderAction[] RenderActions;
 		public IMaterial Material;
 		public Matrix32 LocalToWorldTransform;
@@ -31,12 +32,14 @@ namespace Lime
 		public float SourceTextureScaling;
 
 		public SDFRenderActionMain.Buffer SDFBuffer;
-		public SignedDistanceFieldMaterial SDFMaterial;
+		public SDFMaterialProvider SDFMaterialProvider;
+		public SignedDistanceFieldMaterial SDFMaterial => SDFMaterialProvider.Material;
 		public float Softness;
 		public float Dilate;
 		public Color4 FaceColor;
 		public SDFRenderActionOutline.Buffer OutlineBuffer;
-		public SDFOutlineMaterial OutlineMaterial;
+		public SDFOutlineMaterialProvider OutlineMaterialProvider;
+		public SDFOutlineMaterial OutlineMaterial => OutlineMaterialProvider.Material;
 		public float Thickness;
 		public float OutlineSoftness;
 		public bool OutlineEnabled;
@@ -48,9 +51,9 @@ namespace Lime
 			SourceTextureBuffer = null;
 			Material = null;
 			SDFBuffer = null;
-			SDFMaterial = null;
+			SDFMaterialProvider = null;
 			OutlineBuffer = null;
-			OutlineMaterial = null;
+			OutlineMaterialProvider = null;
 		}
 
 		public override void Render()
@@ -74,7 +77,7 @@ namespace Lime
 					}
 				}
 			} finally {
-				FinalizeOffscreenRendering();
+				//FinalizeOffscreenRendering();
 			}
 		}
 
@@ -99,6 +102,12 @@ namespace Lime
 			var uv1 = customUV1 ?? ProcessedUV1;
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.DrawSprite(texture, null, customMaterial ?? Material, Color, Position, Size, UV0 * uv1, UV1 * uv1, Vector2.Zero, Vector2.Zero);
+		}
+
+		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider)
+		{
+			Renderer.Transform1 = LocalToWorldTransform;
+			SpriteList.Render(FaceColor, materialProvider);
 		}
 
 		internal void PrepareOffscreenRendering(Vector2 orthogonalProjection)
