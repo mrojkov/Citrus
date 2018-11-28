@@ -66,7 +66,6 @@ namespace Lime
 		public Animation()
 		{
 			Markers = new MarkerList(this);
-			Id = "";
 		}
 
 		public void Advance(float delta)
