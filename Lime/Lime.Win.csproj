@@ -318,8 +318,6 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionOutline.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionTextureBuilder.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionTextureRender.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SignedDistanceFieldComponent.cs" />

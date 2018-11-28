@@ -11,9 +11,6 @@ namespace Lime
 		private Blending blending;
 		private ShaderId shader;
 		private bool opaque;
-		private SDFRenderAction.Buffer sourceTextureBuffer;
-		private SDFRenderActionMain.Buffer SDFBuffer;
-		private SDFRenderActionOutline.Buffer OutlineBuffer;
 
 		public SDFPresenter()
 		{
@@ -48,20 +45,7 @@ namespace Lime
 				renderChain.Clear();
 			}
 
-			sourceTextureBuffer?.MarkAsDirty();
-
 			var widget = (Widget)node;
-			var bufferSize = new Size((int)widget.Width, (int)widget.Height);
-			var sourceTextureScaling = 1f;
-			if (sourceTextureBuffer?.Size != bufferSize) {
-				sourceTextureBuffer = new SDFRenderAction.Buffer(bufferSize);
-			}
-			if (SDFBuffer?.Size != bufferSize) {
-				SDFBuffer = new SDFRenderActionMain.Buffer(bufferSize);
-			}
-			if (OutlineBuffer?.Size != bufferSize) {
-				OutlineBuffer = new SDFRenderActionOutline.Buffer(bufferSize);
-			}
 			ro.RenderActions = renderActions;
 			ro.Material = GetMaterial(widget, component);
 			ro.LocalToWorldTransform = widget.LocalToWorldTransform;
@@ -70,14 +54,10 @@ namespace Lime
 			ro.Color = widget.GlobalColor;
 			ro.UV0 = Vector2.Zero;
 			ro.UV1 = Vector2.One;
-			ro.SourceTextureBuffer = sourceTextureBuffer;
-			ro.SourceTextureScaling = sourceTextureScaling;
-			ro.SDFBuffer = SDFBuffer;
 			ro.SDFMaterialProvider = component.SDFMaterialProvider;
 			ro.Softness = component.Softness;
 			ro.Dilate = component.Dilate;
 			ro.OutlineMaterialProvider = component.OutlineMaterialProvider;
-			ro.OutlineBuffer = OutlineBuffer;
 			ro.OutlineColor = component.OutlineColor;
 			ro.Thickness = component.Thickness;
 			ro.OutlineSoftness = component.OutlineSoftness;
