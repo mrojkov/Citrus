@@ -297,30 +297,9 @@ namespace Tangerine.Panels
 				AddNode(treeNodeWidget);
 
 				if (parentTreeNode != null) {
-					bool parentFirstUpdate = true;
-					this.AddChangeWatcher(
-						() => rootNode.NextSibling,
-						_ => {
-							if (parentFirstUpdate) {
-								parentFirstUpdate = false;
-								// Skip first update for the sake of optimization.
-								return;
-							}
-							parentTreeNode.UpdateChildren();
-						});
+					this.AddChangeWatcher(() => rootNode.NextSibling, _ => parentTreeNode.UpdateChildren());
 				}
-				bool childrenFirstUpdate = true;
-				this.AddChangeWatcher(
-					() => rootNode.Nodes.Count,
-					_ => {
-						if (childrenFirstUpdate) {
-							childrenFirstUpdate = false;
-							// Skip first update for the sake of optimization.
-							return;
-						}
-						UpdateChildren();
-					});
-
+				this.AddChangeWatcher(() => rootNode.Nodes.Version, _ => UpdateChildren());
 				UpdateChildren();
 			}
 
