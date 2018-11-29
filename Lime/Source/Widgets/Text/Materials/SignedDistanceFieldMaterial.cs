@@ -12,11 +12,13 @@ namespace Lime
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> softnessKey;
 		private readonly ShaderParamKey<float> dilateKey;
-		private readonly ShaderParamKey<Vector4> colorKey;
+		private readonly ShaderParamKey<float> thicknessKey;
+		private readonly ShaderParamKey<Vector4> outlineColorKey;
 
 		public float Softness { get; set; } = 0f;
 		public float Dilate { get; set; } = 0f;
-		public Color4 Color { get; set; } = Color4.White;
+		public float Thickness { get; set; } = 0f;
+		public Color4 OutlineColor { get; set; } = Color4.Black;
 
 		public int PassCount => 1;
 
@@ -29,14 +31,16 @@ namespace Lime
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			softnessKey = shaderParams.GetParamKey<float>("softness");
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
-			colorKey = shaderParams.GetParamKey<Vector4>("textColor");
+			thicknessKey = shaderParams.GetParamKey<float>("thickness");
+			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
 		}
 
 		public void Apply(int pass)
 		{
 			shaderParams.Set(softnessKey, Softness);
 			shaderParams.Set(dilateKey, 0.5f - Dilate);
-			shaderParams.Set(colorKey, Color.ToVector4());
+			shaderParams.Set(thicknessKey, -Thickness);
+			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -49,6 +53,7 @@ namespace Lime
 			return new SignedDistanceFieldMaterial(blending) {
 				Softness = Softness,
 				Dilate = Dilate,
+				Thickness = Thickness,
 			};
 		}
 	}
@@ -89,12 +94,15 @@ namespace Lime
 
 			uniform lowp float softness;
 			uniform lowp float dilate;
-			uniform lowp vec4 textColor;
+			uniform lowp float thickness;
+			uniform lowp vec4 outlineColor;
 
 			void main() {
-				lowp float c = texture2D(tex1, texCoords1).r;
-				lowp float alpha = smoothstep(dilate-softness, dilate+softness, c);
-				gl_FragColor = vec4(color.rgb, alpha * color.a);
+				lowp float distance = texture2D(tex1, texCoords1).r;
+				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
+				lowp vec4 c = mix(outlineColor, color, outlineFactor);
+				lowp float alpha = smoothstep(dilate + thickness - softness, dilate + thickness + softness, distance);
+				gl_FragColor = vec4(c.rgb, c.a * alpha);
 			}";
 
 		private static SDFShaderProgram instance;

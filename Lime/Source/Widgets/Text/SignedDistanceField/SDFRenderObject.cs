@@ -26,11 +26,7 @@ namespace Lime
 		public float Softness;
 		public float Dilate;
 		public Color4 FaceColor;
-		public SDFOutlineMaterialProvider OutlineMaterialProvider;
-		public SDFOutlineMaterial OutlineMaterial => OutlineMaterialProvider.Material;
 		public float Thickness;
-		public float OutlineSoftness;
-		public bool OutlineEnabled;
 		public Color4 OutlineColor;
 		public SDFUnderlayMaterialProvider UnderlayMaterialProvider;
 		public SDFUnderlayMaterial UnderlayMaterial => UnderlayMaterialProvider.Material;
@@ -46,7 +42,6 @@ namespace Lime
 			SpriteList = null;
 			Material = null;
 			SDFMaterialProvider = null;
-			OutlineMaterialProvider = null;
 			UnderlayMaterialProvider = null;
 		}
 

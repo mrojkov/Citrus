@@ -17,7 +17,6 @@ namespace Lime
 			renderActions = new SDFRenderAction[] {
 				new SDFRenderActionUnderlay(),
 				new SDFRenderActionMain(),
-				new SDFRenderActionOutline(),
 			};
 		}
 
@@ -58,11 +57,8 @@ namespace Lime
 			ro.SDFMaterialProvider = component.SDFMaterialProvider;
 			ro.Softness = component.Softness;
 			ro.Dilate = component.Dilate;
-			ro.OutlineMaterialProvider = component.OutlineMaterialProvider;
 			ro.OutlineColor = component.OutlineColor;
 			ro.Thickness = component.Thickness;
-			ro.OutlineSoftness = component.OutlineSoftness;
-			ro.OutlineEnabled = component.OutlineEnabled;
 			ro.UnderlayMaterialProvider = component.UnderlayMaterialProvider;
 			ro.UnderlayColor = component.UnderlayColor;
 			ro.UnderlayDilate = component.UnderlayDilate;

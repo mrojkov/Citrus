@@ -17,13 +17,11 @@ namespace Lime
 		private const float MaximumThickness = 0.5f;
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
-		internal SDFOutlineMaterialProvider OutlineMaterialProvider { get; private set; } = new SDFOutlineMaterialProvider();
 		internal SDFUnderlayMaterialProvider UnderlayMaterialProvider { get; private set; } = new SDFUnderlayMaterialProvider();
 
 		private SDFPresenter presenter = new SDFPresenter();
 		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
 		private float softness = 0f;
-		private float outlineSoftness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
 		private float underlaySoftness = 0f;
@@ -48,10 +46,6 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
-		public bool OutlineEnabled { get; set; }
-
-		[YuzuMember]
-		[TangerineGroup(GroupOutline)]
 		public Color4 OutlineColor { get; set; } = new Color4(0, 0, 0, 255);
 
 		[YuzuMember]
@@ -60,14 +54,6 @@ namespace Lime
 		{
 			get => thickness;
 			set => thickness = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupOutline)]
-		public float OutlineSoftness
-		{
-			get => outlineSoftness;
-			set => outlineSoftness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
 		}
 
 		[YuzuMember]
@@ -141,7 +127,6 @@ namespace Lime
 			clone.presenter = (SDFPresenter)presenter.Clone();
 			clone.renderChainBuilder = (SDFRenderChainBuilder)renderChainBuilder.Clone(null);
 			clone.SDFMaterialProvider = (SDFMaterialProvider)SDFMaterialProvider.Clone();
-			clone.OutlineMaterialProvider = (SDFOutlineMaterialProvider)OutlineMaterialProvider.Clone();
 			return clone;
 		}
 	}
