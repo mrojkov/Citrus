@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -166,10 +166,10 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 							Vector2 useSize = new Vector2(
 								Math.Abs(widget.Scale.X) < FloatSignificantDelta
 									? widget.Size.X
-									: widget.Size.X * Math.Abs(useScale.X / widget.Scale.X),
+									: widget.Size.X * useScale.X / widget.Scale.X,
 								Math.Abs(widget.Scale.Y) < FloatSignificantDelta
 									? widget.Size.Y
-									: widget.Size.Y * Math.Abs(useScale.Y / widget.Scale.Y)
+									: widget.Size.Y * useScale.Y / widget.Scale.Y
 							);
 							SetAnimableProperty.Perform(widget, nameof(Widget.Size), useSize,
 								CoreUserPreferences.Instance.AutoKeyframes);
