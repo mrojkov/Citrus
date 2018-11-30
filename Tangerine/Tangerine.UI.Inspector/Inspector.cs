@@ -126,11 +126,11 @@ namespace Tangerine.UI.Inspector
 			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
-			// contentWidget.MaxScrollPosition is not updated on current frame
-			contentWidget.LateTasks.Add(UpdateScrollPosition);
+			// Delay UpdateScrollPosition, since contentWidget.MaxScrollPosition is not updated yet.
+			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
 		}
 
-		private IEnumerator<object> UpdateScrollPosition()
+		private IEnumerator<object> UpdateScrollPositionOnNextUpdate()
 		{
 			var nodes = Document.Current.InspectRootNode
 				? new[] { Document.Current.RootNode }
