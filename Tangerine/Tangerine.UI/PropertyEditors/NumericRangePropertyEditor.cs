@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.ExpressionParser;
@@ -22,15 +23,15 @@ namespace Tangerine.UI
 			var currentDisp = CoalescedPropertyComponentValue(v => v.Dispersion);
 			medEditor.Submitted += text => SetComponent(editorParams, 0, medEditor, currentMed.GetValue());
 			dispEditor.Submitted += text => SetComponent(editorParams, 1, dispEditor, currentDisp.GetValue());
-			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.ToString());
-			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.ToString());
+			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
-		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, float currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
 		{
 			if (Parser.TryParse(editor.Text, out double newValue)) {
 				DoTransaction(() => {
-					SetProperty<NumericRange>((current) => {
+					SetProperty<NumericRange>(current => {
 						if (component == 0) {
 							current.Median = (float)newValue;
 						} else {
@@ -39,9 +40,11 @@ namespace Tangerine.UI
 						return current;
 					});
 				});
-				editor.Text = newValue.ToString();
+				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.ToString();
+				editor.Text = currentValue.IsUndefined
+						? currentValue.Value.ToString("0.###")
+						: ManyValuesText;
 			}
 		}
 

@@ -39,8 +39,20 @@ namespace Tangerine.UI
 			}
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
-			selectorH.AddChangeWatcher(currentX, v => selectorH.Value = v);
-			selectorV.AddChangeWatcher(currentY, v => selectorV.Value = v);
+			selectorH.AddChangeWatcher(currentX, v => {
+				if (v.IsUndefined) {
+					selectorH.Value = v.Value;
+				} else {
+					selectorH.Text = ManyValuesText;
+				}
+			});
+			selectorV.AddChangeWatcher(currentY, v => {
+				if (v.IsUndefined) {
+					selectorV.Value = v.Value;
+				} else {
+					selectorV.Text = ManyValuesText;
+				}
+			});
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, Type t)

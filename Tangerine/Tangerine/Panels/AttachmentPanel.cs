@@ -1085,11 +1085,11 @@ namespace Tangerine
 					if (int.TryParse(text, out var newValue)) {
 						SetProperty(new BlendingOption(newValue));
 					} else {
-						editor.Text = current.GetValue().Frames.ToString();
+						editor.Text = current.GetValue().Value.Frames.ToString();
 					}
 				};
 				editor.MaxWidth = float.PositiveInfinity;
-				editor.AddChangeWatcher(current, v => editor.Text = v?.Frames.ToString() ?? "0");
+				editor.AddChangeWatcher(current, v => editor.Text = v.Value.Frames.ToString() ?? "0");
 			}
 		}
 

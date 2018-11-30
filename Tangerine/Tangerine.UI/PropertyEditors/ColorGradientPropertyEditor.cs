@@ -35,8 +35,8 @@ namespace Tangerine.UI
 				Padding = new Thickness { Right = 5f, Bottom = 5f}
 			};
 			var gradientProperty = CoalescedPropertyValue(new ColorGradient(Color4.White, Color4.Black)).DistinctUntilChanged();
-			gradientControlWidget.Gradient = gradientProperty.GetValue();
-			ContainerWidget.AddChangeWatcher(gradientProperty, g => gradientControlWidget.Gradient = g);
+			gradientControlWidget.Gradient = gradientProperty.GetValue().Value;
+			ContainerWidget.AddChangeWatcher(gradientProperty, g => gradientControlWidget.Gradient = g.Value);
 			gradientControlWidget.SelectionChanged += SelectPoint;
 			EditorContainer.AddNode(gradientControlWidget);
 			EditorContainer.AddNode(CreatePipetteButton());

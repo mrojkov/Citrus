@@ -9,6 +9,8 @@ namespace Tangerine.UI
 {
 	public class CommonPropertyEditor<T> : IPropertyEditor
 	{
+		protected const string ManyValuesText = "<many values>";
+
 		public IPropertyEditorParams EditorParams { get; private set; }
 		public Widget ContainerWidget { get; private set; }
 		public SimpleText PropertyLabel { get; private set; }
@@ -98,7 +100,7 @@ namespace Tangerine.UI
 		{
 			var v = CoalescedPropertyValue().GetValue();
 			try {
-				Clipboard.Text = Serialize(v);
+				Clipboard.Text = Serialize(v.Value);
 			} catch (System.Exception) { }
 		}
 
@@ -147,65 +149,71 @@ namespace Tangerine.UI
 
 		public virtual void DropFiles(IEnumerable<string> files) { }
 
-		protected IDataflowProvider<T> CoalescedPropertyValue(T defaultValue = default(T))
+		protected IDataflowProvider<T> PropertyValue(object o)
 		{
 			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
-			if (indexParameters.Length == 0) {
-				IDataflowProvider<T> provider = null;
-				foreach (var o in EditorParams.Objects) {
-					var p = new Property<T>(o, EditorParams.PropertyName);
-					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				}
-				return provider;
-			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
-				IDataflowProvider<T> provider = null;
-				foreach (var o in EditorParams.Objects) {
-					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
-					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				}
-				return provider;
-			} else {
-				throw new NotSupportedException();
+			switch (indexParameters.Length)
+			{
+				case 0:
+					return new Property<T>(o, EditorParams.PropertyName);
+				case 1 when indexParameters[0].ParameterType == typeof(int):
+					return new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
+				default:
+					throw new NotSupportedException();
 			}
 		}
 
-		protected IDataflowProvider<T> PropertyValue(object o, T defaultValue = default(T))
+		protected IDataflowProvider<CoalescedValue<T>> CoalescedPropertyValue(T defaultValue = default, Func<T, T, bool> comparator = null)
 		{
 			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
-			if (indexParameters.Length == 0) {
-				IDataflowProvider<T> provider = null;
-				var p = new Property<T>(o, EditorParams.PropertyName);
-				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				return provider;
-			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
-				IDataflowProvider<T> provider = null;
-				var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList);
-				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				return provider;
-			} else {
-				throw new NotSupportedException();
+			var provider = new CoalescedValuesProvider<T>(defaultValue, comparator);
+			switch (indexParameters.Length) {
+				case 0:
+					foreach (var o in EditorParams.Objects) {
+						provider.AddDataflow(new Property<T>(o, EditorParams.PropertyName));
+					}
+					return new DataflowProvider<CoalescedValue<T>>(() => provider);
+				case 1 when indexParameters[0].ParameterType == typeof(int):
+					foreach (var o in EditorParams.Objects) {
+						provider.AddDataflow(new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList));
+					}
+					return new DataflowProvider<CoalescedValue<T>>(() => provider);
+				default:
+					throw new NotSupportedException();
 			}
 		}
 
-		protected IDataflowProvider<ComponentType> CoalescedPropertyComponentValue<ComponentType>(Func<T, ComponentType> selector, ComponentType defaultValue = default(ComponentType))
+		protected IDataflowProvider<CoalescedValue<ComponentValue>> CoalescedPropertyComponentValue<ComponentValue>(Func<T, ComponentValue> selector,
+			ComponentValue defaultValue = default)
 		{
 			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
-			if (indexParameters.Length == 0) {
-				IDataflowProvider<ComponentType> provider = null;
-				foreach (var o in EditorParams.Objects) {
-					var p = new Property<T>(o, EditorParams.PropertyName).Select(selector);
-					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				}
-				return provider;
-			} else if (indexParameters.Length == 1 && indexParameters.First().ParameterType == typeof(int)) {
-				IDataflowProvider<ComponentType> provider = null;
-				foreach (var o in EditorParams.Objects) {
-					var p = new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList).Select(selector);
-					provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
-				}
-				return provider;
-			} else {
-				throw new NotSupportedException();
+			var provider = new CoalescedValuesProvider<ComponentValue>(defaultValue);
+			switch (indexParameters.Length) {
+				case 0:
+					foreach (var o in EditorParams.Objects) {
+						provider.AddDataflow(new Property<T>(o, EditorParams.PropertyName).Select(selector));
+					}
+					return new DataflowProvider<CoalescedValue<ComponentValue>>(() => provider);
+				case 1 when indexParameters[0].ParameterType == typeof(int):
+					foreach (var o in EditorParams.Objects) {
+						provider.AddDataflow(new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList).Select(selector));
+					}
+					return new DataflowProvider<CoalescedValue<ComponentValue>>(() => provider);
+				default:
+					throw new NotSupportedException();
+			}
+		}
+
+		protected IDataflowProvider<ComponentType> PropertyComponentValue<ComponentType>(object o, Func<T, ComponentType> selector)
+		{
+			var indexParameters = EditorParams.PropertyInfo.GetIndexParameters();
+			switch (indexParameters.Length) {
+				case 0:
+					return new Property<T>(o, EditorParams.PropertyName).Select(selector);
+				case 1 when indexParameters[0].ParameterType == typeof(int):
+					return new IndexedProperty<T>(o, EditorParams.PropertyName, EditorParams.IndexInList).Select(selector);
+				default:
+					throw new NotSupportedException();
 			}
 		}
 
@@ -242,6 +250,26 @@ namespace Tangerine.UI
 					}
 				}
 			});
+		}
+
+		protected bool SameValues()
+		{
+			if (!EditorParams.Objects.Any()) {
+				return false;
+			}
+			var first = PropertyValue(EditorParams.Objects.First()).GetValue();
+			return EditorParams.Objects.Aggregate(true,
+				(current, o) => current && EqualityComparer<T>.Default.Equals(first, PropertyValue(o).GetValue()));
+		}
+
+		protected bool SameComponentValues<ComponentType>(Func<T, ComponentType> selector)
+		{
+			if (!EditorParams.Objects.Any()) {
+				return false;
+			}
+			var first = PropertyComponentValue(EditorParams.Objects.First(), selector).GetValue();
+			return EditorParams.Objects.Aggregate(true,
+				(current, o) => current && EqualityComparer<ComponentType>.Default.Equals(first, PropertyComponentValue(o, selector).GetValue()));
 		}
 
 		public virtual void Submit()

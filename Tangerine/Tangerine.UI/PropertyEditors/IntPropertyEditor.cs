@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.ExpressionParser;
@@ -15,22 +16,22 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(editor);
 			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
-			editor.Submitted += text => SetComponent(text, current);
-			editor.AddChangeWatcher(current, v => editor.Text = v.ToString());
+			editor.Submitted += text => SetComponent(text, current.GetValue());
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString() : ManyValuesText);
 		}
 
-		public void SetComponent(string text, IDataflowProvider<int> current)
+		public void SetComponent(string text, CoalescedValue<int> current)
 		{
 			if (Parser.TryParse(text, out double newValue)) {
 				SetProperty((int)newValue);
 			}
-			editor.Text = current.GetValue().ToString();
+			editor.Text = current.IsUndefined ? current.Value.ToString() : ManyValuesText;
 		}
 
 		public override void Submit()
 		{
 			var current = CoalescedPropertyValue();
-			SetComponent(editor.Text, current);
+			SetComponent(editor.Text, current.GetValue());
 		}
 	}
 }

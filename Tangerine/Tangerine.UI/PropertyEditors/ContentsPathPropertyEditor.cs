@@ -32,7 +32,8 @@ namespace Tangerine.UI
 				SetProperty(path);
 				Document.Current.RefreshExternalScenes();
 			} else {
-				editor.Text = CoalescedPropertyValue().GetValue();
+				var value = CoalescedPropertyValue().GetValue();
+				editor.Text = value.IsUndefined ? value.Value : ManyValuesText;
 			}
 		}
 

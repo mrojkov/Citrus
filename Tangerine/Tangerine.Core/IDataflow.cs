@@ -207,6 +207,65 @@ namespace Tangerine.Core
 		public void Dispose() { }
 	}
 
+	public struct CoalescedValue<T>
+	{
+		public T Value { get; private set; }
+		public bool IsUndefined { get; private set; }
+
+		public CoalescedValue(T value, bool isUndefined)
+		{
+			Value = value;
+			IsUndefined = isUndefined;
+		}
+	}
+
+	public class CoalescedValuesProvider<T> : IDataflow<CoalescedValue<T>>
+	{
+		private readonly List<IDataflow<T>> dataflows = new List<IDataflow<T>>();
+		private readonly T defaultValue;
+		private readonly Func<T, T, bool> comparator;
+
+		public bool GotValue { get; private set; }
+		public CoalescedValue<T> Value { get; private set; }
+
+		public CoalescedValuesProvider(T defaultValue = default, Func<T, T, bool> comparator = null)
+		{
+			this.defaultValue = defaultValue;
+			this.comparator = comparator;
+		}
+
+		public void AddDataflow(IDataflow<T> dataflow)
+		{
+			dataflows.Add(dataflow);
+		}
+
+		public void Poll()
+		{
+			if (dataflows.Count == 0) {
+				return;
+			}
+			var areAllEqual = true;
+			dataflows[0].Poll();
+			var firstValue = dataflows[0].Value;
+			foreach (var dataflow in dataflows) {
+				dataflow.Poll();
+				GotValue = GotValue || dataflow.GotValue;
+				areAllEqual = areAllEqual && (comparator?.Invoke(firstValue, dataflow.Value) ??
+					 EqualityComparer<T>.Default.Equals(firstValue, dataflow.Value));
+			}
+			if (GotValue) {
+				Value = new CoalescedValue<T>(areAllEqual ? firstValue : defaultValue, areAllEqual);
+			}
+		}
+
+		public void Dispose()
+		{
+			foreach (var dataflow in dataflows) {
+				dataflow.Dispose();
+			}
+		}
+	}
+
 	public static class DataflowMixins
 	{
 		public static bool Poll<T>(this IDataflow<T> dataflow, out T value)
@@ -252,6 +311,11 @@ namespace Tangerine.Core
 		public static IDataflowProvider<T> Skip<T>(this IDataflowProvider<T> arg, int count)
 		{
 			return new DataflowProvider<T>(() => new SkipProvider<T>(arg.GetDataflow(), count));
+		}
+
+		public static void AddDataflow<T>(this CoalescedValuesProvider<T> coalescedValuesProvider, IDataflowProvider<T> provider)
+		{
+			coalescedValuesProvider.AddDataflow(provider.GetDataflow());
 		}
 
 		public static Consumer<T> Consume<T>(this IDataflowProvider<T> arg, Action<T> action)

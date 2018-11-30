@@ -22,20 +22,21 @@ namespace Tangerine.UI
 					Spacer.HStretch(),
 				}
 			});
-			var current = CoalescedPropertyValue();
-			editorLeft.Submitted += text => SetComponent(editorParams, 0, editorLeft, current.GetValue());
-			editorRight.Submitted += text => SetComponent(editorParams, 1, editorRight, current.GetValue());
-			editorTop.Submitted += text => SetComponent(editorParams, 2, editorTop, current.GetValue());
-			editorBottom.Submitted += text => SetComponent(editorParams, 3, editorBottom, current.GetValue());
-			editorLeft.AddChangeWatcher(current, v => {
-				editorLeft.Text = v.Left.ToString("0.###");
-				editorRight.Text = v.Right.ToString("0.###");
-				editorTop.Text = v.Top.ToString("0.###");
-				editorBottom.Text = v.Bottom.ToString("0.###");
-			});
+			var currentLeft = CoalescedPropertyComponentValue(v => v.Left);
+			var currentRight = CoalescedPropertyComponentValue(v => v.Right);
+			var currentTop = CoalescedPropertyComponentValue(v => v.Top);
+			var currentBottom = CoalescedPropertyComponentValue(v => v.Bottom);
+			editorLeft.Submitted += text => SetComponent(editorParams, 0, editorLeft, currentLeft.GetValue());
+			editorRight.Submitted += text => SetComponent(editorParams, 1, editorRight, currentRight.GetValue());
+			editorTop.Submitted += text => SetComponent(editorParams, 2, editorTop, currentTop.GetValue());
+			editorBottom.Submitted += text => SetComponent(editorParams, 3, editorBottom, currentBottom.GetValue());
+			editorLeft.AddChangeWatcher(currentLeft, v => editorLeft.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorRight.AddChangeWatcher(currentRight, v => editorRight.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorTop.AddChangeWatcher(currentTop, v => editorTop.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorBottom.AddChangeWatcher(currentBottom, v => editorBottom.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
-		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, Thickness currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -52,21 +53,24 @@ namespace Tangerine.UI
 				});
 			} else {
 				switch (component) {
-					case 0: editor.Text = currentValue.Left.ToString("0.###"); break;
-					case 1: editor.Text = currentValue.Right.ToString("0.###"); break;
-					case 2: editor.Text = currentValue.Top.ToString("0.###"); break;
-					case 3: editor.Text = currentValue.Bottom.ToString("0.###"); break;
+					case 0: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 1: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 2: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 3: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
 				}
 			}
 		}
 
 		public override void Submit()
 		{
-			var current = CoalescedPropertyValue();
-			SetComponent(EditorParams, 0, editorLeft, current.GetValue());
-			SetComponent(EditorParams, 1, editorRight, current.GetValue());
-			SetComponent(EditorParams, 2, editorTop, current.GetValue());
-			SetComponent(EditorParams, 3, editorBottom, current.GetValue());
+			var currentLeft = CoalescedPropertyComponentValue(v => v.Left);
+			var currentRight = CoalescedPropertyComponentValue(v => v.Right);
+			var currentTop = CoalescedPropertyComponentValue(v => v.Top);
+			var currentBottom = CoalescedPropertyComponentValue(v => v.Bottom);
+			SetComponent(EditorParams, 0, editorLeft, currentLeft.GetValue());
+			SetComponent(EditorParams, 1, editorRight, currentRight.GetValue());
+			SetComponent(EditorParams, 2, editorTop, currentTop.GetValue());
+			SetComponent(EditorParams, 3, editorBottom, currentBottom.GetValue());
 		}
 	}
 }

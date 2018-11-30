@@ -15,7 +15,7 @@ namespace Tangerine.UI
 			if (IsValid(path)) {
 				SetProperty(new SerializableTexture(path));
 			} else {
-				editor.Text = (CoalescedPropertyValue().GetValue() as SerializableTexture)?.SerializationPath;
+				editor.Text = (CoalescedPropertyValue().GetValue().Value as SerializableTexture)?.SerializationPath;
 				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
 			}
 		}

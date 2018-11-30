@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using Tangerine.Core;
 
@@ -19,20 +20,20 @@ namespace Tangerine.UI
 				}
 			});
 			var current = CoalescedPropertyValue();
-			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, current.GetValue());
-			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, current.GetValue());
-			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue());
+			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, current.GetValue().Value, q => q.ToEulerAngles().X);
+			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, current.GetValue().Value, q => q.ToEulerAngles().Y);
+			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue().Value, q => q.ToEulerAngles().Z);
 			editorX.AddChangeWatcher(current, v => {
-				var ea = v.ToEulerAngles() * Mathf.RadToDeg;
-				editorX.Text = RoundAngle(ea.X).ToString("0.###");
-				editorY.Text = RoundAngle(ea.Y).ToString("0.###");
-				editorZ.Text = RoundAngle(ea.Z).ToString("0.###");
+				var ea = v.Value.ToEulerAngles() * Mathf.RadToDeg;
+				editorX.Text = SameComponentValues(q => q.ToEulerAngles().X) ? RoundAngle(ea.X).ToString("0.###") : ManyValuesText;
+				editorY.Text = SameComponentValues(q => q.ToEulerAngles().Y) ? RoundAngle(ea.Y).ToString("0.###") : ManyValuesText;
+				editorZ.Text = SameComponentValues(q => q.ToEulerAngles().Z) ? RoundAngle(ea.Z).ToString("0.###") : ManyValuesText;
 			});
 		}
 
 		float RoundAngle(float value) => (value * 1000f).Round() / 1000f;
 
-		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, Quaternion currentValue)
+		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, Quaternion currentValue, Func<Quaternion, float> selector)
 		{
 			float newValue;
 			if (float.TryParse(editor.Text, out newValue)) {
@@ -44,16 +45,18 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString("0.###");
+				editor.Text = SameComponentValues(selector)
+					? RoundAngle(currentValue.ToEulerAngles()[component] * Mathf.RadToDeg).ToString("0.###")
+					: ManyValuesText;
 			}
 		}
 
 		public override void Submit()
 		{
 			var current = CoalescedPropertyValue();
-			SetComponent(EditorParams, 0, editorX, current.GetValue());
-			SetComponent(EditorParams, 1, editorY, current.GetValue());
-			SetComponent(EditorParams, 2, editorZ, current.GetValue());
+			SetComponent(EditorParams, 0, editorX, current.GetValue().Value, q => q.ToEulerAngles().X);
+			SetComponent(EditorParams, 1, editorY, current.GetValue().Value, q => q.ToEulerAngles().Y);
+			SetComponent(EditorParams, 2, editorZ, current.GetValue().Value, q => q.ToEulerAngles().Z);
 		}
 	}
 }
