@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Tangerine.Core
@@ -218,7 +217,6 @@ namespace Tangerine.Core
 			Value = value;
 			IsUndefined = isUndefined;
 		}
-
 	}
 
 	public class CoalescedValuesProvider<T> : IDataflow<CoalescedValue<T>>
@@ -243,7 +241,7 @@ namespace Tangerine.Core
 
 		public void Poll()
 		{
-			if (!dataflows.Any()) {
+			if (dataflows.Count == 0) {
 				return;
 			}
 			var areAllEqual = true;
