@@ -180,4 +180,37 @@ namespace Lime
 			return (IEnumerable<(string, object)>)fn.Invoke(o, new object[] { });
 		}
 	}
+
+	public abstract class TangerineValidationAttribute : Attribute
+	{
+		public abstract bool IsValid(object value);
+	}
+
+	public class TangerineValidRangeAttribute : TangerineValidationAttribute
+	{
+		public object Minimum { get; private set; }
+		public object Maximum { get; private set; }
+
+		public TangerineValidRangeAttribute(int minimum, int maximum)
+		{
+			Maximum = maximum;
+			Minimum = minimum;
+		}
+
+		public TangerineValidRangeAttribute(float minimum, float maximum)
+		{
+			Maximum = maximum;
+			Minimum = minimum;
+		}
+
+		public override bool IsValid(object value)
+		{
+			if (value == null) {
+				return true;
+			}
+			var min = (IComparable)Minimum;
+			var max = (IComparable)Maximum;
+			return min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0;
+		}
+	}
 }
