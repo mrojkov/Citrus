@@ -20,7 +20,8 @@ namespace Tangerine.UI
 
 		public void SetComponent(string text, CoalescedValue<float> current)
 		{
-			if (Parser.TryParse(text, out double newValue)) {
+			if (Parser.TryParse(text, out double newValue) &&
+			    PropertyValidator.ValidateValue((float)newValue, EditorParams.PropertyInfo)) {
 				SetProperty((float)newValue);
 			}
 			editor.Text = current.IsUndefined ? current.Value.ToString("0.###") : ManyValuesText;

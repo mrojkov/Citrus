@@ -63,6 +63,7 @@
     <Compile Include="SyncPresenters.cs" />
     <Compile Include="Operations\RemoveAnimationProcessor.cs" />
     <Compile Include="Operations\RenameAnimationProcessor.cs" />
+    <Compile Include="PropertyValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />

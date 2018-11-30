@@ -80,6 +80,7 @@
     <Compile Include="Operations\Modification.cs" />
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="PropertyAttributes.cs" />
+    <Compile Include="PropertyValidator.cs" />
     <Compile Include="ResolutionPreview.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="RowsSynchronizer.cs" />
