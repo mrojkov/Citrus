@@ -17,7 +17,8 @@ namespace Tangerine.UI.Inspector
 		private readonly InspectorContent content;
 		private readonly ThemedScrollView contentWidget;
 
-		private HashSet<Type> prevTypes { get; set; } = new HashSet<Type>();
+		private HashSet<Type> prevTypes = new HashSet<Type>();
+		private float prevPosition;
 
 		public static Inspector Instance { get; private set; }
 
@@ -122,17 +123,25 @@ namespace Tangerine.UI.Inspector
 
 		private void Rebuild()
 		{
-			var prevMax = contentWidget.MaxScrollPosition;
-			var nodes = Document.Current.InspectRootNode
-				? new[] {Document.Current.RootNode}
-				: Document.Current.SelectedNodes().ToArray();
-			var types = new HashSet<Type>(InspectorContent.GetTypes(nodes));
-			content.BuildForObjects(nodes);
+			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
-			if (contentWidget.MaxScrollPosition > prevMax || !types.SetEquals(prevTypes))
-				contentWidget.ScrollPosition = contentWidget.MinScrollPosition;
+			// Delay UpdateScrollPosition, since contentWidget.MaxScrollPosition is not updated yet.
+			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
+		}
+
+		private IEnumerator<object> UpdateScrollPositionOnNextUpdate()
+		{
+			var nodes = Document.Current.InspectRootNode
+				? new[] { Document.Current.RootNode }
+				: Document.Current.SelectedNodes().ToArray();
+			
+			var types = new HashSet<Type>(InspectorContent.GetTypes(nodes));
+			var areEqual = types.SetEquals(prevTypes);
+			contentWidget.ScrollPosition = areEqual ?
+				Math.Min(contentWidget.MaxScrollPosition, contentWidget.ScrollPosition) : contentWidget.MinScrollPosition;
 			prevTypes = types;
+			yield break;
 		}
 	}
 }
