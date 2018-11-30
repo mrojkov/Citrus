@@ -196,8 +196,9 @@ namespace Lime
 						OpacityMask = new OpacityMask(maskPath);
 					}
 
-					// Update audio buffers if the audio system performs in the main thread.
-					AudioSystem.Update();
+					if (Application.IsMain(Application.CurrentThread)) {
+						AudioSystem.Update();
+					}
 
 					return;
 				}
