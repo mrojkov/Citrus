@@ -97,7 +97,8 @@ namespace Tangerine.UI.Inspector
 					Document.Current.History.DoTransaction(() => {
 						SetKeyframe(!kf.HasValue);
 						if (!kf.HasValue) {
-							SetKeyFunction(KeyFunction.Linear);
+							keyFunctionFlow.Poll(out kf);
+							SetKeyFunction(kf ?? KeyFunction.Linear);
 						}
 					});
 				}
