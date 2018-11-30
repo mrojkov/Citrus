@@ -142,20 +142,8 @@ namespace Tangerine.UI
 
 		protected virtual bool IsValid(string path)
 		{
-			foreach (var c in path) {
-				if (!ValidChars.Contains(c)) {
-					return false;
-				}
-			}
-			return true;
+			return PropertyValidator.ValidateValue(path, EditorParams.PropertyInfo);
 		}
-
-		private static readonly char[] validSymbols = { '\\', '/', '_', '.', '!', '-' };
-		private static readonly IReadOnlyList<char> validchars =
-			Enumerable.Range(1, 128).Select(i => (char)i).
-			Where(c => char.IsLetterOrDigit(c) || validSymbols.Contains(c)).ToList();
-
-		protected virtual IEnumerable<char> ValidChars => validchars;
 
 		public string GetLongestCommonPrefix(List<string> paths)
 		{

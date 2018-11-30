@@ -20,15 +20,6 @@ namespace Tangerine.UI
 			}
 		}
 
-		private static readonly IReadOnlyList<char> validchars =
-			Enumerable.Range(1, 128).Select(i => (char)i).
-			Where(c =>
-				char.IsLetterOrDigit(c) ||
-				c == '\\' || c == '/' ||
-				c == '_' || c == '.' || c == '!' || c == '#').ToList();
-
-		protected override IEnumerable<char> ValidChars => validchars;
-
 		protected override string ValueToStringConverter(T obj) {
 			return (obj as SerializableTexture)?.SerializationPath ?? "";
 		}
