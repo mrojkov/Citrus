@@ -10,11 +10,15 @@ namespace Lime
 		private readonly Node owner;
 		private List<Node> list;
 
-		public int Count => list != null ? list.Count : 0;
+		public int Count => list?.Count ?? 0;
+
+#if TANGERINE
+		public int Version { get; private set; }
+#endif // TANGERINE
 
 		public NodeList(Node owner)
 		{
-			this.list = null;
+			list = null;
 			this.owner = owner;
 		}
 
@@ -36,18 +40,12 @@ namespace Lime
 
 		public int IndexOf(Node node)
 		{
-			if (list == null) {
-				return -1;
-			}
-			return list.IndexOf(node);
+			return list?.IndexOf(node) ?? -1;
 		}
 
 		public void CopyTo(Node[] array, int index)
 		{
-			if (list == null) {
-				return;
-			}
-			list.CopyTo(array, index);
+			list?.CopyTo(array, index);
 		}
 
 		/// <summary>
@@ -84,6 +82,9 @@ namespace Lime
 				list[Count - 1].NextSibling = null;
 			}
 			RefreshFirstChild();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		public bool Contains(Node node)
@@ -113,6 +114,9 @@ namespace Lime
 			list.Add(node);
 			RefreshFirstChild();
 			node.PropagateDirtyFlags();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		private void CreateListIfNeeded()
@@ -151,6 +155,9 @@ namespace Lime
 			RefreshFirstChild();
 			node.PropagateDirtyFlags();
 			Node.InvalidateNodeReferenceCache();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -165,6 +172,9 @@ namespace Lime
 			int index = IndexOf(node);
 			if (index >= 0) {
 				RemoveAt(index);
+#if TANGERINE
+				Version++;
+#endif // TANGERINE
 				return true;
 			}
 			return false;
@@ -198,6 +208,9 @@ namespace Lime
 			}
 			list = null;
 			RefreshFirstChild();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		/// <summary>
@@ -235,6 +248,9 @@ namespace Lime
 			}
 			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		public void RemoveAt(int index)
@@ -252,6 +268,9 @@ namespace Lime
 			}
 			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		public Node this[int index]
@@ -282,6 +301,9 @@ namespace Lime
 				RefreshFirstChild();
 				value.PropagateDirtyFlags();
 				Node.InvalidateNodeReferenceCache();
+#if TANGERINE
+				Version++;
+#endif // TANGERINE
 			}
 		}
 
@@ -314,6 +336,9 @@ namespace Lime
 			RefreshFirstChild();
 			Node.InvalidateNodeReferenceCache();
 			owner.AsWidget?.Layout.InvalidateConstraintsAndArrangement();
+#if TANGERINE
+			Version++;
+#endif // TANGERINE
 		}
 
 		private void RefreshFirstChild()
@@ -323,33 +348,28 @@ namespace Lime
 
 		public struct Enumerator : IEnumerator<Node>
 		{
-			private Node first;
-			private Node current;
+			private readonly Node first;
 
 			public Enumerator(Node first)
 			{
 				this.first = first;
-				current = null;
+				Current = null;
 			}
 
-			object IEnumerator.Current { get { return current; } }
+			object IEnumerator.Current => Current;
 
 			public bool MoveNext()
 			{
-				if (current == null) {
-					current = first;
-				} else {
-					current = current.NextSibling;
-				}
-				return current != null;
+				Current = Current == null ? first : Current.NextSibling;
+				return Current != null;
 			}
 
 			public void Reset()
 			{
-				current = null;
+				Current = null;
 			}
 
-			public Node Current { get { return current; } }
+			public Node Current { get; private set; }
 
 			public void Dispose() { }
 		}
