@@ -12,7 +12,7 @@ namespace Tangerine.Core.Operations
 		public override bool IsChangingDocument => true;
 
 		private readonly int column;
-		private int keyRemoveAt = -1;
+		private Dictionary<Node, int> keyRemoveAt = new Dictionary<Node, int>();
 		private int markerRemoveAt = -1;
 
 		private TimelineColumnRemove(int column)
@@ -29,29 +29,28 @@ namespace Tangerine.Core.Operations
 		{
 			protected override void InternalRedo(TimelineColumnRemove op)
 			{
-				int max;
+				op.keyRemoveAt.Clear();
 				foreach (var node in Document.Current.Container.Nodes) {
 					if (node.Animators.Count == 0) {
 						continue;
 					}
-					var occupied = new HashSet<int>();
-						max = 0;
+					if (!op.keyRemoveAt.ContainsKey(node)) {
+						var occupied = new HashSet<int>();
 						foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
 							foreach (var k in animator.ReadonlyKeys) {
 								occupied.Add(k.Frame);
-								max = k.Frame > max ? k.Frame : max;
 							}
 						}
-						op.keyRemoveAt = max + 1;
 						for (var i = op.column; ; ++i) {
 							if (!occupied.Contains(i)) {
-								op.keyRemoveAt = i;
+								op.keyRemoveAt[node] = i;
 								break;
 							}
 						}
+					}
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
 						foreach (var k in animator.ReadonlyKeys) {
-							if (k.Frame != 0 && k.Frame >= op.keyRemoveAt) {
+							if (k.Frame != 0 && k.Frame >= op.keyRemoveAt[node]) {
 								k.Frame -= 1;
 							}
 						}
@@ -63,17 +62,16 @@ namespace Tangerine.Core.Operations
 				if (markers.Count == 0) {
 					return;
 				}
-				var markersOccupied = new HashSet<int>();
-				max = 0;
-				foreach (var m in markers) {
-					markersOccupied.Add(m.Frame);
-					max = m.Frame > max ? m.Frame : max;
-				}
-				op.markerRemoveAt = max + 1;
-				for (var i = op.column; ; ++i) {
-					if (!markersOccupied.Contains(i)) {
-						op.markerRemoveAt = i;
-						break;
+				if (op.markerRemoveAt == -1) {
+					var markersOccupied = new HashSet<int>();
+					foreach (var m in markers) {
+						markersOccupied.Add(m.Frame);
+					}
+					for (var i = op.column; ; ++i) {
+						if (!markersOccupied.Contains(i)) {
+							op.markerRemoveAt = i;
+							break;
+						}
 					}
 				}
 				foreach (var m in markers) {
@@ -88,7 +86,7 @@ namespace Tangerine.Core.Operations
 				foreach (var node in Document.Current.Container.Nodes) {
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
 						foreach (var k in animator.ReadonlyKeys.Reverse()) {
-							if (k.Frame >= op.keyRemoveAt) {
+							if (k.Frame >= op.keyRemoveAt[node]) {
 								k.Frame += 1;
 							}
 						}
