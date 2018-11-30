@@ -389,7 +389,10 @@ namespace Lime
 			public Animation this[int index]
 			{
 				get => owner.Animations[ToInternalIndex(index)];
-				set => owner.Animations[ToInternalIndex(index)] = value;
+				set {
+					value.Id = value.Id ?? "";
+					owner.Animations[ToInternalIndex(index)] = value;
+				}
 			}
 
 			public int Count
@@ -433,6 +436,7 @@ namespace Lime
 				if (item != null && item.IsLegacy) {
 					throw new ArgumentException(nameof(item));
 				}
+				item.Id = item.Id ?? "";
 				owner.Animations.Add(item);
 			}
 
@@ -466,6 +470,7 @@ namespace Lime
 				if (item != null && item.IsLegacy) {
 					throw new ArgumentException(nameof(item));
 				}
+				item.Id = item.Id ?? "";
 				owner.Animations.Insert(ToInternalIndex(index), item);
 			}
 
