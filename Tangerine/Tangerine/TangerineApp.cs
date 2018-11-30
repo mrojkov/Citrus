@@ -261,6 +261,7 @@ namespace Tangerine
 			Document.NodeDecorators.AddFor<ParticleEmitter>(n => n.CompoundPostPresenter.Add(new UI.SceneView.ParticleEmitterPresenter()));
 			DocumentHistory.AddOperationProcessorTypes(new[] {
 				typeof(Core.Operations.TimelineHorizontalShift.Processor),
+				typeof(Core.Operations.TimelineColumnRemove.Processor),
 				typeof(Core.Operations.RemoveKeyframeRange.Processor),
 				typeof(Core.Operations.SelectRow.Processor),
 				typeof(Core.Operations.RenameAnimationProcessor),
