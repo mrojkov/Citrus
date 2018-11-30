@@ -1,3 +1,14 @@
+##### Changelog 30.11.2018
+
+* Исправлено медленное удаление столбца на таймлайне (через `Ctrl + W`) [CIT-739](https://gitlab.game-forest.com:2000/browse/CIT-739)
+* Исправлено поведение Resize, если положение пивота виджета было отлично от значений по-умолчанию [CIT-800](https://gitlab.game-forest.com:2000/browse/CIT-800)
+* При множественном выделении теперь отображается <many values>, если значения у свойств виджетов было разное [CIT-884](https://gitlab.game-forest.com:2000/browse/CIT-884)
+* В исключения валидатора FilesystemPropertyEditor добавлен символ "-" [CIT-910](https://gitlab.game-forest.com:2000/browse/CIT-910)
+* При смене виджета, если скролл оказался в недоступной зоне, он откатывается на последнюю доступную позицию [CIT-920](https://gitlab.game-forest.com:2000/browse/CIT-920)
+* Исправлена ошибка, не позволяющая сохранять текущий тип интерполяции на таймлайне при работе с кейфреймами [CIT-935](https://gitlab.game-forest.com:2000/browse/CIT-935)
+* RowCount и ColumnCount в Table Layout больше не могут быть отрицательными значениями [CIT-945](https://gitlab.game-forest.com:2000/browse/CIT-945)
+* Исправлена проблема, приводящая к ошибки в обновлении дерева Hierarchy [CIT-957](https://gitlab.game-forest.com:2000/browse/CIT-957)
+
 ##### Changelog 26.11.2018
 
 * Исправлена ошибка, приводящая к крашу, если была использована модель .fbx c частотой кадров 30 fps [CIT-947](https://gitlab.game-forest.com:2000/browse/CIT-947)
