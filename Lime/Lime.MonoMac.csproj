@@ -363,6 +363,11 @@
     <Compile Include="Source\Widgets\Text\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFPresenter.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />
+    <Compile Include="Source\Widgets\Text\Materials\SDFUnderlayMaterial.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionUnderlay.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
