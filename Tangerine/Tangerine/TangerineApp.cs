@@ -319,7 +319,7 @@ namespace Tangerine
 					UI.SceneView.SceneView.ShowNodeDecorationsPanelButton.Clicked = () => dockManager.TogglePanel(visualHintsPanel);
 				}
 			};
-			var proj = AppUserPreferences.Instance.RecentProjects.FirstOrDefault();
+			var proj = AppUserPreferences.Instance.CurrentProject;
 			if (proj != null) {
 				try {
 					new Project(proj).Open();
