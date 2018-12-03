@@ -174,7 +174,7 @@ namespace Lime.Text
 						var sz = style.ImageSize * scaleFactor;
 						spriteList.Add(
 							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),
-							sz, Vector2.Zero, Vector2.One, tag: word.Style);
+							sz, Vector2.Zero, Vector2.Right, Vector2.One, Vector2.Down, tag: word.Style);
 						position.X += sz.X;
 						c++;
 					}
@@ -217,7 +217,7 @@ namespace Lime.Text
 						float yOffset = (maxHeight - ScaleSize(style.ImageSize.Y)) * 0.5f;
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
-							Vector2.Zero, Vector2.One, tag: word.Style);
+							Vector2.Zero, Vector2.Right, Vector2.One, Vector2.Down, tag: word.Style);
 						j = k;
 					}
 				}

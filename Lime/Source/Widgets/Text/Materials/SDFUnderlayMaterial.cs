@@ -37,8 +37,8 @@ namespace Lime
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(dilateKey, 0.5f - Dilate);
-			shaderParams.Set(softnessKey, Softness);
+			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
+			shaderParams.Set(softnessKey, Softness * 0.01f);
 			shaderParams.Set(colorKey, Color.ToVector4());
 			shaderParams.Set(offsetKey, Offset / 100);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
@@ -67,6 +67,8 @@ namespace Lime
 		public Sprite.IMaterialProvider Clone() => new SDFUnderlayMaterialProvider() {
 			Material = Material
 		};
+
+		public Sprite ProcessSprite(Sprite s) => s;
 	}
 
 	public class SDFUnderlayShaderProgram : ShaderProgram

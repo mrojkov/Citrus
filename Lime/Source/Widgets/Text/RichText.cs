@@ -411,6 +411,8 @@ namespace Lime
 				}
 				return material;
 			}
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 	}
 }

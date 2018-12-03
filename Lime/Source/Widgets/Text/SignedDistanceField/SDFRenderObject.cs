@@ -8,8 +8,6 @@ namespace Lime
 {
 	class SDFRenderObject : RenderObject
 	{
-		private bool wasOffscreenRenderingPrepared;
-
 		public readonly RenderObjectList Objects = new RenderObjectList();
 		public SpriteList SpriteList;
 		public SDFRenderAction[] RenderActions;
@@ -35,6 +33,8 @@ namespace Lime
 		public float UnderlayDilate;
 		public bool UnderlayEnabled;
 		public Color4 UnderlayColor;
+		public bool GradientEnabled;
+		public ColorGradient Gradient;
 
 		protected override void OnRelease()
 		{
@@ -47,7 +47,6 @@ namespace Lime
 
 		public override void Render()
 		{
-			wasOffscreenRenderingPrepared = false;
 			foreach (var action in RenderActions) {
 				if (action.EnabledCheck(this)) {
 					action.Do(this);

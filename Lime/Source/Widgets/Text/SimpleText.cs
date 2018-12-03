@@ -564,6 +564,8 @@ namespace Lime
 			}
 
 			public IMaterial GetMaterial(int tag) => material;
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 	}
 }

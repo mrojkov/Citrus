@@ -65,6 +65,8 @@ namespace Lime
 			ro.UnderlaySoftness = component.UnderlaySoftness;
 			ro.UnderlayOffset = component.UnderlayOffset;
 			ro.UnderlayEnabled = component.UnderlayEnabled;
+			ro.GradientEnabled = component.GradientEnabled;
+			ro.Gradient = component.Gradient;
 
 			return ro;
 		}

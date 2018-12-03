@@ -16,6 +16,8 @@ namespace Lime
 			ro.SDFMaterial.Dilate = ro.Dilate;
 			ro.SDFMaterial.Thickness = ro.Thickness;
 			ro.SDFMaterial.OutlineColor = ro.OutlineColor;
+			ro.SDFMaterial.Gradient = ro.Gradient;
+			ro.SDFMaterial.GradientEnabled = ro.GradientEnabled;
 			ro.RenderSpriteList(ro.SDFMaterialProvider);
 		}
 	}

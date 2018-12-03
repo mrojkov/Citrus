@@ -9,12 +9,17 @@ namespace Lime
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
 		private const string GroupUnderlay = "02. Underlay";
+		private const string GroupGradient = "03. Gradient";
 		private const float MinimumSoftness = 0f;
-		private const float MaximumSoftness = 1f;
-		private const float MinimumDilate = -0.5f;
-		private const float MaximumDilate = 0.5f;
+		private const float MaximumSoftness = 50f;
+		private const float MinimumDilate = -30f;
+		private const float MaximumDilate = 30f;
 		private const float MinimumThickness = 0f;
-		private const float MaximumThickness = 0.5f;
+		private const float MaximumThickness = 30f;
+		private const float MinimumUnderlaySoftness = 0f;
+		private const float MaximumUnderlaySoftness = 45f;
+		private const float MinimumUnderlayDilate = -40f;
+		private const float MaximumUnderlayDilate = 40f;
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
 		internal SDFUnderlayMaterialProvider UnderlayMaterialProvider { get; private set; } = new SDFUnderlayMaterialProvider();
@@ -77,7 +82,7 @@ namespace Lime
 		public float UnderlaySoftness
 		{
 			get => underlaySoftness;
-			set => underlaySoftness = value;
+			set => underlaySoftness = Mathf.Clamp(value, MinimumUnderlaySoftness, MaximumUnderlaySoftness);
 		}
 
 		[YuzuMember]
@@ -85,8 +90,16 @@ namespace Lime
 		public float UnderlayDilate
 		{
 			get => underlayDilate;
-			set => underlayDilate = value;
+			set => underlayDilate = Mathf.Clamp(value, MinimumUnderlayDilate, MaximumUnderlayDilate);
 		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupGradient)]
+		public bool GradientEnabled { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupGradient)]
+		public ColorGradient Gradient { get; set; } = new ColorGradient(Color4.White, Color4.Black);
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
