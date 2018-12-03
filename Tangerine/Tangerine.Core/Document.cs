@@ -253,7 +253,7 @@ namespace Tangerine.Core
 		private void Document_ModifiedStateChanged()
 		{
 			if (IsModified) {
-				Project.Current.SceneCache.InvalidateEntry(Path, () => RootNodeUnwrapped.Clone());
+				Project.Current.SceneCache.InvalidateEntry(Path, () => RootNodeUnwrapped);
 			} else {
 				Project.Current.SceneCache.RemoveNodeProvider(Path);
 			}
@@ -384,8 +384,11 @@ namespace Tangerine.Core
 			//}
 		}
 
-		private void DetachViews()
+		private static void DetachViews()
 		{
+			if (Current == null) {
+				return;
+			}
 			foreach (var i in Current.Views) {
 				i.Detach();
 			}

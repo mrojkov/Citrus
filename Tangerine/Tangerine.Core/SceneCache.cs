@@ -11,8 +11,6 @@ namespace Tangerine.Core
 		private class CacheEntry
 		{
 			public Node Node;
-			public DateTime LastModificationTime;
-			public bool IsLocked;
 			public HashSet<string> Dependencies = new HashSet<string>();
 			public bool IsNeedReloadExternalScenes { get; set; }
 			public Func<Node> NodeProvider { get; set; }
@@ -20,7 +18,11 @@ namespace Tangerine.Core
 			public void RefreshDependencies()
 			{
 				Dependencies.Clear();
-				foreach (var descendant in Node.Descendants) {
+				var node = Node ?? NodeProvider?.Invoke();
+				if (node == null) {
+					return;
+				}
+				foreach (var descendant in node.Descendants) {
 					string contentsPath = descendant.ContentsPath;
 					if (!contentsPath.IsNullOrWhiteSpace() && Node.ResolveScenePath(contentsPath) != null) {
 						Dependencies.Add(contentsPath);
@@ -35,8 +37,7 @@ namespace Tangerine.Core
 			Node.SceneLoaded = new ThreadLocal<Node.SceneLoadedDelegate>(() => SceneCache_SceneLoaded);
 		}
 
-		private readonly Dictionary<string, CacheEntry> contentPathToNodeAndDateModified = new Dictionary<string, CacheEntry>();
-		private readonly Dictionary<string, object> contentPathToLock = new Dictionary<string, object>();
+		private readonly Dictionary<string, CacheEntry> contentPathToCacheEntry = new Dictionary<string, CacheEntry>();
 
 		private bool SceneCache_SceneLoading(string path, ref Node instance, bool external)
 		{
@@ -44,29 +45,24 @@ namespace Tangerine.Core
 			if (!external) {
 				return false;
 			}
-			lock (GetLockObject(path)) {
-				if (!contentPathToNodeAndDateModified.TryGetValue(path, out var t)) {
-					contentPathToNodeAndDateModified.Add(path, new CacheEntry {
-						LastModificationTime = DateTime.Now,
-						IsLocked = true,
-					});
-					return false;
-				} else if (t.Node == null) {
-					return false;
-				}
+			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
+				contentPathToCacheEntry.Add(path, new CacheEntry());
+				return false;
+			} else if (t.Node == null) {
+				return false;
+			}
 
-				if (t.NodeProvider != null) {
-					t.RefreshDependencies();
-					instance = t.NodeProvider().Clone();
-					return true;
-				}
-				if (t.IsNeedReloadExternalScenes) {
-					t.IsNeedReloadExternalScenes = false;
-					t.Node.LoadExternalScenes(TangerineYuzu.Instance.Value);
-				}
-				instance = t.Node.Clone();
+			if (t.NodeProvider != null) {
+				t.RefreshDependencies();
+				instance = t.NodeProvider().Clone();
 				return true;
 			}
+			if (t.IsNeedReloadExternalScenes) {
+				t.IsNeedReloadExternalScenes = false;
+				t.Node.LoadExternalScenes(TangerineYuzu.Instance.Value);
+			}
+			instance = t.Node.Clone();
+			return true;
 		}
 
 		private void SceneCache_SceneLoaded(string path, Node instance, bool external)
@@ -75,34 +71,29 @@ namespace Tangerine.Core
 			if (!external) {
 				return;
 			}
-			lock (GetLockObject(path)) {
-				if (!contentPathToNodeAndDateModified.TryGetValue(path, out var t)) {
-					throw new InvalidOperationException();
-				}
+			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
+				throw new InvalidOperationException();
+			}
 
-				if (t.Node == null) {
-					t.Node = instance.Clone();
-					t.RefreshDependencies();
-				} else {
-					return;
-				}
+			if (t.Node == null) {
+				t.Node = instance.Clone();
+				t.RefreshDependencies();
+			} else {
+				return;
 			}
 		}
 
 		public void InvalidateEntry(string path, Func<Node> nodeProviderFunc)
 		{
-			lock (GetLockObject(path)) {
-				var t = contentPathToNodeAndDateModified[path];
-				if (nodeProviderFunc == null) {
-					t.Node = null;
-					t.NodeProvider = null;
-				}
-				else {
-					t.NodeProvider = nodeProviderFunc;
-				}
-				t.Dependencies.Clear();
+			var t = GetCacheEntrySafe(path);
+			if (nodeProviderFunc == null) {
+				t.Node = null;
+				t.NodeProvider = null;
+			} else {
+				t.NodeProvider = nodeProviderFunc;
 			}
-			foreach (var kv in contentPathToNodeAndDateModified) {
+			t.Dependencies.Clear();
+			foreach (var kv in contentPathToCacheEntry) {
 				if (kv.Value.Dependencies.Contains(path)) {
 					// InvalidateEntry(kv.Key);
 					// kv.Value.Node.LoadExternalScenes(TangerineYuzu.Instance.Value); // file access problems use lazy access
@@ -111,31 +102,26 @@ namespace Tangerine.Core
 			}
 		}
 
-		private object GetLockObject(string path)
-		{
-			lock (contentPathToLock) {
-				if (!contentPathToLock.TryGetValue(path, out var lockObject)) {
-					lockObject = new object();
-					contentPathToLock.Add(path, lockObject);
-				}
-				return lockObject;
-			}
-		}
-
 		public void RemoveNodeProvider(string path)
 		{
-			lock (GetLockObject(path)) {
-				var t = contentPathToNodeAndDateModified[path];
-				t.NodeProvider = null;
-				t.RefreshDependencies();
-			}
-			foreach (var kv in contentPathToNodeAndDateModified) {
+			var t = GetCacheEntrySafe(path);
+			t.NodeProvider = null;
+			t.RefreshDependencies();
+			foreach (var kv in contentPathToCacheEntry) {
 				if (kv.Value.Dependencies.Contains(path)) {
 					// InvalidateEntry(kv.Key);
 					// kv.Value.Node.LoadExternalScenes(TangerineYuzu.Instance.Value); // file access problems use lazy
 					kv.Value.IsNeedReloadExternalScenes = true;
 				}
 			}
+		}
+
+		private CacheEntry GetCacheEntrySafe(string path)
+		{
+			if (!contentPathToCacheEntry.TryGetValue(path, out CacheEntry t)) {
+				contentPathToCacheEntry.Add(path, t = new CacheEntry());
+			}
+			return t;
 		}
 	}
 }
