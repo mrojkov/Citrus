@@ -338,7 +338,9 @@ namespace Tangerine.Core
 				DetachViews();
 				Current = doc;
 				doc?.AttachViews();
-				ProjectUserPreferences.Instance.CurrentDocument = doc?.Path;
+				if (doc != null) {
+					ProjectUserPreferences.Instance.CurrentDocument = doc.Path;
+				}
 				ForceAnimationUpdate();
 			}
 		}

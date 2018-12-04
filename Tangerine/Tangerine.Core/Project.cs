@@ -258,6 +258,7 @@ namespace Tangerine.Core
 						documents[currentIndex.Min(Documents.Count - 1)].MakeCurrent();
 					} else {
 						Document.SetCurrent(null);
+						ProjectUserPreferences.Instance.CurrentDocument = null;
 					}
 				}
 				return true;
