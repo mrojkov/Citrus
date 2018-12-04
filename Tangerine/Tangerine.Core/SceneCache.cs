@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Lime;
 using Yuzu = Lime.Yuzu;
@@ -10,24 +11,61 @@ namespace Tangerine.Core
 	{
 		private class CacheEntry
 		{
-			public Node Node;
-			public HashSet<string> Dependencies = new HashSet<string>();
-			public bool IsNeedReloadExternalScenes { get; set; }
-			public Func<Node> NodeProvider { get; set; }
-
-			public void RefreshDependencies()
+			public Node Node
 			{
-				Dependencies.Clear();
-				var node = Node ?? NodeProvider?.Invoke();
-				if (node == null) {
+				get
+				{
+					var r = nodeProvider?.Invoke() ?? node;
+					if (r != null && DoNeedReloadExternalScenes) {
+						DoNeedReloadExternalScenes = false;
+						r.LoadExternalScenes(TangerineYuzu.Instance.Value);
+					}
+					return r;
+				}
+			}
+			private Func<Node> nodeProvider;
+			private Node node;
+			public HashSet<string> Dependencies
+			{
+				get
+				{
+					if (!areDependenciesValid) {
+						RefreshDependencies();
+					}
+					return dependencies;
+				}
+			}
+
+			private readonly HashSet<string> dependencies = new HashSet<string>();
+			bool areDependenciesValid = false;
+			public bool DoNeedReloadExternalScenes { get; set; }
+			public void SetNodeProvider(Func<Node> nodeProvider)
+			{
+				areDependenciesValid = false;
+				this.nodeProvider = nodeProvider;
+			}
+			public void SetNode(Node node)
+			{
+				areDependenciesValid = nodeProvider != null;
+				this.node = node;
+			}
+
+			private void RefreshDependencies()
+			{
+				var sw = System.Diagnostics.Stopwatch.StartNew();
+				dependencies.Clear();
+				if (Node == null) {
 					return;
 				}
-				foreach (var descendant in node.Descendants) {
+				foreach (var descendant in Node.Descendants) {
 					string contentsPath = descendant.ContentsPath;
 					if (!contentsPath.IsNullOrWhiteSpace() && Node.ResolveScenePath(contentsPath) != null) {
-						Dependencies.Add(contentsPath);
+						dependencies.Add(contentsPath);
 					}
 				}
+				areDependenciesValid = true;
+				sw.Stop();
+				Console.WriteLine($"RefreshDependencies took {sw.ElapsedMilliseconds} ms");
 			}
 		}
 
@@ -51,16 +89,6 @@ namespace Tangerine.Core
 			} else if (t.Node == null) {
 				return false;
 			}
-
-			if (t.NodeProvider != null) {
-				t.RefreshDependencies();
-				instance = t.NodeProvider().Clone();
-				return true;
-			}
-			if (t.IsNeedReloadExternalScenes) {
-				t.IsNeedReloadExternalScenes = false;
-				t.Node.LoadExternalScenes(TangerineYuzu.Instance.Value);
-			}
 			instance = t.Node.Clone();
 			return true;
 		}
@@ -74,46 +102,25 @@ namespace Tangerine.Core
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
 				throw new InvalidOperationException();
 			}
-
 			if (t.Node == null) {
-				t.Node = instance.Clone();
-				t.RefreshDependencies();
+				t.SetNode(instance.Clone());
 			} else {
 				return;
 			}
 		}
 
-		public void InvalidateEntry(string path, Func<Node> nodeProviderFunc)
+		public void InvalidateEntryFromFilesystem(string path)
 		{
 			var t = GetCacheEntrySafe(path);
-			if (nodeProviderFunc == null) {
-				t.Node = null;
-				t.NodeProvider = null;
-			} else {
-				t.NodeProvider = nodeProviderFunc;
-			}
-			t.Dependencies.Clear();
-			foreach (var kv in contentPathToCacheEntry) {
-				if (kv.Value.Dependencies.Contains(path)) {
-					// InvalidateEntry(kv.Key);
-					// kv.Value.Node.LoadExternalScenes(TangerineYuzu.Instance.Value); // file access problems use lazy access
-					kv.Value.IsNeedReloadExternalScenes = true;
-				}
-			}
+			t.SetNode(null);
+			MarkDependentsForReload(path);
 		}
 
-		public void RemoveNodeProvider(string path)
+		public void InvalidateEntryFromOpenedDocumentChanged(string path, Func<Node> nodeProviderFunc)
 		{
 			var t = GetCacheEntrySafe(path);
-			t.NodeProvider = null;
-			t.RefreshDependencies();
-			foreach (var kv in contentPathToCacheEntry) {
-				if (kv.Value.Dependencies.Contains(path)) {
-					// InvalidateEntry(kv.Key);
-					// kv.Value.Node.LoadExternalScenes(TangerineYuzu.Instance.Value); // file access problems use lazy
-					kv.Value.IsNeedReloadExternalScenes = true;
-				}
-			}
+			t.SetNodeProvider(nodeProviderFunc);
+			MarkDependentsForReload(path);
 		}
 
 		private CacheEntry GetCacheEntrySafe(string path)
@@ -122,6 +129,34 @@ namespace Tangerine.Core
 				contentPathToCacheEntry.Add(path, t = new CacheEntry());
 			}
 			return t;
+		}
+
+		private void MarkDependentsForReload(string path)
+		{
+			var q = new Queue<string>();
+			q.Enqueue(path);
+			while (q.Count != 0) {
+				var nextPath = q.Dequeue();
+				foreach (var kv in contentPathToCacheEntry) {
+					if (kv.Key == path) {
+						continue;
+					}
+					if (kv.Value.Dependencies.Contains(nextPath)) {
+						kv.Value.DoNeedReloadExternalScenes = true;
+						q.Enqueue(kv.Key);
+					}
+				}
+			}
+		}
+
+		public void Clear(string docPath)
+		{
+			if (contentPathToCacheEntry.TryGetValue(docPath, out CacheEntry t)) {
+				contentPathToCacheEntry.Remove(docPath);
+				foreach (var d in t.Dependencies) {
+					Clear(d);
+				}
+			}
 		}
 	}
 }

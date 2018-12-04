@@ -249,6 +249,7 @@ namespace Tangerine.Core
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
 			if (force || doc.Close()) {
+				SceneCache.Clear(doc.Path);
 				documents.Remove(doc);
 				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
@@ -405,7 +406,7 @@ namespace Tangerine.Core
 			}
 			localPath = AssetPath.CorrectSlashes(localPath);
 			modifiedAssets.Add(localPath);
-			Project.Current.SceneCache.InvalidateEntry(localPath, null);
+			Project.Current.SceneCache.InvalidateEntryFromFilesystem(localPath);
 			Tasks.StopByTag(aggregateModifiedAssetsTaskTag);
 			Tasks.Add(AggregateModifiedAssetsTask, aggregateModifiedAssetsTaskTag);
 		}
