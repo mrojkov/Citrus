@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.ExpressionParser;
@@ -12,6 +13,8 @@ namespace Tangerine.UI
 		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.NumericEditBoxFactory();
+			// TODO: move IsReadOnly to IPropertyEditor
+			editor.IsReadOnly = editorParams.PropertyInfo.GetCustomAttribute<TangerineReadOnlyAttribute>(true) != null;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
 			EditorContainer.AddNode(Spacer.HStretch());

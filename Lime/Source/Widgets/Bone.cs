@@ -90,15 +90,11 @@ namespace Lime
 		public bool IKStopper { get; set; }
 
 		[YuzuMember]
-#if !DEBUG
-		[TangerineIgnore]
-#endif
+		[TangerineReadOnly]
 		public int Index { get; set; }
 
 		[YuzuMember]
-#if !DEBUG
-		[TangerineIgnore]
-#endif
+		[TangerineReadOnly]
 		public int BaseIndex { get; set; }
 
 		[YuzuMember]

@@ -21,6 +21,10 @@ namespace Lime
 	public sealed class TangerineStaticPropertyAttribute : Attribute
 	{ }
 
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public sealed class TangerineReadOnlyAttribute : Attribute
+	{ }
+
 	public sealed class TangerineKeyframeColorAttribute : Attribute
 	{
 		public int ColorIndex;
