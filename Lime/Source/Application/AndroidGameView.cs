@@ -101,6 +101,7 @@ namespace Lime
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
 			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
+			Application.SupportedDeviceOrientationsChanged += RestrictSupportedOrientationsWith;
 			var readyToRenderGetter = typeof(OpenTK.Platform.Android.AndroidGameView).GetProperty("ReadyToRender",
 				System.Reflection.BindingFlags.Instance |
 				System.Reflection.BindingFlags.NonPublic).GetMethod;
@@ -233,8 +234,6 @@ namespace Lime
 			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
-		private DeviceOrientation previousAllowedOrientaion = 0;
-
 		protected override void OnRenderFrame(FrameEventArgs e) { }
 
 		public void OnRenderFrameForce(FrameEventArgs e)
@@ -246,11 +245,6 @@ namespace Lime
 				MakeCurrent();
 			}
 
-			var allowedOrientaion = Application.SupportedDeviceOrientations;
-			if (previousAllowedOrientaion != allowedOrientaion) {
-				RestrictSupportedOrientationsWith(allowedOrientaion);
-				previousAllowedOrientaion = allowedOrientaion;
-			}
 			base.OnRenderFrame(e);
 			SwapBuffers();
 		}
