@@ -49,8 +49,6 @@ namespace Lime
 			Add(typeof(EmitterShape), typeof(Animator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(Animator<AudioAction>));
 			Add(typeof(MovieAction), typeof(Animator<MovieAction>));
-			Add(typeof(HAlignment), typeof(Animator<HAlignment>));
-			Add(typeof(VAlignment), typeof(Animator<VAlignment>));
 			Add(typeof(Anchors), typeof(Animator<Anchors>));
 			Add(typeof(EmissionType), typeof(Animator<EmissionType>));
 			Add(typeof(ParticlesLinkage), typeof(Animator<ParticlesLinkage>));
@@ -62,6 +60,7 @@ namespace Lime
 			Add(typeof(NodeReference<Camera3D>), typeof(Animator<NodeReference<Camera3D>>));
 			Add(typeof(LayoutDirection), typeof(Animator<LayoutDirection>));
 			Add(typeof(Thickness), typeof(ThicknessAnimator));
+			Add(typeof(Alignment), typeof(Animator<Alignment>));
 		}
 
 		public bool Contains(Type propertyType)
