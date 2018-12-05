@@ -1,8 +1,23 @@
+##### Changelog 05.12.2018
+
+* Увеличена производительность редактора при работе со внешними сценами [CIT-428](https://gitlab.game-forest.com:2000/browse/CIT-428)
+* Внешние сцены больше не подгружаются, если не были изменены [CIT-719](https://gitlab.game-forest.com:2000/browse/CIT-719)
+* Добавлена возможность переназначать материал в Model3D Attachment [CIT-912](https://gitlab.game-forest.com:2000/browse/CIT-912)
+* Переделана вкладка "Mesh Options" в Model3D Attachment [CIT-913](https://gitlab.game-forest.com:2000/browse/CIT-913)
+* AlignmentPropertyEditor теперь используется для Alignment [CIT-919](https://gitlab.game-forest.com:2000/browse/CIT-919)
+* В объектах типa Bone (кости) теперь доступны параметры Index и BaseIndex (в readonly) [CIT-975](https://gitlab.game-forest.com:2000/browse/CIT-975)
+
+Багфиксы:
+
+* Исправлена ошибка, при которой открывался последний закрытый проект после перезапуска редактора [CIT-839](https://gitlab.game-forest.com:2000/browse/CIT-839)
+* Исправлена ошибка, приводящая к крашу при попытке дублирования (`Ctrl + D`) виджета ImageCombiner и свёрнутой папки (Folder) [CIT-956](https://gitlab.game-forest.com:2000/browse/CIT-956)
+* Исправлена ошибка, приводящая к неправильной работе Undo после удаления столбца [CIT-968](https://gitlab.game-forest.com:2000/browse/CIT-968)
+
 ##### Changelog 30.11.2018
 
 * Исправлено медленное удаление столбца на таймлайне (через `Ctrl + W`) [CIT-739](https://gitlab.game-forest.com:2000/browse/CIT-739)
 * Исправлено поведение Resize, если положение пивота виджета было отлично от значений по-умолчанию [CIT-800](https://gitlab.game-forest.com:2000/browse/CIT-800)
-* При множественном выделении теперь отображается <many values>, если значения у свойств виджетов было разное [CIT-884](https://gitlab.game-forest.com:2000/browse/CIT-884)
+* При множественном выделении теперь отображается `<many values>`, если значения у свойств виджетов было разное [CIT-884](https://gitlab.game-forest.com:2000/browse/CIT-884)
 * В исключения валидатора FilesystemPropertyEditor добавлен символ "-" [CIT-910](https://gitlab.game-forest.com:2000/browse/CIT-910)
 * При смене виджета, если скролл оказался в недоступной зоне, он откатывается на последнюю доступную позицию [CIT-920](https://gitlab.game-forest.com:2000/browse/CIT-920)
 * Исправлена ошибка, не позволяющая сохранять текущий тип интерполяции на таймлайне при работе с кейфреймами [CIT-935](https://gitlab.game-forest.com:2000/browse/CIT-935)
