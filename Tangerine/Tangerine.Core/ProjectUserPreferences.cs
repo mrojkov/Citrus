@@ -9,10 +9,10 @@ namespace Tangerine.Core
 		private readonly List<Ruler> defaultRulers = new List<Ruler>();
 		public IReadOnlyList<Ruler> DefaultRulers => defaultRulers;
 
-		[YuzuMember]
+		[YuzuOptional]
 		public readonly List<string> Documents = new List<string>();
 
-		[YuzuMember]
+		[YuzuOptional]
 		public string CurrentDocument;
 
 		[YuzuOptional]
@@ -29,7 +29,7 @@ namespace Tangerine.Core
 
 		[YuzuOptional]
 		public ObservableCollection<Ruler> Rulers { get; } = new ObservableCollection<Ruler>();
-		
+
 		[YuzuOptional]
 		public readonly List<string> RecentDocuments = new List<string>();
 

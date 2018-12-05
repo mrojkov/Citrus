@@ -39,7 +39,7 @@ namespace Tangerine.Core
 
 		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
 
-		private MemoryStream preloadedSceneStream = null;
+		private readonly MemoryStream preloadedSceneStream = null;
 		public DateTime LastWriteTime { get; private set; }
 
 		public bool Loaded { get; private set; } = true;
@@ -95,7 +95,7 @@ namespace Tangerine.Core
 		/// </summary>
 		public Node Container
 		{
-			get { return container; }
+			get => container;
 			set {
 				if (container != value) {
 					container = value;
@@ -161,8 +161,7 @@ namespace Tangerine.Core
 			} else {
 				var constructor = rootType.GetConstructor(Type.EmptyTypes);
 				Container = RootNodeUnwrapped = RootNode = (Node)constructor.Invoke(new object[] { });
-				var widget = RootNode as Widget;
-				if (widget != null) {
+				if (RootNode is Widget widget) {
 					widget.Size = defaultSceneSize;
 				}
 			}
@@ -173,6 +172,7 @@ namespace Tangerine.Core
 			Decorate(RootNode);
 			Container = RootNode;
 			History.PerformingOperation += Document_PerformingOperation;
+			History.Changed += Document_Changed;
 		}
 
 		public Document(string path, bool delayLoad = false)
@@ -243,11 +243,14 @@ namespace Tangerine.Core
 					}
 				}
 				History.PerformingOperation += Document_PerformingOperation;
+				History.Changed += Document_Changed;
 			} catch (System.Exception e) {
 				throw new System.InvalidOperationException($"Can't open '{Path}': {e.Message}");
 			}
 			Loaded = true;
 		}
+
+		private void Document_Changed() => Project.Current.SceneCache.InvalidateEntryFromOpenedDocumentChanged(Path, IsModified ? (Func<Node>)(() => RootNodeUnwrapped) : null);
 
 		private void Document_PerformingOperation(IOperation operation)
 		{
@@ -325,15 +328,17 @@ namespace Tangerine.Core
 				}
 			}
 			if (Current != doc) {
-				Current?.DetachViews();
+				DetachViews();
 				Current = doc;
 				doc?.AttachViews();
-				ProjectUserPreferences.Instance.CurrentDocument = doc?.Path;
+				if (doc != null) {
+					ProjectUserPreferences.Instance.CurrentDocument = doc.Path;
+				}
 				ForceAnimationUpdate();
 			}
 		}
 
-		void AttachViews()
+		private void AttachViews()
 		{
 			RefreshExternalScenes();
 			AttachingViews?.Invoke(this);
@@ -360,21 +365,25 @@ namespace Tangerine.Core
 
 		public void RefreshExternalScenes(Node node)
 		{
-			if (!string.IsNullOrEmpty(node.ContentsPath)) {
-				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
-				if (doc != null && doc.IsModified) {
-					node.ReplaceContent(doc.RootNodeUnwrapped.Clone());
-				} else {
-					node.LoadExternalScenes();
-				}
-			}
-			foreach (var child in node.Nodes) {
-				RefreshExternalScenes(child);
-			}
+			node.LoadExternalScenes();
+			//if (!string.IsNullOrEmpty(node.ContentsPath)) {
+			//	var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
+			//	if (doc != null && doc.IsModified) {
+			//		node.ReplaceContent(doc.RootNodeUnwrapped.Clone());
+			//	} else {
+			//		node.LoadExternalScenes();
+			//	}
+			//}
+			//foreach (var child in node.Nodes) {
+			//	RefreshExternalScenes(child);
+			//}
 		}
 
-		void DetachViews()
+		private static void DetachViews()
 		{
+			if (Current == null) {
+				return;
+			}
 			foreach (var i in Current.Views) {
 				i.Detach();
 			}
@@ -402,8 +411,7 @@ namespace Tangerine.Core
 		public void Save()
 		{
 			if (Path == defaultPath) {
-				string path;
-				if (PathSelector(out path)) {
+				if (PathSelector(out var path)) {
 					SaveAs(path);
 				}
 			} else {
@@ -525,8 +533,7 @@ namespace Tangerine.Core
 
 		public Row GetRowForObject(object obj)
 		{
-			Row row;
-			if (!rowCache.TryGetValue(obj, out row)) {
+			if (!rowCache.TryGetValue(obj, out var row)) {
 				row = new Row();
 				rowCache.Add(obj, row);
 			}

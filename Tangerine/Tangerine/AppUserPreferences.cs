@@ -16,6 +16,9 @@ namespace Tangerine
 		[YuzuOptional]
 		public readonly List<string> RecentProjects;
 
+		[YuzuOptional]
+		public string CurrentProject { get; set; }
+
 		public static int RecentProjectsCount { get; private set; } = 5;
 
 		[YuzuOptional]

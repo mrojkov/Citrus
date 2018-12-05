@@ -28,6 +28,7 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		public event Action<IOperation> PerformingOperation;
+		public event Action Changed;
 
 		public static void AddOperationProcessorTypes(IEnumerable<Type> types)
 		{
@@ -184,18 +185,19 @@ namespace Tangerine.Core
 					break;
 				}
 			}
-			RefreshModifiedStatus();
+			OnChange();
 		}
 
 		public void ExternalModification()
 		{
 			saveIndex = -1;
-			RefreshModifiedStatus();
+			OnChange();
 		}
 
 		private void OnChange()
 		{
 			RefreshModifiedStatus();
+			Changed?.Invoke();
 			Application.InvalidateWindows();
 		}
 
@@ -241,7 +243,7 @@ namespace Tangerine.Core
 
 			public static void Invert(IOperation operation)
 			{
-				foreach (var p in EnumerateProcessors(operation)) { 
+				foreach (var p in EnumerateProcessors(operation)) {
 					if (operation.Performed) {
 						p.Undo(operation);
 					} else {

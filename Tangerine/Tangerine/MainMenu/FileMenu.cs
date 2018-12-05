@@ -35,6 +35,7 @@ namespace Tangerine
 			if (prefs.RecentProjects.Count > AppUserPreferences.RecentProjectsCount) {
 				prefs.RecentProjects.RemoveAt(prefs.RecentProjects.Count - 1);
 			}
+			AppUserPreferences.Instance.CurrentProject = path;
 			UserPreferences.Instance.Save();
 		}
 	}
@@ -58,6 +59,8 @@ namespace Tangerine
 		public override void Execute()
 		{
 			Project.Current.Close();
+			AppUserPreferences.Instance.CurrentProject = null;
+			UserPreferences.Instance.Save();
 		}
 
 		public override void RefreshCommand(ICommand command)

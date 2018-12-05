@@ -14,6 +14,8 @@ namespace Tangerine.Core
 		readonly VersionedCollection<Document> documents = new VersionedCollection<Document>();
 		public IReadOnlyVersionedCollection<Document> Documents => documents;
 
+		public SceneCache SceneCache = new SceneCache();
+
 		private readonly object aggregateModifiedAssetsTaskTag = new object();
 		private readonly HashSet<string> modifiedAssets = new HashSet<string>();
 		private readonly List<Type> registeredNodeTypes = new List<Type>();
@@ -247,6 +249,8 @@ namespace Tangerine.Core
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
 			if (force || doc.Close()) {
+				SceneCache.InvalidateEntryFromOpenedDocumentChanged(doc.Path, null);
+				SceneCache.Clear(doc.Path);
 				documents.Remove(doc);
 				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
 					File.Delete(systemPath);
@@ -256,6 +260,7 @@ namespace Tangerine.Core
 						documents[currentIndex.Min(Documents.Count - 1)].MakeCurrent();
 					} else {
 						Document.SetCurrent(null);
+						ProjectUserPreferences.Instance.CurrentDocument = null;
 					}
 				}
 				return true;
@@ -386,25 +391,23 @@ namespace Tangerine.Core
 		public void ReorderDocument(Document doc, int toIndex)
 		{
 			int previousIndex = documents.IndexOf(doc);
-			if (previousIndex < 0) return;
+			if (previousIndex < 0) {
+				return;
+			}
 			documents.Remove(doc);
 			documents.Insert(toIndex, doc);
 		}
 
-		public void RevertDocument(Document doc)
-		{
-			ReloadDocument(doc);
-		}
+		public void RevertDocument(Document doc) => ReloadDocument(doc);
 
 		private void RegisterModifiedAsset(string path)
 		{
-			string localPath;
-			if (!TryGetAssetPath(path, out localPath)) {
+			if (!TryGetAssetPath(path, out var localPath)) {
 				return;
 			}
 			localPath = AssetPath.CorrectSlashes(localPath);
 			modifiedAssets.Add(localPath);
-
+			Project.Current.SceneCache.InvalidateEntryFromFilesystem(localPath);
 			Tasks.StopByTag(aggregateModifiedAssetsTaskTag);
 			Tasks.Add(AggregateModifiedAssetsTask, aggregateModifiedAssetsTaskTag);
 		}
