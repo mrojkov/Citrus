@@ -7,6 +7,8 @@ using Yuzu = Lime.Yuzu;
 
 namespace Tangerine.Core
 {
+	// We'll just call node.LoadExternalScenes each time tab is activated and make sure our cache contains right versions of external scenes.
+	// Further optimization will include loading only changed external scenes, not all of them.
 	public class SceneCache
 	{
 		private class CacheEntry

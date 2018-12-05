@@ -249,6 +249,7 @@ namespace Tangerine.Core
 			int currentIndex = documents.IndexOf(Document.Current);
 			string systemPath;
 			if (force || doc.Close()) {
+				SceneCache.InvalidateEntryFromOpenedDocumentChanged(doc.Path, null);
 				SceneCache.Clear(doc.Path);
 				documents.Remove(doc);
 				if (GetFullPath(AutosaveProcessor.GetTemporaryFilePath(doc.Path), out systemPath)) {
