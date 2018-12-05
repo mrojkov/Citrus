@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -86,6 +84,7 @@ namespace Lime
 			private ShaderProgram shaderProgramPass1;
 			private ShaderProgram shaderProgramPass2;
 
+			public string Id { get; set; }
 			public int PassCount => 2;
 
 			private LcdFontMaterial()

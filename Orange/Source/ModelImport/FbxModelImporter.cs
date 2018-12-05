@@ -1,42 +1,55 @@
+using System;
 using Lime;
 using Orange.FbxImporter;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
-namespace Orange
+namespace Orange.FbxImporter
 {
-	public partial class FbxModelImporter
+	public class FbxImportOptions
+	{
+		public string Path;
+		public Target Target;
+		public Dictionary<string, CookingRules> CookingRulesMap = new Dictionary<string, CookingRules>();
+		public bool ApplyAttachment = true;
+	}
+
+	public partial class FbxModelImporter : IDisposable
 	{
 		/*
 		* According to the fbx-documentation the camera's forward vector
 		* points along a node's positive X axis.
 		* so we have to rotate it by 90 around the Y-axis to correct it.
 		*/
-		private readonly static Quaternion CameraPostRotation = Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
-		private string path;
-		private FbxManager manager;
-		private Target target;
-		private readonly Dictionary<string, CookingRules> cookingRulesMap;
+		private static readonly Quaternion CameraPostRotation = Quaternion.CreateFromEulerAngles(Vector3.UnitY * -Mathf.Pi / 2);
+		private readonly FbxManager manager;
+		private readonly FbxImportOptions options;
 
-		public Model3D Model { get; private set; }
-
-		public FbxModelImporter(string path, Target target, Dictionary<string, CookingRules> cookingRulesMap, bool applyAttachment = true)
+		public FbxModelImporter(FbxImportOptions options)
 		{
-			this.target = target;
-			this.path = path;
-			this.cookingRulesMap = cookingRulesMap;
+			this.options = options;
 			manager = FbxManager.Create();
-			var scene = manager.LoadScene(path);
-			Model = new Model3D();
-			Model.Nodes.Add(ImportNodes(scene.Root));
-			ImportAnimations(scene);
-			if (applyAttachment && Model3DAttachmentParser.IsAttachmentExists(path)) {
-				Model3DAttachmentParser.GetModel3DAttachment(path).Apply(Model);
-			}
-			manager.Destroy();
 		}
 
-		private Lime.Node ImportNodes(FbxImporter.FbxNode root, Lime.Node parent = null)
+		public Model3D LoadModel()
+		{
+			var scene = LoadRaw();
+			var model = new Model3D();
+			model.Nodes.Add(ImportNodes(scene.Root));
+			ImportAnimations(model, scene);
+			if (options.ApplyAttachment && Model3DAttachmentParser.IsAttachmentExists(options.Path)) {
+				Model3DAttachmentParser.GetModel3DAttachment(options.Path).Apply(model);
+			}
+			return model;
+		}
+
+		public FbxScene LoadRaw()
+		{
+			return manager.LoadScene(options);
+		}
+
+		private Lime.Node ImportNodes(FbxNode root, Node parent = null)
 		{
 			Node3D node = null;
 			if (root == null)
@@ -86,7 +99,7 @@ namespace Orange
 			return node;
 		}
 
-		private Submesh3D ImportSubmesh(FbxSubmesh meshAttribute, FbxImporter.FbxNode node)
+		private Submesh3D ImportSubmesh(FbxSubmesh meshAttribute, FbxNode node)
 		{
 			var sm = new Submesh3D {
 				Mesh = new Mesh<Mesh3D.Vertex> {
@@ -101,11 +114,10 @@ namespace Orange
 						ShaderPrograms.Attributes.Normal
 					}
 				},
-				Material = meshAttribute.MaterialIndex != -1
-					? CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex], path, target)
+				Material = meshAttribute.MaterialIndex != -1 && node.Materials != null
+					? CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex])
 					: FbxMaterial.Default
 			};
-
 
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
@@ -116,13 +128,13 @@ namespace Orange
 			return sm;
 		}
 
-		public CommonMaterial CreateLimeMaterial(FbxMaterial material, string modelPath, Target target)
+		public CommonMaterial CreateLimeMaterial(FbxMaterial material)
 		{
 			var commonMaterial = new CommonMaterial {
-				Name = material.Name
+				Id = material.Name
 			};
 			if (!string.IsNullOrEmpty(material.Path)) {
-				var tex = CreateSerializableTexture(modelPath, material.Path);
+				var tex = CreateSerializableTexture(options.Path, material.Path);
 				commonMaterial.DiffuseTexture = tex;
 				var rulesPath = tex.SerializationPath + ".png";
 
@@ -130,13 +142,13 @@ namespace Orange
 				// Set "Repeat" wrpap mode if wrap mode of any of the components is set as "Repeat".
 				var mode = material.WrapModeU == TextureWrapMode.Repeat || material.WrapModeV == TextureWrapMode.Repeat ?
 						TextureWrapMode.Repeat : TextureWrapMode.Clamp;
-				if (cookingRulesMap.ContainsKey(rulesPath)) {
-					var cookingRules = cookingRulesMap[rulesPath] = cookingRulesMap[rulesPath].InheritClone();
+				if (options.CookingRulesMap.ContainsKey(rulesPath)) {
+					var cookingRules = options.CookingRulesMap[rulesPath] = options.CookingRulesMap[rulesPath].InheritClone();
 					if (cookingRules.CommonRules.WrapMode != mode) {
 						cookingRules.CommonRules.WrapMode = mode;
 						cookingRules.SourceFilename = rulesPath + ".txt";
 						cookingRules.CommonRules.Override(nameof(ParticularCookingRules.WrapMode));
-						cookingRules.DeduceEffectiveRules(target);
+						cookingRules.DeduceEffectiveRules(options.Target);
 						cookingRules.Save();
 					}
 				}
@@ -165,10 +177,13 @@ namespace Orange
 			}
 		}
 
-		private void ImportAnimations(FbxScene scene)
+		private void ImportAnimations(Model3D model, FbxScene scene)
 		{
+			if (scene.Animations == null) {
+				return;
+			}
 			foreach (var animation in scene.Animations.List) {
-				var n = Model.TryFind<Node3D>(animation.TargetNodeId);
+				var n = model.TryFind<Node3D>(animation.TargetNodeId);
 				var scaleKeys = Vector3KeyReducer.Default.Reduce(animation.ScaleKeys);
 				if (scaleKeys.Count != 0) {
 					GetOrAddAnimator<Vector3Animator>(animation, n, nameof(Node3D.Scale)).Keys.AddRange(scaleKeys);
@@ -184,8 +199,8 @@ namespace Orange
 				if (posKeys.Count != 0) {
 					GetOrAddAnimator<Vector3Animator>(animation, n, nameof(Node3D.Position)).Keys.AddRange(posKeys);
 				}
-				if (!Model.Animations.Any(a => a.Id == animation.AnimationStackName)) {
-					Model.Animations.Add(new Animation {
+				if (!model.Animations.Any(a => a.Id == animation.AnimationStackName)) {
+					model.Animations.Add(new Animation {
 						Id = animation.AnimationStackName,
 					});
 				}
@@ -201,6 +216,11 @@ namespace Orange
 			};
 			n.Animators.Add(animator);
 			return animator;
+		}
+
+		public void Dispose()
+		{
+			manager.Destroy();
 		}
 	}
 }

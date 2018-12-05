@@ -89,7 +89,7 @@ namespace Tangerine.UI
 		}
 
 		static Yuzu.Json.JsonSerializer serializer = new Yuzu.Json.JsonSerializer {
-			JsonOptions = new Yuzu.Json.JsonSerializeOptions { FieldSeparator = " ", Indent = "", EnumAsString = true }
+			JsonOptions = new Yuzu.Json.JsonSerializeOptions { FieldSeparator = " ", Indent = "", EnumAsString = true, SaveRootClass = true, }
 		};
 
 		static Yuzu.Json.JsonDeserializer deserializer = new Yuzu.Json.JsonDeserializer {

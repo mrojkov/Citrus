@@ -86,6 +86,7 @@ namespace Lime
 		private ShaderProgram shaderProgram;
 		private int currentVersion;
 		private int currentSize;
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public ColorGradient Gradient

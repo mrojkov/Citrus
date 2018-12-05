@@ -26,6 +26,8 @@ namespace Lime
 			Mathf.Abs(Brightness - DefaultBrightness) >= Mathf.ZeroTolerance || Mathf.Abs(Contrast - DefaultContrast) >= Mathf.ZeroTolerance;
 		private bool RequiredHSLProcess =>
 			Mathf.Abs(HSL.X - defaultHSL.X) >= Mathf.ZeroTolerance || Mathf.Abs(HSL.Y - defaultHSL.Y) >= Mathf.ZeroTolerance || Mathf.Abs(HSL.Z - defaultHSL.Z) >= Mathf.ZeroTolerance;
+
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public ColorCorrectionMaterial() : this(Blending.Alpha) { }

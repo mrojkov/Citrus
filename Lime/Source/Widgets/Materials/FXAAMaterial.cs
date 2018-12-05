@@ -20,6 +20,7 @@ namespace Lime
 		public float MaxSpan { get; set; }
 		public bool Opaque { get; set; }
 
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public FXAAMaterial() : this(Blending.Alpha) { }

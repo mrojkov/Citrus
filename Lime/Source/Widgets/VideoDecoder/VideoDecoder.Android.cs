@@ -430,6 +430,7 @@ namespace Lime
 				private readonly BlendState blendState;
 				private readonly ShaderParams[] shaderParamsArray;
 				private readonly ShaderParams shaderParams;
+				public string Name { get; set; }
 
 				public float Strength { get; set; } = 1f;
 

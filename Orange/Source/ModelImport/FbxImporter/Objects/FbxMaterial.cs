@@ -7,12 +7,12 @@ namespace Orange.FbxImporter
 	public class FbxMaterial : FbxObject
 	{
 		internal static IMaterial Default = new CommonMaterial {
-			Name = "Default",
+			Id = "Default",
 		};
 
 		public string Path { get; }
 
-		public string Name { get; }
+		public string Name { get; set; }
 
 		public Lime.TextureWrapMode WrapModeU { get; }
 

@@ -17,6 +17,7 @@ namespace Lime
 		public Vector2 UVOffset { get; set; } = Vector2.Half;
 		public Color4 Color { get; set; } = Color4.Black;
 
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public VignetteMaterial() : this(Blending.Alpha) { }

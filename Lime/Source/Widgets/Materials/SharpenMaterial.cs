@@ -18,6 +18,7 @@ namespace Lime
 		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
 		public bool Opaque { get; set; }
 
+		public string Id { get; set; }
 		public int PassCount => 1;
 
 		public SharpenMaterial() : this(Blending.Alpha) { }

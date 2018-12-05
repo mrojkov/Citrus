@@ -26,6 +26,7 @@ namespace Orange.FbxImporter
 			Materials = new FbxMaterial[materialsCount];
 			for (int i = 0; i < materialsCount; i++) {
 				Materials[i] = new FbxMaterial(FbxNodeGetMaterial(NativePtr, i));
+				Materials[i].Name = $"{Materials[i].Name}-{Name}";
 			}
 
 			Attribute = FbxNodeAttribute.GetFromNode(NativePtr);
