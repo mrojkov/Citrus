@@ -241,7 +241,7 @@ namespace Tangerine.Core
 
 			public static void Invert(IOperation operation)
 			{
-				foreach (var p in EnumerateProcessors(operation)) { 
+				foreach (var p in EnumerateProcessors(operation)) {
 					if (operation.Performed) {
 						p.Undo(operation);
 					} else {

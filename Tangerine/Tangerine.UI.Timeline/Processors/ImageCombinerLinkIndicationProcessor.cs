@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
@@ -33,9 +35,13 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 			container = Document.Current.Container;
 			var rows = Document.Current.Rows;
+			var rowIndexesToSkip = new List<int>();
 			for (int i = 0; i < rows.Count; ++i) {
 				var row = rows[i];
 				if (!(row.Components.Get<RowView>()?.RollRow is RollNodeView view)) {
+					continue;
+				}
+				if (rowIndexesToSkip.Remove(i)) {
 					continue;
 				}
 				var node = row.Components.Get<NodeRow>()?.Node;
@@ -43,11 +49,17 @@ namespace Tangerine.UI.Timeline.Processors
 					if (combiner.GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)) {
 						view.RefreshLabelColor();
 						view.LinkIndicatorButtonContainer.EnableIndication<ImageCombinerLinkIndicatorButton>().ShowNormal();
-						SetImageCombinerIndication(rows[i + 1]);
-						SetImageCombinerIndication(rows[i + 2]);
-						i += 2;
-					}
-					else {
+						var arg2Row = rows.FirstOrDefault(r => r.Components.Get<NodeRow>()?.Node == arg2);
+						var arg1Row = rows.FirstOrDefault(r => r.Components.Get<NodeRow>()?.Node == arg1);
+						if (arg2Row != null) {
+							rowIndexesToSkip.Add(rows.IndexOf(arg2Row));
+							SetImageCombinerIndication(arg2Row);
+						}
+						if (arg1Row != null) {
+							rowIndexesToSkip.Add(rows.IndexOf(arg1Row));
+							SetImageCombinerIndication(arg1Row);
+						}
+					} else {
 						view.Label.Color = Theme.Colors.RedText;
 						view.LinkIndicatorButtonContainer.EnableIndication<ImageCombinerLinkIndicatorButton>().ShowError();
 					}
