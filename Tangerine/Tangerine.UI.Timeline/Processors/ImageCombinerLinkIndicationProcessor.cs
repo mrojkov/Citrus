@@ -27,6 +27,7 @@ namespace Tangerine.UI.Timeline.Processors
 		}
 
 		private Node container;
+		private List<int> rowIndexesToSkip = new List<int>();
 
 		public override void Process(IOperation op)
 		{
@@ -35,7 +36,7 @@ namespace Tangerine.UI.Timeline.Processors
 			}
 			container = Document.Current.Container;
 			var rows = Document.Current.Rows;
-			var rowIndexesToSkip = new List<int>();
+			rowIndexesToSkip.Clear();
 			for (int i = 0; i < rows.Count; ++i) {
 				var row = rows[i];
 				if (!(row.Components.Get<RowView>()?.RollRow is RollNodeView view)) {
