@@ -18,6 +18,7 @@ namespace Lime
 	public class VideoPlayer : Image
 	{
 		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
+		public bool MuteAudio { get { return decoder.MuteAudio; } set { decoder.MuteAudio = value; } }
 
 		private VideoDecoder decoder;
 

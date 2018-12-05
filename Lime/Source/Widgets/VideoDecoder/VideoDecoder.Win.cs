@@ -107,6 +107,7 @@ namespace Lime
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
 		public float CurrentPosition { get; set; }
 		public float Duration { get; }
+		public bool MuteAudio = false;
 
 		private Texture2D lumaTexture;
 		private Texture2D chromaTexture;

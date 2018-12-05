@@ -18,6 +18,7 @@ namespace Lime
 		public VideoPlayerStatus Status = VideoPlayerStatus.Playing;
 		public float CurrentPosition { get; set; }
 		public float Duration { get; }
+		public bool MuteAudio = false;
 
 		public VideoDecoder(string path)
 		{

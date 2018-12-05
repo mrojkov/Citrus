@@ -32,6 +32,18 @@ namespace Lime
 		}
 
 		private Texture2D texture;
+		private bool audioMuted = false;
+
+		public bool MuteAudio
+		{
+			get => audioMuted;
+			set {
+				audioMuted = value;
+				if (player != null) {
+					player.Muted = audioMuted;
+				}
+			}
+		}
 
 		private float currentPosition => startTime + stopwatch.ElapsedMilliseconds;
 		private AVPlayerItem playerItem;
