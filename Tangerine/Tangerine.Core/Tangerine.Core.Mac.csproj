@@ -64,6 +64,7 @@
     <Compile Include="Operations\RemoveAnimationProcessor.cs" />
     <Compile Include="Operations\RenameAnimationProcessor.cs" />
     <Compile Include="PropertyValidator.cs" />
+    <Compile Include="SceneCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />
