@@ -11,77 +11,14 @@ using System.Threading.Tasks;
 
 namespace Lime
 {
-	public class ReadWriteStream : Stream
-	{
-		private readonly MemoryStream stream;
-		private readonly object locker = new object();
-
-		public ReadWriteStream()
-		{
-			stream = new MemoryStream();
-		}
-
-		public override bool CanRead => true;
-
-		public override bool CanSeek => false;
-
-		public override bool CanWrite => true;
-
-		public override long Length => stream.Length;
-
-		public override long Position {
-			get { return readPosition; }
-			set { throw new NotImplementedException(); }
-		}
-
-		private long readPosition;
-		private long writePosition;
-
-		public override void Flush()
-		{
-			lock (locker) {
-				stream.Flush();
-			}
-		}
-
-		public override int Read(byte[] buffer, int offset, int count)
-		{
-			lock (locker) {
-				stream.Position = readPosition;
-				int read = stream.Read(buffer, offset, count);
-				readPosition = stream.Position;
-				return read;
-			}
-		}
-
-		public override long Seek(long offset, SeekOrigin origin)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void SetLength(long value)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void Write(byte[] buffer, int offset, int count)
-		{
-			lock (locker) {
-				stream.Position = writePosition;
-				stream.Write(buffer, offset, count);
-				writePosition = stream.Position;
-			}
-		}
-	}
-
 	public class AudioPlayer
 	{
-		private ReadWriteStream stream;
+		private MemoryStream stream;
 		private long writePosition = 0;
 		private Sound sound;
 		public AudioPlayer()
 		{
-			stream = new ReadWriteStream();
+			stream = new MemoryStream();
 			sound = PlatformAudioSystem.Play(stream, AudioChannelGroup.Music);
 		}
 
@@ -128,7 +65,7 @@ namespace Lime
 		private Queue<Sample> audioQueue;
 		private Queue<Sample> videoQueue;
 		private const int MaxAudioQueue = 100;
-		private const int MaxVideoQueue = 100;
+		private const int MaxVideoQueue = 10;
 
 		private long currentPosition;
 
@@ -247,7 +184,9 @@ namespace Lime
 							while (queue.Count >= maxItems) {
 								checkQueue.WaitOne();
 								checkQueue.Reset();
-								token.ThrowIfCancellationRequested();
+								if (token.IsCancellationRequested) {
+									return;
+								}
 							}
 							queue.Enqueue(sample);
 							resetEvent.Set();
@@ -264,7 +203,9 @@ namespace Lime
 							while (currentPosition < sample.PresentationTime) {
 								checkVideo.WaitOne();
 								checkVideo.Reset();
-								token.ThrowIfCancellationRequested();
+								if (token.IsCancellationRequested) {
+									return;
+								}
 							}
 							currentVideoSample = sample;
 							HasNewTexture = true;
@@ -280,7 +221,9 @@ namespace Lime
 							while (currentPosition < sample.PresentationTime) {
 								checkAudio.WaitOne();
 								checkAudio.Reset();
-								token.ThrowIfCancellationRequested();
+								if (token.IsCancellationRequested) {
+									return;
+								}
 							}
 							//currentVideoSample = sample;
 							if (!sample.IsEos) {
@@ -368,6 +311,8 @@ namespace Lime
 
 		public void Dispose()
 		{
+			Stop();
+			texture.Dispose();
 		}
 
 
