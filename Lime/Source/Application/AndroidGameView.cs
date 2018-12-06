@@ -117,6 +117,13 @@ namespace Lime
 			holder.SetType(SurfaceType.Gpu);
 		}
 
+		protected override void Dispose(bool disposing)
+		{
+			DestroyEglSurface();
+			DestroyEglContext();
+			base.Dispose(disposing);
+		}
+
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
 		{
 			// Read FixDelKeyInputConnection class for details.
