@@ -23,8 +23,10 @@ namespace Tangerine.UI
 			if (Parser.TryParse(text, out double newValue) &&
 			    PropertyValidator.ValidateValue((float)newValue, EditorParams.PropertyInfo)) {
 				SetProperty((float)newValue);
+				editor.Text = ((float) newValue).ToString("0.###");
+			} else {
+				editor.Text = current.IsUndefined ? current.Value.ToString("0.###") : ManyValuesText;
 			}
-			editor.Text = current.IsUndefined ? current.Value.ToString("0.###") : ManyValuesText;
 		}
 
 		public override void Submit()

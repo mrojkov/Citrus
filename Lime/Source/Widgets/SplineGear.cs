@@ -18,6 +18,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(6)]
+		[TangerineValidRange(0f, 1f)]
 		public float SplineOffset { get; set; }
 
 		[YuzuMember]

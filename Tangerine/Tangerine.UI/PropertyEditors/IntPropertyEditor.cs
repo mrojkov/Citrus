@@ -28,8 +28,10 @@ namespace Tangerine.UI
 			if (Parser.TryParse(text, out double newValue) &&
 			    PropertyValidator.ValidateValue((int)newValue, EditorParams.PropertyInfo)) {
 				SetProperty((int)newValue);
+				editor.Text = ((int) newValue).ToString();
+			} else {
+				editor.Text = current.IsUndefined ? current.Value.ToString() : ManyValuesText;
 			}
-			editor.Text = current.IsUndefined ? current.Value.ToString() : ManyValuesText;
 		}
 
 		public override void Submit()
