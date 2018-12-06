@@ -23,7 +23,7 @@ namespace Tangerine.UI
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				if (v.IsUndefined) {
-					Selector.Value = v;
+					Selector.Value = v.Value;
 				} else {
 					Selector.Text = ManyValuesText;
 				}
