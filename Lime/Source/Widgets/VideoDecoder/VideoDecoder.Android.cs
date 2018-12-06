@@ -436,6 +436,8 @@ namespace Lime
 
 				public int PassCount => 1;
 
+				public string Id { get; set; }
+
 				public SurfaceTextureMaterial()
 				{
 					blendState = BlendState.Default;
