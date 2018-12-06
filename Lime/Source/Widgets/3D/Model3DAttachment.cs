@@ -238,7 +238,7 @@ namespace Lime
 				}
 
 				var newAnimation = srcAnimation;
-				if (animationId != animation.SourceAnimationId && !string.IsNullOrEmpty(animation.SourceAnimationId)) {
+				if (animationId != animation.SourceAnimationId) {
 					newAnimation = new Lime.Animation {
 						Id = animationId
 					};
@@ -300,7 +300,6 @@ namespace Lime
 				var srcAnimators = new List<IAnimator>();
 				animation.FindAnimators(srcAnimators);
 				if (animationsToReduce.Keys.Contains(animation.Id)) {
-					animation.FindAnimators(srcAnimators);
 					srcAnimators.ForEach(a => ReduceKeys(a, animationsToReduce[animation.Id].Item1, animationsToReduce[animation.Id].Item2));
 					foreach (var animator in srcAnimators.Where(a => a.Keys.Count == 0)) {
 						animator.Owner.Animators.Remove(animator);
