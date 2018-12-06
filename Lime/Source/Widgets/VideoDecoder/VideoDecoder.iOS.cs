@@ -93,6 +93,10 @@ namespace Lime
 			playerItem.AddOutput(videoOutput);
 			var asset = playerItem.Asset;
 			var videoTracks = asset.GetTracks(AVMediaTypes.Video);
+			if (videoTracks.Length == 0) {
+				Status = VideoPlayerStatus.Error;
+				return;
+			}
 			var size = videoTracks[0].NaturalSize;
 			Width = (int)size.Width;
 			Height = (int)size.Height;
