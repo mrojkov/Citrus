@@ -376,12 +376,10 @@ namespace Lime
 				throw new System.Exception($"Could not initialize EGL display, error {GetEglErrorString()}");
 			}
 			var attribLists = new[] {
-				BuildEglConfigAttribs(red: 8, green: 8, blue: 8, depth: 24, stencil: 8),
-				BuildEglConfigAttribs(red: 5, green: 6, blue: 5, depth: 24, stencil: 8),
-				BuildEglConfigAttribs(red: 8, green: 8, blue: 8, depth: 16, stencil: 8),
-				BuildEglConfigAttribs(red: 5, green: 6, blue: 5, depth: 16, stencil: 8),
-				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, depth: 24, stencil: 8),
-				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, depth: 16, stencil: 8)
+				BuildEglConfigAttribs(red: 8, green: 8, blue: 8, alpha: 8, depth: 24, stencil: 8),
+				BuildEglConfigAttribs(red: 8, green: 8, blue: 8, alpha: 8, depth: 16, stencil: 8),
+				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, alpha: 4, depth: 24, stencil: 8),
+				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, alpha: 4, depth: 16, stencil: 8)
 			};
 			var numConfigs = new int[1];
 			if (!egl.EglGetConfigs(eglDisplay, null, 0, numConfigs)) {
