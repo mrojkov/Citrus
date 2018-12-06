@@ -381,14 +381,14 @@ namespace Lime
 				BuildEglConfigAttribs(red: 8, green: 8, blue: 8, depth: 16, stencil: 8),
 				BuildEglConfigAttribs(red: 5, green: 6, blue: 5, depth: 16, stencil: 8),
 				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, depth: 24, stencil: 8),
-				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, depth: 15, stencil: 8)
+				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, depth: 16, stencil: 8)
 			};
 			var numConfigs = new int[1];
 			if (!egl.EglGetConfigs(eglDisplay, null, 0, numConfigs)) {
 				throw new System.Exception($"Could not get EGL config count, error {GetEglErrorString()}");
 			}
 			var configs = new EGLConfig[numConfigs[0]];
-			var configFound = true;
+			var configFound = false;
 			foreach (var attribs in attribLists) {
 				configFound = egl.EglChooseConfig(eglDisplay, attribs, configs, 1, numConfigs) && numConfigs[0] > 0;
 				if (configFound) break;
