@@ -100,7 +100,7 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-
+			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRender;
 			PixelScale = Resources.System.DisplayMetrics.Density;
 
 			if (AsyncRendering) {

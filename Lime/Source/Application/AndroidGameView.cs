@@ -98,6 +98,9 @@ namespace Lime
 		public System.Drawing.Size Size { get; private set; }
 		public event Action<object, EventArgs> Resize;
 
+		public event Action SurfaceCreating;
+		public event Action SurfaceDestroing;
+
 		public GameView(Android.Content.Context context, Input input) : base(context)
 		{
 			this.input = input;
@@ -310,6 +313,7 @@ namespace Lime
 
 		void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
 		{
+			SurfaceCreating?.Invoke();
 			if (eglContext == null) {
 				CreateEglContext();
 			}
@@ -318,6 +322,7 @@ namespace Lime
 
 		void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)
 		{
+			SurfaceDestroing?.Invoke();
 			DestroyEglSurface();
 		}
 
