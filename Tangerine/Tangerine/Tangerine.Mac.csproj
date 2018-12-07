@@ -41,14 +41,14 @@
     <EnableCodeSigning>false</EnableCodeSigning>
     <AOTMode>None</AOTMode>
     <EnableSGenConc>true</EnableSGenConc>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>
     </DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>__UNIFIED__;MAC</DefineConstants>
+    <DefineConstants>__MACOS__;__UNIFIED__;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -62,9 +62,9 @@
     <EnableCodeSigning>false</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
-    <XamMacArch>i386</XamMacArch>
+    <XamMacArch>x86_64</XamMacArch>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

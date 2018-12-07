@@ -29,6 +29,8 @@
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <Profiling>false</Profiling>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -46,6 +48,8 @@
     <EnableCodeSigning>true</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
     <Profiling>false</Profiling>
+    <AOTMode>None</AOTMode>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -89,5 +93,11 @@
     <BundleResource Include="..\Data.Mac">
       <Link>Data.Mac</Link>
     </BundleResource>
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\..\..\3rdParty\FreeType\libfreetype6.dylib">
+      <Kind>Dynamic</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
   </ItemGroup>
 </Project>

@@ -38,7 +38,7 @@
     <I18n>west</I18n>
     <EnableSGenConc>true</EnableSGenConc>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType></DebugType>
@@ -60,7 +60,7 @@
     <I18n>west</I18n>
     <MonoBundlingExtraArgs>--registrar:dynamic</MonoBundlingExtraArgs>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -32,7 +32,7 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -50,7 +50,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>__UNIFIED__; __MACOS__; MAC</DefineConstants>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.SubpixelText|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -63,7 +63,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <UseSGen>false</UseSGen>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release.SubpixelText|AnyCPU'">
     <OutputPath>bin\Release.SubpixelText\</OutputPath>
@@ -76,7 +76,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <UseSGen>false</UseSGen>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

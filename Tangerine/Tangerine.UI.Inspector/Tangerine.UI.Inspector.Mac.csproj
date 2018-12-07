@@ -31,7 +31,7 @@
     <XamMacArch></XamMacArch>
     <Profiling>true</Profiling>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -49,7 +49,7 @@
     <CodeSignResourceRules></CodeSignResourceRules>
     <XamMacArch></XamMacArch>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
