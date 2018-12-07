@@ -370,6 +370,12 @@ namespace Lime
 			keyboardHandler.ProcessTextInput();
 		}
 
+		public override void Resume()
+		{
+			base.Resume();
+			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
+		}
+
 		/// <summary>
 		/// Classes to help fix problem with DEL key event not triggered on some devices
 		/// </summary>
