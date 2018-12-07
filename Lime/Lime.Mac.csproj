@@ -34,7 +34,7 @@
     <Profiling>true</Profiling>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -55,7 +55,7 @@
     <Profiling>false</Profiling>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.Tangerine|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -71,7 +71,7 @@
     <XamMacArch>
     </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.Tangerine|AnyCPU' ">
@@ -88,7 +88,7 @@
     <XamMacArch>
     </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <AOTMode>None</AOTMode>
   </PropertyGroup>
   <ItemGroup>

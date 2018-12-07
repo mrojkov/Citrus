@@ -35,7 +35,7 @@
     <Profiling>true</Profiling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -58,7 +58,7 @@
     </XamMacArch>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AOTMode>None</AOTMode>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
