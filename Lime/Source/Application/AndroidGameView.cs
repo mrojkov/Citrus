@@ -115,6 +115,8 @@ namespace Lime
 
 			Application.SupportedDeviceOrientationsChanged += RestrictSupportedOrientationsWith;
 
+			egl = EGLContext.EGL.JavaCast<IEGL10>();
+
 			holder = Holder;
 			holder.AddCallback(this);
 			holder.SetType(SurfaceType.Gpu);
@@ -124,6 +126,7 @@ namespace Lime
 		{
 			DestroyEglSurface();
 			DestroyEglContext();
+			DestroyEglDisplay();
 			base.Dispose(disposing);
 		}
 
@@ -314,9 +317,6 @@ namespace Lime
 		void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
 		{
 			SurfaceCreating?.Invoke();
-			if (eglContext == null) {
-				CreateEglContext();
-			}
 			CreateEglSurface();
 		}
 
@@ -328,20 +328,20 @@ namespace Lime
 
 		public void MakeCurrent()
 		{
-			var hasError = !egl.EglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
-			if (hasError) {
-				var error = egl.EglGetError();
-				if (error == EGL11.EglContextLost) {
-					EglContextLost();
-					hasError = !egl.EglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
-					if (hasError) {
-						error = egl.EglGetError();
-					}
-				}
-				if (hasError) {
-					throw new System.Exception($"Could not make current EGL context, error {GetEglErrorString(error)}");
-				}
+			if (TryMakeCurrent()) return;
+			var error = egl.EglGetError();
+			if (error == EGL11.EglContextLost) {
+				OnEglContextLost();
+				if (TryMakeCurrent()) return;
+				error = egl.EglGetError();
 			}
+			throw new System.Exception($"Could not make current EGL context, error {GetEglErrorString(error)}");
+		}
+
+		private bool TryMakeCurrent()
+		{
+			EnsureEglContextCreated();
+			return egl.EglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
 		}
 
 		public void UnbindContext()
@@ -356,28 +356,32 @@ namespace Lime
 			if (!egl.EglSwapBuffers(eglDisplay, eglSurface)) {
 				var error = egl.EglGetError();
 				if (error == EGL11.EglContextLost) {
-					EglContextLost();
+					OnEglContextLost();
 				} else {
 					throw new System.Exception($"Could not swap buffers, error {GetEglErrorString(error)}");
 				}
 			}
 		}
 
-		private void EglContextLost()
+		private void OnEglContextLost()
 		{
-			CreateEglContext();
+			eglContext = null;
 			GLObjectRegistry.Instance.DiscardObjects();
 		}
 
-		private void CreateEglContext()
+		private void EnsureEglDisplayCreated()
 		{
-			egl = EGLContext.EGL.JavaCast<IEGL10>();
-			eglDisplay = egl.EglGetDisplay(EGL10.EglDefaultDisplay);
-			if (eglDisplay == null || eglDisplay == EGL10.EglNoDisplay) {
+			if (eglDisplay == null) CreateEglDisplay();
+		}
+
+		private void CreateEglDisplay()
+		{
+			var display = egl.EglGetDisplay(EGL10.EglDefaultDisplay);
+			if (display == null || display == EGL10.EglNoDisplay) {
 				throw new System.Exception($"Could not get EGL display, error {GetEglErrorString()}");
 			}
 			var version = new int[2];
-			if (!egl.EglInitialize(eglDisplay, version)) {
+			if (!egl.EglInitialize(display, version)) {
 				throw new System.Exception($"Could not initialize EGL display, error {GetEglErrorString()}");
 			}
 			var attribLists = new[] {
@@ -387,25 +391,46 @@ namespace Lime
 				BuildEglConfigAttribs(red: 4, green: 4, blue: 4, alpha: 4, depth: 16, stencil: 8)
 			};
 			var numConfigs = new int[1];
-			if (!egl.EglGetConfigs(eglDisplay, null, 0, numConfigs)) {
+			if (!egl.EglGetConfigs(display, null, 0, numConfigs)) {
 				throw new System.Exception($"Could not get EGL config count, error {GetEglErrorString()}");
 			}
 			var configs = new EGLConfig[numConfigs[0]];
 			var configFound = false;
 			foreach (var attribs in attribLists) {
-				configFound = egl.EglChooseConfig(eglDisplay, attribs, configs, 1, numConfigs) && numConfigs[0] > 0;
+				configFound = egl.EglChooseConfig(display, attribs, configs, 1, numConfigs) && numConfigs[0] > 0;
 				if (configFound) break;
 			}
 			if (!configFound) {
 				throw new System.Exception($"Could not choose EGL config, error {GetEglErrorString()}");
 			}
+			eglDisplay = display;
 			eglConfig = configs[0];
+		}
+
+		private void DestroyEglDisplay()
+		{
+			if (eglDisplay != null) {
+				if (!egl.EglTerminate(eglDisplay)) {
+					throw new System.Exception($"Could not terminate EGL display, error {GetEglErrorString()}");
+				}
+				eglDisplay = null;
+			}
+		}
+
+		private void EnsureEglContextCreated()
+		{
+			if (eglContext == null) CreateEglContext();
+		}
+
+		private void CreateEglContext()
+		{
+			EnsureEglDisplayCreated();
 			const int EglContextClientVersion = 0x3098;
-			eglContext = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, new[] { EglContextClientVersion, 2, EGL10.EglNone });
-			if (eglContext == null || eglContext == EGL10.EglNoContext) {
-				eglContext = null;
+			var context = egl.EglCreateContext(eglDisplay, eglConfig, EGL10.EglNoContext, new[] { EglContextClientVersion, 2, EGL10.EglNone });
+			if (context == null || context == EGL10.EglNoContext) {
 				throw new System.Exception($"Could not create EGL context, error {GetEglErrorString()}");
 			}
+			eglContext = context;
 		}
 
 		private void DestroyEglContext()
@@ -416,20 +441,16 @@ namespace Lime
 				}
 				eglContext = null;
 			}
-			if (eglDisplay != null) {
-				if (!egl.EglTerminate(eglDisplay)) {
-					throw new System.Exception($"Could not terminate EGL display, error {GetEglErrorString()}");
-				}
-				eglDisplay = null;
-			}
 		}
 
 		private void CreateEglSurface()
 		{
-			eglSurface = egl.EglCreateWindowSurface(eglDisplay, eglConfig, (Java.Lang.Object)Holder, null);
-			if (eglSurface == null || eglSurface == EGL10.EglNoSurface) {
+			EnsureEglDisplayCreated();
+			var surface = egl.EglCreateWindowSurface(eglDisplay, eglConfig, (Java.Lang.Object)Holder, null);
+			if (surface == null || surface == EGL10.EglNoSurface) {
 				throw new System.Exception($"Could not create EGL surface, error {GetEglErrorString()}");
 			}
+			eglSurface = surface;
 		}
 
 		private void DestroyEglSurface()
