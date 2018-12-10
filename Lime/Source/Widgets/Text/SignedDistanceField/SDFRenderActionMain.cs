@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lime
+namespace Lime.SignedDistanceField
 {
 	internal class SDFRenderActionMain : SDFRenderAction
 	{

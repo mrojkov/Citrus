@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lime
+namespace Lime.SignedDistanceField
 {
 	public class SignedDistanceFieldMaterial : IMaterial
 	{

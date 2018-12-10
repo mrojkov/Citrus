@@ -1,6 +1,6 @@
 using System;
 
-namespace Lime
+namespace Lime.SignedDistanceField
 {
 	class SDFPresenter : IPresenter
 	{

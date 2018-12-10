@@ -7161,9 +7161,9 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		private static void Read_Lime_SignedDistanceField__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.SignedDistanceFieldComponent)obj;
+			var result = (global::Lime.SignedDistanceField.SignedDistanceFieldComponent)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -7184,40 +7184,44 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.GradientEnabled = d.Reader.ReadBoolean();
+				result.GradientAngle = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.GradientEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp3 = new global::Lime.Color4();
 				tmp3.ABGR = d.Reader.ReadUInt32();
 				result.OutlineColor = tmp3;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (6 == fd.OurIndex) {
 				result.Softness = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (6 == fd.OurIndex) {
+			if (7 == fd.OurIndex) {
 				result.Thickness = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
+			if (8 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp4 = new global::Lime.Color4();
 				tmp4.ABGR = d.Reader.ReadUInt32();
 				result.UnderlayColor = tmp4;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (8 == fd.OurIndex) {
+			if (9 == fd.OurIndex) {
 				result.UnderlayDilate = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (9 == fd.OurIndex) {
+			if (10 == fd.OurIndex) {
 				result.UnderlayEnabled = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (10 == fd.OurIndex) {
+			if (11 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp5 = new global::Lime.Vector2();
 				tmp5.X = d.Reader.ReadSingle();
@@ -7225,17 +7229,17 @@ namespace GeneratedDeserializersBIN
 				result.UnderlayOffset = tmp5;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (11 == fd.OurIndex) {
+			if (12 == fd.OurIndex) {
 				result.UnderlaySoftness = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
-		private static object Make_Lime__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime_SignedDistanceField__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.SignedDistanceFieldComponent();
-			Read_Lime__SignedDistanceFieldComponent(d, def, result);
+			var result = new global::Lime.SignedDistanceField.SignedDistanceFieldComponent();
+			Read_Lime_SignedDistanceField__SignedDistanceFieldComponent(d, def, result);
 			return result;
 		}
 
@@ -9897,7 +9901,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.SerializableTexture)] = Read_Lime__SerializableTexture;
-			readCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Read_Lime__SignedDistanceFieldComponent;
+			readCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldComponent)] = Read_Lime_SignedDistanceField__SignedDistanceFieldComponent;
 			readCache[typeof(global::Lime.SimpleText)] = Read_Lime__SimpleText;
 			readCache[typeof(global::Lime.SkinningWeights)] = Read_Lime__SkinningWeights;
 			readCache[typeof(global::Lime.Slider)] = Read_Lime__Slider;
@@ -10069,7 +10073,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.SerializableFont)] = Make_Lime__SerializableFont;
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;
 			makeCache[typeof(global::Lime.SerializableTexture)] = Make_Lime__SerializableTexture;
-			makeCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Make_Lime__SignedDistanceFieldComponent;
+			makeCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldComponent)] = Make_Lime_SignedDistanceField__SignedDistanceFieldComponent;
 			makeCache[typeof(global::Lime.SimpleText)] = Make_Lime__SimpleText;
 			makeCache[typeof(global::Lime.Size)] = Make_Lime__Size;
 			makeCache[typeof(global::Lime.SkinningWeights)] = Make_Lime__SkinningWeights;

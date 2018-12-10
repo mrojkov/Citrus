@@ -407,14 +407,14 @@
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SignedDistanceFieldComponent.cs" />
-    <Compile Include="Source\Widgets\Text\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFPresenter.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />
-    <Compile Include="Source\Widgets\Text\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionUnderlay.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

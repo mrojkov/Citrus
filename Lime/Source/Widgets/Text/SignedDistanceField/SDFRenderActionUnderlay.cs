@@ -1,4 +1,4 @@
-namespace Lime
+namespace Lime.SignedDistanceField
 {
 	internal class SDFRenderActionUnderlay : SDFRenderAction
 	{

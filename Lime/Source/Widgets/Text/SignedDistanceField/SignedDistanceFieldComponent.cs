@@ -1,6 +1,6 @@
 using Yuzu;
 
-namespace Lime
+namespace Lime.SignedDistanceField
 {
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
