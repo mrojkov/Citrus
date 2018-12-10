@@ -643,16 +643,16 @@ namespace Lime
 					vertices[v++].UV2 = sprite.Vertex1UV2;
 					vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.TX, Y = x1uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = sprite.Vertex2UV1;
-					vertices[v++].UV2 = sprite.Vertex2UV2;
+					vertices[v].UV1 = new Vector2(sprite.Vertex2UV1.X, sprite.Vertex1UV1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.Vertex2UV2.X, sprite.Vertex1UV2.Y);
 					vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.TX, Y = x0uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = sprite.Vertex4UV1;
-					vertices[v++].UV2 = sprite.Vertex4UV2;
+					vertices[v].UV1 = new Vector2(sprite.Vertex1UV1.X, sprite.Vertex2UV1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.Vertex1UV2.X, sprite.Vertex2UV2.Y);
 					vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.TX, Y = x1uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = sprite.Vertex3UV1;
-					vertices[v++].UV2 = sprite.Vertex3UV2;
+					vertices[v].UV1 = sprite.Vertex2UV1;
+					vertices[v++].UV2 = sprite.Vertex2UV2;
 				}
 				batch.LastIndex = i;
 				batch.LastVertex = v;

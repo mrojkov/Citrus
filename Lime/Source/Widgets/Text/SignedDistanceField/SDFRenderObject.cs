@@ -35,6 +35,7 @@ namespace Lime
 		public Color4 UnderlayColor;
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
+		public float GradientAngle;
 
 		protected override void OnRelease()
 		{

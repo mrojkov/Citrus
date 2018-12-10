@@ -67,6 +67,7 @@ namespace Lime
 			ro.UnderlayEnabled = component.UnderlayEnabled;
 			ro.GradientEnabled = component.GradientEnabled;
 			ro.Gradient = component.Gradient;
+			ro.GradientAngle = component.GradientAngle;
 
 			return ro;
 		}

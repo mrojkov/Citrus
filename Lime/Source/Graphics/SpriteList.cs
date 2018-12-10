@@ -12,12 +12,8 @@ namespace Lime
 		public Color4 Color;
 		public Vector2 Vertex1UV1;
 		public Vector2 Vertex2UV1;
-		public Vector2 Vertex3UV1;
-		public Vector2 Vertex4UV1;
 		public Vector2 Vertex1UV2;
 		public Vector2 Vertex2UV2;
-		public Vector2 Vertex3UV2;
-		public Vector2 Vertex4UV2;
 		public Vector2 Position;
 		public Vector2 Size;
 		
@@ -186,13 +182,9 @@ namespace Lime
 					s.Size = cd.Size(FontHeight);
 					s.Texture1 = cd.FontChar.Texture;
 					s.Vertex1UV1 = cd.FontChar.UV0;
-					s.Vertex2UV1 = new Vector2(cd.FontChar.UV1.X, cd.FontChar.UV0.Y);
-					s.Vertex3UV1 = cd.FontChar.UV1;
-					s.Vertex4UV1 = new Vector2(cd.FontChar.UV0.X, cd.FontChar.UV1.Y);
+					s.Vertex2UV1 = cd.FontChar.UV1;
 					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.Vertex1UV1);
 					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.Vertex2UV1);
-					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.Vertex3UV1);
-					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.Vertex4UV1);
 					s.Color = Color;
 					if (cd.FontChar.RgbIntensity) {
 						s.Material = Sprite.LcdFontMaterialProvider.Instance.GetMaterial(Tag);
@@ -228,12 +220,10 @@ namespace Lime
 		}
 
 		public void Add(
-			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 vertex1UV1, Vector2 vertex2UV1, Vector2 vertex3UV1, Vector2 vertex4UV1, int tag)
+			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 vertex1UV1, Vector2 vertex2UV1, int tag)
 		{
 			texture.TransformUVCoordinatesToAtlasSpace(ref vertex1UV1);
 			texture.TransformUVCoordinatesToAtlasSpace(ref vertex2UV1);
-			texture.TransformUVCoordinatesToAtlasSpace(ref vertex3UV1);
-			texture.TransformUVCoordinatesToAtlasSpace(ref vertex4UV1);
 			items.Add(new NormalSprite {
 				Texture1 = texture,
 				Color = color,
@@ -241,8 +231,6 @@ namespace Lime
 				Size = size,
 				Vertex1UV1 = vertex1UV1,
 				Vertex2UV1 = vertex2UV1,
-				Vertex3UV1 = vertex3UV1,
-				Vertex4UV1 = vertex4UV1,
 				Tag = tag,
 			});
 		}

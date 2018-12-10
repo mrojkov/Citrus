@@ -15,6 +15,7 @@ namespace Lime
 		private readonly ShaderParamKey<float> dilateKey;
 		private readonly ShaderParamKey<float> thicknessKey;
 		private readonly ShaderParamKey<Vector4> outlineColorKey;
+		private readonly ShaderParamKey<float> gradientAngleKey;
 
 		private const int gradientTexturePixelCount = 2048;
 		private readonly GradientControlPoint[] cachedPoints;
@@ -38,6 +39,7 @@ namespace Lime
 				}
 			}
 		}
+		public float GradientAngle { get; set; } = 0f;
 		public Texture2D GradientTexture { get; private set; }
 
 		public int PassCount => 1;
@@ -53,6 +55,7 @@ namespace Lime
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
 			thicknessKey = shaderParams.GetParamKey<float>("thickness");
 			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
+			gradientAngleKey = shaderParams.GetParamKey<float>("g_angle");
 
 			cachedPoints = new GradientControlPoint[gradientTexturePixelCount];
 			pixels = new Color4[gradientTexturePixelCount];
@@ -71,6 +74,7 @@ namespace Lime
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(thicknessKey, -Thickness * 0.01f);
 			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
+			shaderParams.Set(gradientAngleKey, GradientAngle * Mathf.DegToRad);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance(!GradientEnabled));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -130,10 +134,8 @@ namespace Lime
 
 		public Sprite ProcessSprite(Sprite s)
 		{
-			s.Vertex2UV2 = Vector2.Zero;
-			s.Vertex3UV2 = Vector2.Right;
-			s.Vertex4UV2 = Vector2.One;
-			s.Vertex1UV2 = Vector2.Down;
+			s.Vertex1UV2 = Vector2.Zero;
+			s.Vertex2UV2 = Vector2.One;
 			return s;
 		}
 	}
@@ -173,13 +175,19 @@ namespace Lime
 			uniform lowp float thickness;
 			uniform lowp vec4 outlineColor;
 
+			uniform lowp float g_angle;
+
 			void main() {
 				lowp float distance = texture2D(tex1, texCoords1).r;
 				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
 				lowp float alpha = smoothstep(dilate + thickness - softness, dilate + thickness + softness, distance);
 ";
 		private const string FragmentShaderTextureColorPart2 = @"
-				lowp vec4 g_color = texture2D(tex2, texCoords2);
+				float g_sin = sin(g_angle);
+				float g_cos = cos(g_angle);
+
+				vec2 gradientCoords = vec2(dot(texCoords2, vec2(g_cos, g_sin)), dot(texCoords2, vec2(-g_sin, g_cos)));
+				lowp vec4 g_color = texture2D(tex2, gradientCoords);
 				lowp vec4 c = mix(outlineColor, g_color, outlineFactor);
 				gl_FragColor = vec4(c.rgb, c.a * alpha);
 			}";

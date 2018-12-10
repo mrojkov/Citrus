@@ -18,6 +18,7 @@ namespace Lime
 			ro.SDFMaterial.OutlineColor = ro.OutlineColor;
 			ro.SDFMaterial.Gradient = ro.Gradient;
 			ro.SDFMaterial.GradientEnabled = ro.GradientEnabled;
+			ro.SDFMaterial.GradientAngle = ro.GradientAngle;
 			ro.RenderSpriteList(ro.SDFMaterialProvider);
 		}
 	}

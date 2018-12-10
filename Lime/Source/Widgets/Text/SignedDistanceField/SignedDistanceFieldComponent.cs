@@ -4,7 +4,7 @@ namespace Lime
 {
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
-	class SignedDistanceFieldComponent : NodeBehavior
+	class SignedDistanceFieldComponent : NodeComponent
 	{
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
@@ -100,6 +100,10 @@ namespace Lime
 		[YuzuMember]
 		[TangerineGroup(GroupGradient)]
 		public ColorGradient Gradient { get; set; } = new ColorGradient(Color4.White, Color4.Black);
+
+		[YuzuMember]
+		[TangerineGroup(GroupGradient)]
+		public float GradientAngle { get; set; }
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{
