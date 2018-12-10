@@ -18,10 +18,8 @@ namespace Lime.SignedDistanceField
 		private readonly ShaderParamKey<float> gradientAngleKey;
 
 		private const int gradientTexturePixelCount = 2048;
-		private readonly GradientControlPoint[] cachedPoints;
-		private readonly Color4[] pixels;
+		private Color4[] pixels;
 		private int currentVersion;
-		private int currentSize;
 		private ColorGradient gradient;
 
 		public float Softness { get; set; } = 0f;
@@ -57,7 +55,6 @@ namespace Lime.SignedDistanceField
 			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
 			gradientAngleKey = shaderParams.GetParamKey<float>("g_angle");
 
-			cachedPoints = new GradientControlPoint[gradientTexturePixelCount];
 			pixels = new Color4[gradientTexturePixelCount];
 			GradientTexture = new Texture2D {
 				TextureParams = new TextureParams {
@@ -78,7 +75,7 @@ namespace Lime.SignedDistanceField
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance(!GradientEnabled));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
-			if (Gradient != null) {
+			if (GradientEnabled && Gradient != null) {
 				InvalidateTextureIfNecessary();
 				PlatformRenderer.SetTextureLegacy(1, GradientTexture);
 			}
@@ -89,24 +86,7 @@ namespace Lime.SignedDistanceField
 			var hash = Gradient.GetHashCode();
 			if (forceInvalidate || currentVersion != hash) {
 				currentVersion = hash;
-				Array.Clear(cachedPoints, 0, currentSize);
-				currentSize = Gradient.Count;
-				for (var j = 0; j < currentSize; j++) {
-					cachedPoints[j] = Gradient[j];
-				}
-				var i = 0;
-				Array.Sort(cachedPoints, 0, currentSize, Gradient);
-				for (var j = 0; j < currentSize - 1; j++) {
-					var lastPixel = cachedPoints[j + 1].Position * gradientTexturePixelCount;
-					while (i < lastPixel) {
-						var start = cachedPoints[j].Position * gradientTexturePixelCount;
-						var ratio = (i - start) / (lastPixel - start);
-						pixels[i++] = Color4.Lerp(ratio, cachedPoints[j].Color, cachedPoints[j + 1].Color);
-					}
-				}
-				while (i < gradientTexturePixelCount - 1) {
-					pixels[i++] = cachedPoints[currentSize - 1].Color;
-				}
+				Gradient.Rasterize(ref pixels);
 				GradientTexture.LoadImage(pixels, gradientTexturePixelCount, 1);
 			}
 		}
