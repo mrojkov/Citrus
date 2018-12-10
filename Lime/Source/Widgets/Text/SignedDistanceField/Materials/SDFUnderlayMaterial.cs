@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Text;
-
 namespace Lime.SignedDistanceField
 {
 	public class SDFUnderlayMaterial : IMaterial

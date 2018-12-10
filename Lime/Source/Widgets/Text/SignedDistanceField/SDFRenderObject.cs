@@ -1,5 +1,3 @@
-using Lime;
-
 namespace Lime.SignedDistanceField
 {
 	class SDFRenderObject : RenderObject

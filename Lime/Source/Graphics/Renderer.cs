@@ -639,20 +639,20 @@ namespace Lime
 					float y1vy = y1 * matrix.VY;
 					vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.TX, Y = x0uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = sprite.Vertex1UV1;
-					vertices[v++].UV2 = sprite.Vertex1UV2;
+					vertices[v].UV1 = sprite.UV0T1;
+					vertices[v++].UV2 = sprite.UV0T2;
 					vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.TX, Y = x1uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = new Vector2(sprite.Vertex2UV1.X, sprite.Vertex1UV1.Y);
-					vertices[v++].UV2 = new Vector2(sprite.Vertex2UV2.X, sprite.Vertex1UV2.Y);
+					vertices[v].UV1 = new Vector2(sprite.UV1T1.X, sprite.UV0T1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.UV1T2.X, sprite.UV0T2.Y);
 					vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.TX, Y = x0uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = new Vector2(sprite.Vertex1UV1.X, sprite.Vertex2UV1.Y);
-					vertices[v++].UV2 = new Vector2(sprite.Vertex1UV2.X, sprite.Vertex2UV2.Y);
+					vertices[v].UV1 = new Vector2(sprite.UV0T1.X, sprite.UV1T1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.UV0T2.X, sprite.UV1T2.Y);
 					vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.TX, Y = x1uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v].UV1 = sprite.Vertex2UV1;
-					vertices[v++].UV2 = sprite.Vertex2UV2;
+					vertices[v].UV1 = sprite.UV1T1;
+					vertices[v++].UV2 = sprite.UV1T2;
 				}
 				batch.LastIndex = i;
 				batch.LastVertex = v;

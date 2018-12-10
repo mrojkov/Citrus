@@ -1,4 +1,3 @@
-
 namespace Lime.SignedDistanceField
 {
 	internal abstract class SDFRenderAction

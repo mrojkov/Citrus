@@ -7161,9 +7161,9 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		private static void Read_Lime_SignedDistanceField__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		private static void Read_Lime__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.SignedDistanceField.SignedDistanceFieldComponent)obj;
+			var result = (global::Lime.SignedDistanceFieldComponent)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -7236,10 +7236,10 @@ namespace GeneratedDeserializersBIN
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
-		private static object Make_Lime_SignedDistanceField__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def)
+		private static object Make_Lime__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.SignedDistanceField.SignedDistanceFieldComponent();
-			Read_Lime_SignedDistanceField__SignedDistanceFieldComponent(d, def, result);
+			var result = new global::Lime.SignedDistanceFieldComponent();
+			Read_Lime__SignedDistanceFieldComponent(d, def, result);
 			return result;
 		}
 
@@ -9901,7 +9901,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.SerializableTexture)] = Read_Lime__SerializableTexture;
-			readCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldComponent)] = Read_Lime_SignedDistanceField__SignedDistanceFieldComponent;
+			readCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Read_Lime__SignedDistanceFieldComponent;
 			readCache[typeof(global::Lime.SimpleText)] = Read_Lime__SimpleText;
 			readCache[typeof(global::Lime.SkinningWeights)] = Read_Lime__SkinningWeights;
 			readCache[typeof(global::Lime.Slider)] = Read_Lime__Slider;
@@ -10073,7 +10073,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.SerializableFont)] = Make_Lime__SerializableFont;
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;
 			makeCache[typeof(global::Lime.SerializableTexture)] = Make_Lime__SerializableTexture;
-			makeCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldComponent)] = Make_Lime_SignedDistanceField__SignedDistanceFieldComponent;
+			makeCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Make_Lime__SignedDistanceFieldComponent;
 			makeCache[typeof(global::Lime.SimpleText)] = Make_Lime__SimpleText;
 			makeCache[typeof(global::Lime.Size)] = Make_Lime__Size;
 			makeCache[typeof(global::Lime.SkinningWeights)] = Make_Lime__SkinningWeights;

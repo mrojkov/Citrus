@@ -114,8 +114,8 @@ namespace Lime.SignedDistanceField
 
 		public Sprite ProcessSprite(Sprite s)
 		{
-			s.Vertex1UV2 = Vector2.Zero;
-			s.Vertex2UV2 = Vector2.One;
+			s.UV0T2 = Vector2.Zero;
+			s.UV1T2 = Vector2.One;
 			return s;
 		}
 	}
