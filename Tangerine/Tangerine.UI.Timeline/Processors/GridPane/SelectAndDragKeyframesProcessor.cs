@@ -122,30 +122,26 @@ namespace Tangerine.UI.Timeline
 				Window.Current.Invalidate();
 				yield return null;
 			}
-			// If a user has clicked with control on a keyframe, try to deselect it [CIT-125].
-			if (input.IsKeyPressed(Key.Control) && time < 0.2f) {
-				var kfr = new HasKeyframeRequest(initialCell);
-				Timeline.Globals.Add(kfr);
-				yield return null;
-				Timeline.Globals.Remove<HasKeyframeRequest>();
-				if (kfr.Result) {
-					Operations.DeselectGridSpan.Perform(kfr.Cell.Y, kfr.Cell.X, kfr.Cell.X + 1);
-				}
-			}
-			Grid.OnPostRender -= Action;
-			Window.Current.Invalidate();
 			if (offset != IntVector2.Zero) {
 				Timeline.Globals.Add(new DragKeyframesRequest(offset, !input.IsKeyPressed(Key.Alt)));
 				Timeline.Ruler.MeasuredFrameDistance = 0;
 			} else {
-				Operations.ClearGridSelection.Perform();
-				var currentCell = Grid.CellUnderMouse();
-				Operations.SelectGridSpan.Perform(
-					currentCell.Y,
-					currentCell.X,
-					currentCell.X + 1
-				);
+				// If a user has clicked with control on a keyframe, try to deselect it [CIT-125].
+				if (input.IsKeyPressed(Key.Control) && time < 0.2f) {
+					var cell = Grid.CellUnderMouse();
+					Operations.DeselectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
+				} else {
+					Operations.ClearGridSelection.Perform();
+					var currentCell = Grid.CellUnderMouse();
+					Operations.SelectGridSpan.Perform(
+						currentCell.Y,
+						currentCell.X,
+						currentCell.X + 1
+					);
+				}
 			}
+			Grid.OnPostRender -= Action;
+			Window.Current.Invalidate();
 		}
 
 		private static IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)

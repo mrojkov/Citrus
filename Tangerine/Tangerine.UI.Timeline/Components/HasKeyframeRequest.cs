@@ -13,5 +13,5 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.Cell = cell;
 		}
-	}	
+	}
 }
