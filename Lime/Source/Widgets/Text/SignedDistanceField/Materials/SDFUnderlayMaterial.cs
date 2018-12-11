@@ -19,6 +19,8 @@ namespace Lime.SignedDistanceField
 
 		public int PassCount => 1;
 
+		public string Id { get; set; }
+
 		public SDFUnderlayMaterial() : this(Blending.Alpha) { }
 
 		public SDFUnderlayMaterial(Blending blending)

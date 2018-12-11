@@ -40,6 +40,8 @@ namespace Lime.SignedDistanceField
 		public float GradientAngle { get; set; } = 0f;
 		public Texture2D GradientTexture { get; private set; }
 
+		public string Id { get; set; }
+
 		public int PassCount => 1;
 
 		public SignedDistanceFieldMaterial() : this(Blending.Alpha) { }
