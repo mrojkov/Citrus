@@ -468,10 +468,16 @@ namespace Tangerine.Panels
 					foreach (int i in path) {
 						node = node.Nodes[i];
 					}
+				} else {
+					// to ensure TangerineFlags.DisplayContent set by EnterNode is cleared
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.LeaveNode.Perform();
+					});
 				}
 				Document.Current.History.DoTransaction(() => {
-					Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
-					Core.Operations.SelectNode.Perform(node);
+					if (Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false)) {
+						Core.Operations.SelectNode.Perform(node);
+					}
 				});
 			}
 
