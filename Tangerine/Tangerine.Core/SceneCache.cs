@@ -54,7 +54,6 @@ namespace Tangerine.Core
 
 			private void RefreshDependencies()
 			{
-				var sw = System.Diagnostics.Stopwatch.StartNew();
 				dependencies.Clear();
 				if (Node == null) {
 					return;
@@ -66,8 +65,6 @@ namespace Tangerine.Core
 					}
 				}
 				areDependenciesValid = true;
-				sw.Stop();
-				Console.WriteLine($"RefreshDependencies took {sw.ElapsedMilliseconds} ms");
 			}
 		}
 
