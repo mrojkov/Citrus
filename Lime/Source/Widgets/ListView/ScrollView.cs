@@ -18,7 +18,22 @@ namespace Lime
 
 		protected bool IsBeingRefreshed { get; set; }
 		public bool CanScroll { get; set; }
-		public bool ScrollBySlider { get; set; }
+		public bool ScrollBySlider {
+			get => scrollBySlider;
+			set
+			{
+				if (scrollBySlider == value) {
+					return;
+				}
+				scrollBySlider = value;
+				if (value) {
+					Frame.Gestures.Remove(dragGesture);
+				} else {
+					Frame.Gestures.Add(dragGesture);
+				}
+			}
+		}
+		private bool scrollBySlider;
 		public bool RejectOrtogonalSwipes { get; set; }
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
