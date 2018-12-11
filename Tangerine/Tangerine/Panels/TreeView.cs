@@ -292,7 +292,9 @@ namespace Tangerine.Panels
 					}
 					HighlightText();
 				}));
-				treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
+				var clickGesture = new ClickGesture();
+				clickGesture.Began += () => view.SelectTreeNode(this);
+				treeNodeWidget.Gestures.Add(clickGesture);
 				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
 				AddNode(treeNodeWidget);
 
