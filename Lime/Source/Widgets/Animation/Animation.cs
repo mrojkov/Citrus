@@ -36,6 +36,7 @@ namespace Lime
 			{
 				TimeInternal = value;
 				NextMarkerOrTriggerTime = null;
+				RunningMarkerId = null;
 				ApplyAnimators(invokeTriggers: false);
 			}
 		}
