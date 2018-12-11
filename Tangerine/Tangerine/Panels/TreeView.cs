@@ -222,7 +222,7 @@ namespace Tangerine.Panels
 
 		private class TreeNode : Widget
 		{
-			private const float DefaultPadding = 5;
+			private const float DefaultPadding = 2;
 			private const float DefaultJointWidth = 19;
 
 			private readonly Node rootNode;
