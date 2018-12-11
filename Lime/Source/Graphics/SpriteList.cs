@@ -6,17 +6,21 @@ namespace Lime
 	public class Sprite
 	{
 		public int Tag;
-		public ITexture Texture;
+		public ITexture Texture1;
+		public ITexture Texture2;
 		public IMaterial Material;
 		public Color4 Color;
-		public Vector2 UV0;
-		public Vector2 UV1;
+		public Vector2 UV0T1;
+		public Vector2 UV1T1;
+		public Vector2 UV0T2;
+		public Vector2 UV1T2;
 		public Vector2 Position;
 		public Vector2 Size;
 		
 		public interface IMaterialProvider
 		{
 			IMaterial GetMaterial(int tag);
+			Sprite ProcessSprite(Sprite s);
 		}
 		
 		public class DefaultMaterialProvider : IMaterialProvider
@@ -34,6 +38,8 @@ namespace Lime
 			{
 				return material;
 			}
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 		
 		public class LcdFontMaterialProvider : IMaterialProvider
@@ -44,6 +50,8 @@ namespace Lime
 			{
 				return LcdFontMaterial.Instance;
 			}
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 		
 		public class LcdFontMaterial : IMaterial
@@ -132,7 +140,7 @@ namespace Lime
 			public void AddToList(List<Sprite> sprites, IMaterialProvider provider)
 			{
 				Material = provider.GetMaterial(Tag);
-				sprites.Add(this);
+				sprites.Add(provider.ProcessSprite(this));
 			}
 
 			public bool HitTest(Vector2 point, out int tag)
@@ -172,18 +180,18 @@ namespace Lime
 					s.Tag = Tag;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
-					s.UV0 = cd.FontChar.UV0;
-					s.UV1 = cd.FontChar.UV1;
-					s.Texture = cd.FontChar.Texture;
-					s.Texture.TransformUVCoordinatesToAtlasSpace(ref s.UV0);
-					s.Texture.TransformUVCoordinatesToAtlasSpace(ref s.UV1);
+					s.Texture1 = cd.FontChar.Texture;
+					s.UV0T1 = cd.FontChar.UV0;
+					s.UV1T1 = cd.FontChar.UV1;
+					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.UV0T1);
+					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.UV1T1);
 					s.Color = Color;
 					if (cd.FontChar.RgbIntensity) {
 						s.Material = Sprite.LcdFontMaterialProvider.Instance.GetMaterial(Tag);
 					} else {
 						s.Material = provider.GetMaterial(Tag);
 					}
-					sprites.Add(s);
+					sprites.Add(provider.ProcessSprite(s));
 				}
 			}
 			
@@ -212,17 +220,17 @@ namespace Lime
 		}
 
 		public void Add(
-			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1, int tag)
+			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, int tag)
 		{
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv0t1);
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv1t1);
 			items.Add(new NormalSprite {
-				Texture = texture,
+				Texture1 = texture,
 				Color = color,
 				Position = position,
 				Size = size,
-				UV0 = uv0,
-				UV1 = uv1,
+				UV0T1 = uv0t1,
+				UV1T1 = uv1t1,
 				Tag = tag,
 			});
 		}

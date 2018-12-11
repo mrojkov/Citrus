@@ -604,11 +604,11 @@ namespace Lime
 						continue;
 					}
 				}
-				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture && s.Material == batchedSprites[0].Material) {
+				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture1 == batchedSprites[0].Texture1 && s.Material == batchedSprites[0].Material) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
-				var texture = batchedSprites[0].Texture;
+				var texture = batchedSprites[0].Texture1;
 				var material = batchedSprites[0].Material;
 				var batch = CurrentRenderList.GetBatch<Vertex>(texture, null, material, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
@@ -637,20 +637,22 @@ namespace Lime
 					float x1uy = x1 * matrix.UY;
 					float y1vx = y1 * matrix.VX;
 					float y1vy = y1 * matrix.VY;
-					var uv0 = sprite.UV0;
-					var uv1 = sprite.UV1;
 					vertices[v].Pos = new Vector2 { X = x0ux + y0vx + matrix.TX, Y = x0uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v++].UV1 = uv0;
+					vertices[v].UV1 = sprite.UV0T1;
+					vertices[v++].UV2 = sprite.UV0T2;
 					vertices[v].Pos = new Vector2 { X = x1ux + y0vx + matrix.TX, Y = x1uy + y0vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v++].UV1 = new Vector2 { X = uv1.X, Y = uv0.Y };
+					vertices[v].UV1 = new Vector2(sprite.UV1T1.X, sprite.UV0T1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.UV1T2.X, sprite.UV0T2.Y);
 					vertices[v].Pos = new Vector2 { X = x0ux + y1vx + matrix.TX, Y = x0uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v++].UV1 = new Vector2 { X = uv0.X, Y = uv1.Y };
+					vertices[v].UV1 = new Vector2(sprite.UV0T1.X, sprite.UV1T1.Y);
+					vertices[v++].UV2 = new Vector2(sprite.UV0T2.X, sprite.UV1T2.Y);
 					vertices[v].Pos = new Vector2 { X = x1ux + y1vx + matrix.TX, Y = x1uy + y1vy + matrix.TY };
 					vertices[v].Color = effectiveColor;
-					vertices[v++].UV1 = uv1;
+					vertices[v].UV1 = sprite.UV1T1;
+					vertices[v++].UV2 = sprite.UV1T2;
 				}
 				batch.LastIndex = i;
 				batch.LastVertex = v;

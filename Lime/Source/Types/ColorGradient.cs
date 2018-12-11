@@ -42,6 +42,23 @@ namespace Lime
 			return this.OrderBy(p => p.Position);
 		}
 
+		public void Rasterize(ref Color4[] pixels)
+		{
+			var pixelCount = pixels.Length;
+			var i = 0;
+			for (var j = 0; j < Count - 1; j++) {
+				var lastPixel = (j + 1 < Count) ? this[j + 1].Position * pixelCount : pixelCount;
+				while (i < lastPixel) {
+					var start = this[j].Position * pixelCount;
+					var ratio = (i - start) / (lastPixel - start);
+					pixels[i++] = Color4.Lerp(ratio, this[j].Color, this[j + 1].Color);
+				}
+			}
+			while (i < pixelCount - 1) {
+				pixels[i++] = this[Count - 1].Color;
+			}
+		}
+
 		public ColorGradient Clone()
 		{
 			var clone = new ColorGradient();

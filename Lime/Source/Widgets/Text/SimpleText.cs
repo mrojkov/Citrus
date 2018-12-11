@@ -520,7 +520,7 @@ namespace Lime
 			return clone;
 		}
 
-		private class RenderObject : WidgetRenderObject
+		internal class RenderObject : WidgetRenderObject
 		{
 			public SpriteList SpriteList;
 			public int GradientMapIndex;
@@ -564,6 +564,8 @@ namespace Lime
 			}
 
 			public IMaterial GetMaterial(int tag) => material;
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 	}
 }

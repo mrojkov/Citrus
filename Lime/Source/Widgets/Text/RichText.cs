@@ -344,7 +344,7 @@ namespace Lime
 			}
 		}
 
-		private class RenderObject : WidgetRenderObject
+		internal class RenderObject : WidgetRenderObject
 		{
 			public SpriteList SpriteList;
 			public int[] GradientMapIndices;
@@ -411,6 +411,8 @@ namespace Lime
 				}
 				return material;
 			}
+
+			public Sprite ProcessSprite(Sprite s) => s;
 		}
 	}
 }
