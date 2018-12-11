@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +23,7 @@ namespace Lime
 		private PollableEvent recognized;
 
 		internal Action InternalRecognized;
+		public static float Threshold;
 
 		/// <summary>
 		/// Occurs if a user has touched upon the widget.
@@ -38,6 +39,8 @@ namespace Lime
 		/// Occurs when the gesture is fully recognized.
 		/// </summary>
 		public event Action Recognized { add { recognized.Handler += value; } remove { recognized.Handler -= value; } }
+
+		public Vector2 MousePressPosition { get; private set; }
 
 		public bool WasBegan() => began.HasOccurred();
 		public bool WasCanceled() => canceled.HasOccurred();
@@ -76,6 +79,7 @@ namespace Lime
 			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
 				pressTime = DateTime.Now;
 				state = State.WaitDrags;
+				MousePressPosition = Input.MousePosition;
 			}
 			if (state == State.WaitDrags) {
 				// Defer began event if there are any drag gesture.
@@ -91,7 +95,9 @@ namespace Lime
 			if (state == State.Began) {
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					state = State.Initial;
-					if (Owner.IsMouseOverThisOrDescendant()) {
+					if ((Input.MousePosition - MousePressPosition).SqrLength < Threshold.Sqr() ||
+						 Owner.IsMouseOverThisOrDescendant()
+					) {
 						InternalRecognized?.Invoke();
 						recognized.Raise();
 					} else {
