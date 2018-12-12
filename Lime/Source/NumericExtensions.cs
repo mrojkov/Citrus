@@ -150,6 +150,7 @@ namespace Lime
 				case "JP":
 				case "KR":
 				case "CN":
+				case "TW":
 					return value.ToString("N0");
 				case "BR":
 					return value.ToString("N0", brFormat);
