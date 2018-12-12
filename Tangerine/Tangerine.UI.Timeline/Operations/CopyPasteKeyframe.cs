@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline.Operations
 {
 	internal static class KeyframeClipboard
 	{
-		public static List<RowKeyBinding> Keys;
+		public static List<AnimationHostKeyBinding> Keys;
 	}
 
 	public static class CopyKeyframes
@@ -24,9 +24,9 @@ namespace Tangerine.UI.Timeline.Operations
 			KeyframeClipboard.Keys = GetKeyframes();
 		}
 
-		private static List<RowKeyBinding> GetKeyframes()
+		private static List<AnimationHostKeyBinding> GetKeyframes()
 		{
-			var list = new List<RowKeyBinding>();
+			var list = new List<AnimationHostKeyBinding>();
 
 			int startRow = Document.Current.TopLevelSelectedRows().First().Index;
 			var spans = Document.Current.Rows[startRow].Components.Get<GridSpanListComponent>()?.Spans;
@@ -34,6 +34,7 @@ namespace Tangerine.UI.Timeline.Operations
 				return list;
 			}
 			int startCol = spans.First().A;
+			int animationHostIndex = -1;
 
 			foreach (var row in Document.Current.SelectedRows()) {
 				spans = row.Components.Get<GridSpanListComponent>()?.Spans;
@@ -44,15 +45,17 @@ namespace Tangerine.UI.Timeline.Operations
 				if (animable == null) {
 					continue;
 				}
+				animationHostIndex++;
+
 				foreach (var animator in animable.Animators) {
 					if (animator.AnimationId != Document.Current.AnimationId) {
 						continue;
 					}
 					foreach (var keyframe in animator.Keys.Where(i => spans.Any(j => j.Contains(i.Frame)))) {
-						list.Add(new RowKeyBinding {
+						list.Add(new AnimationHostKeyBinding {
 							Frame = keyframe.Frame - startCol,
 							Property = animator.TargetPropertyPath,
-							Row = row.Index - startRow,
+							AnimationHostOrderIndex = animationHostIndex,
 							Keyframe = keyframe
 						});
 					}
@@ -62,10 +65,10 @@ namespace Tangerine.UI.Timeline.Operations
 		}
 	}
 
-	internal class RowKeyBinding
+	internal class AnimationHostKeyBinding
 	{
 		[YuzuMember]
-		public int Row { get; set; }
+		public int AnimationHostOrderIndex { get; set; }
 
 		[YuzuMember]
 		public int Frame { get; set; }
@@ -101,16 +104,31 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 			int startCol = spans.First().A;
 			Document.Current.History.DoTransaction(() => {
+				var rows = Document.Current.Rows;
+				int rowIndex = startRow;
+				int animationHostIndex = 0;
+				IAnimationHost animationHost = null;
+
 				foreach (var key in keys) {
-					int rowIndex = startRow + key.Row;
 					int colIndex = startCol + key.Frame;
 					if (rowIndex >= Document.Current.Rows.Count || colIndex < 0) {
 						continue;
 					}
-					var animationHost = Document.Current.Rows[rowIndex].Components.Get<NodeRow>()?.Node as IAnimationHost;
-					if (animationHost == null) {
-						continue;
+					while (rowIndex < rows.Count) {
+						animationHost = rows[rowIndex].Components.Get<NodeRow>()?.Node;
+						if (animationHost != null) {
+							if (animationHostIndex == key.AnimationHostOrderIndex) {
+								break;
+							}
+							animationHostIndex++;
+						}
+						++rowIndex;
 					}
+
+					if (rowIndex >= rows.Count) {
+						break;
+					}
+
 					var (pd, _, _) = AnimationUtils.GetPropertyByPath(animationHost, key.Property);
 					if (pd.Info == null) {
 						continue;
