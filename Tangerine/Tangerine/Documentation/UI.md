@@ -16,3 +16,4 @@
 8. [**Окно "Hierarchy"**](@Hierarchy.Hierarchy) - дерево и поиск объектов на сцене
 9. [**Окно "Backups"**](@Backups.Backups) - управление бекапами сцены
 10. [**Окно "Console"**](@Console.Console) - используется для отображения различной технической информации и вывода ошибок.
+11. [**Окно "Model3D Attachment"**](@3DAttachment.3DAttachment) - используется для настройки 3d-моделей. (по-умолчанию скрыто, вызывается через View -> Panels -> Model3D Attachment. Имеет смысл при работе с Model3D)
