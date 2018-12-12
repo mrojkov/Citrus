@@ -134,6 +134,9 @@ namespace Tangerine.UI.Timeline
 					}
 					var property = row.Components.Get<PropertyRow>()?.Animator.TargetPropertyPath;
 					foreach (var a in node.Animators.ToList()) {
+						if (a.AnimationId != Document.Current.AnimationId) {
+							continue;
+						}
 						if (property != null && a.TargetPropertyPath != property) {
 							continue;
 						}
