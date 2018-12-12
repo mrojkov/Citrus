@@ -67,6 +67,8 @@ namespace Lime
 			ContentView = new RelativeLayout(activity.ApplicationContext);
 			ContentView.AddView(GameView);
 			Activity.SetContentView(ContentView);
+			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
+			Application.SupportedDeviceOrientationsChanged += RestrictSupportedOrientationsWith;
 			if (gameInitializer != null) {
 				gameInitializer();
 				gameInitializer = null;
@@ -127,6 +129,7 @@ namespace Lime
 				Destroying(Activity);
 			}
 			AccelerometerListener.StopListening();
+			Application.SupportedDeviceOrientationsChanged -= RestrictSupportedOrientationsWith;
 			Activity = null;
 		}
 
@@ -179,6 +182,31 @@ namespace Lime
 		{
 			if (RequestPermissionsResult != null) {
 				RequestPermissionsResult(requestCode, permissions, grantResults);
+			}
+		}
+
+		private void RestrictSupportedOrientationsWith(DeviceOrientation orientation)
+		{
+			Activity.RequestedOrientation = GetScreenOrientation(orientation);
+		}
+
+		private static ScreenOrientation GetScreenOrientation(DeviceOrientation orientation)
+		{
+			switch (orientation) {
+				case DeviceOrientation.LandscapeLeft:
+					return ScreenOrientation.Landscape;
+				case DeviceOrientation.LandscapeRight:
+					return ScreenOrientation.ReverseLandscape;
+				case DeviceOrientation.AllLandscapes:
+					return ScreenOrientation.UserLandscape;
+				case DeviceOrientation.Portrait:
+					return ScreenOrientation.Portrait;
+				case DeviceOrientation.PortraitUpsideDown:
+					return ScreenOrientation.ReversePortrait;
+				case DeviceOrientation.AllPortraits:
+					return ScreenOrientation.UserPortrait;
+				default:
+					return ScreenOrientation.FullUser;
 			}
 		}
 	}

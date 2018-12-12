@@ -111,9 +111,6 @@ namespace Lime
 			}
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
-			RestrictSupportedOrientationsWith(Application.SupportedDeviceOrientations);
-
-			Application.SupportedDeviceOrientationsChanged += RestrictSupportedOrientationsWith;
 
 			egl = EGLContext.EGL.JavaCast<IEGL10>();
 
@@ -190,31 +187,6 @@ namespace Lime
 				Android.Provider.Settings.System.AccelerometerRotation,
 				def: 0);
 			return settingCode == 1;
-		}
-
-		private void RestrictSupportedOrientationsWith(DeviceOrientation orientation)
-		{
-			((Android.App.Activity)Context).RequestedOrientation = GetScreenOrientation(orientation);
-		}
-
-		private static ScreenOrientation GetScreenOrientation(DeviceOrientation orientation)
-		{
-			switch (orientation) {
-				case DeviceOrientation.LandscapeLeft:
-					return ScreenOrientation.Landscape;
-				case DeviceOrientation.LandscapeRight:
-					return ScreenOrientation.ReverseLandscape;
-				case DeviceOrientation.AllLandscapes:
-					return ScreenOrientation.UserLandscape;
-				case DeviceOrientation.Portrait:
-					return ScreenOrientation.Portrait;
-				case DeviceOrientation.PortraitUpsideDown:
-					return ScreenOrientation.ReversePortrait;
-				case DeviceOrientation.AllPortraits:
-					return ScreenOrientation.UserPortrait;
-				default:
-					return ScreenOrientation.FullUser;
-			}
 		}
 
 		private int[] pointerIds = new int[Input.MaxTouches];
