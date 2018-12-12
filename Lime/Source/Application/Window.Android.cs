@@ -89,6 +89,7 @@ namespace Lime
 			AsyncRendering = options.AsyncRendering;
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
+				WaitForRender();
 				Active = false;
 				RaiseDeactivated();
 			};
@@ -99,7 +100,7 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-
+			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRender;
 			PixelScale = Resources.System.DisplayMetrics.Density;
 
 			if (AsyncRendering) {
@@ -114,14 +115,17 @@ namespace Lime
 			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
 			ccb.OnFrame += frameTimeNanos => {
 				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
+				var gw = ActivityDelegate.Instance.GameView;
 				prevFrameTime = frameTimeNanos;
-				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+				if (Active && gw.IsSurfaceCreated) {
 					fpsCounter.Refresh();
+					gw.ProcessTextInput();
 					Update(delta);
 					if (AsyncRendering) {
 						renderCompleted.WaitOne();
 						renderCompleted.Reset();
 						RaiseSync();
+						gw.UnbindContext();
 						renderReady.Set();
 					} else {
 						RaiseSync();
@@ -143,20 +147,19 @@ namespace Lime
 			}
 		}
 
+		internal void WaitForRender()
+		{
+			if (AsyncRendering) {
+				renderCompleted.WaitOne();
+			}
+		}
+
 		private void RenderLoop()
 		{
 			while (true) {
 				renderReady.WaitOne();
 				renderReady.Reset();
-				var gw = ActivityDelegate.Instance.GameView;
-				var surfaceVersion = gw.SurfaceVersion;
-				try {
-					Render();
-				} catch (System.Exception e) {
-					if (surfaceVersion == gw.SurfaceVersion) {
-						System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(e).Throw();
-					}
-				}
+				Render();
 				renderCompleted.Set();
 			}
 		}
@@ -174,9 +177,10 @@ namespace Lime
 		private void Render()
 		{
 			var gw = ActivityDelegate.Instance.GameView;
-			gw.MakeCurrentActual();
+			gw.MakeCurrent();
 			base.RaiseRendering();
 			gw.SwapBuffers();
+			gw.UnbindContext();
 		}
 
 		public void Center() {}

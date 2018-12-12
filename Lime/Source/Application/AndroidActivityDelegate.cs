@@ -94,11 +94,9 @@ namespace Lime
 		public void OnResume()
 		{
 			AudioSystem.Active = true;
-			GameView.Resume();
 			if (!GameView.IsFocused) {
 				GameView.RequestFocus();
 			}
-			GameView.Run();
 			AccelerometerListener.StartListening(Input);
 			if (Resumed != null) {
 				Resumed(Activity);
@@ -108,7 +106,6 @@ namespace Lime
 		public void OnPause()
 		{
 			AudioSystem.Active = false;
-			GameView.Pause();
 			GameView.ClearFocus();
 			if (Paused != null) {
 				Paused(Activity);

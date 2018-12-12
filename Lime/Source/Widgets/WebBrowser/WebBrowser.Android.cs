@@ -65,13 +65,13 @@ namespace Lime
 					// If the device is locked, setting Visibility causes an exception
 				}
 				// Workaround for a crash in RelativeLayout.onLayout() while rotating the device
-				EventHandler<OpenTK.FrameEventArgs> a = null;
-				a = (s, e) => {
+				UpdatingDelegate a = null;
+				a = (dt) => {
 					((RelativeLayout)ActivityDelegate.Instance.GameView.Parent).RemoveView(webView);
 					webView.Dispose();
-					ActivityDelegate.Instance.GameView.UpdateFrame -= a;
+					Window.Current.Updating -= a;
 				};
-				ActivityDelegate.Instance.GameView.UpdateFrame += a;
+				Window.Current.Updating += a;
 			}
 			// Browser may request keyboard and we should hide it on our own when closing browser.
 			// TODO: Check browser behaviour due to new Input logic
