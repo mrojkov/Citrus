@@ -45,15 +45,14 @@ namespace Tangerine.Panels
 						searchTreeView.Attach();
 						view = searchTreeView;
 					}
-					searchTreeView.Filter(t.ToLower());
 				} else {
-					if (!searchTreeView.IsAttached()) {
-						return;
+					if (searchTreeView.IsAttached()) {
+						searchTreeView.Detach();
+						treeView.Attach();
+						view = treeView;
 					}
-					searchTreeView.Detach();
-					treeView.Attach();
-					view = treeView;
 				}
+				searchTreeView.Filter(t.ToLower());
 			});
 			treeView.Attach();
 			view = treeView;
