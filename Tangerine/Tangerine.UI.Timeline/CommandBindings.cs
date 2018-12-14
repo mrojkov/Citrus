@@ -80,11 +80,27 @@ namespace Tangerine.UI.Timeline
 
 		private static void Expand()
 		{
+			var triggered = new HashSet<NodeRow>();
+			void ExpandRow(Row row, NodeRow nodeRow) {
+				if (triggered.Contains(nodeRow)) {
+					return;
+				}
+
+				triggered.Add(nodeRow);
+				SetProperty.Perform(nodeRow, nameof(NodeRow.Expanded), !nodeRow.Expanded, isChangingDocument: false);
+				if (nodeRow.Expanded && row.Rows.Count > 0) {
+					Timeline.Instance.EnsureRowChildsVisible(row);
+				}
+			}
+
 			foreach (var row in Document.Current.SelectedRows().ToList()) {
 				if (row.Components.Get<NodeRow>() is NodeRow nodeRow) {
-					SetProperty.Perform(nodeRow, nameof(NodeRow.Expanded), !nodeRow.Expanded, isChangingDocument: false);
-					if (nodeRow.Expanded && row.Rows.Count > 0) {
-						Timeline.Instance.EnsureRowChildsVisible(row);
+					ExpandRow(row, nodeRow);
+				} else if (row.Components.Get<PropertyRow>() is PropertyRow propertyRow) {
+					Core.Operations.SelectRow.Perform(row, select: false);
+					if (row.Parent.Components.Get<NodeRow>() is NodeRow parentNodeRow) {
+						ExpandRow(row.Parent, parentNodeRow);
+						Core.Operations.SelectRow.Perform(row.Parent, select: true);
 					}
 				}
 			}
