@@ -42,17 +42,7 @@ namespace Tangerine.UI
 
 		protected virtual bool IsValid(string value)
 		{
-			foreach (var c in value) {
-				if (!validChars.Contains(c)) {
-					return false;
-				}
-			}
-			return true;
+			return PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo);
 		}
-
-		private static readonly char [] validSpecialSymbols = { '_', '.', '>', '@', '[', ']', '#' };
-		private static readonly List<char> validChars =
-			Enumerable.Range(1, 128).Select(i => (char)i).
-			Where(c => char.IsLetterOrDigit(c) || validSpecialSymbols.Contains(c)).ToList();
 	}
 }

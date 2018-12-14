@@ -93,6 +93,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[YuzuMember]
+		[TangerineDefaultCharset]
 		[TangerineStaticProperty]
 		public string Id
 		{
@@ -112,6 +113,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[YuzuMember]
+		[TangerineDefaultCharset]
 		[TangerineStaticProperty]
 		public string ContentsPath
 		{

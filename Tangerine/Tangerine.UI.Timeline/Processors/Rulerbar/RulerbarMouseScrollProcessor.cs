@@ -20,13 +20,16 @@ namespace Tangerine.UI.Timeline
 					yield return null;
 					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
-						int initialColumnUnderMouse = CalcColumn(rulerWidget.LocalMousePosition().X);
-						int initialCurrentColumn = timeline.CurrentColumn;
+						int initialCurrentColumn = CalcColumn(rulerWidget.LocalMousePosition().X);
+						Document.Current.AnimationFrame = initialCurrentColumn;
+						Operations.SetCurrentColumn.Perform(initialCurrentColumn);
 						int previousColumn = -1;
-						var marker = Document.Current.Animation.Markers.GetByFrame(initialColumnUnderMouse);
+						var marker = Document.Current.Animation.Markers.GetByFrame(initialCurrentColumn);
+						bool isShifting = false;
 						while (input.IsMousePressed()) {
 							bool isEditing = input.IsKeyPressed(Key.Control);
-							bool isShifting = isEditing && input.IsKeyPressed(Key.Shift);
+							bool startShifting = isEditing && input.IsKeyPressed(Key.Shift);
+							isShifting = isShifting && startShifting;
 
 							var cw = TimelineMetrics.ColWidth;
 							var mp = rulerWidget.LocalMousePosition().X;
@@ -49,14 +52,16 @@ namespace Tangerine.UI.Timeline
 							if (isEditing && !input.WasMousePressed()) {
 								if (isShifting) {
 									ShiftTimeline(CalcColumn(mp));
-								} else if (marker != null) {
+								} else if (startShifting && CalcColumn(mp) == initialCurrentColumn) {
+									isShifting = true;
+								} else if (!startShifting && marker != null) {
 									DragMarker(marker, CalcColumn(mp));
 								}
 							}
 							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
 							Document.Current.AnimationFrame = initialCurrentColumn;
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
-							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialColumnUnderMouse;
+							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCurrentColumn;
 							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
 								Document.ForceAnimationUpdate();
 							}

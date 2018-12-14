@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Lime
 {
@@ -215,6 +217,17 @@ namespace Lime
 			var min = (IComparable)Minimum;
 			var max = (IComparable)Maximum;
 			return min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0;
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public class TangerineDefaultCharsetAttribute : TangerineValidationAttribute
+	{
+		private static readonly Regex regex = new Regex(@"\p{IsCyrillic}", RegexOptions.Compiled);
+
+		public override bool IsValid(object value)
+		{
+			return value is string s && !regex.IsMatch(s);
 		}
 	}
 }

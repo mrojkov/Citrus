@@ -29,8 +29,10 @@ namespace Tangerine.UI
 		protected override void AssignAsset(string path)
 		{
 			if (IsValid(path)) {
-				SetProperty(path);
-				Document.Current.RefreshExternalScenes();
+				DoTransaction(() => {
+					SetProperty(path);
+					Document.Current.RefreshExternalScenes();
+				});
 			} else {
 				var value = CoalescedPropertyValue().GetValue();
 				editor.Text = value.IsUndefined ? value.Value : ManyValuesText;
