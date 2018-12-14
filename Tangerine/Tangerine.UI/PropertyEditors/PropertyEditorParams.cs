@@ -9,6 +9,7 @@ namespace Tangerine.UI
 	public class PropertyEditorParams : IPropertyEditorParams, IPropertyEditorParamsInternal
 	{
 		private PropertySetterDelegate propertySetter;
+		private Func<NumericEditBox> numericEditBoxFactory;
 
 		public bool ShowLabel { get; set; } = true;
 		public Widget InspectorPane { get; set; }
@@ -21,7 +22,20 @@ namespace Tangerine.UI
 		public TangerineKeyframeColorAttribute TangerineAttribute { get; set; }
 		public string Group { get; set; }
 		public System.Reflection.PropertyInfo PropertyInfo { get; set; }
-		public Func<NumericEditBox> NumericEditBoxFactory { get; set; }
+
+		public Func<NumericEditBox> NumericEditBoxFactory
+		{
+			get => numericEditBoxFactory;
+			set {
+				numericEditBoxFactory = () => {
+					var attr = PropertyAttributes<TangerineNumericEditBoxStepAttribute>.Get(PropertyInfo);
+					var editBox = value();
+					attr?.SetProperty(editBox);
+					return editBox;
+				};
+			}
+		}
+
 		public Func<EditBox> EditBoxFactory { get; set; }
 		public Func<DropDownList> DropDownListFactory { get; set; }
 		public Func<object> DefaultValueGetter { get; set; }
