@@ -1,6 +1,17 @@
+##### Changelog 14.12.2018
+
+* Добавлена возможность свернуть список аниматоров виджета, выбрав один из аниматоров [CIT-827](https://gitlab.game-forest.com:2000/browse/CIT-827)
+* Реализована валидация текстовый полей окна Inspector [CIT-932](https://gitlab.game-forest.com:2000/browse/CIT-932)
+
+Багфиксы:
+
+* Исправлена ошибка, позволяющая переместить таймлайн кликом с зажатым Ctrl + Shift [CIT-931](https://gitlab.game-forest.com:2000/browse/CIT-931)
+* Исправлена ошибка при копировании аниматоров виджетов с расвёрнутым списком аниматоров [CIT-933](https://gitlab.game-forest.com:2000/browse/CIT-933)
+* Исправлена ошибка, ломающая сцену, если в ContentsPath Viewport3D вставить внешнюю сцену с отличным от Viewport3D root-сценой [CIT-993](https://gitlab.game-forest.com:2000/browse/CIT-993)
+
 ##### Changelog 12.12.2018
 
-Исправлена ошибка, позволяющая удалять ключи анимаций глобально из всех анимаций [CIT-996](https://gitlab.game-forest.com:2000/browse/CIT-996)
+* Исправлена ошибка, позволяющая удалять ключи анимаций глобально из всех анимаций [CIT-996](https://gitlab.game-forest.com:2000/browse/CIT-996)
 
 ##### Changelog 11.12.2018
 
