@@ -358,6 +358,7 @@ namespace Lime.Text
 			float x = 0;
 			for (int i = 0; i < fittedWords.Count; i++) {
 				var word = fittedWords[i];
+				word = word.Clone();
 				word.LineBreak = word.ForceLineBreak;
 				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
@@ -384,7 +385,6 @@ namespace Lime.Text
 						newWord.Length = word.Length - fittedCharsCount;
 						newWord.Width = CalcWordWidth(newWord);
 						newWord.ForceLineBreak = true;
-						word = word.Clone();
 						word.Length = fittedCharsCount;
 						word.Width = CalcWordWidth(word);
 						word.X = x;
@@ -406,7 +406,6 @@ namespace Lime.Text
 
 				if (overflowMode == TextOverflowMode.Ellipsis) {
 					if (word.X == 0 && word.Width > maxWidth) {
-						word = word.Clone();
 						ClipWordWithEllipsis(word, maxWidth);
 					}
 				}
