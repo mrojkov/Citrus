@@ -62,6 +62,9 @@ namespace Orange
 					if (t.IsGenericType) {
 						if (t == typeof(Keyframe<>) || t == typeof(Animator<>)) {
 							foreach (var specializationType in AnimatorRegistry.Instance.EnumerateRegisteredTypes()) {
+								if (specializationType.Assembly != assembly && !specializationType.Assembly.FullName.StartsWith("mscorlib", StringComparison.OrdinalIgnoreCase)) {
+									continue;
+								}
 								var specializedType = t.MakeGenericType(new[] { specializationType });
 								types.Add(specializedType);
 							}
