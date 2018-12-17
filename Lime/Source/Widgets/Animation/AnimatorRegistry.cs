@@ -6,22 +6,20 @@ namespace Lime
 {
 	public sealed class AnimatorRegistry
 	{
-		static readonly AnimatorRegistry instance = new AnimatorRegistry();
+		public static AnimatorRegistry Instance { get; } = new AnimatorRegistry();
 
-		public static AnimatorRegistry Instance {
-			get { return instance; }
-		}
-
-		public void Add(Type propertyType, Type animatorType)
-		{
-			map.Add(propertyType, animatorType);
-		}
+		public void Add(Type propertyType, Type animatorType) => map.Add(propertyType, animatorType);
 
 		public IAnimator CreateAnimator(Type propertyType)
 		{
-			Type animatorType;
-			if (!map.TryGetValue(propertyType, out animatorType))
-				throw new Lime.Exception("Can't find animator type for property of {0}", propertyType.Name);
+			if (!map.TryGetValue(propertyType, out var animatorType)) {
+				if (propertyType.IsEnum) {
+					animatorType = typeof(Animator<>).MakeGenericType(propertyType);
+					Add(propertyType, animatorType);
+				} else {
+					throw new Lime.Exception("Can't find animator type for property of {0}", propertyType.Name);
+				}
+			}
 			var ctr = animatorType.GetConstructor(System.Type.EmptyTypes);
 			var animator = ctr.Invoke(new object[] {}) as IAnimator;
 			return animator;
@@ -65,12 +63,9 @@ namespace Lime
 			Add(typeof(Alignment), typeof(Animator<Alignment>));
 		}
 
-		public bool Contains(Type propertyType)
-		{
-			return map.ContainsKey(propertyType);
-		}
+		public bool Contains(Type propertyType) => propertyType.IsEnum || map.ContainsKey(propertyType);
 
-		Dictionary<Type, Type> map = new Dictionary<Type, Type>();
+		private Dictionary<Type, Type> map = new Dictionary<Type, Type>();
 
 		public IEnumerable<Type> EnumerateRegisteredTypes()
 		{

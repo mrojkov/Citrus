@@ -214,6 +214,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(4)]
+		[TangerineNumericEditBoxStep(1f)]
 		public Vector2 Position
 		{
 			get { return position; }
@@ -285,6 +286,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(3)]
+		[TangerineNumericEditBoxStep(1f)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -307,6 +309,7 @@ namespace Lime
 		}
 
 		[TangerineKeyframeColor(7)]
+		[TangerineNumericEditBoxStep(1f)]
 		public Vector2 Size
 		{
 			get { return size; }

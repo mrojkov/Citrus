@@ -187,6 +187,19 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public class TangerineNumericEditBoxStepAttribute : Attribute
+	{
+		public readonly float Step;
+
+		public TangerineNumericEditBoxStepAttribute(float step)
+		{
+			Step = step;
+		}
+
+		public void SetProperty(object editBox) => ((NumericEditBox)editBox).Step = Step;
+	}
+
 	public abstract class TangerineValidationAttribute : Attribute
 	{
 		public abstract bool IsValid(object value);
