@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Lime
 {
@@ -30,6 +30,14 @@ namespace Lime
 		{
 			var bs = BlendState.Default;
 			switch (blending) {
+				case Blending.Opaque:
+					bs.SrcBlend = Blend.One;
+					bs.DstBlend = Blend.Zero;
+					break;
+				case Blending.PremultipliedAlpha:
+					bs.SrcBlend = Blend.One;
+					bs.DstBlend = Blend.InverseSrcAlpha;
+					break;
 				case Blending.None:
 				case Blending.Inherited:
 				case Blending.Alpha:
@@ -58,6 +66,10 @@ namespace Lime
 					bs.SrcBlend = Blend.DstColor;
 					bs.DstBlend = Blend.Zero;
 					break;
+			}
+			if (PlatformRenderer.OffscreenRendering) {
+				bs.AlphaSrcBlend = Blend.InverseDstAlpha;
+				bs.AlphaDstBlend = Blend.One;
 			}
 			return bs;
 		}

@@ -202,7 +202,7 @@ namespace Lime
 	public enum CompareFunc
 	{
 		Always,
-        Never,
+		Never,
 		Less,
 		LessEqual,
 		Greater,
@@ -210,7 +210,7 @@ namespace Lime
 		Equal,
 		NotEqual
 	}
-	
+
 	public enum StencilOp
 	{
 		Keep,
@@ -219,7 +219,7 @@ namespace Lime
 		Increment,
 		IncrementSaturation,
 		Decrement,
-        DecrementSaturation,
+		DecrementSaturation,
 		Invert,
 	}
 
@@ -371,7 +371,7 @@ namespace Lime
 			} while (errCode != ErrorCode.NoError && errCode != ErrorCode.InvalidOperation);
 			throw new Exception("OpenGL error(s): " + errors);
 		}
-		
+
 		public static void BeginFrame()
 		{
 			if (!initialized) {
@@ -384,7 +384,7 @@ namespace Lime
 			Reset();
 			Clear(ClearOptions.All, Color4.Black);
 		}
-		
+
 		private static bool initialized;
 
 		private static void Initialize()

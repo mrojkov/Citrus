@@ -19,6 +19,7 @@ namespace Lime
 		Opaque,
 		LcdTextFirstPass,
 		LcdTextSecondPass,
+		PremultipliedAlpha,
 	}
 
 	public enum ShaderId
