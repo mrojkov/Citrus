@@ -5,7 +5,7 @@ namespace Lime
 {
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
-	class SignedDistanceFieldComponent : NodeComponent
+	public class SignedDistanceFieldComponent : NodeComponent
 	{
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
