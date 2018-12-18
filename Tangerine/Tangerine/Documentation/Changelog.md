@@ -1,3 +1,8 @@
+##### Changelog 18.12.2018
+
+* Реализована возможность анимировать кастомные enum-поля [CIT-995](https://gitlab.game-forest.com:2000/browse/CIT-995)
+* Параметры Position, Size, и Rotation теперь по-умолчанию изменяются с шагом в 1 единицу [CIT-582](https://gitlab.game-forest.com:2000/browse/CIT-582)
+
 ##### Changelog 14.12.2018
 
 * Добавлена возможность свернуть список аниматоров виджета, выбрав один из аниматоров [CIT-827](https://gitlab.game-forest.com:2000/browse/CIT-827)
