@@ -1,3 +1,10 @@
+
+##### Changelog 19.12.2018
+
+* Добавлен новый тип блендинга PremultipliedAlpha для корректной работы RenderTarget с прозрачностью [CIT-971](https://gitlab.game-forest.com:2000/browse/CIT-971)
+* Исправлена ошибка, приводящая к невозможности настроить видимость виджета после взаимодействия с Hierarchy [CIT-973](https://gitlab.game-forest.com:2000/browse/CIT-973)
+* Исправлена некорректная работа LetterSpacing в Text [CIT-1014](https://gitlab.game-forest.com:2000/browse/CIT-1014)
+
 ##### Changelog 18.12.2018
 
 * Реализована возможность анимировать кастомные enum-поля [CIT-995](https://gitlab.game-forest.com:2000/browse/CIT-995)
