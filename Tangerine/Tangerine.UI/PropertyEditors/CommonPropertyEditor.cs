@@ -62,6 +62,7 @@ namespace Tangerine.UI
 			} else {
 				LabelContainer = EditorContainer = PropertyContainerWidget;
 			}
+			Validate();
 		}
 
 		private void AddWarning(string message)
@@ -329,5 +330,18 @@ namespace Tangerine.UI
 
 		public virtual void Submit()
 		{ }
+
+		protected void Validate()
+		{
+			var objects = EditorParams.IsAnimable ? EditorParams.RootObjects : EditorParams.Objects;
+			foreach (var o in objects) {
+				if (!PropertyValidator.ValidateValue(PropertyValue(o).GetValue(), EditorParams.PropertyInfo, out var message)) {
+					if (!message.IsNullOrWhiteSpace() && o is Node node) {
+						message = $"{node.Id}: {message}";
+					}
+					AddWarning(message);
+				}
+			}
+		}
 	}
 }
