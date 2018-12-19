@@ -14,31 +14,27 @@ namespace Tangerine.Panels
 		private readonly Widget parent;
 		private readonly ThemedSimpleText nothingToShow = new ThemedSimpleText("Nothing to show");
 		private TreeNode selected;
+		private string filter;
+		private uint filterVersion;
 
 		public DocumentHierarchyTreeView(Widget parent, Node rootNode)
 		{
 			this.parent = parent;
 			scrollView.Content.Layout = new VBoxLayout();
-			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, 0, isLast: true));
+			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, 0, isLast: true, string.Empty));
 		}
 
-		public void Detach()
-		{
-			scrollView.Unlink();
-		}
-
-		public void Attach()
-		{
-			parent.AddNode(scrollView);
-		}
-
-		public bool IsAttached()
-		{
-			return scrollView.Parent != null;
-		}
+		public void Detach() => scrollView.Unlink();
+		public void Attach() => parent.AddNode(scrollView);
+		public bool IsAttached() => scrollView.Parent != null;
 
 		public void Filter(string filter)
 		{
+			if (this.filter == filter) {
+				return;
+			}
+			this.filter = filter;
+			filterVersion++;
 			if (root.Filter(filter)) {
 				nothingToShow.Unlink();
 				if (root.Parent == null) {
@@ -222,7 +218,7 @@ namespace Tangerine.Panels
 
 		private class TreeNode : Widget
 		{
-			private const float DefaultPadding = 5;
+			private const float DefaultPadding = 2;
 			private const float DefaultJointWidth = 19;
 
 			private readonly Node rootNode;
@@ -256,8 +252,9 @@ namespace Tangerine.Panels
 
 			private readonly bool[] skippedChangeWatcherUpdate = { false, false };
 
-			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, IEnumerable<Joint> offsetJoints, int level, int index, bool isLast)
+			public TreeNode(DocumentHierarchyTreeView view, Node rootNode, TreeNode parentTreeNode, JointType jointType, IEnumerable<Joint> offsetJoints, int level, int index, bool isLast, string filter)
 			{
+				this.filter = filter;
 				this.rootNode = rootNode;
 				this.level = level;
 				ParentTreeNode = parentTreeNode;
@@ -292,16 +289,33 @@ namespace Tangerine.Panels
 					}
 					HighlightText();
 				}));
-				treeNodeWidget.Clicked += () => view.SelectTreeNode(this);
+				var clickGesture = new ClickGesture();
+				clickGesture.Began += () => view.SelectTreeNode(this);
+				treeNodeWidget.Gestures.Add(clickGesture);
 				treeNodeWidget.Gestures.Add(new DoubleClickGesture(NavigateToNode));
 				AddNode(treeNodeWidget);
 
 				if (parentTreeNode != null) {
-					this.AddChangeWatcher(() => rootNode.NextSibling, _ => parentTreeNode.UpdateChildren());
+					this.AddChangeWatcher(() => rootNode.NextSibling, _ => {
+						if (!firstTimeSiblingChanged) {
+							firstTimeSiblingChanged = true;
+						} else {
+							parentTreeNode.UpdateChildren();
+						}
+					});
 				}
-				this.AddChangeWatcher(() => rootNode.Nodes.Version, _ => UpdateChildren());
+				this.AddChangeWatcher(() => rootNode.Nodes.Version, _ => {
+					if (!firstTimeVersionChanged) {
+						firstTimeVersionChanged = true;
+					} else {
+						UpdateChildren();
+					}
+				});
 				UpdateChildren();
 			}
+
+			private bool firstTimeVersionChanged;
+			private bool firstTimeSiblingChanged;
 
 			private void CreateExpandButton()
 			{
@@ -429,13 +443,14 @@ namespace Tangerine.Panels
 						savedNodes[index].SetJoints(JointType.VLine, JointType.TShaped);
 						savedNodes[index].Index = i;
 					} else {
-						treeNodesContainer.AddNode(new TreeNode(view, node, this, JointType.TShaped, offsetJoints, level + 1, i, isLast: false));
+						treeNodesContainer.AddNode(new TreeNode(view, node, this, JointType.TShaped, offsetJoints, level + 1, i, isLast: false, filter));
 					}
 				}
 				UpdateExpandable();
 				savedNodes = treeNodesContainer.Nodes.Cast<TreeNode>().ToList();
 				if (!string.IsNullOrEmpty(filter)) {
-					view.root.Filter(filter);
+					filterVersion = uint.MaxValue;
+					Filter(filter);
 				}
 			}
 
@@ -466,15 +481,28 @@ namespace Tangerine.Panels
 					foreach (int i in path) {
 						node = node.Nodes[i];
 					}
+				} else {
+					// to ensure TangerineFlags.DisplayContent set by EnterNode is cleared
+					Document.Current.History.DoTransaction(() => {
+						Core.Operations.LeaveNode.Perform();
+					});
 				}
 				Document.Current.History.DoTransaction(() => {
-					Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
-					Core.Operations.SelectNode.Perform(node);
+					if (Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false)) {
+						Core.Operations.SelectNode.Perform(node);
+					}
 				});
 			}
 
+			private uint filterVersion;
+			private bool savedFilterResult;
+
 			public bool Filter(string newFilter)
 			{
+				if (filterVersion == view.filterVersion) {
+					return savedFilterResult;
+				}
+				filterVersion = view.filterVersion;
 				filter = newFilter;
 				treeNodesContainer.Nodes.Clear();
 				bool result = MatchesFilter();
@@ -492,6 +520,7 @@ namespace Tangerine.Panels
 				if (result) {
 					Expanded = true;
 				}
+				savedFilterResult = result;
 				return result;
 			}
 

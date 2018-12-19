@@ -52,8 +52,8 @@ namespace Tangerine.UI
 	public static class GenericCommands
 	{
 		public static readonly ICommand NewProject = new Command("New Project", new Shortcut(Modifiers.Command, Key.J));
-		public static readonly ICommand NewScene = new Command("New Scene", new Shortcut(Modifiers.Command, Key.N));
-		public static readonly ICommand NewTan = new Command("New Tan");
+		public static readonly ICommand NewScene = new Command("New Scene");
+		public static readonly ICommand NewTan = new Command("New Tan", new Shortcut(Modifiers.Command, Key.N));
 		public static readonly ICommand NewTanWithCustomRoot = new Command("New Tan with Custom Root", new Menu());
 		public static readonly ICommand Open = new Command("Open", new Shortcut(Modifiers.Command, Key.O));
 		public static readonly ICommand RecentDocuments = new Command("Recent Documents", new Menu());

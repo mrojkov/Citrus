@@ -19,6 +19,7 @@ namespace Lime
 		Opaque,
 		LcdTextFirstPass,
 		LcdTextSecondPass,
+		PremultipliedAlpha,
 	}
 
 	public enum ShaderId
@@ -386,7 +387,7 @@ namespace Lime
 					continue;
 				}
 				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + letterSpacing);
+				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + (i == 0 ? 0.0f : letterSpacing));
 				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				Vector2 roundPos;
