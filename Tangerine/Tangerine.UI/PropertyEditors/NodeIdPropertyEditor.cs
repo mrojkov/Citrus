@@ -19,7 +19,8 @@ namespace Tangerine.UI
 			editor.Editor.EditorParams.MaxLines = 1;
 			EditorContainer.AddNode(editor);
 			bool textValid = true;
-			editor.AddChangeWatcher(() => editor.Text, text => textValid = IsValid(text));
+			editor.AddChangeWatcher(() => editor.Text,
+				text => textValid =  PropertyValidator.ValidateValue(text, EditorParams.PropertyInfo, out var none));
 			editor.CompoundPostPresenter.Add(new SyncDelegatePresenter<EditBox>(editBox => {
 				if (!textValid) {
 					editBox.PrepareRendererState();
@@ -32,17 +33,8 @@ namespace Tangerine.UI
 
 		private void SetValue(string value)
 		{
-			if (!IsValid(value)) {
-				AlertDialog.Show($"Field contains characters other than latin letters and digits.");
-			} else {
-				SetProperty(editor.Text);
-			}
+			SetProperty(editor.Text);
 			editor.Text = SameValues() ? PropertyValue(EditorParams.Objects.First()).GetValue() : ManyValuesText;
-		}
-
-		protected virtual bool IsValid(string value)
-		{
-			return PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo);
 		}
 	}
 }

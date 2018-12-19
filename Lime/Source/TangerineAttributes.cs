@@ -202,7 +202,7 @@ namespace Lime
 
 	public abstract class TangerineValidationAttribute : Attribute
 	{
-		public abstract bool IsValid(object value);
+		public abstract bool IsValid(object value, out string message);
 	}
 
 	public class TangerineValidRangeAttribute : TangerineValidationAttribute
@@ -222,14 +222,12 @@ namespace Lime
 			Minimum = minimum;
 		}
 
-		public override bool IsValid(object value)
+		public override bool IsValid(object value, out string message)
 		{
-			if (value == null) {
-				return true;
-			}
 			var min = (IComparable)Minimum;
 			var max = (IComparable)Maximum;
-			return min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0;
+			message = min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0 ? null : $"Value should be in range [{Minimum}, {Maximum}].";
+			return message == null;
 		}
 	}
 
@@ -238,9 +236,10 @@ namespace Lime
 	{
 		private static readonly Regex regex = new Regex(@"\p{IsCyrillic}", RegexOptions.Compiled);
 
-		public override bool IsValid(object value)
+		public override bool IsValid(object value, out string message)
 		{
-			return value is string s && !regex.IsMatch(s);
+			message = value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
+			return message == null;
 		}
 	}
 }
