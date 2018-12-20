@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
 using Tangerine.Core;
@@ -44,8 +45,8 @@ namespace Tangerine.UI
 				lastColor = panel.Color;
 			};
 			panel.DragEnded += () => {
-				if (panel.Color != lastColor) {
-				EditorParams.History?.CommitTransaction();
+				if (panel.Color != lastColor || (editorParams.Objects.Skip(1).Any() && SameValues())) {
+					EditorParams.History?.CommitTransaction();
 				}
 				EditorParams.History?.EndTransaction();
 			};
@@ -63,6 +64,7 @@ namespace Tangerine.UI
 			ManageManyValuesOnFocusChange(editor, currentColor);
 		}
 
+		// TODO: Use Validator
 		private static void CheckEditorText(string value, EditBox editor)
 		{
 			var match = Regex.Match(value, @"^\s*\[\s*(\d+)\s*\]\s*$");
@@ -74,11 +76,9 @@ namespace Tangerine.UI
 
 		public void SetComponent(string text, IDataflowProvider<string> currentColorString)
 		{
-			Color4 newColor;
-			if (Color4.TryParse(text, out newColor)) {
+			if (Color4.TryParse(text, out var newColor)) {
 				SetProperty(newColor);
-			}
-			else {
+			} else {
 				editor.Text = SameValues() ? currentColorString.GetValue() : ManyValuesText;
 			}
 		}

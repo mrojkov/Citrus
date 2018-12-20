@@ -326,6 +326,9 @@ namespace Tangerine.UI
 			if (!EditorParams.Objects.Any()) {
 				return false;
 			}
+			if (!EditorParams.Objects.Skip(1).Any()) {
+				return true;
+			}
 			var first = PropertyValue(EditorParams.Objects.First()).GetValue();
 			return EditorParams.Objects.Aggregate(true,
 				(current, o) => current && EqualityComparer<T>.Default.Equals(first, PropertyValue(o).GetValue()));
