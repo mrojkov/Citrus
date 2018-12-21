@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Orange
@@ -18,6 +19,7 @@ namespace Orange
 
 		private string dataFolderName;
 		private string pluginName;
+		// citrus location is a location of Citrus used by currently loaded project, not *this* Citrus
 		private string citrusLocation;
 
 		public Workspace()
@@ -89,6 +91,11 @@ namespace Orange
 		public void Load()
 		{
 			var config = WorkspaceConfig.Load();
+			var citrusDirectory = Toolbox.CalcCitrusDirectory();
+			var citprojFiles = (new DirectoryInfo(Path.Combine(citrusDirectory, ".."))).EnumerateFiles("*.citproj");
+			if (citprojFiles.Any()) {
+				config.CitrusProject = citprojFiles.First().FullName;
+			}
 			Open(config.CitrusProject);
 			The.UI.LoadFromWorkspaceConfig(config);
 			var citrusVersion = CitrusVersion.Load();

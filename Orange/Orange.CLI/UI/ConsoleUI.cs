@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -39,6 +39,7 @@ namespace Orange
 		private static void OpenWorkspace(string[] args)
 		{
 			var projectFile = args[1];
+			projectFile = Path.Combine(Directory.GetCurrentDirectory(), projectFile);
 			if (!System.IO.File.Exists(projectFile)) {
 				throw new FileNotFoundException("Project file '{0}' does not exist", projectFile);
 			}
