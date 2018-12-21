@@ -18,7 +18,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(editor);
 			editor.Submitted += SetComponent;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
-				editor.Text = v.IsUndefined ? v.Value?.Id: ManyValuesText;
+				editor.Text = v.IsDefined ? v.Value?.Id: ManyValuesText;
 			});
 		}
 

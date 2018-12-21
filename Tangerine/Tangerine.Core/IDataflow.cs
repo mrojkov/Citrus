@@ -210,12 +210,12 @@ namespace Tangerine.Core
 	public struct CoalescedValue<T>
 	{
 		public T Value { get; private set; }
-		public bool IsUndefined { get; private set; }
+		public bool IsDefined { get; private set; }
 
-		public CoalescedValue(T value, bool isUndefined)
+		public CoalescedValue(T value, bool isDefined)
 		{
 			Value = value;
-			IsUndefined = isUndefined;
+			IsDefined = isDefined;
 		}
 	}
 

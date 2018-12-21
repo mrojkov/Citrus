@@ -23,12 +23,12 @@ namespace Tangerine.UI
 			}
 
 			var current = CoalescedPropertyValue().GetValue();
-			selector.Text = current.IsUndefined ? GetFontName(current.Value) : ManyValuesText;
+			selector.Text = current.IsDefined ? GetFontName(current.Value) : ManyValuesText;
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
-				selector.Text = i.IsUndefined ? GetFontName(i.Value) : ManyValuesText;
+				selector.Text = i.IsDefined ? GetFontName(i.Value) : ManyValuesText;
 			});
 		}
 

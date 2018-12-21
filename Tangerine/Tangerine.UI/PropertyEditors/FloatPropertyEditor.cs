@@ -15,7 +15,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current.GetValue());
-			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
 		public void SetComponent(string text, CoalescedValue<float> current)
@@ -24,7 +24,7 @@ namespace Tangerine.UI
 				SetProperty((float)newValue);
 				editor.Text = ((float) newValue).ToString("0.###");
 			} else {
-				editor.Text = current.IsUndefined ? current.Value.ToString("0.###") : ManyValuesText;
+				editor.Text = current.IsDefined ? current.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 

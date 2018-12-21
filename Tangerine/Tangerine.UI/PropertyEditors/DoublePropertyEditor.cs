@@ -18,10 +18,10 @@ namespace Tangerine.UI
 					SetProperty(newValue);
 				} else {
 					var currentValue = current.GetValue();
-					editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
+					editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 				}
 			};
-			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 	}
 }

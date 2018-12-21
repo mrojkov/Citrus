@@ -26,8 +26,8 @@ namespace Tangerine.UI
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
-			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, CommonEditBox editor, CoalescedValue<float> currentValue)
@@ -41,7 +41,7 @@ namespace Tangerine.UI
 				});
 				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
+				editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 

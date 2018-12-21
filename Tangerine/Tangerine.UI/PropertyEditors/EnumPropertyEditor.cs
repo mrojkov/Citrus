@@ -26,7 +26,7 @@ namespace Tangerine.UI
 					SetProperty((T)Selector.Items[a.Index].Value);
 			};
 			Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
-				if (v.IsUndefined) {
+				if (v.IsDefined) {
 					Selector.Value = v.Value;
 				} else {
 					Selector.Text = ManyValuesText;

@@ -35,7 +35,7 @@ namespace Tangerine.UI
 				});
 			} else {
 				var value = CoalescedPropertyValue().GetValue();
-				editor.Text = value.IsUndefined ? value.Value : ManyValuesText;
+				editor.Text = value.IsDefined ? value.Value : ManyValuesText;
 			}
 		}
 

@@ -27,7 +27,7 @@ namespace Tangerine.UI
 			editor.Editor.EditorParams.MaxLines = maxLines;
 			editor.MinHeight += editor.TextWidget.FontHeight * (maxLines - 1);
 			editor.Submitted += text => SetProperty(text);
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
 			button.Clicked += () => {
 				var window = new TextEditorDialog(editorParams.DisplayName ?? editorParams.PropertyName, editor.Text, (s) => {
 					SetProperty(s);
