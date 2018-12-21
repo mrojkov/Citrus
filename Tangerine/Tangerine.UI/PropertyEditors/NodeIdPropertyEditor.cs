@@ -20,6 +20,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(editor);
 			editor.Submitted += SetValue;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, CoalescedPropertyValue());
 		}
 
 		private void SetValue(string value)

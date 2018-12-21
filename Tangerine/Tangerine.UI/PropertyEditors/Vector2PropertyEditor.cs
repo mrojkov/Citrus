@@ -28,6 +28,8 @@ namespace Tangerine.UI
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editorX, currentX);
+			ManageManyValuesOnFocusChange(editorY, currentY);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, CommonEditBox editor, CoalescedValue<float> currentValue)

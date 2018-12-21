@@ -34,6 +34,10 @@ namespace Tangerine.UI
 			editorRight.AddChangeWatcher(currentRight, v => editorRight.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			editorTop.AddChangeWatcher(currentTop, v => editorTop.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			editorBottom.AddChangeWatcher(currentBottom, v => editorBottom.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editorLeft, currentLeft);
+			ManageManyValuesOnFocusChange(editorRight, currentRight);
+			ManageManyValuesOnFocusChange(editorTop, currentTop);
+			ManageManyValuesOnFocusChange(editorBottom, currentBottom);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)

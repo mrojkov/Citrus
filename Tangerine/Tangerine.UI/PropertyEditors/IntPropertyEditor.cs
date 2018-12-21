@@ -21,6 +21,7 @@ namespace Tangerine.UI
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current.GetValue());
 			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString() : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		public void SetComponent(string text, CoalescedValue<int> current)

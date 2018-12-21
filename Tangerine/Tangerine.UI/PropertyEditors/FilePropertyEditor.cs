@@ -66,8 +66,9 @@ namespace Tangerine.UI
 				SetPathPrefix(oldPrefix, v);
 				prefix.Prefix = v.Trim('/');
 			});
-
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = ValueToStringConverter(v.Value) ?? "");
+			var current = CoalescedPropertyValue();
+			editor.AddChangeWatcher(current, v => editor.Text = ValueToStringConverter(v.Value) ?? "");
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		protected override void FillContextMenuItems(Menu menu)

@@ -60,6 +60,8 @@ namespace Tangerine.UI
 				v => indexEditors[idx].Text = v.IsDefined ? v.Value.ToString() : ManyValuesText);
 			weigthsEditors[idx].AddChangeWatcher(weightProvider,
 				v => weigthsEditors[idx].Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(indexEditors[idx], indexProvider);
+			ManageManyValuesOnFocusChange(weigthsEditors[idx], weightProvider);
 		}
 
 		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, CoalescedValue<int> prevValue)

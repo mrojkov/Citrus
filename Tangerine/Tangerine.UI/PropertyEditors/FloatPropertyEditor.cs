@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.ExpressionParser;
@@ -16,6 +17,7 @@ namespace Tangerine.UI
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current.GetValue());
 			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		public void SetComponent(string text, CoalescedValue<float> current)

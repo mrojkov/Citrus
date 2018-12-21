@@ -22,6 +22,7 @@ namespace Tangerine.UI
 				}
 			};
 			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 	}
 }
