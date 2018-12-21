@@ -65,8 +65,7 @@ namespace Tangerine.UI
 		private static void CheckEditorText(string value, EditBox editor)
 		{
 			var match = Regex.Match(value, @"^\s*\[\s*(\d+)\s*\]\s*$");
-			if (match.Success) {
-				UInt32 number = UInt32.Parse(match.Groups[1].Value);
+			if (match.Success && uint.TryParse(match.Groups[1].Value, out var number)) {
 				editor.Text = $"{0x000000FF & number}. {(0x0000FF00 & number) >> 8}. " +
 				              $"{(0x00FF0000 & number) >> 16}. {(0xFF000000 & number) >> 24}";
 			}
