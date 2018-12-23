@@ -200,13 +200,20 @@ namespace Lime
 		public void SetProperty(object editBox) => ((NumericEditBox)editBox).Step = Step;
 	}
 
+	public enum ValidationResult
+	{
+		Ok, Warning, Error,
+	}
+
 	public abstract class TangerineValidationAttribute : Attribute
 	{
-		public abstract bool IsValid(object value, out string message);
+		public abstract ValidationResult IsValid(object value, out string message);
 	}
 
 	public class TangerineValidRangeAttribute : TangerineValidationAttribute
 	{
+		public ValidationResult WarningLevel = ValidationResult.Warning;
+
 		public object Minimum { get; private set; }
 		public object Maximum { get; private set; }
 
@@ -222,12 +229,12 @@ namespace Lime
 			Minimum = minimum;
 		}
 
-		public override bool IsValid(object value, out string message)
+		public override ValidationResult IsValid(object value, out string message)
 		{
 			var min = (IComparable)Minimum;
 			var max = (IComparable)Maximum;
 			message = min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0 ? null : $"Value should be in range [{Minimum}, {Maximum}].";
-			return message == null;
+			return message == null ? ValidationResult.Ok : WarningLevel;
 		}
 	}
 
@@ -236,10 +243,10 @@ namespace Lime
 	{
 		private static readonly Regex regex = new Regex(@"\p{IsCyrillic}", RegexOptions.Compiled);
 
-		public override bool IsValid(object value, out string message)
+		public override ValidationResult IsValid(object value, out string message)
 		{
 			message = value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
-			return message == null;
+			return message == null ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
 }

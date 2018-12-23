@@ -65,7 +65,7 @@ namespace Tangerine.UI
 			Validate();
 		}
 
-		private void AddWarning(string message)
+		private void AddWarning(string message, ValidationResult validationResult)
 		{
 			if (message.IsNullOrWhiteSpace()) {
 				return;
@@ -73,7 +73,7 @@ namespace Tangerine.UI
 			WarningsContainer.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new Image(IconPool.GetTexture("Inspector.Warning")) {
+					new Image(IconPool.GetTexture($"Inspector.{validationResult.ToString()}")) {
 						MinMaxSize = new Vector2(16, 16),
 						LayoutCell = new LayoutCell(Alignment.LeftCenter)
 					},
@@ -260,8 +260,12 @@ namespace Tangerine.UI
 		protected void SetProperty(object value)
 		{
 			ClearWarnings();
-			if (!PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo, out string message)) {
-				AddWarning(message);
+			var result = PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo, out string message);
+			if (result != ValidationResult.Ok) {
+				AddWarning(message, result);
+				if (result == ValidationResult.Error) {
+					return;
+				}
 			}
 			DoTransaction(() => {
 				if (EditorParams.IsAnimable) {
@@ -282,11 +286,15 @@ namespace Tangerine.UI
 			void ValidateAndApply(object o, ValueType current)
 			{
 				var next = valueProducer(current);
-				if (!PropertyValidator.ValidateValue(next, EditorParams.PropertyInfo, out var message)) {
+				var result = PropertyValidator.ValidateValue(next, EditorParams.PropertyInfo, out var message);
+				if (result !=ValidationResult.Ok) {
 					if (!message.IsNullOrWhiteSpace() && o is Node node) {
 						message = $"{node.Id}: {message}";
 					}
-					AddWarning(message);
+					AddWarning(message, result);
+					if (result == ValidationResult.Error) {
+						return;
+					}
 				}
 				((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, next);
 			}
@@ -334,12 +342,14 @@ namespace Tangerine.UI
 		protected void Validate()
 		{
 			var objects = EditorParams.IsAnimable ? EditorParams.RootObjects : EditorParams.Objects;
-			foreach (var o in objects) {
-				if (!PropertyValidator.ValidateValue(PropertyValue(o).GetValue(), EditorParams.PropertyInfo, out var message)) {
+			foreach (var o in EditorParams.Objects) {
+				var result = PropertyValidator.ValidateValue(PropertyValue(o).GetValue(), EditorParams.PropertyInfo,
+					out var message);
+				if (result != ValidationResult.Ok) {
 					if (!message.IsNullOrWhiteSpace() && o is Node node) {
 						message = $"{node.Id}: {message}";
 					}
-					AddWarning(message);
+					AddWarning(message, result);
 				}
 			}
 		}

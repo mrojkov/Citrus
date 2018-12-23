@@ -20,7 +20,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(editor);
 			bool textValid = true;
 			editor.AddChangeWatcher(() => editor.Text,
-				text => textValid =  PropertyValidator.ValidateValue(text, EditorParams.PropertyInfo, out var none));
+				text => textValid =  PropertyValidator.ValidateValue(text, EditorParams.PropertyInfo, out var none) == ValidationResult.Ok);
 			editor.CompoundPostPresenter.Add(new SyncDelegatePresenter<EditBox>(editBox => {
 				if (!textValid) {
 					editBox.PrepareRendererState();
