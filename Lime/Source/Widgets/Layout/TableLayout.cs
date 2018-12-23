@@ -9,7 +9,7 @@ namespace Lime
 	public class TableLayout : Layout, ILayout
 	{
 		[YuzuMember]
-		[TangerineValidRange(0, int.MaxValue)]
+		[TangerineValidRange(0, int.MaxValue, WarningLevel = ValidationResult.Error)]
 		public int RowCount
 		{
 			get => rowCount;
@@ -25,7 +25,7 @@ namespace Lime
 		private int rowCount;
 
 		[YuzuMember]
-		[TangerineValidRange(0, int.MaxValue)]
+		[TangerineValidRange(0, int.MaxValue, WarningLevel = ValidationResult.Error)]
 		public int ColumnCount
 		{
 			get => columnCount;

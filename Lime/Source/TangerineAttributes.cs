@@ -245,7 +245,7 @@ namespace Lime
 
 		public override ValidationResult IsValid(object value, out string message)
 		{
-			message = value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
+			message = value == null || value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
 			return message == null ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
