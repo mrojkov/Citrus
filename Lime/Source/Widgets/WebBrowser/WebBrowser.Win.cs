@@ -34,11 +34,6 @@ namespace Lime
 			Size = parentWidget.Size;
 		}
 
-		//public override void Render()
-		//{
-		//	implementation.Render();
-		//}
-
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
 			// OnSizeChanged() is called before WebBrowser constructor, where normal
@@ -51,6 +46,7 @@ namespace Lime
 		{
 			base.Update(delta);
 			implementation.Update(delta);
+			implementation.Render();
 		}
 
 		public override void Dispose()
