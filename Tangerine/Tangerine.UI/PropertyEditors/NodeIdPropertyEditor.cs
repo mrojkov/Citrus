@@ -18,15 +18,6 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = 1;
 			EditorContainer.AddNode(editor);
-			bool textValid = true;
-			editor.AddChangeWatcher(() => editor.Text,
-				text => textValid =  PropertyValidator.ValidateValue(text, EditorParams.PropertyInfo, out var none) == ValidationResult.Ok);
-			editor.CompoundPostPresenter.Add(new SyncDelegatePresenter<EditBox>(editBox => {
-				if (!textValid) {
-					editBox.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
-				}
-			}));
 			editor.Submitted += SetValue;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
 		}
