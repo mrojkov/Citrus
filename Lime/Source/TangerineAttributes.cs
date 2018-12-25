@@ -205,6 +205,11 @@ namespace Lime
 		Ok, Warning, Error,
 	}
 
+	/// <summary>
+	/// Everything that leads to exception is Error, except if exception throw is
+	/// influenced by something from outside (e.g. another property).
+	/// Otherwise it's Warning.
+	/// </summary>
 	public abstract class TangerineValidationAttribute : Attribute
 	{
 		public abstract ValidationResult IsValid(object value, out string message);
