@@ -435,12 +435,11 @@ namespace MFDecoder {
 
 								if (SUCCEEDED(hr)) {
 									size_t sizeWithoutZeros = width * height + width * height / 2;
-									BYTE* dataWithoutZeros = (byte*)malloc(sizeWithoutZeros);
 									res->Data = gcnew array<System::Byte>(sizeWithoutZeros);
+									System::IntPtr dataIntPtr(data);
 									for (long i = 0; i < height + height / 2; ++i) {
-										memcpy(dataWithoutZeros + (i * width), data + (i * stride), width);
+										System::Runtime::InteropServices::Marshal::Copy(dataIntPtr + (i * stride), res->Data, i * width, width);
 									}
-									System::Runtime::InteropServices::Marshal::Copy(System::IntPtr(dataWithoutZeros), res->Data, 0, sizeWithoutZeros);
 								}
 								buffer2->Unlock2D();
 							}
