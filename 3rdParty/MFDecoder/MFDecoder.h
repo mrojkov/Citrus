@@ -400,6 +400,8 @@ namespace MFDecoder {
 			IMFSample *pSample = NULL;
 			DWORD actualStreamIndex, flags;
 			LONGLONG llTimeStamp;
+			long width = GetWidth();
+			long height = GetHeight();
 			HRESULT hr = ReadSample(streamIndex, &pSample, &actualStreamIndex, &flags, &llTimeStamp);
 			if (SUCCEEDED(hr)) {
 				res->PresentationTime = llTimeStamp;
@@ -432,8 +434,13 @@ namespace MFDecoder {
 								hr = buffer2->Lock2DSize(MF2DBuffer_LockFlags_Read, &data, &stride, &bufferStart, &bufferLength);
 
 								if (SUCCEEDED(hr)) {
-									res->Data = gcnew array<System::Byte>(bufferLength);
-									System::Runtime::InteropServices::Marshal::Copy(System::IntPtr(bufferStart), res->Data, 0, bufferLength);
+									size_t sizeWithoutZeros = width * height + width * height / 2;
+									BYTE* dataWithoutZeros = (byte*)malloc(sizeWithoutZeros);
+									res->Data = gcnew array<System::Byte>(sizeWithoutZeros);
+									for (long i = 0; i < height + height / 2; ++i) {
+										memcpy(dataWithoutZeros + (i * width), data + (i * stride), width);
+									}
+									System::Runtime::InteropServices::Marshal::Copy(System::IntPtr(dataWithoutZeros), res->Data, 0, sizeWithoutZeros);
 								}
 								buffer2->Unlock2D();
 							}
