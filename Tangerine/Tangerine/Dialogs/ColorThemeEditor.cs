@@ -109,7 +109,7 @@ namespace Tangerine.Dialogs
 					case ThemedFrame tf:
 						break;
 					case Widget w:
-						var colorName = (w.Nodes[0].Nodes[1] as ThemedSimpleText).Text.ToLower();
+						var colorName = (w.Nodes[0].Nodes[0].Nodes[1] as ThemedSimpleText).Text.ToLower();
 						w.Visible = colorName.Contains(filter) || isShowingAll;
 						break;
 				}

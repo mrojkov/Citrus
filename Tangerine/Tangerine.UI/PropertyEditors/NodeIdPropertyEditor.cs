@@ -18,31 +18,14 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = 1;
 			EditorContainer.AddNode(editor);
-			bool textValid = true;
-			editor.AddChangeWatcher(() => editor.Text, text => textValid = IsValid(text));
-			editor.CompoundPostPresenter.Add(new SyncDelegatePresenter<EditBox>(editBox => {
-				if (!textValid) {
-					editBox.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
-				}
-			}));
 			editor.Submitted += SetValue;
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
 		}
 
 		private void SetValue(string value)
 		{
-			if (!IsValid(value)) {
-				AlertDialog.Show($"Field contains characters other than latin letters and digits.");
-			} else {
-				SetProperty(editor.Text);
-			}
+			SetProperty(editor.Text);
 			editor.Text = SameValues() ? PropertyValue(EditorParams.Objects.First()).GetValue() : ManyValuesText;
-		}
-
-		protected virtual bool IsValid(string value)
-		{
-			return PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo);
 		}
 	}
 }

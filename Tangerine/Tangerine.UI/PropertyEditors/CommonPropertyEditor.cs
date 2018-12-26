@@ -16,15 +16,19 @@ namespace Tangerine.UI
 		public SimpleText PropertyLabel { get; private set; }
 		public Widget LabelContainer { get; private set; }
 		public Widget EditorContainer { get; private set; }
+		public Widget WarningsContainer { get; private set; }
+		public Widget PropertyContainerWidget { get; private set; }
 
 		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
 			EditorParams = editorParams;
 			ContainerWidget = new Widget {
-				Layout = new HBoxLayout { IgnoreHidden = false },
-				LayoutCell = new LayoutCell { StretchY = 0 },
+				Layout = new VBoxLayout(),
 			};
-			//ContainerWidget.CompoundPostPresenter.Add(new LayoutDebugPresenter(Color4.Red, 2.0f));
+			PropertyContainerWidget = new Widget {
+				Layout = new HBoxLayout { IgnoreHidden = false },
+			};
+			ContainerWidget.AddNode(PropertyContainerWidget);
 			editorParams.InspectorPane.AddNode(ContainerWidget);
 			if (editorParams.ShowLabel) {
 				LabelContainer = new Widget {
@@ -43,16 +47,52 @@ namespace Tangerine.UI
 					}
 				};
 				PropertyLabel.Tasks.Add(ManageLabelTask());
-				ContainerWidget.Tasks.Add(Tip.ShowTipOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
-				ContainerWidget.AddNode(LabelContainer);
+				PropertyContainerWidget.Tasks.Add(Tip.ShowTipOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
+				PropertyContainerWidget.AddNode(LabelContainer);
 				EditorContainer = new Widget {
 					Layout = new HBoxLayout(),
 					LayoutCell = new LayoutCell { StretchX = 2.0f },
 				};
-				ContainerWidget.AddNode(EditorContainer);
+				PropertyContainerWidget.AddNode(EditorContainer);
+				WarningsContainer = new Widget {
+					Layout = new VBoxLayout(),
+					LayoutCell = new LayoutCell(),
+				};
+				ContainerWidget.AddNode(WarningsContainer);
 			} else {
-				LabelContainer = EditorContainer = ContainerWidget;
+				LabelContainer = EditorContainer = PropertyContainerWidget;
 			}
+			Validate();
+		}
+
+		private void AddWarning(string message, ValidationResult validationResult)
+		{
+			if (message.IsNullOrWhiteSpace()) {
+				return;
+			}
+			WarningsContainer.AddNode(new Widget {
+				Layout = new HBoxLayout(),
+				Nodes = {
+					new Image(IconPool.GetTexture($"Inspector.{validationResult.ToString()}")) {
+						MinMaxSize = new Vector2(16, 16),
+						LayoutCell = new LayoutCell(Alignment.LeftCenter)
+					},
+					new ThemedSimpleText {
+						Text = message,
+						VAlignment = VAlignment.Center,
+						LayoutCell = new LayoutCell(Alignment.LeftCenter),
+						ForceUncutText = false,
+						Padding = new Thickness(left: 5.0f),
+						HitTestTarget = true,
+						TabTravesable = new TabTraversable()
+					}
+				}
+			});
+		}
+
+		private void ClearWarnings()
+		{
+			WarningsContainer.Nodes.Clear();
 		}
 
 		IEnumerator<object> ManageLabelTask()
@@ -219,6 +259,14 @@ namespace Tangerine.UI
 
 		protected void SetProperty(object value)
 		{
+			ClearWarnings();
+			var result = PropertyValidator.ValidateValue(value, EditorParams.PropertyInfo, out string message);
+			if (result != ValidationResult.Ok) {
+				AddWarning(message, result);
+				if (result == ValidationResult.Error) {
+					return;
+				}
+			}
 			DoTransaction(() => {
 				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
@@ -234,19 +282,35 @@ namespace Tangerine.UI
 
 		protected void SetProperty<ValueType>(Func<ValueType, object> valueProducer)
 		{
+			ClearWarnings();
+			void ValidateAndApply(object o, ValueType current)
+			{
+				var next = valueProducer(current);
+				var result = PropertyValidator.ValidateValue(next, EditorParams.PropertyInfo, out var message);
+				if (result !=ValidationResult.Ok) {
+					if (!message.IsNullOrWhiteSpace() && o is Node node) {
+						message = $"{node.Id}: {message}";
+					}
+					AddWarning(message, result);
+					if (result == ValidationResult.Error) {
+						return;
+					}
+				}
+				((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, next);
+			}
 			DoTransaction(() => {
 				if (EditorParams.IsAnimable) {
 					foreach (var o in EditorParams.RootObjects) {
 						var (p, a, i) = AnimationUtils.GetPropertyByPath((IAnimationHost)o, EditorParams.PropertyPath);
 						var current = i == -1 ? p.Info.GetValue(a) : p.Info.GetValue(a, new object[] { i });
-						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, valueProducer((ValueType)current));
+						ValidateAndApply(o, (ValueType)current);
 					}
 				} else {
 					foreach (var o in EditorParams.Objects) {
 						var current = EditorParams.IndexInList != -1
 							? (new IndexedProperty(o, EditorParams.PropertyName, EditorParams.IndexInList)).Value
 							: (new Property(o, EditorParams.PropertyName).Value);
-						((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyName, valueProducer((ValueType)current));
+						ValidateAndApply(o, (ValueType)current);
 					}
 				}
 			});
@@ -274,5 +338,20 @@ namespace Tangerine.UI
 
 		public virtual void Submit()
 		{ }
+
+		protected void Validate()
+		{
+			var objects = EditorParams.IsAnimable ? EditorParams.RootObjects : EditorParams.Objects;
+			foreach (var o in EditorParams.Objects) {
+				var result = PropertyValidator.ValidateValue(PropertyValue(o).GetValue(), EditorParams.PropertyInfo,
+					out var message);
+				if (result != ValidationResult.Ok) {
+					if (!message.IsNullOrWhiteSpace() && o is Node node) {
+						message = $"{node.Id}: {message}";
+					}
+					AddWarning(message, result);
+				}
+			}
+		}
 	}
 }

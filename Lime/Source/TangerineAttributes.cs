@@ -200,13 +200,25 @@ namespace Lime
 		public void SetProperty(object editBox) => ((NumericEditBox)editBox).Step = Step;
 	}
 
+	public enum ValidationResult
+	{
+		Ok, Warning, Error,
+	}
+
+	/// <summary>
+	/// Everything that leads to exception is Error, except if exception throw is
+	/// influenced by something from outside (e.g. another property).
+	/// Otherwise it's Warning.
+	/// </summary>
 	public abstract class TangerineValidationAttribute : Attribute
 	{
-		public abstract bool IsValid(object value);
+		public abstract ValidationResult IsValid(object value, out string message);
 	}
 
 	public class TangerineValidRangeAttribute : TangerineValidationAttribute
 	{
+		public ValidationResult WarningLevel = ValidationResult.Warning;
+
 		public object Minimum { get; private set; }
 		public object Maximum { get; private set; }
 
@@ -222,14 +234,12 @@ namespace Lime
 			Minimum = minimum;
 		}
 
-		public override bool IsValid(object value)
+		public override ValidationResult IsValid(object value, out string message)
 		{
-			if (value == null) {
-				return true;
-			}
 			var min = (IComparable)Minimum;
 			var max = (IComparable)Maximum;
-			return min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0;
+			message = min.CompareTo(value) <= 0 && max.CompareTo(value) >= 0 ? null : $"Value should be in range [{Minimum}, {Maximum}].";
+			return message == null ? ValidationResult.Ok : WarningLevel;
 		}
 	}
 
@@ -238,9 +248,10 @@ namespace Lime
 	{
 		private static readonly Regex regex = new Regex(@"\p{IsCyrillic}", RegexOptions.Compiled);
 
-		public override bool IsValid(object value)
+		public override ValidationResult IsValid(object value, out string message)
 		{
-			return value is string s && !regex.IsMatch(s);
+			message = value == null || value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
+			return message == null ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
 }
