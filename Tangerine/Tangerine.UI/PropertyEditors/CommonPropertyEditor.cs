@@ -61,6 +61,11 @@ namespace Tangerine.UI
 				ContainerWidget.AddNode(WarningsContainer);
 			} else {
 				LabelContainer = EditorContainer = PropertyContainerWidget;
+				WarningsContainer = new Widget {
+					Layout = new VBoxLayout(),
+					LayoutCell = new LayoutCell(),
+				};
+				ContainerWidget.AddNode(WarningsContainer);
 			}
 			Validate();
 		}
