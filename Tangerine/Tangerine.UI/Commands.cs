@@ -12,7 +12,7 @@ namespace Tangerine.UI
 		public static readonly ICommand ScrollDown = new Command("Scroll Down", new Shortcut(Key.Down));
 		public static readonly ICommand SelectNodeUp = new Command("Select Up", new Shortcut(Modifiers.Shift, Key.Up));
 		public static readonly ICommand SelectNodeDown = new Command("Select Down", new Shortcut(Modifiers.Shift, Key.Down));
-		public static readonly ICommand EnterNode = new Command("Enter Node", new Shortcut(Key.Enter));
+		public static readonly ICommand EnterNode = new Command("Enter Node", new Shortcut(Key.Enter)) { Repeatable = false };
 		public static readonly ICommand EnterNodeAlias = new Command("Enter Node", new Shortcut(Modifiers.Alt | Modifiers.Shift, Key.Right));
 		public static readonly ICommand EnterNodeMouse = new Command("Enter Node", new Shortcut(Key.MouseForward));
 		public static readonly ICommand ExitNode = new Command("Exit Node", new Shortcut(Key.BackSpace));

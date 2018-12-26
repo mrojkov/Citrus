@@ -151,8 +151,9 @@ namespace Lime
 		{
 			int j = 0;
 			for (int i = 0; i < MaxTouches; i++) {
-				if (IsTouching(i))
+				if (IsTouching(i)) {
 					j++;
+				}
 			}
 			return j;
 		}
@@ -205,14 +206,21 @@ namespace Lime
 
 		private Key FindMainKey()
 		{
-			for (var i = Key.Unknown; i < Key.LastNormal; i++)
-				if (keys[i].CurrentState && Shortcut.ValidateMainKey(i))
+			for (var i = Key.Unknown; i < Key.LastNormal; i++) {
+				if (keys[i].CurrentState && Shortcut.ValidateMainKey(i)) {
 					return i;
+				}
+			}
 			return Key.Unknown;
 		}
 
 		private void ProcessKeyEvent(Key key, bool value)
 		{
+			// Dont let system key repeat events get to us, for our key repeat mechanism to work properly
+			if (keys[key].CurrentState && value) {
+				return;
+			}
+			var previousCurrentShortcut = currentShortcut;
 			if (currentShortcut != Key.Unknown) {
 				// If currentShortcut == key, we will restore state by the next call.
 				SetKeyStateInternal(currentShortcut, false);
@@ -226,10 +234,17 @@ namespace Lime
 			}
 			// Give priority to the last pressed key, choose arbitrarily among others.
 			Key mainKey = value && Shortcut.ValidateMainKey(key) ? key : FindMainKey();
-			if (mainKey == Key.Unknown)
+			if (mainKey == Key.Unknown) {
 				return;
-			if (Key.ShortcutMap.TryGetValue(new Shortcut(GetModifiers(), mainKey), out currentShortcut))
+			}
+			if (Key.ShortcutMap.TryGetValue(new Shortcut(GetModifiers(), mainKey), out currentShortcut)) {
 				SetKeyStateInternal(currentShortcut, true);
+				if (previousCurrentShortcut == currentShortcut) {
+					// Prevent setting Repeated = true before key repeat timeout for given key in case
+					// we're here because another key has been released. e.g. releasing key "3" while still holding "Enter" key in edit box (see CIT-783)
+					keys[currentShortcut].Repeated = false;
+				}
+			}
 		}
 
 		private void SetKeyStateInternal(Key key, bool value)
