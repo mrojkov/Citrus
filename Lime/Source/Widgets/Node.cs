@@ -115,6 +115,7 @@ namespace Lime
 		[YuzuMember]
 		[TangerineDefaultCharset]
 		[TangerineStaticProperty]
+		[TangerineIgnoreIf(nameof(ShouldInspectContentsPath))]
 		public string ContentsPath
 		{
 			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
@@ -561,7 +562,12 @@ namespace Lime
 
 		[TangerineInspect]
 		public TangerineAnimationCollection TangerineAnimations { get; private set;  }
-#endif
+
+		protected bool ShouldInspectContentsPath() => ContentsPathTangerineInspectChecker?.Invoke(this) ?? false;
+
+		public static Func<object, bool> ContentsPathTangerineInspectChecker;
+
+#endif // TANGERINE
 
 		public bool NeedSerializeAnimations() =>
 			Animations.Count > 1 || (Animations.Count == 1 && (!FirstAnimation.IsLegacy || FirstAnimation.Markers.Count > 0));

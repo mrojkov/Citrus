@@ -21,6 +21,7 @@ namespace Tangerine.UI.Inspector
 
 		InspectorPropertyRegistry()
 		{
+			Node.ContentsPathTangerineInspectChecker = o => o == Document.Current.RootNode;
 			Items = new List<RegistryItem>();
 			AddEditor(c => PropertyAttributes<TangerineDropDownListPropertyEditorAttribute>.Get(c.Type, c.PropertyName) != null,
 				c => {
