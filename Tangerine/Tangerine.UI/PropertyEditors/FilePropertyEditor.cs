@@ -36,14 +36,6 @@ namespace Tangerine.UI
 			});
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Submitted += text => SetComponent(text);
-			bool textValid = true;
-			editor.AddChangeWatcher(() => editor.Text, text => textValid = IsValid(text));
-			editor.CompoundPostPresenter.Add(new SyncDelegatePresenter<EditBox>(editBox => {
-				if (!textValid) {
-					editBox.PrepareRendererState();
-					Renderer.DrawRect(Vector2.Zero, editBox.Size, Color4.Red.Transparentify(0.8f));
-				}
-			}));
 			button.Clicked += () => {
 				var dlg = new FileDialog {
 					AllowedFileTypes = allowedFileTypes,

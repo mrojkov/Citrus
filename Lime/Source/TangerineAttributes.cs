@@ -250,8 +250,25 @@ namespace Lime
 
 		public override ValidationResult IsValid(object value, out string message)
 		{
-			message = value == null || value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
+			return IsValidPath(value as string, out message);
+		}
+
+		public static ValidationResult IsValidPath(string path, out string message)
+		{
+			message = path == null || path is string s && !regex.IsMatch(s) ? null : "Wrong charset";
 			return message == null ? ValidationResult.Ok : ValidationResult.Warning;
+		}
+	}
+
+	public class TangerineTileImageTextureAttribute : TangerineValidationAttribute
+	{
+		public override ValidationResult IsValid(object value, out string message)
+		{
+			var res = value is ITexture texture && (texture.IsStubTexture ||
+			                                        !(texture.TextureParams.WrapModeU == TextureWrapMode.Clamp ||
+			                                          texture.TextureParams.WrapModeV == TextureWrapMode.Clamp));
+			message = res ? null : $"Texture of TiledImage should have WrapMode set to either Repeat or MirroredRepeat.";
+			return res ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
 }

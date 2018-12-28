@@ -20,6 +20,7 @@ namespace Lime
 #if TANGERINE
 		[TangerineKeyframeColor(15)]
 		[TangerineOnPropertySet(nameof(OnSetTextureViaTangerine))]
+		[TangerineTileImageTexture]
 #endif // TANGERINE
 		public override sealed ITexture Texture
 		{
