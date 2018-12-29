@@ -51,14 +51,14 @@ namespace Tangerine.UI
 			};
 			colorBox.Clicked += () => Expanded = !Expanded;
 			var currentColorString = currentColor.Select(i => i.Value.ToString(Color4.StringPresentation.Dec));
-			editor.Submitted += text => SetComponent(text, currentColorString);
-			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
+			editor.Submitted += text => {
+				SetComponent(text, currentColorString);
+			};
+			editor.Tasks.Add(currentColorString.Consume(v => {
+				editor.Text = SameValues() ? v : ManyValuesText;
+			}));
 			editor.AddChangeWatcher(() => editor.Text, value => {
-				if (SameValues()) {
-					CheckEditorText(value, editor);
-				} else {
-					editor.Text = ManyValuesText;
-				}
+				CheckEditorText(value, editor);
 			});
 			ManageManyValuesOnFocusChange(editor, currentColor);
 		}
