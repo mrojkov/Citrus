@@ -16,7 +16,9 @@ namespace Tangerine.UI
 			editor.MinHeight += multiline ? editor.TextWidget.FontHeight * (maxLines - 1) : 0;
 			EditorContainer.AddNode(editor);
 			editor.Submitted += text => SetProperty(text);
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
+			var current = CoalescedPropertyValue();
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		public override void Submit()

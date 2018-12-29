@@ -19,7 +19,8 @@ namespace Tangerine.UI
 			editor.Editor.EditorParams.MaxLines = 1;
 			EditorContainer.AddNode(editor);
 			editor.Submitted += SetValue;
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsUndefined ? v.Value : ManyValuesText);
+			editor.AddChangeWatcher(CoalescedPropertyValue(), v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, CoalescedPropertyValue());
 		}
 
 		private void SetValue(string value)

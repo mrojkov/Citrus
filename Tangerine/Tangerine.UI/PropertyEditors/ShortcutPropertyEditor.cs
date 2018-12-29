@@ -33,7 +33,7 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
 				var text = v.Value.ToString();
-				editor.Text = v.IsUndefined ? v.Value.Main != Key.Unknown ? text : text.Replace("Unknown", "") : ManyValuesText;
+				editor.Text = v.IsDefined ? v.Value.Main != Key.Unknown ? text : text.Replace("Unknown", "") : ManyValuesText;
 			});
 			editor.IsReadOnly = true;
 			editor.TextWidget.Tasks.Clear();

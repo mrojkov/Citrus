@@ -57,9 +57,11 @@ namespace Tangerine.UI
 			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentIndexValue);
 			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentWeightValue);
 			indexEditors[idx].AddChangeWatcher(indexProvider,
-				v => indexEditors[idx].Text = v.IsUndefined ? v.Value.ToString() : ManyValuesText);
+				v => indexEditors[idx].Text = v.IsDefined ? v.Value.ToString() : ManyValuesText);
 			weigthsEditors[idx].AddChangeWatcher(weightProvider,
-				v => weigthsEditors[idx].Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+				v => weigthsEditors[idx].Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(indexEditors[idx], indexProvider);
+			ManageManyValuesOnFocusChange(weigthsEditors[idx], weightProvider);
 		}
 
 		private void SetIndexValue(IPropertyEditorParams editorParams, int idx, CommonEditBox editor, CoalescedValue<int> prevValue)
@@ -76,7 +78,7 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = prevValue.IsUndefined ? prevValue.Value.ToString() : ManyValuesText;
+				editor.Text = prevValue.IsDefined ? prevValue.Value.ToString() : ManyValuesText;
 			}
 		}
 
@@ -94,7 +96,7 @@ namespace Tangerine.UI
 					});
 				});
 			} else {
-				editor.Text = prevWeight.IsUndefined ? prevWeight.Value.ToString("0.###") : ManyValuesText;
+				editor.Text = prevWeight.IsDefined ? prevWeight.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 	}

@@ -60,6 +60,7 @@ namespace Tangerine.UI
 					editor.Text = ManyValuesText;
 				}
 			});
+			ManageManyValuesOnFocusChange(editor, currentColor);
 		}
 
 		private static void CheckEditorText(string value, EditBox editor)

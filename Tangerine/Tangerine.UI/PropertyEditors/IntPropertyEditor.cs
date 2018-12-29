@@ -20,7 +20,8 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Spacer.HStretch());
 			var current = CoalescedPropertyValue();
 			editor.Submitted += text => SetComponent(text, current.GetValue());
-			editor.AddChangeWatcher(current, v => editor.Text = v.IsUndefined ? v.Value.ToString() : ManyValuesText);
+			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString() : ManyValuesText);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		public void SetComponent(string text, CoalescedValue<int> current)
@@ -29,7 +30,7 @@ namespace Tangerine.UI
 				SetProperty((int)newValue);
 				editor.Text = ((int) newValue).ToString();
 			} else {
-				editor.Text = current.IsUndefined ? current.Value.ToString() : ManyValuesText;
+				editor.Text = current.IsDefined ? current.Value.ToString() : ManyValuesText;
 			}
 		}
 

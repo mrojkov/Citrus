@@ -45,7 +45,7 @@ namespace Tangerine.UI
 				comparator: (t1, t2) => t1 == null && t2 == null || t1 != null && t2 != null && t1.GetType() == t2.GetType()),
 				v => {
 				OnValueChanged?.Invoke(ExpandableContent);
-				if (v.IsUndefined) {
+				if (v.IsDefined) {
 					Selector.Value = v.Value?.GetType();
 				} else {
 					Selector.Text = ManyValuesText;

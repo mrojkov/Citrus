@@ -26,7 +26,7 @@ namespace Tangerine.UI
 					}
 				}
 			}
-			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsUndefined ? v.Value : ManyValuesText);
+			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
 		}
 
 		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
@@ -47,7 +47,7 @@ namespace Tangerine.UI
 						Distinct(new TriggerStringComparer())
 				);
 				if (setTrigger.Length == 0) {
-					comboBox.Text = currentTriggers.IsUndefined ? currentTriggers.Value : ManyValuesText;
+					comboBox.Text = currentTriggers.IsDefined ? currentTriggers.Value : ManyValuesText;
 					return;
 				}
 				SetProperty(setTrigger);

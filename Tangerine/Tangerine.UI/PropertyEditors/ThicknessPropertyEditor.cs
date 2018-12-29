@@ -30,10 +30,14 @@ namespace Tangerine.UI
 			editorRight.Submitted += text => SetComponent(editorParams, 1, editorRight, currentRight.GetValue());
 			editorTop.Submitted += text => SetComponent(editorParams, 2, editorTop, currentTop.GetValue());
 			editorBottom.Submitted += text => SetComponent(editorParams, 3, editorBottom, currentBottom.GetValue());
-			editorLeft.AddChangeWatcher(currentLeft, v => editorLeft.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorRight.AddChangeWatcher(currentRight, v => editorRight.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorTop.AddChangeWatcher(currentTop, v => editorTop.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorBottom.AddChangeWatcher(currentBottom, v => editorBottom.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorLeft.AddChangeWatcher(currentLeft, v => editorLeft.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorRight.AddChangeWatcher(currentRight, v => editorRight.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorTop.AddChangeWatcher(currentTop, v => editorTop.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorBottom.AddChangeWatcher(currentBottom, v => editorBottom.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editorLeft, currentLeft);
+			ManageManyValuesOnFocusChange(editorRight, currentRight);
+			ManageManyValuesOnFocusChange(editorTop, currentTop);
+			ManageManyValuesOnFocusChange(editorBottom, currentBottom);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
@@ -53,10 +57,10 @@ namespace Tangerine.UI
 				});
 			} else {
 				switch (component) {
-					case 0: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
-					case 1: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
-					case 2: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
-					case 3: editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 0: editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 1: editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 2: editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
+					case 3: editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText; break;
 				}
 			}
 		}

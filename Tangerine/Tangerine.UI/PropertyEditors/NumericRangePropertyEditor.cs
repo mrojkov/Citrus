@@ -23,8 +23,10 @@ namespace Tangerine.UI
 			var currentDisp = CoalescedPropertyComponentValue(v => v.Dispersion);
 			medEditor.Submitted += text => SetComponent(editorParams, 0, medEditor, currentMed.GetValue());
 			dispEditor.Submitted += text => SetComponent(editorParams, 1, dispEditor, currentDisp.GetValue());
-			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			medEditor.AddChangeWatcher(currentMed, v => medEditor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			dispEditor.AddChangeWatcher(currentDisp, v => dispEditor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(medEditor, currentMed);
+			ManageManyValuesOnFocusChange(dispEditor, currentDisp);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
@@ -42,7 +44,7 @@ namespace Tangerine.UI
 				});
 				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.IsUndefined
+				editor.Text = currentValue.IsDefined
 						? currentValue.Value.ToString("0.###")
 						: ManyValuesText;
 			}

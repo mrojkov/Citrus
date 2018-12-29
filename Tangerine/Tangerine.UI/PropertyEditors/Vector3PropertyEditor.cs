@@ -26,9 +26,12 @@ namespace Tangerine.UI
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, currentY.GetValue());
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, currentZ.GetValue());
-			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.IsUndefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorX.AddChangeWatcher(currentX, v => editorX.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorY.AddChangeWatcher(currentY, v => editorY.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorZ.AddChangeWatcher(currentZ, v => editorZ.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			ManageManyValuesOnFocusChange(editorX, currentX);
+			ManageManyValuesOnFocusChange(editorY, currentY);
+			ManageManyValuesOnFocusChange(editorZ, currentZ);
 		}
 
 		void SetComponent(IPropertyEditorParams editorParams, int component, NumericEditBox editor, CoalescedValue<float> currentValue)
@@ -42,7 +45,7 @@ namespace Tangerine.UI
 				});
 				editor.Text = newValue.ToString("0.###");
 			} else {
-				editor.Text = currentValue.IsUndefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
+				editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
 

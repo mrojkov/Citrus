@@ -17,9 +17,11 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
 			editor.Submitted += SetComponent;
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v => {
-				editor.Text = v.IsUndefined ? v.Value?.Id: ManyValuesText;
+			var current = CoalescedPropertyValue();
+			editor.AddChangeWatcher(current, v => {
+				editor.Text = v.IsDefined ? v.Value?.Id: ManyValuesText;
 			});
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 
 		void SetComponent(string text)

@@ -13,11 +13,13 @@ namespace Tangerine.UI
 			editor.IsReadOnly = true;
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(editor);
-			editor.AddChangeWatcher(CoalescedPropertyValue(), v =>
+			var current = CoalescedPropertyValue();
+			editor.AddChangeWatcher(current, v =>
 				editor.Text = v.Value == null ?
 					"RenderTexture (null)" :
 					$"RenderTexture ({v.Value.ImageSize.Width}x{v.Value.ImageSize.Height})"
 			);
+			ManageManyValuesOnFocusChange(editor, current);
 		}
 	}
 }

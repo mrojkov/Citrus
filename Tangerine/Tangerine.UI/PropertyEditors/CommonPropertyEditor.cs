@@ -341,6 +341,24 @@ namespace Tangerine.UI
 				(current, o) => current && EqualityComparer<ComponentType>.Default.Equals(first, PropertyComponentValue(o, selector).GetValue()));
 		}
 
+		protected void ManageManyValuesOnFocusChange<U>(CommonEditBox editBox, IDataflowProvider<CoalescedValue<U>> current)
+		{
+			editBox.TextWidget.TextProcessor += (ref string text, Widget widget) => {
+				if (!editBox.IsFocused() && !current.GetValue().IsDefined) {
+					text = ManyValuesText;
+				}
+			};
+
+			editBox.AddChangeLateWatcher(editBox.IsFocused, focused => {
+				if (!focused && !current.GetValue().IsDefined) {
+					editBox.Editor.Text.Invalidate();
+				} else if (focused && !current.GetValue().IsDefined) {
+					editBox.Text = "";
+					editBox.Editor.Text.Invalidate();
+				}
+			});
+		}
+
 		public virtual void Submit()
 		{ }
 
