@@ -1,4 +1,5 @@
 using Yuzu;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -121,12 +122,12 @@ namespace Lime
 			texture.TransformUVCoordinatesToAtlasSpace(ref uv);
 		}
 
-		public uint GetHandle()
+		public IPlatformTexture2D GetPlatformTexture()
 		{
 			if (texture == null) {
 				texture = LoadTexture();
 			}
-			return texture.GetHandle();
+			return texture.GetPlatformTexture();
 		}
 
 		public void Discard() { }

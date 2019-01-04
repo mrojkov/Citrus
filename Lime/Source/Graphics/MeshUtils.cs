@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -6,7 +6,7 @@ namespace Lime
 {
 	public static class MeshUtils
 	{
-		public static Mesh<T> Combine<T>(params Mesh<T>[] meshes) where T : struct
+		public static Mesh<T> Combine<T>(params Mesh<T>[] meshes) where T : unmanaged
 		{
 			int numVertices = meshes.Sum(m => m.Vertices.Length);
 			int numIndices = meshes.Sum(m => m.Indices.Length);
@@ -32,9 +32,9 @@ namespace Lime
 			};
 		}
 
-		public delegate void VertexProcessor<T>(ref T vertex) where T : struct;
+		public delegate void VertexProcessor<T>(ref T vertex) where T : unmanaged;
 
-		public static void TransformVertices<T>(Mesh<T> mesh, VertexProcessor<T> processor) where T : struct
+		public static void TransformVertices<T>(Mesh<T> mesh, VertexProcessor<T> processor) where T : unmanaged
 		{
 			var vertices = mesh.Vertices;
 			for (int i = 0; i < vertices.Length; i++) {

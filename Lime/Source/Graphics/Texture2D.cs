@@ -1,14 +1,6 @@
-#if OPENGL
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-#if iOS || ANDROID || WIN
-using OpenTK.Graphics.ES20;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
-
-#pragma warning disable 0618
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -103,7 +95,7 @@ namespace Lime
 #endif
 		};
 
-		private uint handle;
+		private IPlatformTexture2D platformTexture;
 		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
 		public Size SurfaceSize { get; protected set; }
@@ -119,17 +111,6 @@ namespace Lime
 
 		public bool IsStubTexture { get; private set; }
 
-		private void SetTextureParameter(TextureParameterName name, int value)
-		{
-			if (handle == 0) {
-				return;
-			}
-			GL.ActiveTexture(TextureUnit.Texture0);
-			GL.BindTexture(TextureTarget.Texture2D, handle);
-			GL.TexParameter(TextureTarget.Texture2D, name, value);
-			PlatformRenderer.MarkTextureSlotAsDirty(0);
-		}
-
 		private TextureParams textureParams = TextureParams.Default;
 		public TextureParams TextureParams {
 			get
@@ -138,14 +119,12 @@ namespace Lime
 			}
 			set
 			{
-				if (textureParams == value) {
-					return;
+				if (textureParams != value) {
+					textureParams = value;
+					if (platformTexture != null) {
+						platformTexture.TextureParams = textureParams;
+					}
 				}
-				if (textureParams.WrapModeU != value.WrapModeU) SetTextureParameter(TextureParameterName.TextureWrapS, value.WrapModeU.ToInt());
-				if (textureParams.WrapModeV != value.WrapModeV) SetTextureParameter(TextureParameterName.TextureWrapT, value.WrapModeV.ToInt());
-				if (textureParams.MinFilter != value.MinFilter) SetTextureParameter(TextureParameterName.TextureMinFilter, value.MinFilter.ToInt());
-				if (textureParams.MagFilter != value.MagFilter) SetTextureParameter(TextureParameterName.TextureMagFilter, value.MagFilter.ToInt());
-				textureParams = value;
 			}
 		}
 
@@ -292,22 +271,19 @@ namespace Lime
 			}
 		}
 
-		private void PrepareOpenGLTexture()
+		private void EnsurePlatformTexture(Format format, int width, int height, bool mipmaps)
 		{
-			// Generate a new texture.
-			if (handle == 0) {
-				var t = new int[1];
-				GL.GenTextures(1, t);
-				handle = (uint)t[0];
+			if (platformTexture == null ||
+				platformTexture.Format != format ||
+				platformTexture.Width != width ||
+				platformTexture.Height != height ||
+				platformTexture.LevelCount > 1 != mipmaps
+			) {
+				if (platformTexture != null) {
+					platformTexture.Dispose();
+				}
+				platformTexture = RenderContextManager.CurrentContext.CreateTexture2D(format, width, height, mipmaps, textureParams);
 			}
-			GL.ActiveTexture(TextureUnit.Texture0);
-			GL.BindTexture(TextureTarget.Texture2D, handle);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, textureParams.MinFilter.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, textureParams.MagFilter.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, textureParams.WrapModeU.ToInt());
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, textureParams.WrapModeV.ToInt());
-			PlatformRenderer.MarkTextureSlotAsDirty(0);
-			PlatformRenderer.CheckErrors();
 		}
 
 		/// <summary>
@@ -325,31 +301,17 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 
 			Window.Current.InvokeOnRendering(() => {
-				var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
-				var pointer = pinnedArray.AddrOfPinnedObject();
-
-				PrepareOpenGLTexture();
-				GL.ActiveTexture(TextureUnit.Texture0);
-				GL.BindTexture(TextureTarget.Texture2D, handle);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pointer);
-				PlatformRenderer.MarkTextureSlotAsDirty(0);
-				PlatformRenderer.CheckErrors();
-
-				pinnedArray.Free();
+				EnsurePlatformTexture(Format.R8G8B8A8_UNorm, width, height, false);
+				platformTexture.SetData(0, pixels);
 			});
 		}
 
 		public void LoadImage(IntPtr pixels, int width, int height)
 		{
-			LoadImage(pixels, width, height, PixelFormat.Rgba);
+			LoadImage(pixels, width, height, Format.R8G8B8A8_UNorm);
 		}
 
-		internal void LoadImage(IntPtr pixels, int width, int height, PixelFormat pixelFormat)
-		{
-			LoadImage(pixels, width, height, PixelInternalFormat.Rgba, pixelFormat);
-		}
-
-		internal void LoadImage(IntPtr pixels, int width, int height, PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat)
+		internal void LoadImage(IntPtr pixels, int width, int height, Format format)
 		{
 			MemoryUsed = 4 * width * height;
 			ImageSize = new Size(width, height);
@@ -357,12 +319,8 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 
 			Window.Current.InvokeOnRendering(() => {
-				PrepareOpenGLTexture();
-				GL.ActiveTexture(TextureUnit.Texture0);
-				GL.BindTexture(TextureTarget.Texture2D, handle);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, width, height, 0, pixelFormat, PixelType.UnsignedByte, pixels);
-				PlatformRenderer.MarkTextureSlotAsDirty(0);
-				PlatformRenderer.CheckErrors();
+				EnsurePlatformTexture(format, width, height, false);
+				platformTexture.SetData(0, pixels);
 			});
 		}
 
@@ -375,13 +333,7 @@ namespace Lime
 			IsStubTexture = false;
 
 			Window.Current.InvokeOnRendering(() => {
-				PrepareOpenGLTexture();
-				GL.ActiveTexture(TextureUnit.Texture0);
-				GL.BindTexture(TextureTarget.Texture2D, handle);
-				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
-					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-				PlatformRenderer.CheckErrors();
-				PlatformRenderer.MarkTextureSlotAsDirty(0);
+				platformTexture.SetData(0, x, y, width, height, pixels);
 			});
 		}
 
@@ -396,31 +348,31 @@ namespace Lime
 			base.Dispose();
 		}
 
-		/// <summary>
-		/// Returns native texture handle
-		/// </summary>
-		/// <returns></returns>
-		public virtual uint GetHandle()
+		public virtual IPlatformTexture2D GetPlatformTexture()
 		{
 			if (IsDisposed) {
 				throw new ObjectDisposedException(GetType().Name);
 			}
-			if (handle == 0) {
+			if (platformTexture == null) {
 				Reload();
+				if (platformTexture == null) {
+					platformTexture = RenderContextManager.CurrentContext.CreateTexture2D(Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
+					platformTexture.SetData(0, Color4.Black);
+				}
 			}
 			usedOnRenderCycle = Renderer.RenderCycle;
-			return handle;
+			return platformTexture;
 		}
 
 		public void Discard()
 		{
 			MemoryUsed = 0;
-			if (handle != 0) {
-				var capturedHandle = handle;
+			if (platformTexture != null) {
+				var platformTextureCopy = platformTexture;
 				Window.Current.InvokeOnRendering(() => {
-					GL.DeleteTextures(1, new uint[] { capturedHandle });
+					platformTextureCopy.Dispose();
 				});
-				handle = 0;
+				platformTexture = null;
 			}
 		}
 
@@ -436,9 +388,6 @@ namespace Lime
 			Window.Current.InvokeOnRendering(() => {
 				if (reloader != null) {
 					reloader.Reload(this);
-				} else {
-					PrepareOpenGLTexture();
-					PlatformRenderer.CheckErrors();
 				}
 			});
 		}
@@ -501,4 +450,3 @@ namespace Lime
 		}
 	}
 }
-#endif

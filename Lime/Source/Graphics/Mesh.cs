@@ -2,17 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-#if iOS || ANDROID || WIN
-using OpenTK.Graphics.ES30;
-#else
-using OpenTK.Graphics.OpenGL;
-#endif
 using Yuzu;
 
 namespace Lime
 {
 	[YuzuSpecializeWith(typeof(Lime.Mesh3D.Vertex))]
-	public partial class Mesh<T> : IMesh, IGLObject, IDisposable where T : struct
+	public unsafe partial class Mesh<T> : IMesh, IGLObject, IDisposable where T : unmanaged
 	{
 		private bool disposed;
 
@@ -116,18 +111,22 @@ namespace Lime
 		private void UpdateInputLayout()
 		{
 			if (inputLayout == null || (DirtyFlags & MeshDirtyFlags.AttributeLocations) != 0) {
-				var elements = new List<VertexInputElement>();
-				var stride = Toolbox.SizeOf<T>();
-				foreach (var elementDescription in GetElementDescriptions()) {
-					elements.Add(new VertexInputElement {
+				var bindings = new[] {
+					new VertexInputLayoutBinding {
 						Slot = 0,
-						Attribute = AttributeLocations[elements.Count],
-						Stride = stride,
+						Stride = sizeof(T)
+					}
+				};
+				var attributes = new List<VertexInputLayoutAttribute>();
+				foreach (var elementDescription in GetElementDescriptions()) {
+					attributes.Add(new VertexInputLayoutAttribute {
+						Slot = 0,
+						Location = AttributeLocations[attributes.Count],
 						Offset = elementDescription.Offset,
 						Format = elementDescription.Format,
 					});
 				}
-				inputLayout = VertexInputLayout.New(elements.ToArray());
+				inputLayout = VertexInputLayout.New(bindings, attributes.ToArray());
 				DirtyFlags &= ~MeshDirtyFlags.AttributeLocations;
 			}
 		}
@@ -169,22 +168,25 @@ namespace Lime
 		{
 			ElementDescription result = null;
 			if (type == typeof(float)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.Float1, Offset = offset };
+				result = new ElementDescription { Format = Format.R32_SFloat, Offset = offset };
 				offset += 4;
 			} else if (type == typeof(Vector2)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.Float2, Offset = offset };
+				result = new ElementDescription { Format = Format.R32G32_SFloat, Offset = offset };
 				offset += 8;
 			} else if (type == typeof(Vector3)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.Float3, Offset = offset };
+				result = new ElementDescription { Format = Format.R32G32B32_SFloat, Offset = offset };
 				offset += 12;
+			} else if (type == typeof(Vector4)) {
+				result = new ElementDescription { Format = Format.R32G32B32A32_SFloat, Offset = offset };
+				offset += 16;
 			} else if (type == typeof(Color4)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.UByte4Norm, Offset = offset };
+				result = new ElementDescription { Format = Format.R8G8B8A8_UNorm, Offset = offset };
 				offset += 4;
 			} else if (type == typeof(Mesh3D.BlendIndices)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.UByte4, Offset = offset };
+				result = new ElementDescription { Format = Format.R8G8B8A8_UInt, Offset = offset };
 				offset += 4;
 			} else if (type == typeof(Mesh3D.BlendWeights)) {
-				result = new ElementDescription { Format = VertexInputElementFormat.Float4, Offset = offset };
+				result = new ElementDescription { Format = Format.R32G32B32A32_SFloat, Offset = offset };
 				offset += 16;
 			}
 			return result;
@@ -192,7 +194,7 @@ namespace Lime
 
 		private class ElementDescription
 		{
-			public VertexInputElementFormat Format;
+			public Format Format;
 			public int Offset;
 		}
 	}

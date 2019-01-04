@@ -231,14 +231,46 @@ namespace Lime
 			form.Close();
 		}
 
-		private class GLControl : OpenTK.GLControl
+		private class GLControl : UserControl
 		{
+			private static int ctxRefCount;
+			private static Graphics.Platform.Vulkan.PlatformRenderContext ctx;
+
+			private Graphics.Platform.Vulkan.Swapchain swapchain;
+
+			public bool VSync { get; set; }
+
 			public event Action BeforeBoundsChanged;
 
-			public GLControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
-				: base(mode, major, minor, flags)
+			protected override void OnHandleCreated(EventArgs e)
 			{
+				base.OnHandleCreated(e);
+				CreateContext();
+				swapchain = new Graphics.Platform.Vulkan.Swapchain(ctx, Handle, ClientSize.Width, ClientSize.Height);
+			}
 
+			protected override void OnHandleDestroyed(EventArgs e)
+			{
+				swapchain.Dispose();
+				ReleaseContext();
+				base.OnHandleDestroyed(e);
+			}
+
+			private void CreateContext()
+			{
+				ctxRefCount++;
+				if (ctxRefCount == 1) {
+					ctx = new Graphics.Platform.Vulkan.PlatformRenderContext();
+				}
+			}
+
+			private void ReleaseContext()
+			{
+				ctxRefCount--;
+				if (ctxRefCount == 0) {
+					ctx.Dispose();
+					ctx = null;
+				}
 			}
 			// Without this at least Left, Right, Up, Down and Tab keys are not submitted OnKeyDown
 			protected override bool IsInputKey(Keys keyData)
@@ -250,16 +282,33 @@ namespace Lime
 			{
 				BeforeBoundsChanged?.Invoke();
 				base.SetBoundsCore(x, y, width, height, specified);
+				swapchain.Resize(ClientSize.Width, ClientSize.Height);
+			}
+
+			public void MakeCurrent()
+			{
+				RenderContextManager.MakeCurrent(ctx);
+			}
+
+			public void Begin()
+			{
+				ctx.Begin(swapchain);
+			}
+
+			public void SwapBuffers()
+			{
+				ctx.Present();
+			}
+
+			public void UnbindContext()
+			{
+				RenderContextManager.MakeCurrent(null);
 			}
 		}
 
 		private static GLControl CreateGLControl()
 		{
-			return new GLControl(new GraphicsMode(32, 16, 8), 2, 0,
-				Application.RenderingBackend == RenderingBackend.OpenGL ?
-					OpenTK.Graphics.GraphicsContextFlags.Default :
-					OpenTK.Graphics.GraphicsContextFlags.Embedded
-			);
+			return new GLControl();
 		}
 
 		static Window()
@@ -308,7 +357,7 @@ namespace Lime
 			}
 			glControl = CreateGLControl();
 			glControl.CreateControl();
-			glControl.Context.MakeCurrent(null);
+			glControl.UnbindContext();
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
 			glControl.KeyDown += OnKeyDown;
@@ -344,7 +393,7 @@ namespace Lime
 				vSync = options.VSync;
 				glControl.MakeCurrent();
 				glControl.VSync = vSync;
-				glControl.Context.MakeCurrent(null);
+				glControl.UnbindContext();
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
@@ -400,7 +449,7 @@ namespace Lime
 					WaitForRendering();
 					glControl.MakeCurrent();
 					glControl.VSync = value;
-					glControl.Context.MakeCurrent(null);
+					glControl.UnbindContext();
 				}
 			}
 		}
@@ -645,9 +694,10 @@ namespace Lime
 					return;
 				}
 				glControl.MakeCurrent();
+				glControl.Begin();
 				RaiseRendering();
 				glControl.SwapBuffers();
-				glControl.Context.MakeCurrent(null);
+				glControl.UnbindContext();
 				renderCompleted.Set();
 			}
 		}
@@ -666,6 +716,7 @@ namespace Lime
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
 					if (!AsyncRendering && glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
 						glControl.MakeCurrent();
+						glControl.Begin();
 						RaiseRendering();
 						glControl.SwapBuffers();
 					}
@@ -683,7 +734,7 @@ namespace Lime
 		{
 			var wasInvalidated = isInvalidated;
 			isInvalidated = false;
-			if (!form.Visible || !form.CanFocus) {
+			if (!form.Visible || !form.CanFocus || !glControl.IsHandleCreated) {
 				return;
 			}
 			UnclampedDelta = (float)stopwatch.Elapsed.TotalSeconds;

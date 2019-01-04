@@ -288,13 +288,9 @@ namespace Lime
 				var sample = currentVideoSample;
 				var pinnedArray = GCHandle.Alloc(sample.Data, GCHandleType.Pinned);
 				var pointer = pinnedArray.AddrOfPinnedObject();
-				var pixelInternalFormat = (OpenTK.Graphics.ES20.PixelInternalFormat.Luminance); //OpenTK.Graphics.ES20.PixelInternalFormat.Luminance
-				lumaTexture.LoadImage(pointer, width, height, pixelInternalFormat, OpenTK.Graphics.ES20.PixelFormat.Luminance);
+				lumaTexture.LoadImage(pointer, width, height, Format.Luminance);
 
-
-				pixelInternalFormat = (OpenTK.Graphics.ES20.PixelInternalFormat.LuminanceAlpha);
-				var pixelFormat = (OpenTK.Graphics.ES20.PixelFormat.LuminanceAlpha);
-				chromaTexture.LoadImage(pointer + width * height, width / 2, height / 2, pixelInternalFormat, pixelFormat);
+				chromaTexture.LoadImage(pointer + width * height, width / 2, height / 2, Format.LuminanceAlpha);
 				pinnedArray.Free();
 
 				RendererWrapper.Current.PushState(RenderState.Viewport | RenderState.Shader | RenderState.Blending);

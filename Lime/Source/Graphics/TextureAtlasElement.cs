@@ -1,5 +1,6 @@
 using System;
 using Yuzu;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -72,9 +73,9 @@ namespace Lime
 			uv.Y = AtlasUVRect.Top + height * uv.Y;
 		}
 
-		public uint GetHandle()
+		public IPlatformTexture2D GetPlatformTexture()
 		{
-			return AtlasTexture.GetHandle();
+			return AtlasTexture.GetPlatformTexture();
 		}
 
 		public void SetAsRenderTarget()

@@ -21,7 +21,7 @@ namespace Lime
 		public const int MaxIndices = 600;
 	}
 
-	public class RenderBatch<TVertex> : IRenderBatch where TVertex : struct
+	public class RenderBatch<TVertex> : IRenderBatch where TVertex : unmanaged
 	{
 		private static Stack<RenderBatch<TVertex>> batchPool = new Stack<RenderBatch<TVertex>>();
 		private static Stack<Mesh<TVertex>> meshPool = new Stack<Mesh<TVertex>>();

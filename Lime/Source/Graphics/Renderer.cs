@@ -80,10 +80,16 @@ namespace Lime
 	}
 #pragma warning restore CS0660, CS0661
 
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36)]
 	public struct Vertex
 	{
-		public Vector2 Pos;
+		public Vector2 Pos
+		{
+			get { return new Vector2(Pos4.X, Pos4.Y); }
+			set { Pos4 = new Vector4(value.X, value.Y, 0, 1.0f); }
+		}
+
+		public Vector4 Pos4;
 		public Color4 Color;
 		public Vector2 UV1;
 		public Vector2 UV2;
@@ -678,7 +684,7 @@ namespace Lime
 			scissorRect.A = scissorRect.A * 2 - Vector2.One;
 			scissorRect.B = scissorRect.B * 2 - Vector2.One;
 			// Get the unprojected coordinates
-			var invProjection = Projection.CalcInverted();
+			var invProjection = FixupWVP(Projection).CalcInverted();
 			var v0 = invProjection.ProjectVector(scissorRect.A);
 			var v1 = invProjection.ProjectVector(new Vector2(scissorRect.B.X, scissorRect.A.Y));
 			var v2 = invProjection.ProjectVector(scissorRect.B);
@@ -955,7 +961,7 @@ namespace Lime
 
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
-			if (PlatformRenderer.OffscreenRendering) {
+			if (!PlatformRenderer.OffscreenRendering) {
 				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
 			}
 			return projection;
