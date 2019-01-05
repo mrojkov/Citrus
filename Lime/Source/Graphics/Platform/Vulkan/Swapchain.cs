@@ -51,7 +51,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void DestroySwapchain()
 		{
 			if (swapchain != SharpVulkan.Swapchain.Null) {
-				context.Device.WaitIdle();
+				context.Finish();
 				foreach (var i in framebuffers) {
 					context.Device.DestroyFramebuffer(i);
 				}

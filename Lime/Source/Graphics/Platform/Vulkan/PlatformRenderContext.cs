@@ -702,6 +702,13 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
+		public void Finish()
+		{
+			Flush();
+			device.WaitIdle();
+			scheduler.Perform();
+		}
+
 		public void Flush()
 		{
 			scheduler.Perform();

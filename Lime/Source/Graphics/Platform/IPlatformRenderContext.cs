@@ -22,6 +22,7 @@ namespace Lime.Graphics.Platform
 		void SetRenderTarget(IPlatformRenderTexture2D texture);
 		void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil);
 		void Flush();
+		void Finish();
 		void SetViewport(Viewport vp);
 		void SetBlendState(BlendState state);
 		void SetDepthState(DepthState state);
