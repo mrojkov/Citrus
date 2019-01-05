@@ -26,7 +26,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		public UploadBufferAlloc Allocate(ulong size, ulong alignment)
 		{
 			var alignedOffset = GraphicsUtility.AlignUp(bufferOffset, alignment);
-			if (alignedOffset > bufferSize - size) {
+			if (alignedOffset + size > bufferSize) {
 				var newBufferSize = bufferSize;
 				while (newBufferSize < size) {
 					newBufferSize *= 2;
