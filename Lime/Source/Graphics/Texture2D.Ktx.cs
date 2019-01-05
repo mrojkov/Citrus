@@ -9,9 +9,6 @@ namespace Lime
 	{
 		public const UInt32 KTXMagic = 0x58544BAB;
 
-		static bool etc2Checked;
-		static bool etc2Supported;
-
 		private void InitWithKTXTexture(BinaryReader reader)
 		{
 			var identifier = reader.ReadBytes(12);
