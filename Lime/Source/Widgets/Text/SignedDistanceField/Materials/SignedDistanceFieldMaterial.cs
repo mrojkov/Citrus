@@ -216,7 +216,7 @@ namespace Lime.SignedDistanceField
 				lowp vec4 c = inner_color;
 ";
 		private const string FragmentShaderPart4 = @"
-				gl_FragColor = vec4(c.rgb, c.a * alpha);
+				gl_FragColor = vec4(c.rgb, color.a * alpha);
 			}";
 
 		private static readonly Dictionary<int, SDFShaderProgram> instances = new Dictionary<int, SDFShaderProgram>();

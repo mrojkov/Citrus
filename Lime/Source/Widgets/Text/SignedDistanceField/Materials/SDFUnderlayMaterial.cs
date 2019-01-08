@@ -73,20 +73,24 @@ namespace Lime.SignedDistanceField
 	public class SDFUnderlayShaderProgram : ShaderProgram
 	{
 		private const string VertexShader = @"
+			attribute vec4 inColor;
 			attribute vec4 inPos;
 			attribute vec2 inTexCoords1;
 
 			uniform mat4 matProjection;
 
 			varying lowp vec2 texCoords1;
+			varying lowp vec4 global_color;
 
 			void main()
 			{
 				gl_Position = matProjection * inPos;
+				global_color = inColor;
 				texCoords1 = inTexCoords1;
 			}";
 
 		private const string FragmentShader = @"
+			varying lowp vec4 global_color;
 			varying lowp vec2 texCoords1;
 			uniform lowp sampler2D tex1;
 
@@ -98,7 +102,7 @@ namespace Lime.SignedDistanceField
 			void main() {
 				lowp float shadowDistance = texture2D(tex1, texCoords1 - offset).r;
 				lowp float shadowAlpha = smoothstep(dilate - softness, dilate + softness, shadowDistance);
-				gl_FragColor = vec4(color.rgb, color.a * shadowAlpha);
+				gl_FragColor = vec4(color.rgb, color.a * shadowAlpha * global_color.a);
 			}";
 
 		private static SDFUnderlayShaderProgram instance;
