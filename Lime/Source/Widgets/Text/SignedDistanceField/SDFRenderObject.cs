@@ -30,6 +30,12 @@ namespace Lime.SignedDistanceField
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
 		public float GradientAngle;
+		public bool BevelEnabled;
+		public Color4 LightColor;
+		public float LightAngle;
+		public float ReflectionPower;
+		public float BevelRoundness;
+		public float BevelWidth;
 
 		protected override void OnRelease()
 		{

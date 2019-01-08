@@ -16,6 +16,11 @@ namespace Lime.SignedDistanceField
 		private readonly ShaderParamKey<float> thicknessKey;
 		private readonly ShaderParamKey<Vector4> outlineColorKey;
 		private readonly ShaderParamKey<float> gradientAngleKey;
+		private readonly ShaderParamKey<Vector4> lightColorKey;
+		private readonly ShaderParamKey<Vector2> lightAngleKey;
+		private readonly ShaderParamKey<float> bevelRoundnessKey;
+		private readonly ShaderParamKey<float> bevelWidthKey;
+		private readonly ShaderParamKey<float> reflectionKey;
 
 		private const int gradientTexturePixelCount = 2048;
 		private Color4[] pixels;
@@ -39,6 +44,12 @@ namespace Lime.SignedDistanceField
 		}
 		public float GradientAngle { get; set; } = 0f;
 		public Texture2D GradientTexture { get; private set; }
+		public bool BevelEnabled { get; set; }
+		public float LightAngle { get; set; }
+		public Color4 LightColor { get; set; }
+		public float BevelWidth { get; set; }
+		public float ReflectionPower { get; set; }
+		public float BevelRoundness { get; set; }
 
 		public string Id { get; set; }
 
@@ -56,6 +67,11 @@ namespace Lime.SignedDistanceField
 			thicknessKey = shaderParams.GetParamKey<float>("thickness");
 			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
 			gradientAngleKey = shaderParams.GetParamKey<float>("g_angle");
+			lightColorKey = shaderParams.GetParamKey<Vector4>("lightColor");
+			lightAngleKey = shaderParams.GetParamKey<Vector2>("lightdir");
+			bevelRoundnessKey = shaderParams.GetParamKey<float>("bevelCurvature");
+			reflectionKey = shaderParams.GetParamKey<float>("reflection");
+			bevelWidthKey = shaderParams.GetParamKey<float>("bevelWidth");
 
 			pixels = new Color4[gradientTexturePixelCount];
 			GradientTexture = new Texture2D {
@@ -74,8 +90,15 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(thicknessKey, -Thickness * 0.01f);
 			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
 			shaderParams.Set(gradientAngleKey, GradientAngle * Mathf.DegToRad);
+			shaderParams.Set(lightColorKey, LightColor.ToVector4());
+			shaderParams.Set(bevelWidthKey, BevelWidth * 0.01f);
+			shaderParams.Set(bevelRoundnessKey, BevelRoundness);
+			shaderParams.Set(reflectionKey, ReflectionPower * 0.01f);
+
+			var lightAngle = LightAngle * Mathf.DegToRad;
+			shaderParams.Set(lightAngleKey, new Vector2(Mathf.Cos(lightAngle), Mathf.Sin(lightAngle)));
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
-			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance(!GradientEnabled));
+			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance(GradientEnabled, Thickness > Mathf.ZeroTolerance, BevelEnabled));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 			if (GradientEnabled && Gradient != null) {
 				InvalidateTextureIfNecessary();
@@ -157,44 +180,83 @@ namespace Lime.SignedDistanceField
 			uniform lowp float thickness;
 			uniform lowp vec4 outlineColor;
 
+			uniform lowp vec4 lightColor;
+			uniform lowp vec2 lightdir;
+			uniform lowp float bevelCurvature;
+			uniform lowp float reflection;
+			uniform lowp float bevelWidth;
+
 			uniform lowp float g_angle;
 
 			void main() {
-				lowp float distance = texture2D(tex1, texCoords1).r;
+				lowp vec3 sdf = texture2D(tex1, texCoords1).rgb;
+				lowp float distance = sdf.r;
 				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
 				lowp float alpha = smoothstep(dilate + thickness - softness, dilate + thickness + softness, distance);
+				lowp vec4 inner_color = color;
+				lowp vec4 bevel_color = outlineColor;
 ";
-		private const string FragmentShaderTextureColorPart2 = @"
+		private const string FragmentShaderGradientPart2 = @"
 				float g_sin = sin(g_angle);
 				float g_cos = cos(g_angle);
 
 				vec2 gradientCoords = vec2(dot(texCoords2, vec2(g_cos, g_sin)), dot(texCoords2, vec2(-g_sin, g_cos)));
-				lowp vec4 g_color = texture2D(tex2, gradientCoords);
-				lowp vec4 c = mix(outlineColor, g_color, outlineFactor);
-				gl_FragColor = vec4(c.rgb, c.a * alpha);
-			}";
-		private const string FragmentShaderSolidColorPart2 = @"
-				lowp vec4 c = mix(outlineColor, color, outlineFactor);
+				inner_color = texture2D(tex2, gradientCoords);
+";
+		private const string FragmentShaderBevelPart3 = @"
+				lowp float diffuse = clamp(dot(sdf.gb - vec2(0.5, 0.5), lightdir), 0.0, 1.0);
+				lowp float curvature = pow(clamp(distance / bevelWidth, 0.0, 1.0), bevelCurvature);
+				diffuse = mix(1.0, diffuse, curvature);
+				bevel_color = mix(lightColor, outlineColor, (diffuse * (1.0 - reflection) + reflection));
+";
+		private const string FragmentShaderOutlinePart3 = @"
+				lowp vec4 c = mix(bevel_color, inner_color, outlineFactor);
+";
+		private const string FragmentShaderPart3 = @"
+				lowp vec4 c = inner_color;
+";
+		private const string FragmentShaderPart4 = @"
 				gl_FragColor = vec4(c.rgb, c.a * alpha);
 			}";
 
 		private static readonly Dictionary<int, SDFShaderProgram> instances = new Dictionary<int, SDFShaderProgram>();
 
-		private static int GetInstanceKey(bool solidColor) => solidColor ? 1 : 0;
+		private static int GetInstanceKey(bool gradient, bool outline, bool bevel) =>
+			(gradient ? 1 : 0) | ((outline ? 1 : 0) << 1) | ((bevel ? 1 : 0) << 2);
 
-		public static SDFShaderProgram GetInstance(bool solidColor = true)
+		public static SDFShaderProgram GetInstance(bool gradient = false, bool outline = false, bool bevel = false)
 		{
-			var key = GetInstanceKey(solidColor);
-			return instances.TryGetValue(key, out var shaderProgram) ? shaderProgram : (instances[key] = new SDFShaderProgram(solidColor));
+			var key = GetInstanceKey(gradient, outline, bevel);
+			return instances.TryGetValue(key, out var shaderProgram) ? shaderProgram : (instances[key] = new SDFShaderProgram(gradient, outline, bevel));
 		}
 
-		private SDFShaderProgram(bool solidColor) : base(CreateShaders(solidColor), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+		private SDFShaderProgram(bool solidColor, bool outline, bool bevel) : base(CreateShaders(solidColor, outline, bevel), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
 
-		private static Shader[] CreateShaders(bool solidColor)
+		private static Shader[] CreateShaders(bool gradient, bool outline, bool bevel)
 		{
-			var fragmentShader = new StringBuilder(FragmentShaderPart1.Length + Math.Max(FragmentShaderTextureColorPart2.Length, FragmentShaderTextureColorPart2.Length));
+			var length =
+				FragmentShaderPart1.Length +
+				(gradient ? FragmentShaderGradientPart2.Length : 0) +
+				(outline ? FragmentShaderOutlinePart3.Length : FragmentShaderPart3.Length) +
+				(bevel ? FragmentShaderBevelPart3.Length : 0) +
+				FragmentShaderPart4.Length;
+			var fragmentShader = new StringBuilder(length);
 			fragmentShader.Append(FragmentShaderPart1);
-			fragmentShader.Append(solidColor ? FragmentShaderSolidColorPart2 : FragmentShaderTextureColorPart2);
+			if (gradient) {
+				fragmentShader.Append(FragmentShaderGradientPart2);
+			}
+			if (outline) {
+				if (bevel) {
+					fragmentShader.Append(FragmentShaderBevelPart3);
+				}
+				fragmentShader.Append(FragmentShaderOutlinePart3);
+			}
+			else {
+				fragmentShader.Append(FragmentShaderPart3);
+			}
+
+			fragmentShader.Append(FragmentShaderPart4);
+
 			return new Shader[] {
 				new VertexShader(VertexShader),
 				new FragmentShader(fragmentShader.ToString())

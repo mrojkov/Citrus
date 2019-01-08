@@ -13,6 +13,12 @@ namespace Lime.SignedDistanceField
 			ro.SDFMaterial.Gradient = ro.Gradient;
 			ro.SDFMaterial.GradientEnabled = ro.GradientEnabled;
 			ro.SDFMaterial.GradientAngle = ro.GradientAngle;
+			ro.SDFMaterial.BevelEnabled = ro.BevelEnabled;
+			ro.SDFMaterial.BevelRoundness = ro.BevelRoundness;
+			ro.SDFMaterial.BevelWidth = ro.BevelWidth;
+			ro.SDFMaterial.LightAngle = ro.LightAngle;
+			ro.SDFMaterial.LightColor = ro.LightColor;
+			ro.SDFMaterial.ReflectionPower = ro.ReflectionPower;
 			ro.RenderSpriteList(ro.SDFMaterialProvider);
 		}
 	}

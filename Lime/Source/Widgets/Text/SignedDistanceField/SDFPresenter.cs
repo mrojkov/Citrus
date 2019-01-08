@@ -68,6 +68,12 @@ namespace Lime.SignedDistanceField
 			ro.GradientEnabled = component.GradientEnabled;
 			ro.Gradient = component.Gradient;
 			ro.GradientAngle = component.GradientAngle;
+			ro.BevelEnabled = component.BevelEnabled;
+			ro.LightAngle = component.LightAngle;
+			ro.LightColor = component.LightColor;
+			ro.ReflectionPower = component.ReflectionPower;
+			ro.BevelRoundness = component.BevelRoundness;
+			ro.BevelWidth = component.BevelWidth;
 
 			return ro;
 		}
