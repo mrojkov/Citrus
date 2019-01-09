@@ -40,10 +40,9 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private static ulong GetAlignmentForBufferUsage(PlatformRenderContext ctx, SharpVulkan.BufferUsageFlags usage)
 		{
-			ctx.PhysicalDevice.GetProperties(out var physicalDeviceProperties);
 			ulong alignment = 1;
 			if ((usage & SharpVulkan.BufferUsageFlags.UniformBuffer) != 0) {
-				alignment = GraphicsUtility.CombineAlignment(alignment, physicalDeviceProperties.Limits.MinUniformBufferOffsetAlignment);
+				alignment = GraphicsUtility.CombineAlignment(alignment, ctx.PhysicalDeviceLimits.MinUniformBufferOffsetAlignment);
 			}
 			return alignment;
 		}
@@ -54,7 +53,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				Offset = sliceOffset,
 				FenceValue = fenceValue
 			});
-			if (sliceQueue.Count == 1 || !context.IsFenceCompleted(sliceQueue.Peek().FenceValue)) {
+			if (!context.IsFenceCompleted(sliceQueue.Peek().FenceValue)) {
 				sliceCount *= 2;
 				ReleaseBuffer();
 				CreateBuffer();
