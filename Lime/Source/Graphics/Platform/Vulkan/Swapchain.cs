@@ -20,8 +20,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.RenderPass renderPass;
 		private SharpVulkan.Framebuffer[] framebuffers;
 		private uint backbufferIndex;
-		private SharpVulkan.Semaphore[] semaphores;
-		private int nextSemaphoreIndex;
+		private SharpVulkan.Semaphore[] acquirementSemaphores;
+		private SharpVulkan.Semaphore acquirementSemaphore;
+		private int nextAcquirementSemaphoreIndex;
 		private int width;
 		private int height;
 		
@@ -58,7 +59,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				foreach (var i in backbufferViews) {
 					context.Device.DestroyImageView(i);
 				}
-				foreach (var i in semaphores) {
+				foreach (var i in acquirementSemaphores) {
 					context.Device.DestroySemaphore(i);
 				}
 				context.Device.DestroyImageView(depthStencilView);
@@ -155,6 +156,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			CreateDepthStencilBuffer();
 			CreateRenderPass();
 			CreateFramebuffers();
+			AcquireNextImage();
 		}
 
 		private void CreateBackbuffers()
@@ -172,12 +174,12 @@ namespace Lime.Graphics.Platform.Vulkan
 				};
 				backbufferViews[i] = context.Device.CreateImageView(ref viewCreateInfo);
 			}
-			semaphores = new SharpVulkan.Semaphore[backbuffers.Length + 1];
+			acquirementSemaphores = new SharpVulkan.Semaphore[backbuffers.Length + 1];
 			for (var i = 0; i < backbuffers.Length + 1; i++) {
 				var semaphoreCreateInfo = new SharpVulkan.SemaphoreCreateInfo {
 					StructureType = SharpVulkan.StructureType.SemaphoreCreateInfo
 				};
-				semaphores[i] = context.Device.CreateSemaphore(ref semaphoreCreateInfo);
+				acquirementSemaphores[i] = context.Device.CreateSemaphore(ref semaphoreCreateInfo);
 			}
 		}
 
@@ -306,12 +308,19 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
-		internal void AcquireNextImage(out SharpVulkan.Semaphore semaphore)
+		private void AcquireNextImage()
 		{
-			semaphore = semaphores[nextSemaphoreIndex];
-			nextSemaphoreIndex += 1;
-			nextSemaphoreIndex %= semaphores.Length;
-			backbufferIndex = context.Device.AcquireNextImage(swapchain, ulong.MaxValue, semaphore, SharpVulkan.Fence.Null);
+			acquirementSemaphore = acquirementSemaphores[nextAcquirementSemaphoreIndex];
+			nextAcquirementSemaphoreIndex += 1;
+			nextAcquirementSemaphoreIndex %= acquirementSemaphores.Length;
+			backbufferIndex = context.Device.AcquireNextImage(swapchain, ulong.MaxValue, acquirementSemaphore, SharpVulkan.Fence.Null);
+		}
+
+		internal SharpVulkan.Semaphore ReleaseAcquirementSemaphore()
+		{
+			var semaphore = acquirementSemaphore;
+			acquirementSemaphore = SharpVulkan.Semaphore.Null;
+			return semaphore;
 		}
 
 		internal void Present()
@@ -325,6 +334,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				ImageIndices = new IntPtr(&backbufferIndexCopy)
 			};
 			context.Queue.Present(ref presentInfo);
+			AcquireNextImage();
 		}
 	}
 }

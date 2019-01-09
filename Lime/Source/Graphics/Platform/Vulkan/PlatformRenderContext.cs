@@ -27,7 +27,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		private ulong nextFenceValue = 1;
 		private ulong lastCompletedFenceValue;
 		private Swapchain swapchain;
-		private SharpVulkan.Semaphore waitSemaphore;
 		private Scheduler scheduler;
 		private SharpVulkan.RenderPass activeRenderPass;
 		private Viewport viewport;
@@ -214,7 +213,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				throw new InvalidOperationException();
 			}
 			this.swapchain = swapchain;
-			swapchain.AcquireNextImage(out waitSemaphore);
 			EnsureCommandBuffer();
 			var memoryBarrier = new SharpVulkan.ImageMemoryBarrier {
 				StructureType = SharpVulkan.StructureType.ImageMemoryBarrier,
@@ -716,9 +714,9 @@ namespace Lime.Graphics.Platform.Vulkan
 				EndRenderPass();
 				commandBuffer.End();
 				descriptorAllocator.DiscardPool();
+				var waitSemaphore = swapchain?.ReleaseAcquirementSemaphore() ?? SharpVulkan.Semaphore.Null;
 				Submit(commandBuffer, waitSemaphore, SharpVulkan.PipelineStageFlags.AllCommands);
 				commandBuffer = SharpVulkan.CommandBuffer.Null;
-				waitSemaphore = SharpVulkan.Semaphore.Null;
 				InvalidateState();
 			}
 		}
