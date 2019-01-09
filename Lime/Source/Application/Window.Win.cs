@@ -242,6 +242,26 @@ namespace Lime
 
 			public event Action BeforeBoundsChanged;
 
+			public GLControl()
+			{
+				SetStyle(ControlStyles.Opaque, true);
+				SetStyle(ControlStyles.UserPaint, true);
+				SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+				DoubleBuffered = false;
+			}
+
+			protected override CreateParams CreateParams
+			{
+				get {
+					const int CS_VREDRAW = 0x1;
+					const int CS_HREDRAW = 0x2;
+					const int CS_OWNDC = 0x20;
+					var cp = base.CreateParams;
+					cp.ClassStyle |= CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
+					return cp;
+				}
+			}
+
 			protected override void OnHandleCreated(EventArgs e)
 			{
 				base.OnHandleCreated(e);
