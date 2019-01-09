@@ -41,7 +41,7 @@ namespace Lime
 		public void SetData<T>(T[] data, int elementCount) where T : unmanaged
 		{
 			EnsurePlatformBuffer(sizeof(T) * elementCount);
-			platformBuffer.SetData(0, data, 0, elementCount, BufferSetDataMode.Discard);
+			platformBuffer.SetData(0, data, 0, elementCount, Dynamic ? BufferSetDataMode.Discard : BufferSetDataMode.Default);
 		}
 
 		public void Dispose()
