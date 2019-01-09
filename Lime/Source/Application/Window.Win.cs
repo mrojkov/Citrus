@@ -31,7 +31,7 @@ namespace Lime
 			Rendered,
 		}
 		private readonly System.Windows.Forms.Timer timer;
-		private GLControl glControl;
+		private RenderControl renderControl;
 		private Form form;
 		private Stopwatch stopwatch;
 		private bool active;
@@ -125,13 +125,13 @@ namespace Lime
 
 		public Vector2 ClientPosition
 		{
-			get { return SDToLime.Convert(glControl.PointToScreen(new Point(0, 0)), PixelScale); }
+			get { return SDToLime.Convert(renderControl.PointToScreen(new Point(0, 0)), PixelScale); }
 			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
 		public Vector2 ClientSize
 		{
-			get { return SDToLime.Convert(glControl.ClientSize, PixelScale); }
+			get { return SDToLime.Convert(renderControl.ClientSize, PixelScale); }
 			set { DecoratedSize = value + DecoratedSize - ClientSize; }
 		}
 
@@ -162,13 +162,13 @@ namespace Lime
 		public Vector2 WorldToWindow(Vector2 wp)
 		{
 			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
-			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
+			return new Vector2(sp.X + renderControl.Left, sp.Y + renderControl.Top);
 		}
 
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition, PixelScale)),
+				renderControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition, PixelScale)),
 				PixelScale
 			);
 		}
@@ -176,7 +176,7 @@ namespace Lime
 		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToClient(new Point((int) desktopPosition.X, (int) desktopPosition.Y)),
+				renderControl.PointToClient(new Point((int) desktopPosition.X, (int) desktopPosition.Y)),
 				PixelScale
 			);
 		}
@@ -231,7 +231,7 @@ namespace Lime
 			form.Close();
 		}
 
-		private class GLControl : UserControl
+		private class RenderControl : UserControl
 		{
 			private static int ctxRefCount;
 			private static Graphics.Platform.Vulkan.PlatformRenderContext ctx;
@@ -242,7 +242,7 @@ namespace Lime
 
 			public event Action BeforeBoundsChanged;
 
-			public GLControl()
+			public RenderControl()
 			{
 				SetStyle(ControlStyles.Opaque, true);
 				SetStyle(ControlStyles.UserPaint, true);
@@ -326,9 +326,9 @@ namespace Lime
 			}
 		}
 
-		private static GLControl CreateGLControl()
+		private static RenderControl CreateRenderControl()
 		{
-			return new GLControl();
+			return new RenderControl();
 		}
 
 		static Window()
@@ -375,27 +375,27 @@ namespace Lime
 			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
-			glControl = CreateGLControl();
-			glControl.CreateControl();
-			glControl.UnbindContext();
-			glControl.Dock = DockStyle.Fill;
-			glControl.Paint += OnPaint;
-			glControl.KeyDown += OnKeyDown;
-			glControl.KeyUp += OnKeyUp;
-			glControl.KeyPress += OnKeyPress;
-			glControl.MouseDown += OnMouseDown;
-			glControl.MouseUp += OnMouseUp;
-			glControl.Resize += OnResize;
-			glControl.MouseWheel += OnMouseWheel;
-			glControl.MouseEnter += (sender, args) => {
+			renderControl = CreateRenderControl();
+			renderControl.CreateControl();
+			renderControl.UnbindContext();
+			renderControl.Dock = DockStyle.Fill;
+			renderControl.Paint += OnPaint;
+			renderControl.KeyDown += OnKeyDown;
+			renderControl.KeyUp += OnKeyUp;
+			renderControl.KeyPress += OnKeyPress;
+			renderControl.MouseDown += OnMouseDown;
+			renderControl.MouseUp += OnMouseUp;
+			renderControl.Resize += OnResize;
+			renderControl.MouseWheel += OnMouseWheel;
+			renderControl.MouseEnter += (sender, args) => {
 				Application.WindowUnderMouse = this;
 			};
-			glControl.MouseLeave += (sender, args) => {
+			renderControl.MouseLeave += (sender, args) => {
 				if (Application.WindowUnderMouse == this) {
 					Application.WindowUnderMouse = null;
 				}
 			};
-			glControl.BeforeBoundsChanged += WaitForRendering;
+			renderControl.BeforeBoundsChanged += WaitForRendering;
 			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;
@@ -411,13 +411,13 @@ namespace Lime
 				timer.Tick += OnTick;
 			} else {
 				vSync = options.VSync;
-				glControl.MakeCurrent();
-				glControl.VSync = vSync;
-				glControl.UnbindContext();
+				renderControl.MakeCurrent();
+				renderControl.VSync = vSync;
+				renderControl.UnbindContext();
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
-			form.Controls.Add(glControl);
+			form.Controls.Add(renderControl);
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 
@@ -467,9 +467,9 @@ namespace Lime
 				if (vSync != value && timer == null) {
 					vSync = value;
 					WaitForRendering();
-					glControl.MakeCurrent();
-					glControl.VSync = value;
-					glControl.UnbindContext();
+					renderControl.MakeCurrent();
+					renderControl.VSync = value;
+					renderControl.UnbindContext();
 				}
 			}
 		}
@@ -713,11 +713,11 @@ namespace Lime
 				if (renderThreadToken.IsCancellationRequested) {
 					return;
 				}
-				glControl.MakeCurrent();
-				glControl.Begin();
+				renderControl.MakeCurrent();
+				renderControl.Begin();
 				RaiseRendering();
-				glControl.SwapBuffers();
-				glControl.UnbindContext();
+				renderControl.SwapBuffers();
+				renderControl.UnbindContext();
 				renderCompleted.Set();
 			}
 		}
@@ -734,11 +734,11 @@ namespace Lime
 			switch (renderingState) {
 				case RenderingState.Updated:
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
-					if (!AsyncRendering && glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
-						glControl.MakeCurrent();
-						glControl.Begin();
+					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed) {
+						renderControl.MakeCurrent();
+						renderControl.Begin();
 						RaiseRendering();
-						glControl.SwapBuffers();
+						renderControl.SwapBuffers();
 					}
 					renderingState = RenderingState.Rendered;
 					break;
@@ -754,7 +754,7 @@ namespace Lime
 		{
 			var wasInvalidated = isInvalidated;
 			isInvalidated = false;
-			if (!form.Visible || !form.CanFocus || !glControl.IsHandleCreated) {
+			if (!form.Visible || !form.CanFocus || !renderControl.IsHandleCreated) {
 				return;
 			}
 			UnclampedDelta = (float)stopwatch.Elapsed.TotalSeconds;
@@ -776,7 +776,7 @@ namespace Lime
 				Input.TextInput = null;
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
-				glControl.Invalidate();
+				renderControl.Invalidate();
 			}
 			renderingState = RenderingState.Updated;
 			if (AsyncRendering) {
