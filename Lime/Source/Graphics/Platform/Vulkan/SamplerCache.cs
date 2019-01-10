@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime.Graphics.Platform.Vulkan
 {
 	internal unsafe class SamplerCache
 	{
 		private PlatformRenderContext context;
-		private LruCache<long, SharpVulkan.Sampler> lruCache = new LruCache<long, SharpVulkan.Sampler>();
+		private Dictionary<long, SharpVulkan.Sampler> lruCache = new Dictionary<long, SharpVulkan.Sampler>();
 
 		public SamplerCache(PlatformRenderContext context)
 		{
@@ -14,10 +15,6 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public SharpVulkan.Sampler AcquireSampler(TextureParams textureParams)
 		{
-			const int lruCacheEvictThreshold = 512;
-			while (lruCache.Count > lruCacheEvictThreshold) {
-				context.Release(lruCache.Evict());
-			}
 			var hash = CalculateHash(textureParams);
 			if (!lruCache.TryGetValue(hash, out var sampler)) {
 				sampler = CreateSampler(textureParams);
