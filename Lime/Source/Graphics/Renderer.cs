@@ -961,9 +961,7 @@ namespace Lime
 
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
-			if (!PlatformRenderer.OffscreenRendering) {
-				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
-			}
+			projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
 			return projection;
 		}
 
