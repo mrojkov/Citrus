@@ -25,7 +25,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		private int nextAcquirementSemaphoreIndex;
 		private int width;
 		private int height;
-		
+
+		internal SharpVulkan.Format BackbufferFormat => backbufferFormat;
+		internal SharpVulkan.Format DepthStencilFormat => depthStencilFormat;
 		internal SharpVulkan.Image Backbuffer => backbuffers[backbufferIndex];
 		internal SharpVulkan.Framebuffer Framebuffer => framebuffers[backbufferIndex];
 		internal SharpVulkan.RenderPass RenderPass => renderPass;

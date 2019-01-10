@@ -29,6 +29,8 @@ namespace Lime.Graphics.Platform.Vulkan
 		private Swapchain swapchain;
 		private Scheduler scheduler;
 		private SharpVulkan.RenderPass activeRenderPass;
+		private SharpVulkan.Format activeColorFormat;
+		private SharpVulkan.Format activeDepthStencilFormat;
 		private Viewport viewport;
 		private BlendState blendState;
 		private DepthState depthState;
@@ -469,8 +471,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			hasher.Write(primitiveTopology);
 			hasher.Write(vertexInputLayout.ReferenceHash);
 			hasher.Write(shaderProgram.ReferenceHash);
-			// FIXME: Adjust render pass hash
-			hasher.Write(activeRenderPass);
+			hasher.Write(activeColorFormat);
+			hasher.Write(activeDepthStencilFormat);
 			return hasher.End();
 		}
 
@@ -666,16 +668,19 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void EnsureRenderPass()
 		{
 			if (activeRenderPass == SharpVulkan.RenderPass.Null) {
-				SharpVulkan.RenderPass rp;
 				SharpVulkan.Framebuffer fb;
 				int width, height;
 				if (renderTarget != null) {
-					rp = renderTarget.RenderPass;
+					activeRenderPass = renderTarget.RenderPass;
+					activeColorFormat = renderTarget.ColorFormat;
+					activeDepthStencilFormat = renderTarget.DepthStencilFormat;
 					fb = renderTarget.Framebuffer;
 					width = renderTarget.Width;
 					height = renderTarget.Height;
 				} else {
-					rp = swapchain.RenderPass;
+					activeRenderPass = swapchain.RenderPass;
+					activeColorFormat = swapchain.BackbufferFormat;
+					activeDepthStencilFormat = swapchain.DepthStencilFormat;
 					fb = swapchain.Framebuffer;
 					width = swapchain.Width;
 					height = swapchain.Height;
@@ -683,12 +688,11 @@ namespace Lime.Graphics.Platform.Vulkan
 				EnsureCommandBuffer();
 				var rpBeginInfo = new SharpVulkan.RenderPassBeginInfo {
 					StructureType = SharpVulkan.StructureType.RenderPassBeginInfo,
-					RenderPass = rp,
+					RenderPass = activeRenderPass,
 					Framebuffer = fb,
 					RenderArea = new SharpVulkan.Rect2D(0, 0, (uint)width, (uint)height)
 				};
 				commandBuffer.BeginRenderPass(ref rpBeginInfo, SharpVulkan.SubpassContents.Inline);
-				activeRenderPass = rp;
 			}
 		}
 

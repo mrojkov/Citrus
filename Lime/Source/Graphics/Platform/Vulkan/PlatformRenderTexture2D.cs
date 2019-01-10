@@ -5,6 +5,7 @@ namespace Lime.Graphics.Platform.Vulkan
 {
 	internal unsafe class PlatformRenderTexture2D : PlatformTexture2D, IPlatformRenderTexture2D
 	{
+		private SharpVulkan.Format colorFormat;
 		private SharpVulkan.Image depthStencilBuffer;
 		private SharpVulkan.ImageView depthStencilView;
 		private SharpVulkan.DeviceMemory depthStencilMemory;
@@ -12,12 +13,15 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.RenderPass renderPass;
 		private SharpVulkan.Framebuffer framebuffer;
 
+		internal SharpVulkan.Format ColorFormat => colorFormat;
+		internal SharpVulkan.Format DepthStencilFormat => depthStencilFormat;
 		internal SharpVulkan.Framebuffer Framebuffer => framebuffer;
 		internal SharpVulkan.RenderPass RenderPass => renderPass;
 
 		public PlatformRenderTexture2D(PlatformRenderContext context, Format format, int width, int height, TextureParams textureParams)
 			: base(context, format, width, height, false, true, textureParams)
 		{
+			colorFormat = VulkanHelper.GetVKFormat(format);
 			CreateDepthStencilBuffer();
 			CreateRenderPass();
 			CreateFramebuffer();
@@ -97,7 +101,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			var attachmentDescs = new[] {
 				new SharpVulkan.AttachmentDescription {
-					Format = VulkanHelper.GetVKFormat(Format),
+					Format = colorFormat,
 					Samples = SharpVulkan.SampleCountFlags.Sample1,
 					LoadOperation = SharpVulkan.AttachmentLoadOperation.Load,
 					StoreOperation = SharpVulkan.AttachmentStoreOperation.Store,
