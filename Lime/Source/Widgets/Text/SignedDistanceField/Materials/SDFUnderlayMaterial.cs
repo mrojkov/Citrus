@@ -1,6 +1,7 @@
 namespace Lime.SignedDistanceField
 {
-	public class SDFUnderlayMaterial : IMaterial
+
+	public class SDFShadowMaterial : IMaterial
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
@@ -21,9 +22,9 @@ namespace Lime.SignedDistanceField
 
 		public string Id { get; set; }
 
-		public SDFUnderlayMaterial() : this(Blending.Alpha) { }
+		public SDFShadowMaterial() : this(Blending.Alpha) { }
 
-		public SDFUnderlayMaterial(Blending blending)
+		public SDFShadowMaterial(Blending blending)
 		{
 			this.blending = blending;
 			shaderParams = new ShaderParams();
@@ -41,7 +42,7 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(colorKey, Color.ToVector4());
 			shaderParams.Set(offsetKey, Offset / 100);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
-			PlatformRenderer.SetShaderProgram(SDFUnderlayShaderProgram.GetInstance());
+			PlatformRenderer.SetShaderProgram(SDFShadowShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
@@ -49,7 +50,7 @@ namespace Lime.SignedDistanceField
 
 		public IMaterial Clone()
 		{
-			return new SDFUnderlayMaterial(blending) {
+			return new SDFShadowMaterial(blending) {
 				Dilate = Dilate,
 				Color = Color,
 				Softness = Softness,
@@ -58,19 +59,59 @@ namespace Lime.SignedDistanceField
 		}
 	}
 
-	public class SDFUnderlayMaterialProvider : Sprite.IMaterialProvider
+	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		public SDFUnderlayMaterial Material = new SDFUnderlayMaterial();
+		internal bool Free = true;
+
+		public SDFShadowMaterial Material = new SDFShadowMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
 
-		public Sprite.IMaterialProvider Clone() => new SDFUnderlayMaterialProvider() {
+		public Sprite.IMaterialProvider Clone() => new SDFShadowMaterialProvider() {
 			Material = Material
 		};
 
 		public Sprite ProcessSprite(Sprite s) => s;
+
+		public void Release()
+		{
+			if (Free) return;
+			try {
+				OnRelease();
+			} finally {
+				Free = true;
+			}
+		}
+
+		protected virtual void OnRelease() { }
 	}
 
-	public class SDFUnderlayShaderProgram : ShaderProgram
+	public static class SDFShadowMaterialProviderPool<T> where T : SDFShadowMaterialProvider, new()
+	{
+		private static T[] items = new T[1] { new T() };
+		private static int index;
+
+		public static T Acquire()
+		{
+			for (int i = 0; i < items.Length; i++) {
+				var item = items[index++];
+				if (index == items.Length)
+					index = 0;
+				if (item.Free) {
+					item.Free = false;
+					return item;
+				}
+			}
+			System.Array.Resize(ref items, items.Length * 2);
+			index = items.Length / 2;
+			for (int i = index; i < items.Length; i++) {
+				items[i] = new T();
+			}
+			items[index].Free = false;
+			return items[index];
+		}
+	}
+
+	public class SDFShadowShaderProgram : ShaderProgram
 	{
 		private const string VertexShader = @"
 			attribute vec4 inColor;
@@ -105,11 +146,11 @@ namespace Lime.SignedDistanceField
 				gl_FragColor = vec4(color.rgb, color.a * shadowAlpha * global_color.a);
 			}";
 
-		private static SDFUnderlayShaderProgram instance;
+		private static SDFShadowShaderProgram instance;
 
-		public static SDFUnderlayShaderProgram GetInstance() => instance ?? (instance = new SDFUnderlayShaderProgram());
+		public static SDFShadowShaderProgram GetInstance() => instance ?? (instance = new SDFShadowShaderProgram());
 
-		private SDFUnderlayShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
+		private SDFShadowShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
 
 		private static Shader[] CreateShaders()
 		{

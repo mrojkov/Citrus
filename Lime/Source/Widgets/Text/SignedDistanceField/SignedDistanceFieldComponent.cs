@@ -1,27 +1,67 @@
 using Yuzu;
 using Lime.SignedDistanceField;
+using System.Collections.Generic;
 
 namespace Lime
 {
+	public class ShadowParams
+	{
+		public enum ShadowType
+		{
+			Outer,
+			Inner
+		}
+
+		private const float MinimumSoftness = 0f;
+		private const float MaximumSoftness = 45f;
+		private const float MinimumDilate = -40f;
+		private const float MaximumDilate = 40f;
+
+		private float softness = 0f;
+		private float dilate = 0f;
+
+		[YuzuMember]
+		public bool Enabled { get; set; } = true;
+
+		[YuzuMember]
+		public ShadowType Type { get; set; }
+
+		[YuzuMember]
+		public Color4 Color { get; set; } = Color4.Black;
+
+		[YuzuMember]
+		public Vector2 Offset { get; set; }
+
+		[YuzuMember]
+		public float Softness
+		{
+			get => softness;
+			set => softness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
+		}
+
+		[YuzuMember]
+		public float Dilate
+		{
+			get => dilate;
+			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+		}
+	}
+
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
 	public class SignedDistanceFieldComponent : NodeComponent
 	{
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
-		private const string GroupUnderlay = "02. Underlay";
 		private const string GroupGradient = "03. Gradient";
 		private const string GroupBevel = "04. Bevel";
+		private const string GroupShadow = "05. Shadows";
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 50f;
 		private const float MinimumDilate = -30f;
 		private const float MaximumDilate = 30f;
 		private const float MinimumThickness = 0f;
 		private const float MaximumThickness = 30f;
-		private const float MinimumUnderlaySoftness = 0f;
-		private const float MaximumUnderlaySoftness = 45f;
-		private const float MinimumUnderlayDilate = -40f;
-		private const float MaximumUnderlayDilate = 40f;
 		private const float MinimumLightAngle = 0f;
 		private const float MaximumLightAngle = 360f;
 		private const float MinimumReflectionPower = 0f;
@@ -32,16 +72,12 @@ namespace Lime
 		private const float MaximumBevelWidth = 30f;
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
-		internal SDFUnderlayMaterialProvider UnderlayMaterialProvider { get; private set; } = new SDFUnderlayMaterialProvider();
 
 		private SDFPresenter presenter = new SDFPresenter();
 		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
 		private float softness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
-		private float underlaySoftness = 0f;
-		private float underlayDilate = 0f;
-		private Vector2 underlayOffset = new Vector2();
 		private float lightAngle;
 		private float reflectionPower;
 		private float bevelRoundness;
@@ -73,38 +109,6 @@ namespace Lime
 		{
 			get => thickness;
 			set => thickness = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupUnderlay)]
-		public bool UnderlayEnabled { get; set; }
-
-		[YuzuMember]
-		[TangerineGroup(GroupUnderlay)]
-		public Color4 UnderlayColor { get; set; } = Color4.Black;
-
-		[YuzuMember]
-		[TangerineGroup(GroupUnderlay)]
-		public Vector2 UnderlayOffset
-		{
-			get => underlayOffset;
-			set => underlayOffset = value;
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupUnderlay)]
-		public float UnderlaySoftness
-		{
-			get => underlaySoftness;
-			set => underlaySoftness = Mathf.Clamp(value, MinimumUnderlaySoftness, MaximumUnderlaySoftness);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupUnderlay)]
-		public float UnderlayDilate
-		{
-			get => underlayDilate;
-			set => underlayDilate = Mathf.Clamp(value, MinimumUnderlayDilate, MaximumUnderlayDilate);
 		}
 
 		[YuzuMember]
@@ -158,6 +162,10 @@ namespace Lime
 			get => bevelWidth;
 			set => bevelWidth = Mathf.Clamp(value, MinimumBevelWidth, MaximumBevelWidth);
 		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupShadow)]
+		public List<ShadowParams> Shadows { get; set; }
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{

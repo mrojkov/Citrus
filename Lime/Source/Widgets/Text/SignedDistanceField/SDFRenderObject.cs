@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Lime.SignedDistanceField
 {
 	class SDFRenderObject : RenderObject
@@ -20,13 +22,8 @@ namespace Lime.SignedDistanceField
 		public Color4 FaceColor;
 		public float Thickness;
 		public Color4 OutlineColor;
-		public SDFUnderlayMaterialProvider UnderlayMaterialProvider;
-		public SDFUnderlayMaterial UnderlayMaterial => UnderlayMaterialProvider.Material;
-		public Vector2 UnderlayOffset;
-		public float UnderlaySoftness;
-		public float UnderlayDilate;
-		public bool UnderlayEnabled;
-		public Color4 UnderlayColor;
+		public List<SDFShadowMaterialProvider> OuterShadowMaterialProviders;
+		public List<SDFShadowMaterialProvider> InnerShadowMaterialProviders;
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
 		public float GradientAngle;
@@ -43,7 +40,18 @@ namespace Lime.SignedDistanceField
 			SpriteList = null;
 			Material = null;
 			SDFMaterialProvider = null;
-			UnderlayMaterialProvider = null;
+			if (InnerShadowMaterialProviders != null) {
+				foreach (var item in InnerShadowMaterialProviders) {
+					item.Release();
+				}
+				InnerShadowMaterialProviders = null;
+			}
+			if (OuterShadowMaterialProviders != null) {
+				foreach (var item in OuterShadowMaterialProviders) {
+					item.Release();
+				}
+				OuterShadowMaterialProviders = null;
+			}
 		}
 
 		public override void Render()
