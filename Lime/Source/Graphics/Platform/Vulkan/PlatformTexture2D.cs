@@ -162,7 +162,7 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void UpdateSampler()
 		{
-			sampler = context.SamplerCache.AcquireSampler(textureParams ?? TextureParams.Default);
+			sampler = context.SamplerCache.AcquireSampler(textureParams);
 		}
 	}
 }

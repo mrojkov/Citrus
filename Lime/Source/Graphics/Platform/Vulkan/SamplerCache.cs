@@ -15,6 +15,7 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public SharpVulkan.Sampler AcquireSampler(TextureParams textureParams)
 		{
+			textureParams = textureParams ?? TextureParams.Default;
 			var hash = CalculateHash(textureParams);
 			if (!lruCache.TryGetValue(hash, out var sampler)) {
 				sampler = CreateSampler(textureParams);
