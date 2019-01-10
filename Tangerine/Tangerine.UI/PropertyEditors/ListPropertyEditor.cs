@@ -92,7 +92,7 @@ namespace Tangerine.UI
 			};
 			ExpandableContent.Nodes.Insert(index, elementContainer);
 			removeButton.Clicked += () => removeCallback = removeClicked;
-			editor.ContainerWidget.AddNode(removeButton);
+			editor.EditorContainer.AddNode(removeButton);
 		}
 	}
 }
