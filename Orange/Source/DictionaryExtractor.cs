@@ -10,6 +10,19 @@ namespace Orange
 {
 	public class DictionaryExtractor
 	{
+		private static readonly Regex tanTextMatcher = new Regex(
+			@"^(\s*""Text""\s*:)\s*""(?<string>[^""\\]*(?:\\.[^""\\]*)*)"",?\s?$",
+			RegexOptions.Compiled | RegexOptions.Multiline);
+
+		private static readonly Regex tanAnimatedTextMatcher = new Regex(
+			@"^\s*\[\s*\d+\s*,\s*\d+\s*,\s*""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""\],?\s?$",
+			RegexOptions.Compiled | RegexOptions.Multiline);
+
+		private static readonly Regex sourceTextMatcher = new Regex(
+			@"(?<prefix>[@$])?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""", RegexOptions.Compiled);
+
+		private static readonly Regex taggedStringMatcher = new Regex(@"^\[.*\](.+)$", RegexOptions.Compiled);
+
 		private LocalizationDictionary dictionary;
 
 		public void ExtractDictionary()
@@ -106,7 +119,8 @@ namespace Orange
 
 		private void ExtractTexts()
 		{
-			Predicate<DirectoryInfo> scanFilter = (directoryInfo) => {
+			bool ScanFilter(DirectoryInfo directoryInfo)
+			{
 				if (directoryInfo.Name == "bin") return false;
 				if (directoryInfo.Name == "obj") return false;
 				if (directoryInfo.Name == ".svn") return false;
@@ -114,8 +128,9 @@ namespace Orange
 				if (directoryInfo.Name == ".vs") return false;
 				if (directoryInfo.Name == "Citrus") return false;
 				return true;
-			};
-			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, scanFilter);
+			}
+
+			var sourceFiles = new ScanOptimizedFileEnumerator(The.Workspace.ProjectDirectory, ScanFilter);
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 				var files = sourceFiles.Enumerate(".cs");
 				foreach (var fileInfo in files) {
@@ -123,7 +138,7 @@ namespace Orange
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				var files = The.Workspace.AssetFiles.Enumerate(".scene").Concat(The.Workspace.AssetFiles.Enumerate(".tan"));
+				var files = The.Workspace.AssetFiles.Enumerate(".scene");
 				foreach (var fileInfo in files) {
 					// First of all scan lines like this: "[]..."
 					ProcessSourceFile(fileInfo.Path);
@@ -131,6 +146,12 @@ namespace Orange
 					if (!ShouldLocalizeOnlyTaggedSceneTexts()) {
 						ProcessSceneFile(fileInfo.Path);
 					}
+				}
+			}
+			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+				var files = The.Workspace.AssetFiles.Enumerate(".tan");
+				foreach (var fileInfo in files) {
+					ProcessTanFile(fileInfo.Path);
 				}
 			}
 		}
@@ -142,11 +163,9 @@ namespace Orange
 
 		private void ProcessSourceFile(string file)
 		{
-			const string quotedStringPattern =
-				@"(?<prefix>[@$])?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""";
 			var code = File.ReadAllText(file, Encoding.UTF8);
 			var context = GetContext(file);
-			foreach (var match in Regex.Matches(code, quotedStringPattern)) {
+			foreach (var match in sourceTextMatcher.Matches(code)) {
 				var m = match as Match;
 				var prefix = m.Groups["prefix"].Value;
 				var s = m.Groups["string"].Value;
@@ -161,7 +180,7 @@ namespace Orange
 			}
 		}
 
-		void ProcessSceneFile(string file)
+		private void ProcessSceneFile(string file)
 		{
 			const string textPropertiesPattern = @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$";
 			var code = File.ReadAllText(file, Encoding.Default);
@@ -174,22 +193,38 @@ namespace Orange
 			}
 		}
 
-		private string GetContext(string file)
+		private void ProcessTanFile(string path)
+		{
+			var content = File.ReadAllText(path, Encoding.UTF8);
+			var context = GetContext(path);
+			var onlyTagged = ShouldLocalizeOnlyTaggedSceneTexts();
+			var matches1 = tanTextMatcher.Matches(content);
+			var matches2 = tanAnimatedTextMatcher.Matches(content);
+
+			foreach (var match in matches1.OfType<Match>().Concat(matches2.OfType<Match>()).Where(m => m.Success)) {
+				var s = match.Groups["string"].Value;
+				if (HasAlphabeticCharacters(s) && (!onlyTagged || IsCorrectTaggedString(s))) {
+					AddToDictionary(s, context);
+				}
+			}
+		}
+
+		private static string GetContext(string file)
 		{
 			return file;
 		}
 
 		private static bool IsCorrectTaggedString(string str)
 		{
-			return Regex.Match(str, @"^\[.*\](.+)$").Success;
+			return taggedStringMatcher.Match(str).Success;
 		}
 
 		private void AddToDictionary(string key, string context)
 		{
-			var match = Regex.Match(key, @"^\[(.*)\](.*)$");
+			var match = taggedStringMatcher.Match(key);
 			if (match.Success) {
 				// The line starts with "[...]..."
-				var value = Unescape(match.Groups[2].Value);
+				var value = Unescape(match.Groups[1].Value);
 				if (key.StartsWith("[]")) {
 					key = key.Substring(2);
 				}
