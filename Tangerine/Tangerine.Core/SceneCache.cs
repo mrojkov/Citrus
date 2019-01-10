@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Lime;
+using Exception = Lime.Exception;
 using Yuzu = Lime.Yuzu;
 
 namespace Tangerine.Core
@@ -141,6 +142,9 @@ namespace Tangerine.Core
 						continue;
 					}
 					if (kv.Value.Dependencies.Contains(nextPath)) {
+						if (nextPath == kv.Key) {
+							throw new Exception($"Scene '{nextPath}' has cyclic dependencies");
+						}
 						kv.Value.DoNeedReloadExternalScenes = true;
 						q.Enqueue(kv.Key);
 					}
@@ -156,6 +160,11 @@ namespace Tangerine.Core
 					Clear(d);
 				}
 			}
+		}
+
+		public void CheckCyclicDependencies(string path)
+		{
+			MarkDependentsForReload(path);
 		}
 	}
 }

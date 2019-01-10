@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,6 +75,9 @@ namespace Orange
 				}
 				The.UI.ProcessPendingEvents();
 			}
+			// WaitForExit WITHOUT timeout argument waits for async output and error streams to finish
+			p.WaitForExit();
+			p.Close();
 			Console.Write(logger.ToString());
 			return p.ExitCode;
 		}
