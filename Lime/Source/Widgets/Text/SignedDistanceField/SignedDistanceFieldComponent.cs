@@ -19,6 +19,7 @@ namespace Lime
 
 		private float softness = 0f;
 		private float dilate = 0f;
+		private Vector2 offset;
 
 		[YuzuMember]
 		public bool Enabled { get; set; } = true;
@@ -30,7 +31,17 @@ namespace Lime
 		public Color4 Color { get; set; } = Color4.Black;
 
 		[YuzuMember]
-		public Vector2 Offset { get; set; }
+		public Vector2 Offset
+		{
+			get => offset;
+			set => offset = value;
+		}
+
+		[YuzuMember]
+		public int OffsetX { get; set; }
+
+		[YuzuMember]
+		public int OffsetY { get; set; }
 
 		[YuzuMember]
 		public float Softness

@@ -86,7 +86,7 @@ namespace Lime.SignedDistanceField
 				materialProvider.Material.Dilate = s.Dilate;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = s.Offset;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
 				if (s.Type == ShadowParams.ShadowType.Inner) {
 					if (ro.InnerShadowMaterialProviders == null) {
 						ro.InnerShadowMaterialProviders = new List<SDFShadowMaterialProvider>();
