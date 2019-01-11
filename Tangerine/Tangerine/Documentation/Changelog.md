@@ -1,3 +1,12 @@
+##### Changelog 11.01.2019
+
+Багфиксы:
+
+* Исправлена ошибка, позволяющая циклические зависимости между сценами [CIT-835](https://gitlab.game-forest.com:2000/browse/CIT-835)
+* Исправлена ошибка, делающая невозможным изменение цвета во множественном выделении [CIT-1035](https://gitlab.game-forest.com:2000/browse/CIT-1035)
+* Исправлена ошибка, позволяющая заменить содержимое root-сцены [CIT-1040](https://gitlab.game-forest.com:2000/browse/CIT-1040)
+* Исправлена ошибка, делающая невозможным обновление проекта XCode [CIT-1055](https://gitlab.game-forest.com:2000/browse/CIT-1055)
+
 ##### Changelog 29.12.2018
 
 * При клике на надпись `<many values>` она автоматически убирается [CIT-1021](https://gitlab.game-forest.com:2000/browse/CIT-1021)
