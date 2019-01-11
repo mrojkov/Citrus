@@ -9,14 +9,13 @@ namespace Tangerine.Dialogs
 {
 	public class HotkeyEditor : Widget
 	{
-		private List<KeyboardButton> buttons = new List<KeyboardButton>();
-		private IEnumerable<KeyboardButton> FindButtons(Key key) => buttons.Where(i => i.Key == key);
+		private readonly Dictionary<Key, KeyboardButton> buttons = new Dictionary<Key, KeyboardButton>();
+		private readonly List<KeyboardButton> modifierButtons = new List<KeyboardButton>();
 
 		private bool IsCommandCurrent(CommandInfo info) => info.Shortcut.Modifiers.HasFlag(Modifiers);
 
 		private bool IsCommandSelected(CommandInfo info) =>
-			info.Shortcut.Modifiers.HasFlag(Modifiers) &&
-			((Main == Key.Unknown) ? false : info.Shortcut.Main == Main);
+			info.Shortcut.Modifiers.HasFlag(Modifiers) && (Main != Key.Unknown) && info.Shortcut.Main == Main;
 
 		public IEnumerable<CommandInfo> SelectedCommands { get; private set; }
 
@@ -35,33 +34,30 @@ namespace Tangerine.Dialogs
 			BuildKeyboard();
 			Updating += ScreenKeyboard_Updating;
 			Updated += ScreenKeyboard_Updated;
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Category, category => {
+			this.AddChangeWatcher(() => Category, category => {
 				UpdateButtonCommands();
 				UpdateShortcuts();
 			});
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Profile, profile => {
+			this.AddChangeWatcher(() => Profile, profile => {
 				UpdateButtonCommands();
 				UpdateShortcuts();
 			});
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Modifiers, modifiers => UpdateShortcuts());
-			Core.WidgetExtensions.AddChangeWatcher(this, () => Main, main => UpdateShortcuts());
+			this.AddChangeWatcher(() => Modifiers, modifiers => UpdateShortcuts());
+			this.AddChangeWatcher(() => Main, main => UpdateShortcuts());
 		}
 
 		public void UpdateButtonCommands()
 		{
 			foreach (var button in this.buttons) {
-				button.Commands.Clear();
+				button.Value.Commands.Clear();
 			}
 			foreach (var command in Profile.Commands) {
 				var key = command.Shortcut.Main;
 				if (key == Key.Unknown)
 					continue;
-				var buttons = FindButtons(key);
-				if (!buttons.Any())
+				if (!buttons.TryGetValue(key, out var b))
 					continue;
-				foreach (var button in buttons) {
-					button.Commands.Add(command);
-				}
+				b.Commands.Add(command);
 			}
 		}
 
@@ -71,13 +67,13 @@ namespace Tangerine.Dialogs
 				return;
 			}
 			bool isGenericCategory = (Category.Id == typeof(GenericCommands).Name);
-			SelectedCommands = isGenericCategory ? Profile.Commands.Where(i => IsCommandSelected(i)) :
+			SelectedCommands = isGenericCategory ? Profile.Commands.Where(IsCommandSelected) :
 				Profile.Commands.Where(i => IsCommandSelected(i) && i.CategoryInfo == Category);
-			foreach (var button in buttons) {
+			foreach (var (key, button)  in buttons) {
 				button.CommandName = null;
 				button.CommandState = KeyboardCommandState.None;
 				var currentCommands = isGenericCategory ?
-					button.Commands.Where(i => IsCommandCurrent(i)) :
+					button.Commands.Where(IsCommandCurrent) :
 					button.Commands.Where(i => IsCommandCurrent(i) && i.CategoryInfo == Category);
 				bool hasGenericCommand = false;
 				bool hasPanelCommand = false;
@@ -96,7 +92,7 @@ namespace Tangerine.Dialogs
 					button.CommandState = KeyboardCommandState.Generic;
 				}
 
-				button.CommandName = currentCommands.Where(i => i.CategoryInfo == Category).FirstOrDefault()?.Title;
+				button.CommandName = currentCommands.FirstOrDefault(i => i.CategoryInfo == Category)?.Title;
 			}
 			SelectedShortcutChanged?.Invoke();
 		}
@@ -104,17 +100,20 @@ namespace Tangerine.Dialogs
 		private void PressModifier(Modifiers modifier, Key key)
 		{
 			var input = Input;
+			var btns = modifierButtons.Where(i => i.Key == key);
 			if (input.WasKeyPressed(key)) {
 				Modifiers |= modifier;
-				var buttons = FindButtons(key);
-				foreach (var button in buttons) {
-					button.State = KeyboardButtonState.Press;
+				if (btns.Any()) {
+					foreach (var btn in btns) {
+						btn.State = KeyboardButtonState.Press;
+					}
 				}
 			} else if (input.WasKeyReleased(key)) {
 				Modifiers &= ~modifier;
-				var buttons = FindButtons(key);
-				foreach (var button in buttons) {
-					button.State = KeyboardButtonState.None;
+				if (btns.Any()) {
+					foreach (var btn in btns) {
+						btn.State = KeyboardButtonState.None;
+					}
 				}
 			}
 		}
@@ -125,24 +124,21 @@ namespace Tangerine.Dialogs
 				return;
 			}
 			if (key != Key.Unknown) {
-				FindButtons(key).First().State = KeyboardButtonState.Press;
+				buttons[key].State = KeyboardButtonState.Press;
 			}
-
 			if (Main != Key.Unknown) {
-				FindButtons(Main).First().State = KeyboardButtonState.None;
+				buttons[Main].State = KeyboardButtonState.None;
 			}
-
 			Main = key;
 		}
 
 		private void SwitchModifier(Modifiers modifier, Key key)
 		{
 			SetFocus();
-			var buttons = FindButtons(key);
 			bool isHolded = Modifiers.HasFlag(modifier);
 			Modifiers = isHolded ? Modifiers & ~modifier : Modifiers | modifier;
-			foreach (var button in buttons) {
-				button.State = isHolded ? KeyboardButtonState.None : KeyboardButtonState.Hold;
+			if (buttons.TryGetValue(key, out var btn)) {
+				btn.State = isHolded ? KeyboardButtonState.None : KeyboardButtonState.Hold;
 			}
 		}
 
@@ -150,17 +146,15 @@ namespace Tangerine.Dialogs
 		{
 			SetFocus();
 			if (Main != Key.Unknown) {
-				FindButtons(Main).First().State = KeyboardButtonState.None;
+				buttons[Main].State = KeyboardButtonState.None;
 				if (key == Main) {
 					Main = Key.Unknown;
 					return;
 				}
 			}
-			var buttons = FindButtons(key);
-			if (buttons.Any() && Shortcut.ValidateMainKey(key)) {
-				var newButton = buttons.First();
-					Main = key;
-				newButton.State = KeyboardButtonState.Hold;
+			if (buttons.TryGetValue(key, out var btn) && Shortcut.ValidateMainKey(key)) {
+				Main = key;
+				btn.State = KeyboardButtonState.Hold;
 			}
 		}
 
@@ -177,7 +171,7 @@ namespace Tangerine.Dialogs
 				!k.IsModifier() && !k.IsMouseKey() && Shortcut.ValidateMainKey(k));
 			if (!keys.Any()) {
 				if (Main != Key.Unknown) {
-					FindButtons(Main).First().State = KeyboardButtonState.None;
+					buttons[Main].State = KeyboardButtonState.None;
 					Main = Key.Unknown;
 				}
 				return;
@@ -359,7 +353,7 @@ namespace Tangerine.Dialogs
 			AddNode(middlePart);
 			AddNode(rightPart);
 
-			foreach (var button in buttons) {
+			foreach (var (key, button) in buttons) {
 				if (!button.Key.IsModifier()) {
 					button.Clicked = () => SwitchButton(button.Key);
 				}
@@ -370,11 +364,14 @@ namespace Tangerine.Dialogs
 		private Widget CreateButton(Widget parent, Key key, string text = null)
 		{
 			var button = new KeyboardButton(key) {
-				Text = String.IsNullOrEmpty(text) ? key.ToString() : text,
+				Text = string.IsNullOrEmpty(text) ? key.ToString() : text,
 				MinSize = Vector2.Zero,
 				MaxSize = Vector2.PositiveInfinity
 			};
-			buttons.Add(button);
+			buttons[key] = button;
+			if (key.IsModifier()) {
+				modifierButtons.Add(button);
+			}
 			parent.AddNode(button);
 			return button;
 		}
@@ -409,7 +406,7 @@ namespace Tangerine.Dialogs
 
 	class KeyboardButton : ThemedButton
 	{
-		private SimpleText commandName;
+		private readonly SimpleText commandName;
 
 		public KeyboardButton(Key key) : base()
 		{
@@ -433,20 +430,20 @@ namespace Tangerine.Dialogs
 			commandName.Height -= caption.FontHeight;
 
 			Key = key;
-			(Presenter as KeyboardButtonPresenter).IsModifier = Key.IsModifier();
+			((KeyboardButtonPresenter) Presenter).IsModifier = Key.IsModifier();
 			State = KeyboardButtonState.None;
 		}
 
 		public string CommandName
 		{
-			get { return commandName.Text; }
-			set { commandName.Text = value; }
+			get => commandName.Text;
+			set => commandName.Text = value;
 		}
 
 		public KeyboardCommandState CommandState
 		{
-			get { return (Presenter as KeyboardButtonPresenter).CommandState; }
-			set { (Presenter as KeyboardButtonPresenter).CommandState = value; }
+			get => (Presenter as KeyboardButtonPresenter).CommandState;
+			set => (Presenter as KeyboardButtonPresenter).CommandState = value;
 		}
 
 		public List<CommandInfo> Commands { get; private set; } = new List<CommandInfo>();
@@ -454,7 +451,7 @@ namespace Tangerine.Dialogs
 		private KeyboardButtonState state;
 		public KeyboardButtonState State
 		{
-			get { return state; }
+			get => state;
 			set {
 				state = value;
 				(Presenter as IButtonPresenter).SetState(state.ToString());
@@ -470,7 +467,7 @@ namespace Tangerine.Dialogs
 		public bool IsModifier { get; set; } = false;
 		public KeyboardCommandState CommandState { get; set; }
 
-		static private Vertex[] triangleVertices = new Vertex[3];
+		private static readonly Vertex[] triangleVertices = new Vertex[3];
 
 		public KeyboardButtonPresenter()
 		{
