@@ -22,9 +22,9 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public SharpVulkan.DescriptorSet AllocateDescriptorSet(PlatformShaderProgram program)
 		{
-			if (allocatedSets >= poolLimits.MaxSets ||
-				allocatedCombinedImageSamplers >= poolLimits.MaxCombinedImageSamplers - program.CombinedImageSamplerCount ||
-				allocatedUniformBuffers >= poolLimits.MaxUniformBuffers - program.UniformBufferCount
+			if (allocatedSets + 1 > poolLimits.MaxSets ||
+				allocatedCombinedImageSamplers + program.CombinedImageSamplerCount > poolLimits.MaxCombinedImageSamplers||
+				allocatedUniformBuffers + program.UniformBufferCount > poolLimits.MaxUniformBuffers
 			) {
 				DiscardPool();
 			}
