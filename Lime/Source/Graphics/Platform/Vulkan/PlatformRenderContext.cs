@@ -341,24 +341,20 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void PreDraw()
 		{
+			shaderProgram.UpdateUniformBuffers(nextFenceValue);
 			EnsureRenderPass();
+			var pipeline = GetOrCreatePipeline();
+			commandBuffer.BindPipeline(SharpVulkan.PipelineBindPoint.Graphics, pipeline);
+			commandBuffer.SetStencilReference(SharpVulkan.StencilFaceFlags.FrontAndBack, stencilState.ReferenceValue);
 			// FIXME: Update blend constants
-
 			var vkViewport = new SharpVulkan.Viewport(
 				viewport.X, viewport.Y, viewport.Width, viewport.Height,
 				viewport.MinDepth, viewport.MaxDepth);
 			commandBuffer.SetViewport(0, 1, &vkViewport);
-
 			var scissorBounds = scissorState.Enable ? scissorState.Bounds : viewport.Bounds;
 			var vkScissor = new SharpVulkan.Rect2D(
 				scissorBounds.X, scissorBounds.Y, (uint)scissorBounds.Width, (uint)scissorBounds.Height);
 			commandBuffer.SetScissor(0, 1, &vkScissor);
-
-			var pipeline = GetOrCreatePipeline();
-			commandBuffer.BindPipeline(SharpVulkan.PipelineBindPoint.Graphics, pipeline);
-			commandBuffer.SetStencilReference(SharpVulkan.StencilFaceFlags.FrontAndBack, stencilState.ReferenceValue);
-
-			shaderProgram.UpdateUniformBuffers(nextFenceValue);
 			BindDescriptorSets();
 			BindVertexBuffers();
 			BindIndexBuffer();
@@ -366,13 +362,15 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void BindVertexBuffers()
 		{
-			for (var slot = 0; slot < vertexBuffers.Length; slot++) {
+			for (var i = 0; i < vertexInputLayout.Bindings.Length; i++) {
+				var slot = vertexInputLayout.Bindings[i].Slot;
 				var buffer = vertexBuffers[slot];
+				var offset = vertexOffsets[slot];
 				if (buffer != null) {
-					buffer.ReaderFenceValue = nextFenceValue;
+					buffer.WriteFenceValue = nextFenceValue;
 					var vkBuffer = buffer.BackingBuffer.Buffer;
-					var vkOffset = buffer.BackingBuffer.SliceOffset + (ulong)vertexOffsets[slot];
-					commandBuffer.BindVertexBuffers((uint)slot, 1, &vkBuffer, &vkOffset);
+					var vkEffectiveOffset = buffer.BackingBuffer.SliceOffset + (ulong)offset;
+					commandBuffer.BindVertexBuffers((uint)slot, 1, &vkBuffer, &vkEffectiveOffset);
 				}
 			}
 		}
@@ -380,9 +378,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void BindIndexBuffer()
 		{
 			if (indexBuffer != null) {
-				indexBuffer.ReaderFenceValue = nextFenceValue;
-				var offset = indexBuffer.BackingBuffer.SliceOffset + (ulong)indexOffset;
-				commandBuffer.BindIndexBuffer(indexBuffer.BackingBuffer.Buffer, offset, VulkanHelper.GetVKIndexType(indexFormat));
+				indexBuffer.WriteFenceValue = nextFenceValue;
+				var effectiveOffset = indexBuffer.BackingBuffer.SliceOffset + (ulong)indexOffset;
+				commandBuffer.BindIndexBuffer(indexBuffer.BackingBuffer.Buffer, effectiveOffset, VulkanHelper.GetVKIndexType(indexFormat));
 			}
 		}
 

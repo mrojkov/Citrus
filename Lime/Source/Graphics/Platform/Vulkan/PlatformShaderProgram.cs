@@ -22,6 +22,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private ShaderStageMask dirtyStageMask;
 		private int combinedImageSamplerCount;
 		private int uniformBufferCount;
+		private ulong uniformBufferWriteFenceValue;
 
 		internal readonly long ReferenceHash = System.Threading.Interlocked.Increment(ref referenceHashCounter);
 		internal SharpVulkan.ShaderModule VSModule => vsModule;
@@ -364,7 +365,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				if ((dirtyStageMask & bufferInfo.Stage) == 0) {
 					continue;
 				}
-				buffer.DiscardSlice(fenceValue);
+				buffer.DiscardSlice(uniformBufferWriteFenceValue);
 				var bufferData = buffer.MapSlice();
 				foreach (var templateEntry in bufferInfo.UpdateTemplate) {
 					var dstData = bufferData + templateEntry.BufferOffset;
@@ -373,6 +374,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				}
 				buffer.UnmapSlice();
 			}
+			uniformBufferWriteFenceValue = fenceValue;
 			dirtyStageMask = ShaderStageMask.None;
 		}
 

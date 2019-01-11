@@ -13,7 +13,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private int size;
 		private bool dynamic;
 
-		internal ulong ReaderFenceValue;
+		internal ulong WriteFenceValue;
 		internal BackingBuffer BackingBuffer => backingBuffer;
 
 		public BufferType BufferType => bufferType;
@@ -72,13 +72,13 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void SetDataDynamic(int offset, IntPtr data, int size, BufferSetDataMode mode)
 		{
 			if (mode == BufferSetDataMode.Discard) {
-				backingBuffer.DiscardSlice(ReaderFenceValue);
-				ReaderFenceValue = 0;
+				backingBuffer.DiscardSlice(WriteFenceValue);
+				WriteFenceValue = 0;
 			} else {
-				if (context.NextFenceValue <= ReaderFenceValue) {
+				if (context.NextFenceValue <= WriteFenceValue) {
 					context.Flush();
 				}
-				context.WaitForFence(ReaderFenceValue);
+				context.WaitForFence(WriteFenceValue);
 			}
 			var dstData = backingBuffer.MapSlice((ulong)offset, (ulong)size);
 			try {
