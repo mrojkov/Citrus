@@ -39,14 +39,14 @@ namespace Lime.Graphics.Platform.Vulkan
 		[DllImport(LibraryName, EntryPoint= "CreateShader", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr CreateShader();
 
-		[DllImport(LibraryName, EntryPoint = "ParseShader", CallingConvention = CallingConvention.Cdecl)]
-		private static extern bool ParseShader(IntPtr shaderHandle, Stage stage, IntPtr source);
+		[DllImport(LibraryName, EntryPoint = "CompileShader", CallingConvention = CallingConvention.Cdecl)]
+		private static extern bool CompileShader(IntPtr shaderHandle, Stage stage, IntPtr source);
 
-		public static bool ParseShader(IntPtr shaderHandle, Stage stage, string source)
+		public static bool CompileShader(IntPtr shaderHandle, Stage stage, string source)
 		{
 			var interopSource = Marshal.StringToHGlobalAnsi(source);
 			try {
-				return ParseShader(shaderHandle, stage, interopSource);
+				return CompileShader(shaderHandle, stage, interopSource);
 			} finally {
 				Marshal.FreeHGlobal(interopSource);
 			}

@@ -32,7 +32,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				? ShaderCompiler.Stage.Vertex
 				: ShaderCompiler.Stage.Fragment;
 			shader = ShaderCompiler.CreateShader();
-			if (!ShaderCompiler.ParseShader(shader, compilerStage, source)) {
+			if (!ShaderCompiler.CompileShader(shader, compilerStage, source)) {
 				var infoLog = ShaderCompiler.GetShaderInfoLog(shader);
 				ShaderCompiler.DestroyShader(shader);
 				throw new InvalidOperationException($"Shader compilation failed:\n{infoLog}");
