@@ -269,31 +269,16 @@ namespace Tangerine
 			}
 			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => {
 				PanelState.ActiveTabIndex = activeTabIndex;
-				switch (PanelState.ActiveTabIndex) {
-					case 1: {
-						var t = materialsPane["Container"];
-						foreach (var node in t.Nodes) {
-							if (node is MaterialRow mr) {
-								mr.Expand();
-							}
+				if (PanelState.ActiveTabIndex == 3) {
+					var t = animationsPane["Container"];
+					foreach (var node in t.Nodes) {
+						if (node is AnimationRow ar) {
+							(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
+							ar.Expand();
 						}
-						if (panelState.MaterialsScrollPosition != 1) {
-							UpdateScrollPosition(materialsPane, panelState.MaterialsScrollPosition);
-							}
-						break;
 					}
-					case 3: {
-						var t = animationsPane["Container"];
-						foreach (var node in t.Nodes) {
-							if (node is AnimationRow ar) {
-								(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
-								ar.Expand();
-							}
-						}
-						if (panelState.AnimationsScrollPosition != 1) {
-							UpdateScrollPosition(animationsPane, panelState.AnimationsScrollPosition);
-						}
-						break;
+					if (panelState.AnimationsScrollPosition != 1) {
+						UpdateScrollPosition(animationsPane, panelState.AnimationsScrollPosition);
 					}
 				}
 			});
