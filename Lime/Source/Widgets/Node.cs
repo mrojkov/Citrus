@@ -115,7 +115,9 @@ namespace Lime
 		[YuzuMember]
 		[TangerineDefaultCharset]
 		[TangerineStaticProperty]
+#if TANGERINE
 		[TangerineIgnoreIf(nameof(ShouldInspectContentsPath))]
+#endif // TANGERINE
 		public string ContentsPath
 		{
 			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
