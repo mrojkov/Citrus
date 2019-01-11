@@ -121,25 +121,18 @@ namespace Tangerine.Dialogs
 
 		private void PressButton(Key key)
 		{
-			var input = Input;
-			if (input.WasKeyPressed(key)) {
-				if (Main != Key.Unknown) {
-					FindButtons(Main).First().State = KeyboardButtonState.None;
-				}
-				var buttons = FindButtons(key);
-				if (buttons.Any()) {
-					var newButton = buttons.First();
-					Main = key;
-					newButton.State = KeyboardButtonState.Press;
-				}
-			} else if (input.WasKeyReleased(key) && key == Main) {
-				var buttons = FindButtons(key);
-				if (buttons.Any()) {
-					var oldButton = buttons.First();
-					Main = Key.Unknown;
-					oldButton.State = KeyboardButtonState.None;
-				}
+			if (key == Main) {
+				return;
 			}
+			if (key != Key.Unknown) {
+				FindButtons(key).First().State = KeyboardButtonState.Press;
+			}
+
+			if (Main != Key.Unknown) {
+				FindButtons(Main).First().State = KeyboardButtonState.None;
+			}
+
+			Main = key;
 		}
 
 		private void SwitchModifier(Modifiers modifier, Key key)
@@ -173,30 +166,33 @@ namespace Tangerine.Dialogs
 
 		private void ScreenKeyboard_Updating(float delta)
 		{
-			if (!IsFocused())
-				return;
 			PressModifier(Modifiers.Alt, Key.Alt);
 			PressModifier(Modifiers.Shift, Key.Shift);
 			PressModifier(Modifiers.Control, Key.Control);
 			PressModifier(Modifiers.Win, Key.Win);
 
-			var input = Input;
+			var input = CommonWindow.Current.Input;
 			var keys = Key.Enumerate().Where(k =>
-				(input.WasKeyPressed(k) || input.WasKeyReleased(k)) &&
+				input.IsKeyPressed(k) &&
 				!k.IsModifier() && !k.IsMouseKey() && Shortcut.ValidateMainKey(k));
-			if (!keys.Any())
+			if (!keys.Any()) {
+				if (Main != Key.Unknown) {
+					FindButtons(Main).First().State = KeyboardButtonState.None;
+					Main = Key.Unknown;
+				}
 				return;
+			}
 			PressButton(keys.First());
 		}
 
 		private void ScreenKeyboard_Updated(float delta)
 		{
-			if (!IsFocused())
-				return;
 			var input = Input;
-			input.ConsumeKeys(Key.Enumerate().Where(
-				k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
-			Command.ConsumeRange(Command.Editing);
+			if (IsFocused()) {
+				input.ConsumeKeys(Key.Enumerate().Where(
+					k => input.WasKeyRepeated(k) || input.WasKeyPressed(k) || input.WasKeyReleased(k)));
+				Command.ConsumeRange(Command.Editing);
+			}
 		}
 
 
