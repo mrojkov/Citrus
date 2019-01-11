@@ -77,9 +77,10 @@ namespace Orange
 			}
 			// WaitForExit WITHOUT timeout argument waits for async output and error streams to finish
 			p.WaitForExit();
+			var exitCode = p.ExitCode;
 			p.Close();
 			Console.Write(logger.ToString());
-			return p.ExitCode;
+			return exitCode;
 		}
 	}
 }
