@@ -15,7 +15,7 @@
 #include <limits>
 #include <stack>
 
-const int TargetGlslVersion = 400;
+const int TargetGlslVersion = 450;
 const EProfile TargetGlslProfile = ENoProfile;
 
 struct AttribInfo
@@ -316,6 +316,9 @@ void GeneratePreamble(std::string& source, EShLanguage stage)
 		preamble += "#define varying out\n";
 	} else {
 		preamble += "#define varying in\n";
+		preamble += "#define gl_FragData _gl_FragData\n";
+		preamble += "#define gl_FragColor gl_FragData[0]\n";
+		preamble += "layout(location = 0) out mediump vec4 _gl_FragData[1];\n";
 	}
 	source.insert(0, preamble);
 }
