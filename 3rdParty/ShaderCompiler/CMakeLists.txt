@@ -27,7 +27,7 @@ if(SHADER_COMPILER_SHARED_LIB)
 	target_compile_definitions(ShaderCompiler PUBLIC SHADER_COMPILER_SHARED_LIB)
 endif()
 
-target_link_libraries(ShaderCompiler PRIVATE glslang SPIRV spirv-cross-glsl)
+target_link_libraries(ShaderCompiler PRIVATE glslang SPIRV SPIRV-Tools-opt spirv-cross-glsl)
 
 install(TARGETS ShaderCompiler
 	RUNTIME DESTINATION bin

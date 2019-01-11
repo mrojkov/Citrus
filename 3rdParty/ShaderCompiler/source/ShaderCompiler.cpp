@@ -2,6 +2,7 @@
 
 #include <glslang/Public/ShaderLang.h>
 #include <SPIRV/GlslangToSpv.h>
+#include <spirv-tools/optimizer.hpp>
 #include <spirv_glsl.hpp>
 
 #include <string>
@@ -326,7 +327,39 @@ void ConvertToTarget(std::string& source, EShLanguage stage)
 	GeneratePreamble(source, stage);
 }
 
-bool ParseAndConvertToTarget(ShaderStage stage, const char* source, std::string* convertedSource, std::ostream& logger)
+bool CompileTarget(EShLanguage stage, const char* source, std::vector<unsigned int>& spirv, std::ostream& logger)
+{
+	glslang::TShader shader(stage);
+	shader.setStrings(&source, 1);
+	shader.setEnvInput(glslang::EShSourceGlsl, stage, glslang::EShClientVulkan, 100);
+	shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
+	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_0);
+	shader.setAutoMapBindings(true);
+	shader.setAutoMapLocations(true);
+	auto parsed = shader.parse(&DefaultBuiltInResource, TargetGlslVersion, TargetGlslProfile, false, false, EShMsgDefault);
+	logger << shader.getInfoLog();
+	logger << shader.getInfoDebugLog();
+	if (!parsed) {
+		return false;
+	}
+	glslang::TProgram program;
+	program.addShader(&shader);
+	auto linked = program.link(EShMsgDefault) && program.mapIO();
+	logger << program.getInfoLog();
+	logger << program.getInfoDebugLog();
+	if (!linked) {
+		return false;
+	}
+	glslang::GlslangToSpv(*program.getIntermediate(stage), spirv);
+	spvtools::Optimizer optimizer(SPV_ENV_VULKAN_1_0);
+	optimizer.RegisterPerformancePasses();
+	std::vector<unsigned int> optimizedSpirv;
+	optimizer.Run(spirv.data(), spirv.size(), &optimizedSpirv);
+	spirv = std::move(optimizedSpirv);
+	return true;
+}
+
+bool Compile(ShaderStage stage, const char* source, std::vector<unsigned int>& spirv, std::ostream& logger)
 {
 	GlslangInitializer glslangInitializer;
 	auto glslangStage = stage == SHADER_STAGE_VERTEX ? EShLangVertex : EShLangFragment;
@@ -336,109 +369,11 @@ bool ParseAndConvertToTarget(ShaderStage stage, const char* source, std::string*
 	if (!ValidateLegacy(glslangStage, source, logger))
 		return false;
 	ConvertToTarget(output, glslangStage);
-	*convertedSource = std::move(output);
+	if (!CompileTarget(glslangStage, output.c_str(), spirv, logger)) {
+		return false;
+	}
 	return true;
 }
-
-class IOMapResolver : public glslang::TIoMapResolver
-{
-public:
-	explicit IOMapResolver(std::unordered_map<std::string, int> attribLocations) :
-		m_attribLocations(std::move(attribLocations)),
-		m_attribAllocator(0xffff),
-		m_varyingAllocator(0xffff),
-		m_fragmentOutputAllocator(0xffff)
-	{
-	}
-
-	int resolveBinding(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override
-	{
-		return bindingCount++;
-	}
-
-	int resolveInOutLocation(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override
-	{
-		if (type.isBuiltIn())
-			return -1;
-		if (type.isStruct()) {
-			// FIXME: Is it a glslang bug?
-			if (type.getStruct() == nullptr)
-				return -1;
-			if (type.getStruct()->size() < 1)
-				return -1;
-			if (type.getStruct()->at(0).type->isBuiltIn())
-				return -1;
-		}
-		if (stage == EShLangVertex && type.getQualifier().isPipeInput()) {
-			if (is_live) {
-				auto locationIt = m_attribLocations.find(name);
-				if (locationIt != m_attribLocations.end())
-					return locationIt->second;
-			}
-			int location;
-			m_attribAllocator.Allocate(glslang::TIntermediate::computeTypeLocationSize(type, stage), &location);
-			return location;
-		}
-		if (stage == EShLangVertex && type.getQualifier().isPipeOutput()) {
-			int location;
-			m_varyingAllocator.Allocate(glslang::TIntermediate::computeTypeLocationSize(type, stage), &location);
-			m_varyingLocations[name] = location;
-			return location;
-		}
-		if (stage == EShLangFragment && type.getQualifier().isPipeInput()) {
-			auto locationIt = m_varyingLocations.find(name);
-			if (locationIt != m_varyingLocations.end())
-				return locationIt->second;
-			int location;
-			m_attribAllocator.Allocate(glslang::TIntermediate::computeTypeLocationSize(type, stage), &location);
-			return location;
-		} else if (stage == EShLangFragment && type.getQualifier().isPipeOutput()) {
-			int location;
-			m_fragmentOutputAllocator.Allocate(glslang::TIntermediate::computeTypeLocationSize(type, stage), &location);
-			return location;
-		}
-		return -1;
-	}
-
-	void notifyInOut(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override
-	{
-		if (stage == EShLangVertex && is_live && type.getQualifier().isPipeInput()) {
-			auto locationIt = m_attribLocations.find(name);
-			if (locationIt != m_attribLocations.end())
-				m_attribAllocator.Reserve(locationIt->second, glslang::TIntermediate::computeTypeLocationSize(type, stage));
-		}
-	}
-
-	bool validateBinding(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return true; }
-
-	int resolveSet(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return -1; }
-
-	int resolveUniformLocation(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return -1; }
-
-	bool validateInOut(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return true; }
-
-	int resolveInOutComponent(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return -1; }
-
-	int resolveInOutIndex(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { return -1; }
-
-	void notifyBinding(EShLanguage stage, const char* name, const glslang::TType& type, bool is_live) override { }
-
-	void endNotifications(EShLanguage stage) override { }
-
-	void beginNotifications(EShLanguage stage) override { }
-
-	void beginResolve(EShLanguage stage) override { }
-
-	void endResolve(EShLanguage stage) override { }
-
-private:
-	int bindingCount = 0;
-	std::unordered_map<std::string, int> m_attribLocations;
-	std::unordered_map<std::string, int> m_varyingLocations;
-	IOAllocator m_attribAllocator;
-	IOAllocator m_varyingAllocator;
-	IOAllocator m_fragmentOutputAllocator;
-};
 
 ShaderVariableType ConvertShaderVariableType(const spirv_cross::Compiler& reflector, const spirv_cross::SPIRType& type)
 {
@@ -571,9 +506,8 @@ void ReflectAttribs(const spirv_cross::Compiler& reflector, const std::vector<sp
 	}
 }
 
-void ReflectSpv(const std::vector<unsigned int>& spv, ProgramReflection& reflection)
+void Reflect(const spirv_cross::Compiler& reflector, ProgramReflection& reflection)
 {
-	spirv_cross::CompilerGLSL reflector(spv);
 	auto stage = reflector.get_execution_model() == spv::ExecutionModelVertex
 		? SHADER_STAGE_VERTEX
 		: SHADER_STAGE_FRAGMENT;
@@ -586,61 +520,129 @@ void ReflectSpv(const std::vector<unsigned int>& spv, ProgramReflection& reflect
 		ReflectAttribs(reflector, resources.stage_inputs, reflection);
 }
 
-bool ParseTarget(glslang::TShader& shader, const char** source, std::ostream& logger)
+int CalculateTypeLocationSize(const spirv_cross::Compiler& reflector, uint32_t typeId)
 {
-	shader.setStrings(source, 1);
-	shader.setEnvInput(glslang::EShSourceGlsl, shader.getStage(), glslang::EShClientVulkan, 100);
-	shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
-	shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_0);
-	shader.setAutoMapBindings(true);
-	shader.setAutoMapLocations(true);
-	auto parsed = shader.parse(&DefaultBuiltInResource, TargetGlslVersion, TargetGlslProfile, false, false, EShMsgDefault);
-	logger << shader.getInfoLog();
-	logger << shader.getInfoDebugLog();
-	return parsed;
+	auto& type = reflector.get_type(typeId);
+	if (type.pointer) {
+		return CalculateTypeLocationSize(reflector, type.parent_type);
+	}
+	if (type.array.size() > 0) {
+		return type.array.back() * CalculateTypeLocationSize(reflector, type.parent_type);
+	}
+	if (type.basetype == spirv_cross::SPIRType::Struct) {
+		int size = 0;
+		for (auto memberTypeId : type.member_types) {
+			size += CalculateTypeLocationSize(reflector, memberTypeId);
+		}
+		return size;
+	}
+	int underlyingTypeSize;
+	switch (type.basetype) {
+		case spirv_cross::SPIRType::Boolean:
+		case spirv_cross::SPIRType::Int:
+		case spirv_cross::SPIRType::UInt:
+		case spirv_cross::SPIRType::Float:
+			underlyingTypeSize = 4;
+			break;
+		case spirv_cross::SPIRType::Double:
+		case spirv_cross::SPIRType::Int64:
+		case spirv_cross::SPIRType::UInt64:
+			underlyingTypeSize = 8;
+			break;
+		default:
+			underlyingTypeSize = 0;
+			break;
+	}
+	return ((underlyingTypeSize * type.vecsize + 15) / 16) * type.columns;
 }
 
-enum LinkStatus
+void PatchDecorations(
+	std::vector<unsigned int>& spirv,
+	spv::Decoration decoration,
+	const spirv_cross::Compiler& reflector,
+	const std::vector<spirv_cross::Resource>& resources)
 {
-	LINK_STATUS_VERTEX_PARSE_FAIL,
-	LINK_STATUS_FRAGMENT_PARSE_FAIL,
-	LINK_STATUS_LINK_FAIL,
-	LINK_STATUS_SUCCESS
-};
+	for (auto& resource : resources) {
+		uint32_t wordOffset;
+		reflector.get_binary_offset_for_decoration(resource.id, decoration, wordOffset);
+		spirv[wordOffset] = reflector.get_decoration(resource.id, decoration);
+	}
+}
 
-LinkStatus Link(
-	const char* vertexSource, const char* fragmentSource, std::unordered_map<std::string, int> attribLocations,
-	std::vector<unsigned int>& vertexSpv, std::vector<unsigned int>& fragmentSpv,
-	ProgramReflection& reflection, std::ostream& logger)
+bool Link(
+	std::vector<unsigned int>& vsSpirv,
+	std::vector<unsigned int>& fsSpirv,
+	const std::unordered_map<std::string, int>& attribLocations,
+	ProgramReflection& reflection,
+	std::ostream& logger)
 {
-	GlslangInitializer glslangInitializer;
-	glslang::TShader vertexShader(EShLangVertex);
-	glslang::TShader fragmentShader(EShLangFragment);
-	if (!ParseTarget(vertexShader, &vertexSource, logger))
-		return LINK_STATUS_VERTEX_PARSE_FAIL;
-	if (!ParseTarget(fragmentShader, &fragmentSource, logger))
-		return LINK_STATUS_FRAGMENT_PARSE_FAIL;
-	glslang::TProgram program;
-	program.addShader(&vertexShader);
-	program.addShader(&fragmentShader);
-	IOMapResolver ioMapResolver(std::move(attribLocations));
-	auto linked = program.link(EShMsgDefault) && program.mapIO(&ioMapResolver);
-	logger << program.getInfoLog();
-	logger << program.getInfoDebugLog();
-	if (!linked)
-		return LINK_STATUS_LINK_FAIL;
-	glslang::GlslangToSpv(*program.getIntermediate(EShLangVertex), vertexSpv);
-	glslang::GlslangToSpv(*program.getIntermediate(EShLangFragment), fragmentSpv);
-	ProgramReflection refl;
-	ReflectSpv(vertexSpv, refl);
-	ReflectSpv(fragmentSpv, refl);
-	reflection = std::move(refl);
-	return LINK_STATUS_SUCCESS;
+	spirv_cross::CompilerGLSL vsReflector(vsSpirv);
+	spirv_cross::CompilerGLSL fsReflector(fsSpirv);
+	auto vsResources = vsReflector.get_shader_resources();
+	auto fsResources = fsReflector.get_shader_resources();
+	IOAllocator attribAllocator(std::numeric_limits<int>::max());
+	IOAllocator varyingAllocator(std::numeric_limits<int>::max());
+	std::unordered_map<std::string, int> varyingLocations;
+	for (auto& attrib : vsResources.stage_inputs) {
+		auto locationIt = attribLocations.find(attrib.name);
+		if (locationIt != attribLocations.end()) {
+			attribAllocator.Reserve(locationIt->second, CalculateTypeLocationSize(vsReflector, attrib.type_id));
+		}
+	}
+	for (auto& attrib : vsResources.stage_inputs) {
+		int location;
+		auto locationIt = attribLocations.find(attrib.name);
+		if (locationIt != attribLocations.end()) {
+			location = locationIt->second;
+		} else {
+			attribAllocator.Allocate(CalculateTypeLocationSize(vsReflector, attrib.type_id), &location);
+		}
+		vsReflector.set_decoration(attrib.id, spv::DecorationLocation, location);
+	}
+	for (auto& varying : vsResources.stage_outputs) {
+		int location;
+		varyingAllocator.Allocate(CalculateTypeLocationSize(vsReflector, varying.type_id), &location);
+		varyingLocations[varying.name] = location;
+		vsReflector.set_decoration(varying.id, spv::DecorationLocation, location);
+	}
+	for (auto& varying : fsResources.stage_inputs) {
+		auto locationIt = varyingLocations.find(varying.name);
+		if (locationIt == varyingLocations.end()) {
+			logger << "Could not resolve fragment shader varying location " << varying.name << std::endl;
+			return false;
+		}
+		fsReflector.set_decoration(varying.id, spv::DecorationLocation, locationIt->second);
+	}
+	int bindingCount = 0;
+	for (auto& resource : vsResources.sampled_images) {
+		vsReflector.set_decoration(resource.id, spv::DecorationBinding, bindingCount++);
+	}
+	for (auto& resource : vsResources.uniform_buffers) {
+		vsReflector.set_decoration(resource.id, spv::DecorationBinding, bindingCount++);
+	}
+	for (auto& resource : fsResources.sampled_images) {
+		fsReflector.set_decoration(resource.id, spv::DecorationBinding, bindingCount++);
+	}
+	for (auto& resource : fsResources.uniform_buffers) {
+		fsReflector.set_decoration(resource.id, spv::DecorationBinding, bindingCount++);
+	}
+	PatchDecorations(vsSpirv, spv::DecorationLocation, vsReflector, vsResources.stage_inputs);
+	PatchDecorations(vsSpirv, spv::DecorationLocation, vsReflector, vsResources.stage_outputs);
+	PatchDecorations(vsSpirv, spv::DecorationBinding, vsReflector, vsResources.sampled_images);
+	PatchDecorations(vsSpirv, spv::DecorationBinding, vsReflector, vsResources.uniform_buffers);
+	PatchDecorations(fsSpirv, spv::DecorationLocation, fsReflector, fsResources.stage_inputs);
+	PatchDecorations(fsSpirv, spv::DecorationBinding, fsReflector, fsResources.sampled_images);
+	PatchDecorations(fsSpirv, spv::DecorationBinding, fsReflector, fsResources.uniform_buffers);
+	ProgramReflection programReflection;
+	Reflect(vsReflector, programReflection);
+	Reflect(fsReflector, programReflection);
+	reflection = std::move(programReflection);
+	return true;
 }
 
 struct Shader
 {
-	std::string convertedSource;
+	std::vector<unsigned int> spirv;
 	std::string infoLog;
 };
 
@@ -649,11 +651,13 @@ ShaderHandle CreateShader()
 	return new Shader();
 }
 
-bool ParseShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source)
+bool CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source)
 {
 	auto shader = static_cast<Shader*>(shaderHandle);
 	std::ostringstream logger;
-	auto status = ParseAndConvertToTarget(stage, source, &shader->convertedSource, logger);
+	std::vector<unsigned int> spirv;
+	auto status = Compile(stage, source, spirv, logger);
+	shader->spirv = std::move(spirv);
 	shader->infoLog = logger.str();
 	return status;
 }
@@ -671,8 +675,8 @@ void DestroyShader(ShaderHandle shaderHandle)
 struct Program
 {
 	std::unordered_map<std::string, int> attribLocations;
-	std::vector<unsigned int> vertexSpv;
-	std::vector<unsigned int> fragmentSpv;
+	std::vector<unsigned int> vsSpirv;
+	std::vector<unsigned int> fsSpirv;
 	ProgramReflection reflection;
 	std::string infoLog;
 };
@@ -687,24 +691,17 @@ void BindAttribLocation(ProgramHandle programHandle, const char* name, int locat
 	static_cast<Program*>(programHandle)->attribLocations[name] = location;
 }
 
-bool LinkProgram(ProgramHandle programHandle, ShaderHandle vertexShaderHandle, ShaderHandle fragmentShaderHandle)
+bool LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle)
 {
 	auto program = static_cast<Program*>(programHandle);
-	auto vertexShader = static_cast<Shader*>(vertexShaderHandle);
-	auto fragmentShader = static_cast<Shader*>(fragmentShaderHandle);
+	auto vs = static_cast<Shader*>(vsHandle);
+	auto fs = static_cast<Shader*>(fsHandle);
 	std::ostringstream logger;
-	auto status = Link(vertexShader->convertedSource.c_str(), fragmentShader->convertedSource.c_str(),
-		program->attribLocations, program->vertexSpv, program->fragmentSpv, program->reflection, logger);
-	switch (status) {
-		case LINK_STATUS_VERTEX_PARSE_FAIL:
-			logger << "Could not parse converted vertex shader source" << std::endl;
-			break;
-		case LINK_STATUS_FRAGMENT_PARSE_FAIL:
-			logger << "Could not parse converted fragment shader source" << std::endl;
-			break;
-	}
+	program->vsSpirv = vs->spirv;
+	program->fsSpirv = fs->spirv;
+	auto status = Link(program->vsSpirv, program->fsSpirv, program->attribLocations, program->reflection, logger);
 	program->infoLog = logger.str();
-	return status == LINK_STATUS_SUCCESS;
+	return status;
 }
 
 const char* GetProgramInfoLog(ProgramHandle programHandle)
@@ -717,9 +714,9 @@ unsigned int GetSpvSize(ProgramHandle programHandle, ShaderStage stage)
 	auto program = static_cast<Program*>(programHandle);
 	switch (stage) {
 		case SHADER_STAGE_VERTEX:
-			return program->vertexSpv.size() * sizeof(uint32_t);
+			return program->vsSpirv.size() * sizeof(uint32_t);
 		case SHADER_STAGE_FRAGMENT:
-			return program->fragmentSpv.size() * sizeof(uint32_t);
+			return program->fsSpirv.size() * sizeof(uint32_t);
 		default:
 			return 0;
 	}
@@ -730,9 +727,9 @@ const unsigned int* GetSpv(ProgramHandle programHandle, ShaderStage stage)
 	auto program = static_cast<Program*>(programHandle);
 	switch (stage) {
 		case SHADER_STAGE_VERTEX:
-			return program->vertexSpv.data();
+			return program->vsSpirv.data();
 		case SHADER_STAGE_FRAGMENT:
-			return program->fragmentSpv.data();
+			return program->fsSpirv.data();
 		default:
 			return 0;
 	}
