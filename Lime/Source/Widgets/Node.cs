@@ -1110,7 +1110,7 @@ namespace Lime
 
 		private static readonly ThreadLocal<HashSet<string>> scenesBeingLoaded = new ThreadLocal<HashSet<string>>(() => new HashSet<string>());
 
-		public delegate bool SceneLoadingDelegate(string path, ref Node instance, bool external);
+		public delegate bool SceneLoadingDelegate(string path, ref Node instance, bool external, bool ignoreExternals);
 		public delegate void SceneLoadedDelegate(string path, Node instance, bool external);
 		public static ThreadLocal<SceneLoadingDelegate> SceneLoading;
 		public static ThreadLocal<SceneLoadedDelegate> SceneLoaded;
@@ -1136,27 +1136,27 @@ namespace Lime
 			}
 		}
 
-		public static T CreateFromAssetBundle<T>(string path, T instance = null, Yuzu yuzu = null) where T : Node
+		public static T CreateFromAssetBundle<T>(string path, T instance = null, Yuzu yuzu = null, bool ignoreExternals = false) where T : Node
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return (T) CreateFromAssetBundleHelper(path, instance, yuzu, external: false);
+			return (T) CreateFromAssetBundleHelper(path, instance, yuzu, external: false, ignoreExternals: ignoreExternals);
 		}
 
-		public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null)
+		public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null, bool ignoreExternals = false)
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return CreateFromAssetBundleHelper(path, instance, yuzu, external: false);
+			return CreateFromAssetBundleHelper(path, instance, yuzu, external: false, ignoreExternals: ignoreExternals);
 		}
 
-		public static Node CreateFromStream(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null)
+		public static Node CreateFromStream(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool ignoreExternals = false)
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return CreateFromAssetBundleHelper(path, instance, yuzu, stream, external: false);
+			return CreateFromAssetBundleHelper(path, instance, yuzu, stream, external: false, ignoreExternals);
 		}
 
-		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool external = false)
+		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool external = false, bool ignoreExternals = false)
 		{
-			if (SceneLoading?.Value?.Invoke(path, ref instance, external) ?? false) {
+			if (SceneLoading?.Value?.Invoke(path, ref instance, external, ignoreExternals) ?? false) {
 				SceneLoaded?.Value?.Invoke(path, instance, external);
 				return instance;
 			}
@@ -1176,7 +1176,9 @@ namespace Lime
 						instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
 					}
 				}
-				instance.LoadExternalScenes(yuzu);
+				if (!ignoreExternals) {
+					instance.LoadExternalScenes(yuzu);
+				}
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
