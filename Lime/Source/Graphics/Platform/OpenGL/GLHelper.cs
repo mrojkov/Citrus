@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using OpenTK.Graphics.ES20;
 
 namespace Lime.Graphics.Platform.OpenGL
@@ -401,6 +402,25 @@ namespace Lime.Graphics.Platform.OpenGL
 				default:
 					throw new ArgumentException(nameof(format));
 			}
+		}
+
+		public static void ParseGLVersion(string s, out int major, out int minor, out bool esProfile)
+		{
+			var match = Regex.Match(s, @"OpenGL ES (\d+)\.(\d+).*");
+			if (match.Success) {
+				major = int.Parse(match.Groups[1].Value);
+				minor = int.Parse(match.Groups[2].Value);
+				esProfile = true;
+				return;
+			}
+			match = Regex.Match(s, @"(\d+)\.(\d+).*");
+			if (match.Success) {
+				major = int.Parse(match.Groups[1].Value);
+				minor = int.Parse(match.Groups[2].Value);
+				esProfile = false;
+				return;
+			}
+			throw new ArgumentException(nameof(s));
 		}
 	}
 

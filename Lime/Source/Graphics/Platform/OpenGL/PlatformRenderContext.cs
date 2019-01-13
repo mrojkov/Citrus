@@ -32,11 +32,18 @@ namespace Lime.Graphics.Platform.OpenGL
 		internal int MaxVertexAttributes;
 		internal bool SupportsPackedDepth24Stencil8;
 		internal bool SupportsDepth24;
+		internal bool SupportsDxt1;
+		internal bool SupportsDxt3;
+		internal bool SupportsDxt5;
+		internal bool SupportsPvrtc;
+		internal bool SupportsEtc1;
+		internal bool SupportsEtc2;
+		internal int GLMajorVersion;
+		internal int GLMinorVersion;
 		internal bool ESProfile;
 
-		public PlatformRenderContext(bool esProfile)
+		public PlatformRenderContext()
 		{
-			ESProfile = esProfile;
 			CheckFeatures();
 			textures = new PlatformTexture2D[MaxTextureSlots];
 			vertexBuffers = new PlatformBuffer[MaxVertexBufferSlots];
@@ -91,15 +98,19 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		private void CheckFeatures()
 		{
-			var glExtensionsString = GL.GetString(StringName.Extensions);
-			GLHelper.CheckGLErrors();
-			var glExtensions = new HashSet<string>(glExtensionsString.Split(' '));
+			GLHelper.ParseGLVersion(GL.GetString(StringName.Version), out GLMajorVersion, out GLMinorVersion, out ESProfile);
+			var glExtensions = new HashSet<string>(GL.GetString(StringName.Extensions).Split(' '));
 			SupportsPackedDepth24Stencil8 = !ESProfile || glExtensions.Contains("GL_OES_packed_depth_stencil");
 			SupportsDepth24 = !ESProfile || glExtensions.Contains("GL_OES_depth24");
+			var supportsS3tc = glExtensions.Contains("GL_EXT_texture_compression_s3tc");
+			SupportsDxt1 = supportsS3tc || glExtensions.Contains("GL_EXT_texture_compression_dxt1");
+			SupportsDxt3 = supportsS3tc || glExtensions.Contains("GL_ANGLE_texture_compression_dxt3");
+			SupportsDxt5 = supportsS3tc || glExtensions.Contains("GL_ANGLE_texture_compression_dxt5");
+			SupportsPvrtc = glExtensions.Contains("GL_IMG_texture_compression_pvrtc");
+			SupportsEtc1 = glExtensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
+			SupportsEtc2 = (ESProfile && GLMajorVersion >= 3) || glExtensions.Contains("GL_ARB_ES3_compatibility");
 			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
-			GLHelper.CheckGLErrors();
 			GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-			GLHelper.CheckGLErrors();
 			MaxVertexBufferSlots = MaxVertexAttributes;
 		}
 
@@ -410,7 +421,53 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public FormatFeatures GetFormatFeatures(Format format)
 		{
-			throw new NotImplementedException();
+			switch (format) {
+				case Format.R8_SInt:
+				case Format.R8_SNorm:
+				case Format.R8_UInt:
+				case Format.R8_UNorm:
+				case Format.R8G8_SInt:
+				case Format.R8G8_SNorm:
+				case Format.R8G8_UInt:
+				case Format.R8G8_UNorm:
+				case Format.R8G8B8_SInt:
+				case Format.R8G8B8_SNorm:
+				case Format.R8G8B8_UInt:
+				case Format.R8G8B8A8_SInt:
+				case Format.R8G8B8A8_SNorm:
+				case Format.R8G8B8A8_UInt:
+				case Format.R32_SFloat:
+				case Format.R32G32_SFloat:
+				case Format.R32G32B32_SFloat:
+				case Format.R32G32B32A32_SFloat:
+					return FormatFeatures.VertexBuffer;
+				case Format.R8G8B8_UNorm:
+				case Format.R8G8B8A8_UNorm:
+				case Format.R5G6B5_UNorm_Pack16:
+				case Format.R5G5B5A1_UNorm_Pack16:
+				case Format.R4G4B4A4_UNorm_Pack16:
+					return FormatFeatures.Sample | FormatFeatures.RenderTarget | FormatFeatures.VertexBuffer;
+				case Format.BC1_RGB_UNorm_Block:
+				case Format.BC1_RGBA_UNorm_Block:
+					return SupportsDxt1 ? FormatFeatures.Sample : FormatFeatures.None;
+				case Format.BC2_UNorm_Block:
+					return SupportsDxt3 ? FormatFeatures.Sample : FormatFeatures.None;
+				case Format.BC3_UNorm_Block:
+					return SupportsDxt5 ? FormatFeatures.Sample : FormatFeatures.None;
+				case Format.ETC1_R8G8B8_UNorm_Block:
+					return SupportsEtc1 ? FormatFeatures.Sample : FormatFeatures.None;
+				case Format.ETC2_R8G8B8_UNorm_Block:
+				case Format.ETC2_R8G8B8A1_UNorm_Block:
+				case Format.ETC2_R8G8B8A8_UNorm_Block:
+					return SupportsEtc2 ? FormatFeatures.Sample : FormatFeatures.None;
+				case Format.PVRTC1_2Bpp_UNorm_Block:
+				case Format.PVRTC1_4Bpp_UNorm_Block:
+				case Format.PVRTC2_2Bpp_UNorm_Block:
+				case Format.PVRTC2_4Bpp_UNorm_Block:
+					return SupportsPvrtc ? FormatFeatures.Sample : FormatFeatures.None;
+				default:
+					return FormatFeatures.None;
+			}
 		}
 	}
 }
