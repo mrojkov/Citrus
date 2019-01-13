@@ -222,6 +222,14 @@
     <Compile Include="Source\Graphics\Etc2Decoder.cs" />
     <Compile Include="Source\Graphics\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\GLHelper.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformRenderContext.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformRenderTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformShader.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformShaderProgram.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformVertexInputLayout.cs" />
     <Compile Include="Source\Graphics\ShaderParams.cs" />
     <Compile Include="Source\Graphics\Texture2D.Ktx.cs" />
     <Compile Include="Source\Graphics\Format.cs" />

@@ -1,11 +1,10 @@
- #if WIN
+#if WIN
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using OpenTK.Graphics;
 using WinFormsCloseReason = System.Windows.Forms.CloseReason;
 
 namespace Lime
@@ -231,13 +230,129 @@ namespace Lime
 			form.Close();
 		}
 
-		private class RenderControl : UserControl
+		private class OpenGLRenderControl : RenderControl
 		{
-			private static int ctxRefCount;
-			private static Graphics.Platform.Vulkan.PlatformRenderContext ctx;
+			private OpenTK.Platform.IWindowInfo windowInfo;
+			private OpenTK.Graphics.GraphicsMode graphicsMode;
+			private OpenTK.Graphics.GraphicsContext graphicsContext;
+			private OpenTK.Graphics.GraphicsContextFlags graphicsContextFlags;
+			private int major;
+			private int minor;
+			private static Graphics.Platform.OpenGL.PlatformRenderContext platformRenderContext;
+
+			static OpenGLRenderControl()
+			{
+				OpenTK.Graphics.GraphicsContext.ShareContexts = true;
+			}
+
+			public OpenGLRenderControl(OpenTK.Graphics.GraphicsMode graphicsMode, int major, int minor, OpenTK.Graphics.GraphicsContextFlags graphicsContextFlags)
+			{
+				this.graphicsMode = graphicsMode;
+				this.graphicsContextFlags = graphicsContextFlags;
+				this.major = major;
+				this.minor = minor;
+			}
+
+			protected override void OnHandleCreated(EventArgs e)
+			{
+				base.OnHandleCreated(e);
+				windowInfo = OpenTK.Platform.Utilities.CreateWindowsWindowInfo(Handle);
+				graphicsContext = new OpenTK.Graphics.GraphicsContext(graphicsMode, windowInfo, major, minor, graphicsContextFlags);
+				graphicsContext.MakeCurrent(windowInfo);
+				graphicsContext.LoadAll();
+				if (platformRenderContext == null) {
+					var esProfile = (graphicsContextFlags & OpenTK.Graphics.GraphicsContextFlags.Embedded) != 0;
+					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext(esProfile);
+					platformRenderContext.SetDefaultFramebuffer(0);
+				}
+				graphicsContext.MakeCurrent(null);
+			}
+
+			protected override void OnHandleDestroyed(EventArgs e)
+			{
+				base.OnHandleDestroyed(e);
+				if (graphicsContext != null) {
+					graphicsContext.Dispose();
+					graphicsContext = null;
+				}
+				if (windowInfo != null) {
+					windowInfo.Dispose();
+					windowInfo = null;
+				}
+			}
+
+			protected override void OnSizeChanged(EventArgs e)
+			{
+				base.OnSizeChanged(e);
+				graphicsContext.Update(windowInfo);
+			}
+
+			public override void MakeCurrent()
+			{
+				graphicsContext.MakeCurrent(windowInfo);
+				platformRenderContext.Invalidate();
+				platformRenderContext.SetDefaultFramebuffer(0);
+				RenderContextManager.MakeCurrent(platformRenderContext);
+			}
+
+			public override void SwapBuffers()
+			{
+				graphicsContext.SwapBuffers();
+			}
+
+			public override void UnbindContext()
+			{
+				RenderContextManager.MakeCurrent(null);
+				OpenTK.Graphics.GraphicsContext.CurrentContext?.MakeCurrent(null);
+			}
+		}
+
+		private class VulkanRenderControl : RenderControl
+		{
+			private static Graphics.Platform.Vulkan.PlatformRenderContext platformRenderContext;
 
 			private Graphics.Platform.Vulkan.Swapchain swapchain;
 
+			protected override void OnHandleCreated(EventArgs e)
+			{
+				base.OnHandleCreated(e);
+				if (platformRenderContext == null) {
+					platformRenderContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
+				}
+				swapchain = new Graphics.Platform.Vulkan.Swapchain(platformRenderContext, Handle, ClientSize.Width, ClientSize.Height);
+			}
+
+			protected override void OnHandleDestroyed(EventArgs e)
+			{
+				swapchain.Dispose();
+				base.OnHandleDestroyed(e);
+			}
+
+			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+			{
+				base.SetBoundsCore(x, y, width, height, specified);
+				swapchain.Resize(ClientSize.Width, ClientSize.Height);
+			}
+
+			public override void MakeCurrent()
+			{
+				RenderContextManager.MakeCurrent(platformRenderContext);
+				platformRenderContext.Begin(swapchain);
+			}
+
+			public override void SwapBuffers()
+			{
+				platformRenderContext.Present();
+			}
+
+			public override void UnbindContext()
+			{
+				RenderContextManager.MakeCurrent(null);
+			}
+		}
+
+		private abstract class RenderControl : UserControl
+		{
 			public bool VSync { get; set; }
 
 			public event Action BeforeBoundsChanged;
@@ -262,36 +377,6 @@ namespace Lime
 				}
 			}
 
-			protected override void OnHandleCreated(EventArgs e)
-			{
-				base.OnHandleCreated(e);
-				CreateContext();
-				swapchain = new Graphics.Platform.Vulkan.Swapchain(ctx, Handle, ClientSize.Width, ClientSize.Height);
-			}
-
-			protected override void OnHandleDestroyed(EventArgs e)
-			{
-				swapchain.Dispose();
-				ReleaseContext();
-				base.OnHandleDestroyed(e);
-			}
-
-			private void CreateContext()
-			{
-				ctxRefCount++;
-				if (ctxRefCount == 1) {
-					ctx = new Graphics.Platform.Vulkan.PlatformRenderContext();
-				}
-			}
-
-			private void ReleaseContext()
-			{
-				ctxRefCount--;
-				if (ctxRefCount == 0) {
-					ctx.Dispose();
-					ctx = null;
-				}
-			}
 			// Without this at least Left, Right, Up, Down and Tab keys are not submitted OnKeyDown
 			protected override bool IsInputKey(Keys keyData)
 			{
@@ -302,38 +387,23 @@ namespace Lime
 			{
 				BeforeBoundsChanged?.Invoke();
 				base.SetBoundsCore(x, y, width, height, specified);
-				swapchain.Resize(ClientSize.Width, ClientSize.Height);
 			}
 
-			public void MakeCurrent()
-			{
-				RenderContextManager.MakeCurrent(ctx);
-			}
-
-			public void Begin()
-			{
-				ctx.Begin(swapchain);
-			}
-
-			public void SwapBuffers()
-			{
-				ctx.Present();
-			}
-
-			public void UnbindContext()
-			{
-				RenderContextManager.MakeCurrent(null);
-			}
+			public abstract void MakeCurrent();
+			public abstract void SwapBuffers();
+			public abstract void UnbindContext();
 		}
 
-		private static RenderControl CreateRenderControl()
+		private static RenderControl CreateRenderControl(RenderingBackend backend)
 		{
-			return new RenderControl();
-		}
-
-		static Window()
-		{
-			GraphicsContext.ShareContexts = true;
+			if (backend == RenderingBackend.Vulkan) {
+				return new VulkanRenderControl();
+			} else {
+				var flags = backend == RenderingBackend.ES20
+					? OpenTK.Graphics.GraphicsContextFlags.Embedded
+					: OpenTK.Graphics.GraphicsContextFlags.Default;
+				return new OpenGLRenderControl(new OpenTK.Graphics.GraphicsMode(32, 16, 8), 2, 0, flags);
+			}
 		}
 
 		public Window()
@@ -375,7 +445,7 @@ namespace Lime
 			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
-			renderControl = CreateRenderControl();
+			renderControl = CreateRenderControl(Application.RenderingBackend);
 			renderControl.CreateControl();
 			renderControl.UnbindContext();
 			renderControl.Dock = DockStyle.Fill;
@@ -714,7 +784,6 @@ namespace Lime
 					return;
 				}
 				renderControl.MakeCurrent();
-				renderControl.Begin();
 				RaiseRendering();
 				renderControl.SwapBuffers();
 				renderControl.UnbindContext();
@@ -736,7 +805,6 @@ namespace Lime
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
 					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed) {
 						renderControl.MakeCurrent();
-						renderControl.Begin();
 						RaiseRendering();
 						renderControl.SwapBuffers();
 					}

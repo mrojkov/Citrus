@@ -25,7 +25,7 @@ namespace Lime
 				if (textureParams != value) {
 					textureParams = value;
 					if (platformTexture != null) {
-						platformTexture.TextureParams = textureParams;
+						platformTexture.SetTextureParams(textureParams);
 					}
 				}
 			}

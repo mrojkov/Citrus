@@ -246,6 +246,19 @@ namespace Lime
 		Index16Bits
 	}
 
+	public static class IndexFormatExtensions
+	{
+		public static int GetSize(this IndexFormat format)
+		{
+			switch (format) {
+				case IndexFormat.Index16Bits:
+					return 2;
+				default:
+					throw new ArgumentException(nameof(format));
+			}
+		}
+	}
+
 	public unsafe static class PlatformRenderer
 	{
 		private static ShaderProgram shaderProgram;
@@ -378,11 +391,6 @@ namespace Lime
 			SetRenderTarget(null);
 			Array.Clear(shaderParamsArray, 0, shaderParamsArray.Length);
 			shaderParamsArrayCount = 0;
-		}
-
-		private static FrontFace AdjustFrontFace(FrontFace frontFace)
-		{
-			return OffscreenRendering ? frontFace.Invert() : frontFace;
 		}
 
 		internal static void SetRenderTarget(RenderTexture texture)

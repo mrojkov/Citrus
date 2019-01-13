@@ -8,9 +8,9 @@ namespace Lime.Graphics.Platform
 		int Width { get; }
 		int Height { get; }
 		int LevelCount { get; }
-		TextureParams TextureParams { get; set; }
 
 		void SetData(int level, int x, int y, int width, int height, IntPtr data);
+		void SetTextureParams(TextureParams textureParams);
 	}
 
 	public unsafe static class PlatformTexture2DExtensions

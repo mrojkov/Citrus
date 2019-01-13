@@ -13,7 +13,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.ImageView imageView;
 		private SharpVulkan.DeviceMemory memory;
 		private SharpVulkan.Sampler sampler;
-		private TextureParams textureParams;
 
 		internal SharpVulkan.Image Image => image;
 		internal SharpVulkan.ImageView ImageView => imageView;
@@ -24,17 +23,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		public int Width => width;
 		public int Height => height;
 		public int LevelCount => levelCount;
-
-		public TextureParams TextureParams
-		{
-			get { return textureParams; }
-			set {
-				if (textureParams != value) {
-					textureParams = value;
-					UpdateSampler();
-				}
-			}
-		}
 
 		public PlatformTexture2D(PlatformRenderContext context, Format format, int width, int height, bool mipmaps, TextureParams textureParams)
 			: this(context, format, width, height, mipmaps, false, textureParams)
@@ -48,9 +36,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			this.width = width;
 			this.height = height;
 			this.levelCount = mipmaps ? GraphicsUtility.CalculateMipLevelCount(width, height) : 1;
-			this.textureParams = textureParams;
 			Create(renderTarget);
-			UpdateSampler();
+			SetTextureParams(textureParams);
 		}
 
 		public virtual void Dispose()
@@ -160,7 +147,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				SharpVulkan.DependencyFlags.None, 0, null, 0, null, 1, &postMemoryBarrier);
 		}
 
-		private void UpdateSampler()
+		public void SetTextureParams(TextureParams textureParams)
 		{
 			sampler = context.SamplerCache.AcquireSampler(textureParams);
 		}
