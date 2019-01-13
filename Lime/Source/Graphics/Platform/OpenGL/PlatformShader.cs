@@ -29,7 +29,6 @@ namespace Lime.Graphics.Platform.OpenGL
 		{
 			GLShader = GL.CreateShader(GLHelper.GetGLShaderType(Stage));
 			GLHelper.CheckGLErrors();
-			var src = ProcessSource(source);
 			GL.ShaderSource(GLShader, ProcessSource(source));
 			GLHelper.CheckGLErrors();
 			GL.CompileShader(GLShader);
