@@ -197,10 +197,10 @@ namespace Lime.SignedDistanceField
 				lowp vec4 bevel_color = outlineColor;
 ";
 		private const string FragmentShaderGradientPart2 = @"
-				float g_sin = sin(g_angle);
-				float g_cos = cos(g_angle);
+				lowp float g_sin = sin(g_angle);
+				lowp float g_cos = cos(g_angle);
 
-				vec2 gradientCoords = vec2(dot(texCoords2, vec2(g_cos, g_sin)), dot(texCoords2, vec2(-g_sin, g_cos)));
+				lowp vec2 gradientCoords = vec2(dot(texCoords2, vec2(g_cos, g_sin)), dot(texCoords2, vec2(-g_sin, g_cos)));
 				inner_color = texture2D(tex2, gradientCoords);
 ";
 		private const string FragmentShaderBevelPart3 = @"
