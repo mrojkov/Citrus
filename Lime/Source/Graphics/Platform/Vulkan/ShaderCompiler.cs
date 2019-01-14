@@ -40,13 +40,13 @@ namespace Lime.Graphics.Platform.Vulkan
 		public static extern IntPtr CreateShader();
 
 		[DllImport(LibraryName, EntryPoint = "CompileShader", CallingConvention = CallingConvention.Cdecl)]
-		private static extern bool CompileShader(IntPtr shaderHandle, Stage stage, IntPtr source);
+		private static extern int CompileShaderInternal(IntPtr shaderHandle, Stage stage, IntPtr source);
 
 		public static bool CompileShader(IntPtr shaderHandle, Stage stage, string source)
 		{
 			var interopSource = Marshal.StringToHGlobalAnsi(source);
 			try {
-				return CompileShader(shaderHandle, stage, interopSource);
+				return CompileShaderInternal(shaderHandle, stage, interopSource) != 0;
 			} finally {
 				Marshal.FreeHGlobal(interopSource);
 			}
@@ -80,7 +80,12 @@ namespace Lime.Graphics.Platform.Vulkan
 		}
 
 		[DllImport(LibraryName, EntryPoint = "LinkProgram", CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool LinkProgram(IntPtr programHandle, IntPtr vertexShaderHandle, IntPtr fragmentShaderHandle);
+		private static extern int LinkProgramInternal(IntPtr programHandle, IntPtr vertexShaderHandle, IntPtr fragmentShaderHandle);
+
+		public static bool LinkProgram(IntPtr programHandle, IntPtr vertexShaderHandle, IntPtr fragmentShaderHandle)
+		{
+			return LinkProgramInternal(programHandle, vertexShaderHandle, fragmentShaderHandle) != 0;
+		}
 
 		[DllImport(LibraryName, EntryPoint = "GetProgramInfoLog", CallingConvention = CallingConvention.Cdecl)]
 		private static extern IntPtr GetProgramInfoLogInternal(IntPtr programHandle);
