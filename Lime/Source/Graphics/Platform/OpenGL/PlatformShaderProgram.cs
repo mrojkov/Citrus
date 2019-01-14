@@ -104,7 +104,6 @@ namespace Lime.Graphics.Platform.OpenGL
 				var name = sb.ToString();
 				var location = GL.GetUniformLocation(GLProgram, name);
 				GLHelper.CheckGLErrors();
-				GLHelper.CheckGLErrors();
 				var info = new UniformInfo {
 					Name = AdjustUniformName(name),
 					Type = ConvertUniformType(type),
@@ -134,7 +133,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				throw new InvalidOperationException();
 			}
 			elementCount = Math.Min(elementCount, info.ArraySize);
-			GraphicsUtility.CopyMemory(uniformStagingData, data, info.ElementSize * elementCount);
+			GraphicsUtility.CopyMemory(uniformStagingData + info.StagingDataOffset, data, info.ElementSize * elementCount);
 			var lastDirtyElementCount = dirtyUniformElementCount[index];
 			if (lastDirtyElementCount == 0) {
 				dirtyUniformIndices[dirtyUniformCount++] = index;
