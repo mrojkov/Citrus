@@ -989,7 +989,7 @@ namespace Lime
 
 		public static FrontFace FixupFrontFace(FrontFace frontFace)
 		{
-			if (/*Application.RenderingBackend == RenderingBackend.Vulkan || */PlatformRenderer.OffscreenRendering) {
+			if (Application.RenderingBackend != RenderingBackend.Vulkan && PlatformRenderer.OffscreenRendering) {
 				frontFace = frontFace.Invert();
 			}
 			return frontFace;
