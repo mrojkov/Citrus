@@ -6,7 +6,7 @@ namespace Lime.Graphics.Platform.Vulkan
 	internal unsafe class SamplerCache
 	{
 		private PlatformRenderContext context;
-		private Dictionary<long, SharpVulkan.Sampler> lruCache = new Dictionary<long, SharpVulkan.Sampler>();
+		private Dictionary<long, SharpVulkan.Sampler> cache = new Dictionary<long, SharpVulkan.Sampler>();
 
 		public SamplerCache(PlatformRenderContext context)
 		{
@@ -17,9 +17,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			textureParams = textureParams ?? TextureParams.Default;
 			var hash = CalculateHash(textureParams);
-			if (!lruCache.TryGetValue(hash, out var sampler)) {
+			if (!cache.TryGetValue(hash, out var sampler)) {
 				sampler = CreateSampler(textureParams);
-				lruCache.Add(hash, sampler);
+				cache.Add(hash, sampler);
 			}
 			return sampler;
 		}
@@ -35,7 +35,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				AddressModeV = GetVKSamplerAddressMode(textureParams.WrapModeV)
 			};
 			return context.Device.CreateSampler(ref createInfo);
-			// FIXME: Adjust MinLod, MaxLog to match OpenGL
+			// FIXME: Adjust MinLod, MaxLod to match OpenGL
 		}
 
 		private static SharpVulkan.Filter GetVKFilter(TextureFilter filter)
