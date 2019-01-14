@@ -261,8 +261,7 @@ namespace Lime
 				graphicsContext.MakeCurrent(windowInfo);
 				graphicsContext.LoadAll();
 				if (platformRenderContext == null) {
-					var esProfile = (graphicsContextFlags & OpenTK.Graphics.GraphicsContextFlags.Embedded) != 0;
-					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext(esProfile);
+					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
 					platformRenderContext.SetDefaultFramebuffer(0);
 				}
 				graphicsContext.MakeCurrent(null);
