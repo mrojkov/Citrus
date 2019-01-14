@@ -200,7 +200,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					default:
 						throw new NotSupportedException();
 				}
-				dirtyUniformElementCount[i] = 0;
+				dirtyUniformElementCount[uniformIndex] = 0;
 			}
 			dirtyUniformCount = 0;
 		}
