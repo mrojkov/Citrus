@@ -8,21 +8,37 @@ namespace Lime
 		Luminance,
 		LuminanceAlpha,
 		R8_SNorm,
-		R8_SInt,
+		R8_SScaled,
 		R8_UNorm,
-		R8_UInt,
+		R8_UScaled,
 		R8G8_SNorm,
-		R8G8_SInt,
+		R8G8_SScaled,
 		R8G8_UNorm,
-		R8G8_UInt,
+		R8G8_UScaled,
 		R8G8B8_SNorm,
-		R8G8B8_SInt,
+		R8G8B8_SScaled,
 		R8G8B8_UNorm,
-		R8G8B8_UInt,
+		R8G8B8_UScaled,
 		R8G8B8A8_SNorm,
-		R8G8B8A8_SInt,
+		R8G8B8A8_SScaled,
 		R8G8B8A8_UNorm,
-		R8G8B8A8_UInt,
+		R8G8B8A8_UScaled,
+		R16_SNorm,
+		R16_SScaled,
+		R16_UNorm,
+		R16_UScaled,
+		R16G16_SNorm,
+		R16G16_SScaled,
+		R16G16_UNorm,
+		R16G16_UScaled,
+		R16G16B16_SNorm,
+		R16G16B16_SScaled,
+		R16G16B16_UNorm,
+		R16G16B16_UScaled,
+		R16G16B16A16_SNorm,
+		R16G16B16A16_SScaled,
+		R16G16B16A16_UNorm,
+		R16G16B16A16_UScaled,
 		R32_SFloat,
 		R32G32_SFloat,
 		R32G32B32_SFloat,
@@ -59,25 +75,45 @@ namespace Lime
 		{
 			switch (format) {
 				case Format.R8_SNorm:
-				case Format.R8_SInt:
+				case Format.R8_SScaled:
 				case Format.R8_UNorm:
-				case Format.R8_UInt:
+				case Format.R8_UScaled:
 					return 1;
 				case Format.R8G8_SNorm:
-				case Format.R8G8_SInt:
+				case Format.R8G8_SScaled:
 				case Format.R8G8_UNorm:
-				case Format.R8G8_UInt:
+				case Format.R8G8_UScaled:
 					return 2;
 				case Format.R8G8B8_SNorm:
-				case Format.R8G8B8_SInt:
+				case Format.R8G8B8_SScaled:
 				case Format.R8G8B8_UNorm:
-				case Format.R8G8B8_UInt:
+				case Format.R8G8B8_UScaled:
 					return 3;
 				case Format.R8G8B8A8_SNorm:
-				case Format.R8G8B8A8_SInt:
+				case Format.R8G8B8A8_SScaled:
 				case Format.R8G8B8A8_UNorm:
-				case Format.R8G8B8A8_UInt:
+				case Format.R8G8B8A8_UScaled:
 					return 4;
+				case Format.R16_SNorm:
+				case Format.R16_SScaled:
+				case Format.R16_UNorm:
+				case Format.R16_UScaled:
+					return 2;
+				case Format.R16G16_SNorm:
+				case Format.R16G16_SScaled:
+				case Format.R16G16_UNorm:
+				case Format.R16G16_UScaled:
+					return 4;
+				case Format.R16G16B16_SNorm:
+				case Format.R16G16B16_SScaled:
+				case Format.R16G16B16_UNorm:
+				case Format.R16G16B16_UScaled:
+					return 6;
+				case Format.R16G16B16A16_SNorm:
+				case Format.R16G16B16A16_SScaled:
+				case Format.R16G16B16A16_UNorm:
+				case Format.R16G16B16A16_UScaled:
+					return 8;
 				case Format.R32_SFloat:
 					return 4;
 				case Format.R32G32_SFloat:

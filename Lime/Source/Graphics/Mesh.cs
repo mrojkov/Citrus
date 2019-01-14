@@ -183,7 +183,7 @@ namespace Lime
 				result = new ElementDescription { Format = Format.R8G8B8A8_UNorm, Offset = offset };
 				offset += 4;
 			} else if (type == typeof(Mesh3D.BlendIndices)) {
-				result = new ElementDescription { Format = Format.R8G8B8A8_UInt, Offset = offset };
+				result = new ElementDescription { Format = Format.R8G8B8A8_UScaled, Offset = offset };
 				offset += 4;
 			} else if (type == typeof(Mesh3D.BlendWeights)) {
 				result = new ElementDescription { Format = Format.R32G32B32A32_SFloat, Offset = offset };

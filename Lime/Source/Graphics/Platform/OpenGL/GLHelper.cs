@@ -157,7 +157,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		public static void GetGLVertexAttribFormat(Format format, out All glType, out int glSize, out bool glNormalized)
 		{
 			switch (format) {
-				case Format.R8_SInt:
+				case Format.R8_SScaled:
 					glType = All.Byte;
 					glSize = 1;
 					glNormalized = false;
@@ -167,7 +167,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 1;
 					glNormalized = true;
 					break;
-				case Format.R8_UInt:
+				case Format.R8_UScaled:
 					glType = All.UnsignedByte;
 					glSize = 1;
 					glNormalized = false;
@@ -177,7 +177,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 1;
 					glNormalized = true;
 					break;
-				case Format.R8G8_SInt:
+				case Format.R8G8_SScaled:
 					glType = All.Byte;
 					glSize = 2;
 					glNormalized = false;
@@ -187,7 +187,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 2;
 					glNormalized = true;
 					break;
-				case Format.R8G8_UInt:
+				case Format.R8G8_UScaled:
 					glType = All.UnsignedByte;
 					glSize = 2;
 					glNormalized = false;
@@ -197,7 +197,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 2;
 					glNormalized = true;
 					break;
-				case Format.R8G8B8_SInt:
+				case Format.R8G8B8_SScaled:
 					glType = All.Byte;
 					glSize = 3;
 					glNormalized = false;
@@ -207,7 +207,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 3;
 					glNormalized = true;
 					break;
-				case Format.R8G8B8_UInt:
+				case Format.R8G8B8_UScaled:
 					glType = All.UnsignedByte;
 					glSize = 3;
 					glNormalized = false;
@@ -217,7 +217,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 3;
 					glNormalized = true;
 					break;
-				case Format.R8G8B8A8_SInt:
+				case Format.R8G8B8A8_SScaled:
 					glType = All.Byte;
 					glSize = 4;
 					glNormalized = false;
@@ -227,13 +227,93 @@ namespace Lime.Graphics.Platform.OpenGL
 					glSize = 4;
 					glNormalized = true;
 					break;
-				case Format.R8G8B8A8_UInt:
+				case Format.R8G8B8A8_UScaled:
 					glType = All.UnsignedByte;
 					glSize = 4;
 					glNormalized = false;
 					break;
 				case Format.R8G8B8A8_UNorm:
 					glType = All.UnsignedByte;
+					glSize = 4;
+					glNormalized = true;
+					break;
+				case Format.R16_SScaled:
+					glType = All.Short;
+					glSize = 1;
+					glNormalized = false;
+					break;
+				case Format.R16_SNorm:
+					glType = All.Short;
+					glSize = 1;
+					glNormalized = true;
+					break;
+				case Format.R16_UScaled:
+					glType = All.UnsignedShort;
+					glSize = 1;
+					glNormalized = false;
+					break;
+				case Format.R16_UNorm:
+					glType = All.UnsignedShort;
+					glSize = 1;
+					glNormalized = true;
+					break;
+				case Format.R16G16_SScaled:
+					glType = All.Short;
+					glSize = 2;
+					glNormalized = false;
+					break;
+				case Format.R16G16_SNorm:
+					glType = All.Short;
+					glSize = 2;
+					glNormalized = true;
+					break;
+				case Format.R16G16_UScaled:
+					glType = All.UnsignedShort;
+					glSize = 2;
+					glNormalized = false;
+					break;
+				case Format.R16G16_UNorm:
+					glType = All.UnsignedShort;
+					glSize = 2;
+					glNormalized = true;
+					break;
+				case Format.R16G16B16_SScaled:
+					glType = All.Short;
+					glSize = 3;
+					glNormalized = false;
+					break;
+				case Format.R16G16B16_SNorm:
+					glType = All.Short;
+					glSize = 3;
+					glNormalized = true;
+					break;
+				case Format.R16G16B16_UScaled:
+					glType = All.UnsignedShort;
+					glSize = 3;
+					glNormalized = false;
+					break;
+				case Format.R16G16B16_UNorm:
+					glType = All.UnsignedShort;
+					glSize = 3;
+					glNormalized = true;
+					break;
+				case Format.R16G16B16A16_SScaled:
+					glType = All.Short;
+					glSize = 4;
+					glNormalized = false;
+					break;
+				case Format.R16G16B16A16_SNorm:
+					glType = All.Short;
+					glSize = 4;
+					glNormalized = true;
+					break;
+				case Format.R16G16B16A16_UScaled:
+					glType = All.UnsignedShort;
+					glSize = 4;
+					glNormalized = false;
+					break;
+				case Format.R16G16B16A16_UNorm:
+					glType = All.UnsignedShort;
 					glSize = 4;
 					glNormalized = true;
 					break;

@@ -11,36 +11,68 @@ namespace Lime.Graphics.Platform.Vulkan
 					return SharpVulkan.Format.Undefined;
 				case Format.R8_SNorm:
 					return SharpVulkan.Format.R8SNorm;
-				case Format.R8_SInt:
-					return SharpVulkan.Format.R8SInt;
+				case Format.R8_SScaled:
+					return SharpVulkan.Format.R8Sscaled;
 				case Format.R8_UNorm:
 					return SharpVulkan.Format.R8UNorm;
-				case Format.R8_UInt:
-					return SharpVulkan.Format.R8UInt;
+				case Format.R8_UScaled:
+					return SharpVulkan.Format.R8UScaled;
 				case Format.R8G8_SNorm:
 					return SharpVulkan.Format.R8G8SNorm;
-				case Format.R8G8_SInt:
-					return SharpVulkan.Format.R8G8SInt;
+				case Format.R8G8_SScaled:
+					return SharpVulkan.Format.R8G8Sscaled;
 				case Format.R8G8_UNorm:
 					return SharpVulkan.Format.R8G8UNorm;
-				case Format.R8G8_UInt:
-					return SharpVulkan.Format.R8G8UInt;
+				case Format.R8G8_UScaled:
+					return SharpVulkan.Format.R8G8UScaled;
 				case Format.R8G8B8_SNorm:
 					return SharpVulkan.Format.R8G8B8SNorm;
-				case Format.R8G8B8_SInt:
-					return SharpVulkan.Format.R8G8B8SInt;
+				case Format.R8G8B8_SScaled:
+					return SharpVulkan.Format.R8G8B8Sscaled;
 				case Format.R8G8B8_UNorm:
 					return SharpVulkan.Format.R8G8B8UNorm;
-				case Format.R8G8B8_UInt:
-					return SharpVulkan.Format.R8G8B8UInt;
+				case Format.R8G8B8_UScaled:
+					return SharpVulkan.Format.R8G8B8UScaled;
 				case Format.R8G8B8A8_SNorm:
 					return SharpVulkan.Format.R8G8B8A8SNorm;
-				case Format.R8G8B8A8_SInt:
-					return SharpVulkan.Format.R8G8B8A8SInt;
+				case Format.R8G8B8A8_SScaled:
+					return SharpVulkan.Format.R8G8B8A8Sscaled;
 				case Format.R8G8B8A8_UNorm:
 					return SharpVulkan.Format.R8G8B8A8UNorm;
-				case Format.R8G8B8A8_UInt:
-					return SharpVulkan.Format.R8G8B8A8UInt;
+				case Format.R8G8B8A8_UScaled:
+					return SharpVulkan.Format.R8G8B8A8UScaled;
+				case Format.R16_SNorm:
+					return SharpVulkan.Format.R16SNorm;
+				case Format.R16_SScaled:
+					return SharpVulkan.Format.R16Sscaled;
+				case Format.R16_UNorm:
+					return SharpVulkan.Format.R16UNorm;
+				case Format.R16_UScaled:
+					return SharpVulkan.Format.R16UScaled;
+				case Format.R16G16_SNorm:
+					return SharpVulkan.Format.R16G16SNorm;
+				case Format.R16G16_SScaled:
+					return SharpVulkan.Format.R16G16Sscaled;
+				case Format.R16G16_UNorm:
+					return SharpVulkan.Format.R16G16UNorm;
+				case Format.R16G16_UScaled:
+					return SharpVulkan.Format.R16G16UScaled;
+				case Format.R16G16B16_SNorm:
+					return SharpVulkan.Format.R16G16B16SNorm;
+				case Format.R16G16B16_SScaled:
+					return SharpVulkan.Format.R16G16B16Sscaled;
+				case Format.R16G16B16_UNorm:
+					return SharpVulkan.Format.R16G16B16UNorm;
+				case Format.R16G16B16_UScaled:
+					return SharpVulkan.Format.R16G16B16UScaled;
+				case Format.R16G16B16A16_SNorm:
+					return SharpVulkan.Format.R16G16B16A16SNorm;
+				case Format.R16G16B16A16_SScaled:
+					return SharpVulkan.Format.R16G16B16A16Sscaled;
+				case Format.R16G16B16A16_UNorm:
+					return SharpVulkan.Format.R16G16B16A16UNorm;
+				case Format.R16G16B16A16_UScaled:
+					return SharpVulkan.Format.R16G16B16A16UScaled;
 				case Format.R32_SFloat:
 					return SharpVulkan.Format.R32SFloat;
 				case Format.R32G32_SFloat:

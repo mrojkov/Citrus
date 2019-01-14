@@ -436,20 +436,34 @@ namespace Lime.Graphics.Platform.OpenGL
 		public FormatFeatures GetFormatFeatures(Format format)
 		{
 			switch (format) {
-				case Format.R8_SInt:
+				case Format.R8_SScaled:
 				case Format.R8_SNorm:
-				case Format.R8_UInt:
+				case Format.R8_UScaled:
 				case Format.R8_UNorm:
-				case Format.R8G8_SInt:
+				case Format.R8G8_SScaled:
 				case Format.R8G8_SNorm:
-				case Format.R8G8_UInt:
+				case Format.R8G8_UScaled:
 				case Format.R8G8_UNorm:
-				case Format.R8G8B8_SInt:
+				case Format.R8G8B8_SScaled:
 				case Format.R8G8B8_SNorm:
-				case Format.R8G8B8_UInt:
-				case Format.R8G8B8A8_SInt:
+				case Format.R8G8B8_UScaled:
+				case Format.R8G8B8A8_SScaled:
 				case Format.R8G8B8A8_SNorm:
-				case Format.R8G8B8A8_UInt:
+				case Format.R8G8B8A8_UScaled:
+				case Format.R16_SScaled:
+				case Format.R16_SNorm:
+				case Format.R16_UScaled:
+				case Format.R16_UNorm:
+				case Format.R16G16_SScaled:
+				case Format.R16G16_SNorm:
+				case Format.R16G16_UScaled:
+				case Format.R16G16_UNorm:
+				case Format.R16G16B16_SScaled:
+				case Format.R16G16B16_SNorm:
+				case Format.R16G16B16_UScaled:
+				case Format.R16G16B16A16_SScaled:
+				case Format.R16G16B16A16_SNorm:
+				case Format.R16G16B16A16_UScaled:
 				case Format.R32_SFloat:
 				case Format.R32G32_SFloat:
 				case Format.R32G32B32_SFloat:
@@ -457,10 +471,11 @@ namespace Lime.Graphics.Platform.OpenGL
 					return FormatFeatures.VertexBuffer;
 				case Format.R8G8B8_UNorm:
 				case Format.R8G8B8A8_UNorm:
+					return FormatFeatures.Sample | FormatFeatures.RenderTarget | FormatFeatures.VertexBuffer;
 				case Format.R5G6B5_UNorm_Pack16:
 				case Format.R5G5B5A1_UNorm_Pack16:
 				case Format.R4G4B4A4_UNorm_Pack16:
-					return FormatFeatures.Sample | FormatFeatures.RenderTarget | FormatFeatures.VertexBuffer;
+					return FormatFeatures.Sample | FormatFeatures.RenderTarget;
 				case Format.BC1_RGB_UNorm_Block:
 				case Format.BC1_RGBA_UNorm_Block:
 					return SupportsDxt1 ? FormatFeatures.Sample : FormatFeatures.None;
