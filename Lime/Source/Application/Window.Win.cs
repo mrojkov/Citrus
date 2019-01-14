@@ -262,7 +262,6 @@ namespace Lime
 				graphicsContext.LoadAll();
 				if (platformRenderContext == null) {
 					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
-					platformRenderContext.SetDefaultFramebuffer(0);
 				}
 				graphicsContext.MakeCurrent(null);
 			}
@@ -289,13 +288,13 @@ namespace Lime
 			public override void MakeCurrent()
 			{
 				graphicsContext.MakeCurrent(windowInfo);
-				platformRenderContext.Invalidate();
-				platformRenderContext.SetDefaultFramebuffer(0);
+				platformRenderContext.Begin(0);
 				RenderContextManager.MakeCurrent(platformRenderContext);
 			}
 
 			public override void SwapBuffers()
 			{
+				platformRenderContext.End();
 				graphicsContext.SwapBuffers();
 			}
 

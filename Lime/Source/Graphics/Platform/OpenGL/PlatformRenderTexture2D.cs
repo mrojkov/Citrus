@@ -77,6 +77,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			if (fbStatus != FramebufferErrorCode.FramebufferComplete) {
 				throw new InvalidOperationException();
 			}
+			Context.InvalidateRenderTargetBinding();
 		}
 
 		private void GetGLDepthStencilFormat(out All glDepthFormat, out All glStencilFormat)

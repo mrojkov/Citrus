@@ -21,6 +21,8 @@ namespace Lime.Graphics.Platform.OpenGL
 		private PlatformVertexInputLayout vertexInputLayout;
 		private PlatformTexture2D[] textures;
 		private PlatformBuffer[] vertexBuffers;
+		private bool renderTargetDirty = false;
+
 		private int[] vertexOffsets;
 		private PlatformBuffer indexBuffer;
 		private int indexOffset;
@@ -50,16 +52,22 @@ namespace Lime.Graphics.Platform.OpenGL
 			vertexOffsets = new int[MaxVertexBufferSlots];
 		}
 
-		public void Invalidate()
-		{
-		}
+		public void Dispose() { }
 
-		public void SetDefaultFramebuffer(int glFramebuffer)
+		public void Begin(int glFramebuffer)
 		{
 			glDefaultFramebuffer = glFramebuffer;
+			renderTargetDirty = true;
 		}
 
-		public void Dispose() { }
+		internal void InvalidateRenderTargetBinding()
+		{
+			renderTargetDirty = true;
+		}
+
+		public void End()
+		{
+		}
 
 		public IPlatformBuffer CreateBuffer(BufferType bufferType, int size, bool dynamic)
 		{
@@ -189,7 +197,10 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public void SetRenderTarget(IPlatformRenderTexture2D texture)
 		{
-			renderTarget = (PlatformRenderTexture2D)texture;
+			if (renderTarget != texture) {
+				renderTarget = (PlatformRenderTexture2D)texture;
+				renderTargetDirty = true;
+			}
 		}
 
 		public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
@@ -267,9 +278,12 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		private void EnsureRenderTarget()
 		{
-			var glFramebuffer = renderTarget != null ? renderTarget.GLFramebuffer : glDefaultFramebuffer;
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, glFramebuffer);
-			GLHelper.CheckGLErrors();
+			if (renderTargetDirty) {
+				var glFramebuffer = renderTarget != null ? renderTarget.GLFramebuffer : glDefaultFramebuffer;
+				GL.BindFramebuffer(FramebufferTarget.Framebuffer, glFramebuffer);
+				GLHelper.CheckGLErrors();
+				renderTargetDirty = false;
+			}
 		}
 
 		private void BindState()
@@ -366,7 +380,7 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		private void BindTextures()
 		{
-			for (var slot = 0; slot < textures.Length; slot++) {
+			foreach (var slot in shaderProgram.TextureSlots) {
 				var texture = textures[slot];
 				GL.ActiveTexture(TextureUnit.Texture0 + slot);
 				GLHelper.CheckGLErrors();

@@ -16,6 +16,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		private IntPtr uniformStagingData;
 
 		internal int GLProgram;
+		internal int[] TextureSlots;
 
 		public PlatformRenderContext Context { get; }
 
@@ -31,6 +32,10 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public void Dispose()
 		{
+			if (uniformStagingData != IntPtr.Zero) {
+				Marshal.FreeHGlobal(uniformStagingData);
+				uniformStagingData = IntPtr.Zero;
+			}
 			if (GLProgram != 0) {
 				GL.DeleteProgram(GLProgram);
 				GLHelper.CheckGLErrors();
@@ -78,6 +83,10 @@ namespace Lime.Graphics.Platform.OpenGL
 			for (var i = 0; i < uniformInfos.Length; i++) {
 				dirtyUniformElementCount[i] = 0;
 			}
+			TextureSlots = uniformInfos
+				.Select(ui => ui.TextureSlot)
+				.Where(slot => slot >= 0)
+				.ToArray();
 		}
 
 		private void Reflect(ShaderProgram.Sampler[] samplers)
