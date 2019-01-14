@@ -285,7 +285,7 @@ namespace Lime
 				graphicsContext.Update(windowInfo);
 			}
 
-			public override void MakeCurrent()
+			public override void Begin()
 			{
 				graphicsContext.MakeCurrent(windowInfo);
 				platformRenderContext.Begin(0);
@@ -332,7 +332,7 @@ namespace Lime
 				swapchain.Resize(ClientSize.Width, ClientSize.Height);
 			}
 
-			public override void MakeCurrent()
+			public override void Begin()
 			{
 				RenderContextManager.MakeCurrent(platformRenderContext);
 				platformRenderContext.Begin(swapchain);
@@ -387,7 +387,7 @@ namespace Lime
 				base.SetBoundsCore(x, y, width, height, specified);
 			}
 
-			public abstract void MakeCurrent();
+			public abstract void Begin();
 			public abstract void SwapBuffers();
 			public abstract void UnbindContext();
 		}
@@ -479,9 +479,7 @@ namespace Lime
 				timer.Tick += OnTick;
 			} else {
 				vSync = options.VSync;
-				renderControl.MakeCurrent();
 				renderControl.VSync = vSync;
-				renderControl.UnbindContext();
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
@@ -535,9 +533,7 @@ namespace Lime
 				if (vSync != value && timer == null) {
 					vSync = value;
 					WaitForRendering();
-					renderControl.MakeCurrent();
 					renderControl.VSync = value;
-					renderControl.UnbindContext();
 				}
 			}
 		}
@@ -781,7 +777,7 @@ namespace Lime
 				if (renderThreadToken.IsCancellationRequested) {
 					return;
 				}
-				renderControl.MakeCurrent();
+				renderControl.Begin();
 				RaiseRendering();
 				renderControl.SwapBuffers();
 				renderControl.UnbindContext();
@@ -802,7 +798,7 @@ namespace Lime
 				case RenderingState.Updated:
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
 					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed) {
-						renderControl.MakeCurrent();
+						renderControl.Begin();
 						RaiseRendering();
 						renderControl.SwapBuffers();
 					}
