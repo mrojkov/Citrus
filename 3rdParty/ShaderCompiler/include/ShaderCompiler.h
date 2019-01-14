@@ -60,13 +60,13 @@ typedef void* ShaderHandle;
 typedef void* ProgramHandle;
 
 API ShaderHandle C_DECL CreateShader();
-API bool C_DECL CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source);
+API int C_DECL CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source);
 API const char* C_DECL GetShaderInfoLog(ShaderHandle shaderHandle);
 API void C_DECL DestroyShader(ShaderHandle shaderHandle);
 
 API ProgramHandle C_DECL CreateProgram();
 API void C_DECL BindAttribLocation(ProgramHandle programHandle, const char* name, int location);
-API bool C_DECL LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle);
+API int C_DECL LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle);
 API const char* C_DECL GetProgramInfoLog(ProgramHandle programHandle);
 API unsigned int C_DECL GetSpvSize(ProgramHandle programHandle, ShaderStage stage);
 API const unsigned int* C_DECL GetSpv(ProgramHandle programHandle, ShaderStage stage);

@@ -654,7 +654,7 @@ ShaderHandle CreateShader()
 	return new Shader();
 }
 
-bool CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source)
+int CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source)
 {
 	auto shader = static_cast<Shader*>(shaderHandle);
 	std::ostringstream logger;
@@ -694,7 +694,7 @@ void BindAttribLocation(ProgramHandle programHandle, const char* name, int locat
 	static_cast<Program*>(programHandle)->attribLocations[name] = location;
 }
 
-bool LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle)
+int LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle)
 {
 	auto program = static_cast<Program*>(programHandle);
 	auto vs = static_cast<Shader*>(vsHandle);
