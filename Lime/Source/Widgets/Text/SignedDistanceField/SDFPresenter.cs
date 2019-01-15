@@ -47,6 +47,11 @@ namespace Lime.SignedDistanceField
 				renderChain.Clear();
 			}
 
+			if (ro.SpriteList == null) {
+				ro.Release();
+				return null;
+			}
+
 			var widget = (Widget)node;
 			ro.RenderActions = renderActions;
 			ro.Material = GetMaterial(widget, component);
