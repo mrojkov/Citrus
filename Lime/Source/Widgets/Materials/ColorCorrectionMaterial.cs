@@ -1,5 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+#if iOS || ANDROID || WIN
+using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 
 namespace Lime
 {
@@ -88,8 +93,6 @@ namespace Lime
 
 			varying lowp vec2 texCoords1;";
 		private const string FragmentShaderHSLMethods = @"
-			#define LOWP_FLOAT_PRECISION 1e-3			
-
 			lowp float HueToRgb(lowp float f1, lowp float f2, lowp float hue) {
 				if (hue < 0.0)
 					hue += 1.0;
@@ -170,9 +173,12 @@ namespace Lime
 
 		private static Shader[] CreateShaders(bool requiredBrightnessContrast, bool requiredHSL, bool opaque)
 		{
+			GL.GetShaderPrecisionFormat(All.FragmentShader, All.LowFloat, out _, out var precision);
+			var power = (int)Mathf.Min((float)System.Math.Log10(System.Math.Pow(2, precision)), 10f);
+			var lowpPrecisionStr = $"#define LOWP_FLOAT_PRECISION 1e-{power}\n";
 			var length =
 				(requiredBrightnessContrast ? FragmentShaderUniformBrightnessContrast.Length + FragmentShaderBrightnessContrast.Length : 0) +
-				(requiredHSL ? FragmentShaderUniformHSL.Length + FragmentShaderHSLMethods.Length + FragmentShaderHSL.Length : 0) +
+				(requiredHSL ? FragmentShaderUniformHSL.Length + lowpPrecisionStr.Length + FragmentShaderHSLMethods.Length + FragmentShaderHSL.Length : 0) +
 				FragmentShaderUniform.Length +
 				FragmentShaderPart1.Length +
 				(!opaque ? FragmentShaderPart2.Length : FragmentShaderPart2Opaque.Length);
@@ -181,6 +187,7 @@ namespace Lime
 				fragmentShader.Append(FragmentShaderUniformBrightnessContrast);
 			}
 			if (requiredHSL) {
+				fragmentShader.Append(lowpPrecisionStr);
 				fragmentShader.Append(FragmentShaderUniformHSL);
 			}
 			fragmentShader.Append(FragmentShaderUniform);
