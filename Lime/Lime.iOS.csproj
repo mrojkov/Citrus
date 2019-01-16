@@ -419,6 +419,7 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionShadows.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

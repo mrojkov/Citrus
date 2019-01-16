@@ -118,6 +118,8 @@ namespace Lime.SignedDistanceField
 				}
 				var materialProvider = SDFInnerShadowMaterialProviderPool<SDFInnerShadowMaterialProvider>.Acquire();
 				materialProvider.Material.Dilate = s.Dilate;
+				materialProvider.Material.TextDilate = ro.Dilate;
+				materialProvider.Material.TextSoftness = ro.Softness;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
 				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
