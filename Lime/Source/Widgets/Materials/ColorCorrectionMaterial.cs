@@ -173,7 +173,7 @@ namespace Lime
 
 		private static Shader[] CreateShaders(bool requiredBrightnessContrast, bool requiredHSL, bool opaque)
 		{
-			GL.GetShaderPrecisionFormat(All.FragmentShader, All.LowFloat, out _, out var precision);
+			GL.GetShaderPrecisionFormat(ShaderType.FragmentShader, ShaderPrecision.LowFloat, out int _, out int precision);
 			var power = (int)Mathf.Min((float)System.Math.Log10(System.Math.Pow(2, precision)), 10f);
 			var lowpPrecisionStr = $"#define LOWP_FLOAT_PRECISION 1e-{power}\n";
 			var length =
