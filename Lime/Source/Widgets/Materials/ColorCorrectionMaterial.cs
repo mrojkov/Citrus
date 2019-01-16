@@ -1,5 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+#if iOS || ANDROID || WIN
+using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 
 namespace Lime
 {
@@ -128,9 +133,9 @@ namespace Lime
 				lowp vec4 p = (rgb.g < rgb.b) ? vec4(rgb.bg, -1.0, 0.66666666) : vec4(rgb.gb, 0.0, -0.33333333);
 				lowp vec4 q = (rgb.r < p.x) ? vec4(p.xyw, rgb.r) : vec4(rgb.r, p.yzx);
 				lowp float c = q.x - min(q.w, q.y);
-				lowp float h = abs((q.w - q.y) / (6.0 * c + 1e-10) + q.z);
+				lowp float h = abs((q.w - q.y) / (6.0 * c + LOWP_FLOAT_PRECISION) + q.z);
 				lowp float l = q.x - c * 0.5;
-				lowp float s = c / (1.0 - abs(l * 2.0 - 1.0) + 1e-10);
+				lowp float s = c / (1.0 - abs(l * 2.0 - 1.0) + LOWP_FLOAT_PRECISION);
 				return vec3(h, s, l);
 			}";
 		private const string FragmentShaderPart1 = @"
@@ -168,9 +173,12 @@ namespace Lime
 
 		private static Shader[] CreateShaders(bool requiredBrightnessContrast, bool requiredHSL, bool opaque)
 		{
+			GL.GetShaderPrecisionFormat(All.FragmentShader, All.LowFloat, out _, out var precision);
+			var power = (int)Mathf.Min((float)System.Math.Log10(System.Math.Pow(2, precision)), 10f);
+			var lowpPrecisionStr = $"#define LOWP_FLOAT_PRECISION 1e-{power}\n";
 			var length =
 				(requiredBrightnessContrast ? FragmentShaderUniformBrightnessContrast.Length + FragmentShaderBrightnessContrast.Length : 0) +
-				(requiredHSL ? FragmentShaderUniformHSL.Length + FragmentShaderHSLMethods.Length + FragmentShaderHSL.Length : 0) +
+				(requiredHSL ? FragmentShaderUniformHSL.Length + lowpPrecisionStr.Length + FragmentShaderHSLMethods.Length + FragmentShaderHSL.Length : 0) +
 				FragmentShaderUniform.Length +
 				FragmentShaderPart1.Length +
 				(!opaque ? FragmentShaderPart2.Length : FragmentShaderPart2Opaque.Length);
@@ -179,6 +187,7 @@ namespace Lime
 				fragmentShader.Append(FragmentShaderUniformBrightnessContrast);
 			}
 			if (requiredHSL) {
+				fragmentShader.Append(lowpPrecisionStr);
 				fragmentShader.Append(FragmentShaderUniformHSL);
 			}
 			fragmentShader.Append(FragmentShaderUniform);
