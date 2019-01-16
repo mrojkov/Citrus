@@ -114,7 +114,9 @@ namespace Lime.Graphics.Platform.Vulkan
 			var enabledExtensionNames = new List<IntPtr>();
 			enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_surface"));
 			enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_win32_surface"));
-			enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_EXT_debug_report"));
+			if (validation) {
+				enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_EXT_debug_report"));
+			}
 			try {
 				fixed (IntPtr* enabledLayerNamesPtr = enabledLayerNames.ToArray())
 				fixed (IntPtr* enabledExtensionNamesPtr = enabledExtensionNames.ToArray()) {
