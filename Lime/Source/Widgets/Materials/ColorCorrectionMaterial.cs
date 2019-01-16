@@ -88,6 +88,8 @@ namespace Lime
 
 			varying lowp vec2 texCoords1;";
 		private const string FragmentShaderHSLMethods = @"
+			#define LOWP_FLOAT_PRECISION 1e-3			
+
 			lowp float HueToRgb(lowp float f1, lowp float f2, lowp float hue) {
 				if (hue < 0.0)
 					hue += 1.0;
@@ -128,9 +130,9 @@ namespace Lime
 				lowp vec4 p = (rgb.g < rgb.b) ? vec4(rgb.bg, -1.0, 0.66666666) : vec4(rgb.gb, 0.0, -0.33333333);
 				lowp vec4 q = (rgb.r < p.x) ? vec4(p.xyw, rgb.r) : vec4(rgb.r, p.yzx);
 				lowp float c = q.x - min(q.w, q.y);
-				lowp float h = abs((q.w - q.y) / (6.0 * c + 1e-10) + q.z);
+				lowp float h = abs((q.w - q.y) / (6.0 * c + LOWP_FLOAT_PRECISION) + q.z);
 				lowp float l = q.x - c * 0.5;
-				lowp float s = c / (1.0 - abs(l * 2.0 - 1.0) + 1e-10);
+				lowp float s = c / (1.0 - abs(l * 2.0 - 1.0) + LOWP_FLOAT_PRECISION);
 				return vec3(h, s, l);
 			}";
 		private const string FragmentShaderPart1 = @"
