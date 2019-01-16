@@ -7,7 +7,7 @@ namespace Lime.Graphics.Platform.Vulkan
 	{
 		private PlatformRenderContext context;
 		private SharpVulkan.Buffer buffer;
-		private SharpVulkan.DeviceMemory memory;
+		private MemoryAlloc memory;
 		private SharpVulkan.BufferUsageFlags usage;
 		private SharpVulkan.MemoryPropertyFlags memoryPropertyFlags;
 		private ulong sliceAlignment;
@@ -17,7 +17,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		private Queue<SliceEntry> sliceQueue = new Queue<SliceEntry>();
 
 		internal SharpVulkan.Buffer Buffer => buffer;
-		internal SharpVulkan.DeviceMemory Memory => memory;
 		internal ulong SliceOffset => sliceOffset;
 		internal ulong SliceSize => sliceSize;
 
@@ -68,12 +67,12 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public IntPtr MapSlice(ulong offset, ulong size)
 		{
-			return context.Device.MapMemory(memory, sliceOffset + offset, size, SharpVulkan.MemoryMapFlags.None);
+			return context.MemoryAllocator.Map(memory, sliceOffset + offset, size);
 		}
 
 		public void UnmapSlice()
 		{
-			context.Device.UnmapMemory(memory);
+			context.MemoryAllocator.Unmap(memory);
 		}
 
 		private void ReleaseBuffer()
@@ -97,8 +96,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			};
 			buffer = context.Device.CreateBuffer(ref createInfo);
 			context.Device.GetBufferMemoryRequirements(buffer, out var memoryRequirements);
-			memory = context.AllocateMemory(memoryRequirements, memoryPropertyFlags);
-			context.Device.BindBufferMemory(buffer, memory, 0);
+			memory = context.MemoryAllocator.Allocate(memoryRequirements, memoryPropertyFlags, true);
+			context.Device.BindBufferMemory(buffer, memory.Memory, memory.Offset);
 			sliceQueue.Clear();
 			for (ulong i = 0; i < sliceCount; i++) {
 				sliceQueue.Enqueue(new SliceEntry {

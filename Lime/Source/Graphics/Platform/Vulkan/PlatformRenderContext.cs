@@ -67,6 +67,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		internal ulong NextFenceValue => nextFenceValue;
 		internal SharpVulkan.PhysicalDeviceLimits PhysicalDeviceLimits => physicalDeviceLimits;
 		internal SamplerCache SamplerCache => samplerCache;
+		internal readonly MemoryAllocator MemoryAllocator;
 
 		public PlatformRenderContext()
 		{
@@ -78,6 +79,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			CheckFeatures();
 			CreateCommandPool();
 			CreatePipelineCache();
+			MemoryAllocator = new MemoryAllocator(this);
 			scheduler = new Scheduler(this);
 			uploadBufferSuballocator = new UploadBufferAllocator(this, 4 * 1024 * 1024);
 			descriptorAllocator = new DescriptorAllocator(this, new DescriptorPoolLimits {
@@ -878,13 +880,6 @@ namespace Lime.Graphics.Platform.Vulkan
 			});
 		}
 
-		internal void Release(SharpVulkan.DeviceMemory obj)
-		{
-			scheduler.Add(nextFenceValue, () => {
-				device.FreeMemory(obj);
-			});
-		}
-
 		internal void Release(SharpVulkan.Framebuffer obj)
 		{
 			scheduler.Add(nextFenceValue, () => {
@@ -934,6 +929,13 @@ namespace Lime.Graphics.Platform.Vulkan
 			});
 		}
 
+		internal void Release(MemoryAlloc memoryAlloc)
+		{
+			scheduler.Add(nextFenceValue, () => {
+				MemoryAllocator.Free(memoryAlloc);
+			});
+		}
+
 		public FormatFeatures GetFormatFeatures(Format format)
 		{
 			if (!formatFeaturesCache.TryGetValue(format, out var features)) {
@@ -956,20 +958,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		internal UploadBufferAlloc AllocateUploadBuffer(ulong size, ulong alignment)
 		{
 			return uploadBufferSuballocator.Allocate(size, alignment);
-		}
-
-		internal SharpVulkan.DeviceMemory AllocateMemory(SharpVulkan.MemoryRequirements requirements, SharpVulkan.MemoryPropertyFlags propertyFlags)
-		{
-			var typeIndex = FindMemoryTypeIndex(requirements.MemoryTypeBits, propertyFlags);
-			if (typeIndex == uint.MaxValue) {
-				throw new InvalidOperationException();
-			}
-			var allocateInfo = new SharpVulkan.MemoryAllocateInfo {
-				StructureType = SharpVulkan.StructureType.MemoryAllocateInfo,
-				MemoryTypeIndex = typeIndex,
-				AllocationSize = requirements.Size
-			};
-			return device.AllocateMemory(ref allocateInfo);
 		}
 
 		private uint FindMemoryTypeIndex(uint typeBits, SharpVulkan.MemoryPropertyFlags propertyFlags)

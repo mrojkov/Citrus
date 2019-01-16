@@ -7,7 +7,7 @@ namespace Lime.Graphics.Platform.Vulkan
 	{
 		private PlatformRenderContext context;
 		private SharpVulkan.Buffer buffer;
-		private SharpVulkan.DeviceMemory memory;
+		private MemoryAlloc memory;
 		private ulong bufferSize;
 		private ulong bufferOffset;
 		private IntPtr mappedMemory;
@@ -49,10 +49,10 @@ namespace Lime.Graphics.Platform.Vulkan
 			};
 			buffer = context.Device.CreateBuffer(ref createInfo);
 			context.Device.GetBufferMemoryRequirements(buffer, out var memoryRequirements);
-			memory = context.AllocateMemory(memoryRequirements,
-				SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent);
-			context.Device.BindBufferMemory(buffer, memory, 0);
-			mappedMemory = context.Device.MapMemory(memory, 0, size, SharpVulkan.MemoryMapFlags.None);
+			var memoryPropertyFlags = SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent;
+			memory = context.MemoryAllocator.Allocate(memoryRequirements, memoryPropertyFlags, true);
+			context.Device.BindBufferMemory(buffer, memory.Memory, memory.Offset);
+			mappedMemory = context.MemoryAllocator.Map(memory, 0, size);
 			bufferSize = size;
 			bufferOffset = 0;
 		}
@@ -60,7 +60,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void ReleaseBuffer()
 		{
 			if (buffer != SharpVulkan.Buffer.Null) {
-				context.Device.UnmapMemory(memory);
+				context.MemoryAllocator.Unmap(memory);
 				context.Release(buffer);
 				context.Release(memory);
 				buffer = SharpVulkan.Buffer.Null;

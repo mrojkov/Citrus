@@ -8,7 +8,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.Format colorFormat;
 		private SharpVulkan.Image depthStencilBuffer;
 		private SharpVulkan.ImageView depthStencilView;
-		private SharpVulkan.DeviceMemory depthStencilMemory;
+		private MemoryAlloc depthStencilMemory;
 		private SharpVulkan.Format depthStencilFormat;
 		private SharpVulkan.RenderPass renderPass;
 		private SharpVulkan.Framebuffer framebuffer;
@@ -66,8 +66,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			};
 			depthStencilBuffer = Context.Device.CreateImage(ref createInfo);
 			Context.Device.GetImageMemoryRequirements(depthStencilBuffer, out var memoryRequirements);
-			depthStencilMemory = Context.AllocateMemory(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal);
-			Context.Device.BindImageMemory(depthStencilBuffer, depthStencilMemory, 0);
+			depthStencilMemory = Context.MemoryAllocator.Allocate(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal, false);
+			Context.Device.BindImageMemory(depthStencilBuffer, depthStencilMemory.Memory, depthStencilMemory.Offset);
 			var viewCreateInfo = new SharpVulkan.ImageViewCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageViewCreateInfo,
 				ViewType = SharpVulkan.ImageViewType.Image2D,

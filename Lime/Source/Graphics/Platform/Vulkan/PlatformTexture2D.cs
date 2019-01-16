@@ -11,7 +11,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private int levelCount;
 		private SharpVulkan.Image image;
 		private SharpVulkan.ImageView imageView;
-		private SharpVulkan.DeviceMemory memory;
+		private MemoryAlloc memory;
 		private SharpVulkan.Sampler sampler;
 
 		internal SharpVulkan.Image Image => image;
@@ -72,8 +72,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			};
 			image = context.Device.CreateImage(ref imageCreateInfo);
 			context.Device.GetImageMemoryRequirements(image, out var memoryRequirements);
-			memory = context.AllocateMemory(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal);
-			context.Device.BindImageMemory(image, memory, 0);
+			memory = context.MemoryAllocator.Allocate(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal, false);
+			context.Device.BindImageMemory(image, memory.Memory, memory.Offset);
 			var viewCreateInfo = new SharpVulkan.ImageViewCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageViewCreateInfo,
 				ViewType = SharpVulkan.ImageViewType.Image2D,
