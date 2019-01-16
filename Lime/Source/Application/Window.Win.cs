@@ -329,7 +329,9 @@ namespace Lime
 			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
 			{
 				base.SetBoundsCore(x, y, width, height, specified);
-				swapchain.Resize(ClientSize.Width, ClientSize.Height);
+				if (width != 0 && height != 0) {
+					swapchain.Resize(ClientSize.Width, ClientSize.Height);
+				}
 			}
 
 			public override void Begin()
