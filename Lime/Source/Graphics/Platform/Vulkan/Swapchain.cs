@@ -25,6 +25,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private int nextAcquirementSemaphoreIndex;
 		private int width;
 		private int height;
+		private ulong swapchainDestroyFenceValue;
 
 		internal SharpVulkan.Format BackbufferFormat => backbufferFormat;
 		internal SharpVulkan.Format DepthStencilFormat => depthStencilFormat;
@@ -54,21 +55,23 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void DestroySwapchain()
 		{
 			if (swapchain != SharpVulkan.Swapchain.Null) {
-				context.Finish();
+				context.WaitForFence(swapchainDestroyFenceValue);
+				swapchainDestroyFenceValue = context.NextFenceValue;
 				foreach (var i in framebuffers) {
-					context.Device.DestroyFramebuffer(i);
+					context.Release(i);
 				}
 				foreach (var i in backbufferViews) {
-					context.Device.DestroyImageView(i);
+					context.Release(i);
 				}
 				foreach (var i in acquirementSemaphores) {
-					context.Device.DestroySemaphore(i);
+					context.Release(i);
 				}
-				context.Device.DestroyImageView(depthStencilView);
-				context.Device.DestroyImage(depthStencilBuffer);
-				context.MemoryAllocator.Free(depthStencilMemory);
-				context.Device.DestroyRenderPass(renderPass);
-				context.Device.DestroySwapchain(swapchain);
+				context.Release(depthStencilView);
+				context.Release(depthStencilBuffer);
+				context.Release(depthStencilMemory);
+				context.Release(renderPass);
+				context.Release(swapchain);
+				context.Flush();
 				swapchain = SharpVulkan.Swapchain.Null;
 			}
 		}
@@ -76,6 +79,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void DestroySurface()
 		{
 			if (surface != SharpVulkan.Surface.Null) {
+				context.Finish();
 				context.Instance.DestroySurface(surface);
 				surface = SharpVulkan.Surface.Null;
 			}
@@ -136,6 +140,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			if ((surfaceCapabilities.SupportedUsageFlags & backbufferUsage) == 0) {
 				throw new NotSupportedException();
 			}
+			var oldSwapchain = swapchain;
+			DestroySwapchain();
 			var createInfo = new SharpVulkan.SwapchainCreateInfo {
 				StructureType = SharpVulkan.StructureType.SwapchainCreateInfo,
 				Surface = surface,
@@ -149,10 +155,9 @@ namespace Lime.Graphics.Platform.Vulkan
 				ImageArrayLayers = 1,
 				ImageSharingMode = SharpVulkan.SharingMode.Exclusive,
 				MinImageCount = desiredBufferCount,
-				Clipped = true
+				Clipped = true,
+				OldSwapchain = oldSwapchain
 			};
-			// FIXME: Find better way to recreate swapchain
-			DestroySwapchain();
 			swapchain = context.Device.CreateSwapchain(ref createInfo);
 			CreateBackbuffers();
 			CreateDepthStencilBuffer();
