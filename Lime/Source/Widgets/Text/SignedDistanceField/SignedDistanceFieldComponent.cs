@@ -4,14 +4,8 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class ShadowParams
+	public class BaseShadowParams
 	{
-		public enum ShadowType
-		{
-			Outer,
-			Inner
-		}
-
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 45f;
 		private const float MinimumDilate = -40f;
@@ -19,23 +13,12 @@ namespace Lime
 
 		private float softness = 0f;
 		private float dilate = 0f;
-		private Vector2 offset;
 
 		[YuzuMember]
 		public bool Enabled { get; set; } = true;
 
 		[YuzuMember]
-		public ShadowType Type { get; set; }
-
-		[YuzuMember]
 		public Color4 Color { get; set; } = Color4.Black;
-
-		[YuzuMember]
-		public Vector2 Offset
-		{
-			get => offset;
-			set => offset = value;
-		}
 
 		[YuzuMember]
 		public int OffsetX { get; set; }
@@ -56,6 +39,18 @@ namespace Lime
 			get => dilate;
 			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
 		}
+	}
+
+	public class ShadowParams : BaseShadowParams
+	{
+		public enum ShadowType
+		{
+			Outer,
+			Inner
+		}
+
+		[YuzuMember]
+		public ShadowType Type { get; set; }
 	}
 
 	[TangerineRegisterComponent]
@@ -177,6 +172,10 @@ namespace Lime
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
 		public List<ShadowParams> Shadows { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupShadow)]
+		public List<BaseShadowParams> InnerShadows { get; set; }
 
 		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
 		{

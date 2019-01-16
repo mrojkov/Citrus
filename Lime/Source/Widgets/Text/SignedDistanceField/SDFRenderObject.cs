@@ -24,6 +24,7 @@ namespace Lime.SignedDistanceField
 		public Color4 OutlineColor;
 		public List<SDFShadowMaterialProvider> OuterShadowMaterialProviders;
 		public List<SDFShadowMaterialProvider> InnerShadowMaterialProviders;
+		public List<SDFInnerShadowMaterialProvider> NewInnerShadowMaterialProviders;
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
 		public float GradientAngle;
@@ -51,6 +52,12 @@ namespace Lime.SignedDistanceField
 					item.Release();
 				}
 				OuterShadowMaterialProviders = null;
+			}
+			if (NewInnerShadowMaterialProviders != null) {
+				foreach (var item in NewInnerShadowMaterialProviders) {
+					item.Release();
+				}
+				NewInnerShadowMaterialProviders = null;
 			}
 		}
 

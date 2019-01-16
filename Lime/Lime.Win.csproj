@@ -312,6 +312,7 @@
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFPresenter.cs" />
