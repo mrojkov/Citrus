@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime.SignedDistanceField
 {
@@ -15,8 +16,9 @@ namespace Lime.SignedDistanceField
 		public SDFPresenter()
 		{
 			renderActions = new SDFRenderAction[] {
-				new SDFRenderActionUnderlay(),
+				new SDFRenderActionOuterShadows(),
 				new SDFRenderActionMain(),
+				new SDFRenderActionInnerShadows()
 			};
 		}
 
@@ -45,6 +47,11 @@ namespace Lime.SignedDistanceField
 				renderChain.Clear();
 			}
 
+			if (ro.SpriteList == null) {
+				ro.Release();
+				return null;
+			}
+
 			var widget = (Widget)node;
 			ro.RenderActions = renderActions;
 			ro.Material = GetMaterial(widget, component);
@@ -59,17 +66,44 @@ namespace Lime.SignedDistanceField
 			ro.Dilate = component.Dilate;
 			ro.OutlineColor = component.OutlineColor;
 			ro.Thickness = component.Thickness;
-			ro.UnderlayMaterialProvider = component.UnderlayMaterialProvider;
-			ro.UnderlayColor = component.UnderlayColor;
-			ro.UnderlayDilate = component.UnderlayDilate;
-			ro.UnderlaySoftness = component.UnderlaySoftness;
-			ro.UnderlayOffset = component.UnderlayOffset;
-			ro.UnderlayEnabled = component.UnderlayEnabled;
 			ro.GradientEnabled = component.GradientEnabled;
 			ro.Gradient = component.Gradient;
 			ro.GradientAngle = component.GradientAngle;
-
+			ro.BevelEnabled = component.BevelEnabled;
+			ro.LightAngle = component.LightAngle;
+			ro.LightColor = component.LightColor;
+			ro.ReflectionPower = component.ReflectionPower;
+			ro.BevelRoundness = component.BevelRoundness;
+			ro.BevelWidth = component.BevelWidth;
+			if (component.Shadows != null) {
+				PrepareShadows(ro, component.Shadows);
+			}
 			return ro;
+		}
+
+		private void PrepareShadows(SDFRenderObject ro, List<ShadowParams> shadows)
+		{
+			foreach (var s in shadows) {
+				if (!s.Enabled) {
+					continue;
+				}
+				var materialProvider = SDFShadowMaterialProviderPool<SDFShadowMaterialProvider>.Acquire();
+				materialProvider.Material.Dilate = s.Dilate;
+				materialProvider.Material.Softness = s.Softness;
+				materialProvider.Material.Color = s.Color;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
+				if (s.Type == ShadowParams.ShadowType.Inner) {
+					if (ro.InnerShadowMaterialProviders == null) {
+						ro.InnerShadowMaterialProviders = new List<SDFShadowMaterialProvider>();
+					}
+					ro.InnerShadowMaterialProviders.Add(materialProvider);
+				} else if (s.Type == ShadowParams.ShadowType.Outer) {
+					if (ro.OuterShadowMaterialProviders == null) {
+						ro.OuterShadowMaterialProviders = new List<SDFShadowMaterialProvider>();
+					}
+					ro.OuterShadowMaterialProviders.Add(materialProvider);
+				}
+			}
 		}
 
 		private IMaterial GetMaterial(Widget widget, SignedDistanceFieldComponent component)
