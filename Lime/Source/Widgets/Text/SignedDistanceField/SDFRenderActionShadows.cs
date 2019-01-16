@@ -29,4 +29,18 @@ namespace Lime.SignedDistanceField
 			}
 		}
 	}
+
+	internal class SDFRenderActionNewInnerShadows : SDFRenderAction
+	{
+		public override bool EnabledCheck(SDFRenderObject ro) =>
+			ro.NewInnerShadowMaterialProviders != null &&
+			ro.NewInnerShadowMaterialProviders.Count > 0;
+
+		public override void Do(SDFRenderObject ro)
+		{
+			foreach (var provider in ro.NewInnerShadowMaterialProviders) {
+				ro.RenderSpriteList(provider);
+			}
+		}
+	}
 }

@@ -18,7 +18,8 @@ namespace Lime.SignedDistanceField
 			renderActions = new SDFRenderAction[] {
 				new SDFRenderActionOuterShadows(),
 				new SDFRenderActionMain(),
-				new SDFRenderActionInnerShadows()
+				new SDFRenderActionInnerShadows(),
+				new SDFRenderActionNewInnerShadows()
 			};
 		}
 
@@ -78,6 +79,9 @@ namespace Lime.SignedDistanceField
 			if (component.Shadows != null) {
 				PrepareShadows(ro, component.Shadows);
 			}
+			if (component.InnerShadows != null) {
+				PrepareInnerShadows(ro, component.InnerShadows);
+			}
 			return ro;
 		}
 
@@ -103,6 +107,24 @@ namespace Lime.SignedDistanceField
 					}
 					ro.OuterShadowMaterialProviders.Add(materialProvider);
 				}
+			}
+		}
+
+		private void PrepareInnerShadows(SDFRenderObject ro, List<BaseShadowParams> shadows)
+		{
+			foreach (var s in shadows) {
+				if (!s.Enabled) {
+					continue;
+				}
+				var materialProvider = SDFInnerShadowMaterialProviderPool<SDFInnerShadowMaterialProvider>.Acquire();
+				materialProvider.Material.Dilate = s.Dilate;
+				materialProvider.Material.Softness = s.Softness;
+				materialProvider.Material.Color = s.Color;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
+				if (ro.NewInnerShadowMaterialProviders == null) {
+					ro.NewInnerShadowMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
+				}
+				ro.NewInnerShadowMaterialProviders.Add(materialProvider);
 			}
 		}
 
