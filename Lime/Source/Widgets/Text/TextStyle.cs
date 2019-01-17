@@ -222,5 +222,18 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 		}
+
+		protected internal override RenderObject GetRenderObject()
+		{
+			var sdfComponent = Components.Get<SignedDistanceFieldComponent>();
+			if (sdfComponent != null) {
+				var ro = RenderObjectPool<SignedDistanceField.SDFRenderObject>.Acquire();
+				ro.Init(sdfComponent);
+				return ro;
+			} else {
+				var ro = RenderObjectPool<TextRenderObject>.Acquire();
+				return ro;
+			}
+		}
 	}
 }

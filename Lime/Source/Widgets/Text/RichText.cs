@@ -16,7 +16,7 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private TextOverflowMode overflowMode;
-		private SpriteList spriteList;
+		private SpriteList[] spriteLists;
 		private TextRenderer renderer;
 		private string displayText;
 		private TextProcessorDelegate textProcessor;
@@ -179,20 +179,32 @@ namespace Lime
 
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
-			EnsureSpriteList();
+			EnsureSpriteLists();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
+			ro.Objects = new RenderObjectList();
 			ro.CaptureRenderState(this);
-			ro.SpriteList = spriteList;
-			ro.GradientMapIndices = gradientMapIndices;
-			ro.Color = GlobalColor;
+			for (int i = 0; i < renderer.Styles.Count; i++) {
+				var style = renderer.Styles[i];
+				var styleRO = style.GetRenderObject() as TextRenderObject;
+				styleRO.SpriteList = spriteLists[i];
+				styleRO.RenderMode = TextRenderingMode.TwoPasses;
+				styleRO.Color = GlobalColor;
+				styleRO.GradientMapIndex = style.GradientMapIndex;
+				styleRO.CaptureRenderState(this);
+				ro.Objects.Add(styleRO);
+			}
 			return ro;
 		}
 
-		private void EnsureSpriteList()
+		private void EnsureSpriteLists()
 		{
-			if (spriteList == null) {
-				spriteList = new SpriteList();
-				PrepareRenderer().Render(spriteList, Size, HAlignment, VAlignment, maxDisplayCharacters);
+			if (spriteLists == null) {
+				PrepareRenderer();
+				spriteLists = new SpriteList[renderer.Styles.Count];
+				for (int i = 0; i < spriteLists.Length; i++) {
+					spriteLists[i] = new SpriteList();
+				}
+				renderer.Render(spriteLists, Size, HAlignment, VAlignment, maxDisplayCharacters);
 				gradientMapIndices = new int[renderer.Styles.Count];
 				for (var i = 0; i < gradientMapIndices.Length; i++) {
 					gradientMapIndices[i] = renderer.Styles[i].GradientMapIndex;
@@ -275,7 +287,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
-			spriteList = null;
+			spriteLists = null;
 			gradientMapIndices = null;
 			parser = null;
 			renderer = null;
@@ -300,15 +312,17 @@ namespace Lime
 		{
 			style = null;
 			int tag;
-			EnsureSpriteList();
-			if (spriteList.HitTest(LocalToWorldTransform, point, out tag) && tag >= 0) {
-				style = null;
-				if (tag == 0) {
-					style = Nodes[0] as TextStyle;
-				} else {
-					style = Nodes.TryFind(parser.Styles[tag - 1]) as TextStyle;
+			EnsureSpriteLists();
+			foreach (var spriteList in spriteLists) {
+				if (spriteList.HitTest(LocalToWorldTransform, point, out tag) && tag >= 0) {
+					style = null;
+					if (tag == 0) {
+						style = Nodes[0] as TextStyle;
+					} else {
+						style = Nodes.TryFind(parser.Styles[tag - 1]) as TextStyle;
+					}
+					return true;
 				}
-				return true;
 			}
 			return false;
 		}
@@ -339,44 +353,28 @@ namespace Lime
 				// эффект "пропечатывания" символов, поэтому не делаем каждый раз полный Invalidate.
 				if (maxDisplayCharacters != value) {
 					maxDisplayCharacters = value;
-					spriteList = null;
+					spriteLists = null;
 				}
 			}
 		}
 
 		internal class RenderObject : WidgetRenderObject
 		{
-			public SpriteList SpriteList;
-			public int[] GradientMapIndices;
-			public Color4 Color;
+			public RenderObjectList Objects;
 
 			public override void Render()
 			{
 				Renderer.Transform1 = LocalToWorldTransform;
-				ColorfulMaterialProvider.Instance.Init(Blending, Shader, GradientMapIndices);
-				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-				if (InvertGradientMapIndices()) {
-					ColorfulMaterialProvider.Instance.Init(Blending, Shader, GradientMapIndices);
-					SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-					InvertGradientMapIndices();
+				foreach (var ro in Objects) {
+					ro.Render();
 				}
-			}
-
-			private bool InvertGradientMapIndices()
-			{
-				bool dirty = false;
-				for (var i = 0; i < GradientMapIndices.Length; i++) {
-					if (GradientMapIndices[i] != -1) {
-						GradientMapIndices[i] = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndices[i] - 1;
-						dirty = true;
-					}
-				}
-				return dirty;
 			}
 
 			protected override void OnRelease()
 			{
-				SpriteList = null;
+				foreach (var ro in Objects) {
+					ro.Release();
+				}
 			}
 		}
 

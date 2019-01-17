@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -22,7 +23,27 @@ namespace Lime
 			IMaterial GetMaterial(int tag);
 			Sprite ProcessSprite(Sprite s);
 		}
-		
+
+		public class CompoundMaterialProvider : IMaterialProvider
+		{
+			private readonly Func<int, IMaterialProvider> resolver;
+
+			public CompoundMaterialProvider(Func<int, IMaterialProvider> resolver)
+			{
+				this.resolver = resolver;
+			}
+
+			public IMaterial GetMaterial(int tag)
+			{
+				return (resolver(tag) ?? DefaultMaterialProvider.Instance).GetMaterial(tag);
+			}
+
+			public Sprite ProcessSprite(Sprite s)
+			{
+				return (resolver(s.Tag) ?? DefaultMaterialProvider.Instance).ProcessSprite(s);
+			}
+		}
+
 		public class DefaultMaterialProvider : IMaterialProvider
 		{
 			public static readonly DefaultMaterialProvider Instance = new DefaultMaterialProvider();

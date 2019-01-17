@@ -124,7 +124,7 @@ namespace Lime.Text
 			return (size * scaleFactor).Floor();
 		}
 
-		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign, int maxCharacters = -1)
+		public void Render(SpriteList[] spriteLists, Vector2 area, HAlignment hAlign, VAlignment vAlign, int maxCharacters = -1)
 		{
 			if (overflowMode == TextOverflowMode.Minify) {
 				FitTextInsideArea(area);
@@ -172,7 +172,7 @@ namespace Lime.Text
 							break;
 						}
 						var sz = style.ImageSize * scaleFactor;
-						spriteList.Add(
+						spriteLists[word.Style].Add(
 							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),
 							sz, Vector2.Zero, Vector2.One, tag: word.Style);
 						position.X += sz.X;
@@ -184,7 +184,7 @@ namespace Lime.Text
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
 								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, ScaleSize(style.Size),
-								word.Start, word.Length, style.LetterSpacing, spriteList, tag: word.Style);
+								word.Start, word.Length, style.LetterSpacing, spriteLists[word.Style], tag: word.Style);
 						}
 					}
 					int wordLength = word.Length;
@@ -197,7 +197,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteList, tag: word.Style);
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style);
 					}
 					c += wordLength;
 				}
@@ -215,7 +215,7 @@ namespace Lime.Text
 						Vector2 lt = new Vector2(fittedWords[b + j].X, y) + offset;
 						Vector2 rb = new Vector2(fittedWords[b + k].X + fittedWords[b + k].Width, y) + offset;
 						float yOffset = (maxHeight - ScaleSize(style.ImageSize.Y)) * 0.5f;
-						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
+						spriteLists[word.Style].Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
 							Vector2.Zero, Vector2.One, tag: word.Style);
 						j = k;
