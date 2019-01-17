@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TreeLib;
 
 namespace Lime.Graphics.Platform.Vulkan
 {
@@ -58,9 +59,9 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private MemoryAlloc AllocateFromBlock(MemoryType memoryType, MemoryBlock memoryBlock, SharpVulkan.MemoryRequirements requirements)
 		{
-			var offset = memoryBlock.Allocate(requirements.Size, requirements.Alignment);
-			if (offset != ulong.MaxValue) {
-				return new MemoryAlloc(memoryType, memoryBlock, memoryBlock.Memory, offset, requirements.Size);
+			var node = memoryBlock.Allocate(requirements.Size, requirements.Alignment);
+			if (node != null) {
+				return new MemoryAlloc(memoryType, memoryBlock, node, memoryBlock.Memory);
 			}
 			return new MemoryAlloc();
 		}
@@ -69,7 +70,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			var block = alloc.MemoryBlock;
 			if (block != null) {
-				block.Free(alloc.Offset, alloc.Size);
+				block.Free(alloc.MemoryBlockNode);
 			}
 		}
 
@@ -138,101 +139,145 @@ namespace Lime.Graphics.Platform.Vulkan
 
 	internal class MemoryBlock
 	{
-		// TODO: Use RB tree instead of LinkedList
-		private LinkedList<Slice> freeList = new LinkedList<Slice>();
+		private RedBlackTreeMap<FreeTreeKey, LinkedListNode<MemoryBlockSlice>> freeTree = new RedBlackTreeMap<FreeTreeKey, LinkedListNode<MemoryBlockSlice>>();
+		private LinkedList<MemoryBlockSlice> list = new LinkedList<MemoryBlockSlice>();
 
 		public readonly SharpVulkan.DeviceMemory Memory;
 
 		public MemoryBlock(SharpVulkan.DeviceMemory memory, ulong size)
 		{
 			Memory = memory;
-			freeList.AddFirst(new Slice {
-				Offset = 0,
-				Size = size
-			});
+			AddSliceBefore(null, new MemoryBlockSlice { Size = size, Free = true });
 		}
 
-		public ulong Allocate(ulong size, ulong alignment)
+		public LinkedListNode<MemoryBlockSlice> Allocate(ulong size, ulong alignment)
 		{
-			ulong bestFitness = ulong.MaxValue;
-			ulong bestOffset = 0;
-			LinkedListNode<Slice> bestSliceNode = null;
-			for (var sliceNode = freeList.First; sliceNode != null; sliceNode = sliceNode.Next) {
-				var slice = sliceNode.Value;
-				var offset = GraphicsUtility.AlignUp(slice.Offset, alignment);
-				if (offset + size <= slice.Offset + slice.Size) {
-					var fitness = slice.Offset + slice.Size - offset - size;
-					if (fitness < bestFitness) {
-						bestFitness = fitness;
-						bestOffset = offset;
-						bestSliceNode = sliceNode;
-					}
+			if (freeTree.NearestGreaterOrEqual(new FreeTreeKey(size + alignment - 1), out _, out var node)) {
+				var slice = node.Value;
+				var alignedOffset = GraphicsUtility.AlignUp(slice.Offset, alignment);
+				var next = node.Next;
+				if (alignedOffset > slice.Offset) {
+					AddSliceBefore(node, new MemoryBlockSlice {
+						Offset = slice.Offset,
+						Size = alignedOffset - slice.Offset,
+						Free = true
+					});
 				}
-			}
-			if (bestSliceNode == null) {
-				return ulong.MaxValue;
-			}
-			var bestSlice = bestSliceNode.Value;
-			if (bestOffset > bestSlice.Offset) {
-				freeList.AddBefore(bestSliceNode, new Slice {
-					Offset = bestSlice.Offset,
-					Size = bestOffset - bestSlice.Offset
+				var allocNode = AddSliceBefore(node, new MemoryBlockSlice {
+					Offset = alignedOffset,
+					Size = size,
+					Free = false
 				});
+				if (alignedOffset + size < slice.Offset + slice.Size) {
+					AddSliceBefore(node, new MemoryBlockSlice {
+						Offset = alignedOffset + size,
+						Size = slice.Offset + slice.Size - alignedOffset - size,
+						Free = true
+					});
+				}
+				RemoveSliceNode(node);
+				return allocNode;
 			}
-			if (bestOffset + size < bestSlice.Offset + bestSlice.Size) {
-				freeList.AddBefore(bestSliceNode, new Slice {
-					Offset = bestOffset + size,
-					Size = bestSlice.Offset + bestSlice.Size - bestOffset - size
-				});
-			}
-			freeList.Remove(bestSliceNode);
-			return bestOffset;
+			return null;
 		}
 
-		public void Free(ulong offset, ulong size)
+		public void Free(LinkedListNode<MemoryBlockSlice> node)
 		{
-			var sliceNode = freeList.First;
-			while (sliceNode != null) {
-				var next = sliceNode.Next;
-				var slice = sliceNode.Value;
-				if (slice.Offset + slice.Size == offset) {
-					offset = slice.Offset;
-					size += slice.Size;
-					freeList.Remove(sliceNode);
-				} else if (slice.Offset == offset + size) {
-					size += slice.Size;
-					freeList.Remove(sliceNode);
-				}
-				sliceNode = next;
+			var offset = node.Value.Offset;
+			var size = node.Value.Size;
+			var prev = node.Previous;
+			if (prev != null && prev.Value.Free) {
+				offset = prev.Value.Offset;
+				size += prev.Value.Size;
+				RemoveSliceNode(prev);
 			}
-			freeList.AddLast(new Slice {
+			var next = node.Next;
+			if (next != null && next.Value.Free) {
+				size += next.Value.Size;
+				RemoveSliceNode(next);
+			}
+			AddSliceBefore(node, new MemoryBlockSlice {
 				Offset = offset,
-				Size = size
+				Size = size,
+				Free = true
 			});
+			RemoveSliceNode(node);
 		}
 
-		private struct Slice
+		private LinkedListNode<MemoryBlockSlice> AddSliceBefore(LinkedListNode<MemoryBlockSlice> beforeNode, MemoryBlockSlice slice)
+		{
+			var node = beforeNode != null
+				? list.AddBefore(beforeNode, slice)
+				: list.AddLast(slice);
+			if (slice.Free) {
+				freeTree.Add(new FreeTreeKey(slice.Offset, slice.Size), node);
+			}
+			return node;
+		}
+
+		private void RemoveSliceNode(LinkedListNode<MemoryBlockSlice> node)
+		{
+			var slice = node.Value;
+			if (slice.Free) {
+				freeTree.Remove(new FreeTreeKey(slice.Offset, slice.Size));
+			}
+			list.Remove(node);
+		}
+
+		private struct FreeTreeKey : IComparable<FreeTreeKey>
 		{
 			public ulong Offset;
 			public ulong Size;
+
+			public FreeTreeKey(ulong size)
+			{
+				Offset = 0;
+				Size = size;
+			}
+
+			public FreeTreeKey(ulong offset, ulong size)
+			{
+				Offset = offset;
+				Size = size;
+			}
+
+			public int CompareTo(FreeTreeKey key)
+			{
+				var order = Size.CompareTo(key.Size);
+				if (order == 0) {
+					order = Offset.CompareTo(key.Offset);
+				}
+				return order;
+			}
 		}
+	}
+
+	internal struct MemoryBlockSlice
+	{
+		public ulong Offset;
+		public ulong Size;
+		public bool Free;
 	}
 
 	internal struct MemoryAlloc
 	{
 		public readonly MemoryType MemoryType;
 		public readonly MemoryBlock MemoryBlock;
+		public readonly LinkedListNode<MemoryBlockSlice> MemoryBlockNode;
 		public readonly SharpVulkan.DeviceMemory Memory;
-		public readonly ulong Offset;
-		public readonly ulong Size;
 
-		public MemoryAlloc(MemoryType memoryType, MemoryBlock memoryBlock, SharpVulkan.DeviceMemory memory, ulong offset, ulong size)
+		public ulong Offset => MemoryBlockNode.Value.Offset;
+		public ulong Size => MemoryBlockNode.Value.Size;
+
+		public MemoryAlloc(
+			MemoryType memoryType, MemoryBlock memoryBlock,
+			LinkedListNode<MemoryBlockSlice> memoryBlockNode,
+			SharpVulkan.DeviceMemory memory)
 		{
 			MemoryType = memoryType;
 			MemoryBlock = memoryBlock;
+			MemoryBlockNode = memoryBlockNode;
 			Memory = memory;
-			Offset = offset;
-			Size = size;
 		}
 	}
 }
