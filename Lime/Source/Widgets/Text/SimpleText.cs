@@ -26,14 +26,6 @@ namespace Lime
 		private int gradientMapIndex = -1;
 		private float letterSpacing;
 
-		public enum RenderingMode
-		{
-			Common,
-			OnePassWithoutOutline,
-			OnePassWithOutline,
-			TwoPasses
-		}
-
 		public event TextProcessorDelegate TextProcessor
 		{
 			add
@@ -208,7 +200,7 @@ namespace Lime
 
 		[YuzuMember]
 		public bool ForceUncutText { get; set; }
-		public RenderingMode RenderMode{ get; set; }
+		public TextRenderingMode RenderMode{ get; set; }
 
 		public override Vector2 EffectiveMinSize =>
 			Vector2.Max(MeasuredMinSize, ForceUncutText ? Vector2.Max(MinSize, MeasureUncutText() + Padding) : MinSize);
@@ -237,7 +229,7 @@ namespace Lime
 			Localizable = true;
 			TrimWhitespaces = true;
 			Text = "";
-			RenderMode = RenderingMode.TwoPasses;
+			RenderMode = TextRenderingMode.TwoPasses;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -273,7 +265,15 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			PrepareSpriteListAndSyncCaret();
-			var ro = RenderObjectPool<RenderObject>.Acquire();
+			TextRenderObject ro;
+			var sdfComponent = Components.Get<SignedDistanceFieldComponent>();
+			if (sdfComponent != null) {
+				var sdfRO = RenderObjectPool<SignedDistanceField.SDFRenderObject>.Acquire();
+				sdfRO.Init(sdfComponent);
+				ro = sdfRO;
+			} else {
+				ro = RenderObjectPool<TextRenderObject>.Acquire();
+			}
 			ro.CaptureRenderState(this);
 			ro.SpriteList = spriteList;
 			ro.GradientMapIndex = GradientMapIndex;
@@ -520,52 +520,34 @@ namespace Lime
 			return clone;
 		}
 
-		internal class RenderObject : WidgetRenderObject
-		{
-			public SpriteList SpriteList;
-			public int GradientMapIndex;
-			public RenderingMode RenderMode;
-			public Color4 Color;
+		//internal class RenderObject : TextRenderObject
+		//{
+		//	public int GradientMapIndex;
+		//	public RenderingMode RenderMode;
 
-			public override void Render()
-			{
-				Renderer.Transform1 = LocalToWorldTransform;
-				if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
-					SpriteList.Render(Color, Blending, Shader);
-				} else {
-					if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
-						ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
-						SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-					}
+		//	public override void Render()
+		//	{
+		//		Renderer.Transform1 = LocalToWorldTransform;
+		//		if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
+		//			SpriteList.Render(Color, Blending, Shader);
+		//		} else {
+		//			if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
+		//				ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
+		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+		//			}
 
-					if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
-						ColorfulMaterialProvider.Instance.Init(
-							Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
-						SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-					}
-				}
-			}
+		//			if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
+		//				ColorfulMaterialProvider.Instance.Init(
+		//					Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
+		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
+		//			}
+		//		}
+		//	}
 
-			protected override void OnRelease()
-			{
-				SpriteList = null;
-			}
-		}
-
-		private class ColorfulMaterialProvider : Sprite.IMaterialProvider
-		{
-			public static readonly ColorfulMaterialProvider Instance = new ColorfulMaterialProvider();
-
-			private IMaterial material;
-
-			public void Init(Blending blending, int gradientMapIndex)
-			{
-				material = ColorfulTextMaterial.GetInstance(blending, gradientMapIndex);
-			}
-
-			public IMaterial GetMaterial(int tag) => material;
-
-			public Sprite ProcessSprite(Sprite s) => s;
-		}
+		//	protected override void OnRelease()
+		//	{
+		//		SpriteList = null;
+		//	}
+		//}
 	}
 }

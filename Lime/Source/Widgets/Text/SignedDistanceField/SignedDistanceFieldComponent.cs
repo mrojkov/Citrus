@@ -54,7 +54,7 @@ namespace Lime
 	}
 
 	[TangerineRegisterComponent]
-	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(RichText))]
+	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(TextStyle))]
 	public class SignedDistanceFieldComponent : NodeComponent
 	{
 		private const string GroupFont = "01. Face";
@@ -79,8 +79,6 @@ namespace Lime
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
 
-		private SDFPresenter presenter = new SDFPresenter();
-		private SDFRenderChainBuilder renderChainBuilder = new SDFRenderChainBuilder();
 		private float softness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
@@ -177,44 +175,14 @@ namespace Lime
 		[TangerineGroup(GroupShadow)]
 		public List<BaseShadowParams> InnerShadows { get; set; }
 
-		public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)
-		{
-			DettachFromNode(Owner);
-			Owner.AddToRenderChain(renderChain);
-			renderChain.GetRenderObjects(roObjects);
-			AttachToNode(Owner);
-		}
-
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
-			base.OnOwnerChanged(oldOwner);
-			if (oldOwner != null) {
-				DettachFromNode(oldOwner);
-			}
-			if (Owner != null) {
-				AttachToNode(Owner);
-			}
-		}
-
-		private void AttachToNode(Node node)
-		{
-			node.Presenter = presenter;
-			node.RenderChainBuilder = renderChainBuilder;
-			renderChainBuilder.Owner = node.AsWidget;
-		}
-
-		private void DettachFromNode(Node node)
-		{
-			node.RenderChainBuilder = node;
-			node.Presenter = DefaultPresenter.Instance;
-			renderChainBuilder.Owner = null;
+			
 		}
 
 		public override NodeComponent Clone()
 		{
 			var clone = (SignedDistanceFieldComponent)base.Clone();
-			clone.presenter = (SDFPresenter)presenter.Clone();
-			clone.renderChainBuilder = (SDFRenderChainBuilder)renderChainBuilder.Clone(null);
 			clone.SDFMaterialProvider = (SDFMaterialProvider)SDFMaterialProvider.Clone();
 			return clone;
 		}
