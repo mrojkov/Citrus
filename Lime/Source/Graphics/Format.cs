@@ -5,8 +5,6 @@ namespace Lime
 	public enum Format
 	{
 		Undefined,
-		Luminance,
-		LuminanceAlpha,
 		R8_SNorm,
 		R8_SScaled,
 		R8_UNorm,
