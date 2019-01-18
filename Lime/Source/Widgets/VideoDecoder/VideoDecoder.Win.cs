@@ -288,9 +288,9 @@ namespace Lime
 				var sample = currentVideoSample;
 				var pinnedArray = GCHandle.Alloc(sample.Data, GCHandleType.Pinned);
 				var pointer = pinnedArray.AddrOfPinnedObject();
-				lumaTexture.LoadImage(pointer, width, height, Format.Luminance);
+				lumaTexture.LoadImage(pointer, width, height, Format.R8_UNorm);
 
-				chromaTexture.LoadImage(pointer + width * height, width / 2, height / 2, Format.LuminanceAlpha);
+				chromaTexture.LoadImage(pointer + width * height, width / 2, height / 2, Format.R8G8_UNorm);
 				pinnedArray.Free();
 
 				RendererWrapper.Current.PushState(RenderState.Viewport | RenderState.Shader | RenderState.Blending);
@@ -367,7 +367,7 @@ namespace Lime
 					mediump vec3 yuv;
 					lowp vec3 rgb;
 					yuv.x = texture2D(u_SamplerY, v_UV).r;
-					yuv.yz = texture2D(u_SamplerUV, v_UV).ra - vec2(0.5, 0.5);
+					yuv.yz = texture2D(u_SamplerUV, v_UV).rg - vec2(0.5, 0.5);
 					// Using BT.709 which is the standard for HDTV
 					
 					rgb = mat3( 1, 1, 1,
