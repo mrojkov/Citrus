@@ -32,6 +32,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		internal int MaxTextureSlots;
 		internal int MaxVertexBufferSlots;
 		internal int MaxVertexAttributes;
+		internal bool SupportsTextureRG;
 		internal bool SupportsPackedDepth24Stencil8;
 		internal bool SupportsDepth24;
 		internal bool SupportsDxt1;
@@ -108,6 +109,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		{
 			GLHelper.ParseGLVersion(GL.GetString(StringName.Version), out GLMajorVersion, out GLMinorVersion, out ESProfile);
 			var glExtensions = new HashSet<string>(GL.GetString(StringName.Extensions).Split(' '));
+			SupportsTextureRG = !ESProfile || GLMajorVersion >= 3 || glExtensions.Contains("GL_EXT_texture_rg");
 			SupportsPackedDepth24Stencil8 = !ESProfile || glExtensions.Contains("GL_OES_packed_depth_stencil");
 			SupportsDepth24 = !ESProfile || glExtensions.Contains("GL_OES_depth24");
 			var supportsS3tc = glExtensions.Contains("GL_EXT_texture_compression_s3tc");
@@ -435,15 +437,14 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public FormatFeatures GetFormatFeatures(Format format)
 		{
+			var features = FormatFeatures.None;
 			switch (format) {
 				case Format.R8_SScaled:
 				case Format.R8_SNorm:
 				case Format.R8_UScaled:
-				case Format.R8_UNorm:
 				case Format.R8G8_SScaled:
 				case Format.R8G8_SNorm:
 				case Format.R8G8_UScaled:
-				case Format.R8G8_UNorm:
 				case Format.R8G8B8_SScaled:
 				case Format.R8G8B8_SNorm:
 				case Format.R8G8B8_UScaled:
@@ -468,35 +469,66 @@ namespace Lime.Graphics.Platform.OpenGL
 				case Format.R32G32_SFloat:
 				case Format.R32G32B32_SFloat:
 				case Format.R32G32B32A32_SFloat:
-					return FormatFeatures.VertexBuffer;
+					features |= FormatFeatures.VertexBuffer;
+					break;
+				case Format.R8_UNorm:
+				case Format.R8G8_UNorm:
+					if (SupportsTextureRG) {
+						features |= FormatFeatures.Sample;
+						features |= FormatFeatures.RenderTarget;
+					}
+					features |= FormatFeatures.VertexBuffer;
+					break;
 				case Format.R8G8B8_UNorm:
 				case Format.R8G8B8A8_UNorm:
-					return FormatFeatures.Sample | FormatFeatures.RenderTarget | FormatFeatures.VertexBuffer;
+					features |= FormatFeatures.Sample;
+					features |= FormatFeatures.RenderTarget;
+					features |= FormatFeatures.VertexBuffer;
+					break;
 				case Format.R5G6B5_UNorm_Pack16:
 				case Format.R5G5B5A1_UNorm_Pack16:
 				case Format.R4G4B4A4_UNorm_Pack16:
-					return FormatFeatures.Sample | FormatFeatures.RenderTarget;
+					features |= FormatFeatures.Sample;
+					features |= FormatFeatures.RenderTarget;
+					break;
 				case Format.BC1_RGB_UNorm_Block:
 				case Format.BC1_RGBA_UNorm_Block:
-					return SupportsDxt1 ? FormatFeatures.Sample : FormatFeatures.None;
+					if (SupportsDxt1) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.BC2_UNorm_Block:
-					return SupportsDxt3 ? FormatFeatures.Sample : FormatFeatures.None;
+					if (SupportsDxt3) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.BC3_UNorm_Block:
-					return SupportsDxt5 ? FormatFeatures.Sample : FormatFeatures.None;
+					if (SupportsDxt5) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.ETC1_R8G8B8_UNorm_Block:
-					return SupportsEtc1 ? FormatFeatures.Sample : FormatFeatures.None;
+					if (SupportsEtc1) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.ETC2_R8G8B8_UNorm_Block:
 				case Format.ETC2_R8G8B8A1_UNorm_Block:
 				case Format.ETC2_R8G8B8A8_UNorm_Block:
-					return SupportsEtc2 ? FormatFeatures.Sample : FormatFeatures.None;
+					if (SupportsEtc2) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.PVRTC1_2Bpp_UNorm_Block:
 				case Format.PVRTC1_4Bpp_UNorm_Block:
 				case Format.PVRTC2_2Bpp_UNorm_Block:
 				case Format.PVRTC2_4Bpp_UNorm_Block:
-					return SupportsPvrtc ? FormatFeatures.Sample : FormatFeatures.None;
-				default:
-					return FormatFeatures.None;
+					if (SupportsPvrtc) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 			}
+			return features;
 		}
 	}
 }

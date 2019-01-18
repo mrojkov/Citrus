@@ -36,6 +36,16 @@ namespace Lime.Graphics.Platform.OpenGL
 			glFormat = 0;
 			glType = 0;
 			switch (format) {
+				case Format.R8_UNorm:
+					glInternalFormat = All.Red;
+					glFormat = All.Red;
+					glType = All.UnsignedByte;
+					break;
+				case Format.R8G8_UNorm:
+					glInternalFormat = All.RgExt;
+					glFormat = All.RgExt;
+					glType = All.UnsignedByte;
+					break;
 				case Format.R8G8B8_UNorm:
 					glInternalFormat = All.Rgb;
 					glFormat = All.Rgb;
