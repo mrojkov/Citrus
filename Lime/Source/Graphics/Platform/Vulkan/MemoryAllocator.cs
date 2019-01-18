@@ -47,23 +47,15 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 			var pool = linear ? memoryPoolsLinear[typeIndex] : memoryPoolsNonLinear[typeIndex];
 			foreach (var block in pool) {
-				var alloc = AllocateFromBlock(type, block, requirements);
-				if (alloc.MemoryType != null) {
-					return alloc;
+				var blockNode = block.TryAllocate(requirements.Size, requirements.Alignment);
+				if (blockNode != null) {
+					return new MemoryAlloc(type, block, blockNode);
 				}
 			}
 			var newBlock = AllocateBlock(typeIndex);
 			pool.Add(newBlock);
-			return AllocateFromBlock(type, newBlock, requirements);
-		}
-
-		private MemoryAlloc AllocateFromBlock(MemoryType memoryType, MemoryBlock memoryBlock, SharpVulkan.MemoryRequirements requirements)
-		{
-			var node = memoryBlock.Allocate(requirements.Size, requirements.Alignment);
-			if (node != null) {
-				return new MemoryAlloc(memoryType, memoryBlock, node, memoryBlock.Memory);
-			}
-			return new MemoryAlloc();
+			var newBlockNode = newBlock.TryAllocate(requirements.Size, requirements.Alignment);
+			return new MemoryAlloc(type, newBlock, newBlockNode);
 		}
 
 		public void Free(MemoryAlloc alloc)
@@ -150,28 +142,27 @@ namespace Lime.Graphics.Platform.Vulkan
 			AddSliceBefore(null, new MemoryBlockSlice { Size = size, Free = true });
 		}
 
-		public LinkedListNode<MemoryBlockSlice> Allocate(ulong size, ulong alignment)
+		public LinkedListNode<MemoryBlockSlice> TryAllocate(ulong size, ulong alignment)
 		{
 			if (freeTree.NearestGreaterOrEqual(new FreeTreeKey(size + alignment - 1), out _, out var node)) {
 				var slice = node.Value;
-				var alignedOffset = GraphicsUtility.AlignUp(slice.Offset, alignment);
-				var next = node.Next;
-				if (alignedOffset > slice.Offset) {
+				var offset = GraphicsUtility.AlignUp(slice.Offset, alignment);
+				if (offset > slice.Offset) {
 					AddSliceBefore(node, new MemoryBlockSlice {
 						Offset = slice.Offset,
-						Size = alignedOffset - slice.Offset,
+						Size = offset - slice.Offset,
 						Free = true
 					});
 				}
 				var allocNode = AddSliceBefore(node, new MemoryBlockSlice {
-					Offset = alignedOffset,
+					Offset = offset,
 					Size = size,
 					Free = false
 				});
-				if (alignedOffset + size < slice.Offset + slice.Size) {
+				if (offset + size < slice.Offset + slice.Size) {
 					AddSliceBefore(node, new MemoryBlockSlice {
-						Offset = alignedOffset + size,
-						Size = slice.Offset + slice.Size - alignedOffset - size,
+						Offset = offset + size,
+						Size = slice.Offset + slice.Size - offset - size,
 						Free = true
 					});
 				}
@@ -268,16 +259,13 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public ulong Offset => MemoryBlockNode.Value.Offset;
 		public ulong Size => MemoryBlockNode.Value.Size;
-
-		public MemoryAlloc(
-			MemoryType memoryType, MemoryBlock memoryBlock,
-			LinkedListNode<MemoryBlockSlice> memoryBlockNode,
-			SharpVulkan.DeviceMemory memory)
+		
+		public MemoryAlloc(MemoryType memoryType, MemoryBlock memoryBlock, LinkedListNode<MemoryBlockSlice> memoryBlockNode)
 		{
 			MemoryType = memoryType;
 			MemoryBlock = memoryBlock;
 			MemoryBlockNode = memoryBlockNode;
-			Memory = memory;
+			Memory = memoryBlock.Memory;
 		}
 	}
 }
