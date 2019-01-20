@@ -457,6 +457,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			hasher.Write(depthState.Enable);
 			hasher.Write(depthState.WriteEnable);
 			hasher.Write(depthState.Comparison);
+			hasher.Write(stencilState.Enable);
 			hasher.Write(stencilState.ReadMask);
 			hasher.Write(stencilState.WriteMask);
 			hasher.Write(stencilState.FrontFaceComparison);
