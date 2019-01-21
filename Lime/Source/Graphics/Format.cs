@@ -138,7 +138,7 @@ namespace Lime
 					return 16;
 				case Format.PVRTC1_2Bpp_UNorm_Block:
 				case Format.PVRTC1_4Bpp_UNorm_Block:
-					return 16;
+					return 32;
 				case Format.PVRTC2_2Bpp_UNorm_Block:
 				case Format.PVRTC2_4Bpp_UNorm_Block:
 					return 8;
