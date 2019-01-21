@@ -38,7 +38,8 @@ namespace Lime.Graphics.Platform.OpenGL
 		internal bool SupportsDxt1;
 		internal bool SupportsDxt3;
 		internal bool SupportsDxt5;
-		internal bool SupportsPvrtc;
+		internal bool SupportsPvrtc1;
+		internal bool SupportsPvrtc2;
 		internal bool SupportsEtc1;
 		internal bool SupportsEtc2;
 		internal int GLMajorVersion;
@@ -116,7 +117,8 @@ namespace Lime.Graphics.Platform.OpenGL
 			SupportsDxt1 = supportsS3tc || glExtensions.Contains("GL_EXT_texture_compression_dxt1");
 			SupportsDxt3 = supportsS3tc || glExtensions.Contains("GL_ANGLE_texture_compression_dxt3");
 			SupportsDxt5 = supportsS3tc || glExtensions.Contains("GL_ANGLE_texture_compression_dxt5");
-			SupportsPvrtc = glExtensions.Contains("GL_IMG_texture_compression_pvrtc");
+			SupportsPvrtc1 = glExtensions.Contains("GL_IMG_texture_compression_pvrtc");
+			SupportsPvrtc2 = glExtensions.Contains("GL_IMG_texture_compression_pvrtc2");
 			SupportsEtc1 = glExtensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
 			SupportsEtc2 = (ESProfile && GLMajorVersion >= 3) || glExtensions.Contains("GL_ARB_ES3_compatibility");
 			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
@@ -521,9 +523,13 @@ namespace Lime.Graphics.Platform.OpenGL
 					break;
 				case Format.PVRTC1_2Bpp_UNorm_Block:
 				case Format.PVRTC1_4Bpp_UNorm_Block:
+					if (SupportsPvrtc1) {
+						features |= FormatFeatures.Sample;
+					}
+					break;
 				case Format.PVRTC2_2Bpp_UNorm_Block:
 				case Format.PVRTC2_4Bpp_UNorm_Block:
-					if (SupportsPvrtc) {
+					if (SupportsPvrtc2) {
 						features |= FormatFeatures.Sample;
 					}
 					break;
