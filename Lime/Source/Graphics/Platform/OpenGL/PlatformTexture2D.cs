@@ -17,6 +17,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		public int Width { get; }
 		public int Height { get; }
 		public int LevelCount { get; }
+		public bool Disposed { get; private set; }
 
 		internal PlatformTexture2D(PlatformRenderContext context, Format format, int width, int height, bool mipmaps, TextureParams textureParams)
 		{
@@ -35,6 +36,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				GLHelper.CheckGLErrors();
 				GLTexture = 0;
 			}
+			Disposed = true;
 		}
 
 		private void Initialize(TextureParams textureParams)
@@ -61,6 +63,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				}
 			}
 			UpdateTextureParams(textureParams);
+			Context.InvalidateTextureBinding(0);
 		}
 
 		public void SetData(int level, int x, int y, int width, int height, IntPtr data)
@@ -79,6 +82,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					(PixelFormat)GLFormat, (PixelType)GLPixelType, data);
 				GLHelper.CheckGLErrors();
 			}
+			Context.InvalidateTextureBinding(0);
 		}
 
 		public void SetTextureParams(TextureParams textureParams)
@@ -88,6 +92,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			GL.BindTexture(TextureTarget.Texture2D, GLTexture);
 			GLHelper.CheckGLErrors();
 			UpdateTextureParams(textureParams);
+			Context.InvalidateTextureBinding(0);
 		}
 
 		private void UpdateTextureParams(TextureParams textureParams)

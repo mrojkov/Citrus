@@ -87,6 +87,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				.Select(ui => ui.TextureSlot)
 				.Where(slot => slot >= 0)
 				.ToArray();
+			Context.InvalidateShaderProgramBinding();
 		}
 
 		private void Reflect(ShaderProgram.Sampler[] samplers)

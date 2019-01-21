@@ -13,6 +13,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		public BufferType BufferType { get; }
 		public int Size { get; }
 		public bool Dynamic { get; }
+		public bool Disposed { get; private set; }
 
 		internal PlatformBuffer(PlatformRenderContext context, BufferType bufferType, int size, bool dynamic)
 		{
@@ -30,6 +31,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				GLHelper.CheckGLErrors();
 				GLBuffer = 0;
 			}
+			Disposed = true;
 		}
 
 		private void Initialize()
@@ -42,6 +44,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			GLHelper.CheckGLErrors();
 			GL.BufferData(GLTarget, Size, IntPtr.Zero, GLUsage);
 			GLHelper.CheckGLErrors();
+			Context.InvalidateBufferBinding(BufferType);
 		}
 
 		public void SetData(int offset, IntPtr data, int size, BufferSetDataMode mode)
@@ -54,6 +57,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 			GL.BufferSubData(GLTarget, new IntPtr(offset), size, data);
 			GLHelper.CheckGLErrors();
+			Context.InvalidateBufferBinding(BufferType);
 		}
 
 		private static BufferTarget GetGLBufferTarget(BufferType bufferType)

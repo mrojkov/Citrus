@@ -21,13 +21,21 @@ namespace Lime.Graphics.Platform.OpenGL
 		private PlatformVertexInputLayout vertexInputLayout;
 		private PlatformTexture2D[] textures;
 		private PlatformBuffer[] vertexBuffers;
-		private bool renderTargetDirty = false;
 
 		private int[] vertexOffsets;
 		private PlatformBuffer indexBuffer;
 		private int indexOffset;
 		private IndexFormat indexFormat;
 		private PlatformRenderTexture2D renderTarget;
+		
+		private bool renderTargetDirty;
+		private bool shaderProgramDirty;
+		private bool indexBufferDirty;
+		private int texturesDirtyMask;
+		private long enabledVertexAttribMask;
+		private long vertexBuffersDirtyMask;
+		private bool vertexInputLayoutDirty;
+		private int boundBaseVertex;
 
 		internal int MaxTextureSlots;
 		internal int MaxVertexBufferSlots;
@@ -60,11 +68,32 @@ namespace Lime.Graphics.Platform.OpenGL
 		{
 			glDefaultFramebuffer = glFramebuffer;
 			renderTargetDirty = true;
+			shaderProgramDirty = true;
+			indexBufferDirty = true;
+			texturesDirtyMask = ~0;
+			vertexInputLayoutDirty = true;
+			vertexBuffersDirtyMask = 0;
+			enabledVertexAttribMask = ~0;
+		}
+
+		internal void InvalidateTextureBinding(int slot)
+		{
+			texturesDirtyMask |= 1 << slot;
 		}
 
 		internal void InvalidateRenderTargetBinding()
 		{
 			renderTargetDirty = true;
+		}
+
+		internal void InvalidateShaderProgramBinding()
+		{
+			shaderProgramDirty = true;
+		}
+
+		internal void InvalidateBufferBinding(BufferType type)
+		{
+			indexBufferDirty |= type == BufferType.Index;
 		}
 
 		public void End()
@@ -123,6 +152,8 @@ namespace Lime.Graphics.Platform.OpenGL
 			SupportsEtc2 = (ESProfile && GLMajorVersion >= 3) || glExtensions.Contains("GL_ARB_ES3_compatibility");
 			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
 			GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
+			MaxTextureSlots = Math.Min(MaxTextureSlots, 32);
+			MaxVertexAttributes = Math.Min(MaxVertexAttributes, 64);
 			MaxVertexBufferSlots = MaxVertexAttributes;
 		}
 
@@ -173,28 +204,43 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public void SetShaderProgram(IPlatformShaderProgram program)
 		{
-			shaderProgram = (PlatformShaderProgram)program;
+			if (shaderProgram != program) {
+				shaderProgram = (PlatformShaderProgram)program;
+				shaderProgramDirty = true;
+			}
 		}
 
 		public void SetVertexInputLayout(IPlatformVertexInputLayout layout)
 		{
-			vertexInputLayout = (PlatformVertexInputLayout)layout;
+			if (vertexInputLayout != layout) {
+				vertexInputLayout = (PlatformVertexInputLayout)layout;
+				vertexInputLayoutDirty = true;
+			}
 		}
 
 		public void SetTexture(int slot, IPlatformTexture2D texture)
 		{
-			textures[slot] = (PlatformTexture2D)texture;
+			if (textures[slot] != texture) {
+				textures[slot] = (PlatformTexture2D)texture;
+				texturesDirtyMask |= 1 << slot;
+			}
 		}
 
 		public void SetVertexBuffer(int slot, IPlatformBuffer buffer, int offset)
 		{
-			vertexBuffers[slot] = (PlatformBuffer)buffer;
-			vertexOffsets[slot] = offset;
+			if (vertexBuffers[slot] != buffer || vertexOffsets[slot] != offset) {
+				vertexBuffers[slot] = (PlatformBuffer)buffer;
+				vertexOffsets[slot] = offset;
+				vertexBuffersDirtyMask |= 1L << slot;
+			}
 		}
 
 		public void SetIndexBuffer(IPlatformBuffer buffer, int offset, IndexFormat format)
 		{
-			indexBuffer = (PlatformBuffer)buffer;
+			if (indexBuffer != buffer) {
+				indexBuffer = (PlatformBuffer)buffer;
+				indexBufferDirty = true;
+			}
 			indexOffset = offset;
 			indexFormat = format;
 		}
@@ -385,55 +431,87 @@ namespace Lime.Graphics.Platform.OpenGL
 		private void BindTextures()
 		{
 			foreach (var slot in shaderProgram.TextureSlots) {
-				var texture = textures[slot];
-				GL.ActiveTexture(TextureUnit.Texture0 + slot);
-				GLHelper.CheckGLErrors();
-				GL.BindTexture(TextureTarget.Texture2D, texture != null ? texture.GLTexture : 0);
-				GLHelper.CheckGLErrors();
+				var slotMask = 1 << slot;
+				if ((texturesDirtyMask & slotMask) != 0) {
+					var texture = textures[slot];
+					var glTexture = texture != null && !texture.Disposed ? texture.GLTexture : 0;
+					GL.ActiveTexture(TextureUnit.Texture0 + slot);
+					GLHelper.CheckGLErrors();
+					GL.BindTexture(TextureTarget.Texture2D, glTexture);
+					GLHelper.CheckGLErrors();
+					texturesDirtyMask &= ~slotMask;
+				}
 			}
 		}
 
 		private void BindShaderProgram()
 		{
-			GL.UseProgram(shaderProgram.GLProgram);
-			GLHelper.CheckGLErrors();
+			if (shaderProgramDirty) {
+				GL.UseProgram(shaderProgram.GLProgram);
+				GLHelper.CheckGLErrors();
+				shaderProgramDirty = false;
+			}
 			shaderProgram.SyncUniforms();
 		}
 
-		private List<int> enabledVertexAttribs = new List<int>();
-
 		private void BindVertexAttributes(int baseVertex)
 		{
-			foreach (var attribIndex in enabledVertexAttribs) {
-				GL.DisableVertexAttribArray(attribIndex);
+			if (vertexInputLayoutDirty || baseVertex != boundBaseVertex) {
+				foreach (var binding in vertexInputLayout.GLBindings) {
+					vertexBuffersDirtyMask |= 1L << binding.Slot;
+				}
+				boundBaseVertex = baseVertex;
+				vertexInputLayoutDirty = false;
 			}
-			enabledVertexAttribs.Clear();
+			if (vertexBuffersDirtyMask == 0) {
+				return;
+			}
+			var attribMask = 0L;
 			foreach (var binding in vertexInputLayout.GLBindings) {
-				var buffer = vertexBuffers[binding.Slot];
-				if (buffer == null) {
+				var bindingMask = 1 << binding.Slot;
+				if ((vertexBuffersDirtyMask & bindingMask) == 0) {
 					continue;
 				}
-				var offset = vertexOffsets[binding.Slot] + baseVertex * binding.Stride;
-				GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.GLBuffer);
-				GLHelper.CheckGLErrors();
-				foreach (var attrib in binding.Attributes) {
-					var effectiveOffset = offset + attrib.Offset;
-					GL.EnableVertexAttribArray(attrib.Index);
+				var buffer = vertexBuffers[binding.Slot];
+				if (buffer != null && !buffer.Disposed) {
+					var offset = vertexOffsets[binding.Slot] + baseVertex * binding.Stride;
+					GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.GLBuffer);
 					GLHelper.CheckGLErrors();
-					GL.VertexAttribPointer(
-						attrib.Index, attrib.Size, (VertexAttribPointerType)attrib.Type,
-						attrib.Normalized, binding.Stride, effectiveOffset);
-					GLHelper.CheckGLErrors();
-					enabledVertexAttribs.Add(attrib.Index);
+					foreach (var attrib in binding.Attributes) {
+						var effectiveOffset = offset + attrib.Offset;
+						GL.EnableVertexAttribArray(attrib.Index);
+						GLHelper.CheckGLErrors();
+						GL.VertexAttribPointer(
+							attrib.Index, attrib.Size, (VertexAttribPointerType)attrib.Type,
+							attrib.Normalized, binding.Stride, effectiveOffset);
+						GLHelper.CheckGLErrors();
+						attribMask |= 1L << attrib.Index;
+					}
+				}
+				vertexBuffersDirtyMask &= ~bindingMask;
+			}
+			for (var i = 0; attribMask != enabledVertexAttribMask && i < MaxVertexAttributes; i++) {
+				var mask = 1L << i;
+				if ((attribMask & mask) != (enabledVertexAttribMask & mask)) {
+					if ((attribMask & mask) != 0) {
+						GL.EnableVertexAttribArray(i);
+						GLHelper.CheckGLErrors();
+					} else {
+						GL.DisableVertexAttribArray(i);
+						GLHelper.CheckGLErrors();
+					}
+					enabledVertexAttribMask ^= mask;
 				}
 			}
 		}
 
 		private void BindIndexBuffer()
 		{
-			if (indexBuffer != null) {
+			if (indexBufferDirty) {
+				var glBuffer = indexBuffer != null && !indexBuffer.Disposed ? indexBuffer.GLBuffer : 0;
 				GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer.GLBuffer);
 				GLHelper.CheckGLErrors();
+				indexBufferDirty = false;
 			}
 		}
 
