@@ -12,6 +12,8 @@ namespace Lime
 		private readonly CompoundFontCharSource chars;
 		private readonly List<IFont> fonts = new List<IFont>();
 
+		public List<IFont> Fonts => fonts;
+
 		public CompoundFont()
 		{
 			chars = new CompoundFontCharSource(fonts);
@@ -25,17 +27,6 @@ namespace Lime
 		public CompoundFont(params IFont[] fonts)
 			: this((IEnumerable<IFont>)fonts)
 		{
-		}
-
-		public void ChangeFonts(params IFont[] fonts)
-		{
-			ChangeFonts((IEnumerable<IFont>)fonts);
-		}
-
-		public void ChangeFonts(IEnumerable<IFont> fonts)
-		{
-			this.fonts.Clear();
-			this.fonts.AddRange(fonts);
 		}
 
 		/// <summary>
