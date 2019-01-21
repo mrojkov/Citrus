@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lime;
+using Lime.RenderOptimizer;
 using Tangerine.Core;
 
 namespace Tangerine.UI
@@ -24,10 +25,14 @@ namespace Tangerine.UI
 			EditorParams = editorParams;
 			ContainerWidget = new Widget {
 				Layout = new VBoxLayout(),
+				LayoutCell = new LayoutCell { StretchY = 0f }
 			};
+
 			PropertyContainerWidget = new Widget {
 				Layout = new HBoxLayout { IgnoreHidden = false },
+				LayoutCell = new LayoutCell { StretchY = 0f }
 			};
+
 			ContainerWidget.AddNode(PropertyContainerWidget);
 			editorParams.InspectorPane.AddNode(ContainerWidget);
 			if (editorParams.ShowLabel) {
@@ -54,19 +59,14 @@ namespace Tangerine.UI
 					LayoutCell = new LayoutCell { StretchX = 2.0f },
 				};
 				PropertyContainerWidget.AddNode(EditorContainer);
-				WarningsContainer = new Widget {
-					Layout = new VBoxLayout(),
-					LayoutCell = new LayoutCell(),
-				};
-				ContainerWidget.AddNode(WarningsContainer);
 			} else {
 				LabelContainer = EditorContainer = PropertyContainerWidget;
-				WarningsContainer = new Widget {
-					Layout = new VBoxLayout(),
-					LayoutCell = new LayoutCell(),
-				};
-				ContainerWidget.AddNode(WarningsContainer);
 			}
+			WarningsContainer = new Widget {
+				Layout = new VBoxLayout(),
+				LayoutCell = new LayoutCell(),
+			};
+			ContainerWidget.AddNode(WarningsContainer);
 			Validate();
 		}
 
