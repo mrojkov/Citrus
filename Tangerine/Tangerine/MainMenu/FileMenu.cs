@@ -253,7 +253,7 @@ namespace Tangerine
 				AssetBundle.Current.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
 				Document.Current.Format = DocumentFormat.Tan;
 				RestoreDefaultAnimationEngine(Document.Current.RootNode);
-				new UpsampleAnimationTwice().Execute();
+				new UpsampleAnimationTwiceEntireScene().Execute();
 				Document.Current.Save();
 			}
 			catch (System.Exception e) {

@@ -368,6 +368,18 @@ namespace Tangerine
 		}
 	}
 
+	public class UpsampleAnimationTwiceEntireScene : UpsampleAnimationTwice
+	{
+		public override void ExecuteTransaction()
+		{
+			var root = Document.Current.RootNode;
+			UpsampleNodeAnimation(root);
+			foreach (var node in root.Descendants) {
+				node.Animators.Invalidate();
+			}
+		}
+	}
+
 	public class UpsampleAnimationTwice : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
@@ -377,7 +389,7 @@ namespace Tangerine
 			}
 		}
 
-		private void UpsampleNodeAnimation(Node node)
+		protected void UpsampleNodeAnimation(Node node)
 		{
 			foreach (var a in node.Animations) {
 				foreach (var m in a.Markers) {
