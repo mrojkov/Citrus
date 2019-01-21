@@ -27,6 +27,17 @@ namespace Lime
 		{
 		}
 
+		public void ChangeFonts(params IFont[] fonts)
+		{
+			ChangeFonts((IEnumerable<IFont>)fonts);
+		}
+
+		public void ChangeFonts(IEnumerable<IFont> fonts)
+		{
+			this.fonts.Clear();
+			this.fonts.AddRange(fonts);
+		}
+
 		/// <summary>
 		/// Legacy interface property
 		/// </summary>
