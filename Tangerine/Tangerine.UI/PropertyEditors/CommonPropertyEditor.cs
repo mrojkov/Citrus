@@ -301,7 +301,8 @@ namespace Tangerine.UI
 						return;
 					}
 				}
-				((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o, EditorParams.PropertyPath, next);
+				((IPropertyEditorParamsInternal)EditorParams).PropertySetter(o,
+					EditorParams.IsAnimable ? EditorParams.PropertyPath : EditorParams.PropertyName, next);
 			}
 			DoTransaction(() => {
 				if (EditorParams.IsAnimable) {
