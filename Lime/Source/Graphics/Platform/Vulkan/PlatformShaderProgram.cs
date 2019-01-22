@@ -119,8 +119,15 @@ namespace Lime.Graphics.Platform.Vulkan
 				var memoryPropertyFlags = SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent;
 				uniformBuffers[i] = new BackingBuffer(context, SharpVulkan.BufferUsageFlags.UniformBuffer, memoryPropertyFlags, (ulong)size);
 			}
-			var stagingDataSize = uniformInfos.Max(ui => ui.StagingOffset + ui.ColumnStride * ui.ColumnCount * ui.ArraySize);
-			uniformStagingData = Marshal.AllocHGlobal(stagingDataSize);
+			var stagingDataSize = 0;
+			foreach (var ui in uniformInfos) {
+				if (ui.StagingOffset >= 0) {
+					stagingDataSize = Math.Max(stagingDataSize, ui.StagingOffset + ui.ColumnStride * ui.ColumnCount * ui.ArraySize);
+				}
+			}
+			if (stagingDataSize > 0) {
+				uniformStagingData = Marshal.AllocHGlobal(stagingDataSize);
+			}
 		}
 
 		private static ShaderStageMask ConvertShaderStage(ShaderCompiler.Stage stage)
