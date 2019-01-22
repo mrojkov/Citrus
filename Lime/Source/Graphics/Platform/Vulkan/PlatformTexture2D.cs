@@ -53,7 +53,10 @@ namespace Lime.Graphics.Platform.Vulkan
 		private void Create(bool renderTarget)
 		{
 			var vkFormat = VulkanHelper.GetVKFormat(format);
-			var usage = SharpVulkan.ImageUsageFlags.TransferDestination | SharpVulkan.ImageUsageFlags.Sampled;
+			var usage =
+				SharpVulkan.ImageUsageFlags.TransferSource |
+				SharpVulkan.ImageUsageFlags.TransferDestination |
+				SharpVulkan.ImageUsageFlags.Sampled;
 			if (renderTarget) {
 				usage |= SharpVulkan.ImageUsageFlags.ColorAttachment;
 			}
