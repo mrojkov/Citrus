@@ -151,5 +151,71 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			sampler = context.SamplerCache.AcquireSampler(textureParams);
 		}
+
+		internal void GetData(Format dstFormat, int level, int x, int y, int width, int height, IntPtr data)
+		{
+			// TODO: Are the memory barriers corrent?
+			ulong bufferOffsetAlignment = 4;
+			bufferOffsetAlignment = GraphicsUtility.CombineAlignment(bufferOffsetAlignment, (ulong)Format.GetSize());
+			bufferOffsetAlignment = GraphicsUtility.CombineAlignment(bufferOffsetAlignment, context.PhysicalDeviceLimits.OptimalBufferCopyOffsetAlignment);
+			var dataSize = GraphicsUtility.CalculateImageDataSize(Format, width, height);
+			// FIXME: Implement read-back buffer allocator
+			var readbackBufferAlloc = context.AllocateUploadBuffer((ulong)dataSize, bufferOffsetAlignment);
+			context.EndRenderPass();
+			context.EnsureCommandBuffer();
+			var preMemoryBarrier = new SharpVulkan.ImageMemoryBarrier {
+				StructureType = SharpVulkan.StructureType.ImageMemoryBarrier,
+				Image = image,
+				OldLayout = SharpVulkan.ImageLayout.ShaderReadOnlyOptimal,
+				NewLayout = SharpVulkan.ImageLayout.TransferSourceOptimal,
+				SourceAccessMask = SharpVulkan.AccessFlags.ShaderRead,
+				DestinationAccessMask = SharpVulkan.AccessFlags.TransferRead,
+				SubresourceRange = new SharpVulkan.ImageSubresourceRange(SharpVulkan.ImageAspectFlags.Color, 0, 1, (uint)level, 1)
+			};
+			context.CommandBuffer.PipelineBarrier(
+				SharpVulkan.PipelineStageFlags.VertexShader | SharpVulkan.PipelineStageFlags.FragmentShader,
+				SharpVulkan.PipelineStageFlags.Transfer, SharpVulkan.DependencyFlags.None,
+				0, null, 0, null, 1, &preMemoryBarrier);
+			var copyRegion = new SharpVulkan.BufferImageCopy {
+				BufferOffset = readbackBufferAlloc.BufferOffset,
+				BufferRowLength = (uint)width,
+				BufferImageHeight = (uint)height,
+				ImageOffset = new SharpVulkan.Offset3D(x, y, 0),
+				ImageExtent = new SharpVulkan.Extent3D((uint)width, (uint)height, 1),
+				ImageSubresource = new SharpVulkan.ImageSubresourceLayers(SharpVulkan.ImageAspectFlags.Color, 0, 1, (uint)level)
+			};
+			context.CommandBuffer.CopyImageToBuffer(
+				image, SharpVulkan.ImageLayout.TransferSourceOptimal, readbackBufferAlloc.Buffer, 1, &copyRegion);
+			var postMemoryBarrier = new SharpVulkan.ImageMemoryBarrier {
+				StructureType = SharpVulkan.StructureType.ImageMemoryBarrier,
+				Image = image,
+				OldLayout = SharpVulkan.ImageLayout.TransferSourceOptimal,
+				NewLayout = SharpVulkan.ImageLayout.ShaderReadOnlyOptimal,
+				SourceAccessMask = SharpVulkan.AccessFlags.TransferRead,
+				DestinationAccessMask = SharpVulkan.AccessFlags.ShaderRead,
+				SubresourceRange = new SharpVulkan.ImageSubresourceRange(SharpVulkan.ImageAspectFlags.Color, 0, 1, (uint)level, 1)
+			};
+			context.CommandBuffer.PipelineBarrier(
+				SharpVulkan.PipelineStageFlags.Transfer,
+				SharpVulkan.PipelineStageFlags.VertexShader | SharpVulkan.PipelineStageFlags.FragmentShader,
+				SharpVulkan.DependencyFlags.None, 0, null, 0, null, 1, &postMemoryBarrier);
+			context.Finish();
+			if (dstFormat == Format) {
+				GraphicsUtility.CopyMemory(data, readbackBufferAlloc.Data, Format.GetSize() * width * height);
+			} else {
+				var decoder = FormatConverter.GetDecoder(Format);
+				var encoder = FormatConverter.GetEncoder(dstFormat);
+				var srcTexelSize = Format.GetSize();
+				var dstTexelSize = dstFormat.GetSize();
+				var srcData = readbackBufferAlloc.Data;
+				var dstData = data;
+				var texelCount = width * height;
+				while (texelCount-- > 0) {
+					encoder(dstData, decoder(srcData));
+					srcData += srcTexelSize;
+					dstData += dstTexelSize;
+				}
+			}
+		}
 	}
 }

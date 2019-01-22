@@ -161,5 +161,10 @@ namespace Lime.Graphics.Platform.Vulkan
 				framebuffer = Context.Device.CreateFramebuffer(ref createInfo);
 			}
 		}
+
+		public void ReadPixels(Format format, int x, int y, int width, int height, IntPtr pixels)
+		{
+			GetData(format, 0, x, y, width, height, pixels);
+		}
 	}
 }

@@ -120,7 +120,13 @@ namespace Lime
 		/// <returns></returns>
 		public Color4[] GetPixels()
 		{
-			throw new NotImplementedException();
+			unsafe {
+				var pixels = new Color4[size.Width * size.Height];
+				fixed (Color4* pixelsPtr = pixels) {
+					GetPlatformTexture().ReadPixels(Format.R8G8B8A8_UNorm, 0, 0, size.Width, size.Height, new IntPtr(pixelsPtr));
+				}
+				return pixels;
+			}
 		}
 	}
 }

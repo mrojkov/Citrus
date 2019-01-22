@@ -94,5 +94,15 @@ namespace Lime.Graphics.Platform.OpenGL
 				glStencilFormat = All.StencilIndex8;
 			}
 		}
+
+		public void ReadPixels(Format format, int x, int y, int width, int height, IntPtr pixels)
+		{
+			GLHelper.GetGLTextureFormat(format, out _, out var glDstFormat, out var glDstType);
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, GLFramebuffer);
+			GLHelper.CheckGLErrors();
+			GL.ReadPixels(x, y, width, height, (PixelFormat)glDstFormat, (PixelType)glDstType, pixels);
+			GLHelper.CheckGLErrors();
+			Context.InvalidateRenderTargetBinding();
+		}
 	}
 }

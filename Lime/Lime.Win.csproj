@@ -162,6 +162,12 @@
     <Reference Include="OpenTK">
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="TreeLib, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Tangerine\packages\TreeLib.1.1.1\lib\TreeLib.dll</HintPath>
+    </Reference>
+    <Reference Include="TreeLibInterface, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Tangerine\packages\TreeLibInterface.1.1.1\lib\TreeLibInterface.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -230,6 +236,7 @@
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformShaderProgram.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformTexture2D.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformVertexInputLayout.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\FormatConverter.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\MemoryAllocator.cs" />
     <Compile Include="Source\Graphics\ShaderParams.cs" />
     <Compile Include="Source\Graphics\Texture2D.Ktx.cs" />
