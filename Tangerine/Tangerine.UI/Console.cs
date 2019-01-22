@@ -27,6 +27,9 @@ namespace Tangerine.UI
 
 			public override void Write(string value)
 			{
+				value = Encoding.UTF8.GetString(
+					Encoding.Convert(Encoding.Default, Encoding.UTF8, Encoding.Default.GetBytes(value))
+				);
 				Application.InvokeOnMainThread(() => {
 #if DEBUG
 					System.Diagnostics.Debug.Write(value);
