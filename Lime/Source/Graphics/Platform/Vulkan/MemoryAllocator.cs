@@ -27,7 +27,9 @@ namespace Lime.Graphics.Platform.Vulkan
 			for (var i = 0U; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++) {
 				var vkMemoryType = &physicalDeviceMemoryProperties.MemoryTypes.Value0 + i;
 				var vkMemoryHeap = &physicalDeviceMemoryProperties.MemoryHeaps.Value0 + vkMemoryType->HeapIndex;
-				memoryTypes[i] = new MemoryType(i, vkMemoryType->PropertyFlags, PickBlockSize(vkMemoryHeap->Size));
+				var blockSize = PickBlockSize(vkMemoryHeap->Size);
+				var minAlignment = GetMemoryTypeMinAlignment(vkMemoryType->PropertyFlags);
+				memoryTypes[i] = new MemoryType(i, vkMemoryType->PropertyFlags, blockSize, minAlignment);
 			}
 			memoryPoolsLinear = new List<MemoryBlock>[memoryTypes.Length];
 			memoryPoolsNonLinear = new List<MemoryBlock>[memoryTypes.Length];
@@ -132,9 +134,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (type.BlockSize < size) {
 				throw new OutOfMemoryException();
 			}
-			if ((type.PropertyFlags & SharpVulkan.MemoryPropertyFlags.HostCoherent) == 0) {
-				alignment = GraphicsUtility.CombineAlignment(alignment, Context.PhysicalDeviceLimits.NonCoherentAtomSize);
-			}
+			alignment = GraphicsUtility.CombineAlignment(alignment, type.MinAlignment);
 			var pool = linear ? memoryPoolsLinear[type.Index] : memoryPoolsNonLinear[type.Index];
 			foreach (var block in pool) {
 				var blockNode = block.TryAllocate(size, alignment);
@@ -170,6 +170,16 @@ namespace Lime.Graphics.Platform.Vulkan
 				FreeDeviceMemory(alloc.Memory);
 			}
 			alloc.Allocator = null;
+		}
+
+		private ulong GetMemoryTypeMinAlignment(SharpVulkan.MemoryPropertyFlags propertyFlags)
+		{
+			var hostVisible = SharpVulkan.MemoryPropertyFlags.HostVisible;
+			var hostCoherent = SharpVulkan.MemoryPropertyFlags.HostCoherent;
+			if ((propertyFlags & (hostVisible | hostCoherent)) == hostVisible) {
+				return Context.PhysicalDeviceLimits.NonCoherentAtomSize;
+			}
+			return 1;
 		}
 
 		public IntPtr Map(MemoryAlloc alloc)
@@ -342,12 +352,14 @@ namespace Lime.Graphics.Platform.Vulkan
 		public readonly uint Index;
 		public readonly SharpVulkan.MemoryPropertyFlags PropertyFlags;
 		public readonly ulong BlockSize;
+		public readonly ulong MinAlignment;
 
-		public MemoryType(uint index, SharpVulkan.MemoryPropertyFlags propertyFlags, ulong blockSize)
+		public MemoryType(uint index, SharpVulkan.MemoryPropertyFlags propertyFlags, ulong blockSize, ulong minAlignment)
 		{
 			Index = index;
 			PropertyFlags = propertyFlags;
 			BlockSize = blockSize;
+			MinAlignment = minAlignment;
 		}
 	}
 
