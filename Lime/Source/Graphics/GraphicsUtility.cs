@@ -34,6 +34,14 @@ namespace Lime
 			memcpy(dst, src, new UIntPtr((uint)count));
 		}
 
+		[DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+		private static extern IntPtr memset(IntPtr dest, int c, UIntPtr count);
+
+		public static unsafe void FillMemory(IntPtr dst, int c, int count)
+		{
+			memset(dst, c, new UIntPtr((uint)count));
+		}
+
 		public static int CalculateMipLevelDataSize(int level, Format format, int width, int height)
 		{
 			CalculateMipLevelSize(level, width, height, out var levelWidth, out var levelHeight);

@@ -228,6 +228,7 @@
     <Compile Include="Source\Graphics\Etc2Decoder.cs" />
     <Compile Include="Source\Graphics\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\Platform\Murmur3.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\GLHelper.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformBuffer.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformRenderContext.cs" />

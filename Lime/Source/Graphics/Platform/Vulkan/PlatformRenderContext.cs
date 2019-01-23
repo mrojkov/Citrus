@@ -42,7 +42,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private FrontFace frontFace;
 		private PrimitiveTopology primitiveTopology;
 		private PlatformVertexInputLayout vertexInputLayout;
-		private LruCache<long, SharpVulkan.Pipeline> pipelineLruCache = new LruCache<long, SharpVulkan.Pipeline>();
+		private LruCache<Hash128, SharpVulkan.Pipeline> pipelineLruCache = new LruCache<Hash128, SharpVulkan.Pipeline>();
 		private SharpVulkan.PipelineCache pipelineCache;
 		private UploadBufferAllocator uploadBufferSuballocator;
 		private DescriptorAllocator descriptorAllocator;
@@ -455,40 +455,80 @@ namespace Lime.Graphics.Platform.Vulkan
 			return pipeline;
 		}
 
-		private long ComputePipelineHash()
+		private struct PipelineKey
 		{
-			var hasher = new Hasher();
-			hasher.Begin();
-			hasher.Write(blendState.Enable);
-			hasher.Write(blendState.ColorBlendFunc);
-			hasher.Write(blendState.ColorSrcBlend);
-			hasher.Write(blendState.ColorDstBlend);
-			hasher.Write(blendState.AlphaBlendFunc);
-			hasher.Write(blendState.AlphaSrcBlend);
-			hasher.Write(blendState.AlphaDstBlend);
-			hasher.Write(depthState.Enable);
-			hasher.Write(depthState.WriteEnable);
-			hasher.Write(depthState.Comparison);
-			hasher.Write(stencilState.Enable);
-			hasher.Write(stencilState.ReadMask);
-			hasher.Write(stencilState.WriteMask);
-			hasher.Write(stencilState.FrontFaceComparison);
-			hasher.Write(stencilState.FrontFaceDepthFail);
-			hasher.Write(stencilState.FrontFaceFail);
-			hasher.Write(stencilState.FrontFacePass);
-			hasher.Write(stencilState.BackFaceComparison);
-			hasher.Write(stencilState.BackFaceDepthFail);
-			hasher.Write(stencilState.BackFaceFail);
-			hasher.Write(stencilState.BackFacePass);
-			hasher.Write(colorWriteMask);
-			hasher.Write(cullMode);
-			hasher.Write(frontFace);
-			hasher.Write(primitiveTopology);
-			hasher.Write(vertexInputLayout.ReferenceHash);
-			hasher.Write(shaderProgram.ReferenceHash);
-			hasher.Write(activeColorFormat);
-			hasher.Write(activeDepthStencilFormat);
-			return hasher.End();
+			public bool BlendEnabled;
+			public BlendFunc ColorBlendFunc;
+			public Blend ColorSrcBlend;
+			public Blend ColorDstBlend;
+			public BlendFunc AlphaBlendFunc;
+			public Blend AlphaSrcBlend;
+			public Blend AlphaDstBlend;
+			public ColorWriteMask ColorWriteMask;
+			public bool DepthEnabled;
+			public bool DepthWriteEnabled;
+			public CompareFunc DepthComparison;
+			public bool StencilEnabled;
+			public byte StencilReadMask;
+			public byte StencilWriteMask;
+			public CompareFunc FrontFaceStencilComparison;
+			public StencilOp FrontFaceStencilDepthFail;
+			public StencilOp FrontFaceStencilFail;
+			public StencilOp FrontFaceStencilPass;
+			public CompareFunc BackFaceStencilComparison;
+			public StencilOp BackFaceStencilDepthFail;
+			public StencilOp BackFaceStencilFail;
+			public StencilOp BackFaceStencilPass;
+			public CullMode CullMode;
+			public FrontFace FrontFace;
+			public PrimitiveTopology PrimitiveTopology;
+			public long VertexInputLayout;
+			public long ShaderProgram;
+			public SharpVulkan.Format ColorFormat;
+			public SharpVulkan.Format DepthStencilFormat;
+		}
+
+		private Hash128 ComputePipelineHash()
+		{
+			var m = stackalloc byte[sizeof(PipelineKey) + 7];
+			var key = (PipelineKey*)(((ulong)m + 7) & ~7UL);
+			GraphicsUtility.FillMemory(new IntPtr(key), 0, sizeof(PipelineKey));
+			key->BlendEnabled = blendState.Enable;
+			if (key->BlendEnabled) {
+				key->ColorBlendFunc = blendState.ColorBlendFunc;
+				key->ColorSrcBlend = blendState.ColorSrcBlend;
+				key->ColorDstBlend = blendState.ColorDstBlend;
+				key->AlphaBlendFunc = blendState.AlphaBlendFunc;
+				key->AlphaSrcBlend = blendState.AlphaSrcBlend;
+				key->AlphaDstBlend = blendState.AlphaDstBlend;
+			}
+			key->ColorWriteMask = colorWriteMask;
+			key->DepthEnabled = depthState.Enable;
+			if (key->DepthEnabled) {
+				key->DepthWriteEnabled = depthState.WriteEnable;
+				key->DepthComparison = depthState.Comparison;
+			}
+			key->StencilEnabled = stencilState.Enable;
+			if (key->StencilEnabled) {
+				key->StencilReadMask = stencilState.ReadMask;
+				key->StencilWriteMask = stencilState.WriteMask;
+				key->FrontFaceStencilComparison = stencilState.FrontFaceComparison;
+				key->FrontFaceStencilDepthFail = stencilState.FrontFaceDepthFail;
+				key->FrontFaceStencilFail = stencilState.FrontFaceFail;
+				key->FrontFaceStencilPass = stencilState.FrontFacePass;
+				key->BackFaceStencilComparison = stencilState.BackFaceComparison;
+				key->BackFaceStencilDepthFail = stencilState.BackFaceDepthFail;
+				key->BackFaceStencilFail = stencilState.BackFaceFail;
+				key->BackFaceStencilPass = stencilState.BackFacePass;
+			}
+			key->CullMode = cullMode;
+			key->FrontFace = frontFace;
+			key->PrimitiveTopology = primitiveTopology;
+			key->VertexInputLayout = vertexInputLayout.ReferenceHash;
+			key->ShaderProgram = shaderProgram.ReferenceHash;
+			key->ColorFormat = activeColorFormat;
+			key->DepthStencilFormat = activeDepthStencilFormat;
+			return Murmur3.ComputeHash(new IntPtr(key), sizeof(PipelineKey));
 		}
 
 		private SharpVulkan.Pipeline CreatePipeline()
