@@ -80,7 +80,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				}
 				context.WaitForFence(WriteFenceValue);
 			}
-			var dstData = backingBuffer.MapSlice((ulong)offset, (ulong)size);
+			var dstData = backingBuffer.MapSlice() + offset;
 			try {
 				GraphicsUtility.CopyMemory(dstData, data, size);
 			} finally {

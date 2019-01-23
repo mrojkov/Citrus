@@ -81,7 +81,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			CheckFeatures();
 			CreateCommandPool();
 			CreatePipelineCache();
-			MemoryAllocator = new MemoryAllocator(this);
+			MemoryAllocator = new MemoryAllocator(this, preferPersistentMapping: true);
 			scheduler = new Scheduler(this);
 			uploadBufferSuballocator = new UploadBufferAllocator(this, 4 * 1024 * 1024);
 			descriptorAllocator = new DescriptorAllocator(this, new DescriptorPoolLimits {

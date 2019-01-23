@@ -50,7 +50,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			buffer = context.Device.CreateBuffer(ref createInfo);
 			memory = context.MemoryAllocator.Allocate(buffer,
 				SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent);
-			mappedMemory = context.MemoryAllocator.Map(memory, 0, size);
+			mappedMemory = context.MemoryAllocator.Map(memory);
 			bufferSize = size;
 			bufferOffset = 0;
 		}

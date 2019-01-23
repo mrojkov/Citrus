@@ -16,6 +16,11 @@ namespace Lime
 			}
 		}
 
+		public static ulong AlignDown(ulong value, ulong alignment)
+		{
+			return (value / alignment) * alignment;
+		}
+
 		public static ulong AlignUp(ulong value, ulong alignment)
 		{
 			return ((value + alignment - 1) / alignment) * alignment;

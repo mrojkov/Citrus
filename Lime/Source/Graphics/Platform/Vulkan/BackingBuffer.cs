@@ -62,12 +62,7 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public IntPtr MapSlice()
 		{
-			return MapSlice(0, sliceSize);
-		}
-
-		public IntPtr MapSlice(ulong offset, ulong size)
-		{
-			return context.MemoryAllocator.Map(memory, sliceOffset + offset, size);
+			return new IntPtr((byte*)context.MemoryAllocator.Map(memory) + sliceOffset);
 		}
 
 		public void UnmapSlice()
