@@ -238,6 +238,7 @@
     <Compile Include="Source\Graphics\Platform\OpenGL\PlatformVertexInputLayout.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\FormatConverter.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\MemoryAllocator.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
     <Compile Include="Source\Graphics\ShaderParams.cs" />
     <Compile Include="Source\Graphics\Texture2D.Ktx.cs" />
     <Compile Include="Source\Graphics\Format.cs" />

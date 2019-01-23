@@ -60,6 +60,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (renderTarget) {
 				usage |= SharpVulkan.ImageUsageFlags.ColorAttachment;
 			}
+			var tiling = SharpVulkan.ImageTiling.Optimal;
 			var imageCreateInfo = new SharpVulkan.ImageCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageCreateInfo,
 				ImageType = SharpVulkan.ImageType.Image2D,
@@ -71,12 +72,10 @@ namespace Lime.Graphics.Platform.Vulkan
 				Samples = SharpVulkan.SampleCountFlags.Sample1,
 				SharingMode = SharpVulkan.SharingMode.Exclusive,
 				InitialLayout = SharpVulkan.ImageLayout.Undefined,
-				Tiling = SharpVulkan.ImageTiling.Optimal
+				Tiling = tiling
 			};
 			image = context.Device.CreateImage(ref imageCreateInfo);
-			context.Device.GetImageMemoryRequirements(image, out var memoryRequirements);
-			memory = context.MemoryAllocator.Allocate(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal, false);
-			context.Device.BindImageMemory(image, memory.Memory, memory.Offset);
+			memory = context.MemoryAllocator.Allocate(image, SharpVulkan.MemoryPropertyFlags.DeviceLocal, tiling);
 			var viewCreateInfo = new SharpVulkan.ImageViewCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageViewCreateInfo,
 				ViewType = SharpVulkan.ImageViewType.Image2D,

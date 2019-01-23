@@ -14,7 +14,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.Instance instance;
 		private SharpVulkan.PhysicalDevice physicalDevice;
 		private SharpVulkan.DebugReportCallback debugReportCallback;
-		private DebugReportCallbackDelegate debugReport = DebugReport;
+		private SharpVulkan.Ext.DebugReportCallbackDelegate debugReport = DebugReport;
 		private SharpVulkan.Device device;
 		private SharpVulkan.Queue queue;
 		private uint queueFamilyIndex;
@@ -58,6 +58,8 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SamplerCache samplerCache;
 		private Dictionary<Format, FormatFeatures> formatFeaturesCache = new Dictionary<Format, FormatFeatures>();
 
+		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
+		internal bool SupportsDedicatedAllocation;
 		internal SharpVulkan.Instance Instance => instance;
 		internal SharpVulkan.PhysicalDevice PhysicalDevice => physicalDevice;
 		internal SharpVulkan.Device Device => device;
@@ -108,7 +110,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				StructureType = SharpVulkan.StructureType.ApplicationInfo,
 				ApiVersion = new SharpVulkan.Version(1, 0, 0)
 			};
-
 			var enabledLayerNames = new List<IntPtr>();
 			if (validation) {
 				enabledLayerNames.Add(Marshal.StringToHGlobalAnsi("VK_LAYER_LUNARG_standard_validation"));
@@ -139,12 +140,12 @@ namespace Lime.Graphics.Platform.Vulkan
 					Marshal.FreeHGlobal(i);
 				}
 			}
+			VKExt.LoadInstanceEntryPoints(instance);
 			physicalDevice = instance.PhysicalDevices[0];
 		}
 
 		private void CreateDebugReportCallback()
 		{
-			var createDebugReportCallback = GetInstanceEntryPoint<CreateDebugReportCallbackDelegate>("vkCreateDebugReportCallbackEXT");
 			var createInfo = new SharpVulkan.DebugReportCallbackCreateInfo {
 				StructureType = SharpVulkan.StructureType.DebugReportCallbackCreateInfo,
 				Callback = Marshal.GetFunctionPointerForDelegate(debugReport),
@@ -156,7 +157,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					SharpVulkan.DebugReportFlags.Error |
 					SharpVulkan.DebugReportFlags.Warning)
 			};
-			createDebugReportCallback(instance, ref createInfo, null, out debugReportCallback).CheckError();
+			VKExt.CreateDebugReportCallback(instance, ref createInfo, null, out debugReportCallback).CheckError();
 		}
 
 		private void CreateDevice()
@@ -172,14 +173,25 @@ namespace Lime.Graphics.Platform.Vulkan
 				QueuePriorities = new IntPtr(&queuePriority),
 				QueueFamilyIndex = queueFamilyIndex
 			};
-			var enabledExtensionNames = new[] {
-				Marshal.StringToHGlobalAnsi("VK_KHR_swapchain")
-			};
+			var presentedExtensionNames = new HashSet<string>();
+			foreach (var i in physicalDevice.GetDeviceExtensionProperties()) {
+				var extensionName = Marshal.PtrToStringAnsi(new IntPtr(&i.ExtensionName.Value0));
+				presentedExtensionNames.Add(extensionName);
+			}
+			var enabledExtensionNames = new List<IntPtr>();
 			try {
-				fixed (IntPtr* enabledExtensionNamesPtr = enabledExtensionNames) {
+				enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_swapchain"));
+				if (presentedExtensionNames.Contains("VK_KHR_get_memory_requirements2")) {
+					enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_get_memory_requirements2"));
+				}
+				SupportsDedicatedAllocation = presentedExtensionNames.Contains("VK_KHR_dedicated_allocation");
+				if (SupportsDedicatedAllocation) {
+					enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_dedicated_allocation"));
+				}
+				fixed (IntPtr* enabledExtensionNamesPtr = enabledExtensionNames.ToArray()) {
 					var createInfo = new SharpVulkan.DeviceCreateInfo {
 						StructureType = SharpVulkan.StructureType.DeviceCreateInfo,
-						EnabledExtensionCount = (uint)enabledExtensionNames.Length,
+						EnabledExtensionCount = (uint)enabledExtensionNames.Count,
 						EnabledExtensionNames = new IntPtr(enabledExtensionNamesPtr),
 						QueueCreateInfoCount = 1,
 						QueueCreateInfos = new IntPtr(&queueCreateInfo)
@@ -191,6 +203,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					Marshal.FreeHGlobal(i);
 				}
 			}
+			VKExt.LoadDeviceEntryPoints(device);
 			queue = device.GetQueue(queueFamilyIndex, 0);
 		}
 
@@ -211,7 +224,6 @@ namespace Lime.Graphics.Platform.Vulkan
 			};
 			pipelineCache = device.CreatePipelineCache(ref createInfo);
 		}
-
 
 		public void Begin(Swapchain swapchain)
 		{
@@ -979,32 +991,6 @@ namespace Lime.Graphics.Platform.Vulkan
 			return uploadBufferSuballocator.Allocate(size, alignment);
 		}
 
-		private uint FindMemoryTypeIndex(uint typeBits, SharpVulkan.MemoryPropertyFlags propertyFlags)
-		{
-			physicalDevice.GetMemoryProperties(out var memoryProperties);
-			for (var i = 0U; i < memoryProperties.MemoryTypeCount; i++) {
-				if ((typeBits & 1) == 1) {
-					var memoryType = &memoryProperties.MemoryTypes.Value0 + i;
-					if ((memoryType->PropertyFlags & propertyFlags) == propertyFlags) {
-						return i;
-					}
-				}
-				typeBits >>= 1;
-			}
-			return uint.MaxValue;
-		}
-
-		private T GetInstanceEntryPoint<T>(string name) where T : Delegate
-		{
-			var namePtr = Marshal.StringToHGlobalAnsi(name);
-			try {
-				var address = instance.GetProcAddress((byte*)namePtr);
-				return Marshal.GetDelegateForFunctionPointer<T>(address);
-			} finally {
-				Marshal.FreeHGlobal(namePtr);
-			}
-		}
-
 		public Swapchain CreateSwapchain(IntPtr windowHandle, int width, int height)
 		{
 			return new Swapchain(this, windowHandle, width, height);
@@ -1059,20 +1045,5 @@ namespace Lime.Graphics.Platform.Vulkan
 			Logger.Write($"{flags}: {message} ([{messageCode}] {layerPrefix})");
 			return false;
 		}
-
-		[UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-		private delegate SharpVulkan.RawBool DebugReportCallbackDelegate(
-			SharpVulkan.DebugReportFlags flags, SharpVulkan.DebugReportObjectType objectType, ulong @object,
-			SharpVulkan.PointerSize location, int messageCode, string layerPrefix, string message, IntPtr userData);
-
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		private delegate SharpVulkan.Result CreateDebugReportCallbackDelegate(
-			SharpVulkan.Instance instance, ref SharpVulkan.DebugReportCallbackCreateInfo createInfo,
-			SharpVulkan.AllocationCallbacks* allocator, out SharpVulkan.DebugReportCallback callback);
-
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		private delegate SharpVulkan.Result DestroyDebugReportCallbackDelegate(
-			SharpVulkan.Instance instance, SharpVulkan.DebugReportCallback debugReportCallback,
-			SharpVulkan.AllocationCallbacks* allocator);
 	}
 }

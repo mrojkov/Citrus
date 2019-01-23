@@ -35,26 +35,99 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
-		public MemoryAlloc Allocate(SharpVulkan.MemoryRequirements requirements, SharpVulkan.MemoryPropertyFlags propertyFlags, bool linear)
+		public MemoryAlloc Allocate(SharpVulkan.Image image, SharpVulkan.MemoryPropertyFlags propertyFlags, SharpVulkan.ImageTiling tiling)
+		{
+			GetImageMemoryRequirements(image,
+				out var requirements,
+				out var prefersDedicated,
+				out bool requiresDedicated);
+			var dedicatedAllocateInfo = new SharpVulkan.Ext.MemoryDedicatedAllocateInfo {
+				StructureType = SharpVulkan.Ext.StructureType.MemoryDedicatedAllocateInfo,
+				Image = image
+			};
+			var alloc = Allocate(
+				requirements, &dedicatedAllocateInfo, prefersDedicated, requiresDedicated,
+				propertyFlags, tiling == SharpVulkan.ImageTiling.Linear);
+			Context.Device.BindImageMemory(image, alloc.Memory, alloc.Offset);
+			return alloc;
+		}
+
+		public MemoryAlloc Allocate(SharpVulkan.Buffer buffer, SharpVulkan.MemoryPropertyFlags propertyFlags)
+		{
+			GetBufferMemoryRequirements(buffer,
+				out var requirements,
+				out var prefersDedicated,
+				out bool requiresDedicated);
+			var dedicatedAllocateInfo = new SharpVulkan.Ext.MemoryDedicatedAllocateInfo {
+				StructureType = SharpVulkan.Ext.StructureType.MemoryDedicatedAllocateInfo,
+				Buffer = buffer
+			};
+			var alloc = Allocate(
+				requirements, &dedicatedAllocateInfo, prefersDedicated, requiresDedicated,
+				propertyFlags, true);
+			Context.Device.BindBufferMemory(buffer, alloc.Memory, alloc.Offset);
+			return alloc;
+		}
+
+		private MemoryAlloc Allocate(
+			SharpVulkan.MemoryRequirements requirements, SharpVulkan.Ext.MemoryDedicatedAllocateInfo* dedicatedAllocateInfo,
+			bool prefersDedicated, bool requiresDedicated, SharpVulkan.MemoryPropertyFlags propertyFlags, bool linear)
 		{
 			var typeIndex = FindMemoryTypeIndex(requirements.MemoryTypeBits, propertyFlags);
 			if (typeIndex == uint.MaxValue) {
 				throw new InvalidOperationException();
 			}
 			var type = memoryTypes[typeIndex];
-			if (type.BlockSize < requirements.Size) {
+			if (prefersDedicated) {
+				var memory = TryAllocateDeviceMemory(typeIndex, requirements.Size, dedicatedAllocateInfo);
+				if (memory != SharpVulkan.DeviceMemory.Null) {
+					return new MemoryAlloc(type, memory, requirements.Size);
+				}
+				if (requiresDedicated) {
+					throw new OutOfMemoryException();
+				}
+			}
+			return AllocateFromBlock(typeIndex, requirements.Size, requirements.Alignment, linear);
+		}
+
+		private SharpVulkan.DeviceMemory TryAllocateDeviceMemory(uint typeIndex, ulong size, SharpVulkan.Ext.MemoryDedicatedAllocateInfo* dedicatedAllocateInfo)
+		{
+			var allocateInfo = new SharpVulkan.MemoryAllocateInfo {
+				StructureType = SharpVulkan.StructureType.MemoryAllocateInfo,
+				MemoryTypeIndex = typeIndex,
+				AllocationSize = size,
+				Next = new IntPtr(dedicatedAllocateInfo)
+			};
+			try {
+				return Context.Device.AllocateMemory(ref allocateInfo);
+			} catch (SharpVulkan.SharpVulkanException e) when (e.Result == SharpVulkan.Result.ErrorOutOfDeviceMemory) {
+				return SharpVulkan.DeviceMemory.Null;
+			}
+		}
+
+		private MemoryAlloc AllocateFromBlock(uint typeIndex, ulong size, ulong alignment, bool linear)
+		{
+			var type = memoryTypes[typeIndex];
+			if (type.BlockSize < size) {
 				throw new OutOfMemoryException();
 			}
 			var pool = linear ? memoryPoolsLinear[typeIndex] : memoryPoolsNonLinear[typeIndex];
 			foreach (var block in pool) {
-				var blockNode = block.TryAllocate(requirements.Size, requirements.Alignment);
+				var blockNode = block.TryAllocate(size, alignment);
 				if (blockNode != null) {
 					return new MemoryAlloc(type, block, blockNode);
 				}
 			}
-			var newBlock = AllocateBlock(typeIndex);
+			var newBlockMemory = TryAllocateDeviceMemory(typeIndex, type.BlockSize, null);
+			if (newBlockMemory == SharpVulkan.DeviceMemory.Null) {
+				throw new OutOfMemoryException();
+			}
+			var newBlock = new MemoryBlock(newBlockMemory, type.BlockSize);
+			var newBlockNode = newBlock.TryAllocate(size, alignment);
+			if (newBlockNode == null) {
+				throw new OutOfMemoryException();
+			}
 			pool.Add(newBlock);
-			var newBlockNode = newBlock.TryAllocate(requirements.Size, requirements.Alignment);
 			return new MemoryAlloc(type, newBlock, newBlockNode);
 		}
 
@@ -63,6 +136,8 @@ namespace Lime.Graphics.Platform.Vulkan
 			var block = alloc.MemoryBlock;
 			if (block != null) {
 				block.Free(alloc.MemoryBlockNode);
+			} else {
+				Context.Device.FreeMemory(alloc.Memory);
 			}
 		}
 
@@ -84,16 +159,62 @@ namespace Lime.Graphics.Platform.Vulkan
 			Context.Device.UnmapMemory(memory);
 		}
 
-		private MemoryBlock AllocateBlock(uint memoryTypeIndex)
+		internal void GetImageMemoryRequirements(
+			SharpVulkan.Image image,
+			out SharpVulkan.MemoryRequirements requirements,
+			out bool prefersDedicatedAllocation,
+			out bool requiresDedicatedAllocation)
 		{
-			var memoryType = memoryTypes[memoryTypeIndex];
-			var memoryAllocateInfo = new SharpVulkan.MemoryAllocateInfo {
-				StructureType = SharpVulkan.StructureType.MemoryAllocateInfo,
-				MemoryTypeIndex = memoryTypeIndex,
-				AllocationSize = memoryType.BlockSize
-			};
-			var memory = Context.Device.AllocateMemory(ref memoryAllocateInfo);
-			return new MemoryBlock(memory, memoryType.BlockSize);
+			if (Context.SupportsDedicatedAllocation) {
+				var requirementsInfo = new SharpVulkan.Ext.ImageMemoryRequirementsInfo2 {
+					StructureType = SharpVulkan.Ext.StructureType.ImageMemoryRequirementsInfo2,
+					Image = image
+				};
+				var dedicatedRequirements = new SharpVulkan.Ext.MemoryDedicatedRequirements {
+					StructureType = SharpVulkan.Ext.StructureType.MemoryDedicatedRequirements
+				};
+				var requirements2 = new SharpVulkan.Ext.MemoryRequirements2 {
+					StructureType = SharpVulkan.Ext.StructureType.MemoryRequirements2,
+					Next = new IntPtr(&dedicatedRequirements)
+				};
+				Context.VKExt.GetImageMemoryRequirements2(Context.Device, ref requirementsInfo, ref requirements2);
+				requirements = requirements2.MemoryRequirements;
+				prefersDedicatedAllocation = dedicatedRequirements.PrefersDedicatedAllocation;
+				requiresDedicatedAllocation = dedicatedRequirements.RequiresDedicatedAllocation;
+			} else {
+				Context.Device.GetImageMemoryRequirements(image, out requirements);
+				prefersDedicatedAllocation = false;
+				requiresDedicatedAllocation = false;
+			}
+		}
+
+		private void GetBufferMemoryRequirements(
+			SharpVulkan.Buffer buffer,
+			out SharpVulkan.MemoryRequirements requirements,
+			out bool prefersDedicatedAllocation,
+			out bool requiresDedicatedAllocation)
+		{
+			if (Context.SupportsDedicatedAllocation) {
+				var requirementsInfo = new SharpVulkan.Ext.BufferMemoryRequirementsInfo2 {
+					StructureType = SharpVulkan.Ext.StructureType.BufferMemoryRequirementsInfo2,
+					Buffer = buffer
+				};
+				var dedicatedRequirements = new SharpVulkan.Ext.MemoryDedicatedRequirements {
+					StructureType = SharpVulkan.Ext.StructureType.MemoryDedicatedRequirements
+				};
+				var requirements2 = new SharpVulkan.Ext.MemoryRequirements2 {
+					StructureType = SharpVulkan.Ext.StructureType.MemoryRequirements2,
+					Next = new IntPtr(&dedicatedRequirements)
+				};
+				Context.VKExt.GetBufferMemoryRequirements2(Context.Device, ref requirementsInfo, ref requirements2);
+				requirements = requirements2.MemoryRequirements;
+				prefersDedicatedAllocation = dedicatedRequirements.PrefersDedicatedAllocation;
+				requiresDedicatedAllocation = dedicatedRequirements.RequiresDedicatedAllocation;
+			} else {
+				Context.Device.GetBufferMemoryRequirements(buffer, out requirements);
+				prefersDedicatedAllocation = false;
+				requiresDedicatedAllocation = false;
+			}
 		}
 
 		private uint FindMemoryTypeIndex(uint typeBits, SharpVulkan.MemoryPropertyFlags propertyFlags)
@@ -256,16 +377,27 @@ namespace Lime.Graphics.Platform.Vulkan
 		public readonly MemoryBlock MemoryBlock;
 		public readonly LinkedListNode<MemoryBlockSlice> MemoryBlockNode;
 		public readonly SharpVulkan.DeviceMemory Memory;
+		public readonly ulong Offset;
+		public readonly ulong Size;
 
-		public ulong Offset => MemoryBlockNode.Value.Offset;
-		public ulong Size => MemoryBlockNode.Value.Size;
-		
+		public MemoryAlloc(MemoryType memoryType, SharpVulkan.DeviceMemory memory, ulong size)
+		{
+			MemoryType = memoryType;
+			MemoryBlock = null;
+			MemoryBlockNode = null;
+			Memory = memory;
+			Offset = 0;
+			Size = size;
+		}
+
 		public MemoryAlloc(MemoryType memoryType, MemoryBlock memoryBlock, LinkedListNode<MemoryBlockSlice> memoryBlockNode)
 		{
 			MemoryType = memoryType;
 			MemoryBlock = memoryBlock;
 			MemoryBlockNode = memoryBlockNode;
 			Memory = memoryBlock.Memory;
+			Offset = memoryBlockNode.Value.Offset;
+			Size = memoryBlockNode.Value.Size;
 		}
 	}
 }

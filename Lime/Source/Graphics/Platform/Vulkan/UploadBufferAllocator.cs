@@ -48,10 +48,8 @@ namespace Lime.Graphics.Platform.Vulkan
 				Usage = SharpVulkan.BufferUsageFlags.TransferSource
 			};
 			buffer = context.Device.CreateBuffer(ref createInfo);
-			context.Device.GetBufferMemoryRequirements(buffer, out var memoryRequirements);
-			var memoryPropertyFlags = SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent;
-			memory = context.MemoryAllocator.Allocate(memoryRequirements, memoryPropertyFlags, true);
-			context.Device.BindBufferMemory(buffer, memory.Memory, memory.Offset);
+			memory = context.MemoryAllocator.Allocate(buffer,
+				SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCoherent);
 			mappedMemory = context.MemoryAllocator.Map(memory, 0, size);
 			bufferSize = size;
 			bufferOffset = 0;

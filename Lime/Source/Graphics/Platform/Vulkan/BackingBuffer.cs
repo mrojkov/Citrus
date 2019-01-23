@@ -95,9 +95,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				Usage = usage
 			};
 			buffer = context.Device.CreateBuffer(ref createInfo);
-			context.Device.GetBufferMemoryRequirements(buffer, out var memoryRequirements);
-			memory = context.MemoryAllocator.Allocate(memoryRequirements, memoryPropertyFlags, true);
-			context.Device.BindBufferMemory(buffer, memory.Memory, memory.Offset);
+			memory = context.MemoryAllocator.Allocate(buffer, memoryPropertyFlags);
 			sliceQueue.Clear();
 			for (ulong i = 0; i < sliceCount; i++) {
 				sliceQueue.Enqueue(new SliceEntry {

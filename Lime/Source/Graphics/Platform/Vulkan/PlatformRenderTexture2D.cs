@@ -51,6 +51,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				Context.PhysicalDevice.GetFormatProperties(format, out var formatProperties);
 				return (formatProperties.OptimalTilingFeatures & SharpVulkan.FormatFeatureFlags.DepthStencilAttachment) != 0;
 			});
+			var tiling = SharpVulkan.ImageTiling.Optimal;
 			var createInfo = new SharpVulkan.ImageCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageCreateInfo,
 				ImageType = SharpVulkan.ImageType.Image2D,
@@ -61,13 +62,11 @@ namespace Lime.Graphics.Platform.Vulkan
 				ArrayLayers = 1,
 				Samples = SharpVulkan.SampleCountFlags.Sample1,
 				SharingMode = SharpVulkan.SharingMode.Exclusive,
-				Tiling = SharpVulkan.ImageTiling.Optimal,
+				Tiling = tiling,
 				InitialLayout = SharpVulkan.ImageLayout.Undefined
 			};
 			depthStencilBuffer = Context.Device.CreateImage(ref createInfo);
-			Context.Device.GetImageMemoryRequirements(depthStencilBuffer, out var memoryRequirements);
-			depthStencilMemory = Context.MemoryAllocator.Allocate(memoryRequirements, SharpVulkan.MemoryPropertyFlags.DeviceLocal, false);
-			Context.Device.BindImageMemory(depthStencilBuffer, depthStencilMemory.Memory, depthStencilMemory.Offset);
+			depthStencilMemory = Context.MemoryAllocator.Allocate(depthStencilBuffer, SharpVulkan.MemoryPropertyFlags.DeviceLocal, tiling);
 			var viewCreateInfo = new SharpVulkan.ImageViewCreateInfo {
 				StructureType = SharpVulkan.StructureType.ImageViewCreateInfo,
 				ViewType = SharpVulkan.ImageViewType.Image2D,
