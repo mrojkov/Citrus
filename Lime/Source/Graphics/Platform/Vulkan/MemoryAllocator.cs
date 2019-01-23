@@ -25,7 +25,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			for (var i = 0U; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++) {
 				var vkMemoryType = &physicalDeviceMemoryProperties.MemoryTypes.Value0 + i;
 				var vkMemoryHeap = &physicalDeviceMemoryProperties.MemoryHeaps.Value0 + vkMemoryType->HeapIndex;
-				memoryTypes[i] = new MemoryType(vkMemoryType->PropertyFlags, PickBlockSize(vkMemoryHeap->Size));
+				memoryTypes[i] = new MemoryType(i, vkMemoryType->PropertyFlags, PickBlockSize(vkMemoryHeap->Size));
 			}
 			memoryPoolsLinear = new List<MemoryBlock>[memoryTypes.Length];
 			memoryPoolsNonLinear = new List<MemoryBlock>[memoryTypes.Length];
@@ -73,13 +73,12 @@ namespace Lime.Graphics.Platform.Vulkan
 			SharpVulkan.MemoryRequirements requirements, SharpVulkan.Ext.MemoryDedicatedAllocateInfo* dedicatedAllocateInfo,
 			bool prefersDedicated, bool requiresDedicated, SharpVulkan.MemoryPropertyFlags propertyFlags, bool linear)
 		{
-			var typeIndex = FindMemoryTypeIndex(requirements.MemoryTypeBits, propertyFlags);
-			if (typeIndex == uint.MaxValue) {
+			var type = TryFindMemoryType(requirements.MemoryTypeBits, propertyFlags);
+			if (type == null) {
 				throw new InvalidOperationException();
 			}
-			var type = memoryTypes[typeIndex];
 			if (prefersDedicated) {
-				var memory = TryAllocateDeviceMemory(typeIndex, requirements.Size, dedicatedAllocateInfo);
+				var memory = TryAllocateDeviceMemory(type, requirements.Size, dedicatedAllocateInfo);
 				if (memory != SharpVulkan.DeviceMemory.Null) {
 					return new MemoryAlloc(type, memory, requirements.Size);
 				}
@@ -87,14 +86,14 @@ namespace Lime.Graphics.Platform.Vulkan
 					throw new OutOfMemoryException();
 				}
 			}
-			return AllocateFromBlock(typeIndex, requirements.Size, requirements.Alignment, linear);
+			return AllocateFromBlock(type, requirements.Size, requirements.Alignment, linear);
 		}
 
-		private SharpVulkan.DeviceMemory TryAllocateDeviceMemory(uint typeIndex, ulong size, SharpVulkan.Ext.MemoryDedicatedAllocateInfo* dedicatedAllocateInfo)
+		private SharpVulkan.DeviceMemory TryAllocateDeviceMemory(MemoryType type, ulong size, SharpVulkan.Ext.MemoryDedicatedAllocateInfo* dedicatedAllocateInfo)
 		{
 			var allocateInfo = new SharpVulkan.MemoryAllocateInfo {
 				StructureType = SharpVulkan.StructureType.MemoryAllocateInfo,
-				MemoryTypeIndex = typeIndex,
+				MemoryTypeIndex = type.Index,
 				AllocationSize = size,
 				Next = new IntPtr(dedicatedAllocateInfo)
 			};
@@ -105,20 +104,19 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
-		private MemoryAlloc AllocateFromBlock(uint typeIndex, ulong size, ulong alignment, bool linear)
+		private MemoryAlloc AllocateFromBlock(MemoryType type, ulong size, ulong alignment, bool linear)
 		{
-			var type = memoryTypes[typeIndex];
 			if (type.BlockSize < size) {
 				throw new OutOfMemoryException();
 			}
-			var pool = linear ? memoryPoolsLinear[typeIndex] : memoryPoolsNonLinear[typeIndex];
+			var pool = linear ? memoryPoolsLinear[type.Index] : memoryPoolsNonLinear[type.Index];
 			foreach (var block in pool) {
 				var blockNode = block.TryAllocate(size, alignment);
 				if (blockNode != null) {
 					return new MemoryAlloc(type, block, blockNode);
 				}
 			}
-			var newBlockMemory = TryAllocateDeviceMemory(typeIndex, type.BlockSize, null);
+			var newBlockMemory = TryAllocateDeviceMemory(type, type.BlockSize, null);
 			if (newBlockMemory == SharpVulkan.DeviceMemory.Null) {
 				throw new OutOfMemoryException();
 			}
@@ -217,17 +215,15 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
-		private uint FindMemoryTypeIndex(uint typeBits, SharpVulkan.MemoryPropertyFlags propertyFlags)
+		private MemoryType TryFindMemoryType(uint typeBits, SharpVulkan.MemoryPropertyFlags propertyFlags)
 		{
-			for (var i = 0U; i < memoryTypes.Length; i++) {
-				if ((typeBits & 1) == 1) {
-					if ((memoryTypes[i].PropertyFlags & propertyFlags) == propertyFlags) {
-						return i;
-					}
+			foreach (var type in memoryTypes) {
+				var mask = 1 << (int)type.Index;
+				if ((typeBits & mask) != 0 && (type.PropertyFlags & propertyFlags) == propertyFlags) {
+					return type;
 				}
-				typeBits >>= 1;
 			}
-			return uint.MaxValue;
+			return null;
 		}
 
 		private static ulong PickBlockSize(ulong heapSize)
@@ -240,11 +236,13 @@ namespace Lime.Graphics.Platform.Vulkan
 
 	internal class MemoryType
 	{
+		public readonly uint Index;
 		public readonly SharpVulkan.MemoryPropertyFlags PropertyFlags;
 		public readonly ulong BlockSize;
 
-		public MemoryType(SharpVulkan.MemoryPropertyFlags propertyFlags, ulong blockSize)
+		public MemoryType(uint index, SharpVulkan.MemoryPropertyFlags propertyFlags, ulong blockSize)
 		{
+			Index = index;
 			PropertyFlags = propertyFlags;
 			BlockSize = blockSize;
 		}
