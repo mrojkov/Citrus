@@ -211,10 +211,10 @@ namespace Lime
 						// Sometimes Width can be smaller then length of a row due to byte alignment.
 						if (pb.BytesPerRow > pb.Width * 4) {
 							var tempBuffer = AlignmentPixelBuffer(pb);
-							texture.LoadImage(tempBuffer, Width, Height, (PixelFormat)All.Bgra);
+							texture.LoadImage(tempBuffer, Width, Height, Format.R8G8B8A8_UNorm);
 							Marshal.FreeHGlobal(tempBuffer);
 						} else {
-							texture.LoadImage(pb.BaseAddress, Width, Height, (PixelFormat)All.Bgra);
+							texture.LoadImage(pb.BaseAddress, Width, Height, Format.R8G8B8A8_UNorm);
 						}
 						pb.Unlock(CVPixelBufferLock.None);
 					}

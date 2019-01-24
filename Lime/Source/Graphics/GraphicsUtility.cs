@@ -26,7 +26,13 @@ namespace Lime
 			return ((value + alignment - 1) / alignment) * alignment;
 		}
 
-		[DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+#if iOS
+		const string stdlib = "__Internal";
+#else
+		const string stdlib = "msvcrt";
+#endif
+
+		[DllImport(stdlib, EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
 		private static extern IntPtr memcpy(IntPtr dest, IntPtr src, UIntPtr count);
 
 		public static unsafe void CopyMemory(IntPtr dst, IntPtr src, int count)
@@ -34,7 +40,7 @@ namespace Lime
 			memcpy(dst, src, new UIntPtr((uint)count));
 		}
 
-		[DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+		[DllImport(stdlib, EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
 		private static extern IntPtr memset(IntPtr dest, int c, UIntPtr count);
 
 		public static unsafe void FillMemory(IntPtr dst, int c, int count)

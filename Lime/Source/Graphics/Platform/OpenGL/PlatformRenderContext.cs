@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OpenTK.Graphics.ES20;
-using GLStencilOp = OpenTK.Graphics.ES20.StencilOp;
+using GLStencilOp = Lime.Graphics.Platform.OpenGL.StencilOp;
 
 namespace Lime.Graphics.Platform.OpenGL
 {

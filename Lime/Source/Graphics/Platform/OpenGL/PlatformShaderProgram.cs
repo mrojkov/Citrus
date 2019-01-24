@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
-using OpenTK.Graphics.ES20;
 
 namespace Lime.Graphics.Platform.OpenGL
 {

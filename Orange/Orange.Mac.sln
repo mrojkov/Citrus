@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\Lime\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac.CLI", "Orange.CLI\Orange.Mac.CLI.csproj", "{5F39EAEF-F894-4B59-8B52-788444A7A88E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderCompilerBinding.Mac", "..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Mac.csproj", "{94911E6A-53F9-4B86-9ADE-E3B510C810B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoltenVK", "..\3rdParty\MoltenVK\MoltenVK.csproj", "{25A88ABB-AC39-41AD-92EF-DD91341863C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -57,6 +61,14 @@ Global
 		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Debug|x86.Build.0 = Debug|x86
 		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Release|x86.ActiveCfg = Release|x86
 		{5F39EAEF-F894-4B59-8B52-788444A7A88E}.Release|x86.Build.0 = Release|x86
+		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Debug|x86.Build.0 = Debug|Any CPU
+		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Release|x86.Build.0 = Release|Any CPU
+		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,50 +79,5 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.TextStylePolicy = $7
-		$1.FileWidth = 120
-		$1.EolMarker = Windows
-		$1.inheritsSet = null
-		$1.inheritsScope = text/plain
-		$1.scope = application/xml
-		$1.TabWidth = 4
-		$0.CSharpFormattingPolicy = $2
-		$2.BeforeMethodDeclarationParentheses = False
-		$2.BeforeMethodCallParentheses = False
-		$2.BeforeConstructorDeclarationParentheses = False
-		$2.BeforeIndexerDeclarationBracket = False
-		$2.BeforeDelegateDeclarationParentheses = False
-		$2.NewParentheses = False
-		$2.SpacesBeforeBrackets = False
-		$2.scope = text/x-csharp
-		$2.IndentSwitchSection = False
-		$2.NewLinesForBracesInProperties = False
-		$2.NewLinesForBracesInAccessors = False
-		$2.NewLinesForBracesInAnonymousMethods = False
-		$2.NewLinesForBracesInControlBlocks = False
-		$2.NewLinesForBracesInAnonymousTypes = False
-		$2.NewLinesForBracesInObjectCollectionArrayInitializers = False
-		$2.NewLinesForBracesInLambdaExpressionBody = False
-		$2.NewLineForElse = False
-		$2.NewLineForCatch = False
-		$2.NewLineForFinally = False
-		$2.NewLineForMembersInObjectInit = False
-		$2.NewLineForMembersInAnonymousTypes = False
-		$2.NewLineForClausesInQuery = False
-		$2.SpacingAfterMethodDeclarationName = True
-		$2.SpaceAfterMethodCallName = True
-		$2.SpaceBeforeOpenSquareBracket = True
-		$3.EolMarker = Windows
-		$3.scope = text/plain
-		$3.IndentWidth = 8
-		$3.FileWidth = 80
-		$3.TabWidth = 8
-		$4.inheritsSet = null
-		$4.scope = text/x-csrc
-		$0.StandardHeader = $5
-		$0.DotNetNamingPolicy = $6
-		$7.inheritsSet = null
-		$7.scope = application/xml
-		$0.XmlFormattingPolicy = $8
-		$8.scope = application/xml
 	EndGlobalSection
 EndGlobal

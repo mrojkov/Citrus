@@ -49,8 +49,9 @@ namespace Lime
 	{
 		public bool DecodeAudioInSeparateThread = false;
 		public int NumChannels = 24;
-#if MAC
-		public RenderingBackend RenderingBackend = RenderingBackend.OpenGL;
+#if iOS
+		public RenderingBackend RenderingBackend = 
+			MetalGameView.IsMetalSupported() ? RenderingBackend.Vulkan : RenderingBackend.ES20;
 #else
 		public RenderingBackend RenderingBackend = RenderingBackend.ES20;
 #endif // MAC
@@ -225,7 +226,7 @@ namespace Lime
 			}
 		}
 
-		public static RenderingBackend RenderingBackend { get; private set; }
+		public static RenderingBackend RenderingBackend { get; internal set; }
 #if WIN
 		[System.Runtime.InteropServices.DllImport("user32.dll")]
 		private static extern bool SetProcessDPIAware();
@@ -239,6 +240,7 @@ namespace Lime
 
 		public static void Initialize(ApplicationOptions options = null)
 		{
+			// System.Environment.SetEnvironmentVariable("METAL_DEVICE_WRAPPER_TYPE", "1");
 #if MAC
 			NSApplication.Init();
 			NSApplication.SharedApplication.ApplicationShouldTerminate += (sender) => {
@@ -437,11 +439,7 @@ namespace Lime
 #elif iOS
 			get
 			{
-				// Class-level initialization fails on iOS simulator in debug mode,
-				// because it is called before main UI thread.
-				if (pixelsPerPoints == 0)
-					pixelsPerPoints = (float)UIScreen.MainScreen.Scale;
-				return 160 * pixelsPerPoints * Vector2.One;
+				return 160 * MainWindow.PixelScale * Vector2.One;
 			}
 #elif ANDROID
 			get

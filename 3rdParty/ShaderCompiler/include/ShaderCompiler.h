@@ -17,14 +17,10 @@
 #	define EXTERN_C
 #endif
 
-#if defined(SHADER_COMPILER_SHARED_LIB)
-#	if defined(SHADER_COMPILER_IMPL)
-#		define API EXTERN_C EXPORT
-#	else
-#		define API EXTERN_C IMPORT
-#	endif
+#if defined(SHADER_COMPILER_IMPL)
+#	define API EXTERN_C EXPORT
 #else
-#	define API
+#	define API EXTERN_C IMPORT
 #endif
 
 typedef enum

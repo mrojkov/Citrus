@@ -976,7 +976,7 @@ namespace Lime
 
 		private static readonly Matrix44 vulkanClipspaceMatrix = Matrix44.CreateScale(1, -1, 0.5f) * Matrix44.CreateTranslation(0, 0, 0.5f);
 		private static readonly Matrix44 openglRenderTextureClipspaceMatrix = Matrix44.CreateScale(1, -1, 1);
-
+		
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
 			if (Application.RenderingBackend == RenderingBackend.Vulkan) {

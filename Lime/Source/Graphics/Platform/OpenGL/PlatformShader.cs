@@ -1,5 +1,3 @@
-using OpenTK.Graphics.ES20;
-
 namespace Lime.Graphics.Platform.OpenGL
 {
 	internal class PlatformShader : IPlatformShader

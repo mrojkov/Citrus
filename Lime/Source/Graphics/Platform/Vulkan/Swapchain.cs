@@ -97,12 +97,27 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void CreateSurface()
 		{
+#if WIN
 			var createInfo = new SharpVulkan.Win32SurfaceCreateInfo {
 				StructureType = SharpVulkan.StructureType.Win32SurfaceCreateInfo,
 				InstanceHandle = Process.GetCurrentProcess().Handle,
 				WindowHandle = windowHandle
 			};
 			surface = context.Instance.CreateWin32Surface(createInfo);
+#elif MAC
+			var createInfo = new SharpVulkan.MacOSSurfaceCreateInfo {
+				StructureType = SharpVulkan.StructureType.MacOSSurfaceCreateInfo,
+				View = windowHandle
+			};
+			surface = context.Instance.CreateMacOSSurface(ref createInfo);
+#elif iOS
+			var createInfo = new SharpVulkan.IOSSurfaceCreateInfo {
+				StructureType = SharpVulkan.StructureType.IOSSurfaceCreateInfo,
+				View = windowHandle
+			};
+			surface = context.Instance.CreateIOSSurface(ref createInfo);
+
+#endif
 			if (!context.PhysicalDevice.GetSurfaceSupport(context.QueueFamilyIndex, surface)) {
 				throw new NotSupportedException();
 			}
@@ -117,11 +132,14 @@ namespace Lime.Graphics.Platform.Vulkan
 				backbufferFormat = surfaceFormats[0].Format;
 			}
 			context.PhysicalDevice.GetSurfaceCapabilities(surface, out var surfaceCapabilities);
-			if (width < surfaceCapabilities.MinImageExtent.Width || height < surfaceCapabilities.MinImageExtent.Height ||
-				width > surfaceCapabilities.MaxImageExtent.Width || height > surfaceCapabilities.MaxImageExtent.Height
-			) {
-				throw new InvalidOperationException();
-			}
+			//if (width < surfaceCapabilities.MinImageExtent.Width || height < surfaceCapabilities.MinImageExtent.Height ||
+			//	width > surfaceCapabilities.MaxImageExtent.Width || height > surfaceCapabilities.MaxImageExtent.Height
+			//) {
+			//	throw new InvalidOperationException();
+			//}			
+			// XXX
+			width = (int)surfaceCapabilities.CurrentExtent.Width;
+			height = (int)surfaceCapabilities.CurrentExtent.Height;
 			var desiredBufferCount = 2U;
 			if (desiredBufferCount < surfaceCapabilities.MinImageCount) {
 				desiredBufferCount = surfaceCapabilities.MinImageCount;

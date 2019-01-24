@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -262,7 +262,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\PlatformVertexInputLayout.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\SamplerCache.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\Scheduler.cs" />
-    <Compile Include="Source\Graphics\Platform\Vulkan\ShaderCompiler.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\Swapchain.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\PlatformTexture2D.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
@@ -457,13 +456,7 @@
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
-    <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
@@ -571,6 +564,10 @@
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.Android.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.cs" />
     <Compile Include="Source\Widgets\VideoDecoder\VideoDecoder.iOS.cs" />
+    <Compile Include="Source\Application\iOSGLGameView.cs" />
+    <Compile Include="Source\Application\iOSMetalGameView.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

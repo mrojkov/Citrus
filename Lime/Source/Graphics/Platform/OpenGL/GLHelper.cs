@@ -1,6 +1,5 @@
 using System;
 using System.Text.RegularExpressions;
-using OpenTK.Graphics.ES20;
 
 namespace Lime.Graphics.Platform.OpenGL
 {
@@ -71,6 +70,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					glFormat = All.Rgba;
 					glType = All.UnsignedShort4444;
 					break;
+#if !iOS					
 				case Format.BC1_RGB_UNorm_Block:
 					glInternalFormat = All.CompressedRgbS3tcDxt1Ext;
 					break;
@@ -83,6 +83,7 @@ namespace Lime.Graphics.Platform.OpenGL
 				case Format.BC3_UNorm_Block:
 					glInternalFormat = All.CompressedRgbaS3tcDxt5Ext;
 					break;
+#endif
 				case Format.ETC1_R8G8B8_UNorm_Block:
 					glInternalFormat = All.Etc1Rgb8Oes;
 					break;
@@ -100,7 +101,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					break;
 				case Format.PVRTC1_4Bpp_UNorm_Block:
 					glInternalFormat = All.CompressedRgbaPvrtc4Bppv1Img;
-					break;
+					break;					
 				case Format.PVRTC2_2Bpp_UNorm_Block:
 					glInternalFormat = All.CompressedRgbaPvrtc2Bppv2Img;
 					break;
@@ -150,14 +151,14 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		public static All GetGLTextureWrapMode(TextureWrapMode mode)
+		public static All GetGLTextureWrapMode(Lime.TextureWrapMode mode)
 		{
 			switch (mode) {
-				case TextureWrapMode.Clamp:
+				case Lime.TextureWrapMode.Clamp:
 					return All.ClampToEdge;
-				case TextureWrapMode.Repeat:
+				case Lime.TextureWrapMode.Repeat:
 					return All.Repeat;
-				case TextureWrapMode.MirroredRepeat:
+				case Lime.TextureWrapMode.MirroredRepeat:
 					return All.MirroredRepeat;
 				default:
 					throw new ArgumentException(nameof(mode));
@@ -424,24 +425,24 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		public static All GetGLStencilOp(StencilOp op)
+		public static All GetGLStencilOp(Lime.StencilOp op)
 		{
 			switch (op) {
-				case StencilOp.Keep:
+				case Lime.StencilOp.Keep:
 					return All.Keep;
-				case StencilOp.Zero:
+				case Lime.StencilOp.Zero:
 					return All.Zero;
-				case StencilOp.Replace:
+				case Lime.StencilOp.Replace:
 					return All.Replace;
-				case StencilOp.Invert:
+				case Lime.StencilOp.Invert:
 					return All.Invert;
-				case StencilOp.Increment:
+				case Lime.StencilOp.Increment:
 					return All.IncrWrap;
-				case StencilOp.IncrementSaturation:
+				case Lime.StencilOp.IncrementSaturation:
 					return All.Incr;
-				case StencilOp.Decrement:
+				case Lime.StencilOp.Decrement:
 					return All.DecrWrap;
-				case StencilOp.DecrementSaturation:
+				case Lime.StencilOp.DecrementSaturation:
 					return All.Decr;
 				default:
 					throw new ArgumentException(nameof(op));
