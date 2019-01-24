@@ -240,7 +240,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (alloc.Allocator != this) {
 				throw new ArgumentException(nameof(alloc));
 			}
-			if (offset + size < alloc.Size) {
+			if (alloc.Size < offset + size) {
 				throw new ArgumentException();
 			}
 			if (size == 0) {
