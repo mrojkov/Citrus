@@ -84,7 +84,7 @@ namespace Tangerine.UI
 
 		private void SetControlPointProperty(string propertyName, object value)
 		{
-			Core.Operations.SetProperty.Perform(selectedControlPoint, propertyName, value);
+			DoTransaction(() => Core.Operations.SetProperty.Perform(selectedControlPoint, propertyName, value));
 		}
 
 		private Node CreatePipetteButton()
