@@ -189,10 +189,16 @@ namespace Lime.Graphics.Platform.Vulkan
 					enabledExtensionNames.Add(Marshal.StringToHGlobalAnsi("VK_KHR_dedicated_allocation"));
 				}
 				fixed (IntPtr* enabledExtensionNamesPtr = enabledExtensionNames.ToArray()) {
+					physicalDevice.GetFeatures(out var deviceFeatures);
+					var enabledDeviceFeatures = new SharpVulkan.PhysicalDeviceFeatures {
+						TextureCompressionBc = deviceFeatures.TextureCompressionBc,
+						TextureCompressionEtc2 = deviceFeatures.TextureCompressionEtc2
+					};
 					var createInfo = new SharpVulkan.DeviceCreateInfo {
 						StructureType = SharpVulkan.StructureType.DeviceCreateInfo,
 						EnabledExtensionCount = (uint)enabledExtensionNames.Count,
 						EnabledExtensionNames = new IntPtr(enabledExtensionNamesPtr),
+						EnabledFeatures = new IntPtr(&enabledDeviceFeatures),
 						QueueCreateInfoCount = 1,
 						QueueCreateInfos = new IntPtr(&queueCreateInfo)
 					};
