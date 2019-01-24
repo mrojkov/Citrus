@@ -162,8 +162,7 @@ namespace Tangerine.UI.SceneView
 
 			private static void ApplyResolutionPreset(ResolutionPreview resolutionPreview, bool requiredSave)
 			{
-				var rootNode = Document.Current.RootNode as Widget;
-				if (rootNode == null) {
+				if (!(Document.Current.RootNode is Widget rootNode)) {
 					return;
 				}
 				ResolutionPreviewMode = resolutionPreview.Enabled;
@@ -185,24 +184,27 @@ namespace Tangerine.UI.SceneView
 					);
 				}
 				rootNode.Size = resolution;
-				ApplyResolutionAnimations(rootNode, resolutionPreview.Preset, resolutionPreview.IsPortrait);
+				ApplyResolutionMarkers(rootNode, resolutionPreview.Preset, resolutionPreview.IsPortrait);
 			}
 
-			private static void ApplyResolutionAnimations(Node node, ResolutionPreset resolutionPreset, bool isPortrait)
+			private static void ApplyResolutionMarkers(Node rootNode, ResolutionPreset resolutionPreset, bool isPortrait)
 			{
-				var animations = resolutionPreset.GetAnimations(isPortrait);
-				ApplyResolutionAnimation(node, animations);
-				foreach (var descendant in node.Descendants) {
-					ApplyResolutionAnimation(descendant, animations);
-				}
-			}
+				var markers = resolutionPreset.GetMarkers(isPortrait);
 
-			private static void ApplyResolutionAnimation(Node node, IEnumerable<string> animations)
-			{
-				foreach (var animation in animations) {
-					if (node.TryRunAnimation(animation)) {
-						break;
+				void ApplyResolutionMarkerToNode(Node node)
+				{
+					foreach (var animation in node.Animations) {
+						foreach (var marker in markers) {
+							if (animation.TryRun(marker)) {
+								break;
+							}
+						}
 					}
+				}
+
+				ApplyResolutionMarkerToNode(rootNode);
+				foreach (var descendant in rootNode.Descendants) {
+					ApplyResolutionMarkerToNode(descendant);
 				}
 			}
 		}

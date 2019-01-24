@@ -27,7 +27,7 @@ namespace Tangerine.Core
 			this.resolutionMarkers = resolutionMarkers;
 		}
 
-		public List<string> GetAnimations(bool isPortrait)
+		public List<string> GetMarkers(bool isPortrait)
 		{
 			return resolutionMarkers
 				.Select(resolutionMarker => isPortrait ? resolutionMarker.Portrait : resolutionMarker.Landscape)
