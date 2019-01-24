@@ -58,6 +58,10 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SamplerCache samplerCache;
 		private Dictionary<Format, FormatFeatures> formatFeaturesCache = new Dictionary<Format, FormatFeatures>();
 
+		private SharpVulkan.Buffer readbackBuffer;
+		private MemoryAlloc readbackBufferMemory;
+		private ulong readbackBufferSize;
+
 		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
 		internal bool SupportsDedicatedAllocation;
 		internal SharpVulkan.Instance Instance => instance;
@@ -70,6 +74,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		internal SharpVulkan.PhysicalDeviceLimits PhysicalDeviceLimits => physicalDeviceLimits;
 		internal SamplerCache SamplerCache => samplerCache;
 		internal readonly MemoryAllocator MemoryAllocator;
+
+		internal SharpVulkan.Buffer ReadbackBuffer => readbackBuffer;
+		internal MemoryAlloc ReadbackBufferMemory => readbackBufferMemory;
 
 		public PlatformRenderContext()
 		{
@@ -229,6 +236,37 @@ namespace Lime.Graphics.Platform.Vulkan
 				StructureType = SharpVulkan.StructureType.PipelineCacheCreateInfo,
 			};
 			pipelineCache = device.CreatePipelineCache(ref createInfo);
+		}
+
+		internal void EnsureReadbackBuffer(ulong size)
+		{
+			if (readbackBufferSize < size) {
+				ReleaseReadbackBuffer();
+				if (readbackBufferSize == 0) {
+					readbackBufferSize = 1;
+				}
+				while (readbackBufferSize < size) {
+					readbackBufferSize *= 2;
+				}
+				var createInfo = new SharpVulkan.BufferCreateInfo {
+					StructureType = SharpVulkan.StructureType.BufferCreateInfo,
+					Size = readbackBufferSize,
+					SharingMode = SharpVulkan.SharingMode.Exclusive,
+					Usage = SharpVulkan.BufferUsageFlags.TransferDestination
+				};
+				readbackBuffer = device.CreateBuffer(ref createInfo);
+				readbackBufferMemory = MemoryAllocator.Allocate(readbackBuffer,
+					SharpVulkan.MemoryPropertyFlags.HostVisible | SharpVulkan.MemoryPropertyFlags.HostCached);
+			}
+		}
+
+		private void ReleaseReadbackBuffer()
+		{
+			if (readbackBuffer != SharpVulkan.Buffer.Null) {
+				Release(readbackBuffer);
+				Release(readbackBufferMemory);
+				readbackBuffer = SharpVulkan.Buffer.Null;
+			}
 		}
 
 		public void Begin(Swapchain swapchain)

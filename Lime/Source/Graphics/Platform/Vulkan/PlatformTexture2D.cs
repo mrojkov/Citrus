@@ -156,13 +156,8 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		internal void GetData(Format dstFormat, int level, int x, int y, int width, int height, IntPtr data)
 		{
-			// TODO: Are the memory barriers corrent?
-			ulong bufferOffsetAlignment = 4;
-			bufferOffsetAlignment = GraphicsUtility.CombineAlignment(bufferOffsetAlignment, (ulong)Format.GetSize());
-			bufferOffsetAlignment = GraphicsUtility.CombineAlignment(bufferOffsetAlignment, context.PhysicalDeviceLimits.OptimalBufferCopyOffsetAlignment);
 			var dataSize = GraphicsUtility.CalculateImageDataSize(Format, width, height);
-			// FIXME: Implement read-back buffer allocator
-			var readbackBufferAlloc = context.AllocateUploadBuffer((ulong)dataSize, bufferOffsetAlignment);
+			context.EnsureReadbackBuffer((ulong)dataSize);
 			context.EndRenderPass();
 			context.EnsureCommandBuffer();
 			var preMemoryBarrier = new SharpVulkan.ImageMemoryBarrier {
@@ -179,7 +174,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				SharpVulkan.PipelineStageFlags.Transfer, SharpVulkan.DependencyFlags.None,
 				0, null, 0, null, 1, &preMemoryBarrier);
 			var copyRegion = new SharpVulkan.BufferImageCopy {
-				BufferOffset = readbackBufferAlloc.BufferOffset,
+				BufferOffset = 0,
 				BufferRowLength = (uint)width,
 				BufferImageHeight = (uint)height,
 				ImageOffset = new SharpVulkan.Offset3D(x, y, 0),
@@ -187,7 +182,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				ImageSubresource = new SharpVulkan.ImageSubresourceLayers(SharpVulkan.ImageAspectFlags.Color, 0, 1, (uint)level)
 			};
 			context.CommandBuffer.CopyImageToBuffer(
-				image, SharpVulkan.ImageLayout.TransferSourceOptimal, readbackBufferAlloc.Buffer, 1, &copyRegion);
+				image, SharpVulkan.ImageLayout.TransferSourceOptimal, context.ReadbackBuffer, 1, &copyRegion);
 			var postMemoryBarrier = new SharpVulkan.ImageMemoryBarrier {
 				StructureType = SharpVulkan.StructureType.ImageMemoryBarrier,
 				Image = image,
@@ -202,21 +197,28 @@ namespace Lime.Graphics.Platform.Vulkan
 				SharpVulkan.PipelineStageFlags.VertexShader | SharpVulkan.PipelineStageFlags.FragmentShader,
 				SharpVulkan.DependencyFlags.None, 0, null, 0, null, 1, &postMemoryBarrier);
 			context.Finish();
-			if (dstFormat == Format) {
-				GraphicsUtility.CopyMemory(data, readbackBufferAlloc.Data, Format.GetSize() * width * height);
-			} else {
-				var decoder = FormatConverter.GetDecoder(Format);
-				var encoder = FormatConverter.GetEncoder(dstFormat);
-				var srcTexelSize = Format.GetSize();
-				var dstTexelSize = dstFormat.GetSize();
-				var srcData = readbackBufferAlloc.Data;
-				var dstData = data;
-				var texelCount = width * height;
-				while (texelCount-- > 0) {
-					encoder(dstData, decoder(srcData));
-					srcData += srcTexelSize;
-					dstData += dstTexelSize;
+			var readbackBufferMemory = context.ReadbackBufferMemory;
+			var readbackBufferMappedMemory = context.MemoryAllocator.Map(readbackBufferMemory);
+			try {
+				context.MemoryAllocator.InvalidateMappedMemoryRange(readbackBufferMemory, 0, (ulong)dataSize);
+				if (dstFormat == Format) {
+					GraphicsUtility.CopyMemory(data, readbackBufferMappedMemory, Format.GetSize() * width * height);
+				} else {
+					var decoder = FormatConverter.GetDecoder(Format);
+					var encoder = FormatConverter.GetEncoder(dstFormat);
+					var srcTexelSize = Format.GetSize();
+					var dstTexelSize = dstFormat.GetSize();
+					var srcData = readbackBufferMappedMemory;
+					var dstData = data;
+					var texelCount = width * height;
+					while (texelCount-- > 0) {
+						encoder(dstData, decoder(srcData));
+						srcData += srcTexelSize;
+						dstData += dstTexelSize;
+					}
 				}
+			} finally {
+				context.MemoryAllocator.Unmap(readbackBufferMemory);
 			}
 		}
 	}
