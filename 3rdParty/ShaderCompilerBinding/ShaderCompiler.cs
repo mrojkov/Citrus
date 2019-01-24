@@ -7,7 +7,7 @@ namespace Lime.Graphics.Platform.Vulkan
 	{
 #if __IOS__
 		private const string LibraryName = "__Internal";
-#elif __MACOS__
+#else
 		private const string LibraryName = "ShaderCompiler";
 #endif
 		public enum Stage

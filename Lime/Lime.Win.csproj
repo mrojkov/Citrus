@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -599,6 +599,10 @@
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Win.csproj">
+      <Project>{bc4e4e4b-0ee7-4b97-ac0f-55c559e48e59}</Project>
+      <Name>ShaderCompilerBinding.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\3rdParty\SharpVulkan\Source\SharpVulkan\SharpVulkan.csproj">
       <Project>{5e203373-9d25-4fab-b1a4-360c13160120}</Project>
       <Name>SharpVulkan</Name>

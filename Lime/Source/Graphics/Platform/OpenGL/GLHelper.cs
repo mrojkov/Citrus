@@ -1,6 +1,10 @@
 using System;
 using System.Text.RegularExpressions;
 
+#if !iOS && !MAC
+using OpenTK.Graphics.ES20;
+#endif
+
 namespace Lime.Graphics.Platform.OpenGL
 {
 	internal static class GLHelper
@@ -70,7 +74,6 @@ namespace Lime.Graphics.Platform.OpenGL
 					glFormat = All.Rgba;
 					glType = All.UnsignedShort4444;
 					break;
-#if !iOS					
 				case Format.BC1_RGB_UNorm_Block:
 					glInternalFormat = All.CompressedRgbS3tcDxt1Ext;
 					break;
@@ -83,7 +86,6 @@ namespace Lime.Graphics.Platform.OpenGL
 				case Format.BC3_UNorm_Block:
 					glInternalFormat = All.CompressedRgbaS3tcDxt5Ext;
 					break;
-#endif
 				case Format.ETC1_R8G8B8_UNorm_Block:
 					glInternalFormat = All.Etc1Rgb8Oes;
 					break;

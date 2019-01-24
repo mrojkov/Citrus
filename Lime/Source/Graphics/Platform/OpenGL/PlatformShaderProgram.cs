@@ -3,6 +3,10 @@ using System.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+#if !iOS && !MAC
+using OpenTK.Graphics.ES20;
+#endif
+
 namespace Lime.Graphics.Platform.OpenGL
 {
 	internal unsafe class PlatformShaderProgram : IPlatformShaderProgram

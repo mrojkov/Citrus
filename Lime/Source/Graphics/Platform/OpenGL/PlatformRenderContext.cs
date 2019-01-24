@@ -1,6 +1,12 @@
 using System;
 using System.Collections.Generic;
+
+#if iOS || MAC
 using GLStencilOp = Lime.Graphics.Platform.OpenGL.StencilOp;
+#else
+using OpenTK.Graphics.ES20;
+using GLStencilOp = OpenTK.Graphics.ES20.StencilOp;
+#endif
 
 namespace Lime.Graphics.Platform.OpenGL
 {

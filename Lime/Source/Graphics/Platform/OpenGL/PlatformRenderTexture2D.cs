@@ -1,5 +1,9 @@
 using System;
 
+#if !iOS && !MAC
+using OpenTK.Graphics.ES20;
+#endif
+
 namespace Lime.Graphics.Platform.OpenGL
 {
 	internal class PlatformRenderTexture2D : PlatformTexture2D, IPlatformRenderTexture2D
