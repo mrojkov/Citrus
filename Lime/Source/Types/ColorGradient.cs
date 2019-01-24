@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Yuzu;
@@ -51,6 +52,7 @@ namespace Lime
 				while (i < lastPixel) {
 					var start = this[j].Position * pixelCount;
 					var ratio = (i - start) / (lastPixel - start);
+					ratio = double.IsInfinity(ratio) ? 0f : ratio.Clamp(0f, 1f);
 					pixels[i++] = Color4.Lerp(ratio, this[j].Color, this[j + 1].Color);
 				}
 			}
