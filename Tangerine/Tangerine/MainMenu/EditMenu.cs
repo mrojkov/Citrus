@@ -343,7 +343,11 @@ namespace Tangerine
 				AlertDialog.Show("Please, select a single node");
 				return;
 			}
-			Export(nodes[0]);
+			if (!(nodes[0] is Widget w && NodeCompositionValidator.CanHaveChildren(w.GetType()))) {
+				AlertDialog.Show($"Can't export {nodes[0].GetType()}");
+				return;
+			}
+			Export(w);
 		}
 
 		public static void Export(Node node)

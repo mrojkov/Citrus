@@ -320,6 +320,8 @@ namespace Tangerine.UI.Timeline.Components
 			});
 			Menu submenu;
 			var menu = new Menu {
+				GenericCommands.ExportScene,
+				Command.MenuSeparator,
 				Command.Cut,
 				Command.Copy,
 				Command.Paste,
@@ -348,7 +350,7 @@ namespace Tangerine.UI.Timeline.Components
 			};
 
 			if (NodeCompositionValidator.CanHaveChildren(nodeData.Node.GetType())) {
-				menu.Insert(6, new Command("Propagate Markers", () => {
+				menu.Insert(8, new Command("Propagate Markers", () => {
 					Document.Current.History.DoTransaction(() => {
 						Core.Operations.PropagateMarkers.Perform(nodeData.Node);
 					});
