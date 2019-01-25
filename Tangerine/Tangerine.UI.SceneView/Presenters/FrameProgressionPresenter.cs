@@ -50,8 +50,12 @@ namespace Tangerine.UI.SceneView.Presenters
 						animator.Apply(AnimationUtils.FramesToSeconds(i));
 					}
 
+					var color = Color4.Lerp(
+						((float)i - min) / (max - min),
+						ColorTheme.Current.SceneView.FrameProgressionBeginColor,
+						ColorTheme.Current.SceneView.FrameProgressionEndColor
+					);
 					var hull = widget.CalcHullInSpaceOf(sceneView.Frame);
-					var color = Color4.Lerp(((float)i - min) / (max - min), Color4.Orange, Color4.Green);
 					for (int j = 0; j < 4; j++) {
 						var a = hull[j];
 						var b = hull[(j + 1) % 4];

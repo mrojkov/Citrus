@@ -97,6 +97,10 @@ namespace Tangerine.UI
 			public Color4 EmitterCustomShapeLine { get; set; }
 			[YuzuOptional]
 			public Color4 SplineOutline { get; set; }
+			[YuzuOptional]
+			public Color4 FrameProgressionBeginColor { get; set; }
+			[YuzuOptional]
+			public Color4 FrameProgressionEndColor { get; set; }
 		}
 
 		public class TimelineGridColors : Theme.DefaultColors
@@ -493,6 +497,8 @@ namespace Tangerine.UI
 				ResolutionPreviewText = new Color4(204, 204, 204),
 				EmitterCustomShape = Color4.Gray.Darken(0.2f).Transparentify(0.5f),
 				EmitterCustomShapeLine = Color4.White,
+				FrameProgressionBeginColor = new Color4(0, 0, 255, 100),
+				FrameProgressionEndColor = new Color4(255, 0, 0, 100),
 			};
 			var timelineGrid = new TimelineGridColors {
 				PropertyRowBackground = Color4.Black.Transparentify(0.95f),
