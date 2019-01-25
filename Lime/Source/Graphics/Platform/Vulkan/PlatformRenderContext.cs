@@ -57,6 +57,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private PlatformRenderTexture2D renderTarget;
 		private SamplerCache samplerCache;
 		private Dictionary<Format, FormatFeatures> formatFeaturesCache = new Dictionary<Format, FormatFeatures>();
+		private PlatformTexture2D placeholderTexture;
 
 		private SharpVulkan.Buffer readbackBuffer;
 		private MemoryAlloc readbackBufferMemory;
@@ -97,6 +98,8 @@ namespace Lime.Graphics.Platform.Vulkan
 				MaxUniformBuffers = 1024
 			});
 			samplerCache = new SamplerCache(this);
+			placeholderTexture = new PlatformTexture2D(this, Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
+			placeholderTexture.SetData(0, new[] { Color4.Black });
 			ResetState();
 		}
 
@@ -471,7 +474,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				};
 				switch (templateEntry.DescriptorType) {
 					case SharpVulkan.DescriptorType.CombinedImageSampler:
-						var texture = textures[templateEntry.TextureSlot];
+						var texture = textures[templateEntry.TextureSlot] ?? placeholderTexture;
 						imageInfos[writeCount].ImageLayout = SharpVulkan.ImageLayout.ShaderReadOnlyOptimal;
 						imageInfos[writeCount].ImageView = texture.ImageView;
 						imageInfos[writeCount].Sampler = texture.Sampler;
