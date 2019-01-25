@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView.Presenters
 		{
 			if (
 				Document.Current.PreviewAnimation ||
-				Document.Current.ExpositionMode
+				Document.Current.ExpositionMode || !CoreUserPreferences.Instance.ShowFrameProgression
 
 			) {
 				return;

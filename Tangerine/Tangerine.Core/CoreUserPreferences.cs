@@ -29,6 +29,9 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public bool SwapMouseButtonsForKeyframeSwitch { get; set; }
 
+		[YuzuOptional]
+		public bool ShowFrameProgression { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
