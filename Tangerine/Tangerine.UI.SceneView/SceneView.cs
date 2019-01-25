@@ -5,6 +5,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI.Docking;
+using Tangerine.UI.SceneView.Presenters;
 
 namespace Tangerine.UI.SceneView
 {
@@ -276,6 +277,7 @@ namespace Tangerine.UI.SceneView
 			new InspectRootNodePresenter(this);
 			new NineGridLinePresenter(this);
 			new Animation2DPathPresenter(this);
+			new FrameProgressionPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)
