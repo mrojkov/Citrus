@@ -34,7 +34,7 @@ namespace Lime
 			LayoutManager = new LayoutManager();
 		}
 
-		protected virtual bool ContinuousRendering() { return false; }
+		protected virtual bool ContinuousRendering() { return true; }
 
 		private bool prevAnyCaptureKeyPressed;
 		private AssetBundle assetBundle;
