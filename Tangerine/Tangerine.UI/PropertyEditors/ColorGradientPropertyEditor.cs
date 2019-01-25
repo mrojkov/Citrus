@@ -92,7 +92,7 @@ namespace Tangerine.UI
 			var button = new ToolbarButton {
 				Texture = IconPool.GetTexture("Tools.Pipette"),
 			};
-			button.Tasks.Add(UIProcessors.PickColorProcessor(
+			button.Tasks.Add(Color4PropertyEditor.PickColorProcessor(
 				button, v => {
 					v.A = selectedControlPoint.Color.A;
 					SetControlPointProperty(nameof(GradientControlPoint.Color), v);
