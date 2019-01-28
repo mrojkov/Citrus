@@ -188,6 +188,16 @@ namespace Lime
 		/// </summary>
 		public static ISoftKeyboard SoftKeyboard { get; internal set; }
 
+		/// <summary>
+		/// Gets or sets the ISO 639-1 two-letter code for current application language
+		/// </summary>
+		public static string CurrentLanguage { get; set; }
+
+		/// <summary>
+		/// Gets or sets CultureInfo for UI
+		/// </summary>
+		public static System.Globalization.CultureInfo CurrentCultureInfo { get; set; }
+
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
 		private static IMenu mainMenu;

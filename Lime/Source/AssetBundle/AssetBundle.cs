@@ -53,6 +53,7 @@ namespace Lime
 			}
 		}
 
+		[Obsolete("Field is deprecated, please use CurrentLanguage in Application class instead.")]
 		public static string CurrentLanguage;
 
 		public abstract Stream OpenFile(string path);
@@ -93,11 +94,12 @@ namespace Lime
 
 		public string GetLocalizedPath(string path)
 		{
-			if (string.IsNullOrEmpty(CurrentLanguage))
+			if (string.IsNullOrEmpty(Application.CurrentLanguage) && string.IsNullOrEmpty(CurrentLanguage))
 				return path;
+			string lang = string.IsNullOrEmpty(Application.CurrentLanguage) ? CurrentLanguage : Application.CurrentLanguage;
 			string extension = Path.GetExtension(path);
 			string pathWithoutExtension = Path.ChangeExtension(path, null);
-			string localizedParth = pathWithoutExtension + "." + CurrentLanguage + extension;
+			string localizedParth = pathWithoutExtension + "." + lang + extension;
 			return FileExists(localizedParth) ? localizedParth : path;
 		}
 

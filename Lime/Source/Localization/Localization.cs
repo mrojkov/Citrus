@@ -41,6 +41,11 @@ namespace Lime
 #endif
 		}
 
+		public static System.Globalization.CultureInfo GetCurrentCultureInfo()
+		{
+			return System.Globalization.CultureInfo.CurrentUICulture;
+		}
+
 		/// <summary>
 		/// Возвращает локализованную строку из текущего словаря по ее ключу
 		/// </summary>

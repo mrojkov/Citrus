@@ -137,8 +137,12 @@ namespace Lime
 			NumberGroupSeparator = "\u00A0",
 		};
 
-		public static string Localize(this int value)
+		public static string Localize(this int value, string format = "N0")
 		{
+			if (Application.CurrentCultureInfo != null) {
+				return value.ToString(format, Application.CurrentCultureInfo.NumberFormat);
+			}
+
 			if (value > -1000 && value < 1000) {
 				return value.ToString();
 			}
@@ -151,11 +155,11 @@ namespace Lime
 				case "KR":
 				case "CN":
 				case "TW":
-					return value.ToString("N0");
+					return value.ToString(format);
 				case "BR":
-					return value.ToString("N0", brFormat);
+					return value.ToString(format, brFormat);
 				default:
-					return value.ToString("N0", defaultFormat);
+					return value.ToString(format, defaultFormat);
 			}
 		}
 	}
