@@ -43,7 +43,17 @@ namespace Lime
 
 		public static System.Globalization.CultureInfo GetCurrentCultureInfo()
 		{
+#if iOS
+			var locale = NSLocale.PreferredLanguages[0];
+			try {
+				var culture = new System.Globalization.CultureInfo(locale.Substring(0, locale.LastIndexOf('-')));
+				return culture;
+			} catch (System.Exception e) {
+				return System.Globalization.CultureInfo.CurrentUICulture;
+			}
+#else
 			return System.Globalization.CultureInfo.CurrentUICulture;
+#endif
 		}
 
 		/// <summary>
