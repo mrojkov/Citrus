@@ -294,7 +294,9 @@ namespace Lime
 			UpdateFrame?.Invoke(delta);
 			prevUpdateTime = curUpdateTime;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+			renderContext.Begin(framebuffer);
 			RenderFrame?.Invoke();
+			renderContext.End();
 		}
 
 		[Register]
