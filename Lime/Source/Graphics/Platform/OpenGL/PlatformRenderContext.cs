@@ -145,8 +145,8 @@ namespace Lime.Graphics.Platform.OpenGL
 			GLHelper.ParseGLVersion(GL.GetString(StringName.Version), out GLMajorVersion, out GLMinorVersion, out ESProfile);
 			var glExtensions = new HashSet<string>(GL.GetString(StringName.Extensions).Split(' '));
 			SupportsTextureRG = !ESProfile || GLMajorVersion >= 3 || glExtensions.Contains("GL_EXT_texture_rg");
-			SupportsPackedDepth24Stencil8 = !ESProfile || glExtensions.Contains("GL_OES_packed_depth_stencil");
-			SupportsDepth24 = !ESProfile || glExtensions.Contains("GL_OES_depth24");
+			SupportsPackedDepth24Stencil8 = !ESProfile || GLMajorVersion >= 3 || glExtensions.Contains("GL_OES_packed_depth_stencil");
+			SupportsDepth24 = !ESProfile || GLMajorVersion >= 3 || glExtensions.Contains("GL_OES_depth24");
 			var supportsS3tc = glExtensions.Contains("GL_EXT_texture_compression_s3tc");
 			SupportsDxt1 = supportsS3tc || glExtensions.Contains("GL_EXT_texture_compression_dxt1");
 			SupportsDxt3 = supportsS3tc || glExtensions.Contains("GL_ANGLE_texture_compression_dxt3");
