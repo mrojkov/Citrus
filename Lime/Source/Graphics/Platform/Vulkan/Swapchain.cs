@@ -140,7 +140,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			// XXX
 			width = (int)surfaceCapabilities.CurrentExtent.Width;
 			height = (int)surfaceCapabilities.CurrentExtent.Height;
-			var desiredBufferCount = 2U;
+			var desiredBufferCount = 3U;
 			if (desiredBufferCount < surfaceCapabilities.MinImageCount) {
 				desiredBufferCount = surfaceCapabilities.MinImageCount;
 			} else if (surfaceCapabilities.MaxImageCount > 0 && desiredBufferCount > surfaceCapabilities.MaxImageCount) {
