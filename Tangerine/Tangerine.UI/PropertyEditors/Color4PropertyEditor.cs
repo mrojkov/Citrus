@@ -95,7 +95,12 @@ namespace Tangerine.UI
 			var button = new ToolbarButton {
 				Texture = IconPool.GetTexture("Tools.Pipette"),
 			};
-			button.Tasks.Add(UIProcessors.PickColorProcessor(button, v => SetProperty(v)));
+			var current = CoalescedPropertyValue();
+			button.Tasks.Add(UIProcessors.PickColorProcessor(button, v => {
+				var value = current.GetValue();
+				v.A = value.IsDefined ? value.Value.A : v.A;
+				SetProperty(v);
+			}));
 			return button;
 		}
 
