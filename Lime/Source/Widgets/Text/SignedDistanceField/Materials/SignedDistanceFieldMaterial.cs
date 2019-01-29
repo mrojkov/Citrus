@@ -6,6 +6,10 @@ namespace Lime.SignedDistanceField
 {
 	public class SignedDistanceFieldMaterial : IMaterial
 	{
+		private const int gradientTexturePixelCount = 256;
+		private static Dictionary<int, Texture2D> gradientTexturePool = new Dictionary<int, Texture2D>();
+		private static Color4[] gradientTexturePixels = new Color4[gradientTexturePixelCount];
+
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
 		private readonly Blending blending;
@@ -22,8 +26,6 @@ namespace Lime.SignedDistanceField
 		private readonly ShaderParamKey<float> bevelWidthKey;
 		private readonly ShaderParamKey<float> reflectionKey;
 
-		private const int gradientTexturePixelCount = 2048;
-		private Color4[] pixels;
 		private int currentVersion;
 		private ColorGradient gradient;
 
@@ -73,13 +75,6 @@ namespace Lime.SignedDistanceField
 			reflectionKey = shaderParams.GetParamKey<float>("reflection");
 			bevelWidthKey = shaderParams.GetParamKey<float>("bevelWidth");
 
-			pixels = new Color4[gradientTexturePixelCount];
-			GradientTexture = new Texture2D {
-				TextureParams = new TextureParams {
-					WrapMode = TextureWrapMode.Clamp,
-					MinMagFilter = TextureFilter.Linear,
-				}
-			};
 			Gradient = new ColorGradient(Color4.White, Color4.Black);
 		}
 
@@ -111,8 +106,19 @@ namespace Lime.SignedDistanceField
 			var hash = Gradient.GetHashCode();
 			if (forceInvalidate || currentVersion != hash) {
 				currentVersion = hash;
-				Gradient.Rasterize(ref pixels);
-				GradientTexture.LoadImage(pixels, gradientTexturePixelCount, 1);
+				if (gradientTexturePool.TryGetValue(hash, out var texture)) {
+					GradientTexture = texture;
+				} else {
+					Gradient.Rasterize(ref gradientTexturePixels);
+					GradientTexture = new Texture2D {
+						TextureParams = new TextureParams {
+							WrapMode = TextureWrapMode.Clamp,
+							MinMagFilter = TextureFilter.Linear,
+						}
+					};
+					GradientTexture.LoadImage(gradientTexturePixels, gradientTexturePixelCount, 1);
+					gradientTexturePool.Add(hash, GradientTexture);
+				}
 			}
 		}
 
