@@ -101,8 +101,9 @@ namespace Lime.Graphics.Platform.OpenGL
 			GLHelper.CheckGLErrors();
 			uniformInfos = new UniformInfo[uniformCount];
 			uniformStagingDataSize = 0;
+			var sb = new StringBuilder(maxUniformNameLength);
 			for (var i = 0; i < uniformCount; i++) {
-				StringBuilder sb = new StringBuilder();
+				sb.Clear();
 				GL.GetActiveUniform(GLProgram, i, maxUniformNameLength, out _, out var arraySize, out ActiveUniformType type, sb);
 				GLHelper.CheckGLErrors();
 				var name = sb.ToString();
