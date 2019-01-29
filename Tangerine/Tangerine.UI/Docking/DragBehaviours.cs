@@ -165,7 +165,7 @@ namespace Tangerine.UI.Docking
 		private readonly Widget contentWidget;
 		private readonly Placement placement;
 		private Vector2 LocalMousePosition => inputWidget.Parent.AsWidget.LocalMousePosition();
-		private const float Offset = 30;
+		private const float DragThreshold = 30;
 		private readonly WidgetInput input;
 
 		public event Action<Vector2, Vector2> OnUndock;
@@ -191,17 +191,28 @@ namespace Tangerine.UI.Docking
 						var panelWindow = (WindowWidget)contentWidget.GetRoot();
 						var window = panelWindow.Window;
 						if (window.State == WindowState.Maximized) {
-							window.State = WindowState.Normal;
-							pressedPosition = new Vector2(window.ClientSize.X / 2, 10);
+							var initialPosition = LocalMousePosition;
+							while (input.IsMousePressed()) {
+								var diff = Mathf.Abs(LocalMousePosition - initialPosition);
+								if (diff.X >= DragThreshold || diff.Y >= DragThreshold) {
+									window.State = WindowState.Normal;
+									pressedPosition = new Vector2(window.ClientSize.X / 2, 10);
+									WindowDragBehaviour.CreateFor(placement, pressedPosition);
+									break;
+								}
+								yield return null;
+							}
+							yield return null;
+							continue;
 						}
 						WindowDragBehaviour.CreateFor(placement, pressedPosition);
 					} else {
 						var size = inputWidget.Parent.AsWidget.Size;
 						var initialPosition = LocalMousePosition;
 						while (input.IsMousePressed() &&
-							LocalMousePosition.X > -Offset &&
-							LocalMousePosition.X < size.X + Offset &&
-							Mathf.Abs(LocalMousePosition.Y - initialPosition.Y) < Offset
+							LocalMousePosition.X > -DragThreshold &&
+							LocalMousePosition.X < size.X + DragThreshold &&
+							Mathf.Abs(LocalMousePosition.Y - initialPosition.Y) < DragThreshold
 						) {
 							yield return null;
 						}
