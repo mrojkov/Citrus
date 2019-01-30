@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Lime;
 using Tangerine.Core;
+using Exception = Lime.Exception;
 
 namespace Tangerine.UI
 {
@@ -15,20 +16,8 @@ namespace Tangerine.UI
 		{
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
-			EditorContainer.AddNode(Selector);
 			var propertyType = typeof(T);
 			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
-			var propertyMetaItem = meta.Items.FirstOrDefault(i => i.Name == editorParams.PropertyName);
-			if (propertyMetaItem != null) {
-				var defaultValue = propertyMetaItem.GetValue(meta.Default);
-				var resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert")) {
-					Clicked = () => { SetProperty(defaultValue); }
-				};
-				EditorContainer.AddNode(resetToDefaultButton);
-				Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
-					resetToDefaultButton.Visible = !Equals(v.Value, defaultValue);
-				});
-			}
 			if (!propertyType.IsInterface) {
 				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
 			}
@@ -51,6 +40,61 @@ namespace Tangerine.UI
 					Selector.Text = ManyValuesText;
 				}
 			});
+
+			var propertyMetaItem = meta.Items.FirstOrDefault(i => i.Name == editorParams.PropertyName);
+			object defaultValue = null;
+			ToolbarButton resetToDefaultButton = null;
+			if (propertyMetaItem != null) {
+				defaultValue = propertyMetaItem.GetValue(meta.Default);
+				resetToDefaultButton = new ToolbarButton(IconPool.GetTexture("Tools.Revert")) {
+					Clicked = () => SetProperty(defaultValue)
+				};
+				if (Selector.Items.Count == 1) {
+					var t = Selector.Items[0].Value as Type;
+					var b = new ToolbarButton("Create") {
+						TabTravesable = new TabTraversable(),
+						LayoutCell = new LayoutCell(Alignment.LeftCenter),
+						Padding = new Thickness(left: 5.0f),
+						HitTestTarget = true,
+						MinWidth = 0,
+						MaxWidth = float.PositiveInfinity
+					};
+					b.Clicked = () => {
+						b.Visible = false;
+						SetProperty<object>(_ => t != null ? Activator.CreateInstance(t) : null);
+						OnValueChanged?.Invoke(ExpandableContent);
+						Expanded = true;
+					};
+					resetToDefaultButton.Clicked = () => {
+						b.Visible = true;
+						SetProperty(defaultValue);
+						OnValueChanged?.Invoke(ExpandableContent);
+					};
+					EditorContainer.AddNode(b);
+					EditorContainer.AddNode(Spacer.HStretch());
+				} else {
+					EditorContainer.Nodes.Insert(0, Selector);
+				}
+				EditorContainer.AddNode(resetToDefaultButton);
+				Selector.AddChangeWatcher(CoalescedPropertyValue(), v => {
+					resetToDefaultButton.Visible = !Equals(v.Value, defaultValue);
+				});
+			} else if (Selector.Items.Count == 1) {
+				var t = Selector.Items[0].Value as Type;
+				EditorContainer.Nodes.Insert(0, new ThemedSimpleText {
+					Text = Selector.Items[0].Text,
+					VAlignment = VAlignment.Center,
+					LayoutCell = new LayoutCell(Alignment.LeftCenter),
+					ForceUncutText = false,
+					Padding = new Thickness(left: 5.0f),
+					HitTestTarget = true,
+					TabTravesable = new TabTraversable()
+				});
+				SetProperty<object>(_ => t != null ? Activator.CreateInstance(t) : null);
+				OnValueChanged?.Invoke(ExpandableContent);
+			} else {
+				EditorContainer.Nodes.Insert(0, Selector);
+			}
 		}
 
 		private static class DerivedTypesCache
