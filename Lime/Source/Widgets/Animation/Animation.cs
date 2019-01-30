@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Yuzu;
 
 namespace Lime
@@ -193,14 +194,26 @@ namespace Lime
 
 		public class AnimationData
 		{
+			public delegate bool LoadingDelegate(string path, ref AnimationData instance);
+			public delegate void LoadedDelegate(string path, AnimationData instance);
+			public static ThreadLocal<LoadingDelegate> Loading;
+			public static ThreadLocal<LoadedDelegate> Loaded;
+
 			[YuzuMember]
 			public List<IAnimator> Animators { get; private set; } = new List<IAnimator>();
 
 			public static AnimationData Load(string path)
 			{
+				AnimationData instance = null;
 				path = FixAntPath(path);
 				path += ".ant";
-				return Serialization.ReadObject<AnimationData>(path);
+				if (Loading?.Value?.Invoke(path, ref instance) ?? false) {
+					Loaded?.Value?.Invoke(path, instance);
+					return instance;
+				}
+				instance = Serialization.ReadObject<AnimationData>(path);
+				Loaded?.Value?.Invoke(path, instance);
+				return instance;
 			}
 		}
 	}
