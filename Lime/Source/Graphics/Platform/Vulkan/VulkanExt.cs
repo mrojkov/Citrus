@@ -49,7 +49,23 @@ namespace SharpVulkan.Ext
 		ImageMemoryRequirementsInfo2 = 1000146001,
 		MemoryRequirements2 = 1000146003
 	}
-
+	
+	internal struct MVKConfiguration
+	{
+	    public SharpVulkan.RawBool debugMode;
+ 		public SharpVulkan.RawBool shaderConversionFlipVertexY;
+		public SharpVulkan.RawBool synchronousQueueSubmits;
+		public SharpVulkan.RawBool prefillMetalCommandBuffers;
+		public uint maxActiveMetalCommandBuffersPerQueue;
+		public SharpVulkan.RawBool supportLargeQueryPools;
+		public SharpVulkan.RawBool presentWithCommandBuffer;
+		public SharpVulkan.RawBool swapchainMagFilterUseNearest;
+		public ulong metalCompileTimeout;
+		public SharpVulkan.RawBool performanceTracking;
+		public uint performanceLoggingFrameCount;
+		public SharpVulkan.RawBool displayWatermark;
+	}
+	
 	[UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Ansi)]
 	internal unsafe delegate RawBool DebugReportCallbackDelegate(
 			DebugReportFlags flags, DebugReportObjectType objectType, ulong @object,
@@ -70,6 +86,12 @@ namespace SharpVulkan.Ext
 
 	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 	internal delegate void GetBufferMemoryRequirements2Delegate(Device device, ref BufferMemoryRequirementsInfo2 info, ref MemoryRequirements2 memoryRequirements);
+	
+	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+	internal delegate SharpVulkan.Result GetMoltenVKConfigurationDelegate(SharpVulkan.Instance instance, ref MVKConfiguration pConfiguration, ref UIntPtr pConfigurationSize);
+	
+	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+	internal delegate SharpVulkan.Result SetMoltenVKConfigurationDelegate(SharpVulkan.Instance instance, ref MVKConfiguration pConfiguration, ref UIntPtr pConfigurationSize);
 
 	internal unsafe class VulkanExt
 	{
@@ -77,12 +99,16 @@ namespace SharpVulkan.Ext
 		public DestroyDebugReportCallbackDelegate DestroyDebugReportCallback;
 		public GetImageMemoryRequirements2Delegate GetImageMemoryRequirements2;
 		public GetBufferMemoryRequirements2Delegate GetBufferMemoryRequirements2;
+		public GetMoltenVKConfigurationDelegate GetMoltenVKConfiguration;
+		public SetMoltenVKConfigurationDelegate SetMoltenVKConfiguration;
 
 		public void LoadInstanceEntryPoints(Instance instance)
 		{
 			var loader = new InstanceEntryPointLoader(instance);
 			CreateDebugReportCallback = loader.Load<CreateDebugReportCallbackDelegate>("vkCreateDebugReportCallbackEXT");
 			DestroyDebugReportCallback = loader.Load<DestroyDebugReportCallbackDelegate>("vkDestroyDebugReportCallbackEXT");
+			GetMoltenVKConfiguration = loader.Load<GetMoltenVKConfigurationDelegate>("vkGetMoltenVKConfigurationMVK");
+			SetMoltenVKConfiguration = loader.Load<SetMoltenVKConfigurationDelegate>("vkSetMoltenVKConfigurationMVK");
 		}
 
 		public void LoadDeviceEntryPoints(Device device)
