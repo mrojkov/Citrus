@@ -19,6 +19,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		internal SharpVulkan.Buffer Buffer => buffer;
 		internal ulong SliceOffset => sliceOffset;
 		internal ulong SliceSize => sliceSize;
+		internal int Generation;
 
 		public BackingBuffer(PlatformRenderContext context, SharpVulkan.BufferUsageFlags usage, SharpVulkan.MemoryPropertyFlags memoryPropertyFlags, ulong size)
 		{
@@ -97,6 +98,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					Offset = i * alignedSliceSize
 				});
 			}
+			Generation++;
 		}
 
 		private struct SliceEntry

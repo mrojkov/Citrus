@@ -63,6 +63,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		private MemoryAlloc readbackBufferMemory;
 		private ulong readbackBufferSize;
 
+		private BoundVertexBuffer[] boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
+		private BoundIndexBuffer boundIndexBuffer;
+
 		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
 		internal bool SupportsDedicatedAllocation;
 		internal SharpVulkan.Instance Instance => instance;
@@ -435,12 +438,23 @@ namespace Lime.Graphics.Platform.Vulkan
 			for (var i = 0; i < vertexInputLayout.Bindings.Length; i++) {
 				var slot = vertexInputLayout.Bindings[i].Slot;
 				var buffer = vertexBuffers[slot];
-				var offset = vertexOffsets[slot];
 				if (buffer != null) {
 					buffer.WriteFenceValue = nextFenceValue;
-					var vkBuffer = buffer.BackingBuffer.Buffer;
-					var vkEffectiveOffset = buffer.BackingBuffer.SliceOffset + (ulong)offset;
-					commandBuffer.BindVertexBuffers((uint)slot, 1, &vkBuffer, &vkEffectiveOffset);
+					var backingBuffer = buffer.BackingBuffer;
+					var offset = backingBuffer.SliceOffset + (ulong)vertexOffsets[slot];
+					var boundBuffer = boundVertexBuffers[slot];
+					if (boundBuffer.Buffer != buffer ||
+						boundBuffer.Generation != backingBuffer.Generation ||
+						boundBuffer.Offset != offset
+					) {
+						var vkBuffer = backingBuffer.Buffer;
+						commandBuffer.BindVertexBuffers((uint)slot, 1, &vkBuffer, &offset);
+						boundVertexBuffers[slot] = new BoundVertexBuffer {
+							Buffer = buffer,
+							Generation = backingBuffer.Generation,
+							Offset = offset
+						};
+					}
 				}
 			}
 		}
@@ -449,8 +463,21 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			if (indexBuffer != null) {
 				indexBuffer.WriteFenceValue = nextFenceValue;
-				var effectiveOffset = indexBuffer.BackingBuffer.SliceOffset + (ulong)indexOffset;
-				commandBuffer.BindIndexBuffer(indexBuffer.BackingBuffer.Buffer, effectiveOffset, VulkanHelper.GetVKIndexType(indexFormat));
+				var backingBuffer = indexBuffer.BackingBuffer;
+				var offset = backingBuffer.SliceOffset + (ulong)indexOffset;
+				if (boundIndexBuffer.Buffer != indexBuffer ||
+					boundIndexBuffer.Generation != backingBuffer.Generation ||
+					boundIndexBuffer.Offset != offset ||
+					boundIndexBuffer.Format != indexFormat
+				) {
+					commandBuffer.BindIndexBuffer(backingBuffer.Buffer, offset, VulkanHelper.GetVKIndexType(indexFormat));
+					boundIndexBuffer = new BoundIndexBuffer {
+						Buffer = indexBuffer,
+						Generation = backingBuffer.Generation,
+						Offset = offset,
+						Format = indexFormat
+					};
+				}
 			}
 		}
 
@@ -841,7 +868,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				};
 				fence = AcquireFence();
 				queue.Submit(1, &vkSubmitInfo, fence);
-				InvalidateState();
 			}
 			submitInfos.Enqueue(new SubmitInfo {
 				CommandBuffer = commandBuffer,
@@ -872,11 +898,12 @@ namespace Lime.Graphics.Platform.Vulkan
 				vertexBuffers[i] = null;
 			}
 			indexBuffer = null;
-			InvalidateState();
 		}
 
 		private void InvalidateState()
 		{
+			Array.Clear(boundVertexBuffers, 0, boundVertexBuffers.Length);
+			boundIndexBuffer = default;
 		}
 
 		private SharpVulkan.CommandBuffer GetCurrentCommandBuffer()
@@ -901,6 +928,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					Flags = SharpVulkan.CommandBufferUsageFlags.OneTimeSubmit
 				};
 				commandBuffer.Begin(ref beginInfo);
+				InvalidateState();
 			}
 		}
 
@@ -1125,6 +1153,14 @@ namespace Lime.Graphics.Platform.Vulkan
 			return new PlatformBuffer(this, bufferType, size, dynamic);
 		}
 
+		private static SharpVulkan.RawBool DebugReport(
+			SharpVulkan.DebugReportFlags flags, SharpVulkan.DebugReportObjectType objectType, ulong @object,
+			SharpVulkan.PointerSize location, int messageCode, string layerPrefix, string message, IntPtr userData)
+		{
+			Logger.Write($"{flags}: {message} ([{messageCode}] {layerPrefix})");
+			return false;
+		}
+
 		private struct SubmitInfo
 		{
 			public SharpVulkan.CommandBuffer CommandBuffer;
@@ -1132,12 +1168,19 @@ namespace Lime.Graphics.Platform.Vulkan
 			public ulong FenceValue;
 		}
 
-		private static SharpVulkan.RawBool DebugReport(
-			SharpVulkan.DebugReportFlags flags, SharpVulkan.DebugReportObjectType objectType, ulong @object,
-			SharpVulkan.PointerSize location, int messageCode, string layerPrefix, string message, IntPtr userData)
+		private struct BoundVertexBuffer
 		{
-			Logger.Write($"{flags}: {message} ([{messageCode}] {layerPrefix})");
-			return false;
+			public PlatformBuffer Buffer;
+			public int Generation;
+			public ulong Offset;
+		}
+
+		private struct BoundIndexBuffer
+		{
+			public PlatformBuffer Buffer;
+			public int Generation;
+			public ulong Offset;
+			public IndexFormat Format;
 		}
 	}
 }
