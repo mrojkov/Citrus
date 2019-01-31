@@ -847,6 +847,9 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
 		{
+			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
+				return;
+			}
 			var oldBlendState = blendState;
 			var oldDepthState = depthState;
 			var oldStencilState = stencilState;
