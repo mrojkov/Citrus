@@ -1,9 +1,6 @@
-using Lime;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
@@ -108,6 +105,7 @@ namespace Tangerine.UI.Timeline.Operations
 				int rowIndex = startRow;
 				int animationHostIndex = 0;
 				IAnimationHost animationHost = null;
+				Node node = null;
 
 				foreach (var key in keys) {
 					int colIndex = startCol + key.Frame;
@@ -115,7 +113,8 @@ namespace Tangerine.UI.Timeline.Operations
 						continue;
 					}
 					while (rowIndex < rows.Count) {
-						animationHost = rows[rowIndex].Components.Get<NodeRow>()?.Node;
+						node = rows[rowIndex].Components.Get<NodeRow>()?.Node;
+						animationHost = node;
 						if (animationHost != null) {
 							if (animationHostIndex == key.AnimationHostOrderIndex) {
 								break;
@@ -124,11 +123,12 @@ namespace Tangerine.UI.Timeline.Operations
 						}
 						++rowIndex;
 					}
-
 					if (rowIndex >= rows.Count) {
 						break;
 					}
-
+					if (node.EditorState().Locked) {
+						continue;
+					}
 					var (pd, _, _) = AnimationUtils.GetPropertyByPath(animationHost, key.Property);
 					if (pd.Info == null) {
 						continue;
@@ -151,7 +151,11 @@ namespace Tangerine.UI.Timeline.Operations
 					if (spans == null) {
 						continue;
 					}
-					var animable = row.Components.Get<NodeRow>()?.Node as IAnimationHost;
+					var node = row.Components.Get<NodeRow>()?.Node;
+					if (node.EditorState().Locked) {
+						continue;
+					}
+					var animable = (IAnimationHost) node;
 					if (animable == null) {
 						continue;
 					}

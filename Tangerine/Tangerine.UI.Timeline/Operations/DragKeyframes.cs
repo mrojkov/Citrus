@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline.Operations
 				var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans.GetNonOverlappedSpans(offset.X > 0);
 				foreach (var span in spans) {
 					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
-					if (node == null) {
+					if (node == null || node.EditorState().Locked) {
 						continue;
 					}
 					var property = row.Components.Get<PropertyRow>()?.Animator.TargetPropertyPath;
