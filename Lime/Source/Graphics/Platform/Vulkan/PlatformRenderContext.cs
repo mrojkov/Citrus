@@ -425,7 +425,24 @@ namespace Lime.Graphics.Platform.Vulkan
 				viewport.X, viewport.Y, viewport.Width, viewport.Height,
 				viewport.MinDepth, viewport.MaxDepth);
 			commandBuffer.SetViewport(0, 1, &vkViewport);
-			var scissorBounds = scissorState.Enable ? scissorState.Bounds : viewport.Bounds;
+			var scissorBounds = viewport.Bounds;
+			if (scissorState.Enable) {
+				scissorBounds = scissorState.Bounds;
+				if (scissorBounds.X < 0) {
+					scissorBounds.Width += scissorBounds.X;
+					scissorBounds.X = 0;
+				}
+				if (scissorBounds.Y < 0) {
+					scissorBounds.Height += scissorBounds.Y;
+					scissorBounds.Y = 0;
+				}
+				if (scissorBounds.Width <= 0 || scissorBounds.Height <= 0) {
+					scissorBounds.X = viewport.X + viewport.Width;
+					scissorBounds.Y = viewport.Y + viewport.Height;
+					scissorBounds.Width = 1;
+					scissorBounds.Height = 1;
+				}
+			}
 			var vkScissor = new SharpVulkan.Rect2D(
 				scissorBounds.X, scissorBounds.Y, (uint)scissorBounds.Width, (uint)scissorBounds.Height);
 			commandBuffer.SetScissor(0, 1, &vkScissor);
