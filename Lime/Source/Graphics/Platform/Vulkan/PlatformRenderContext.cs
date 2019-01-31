@@ -103,6 +103,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			samplerCache = new SamplerCache(this);
 			placeholderTexture = new PlatformTexture2D(this, Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
 			placeholderTexture.SetData(0, new[] { Color4.Black });
+			CreateClearPipeline();
 			ResetState();
 		}
 
@@ -755,42 +756,156 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 		}
 
+		//public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
+		//{
+		//	EnsureRenderPass();
+		//	var attachments = stackalloc SharpVulkan.ClearAttachment[2];
+		//	var attachmentCount = 0U;
+		//	if ((options & ClearOptions.ColorBuffer) != 0) {
+		//		// FIXME: Handle SInt, UInt formats
+		//		attachments[attachmentCount++] = new SharpVulkan.ClearAttachment {
+		//			ColorAttachment = 0,
+		//			AspectMask = SharpVulkan.ImageAspectFlags.Color,
+		//			ClearValue = new SharpVulkan.ClearValue {
+		//				Color = new SharpVulkan.RawColor4(r, g, b, a)
+		//			}
+		//		};
+		//	}
+		//	if ((options & (ClearOptions.DepthBuffer | ClearOptions.StencilBuffer)) != 0) {
+		//		var aspect = SharpVulkan.ImageAspectFlags.None;
+		//		if ((options & ClearOptions.DepthBuffer) != 0) {
+		//			aspect |= SharpVulkan.ImageAspectFlags.Depth;
+		//		}
+		//		if ((options & ClearOptions.StencilBuffer) != 0) {
+		//			aspect |= SharpVulkan.ImageAspectFlags.Stencil;
+		//		}
+		//		attachments[attachmentCount++] = new SharpVulkan.ClearAttachment {
+		//			AspectMask = aspect,
+		//			ClearValue = new SharpVulkan.ClearValue {
+		//				DepthStencil = new SharpVulkan.ClearDepthStencilValue(depth, stencil)
+		//			}
+		//		};
+		//	}
+		//	var clearRect = new SharpVulkan.ClearRect {
+		//		BaseArrayLayer = 0,
+		//		LayerCount = 1,
+		//		Rect = new SharpVulkan.Rect2D(0, 0, (uint)viewport.Width, (uint)viewport.Height)
+		//	};
+		//	commandBuffer.ClearAttachments(attachmentCount, ref attachments[0], 1, &clearRect);
+		//}
+
+		private Vector4[] clearVertices = new Vector4[4];
+		private PlatformBuffer clearVertexBuffer;
+		private PlatformShaderProgram clearProgram;
+		private PlatformVertexInputLayout clearVertexInputLayout;
+		private int clearColorUniformIndex;
+
+		private void CreateClearPipeline()
+		{
+			var vs = new PlatformShader(this, ShaderStageMask.Vertex, @"
+				attribute highp vec4 in_Position;
+
+				void main()
+				{
+					gl_Position = in_Position;
+				}
+			");
+			var fs = new PlatformShader(this, ShaderStageMask.Fragment, @"
+				uniform lowp vec4 clearColor;
+
+				void main()
+				{
+					gl_FragColor = clearColor;
+				}
+			");
+			const int positionLocation = 0;
+			var attribLocations = new[] {
+				new ShaderProgram.AttribLocation { Name = "in_Position", Index = positionLocation }
+			};
+			clearProgram = new PlatformShaderProgram(this, new[] { vs, fs }, attribLocations, new ShaderProgram.Sampler[0]);
+			clearColorUniformIndex = clearProgram.GetUniformDescriptions()
+				.Where(desc => desc.Name == "clearColor")
+				.Select((desc, index) => index)
+				.First();
+			clearVertexInputLayout = new PlatformVertexInputLayout(this,
+				new[] {
+					new VertexInputLayoutBinding {
+						Slot = 0,
+						Stride = sizeof(Vector4)
+					}
+				},
+				new[] {
+					new VertexInputLayoutAttribute {
+						Slot = 0,
+						Location = positionLocation,
+						Offset =0,
+						Format = Format.R32G32B32A32_SFloat
+					}
+				});
+			clearVertexBuffer = new PlatformBuffer(this, BufferType.Vertex, clearVertices.Length * sizeof(Vector4), true);
+		}
+
 		public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
 		{
-			EnsureRenderPass();
-			var attachments = stackalloc SharpVulkan.ClearAttachment[2];
-			var attachmentCount = 0U;
-			if ((options & ClearOptions.ColorBuffer) != 0) {
-				// FIXME: Handle SInt, UInt formats
-				attachments[attachmentCount++] = new SharpVulkan.ClearAttachment {
-					ColorAttachment = 0,
-					AspectMask = SharpVulkan.ImageAspectFlags.Color,
-					ClearValue = new SharpVulkan.ClearValue {
-						Color = new SharpVulkan.RawColor4(r, g, b, a)
-					}
-				};
-			}
-			if ((options & (ClearOptions.DepthBuffer | ClearOptions.StencilBuffer)) != 0) {
-				var aspect = SharpVulkan.ImageAspectFlags.None;
+			var oldBlendState = blendState;
+			var oldDepthState = depthState;
+			var oldStencilState = stencilState;
+			var oldScissorState = scissorState;
+			var oldColorWriteMask = colorWriteMask;
+			var oldPrimitiveTopology = primitiveTopology;
+			var oldShaderProgram = shaderProgram;
+			var oldVertexInputLayout = vertexInputLayout;
+			var oldCullMode = cullMode;
+			try {
+				clearVertices[0] = new Vector4(-1, 1, depth, 1);
+				clearVertices[1] = new Vector4(-1, -1, depth, 1);
+				clearVertices[2] = new Vector4(1, 1, depth, 1);
+				clearVertices[3] = new Vector4(1, -1, depth, 1);
+				clearVertexBuffer.SetData(0, clearVertices, BufferSetDataMode.Discard);
+
+				var clearColor = new Vector4(r, g, b, a);
+				clearProgram.SetUniform(clearColorUniformIndex, new IntPtr(&clearColor), 1);
+
+				var clearColorWriteMask = ColorWriteMask.None;
+				if ((options & ClearOptions.ColorBuffer) != 0) {
+					clearColorWriteMask = ColorWriteMask.All;
+				}
+				var clearDepthState = new DepthState { Enable = false };
 				if ((options & ClearOptions.DepthBuffer) != 0) {
-					aspect |= SharpVulkan.ImageAspectFlags.Depth;
+					clearDepthState.Enable = true;
+					clearDepthState.WriteEnable = true;
+					clearDepthState.Comparison = CompareFunc.Always;
 				}
+				var clearStencilState = new StencilState { Enable = false };
 				if ((options & ClearOptions.StencilBuffer) != 0) {
-					aspect |= SharpVulkan.ImageAspectFlags.Stencil;
+					clearStencilState.Enable = true;
+					clearStencilState.WriteMask = 0xff;
+					clearStencilState.Comparison = CompareFunc.Always;
+					clearStencilState.Pass = StencilOp.Replace;
+					clearStencilState.ReferenceValue = stencil;
 				}
-				attachments[attachmentCount++] = new SharpVulkan.ClearAttachment {
-					AspectMask = aspect,
-					ClearValue = new SharpVulkan.ClearValue {
-						DepthStencil = new SharpVulkan.ClearDepthStencilValue(depth, stencil)
-					}
-				};
+				SetBlendState(new BlendState { Enable = false });
+				SetDepthState(clearDepthState);
+				SetStencilState(clearStencilState);
+				SetColorWriteMask(clearColorWriteMask);
+				SetScissorState(new ScissorState { Enable = false });
+				SetShaderProgram(clearProgram);
+				SetPrimitiveTopology(PrimitiveTopology.TriangleStrip);
+				SetCullMode(CullMode.None);
+				SetVertexInputLayout(clearVertexInputLayout);
+				SetVertexBuffer(0, clearVertexBuffer, 0);
+				Draw(0, clearVertices.Length);
+			} finally {
+				SetBlendState(oldBlendState);
+				SetDepthState(oldDepthState);
+				SetStencilState(oldStencilState);
+				SetScissorState(oldScissorState);
+				SetColorWriteMask(oldColorWriteMask);
+				SetShaderProgram(oldShaderProgram);
+				SetCullMode(oldCullMode);
+				SetVertexInputLayout(oldVertexInputLayout);
+				SetPrimitiveTopology(oldPrimitiveTopology);
 			}
-			var clearRect = new SharpVulkan.ClearRect {
-				BaseArrayLayer = 0,
-				LayerCount = 1,
-				Rect = new SharpVulkan.Rect2D(0, 0, (uint)viewport.Width, (uint)viewport.Height)
-			};
-			commandBuffer.ClearAttachments(attachmentCount, ref attachments[0], 1, &clearRect);
 		}
 
 		public void SetRenderTarget(IPlatformRenderTexture2D texture)
