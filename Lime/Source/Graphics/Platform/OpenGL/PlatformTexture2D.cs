@@ -45,7 +45,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		private void Initialize(TextureParams textureParams)
 		{
 			compressed = Format.IsCompressed();
-			GLHelper.GetGLTextureFormat(Format, out GLInternalFormat, out GLFormat, out GLPixelType);
+			GLHelper.GetGLTextureFormat(Context, Format, out GLInternalFormat, out GLFormat, out GLPixelType);
 			GLTexture = GL.GenTexture();
 			GLHelper.CheckGLErrors();
 			GL.ActiveTexture(TextureUnit.Texture0);

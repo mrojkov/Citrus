@@ -30,7 +30,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		public static void GetGLTextureFormat(Format format, out All glInternalFormat, out All glFormat, out All glType)
+		public static void GetGLTextureFormat(PlatformRenderContext ctx, Format format, out All glInternalFormat, out All glFormat, out All glType)
 		{
 			const All CompressedRgb8Etc2 = (All)37492;
 			const All CompressedRgb8PunchthroughAlpha1Etc2 = (All)37494;
@@ -87,7 +87,11 @@ namespace Lime.Graphics.Platform.OpenGL
 					glInternalFormat = All.CompressedRgbaS3tcDxt5Ext;
 					break;
 				case Format.ETC1_R8G8B8_UNorm_Block:
-					glInternalFormat = All.Etc1Rgb8Oes;
+					if (ctx.SupportsEtc2) {
+						glInternalFormat = CompressedRgb8Etc2;
+					} else {
+						glInternalFormat = All.Etc1Rgb8Oes;
+					}
 					break;
 				case Format.ETC2_R8G8B8_UNorm_Block:
 					glInternalFormat = CompressedRgb8Etc2;

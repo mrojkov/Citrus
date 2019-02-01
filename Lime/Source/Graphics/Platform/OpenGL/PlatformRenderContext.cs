@@ -594,7 +594,7 @@ namespace Lime.Graphics.Platform.OpenGL
 					}
 					break;
 				case Format.ETC1_R8G8B8_UNorm_Block:
-					if (SupportsEtc1) {
+					if (SupportsEtc1 || SupportsEtc2) {
 						features |= FormatFeatures.Sample;
 					}
 					break;
