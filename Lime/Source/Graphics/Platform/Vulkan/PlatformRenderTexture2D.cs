@@ -126,7 +126,26 @@ namespace Lime.Graphics.Platform.Vulkan
 				Attachment = 1,
 				Layout = SharpVulkan.ImageLayout.DepthStencilAttachmentOptimal
 			};
-			fixed (SharpVulkan.AttachmentDescription* attachmentDescsPtr = attachmentDescs) {
+			var subpassDependencies = new[] {
+				new SharpVulkan.SubpassDependency {
+					SourceSubpass = uint.MaxValue,
+					SourceAccessMask = SharpVulkan.AccessFlags.ShaderRead,
+					SourceStageMask = SharpVulkan.PipelineStageFlags.VertexShader | SharpVulkan.PipelineStageFlags.FragmentShader,
+					DestinationSubpass = 0,
+					DestinationAccessMask = SharpVulkan.AccessFlags.ColorAttachmentRead | SharpVulkan.AccessFlags.ColorAttachmentWrite,
+					DestinationStageMask = SharpVulkan.PipelineStageFlags.ColorAttachmentOutput
+				},
+				new SharpVulkan.SubpassDependency {
+					SourceSubpass = 0,
+					SourceAccessMask = SharpVulkan.AccessFlags.ColorAttachmentRead | SharpVulkan.AccessFlags.ColorAttachmentWrite,
+					SourceStageMask = SharpVulkan.PipelineStageFlags.ColorAttachmentOutput,
+					DestinationSubpass = uint.MaxValue,
+					DestinationAccessMask = SharpVulkan.AccessFlags.ShaderRead,
+					DestinationStageMask = SharpVulkan.PipelineStageFlags.VertexShader | SharpVulkan.PipelineStageFlags.FragmentShader
+				}
+			};
+			fixed (SharpVulkan.AttachmentDescription* attachmentDescsPtr = attachmentDescs)
+			fixed (SharpVulkan.SubpassDependency* subpassDependenciesPtr = subpassDependencies) {
 				var subpass = new SharpVulkan.SubpassDescription {
 					PipelineBindPoint = SharpVulkan.PipelineBindPoint.Graphics,
 					ColorAttachmentCount = 1,
@@ -138,7 +157,9 @@ namespace Lime.Graphics.Platform.Vulkan
 					AttachmentCount = (uint)attachmentDescs.Length,
 					Attachments = new IntPtr(attachmentDescsPtr),
 					SubpassCount = 1,
-					Subpasses = new IntPtr(&subpass)
+					Subpasses = new IntPtr(&subpass),
+					DependencyCount = (uint)subpassDependencies.Length,
+					Dependencies = new IntPtr(subpassDependenciesPtr)
 				};
 				renderPass = Context.Device.CreateRenderPass(ref createInfo);
 			}
