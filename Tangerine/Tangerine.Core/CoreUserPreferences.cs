@@ -32,6 +32,9 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public bool ShowFrameProgression { get; set; }
 
+		[YuzuOptional]
+		public bool LockTimelineCursor { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();

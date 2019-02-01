@@ -24,6 +24,7 @@ namespace Tangerine.UI.Timeline
 					CreateAutoKeyframesButton(),
 					CreateNewFolderButton(),
 					CreateCurveEditorButton(),
+					CreateTimelineCursorLockButton(),
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
 					CreateFrameProgressionButton(),
@@ -33,7 +34,7 @@ namespace Tangerine.UI.Timeline
 					CreateExitButton(),
 					CreateLockAnimationButton(),
 					CreateEyeButton(),
-					CreateLockButton()
+					CreateLockButton(),
 				}
 			};
 		}
@@ -236,6 +237,14 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.FrameProgression")) { Tip = "Frame progression mode" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ShowFrameProgression, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ShowFrameProgression = !CoreUserPreferences.ShowFrameProgression;
+			return button;
+		}
+
+		private ToolbarButton CreateTimelineCursorLockButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tip = "Lock timeline cursor" };
+			button.AddChangeWatcher(() => CoreUserPreferences.LockTimelineCursor, i => button.Checked = i);
+			button.Clicked += () => CoreUserPreferences.LockTimelineCursor = !CoreUserPreferences.LockTimelineCursor;
 			return button;
 		}
 
