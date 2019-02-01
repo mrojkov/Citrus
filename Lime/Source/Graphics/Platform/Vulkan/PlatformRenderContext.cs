@@ -867,6 +867,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
 				return;
 			}
+			var oldViewport = viewport;
 			var oldBlendState = blendState;
 			var oldDepthState = depthState;
 			var oldStencilState = stencilState;
@@ -904,6 +905,10 @@ namespace Lime.Graphics.Platform.Vulkan
 					clearStencilState.Pass = StencilOp.Replace;
 					clearStencilState.ReferenceValue = stencil;
 				}
+				var clearViewport = viewport;
+				clearViewport.MinDepth = 0;
+				clearViewport.MaxDepth = 1;
+				SetViewport(clearViewport);
 				SetBlendState(new BlendState { Enable = false });
 				SetDepthState(clearDepthState);
 				SetStencilState(clearStencilState);
@@ -916,6 +921,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				SetVertexBuffer(0, clearVertexBuffer, 0);
 				Draw(0, clearVertices.Length);
 			} finally {
+				SetViewport(oldViewport);
 				SetBlendState(oldBlendState);
 				SetDepthState(oldDepthState);
 				SetStencilState(oldStencilState);

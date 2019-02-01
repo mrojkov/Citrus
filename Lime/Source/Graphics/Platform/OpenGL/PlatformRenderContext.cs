@@ -263,7 +263,6 @@ namespace Lime.Graphics.Platform.OpenGL
 			if (options == ClearOptions.None) {
 				return;
 			}
-			depth = (1.0f - depth) * viewport.MinDepth + depth * viewport.MaxDepth;
 			EnsureRenderTarget();
 			ClearBufferMask glClearBufferMask = 0;
 			if ((options & ClearOptions.ColorBuffer) != 0) {
