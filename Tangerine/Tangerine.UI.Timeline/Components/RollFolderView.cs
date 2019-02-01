@@ -23,7 +23,12 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			folder = row.Components.Get<FolderRow>().Folder;
-			label = new ThemedSimpleText();
+			label = new ThemedSimpleText {
+				ForceUncutText = false,
+				VAlignment = VAlignment.Center,
+				OverflowMode = TextOverflowMode.Ellipsis,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
+			};
 			editBox = new ThemedEditBox { LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image(IconPool.GetTexture("Tools.NewFolder")) {
 				HitTestTarget = true,
