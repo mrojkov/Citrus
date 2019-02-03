@@ -1318,7 +1318,7 @@ namespace Lime
 			return instance;
 		}
 
-		public void LoadExternalScenes(Yuzu yuzu = null)
+		public virtual void LoadExternalScenes(Yuzu yuzu = null)
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
 			if (string.IsNullOrEmpty(ContentsPath)) {

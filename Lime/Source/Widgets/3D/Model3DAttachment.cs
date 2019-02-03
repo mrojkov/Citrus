@@ -19,6 +19,10 @@ namespace Lime
 
 		public float ScaleFactor { get; set; }
 
+		public string EntryAnimation { get; set; }
+
+		public string EntryMarker { get; set; }
+
 		public class MeshOption
 		{
 			public string Id { get; set; }
@@ -29,7 +33,7 @@ namespace Lime
 
 		public class Animation
 		{
-			public string Name { get; set; }
+			public string Id { get; set; }
 			public int StartFrame { get; set; } = 0;
 			public int LastFrame { get; set; } = -1;
 			public string SourceAnimationId { get; set; }
@@ -219,7 +223,7 @@ namespace Lime
 						// Check if the animation has been deleted but attachment hasn't been modified after that.
 						if (srcAnimation == null) {
 #if TANGERINE
-							Console.WriteLine($"Attachment3D Warning: skip '{ animation.Name }' animation applying. Source Fbx file have no animation data.");
+							Console.WriteLine($"Attachment3D Warning: skip '{ animation.Id }' animation applying. Source Fbx file have no animation data.");
 #endif // TANGERINE
 							continue;
 						}
@@ -231,7 +235,7 @@ namespace Lime
 					}
 				}
 
-				var animationId = animation.Name;
+				var animationId = animation.Id;
 				// TODO: Replace 'Default' animation with its source animation id in all referring to Lime projects.
 				if (animationId == "Default") {
 					animationId = srcAnimation.Id;
@@ -454,6 +458,12 @@ namespace Lime
 
 			[YuzuMember]
 			public List<Model3DAttachment.MaterialRemap> Materials = null;
+
+			[YuzuMember]
+			public string EntryAnimation = null;
+
+			[YuzuMember]
+			public string EntryMarker = null;
 		}
 
 		public class MeshOptionFormat
@@ -588,6 +598,8 @@ namespace Lime
 				var attachment = new Model3DAttachment {
 					ScaleFactor = modelAttachmentFormat.ScaleFactor
 				};
+				attachment.EntryAnimation = modelAttachmentFormat.EntryAnimation;
+				attachment.EntryMarker = modelAttachmentFormat.EntryMarker;
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption {
@@ -631,7 +643,7 @@ namespace Lime
 				if (modelAttachmentFormat.Animations != null) {
 					foreach (var animationFormat in modelAttachmentFormat.Animations) {
 						var animation = new Model3DAttachment.Animation {
-							Name = animationFormat.Key,
+							Id = animationFormat.Key,
 							StartFrame = animationFormat.Value.StartFrame,
 							LastFrame = animationFormat.Value.LastFrame,
 							SourceAnimationId = null
@@ -687,7 +699,7 @@ namespace Lime
 						animation.SourceAnimationId = animationFormat.Value.SourceAnimationId;
 						if (animationFormat.Value.IgnoredNodes != null && animationFormat.Value.IgnoredNodes.Count > 0) {
 							if (animation.Nodes.Count > 0) {
-								throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Name);
+								throw new Exception("Conflict between 'Nodes' and 'IgnoredNodes' in animation '{0}", animation.Id);
 							}
 							animation.IgnoredNodes = new ObservableCollection<Model3DAttachment.NodeData>(
 								animationFormat.Value.IgnoredNodes.Select(n => new Model3DAttachment.NodeData { Id = n }));
@@ -719,6 +731,8 @@ namespace Lime
 		{
 			var origin = new ModelAttachmentFormat();
 			origin.ScaleFactor = attachment.ScaleFactor;
+			origin.EntryAnimation = attachment.EntryAnimation;
+			origin.EntryMarker = attachment.EntryMarker;
 			if (attachment.MeshOptions.Count > 0) {
 				origin.MeshOptions = new Dictionary<string, MeshOptionFormat>();
 			}
@@ -813,7 +827,7 @@ namespace Lime
 				} else if (animation.IgnoredNodes.Count > 0) {
 					animationFormat.IgnoredNodes = animation.IgnoredNodes.Select(n => n.Id).ToList();
 				}
-				origin.Animations.Add(animation.Name, animationFormat);
+				origin.Animations.Add(animation.Id, animationFormat);
 			}
 
 			return origin;

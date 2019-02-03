@@ -554,7 +554,7 @@ namespace Tangerine
 				attachment = new Model3DAttachment { ScaleFactor = 1 };
 				foreach (var a in source.Animations) {
 					attachment.Animations.Add(new Model3DAttachment.Animation {
-						Name = a.Id,
+						Id = a.Id,
 						SourceAnimationId = a.Id,
 						StartFrame = 0,
 						LastFrame = -1
@@ -593,14 +593,14 @@ namespace Tangerine
 
 		private static void CheckErrors(Model3DAttachment attachment, Model3D source)
 		{
-			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count) {
+			if (new HashSet<string>(attachment.Animations.Select(a => a.Id)).Count != attachment.Animations.Count) {
 				throw new Lime.Exception("Animations shouldn't have the same names");
 			}
 
 			var errorAnim = attachment.Animations.FirstOrDefault(a =>
 				new HashSet<string>(a.Markers.Select(m => m.Marker.Id)).Count() != a.Markers.Count);
 			if (errorAnim != null) {
-				throw new Lime.Exception($"Markers in '{ errorAnim.Name }' animation shouldn't have the same ids");
+				throw new Lime.Exception($"Markers in '{ errorAnim.Id }' animation shouldn't have the same ids");
 			}
 
 			if (new HashSet<string>(attachment.MeshOptions.Select(a => a.Id)).Count != attachment.MeshOptions.Count) {
@@ -650,6 +650,7 @@ namespace Tangerine
 				Layout = new VBoxLayout(),
 			};
 			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(CreateEntryAnimationEditor(attachment));
 			pane.Content.AddNode(list);
 			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
 				w => {
@@ -665,7 +666,7 @@ namespace Tangerine
 				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.Animations,
 					attachment.Animations.Count,
-					new Model3DAttachment.Animation { Name = "Animation", }
+					new Model3DAttachment.Animation { Id = "Animation", }
 				));
 			}));
 			list.Components.Add(widgetFactory);
@@ -991,7 +992,7 @@ namespace Tangerine
 					Decorate(new PropertyEditorParams(
 						Header,
 						animation,
-						nameof(Model3DAttachment.Animation.Name))));
+						nameof(Model3DAttachment.Animation.Id))));
 				animationNamePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
@@ -1115,6 +1116,63 @@ namespace Tangerine
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
 				ForceUncutText = false,
 			};
+		}
+
+		private Widget CreateEntryAnimationEditor(Model3DAttachment attachment)
+		{
+			var content = new Widget {
+				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
+				Padding = new Thickness(top: AttachmentMetrics.Spacing)
+			};
+			new EntryAnimationEditor(content, attachment);
+			return content;
+		}
+
+		private class EntryAnimationEditor : TriggerPropertyEditor
+		{
+			public EntryAnimationEditor(Widget contentWidget, Model3DAttachment attachment) :
+				base(new PropertyEditorParams(contentWidget, new EntryAnimationWrapper(attachment), nameof(EntryAnimationWrapper.EntryAnimation), displayName: "Entry Animation"), FillValues) {
+			}
+
+			private static void FillValues(IEnumerable<object> objects, ComboBox comboBox)
+			{
+				foreach (var obj in objects) {
+					var attachment = ((EntryAnimationWrapper)obj).Attachment;
+					foreach (var a in attachment.Animations) {
+						foreach (var markerData in a.Markers.Where(i =>
+							i.Marker.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Marker.Id))) {
+							var id = a.Id != null
+								? (markerData.Marker.Id + '@' + (a.Id == "Default" ? a.SourceAnimationId : a.Id))
+								: markerData.Marker.Id;
+							if (comboBox.Items.All(i => i.Text != id)) {
+								comboBox.Items.Add(new CommonDropDownList.Item(id));
+							}
+						}
+					}
+				}
+			}
+
+			private class EntryAnimationWrapper
+			{
+				public readonly Model3DAttachment Attachment;
+
+				public string EntryAnimation
+				{
+					get => Attachment.EntryAnimation != null
+						? Attachment.EntryMarker + '@' + Attachment.EntryAnimation
+						: Attachment.EntryMarker;
+					set {
+						SplitTrigger(value, out var makerId, out var anim);
+						Attachment.EntryAnimation = anim;
+						Attachment.EntryMarker = makerId;
+					}
+				}
+
+				public EntryAnimationWrapper(Model3DAttachment attachment)
+				{
+					this.Attachment = attachment;
+				}
+			}
 		}
 
 		private class NodeRow : DeletableRow<Model3DAttachment.NodeData>

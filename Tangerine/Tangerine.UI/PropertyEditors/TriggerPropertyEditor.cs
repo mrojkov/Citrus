@@ -8,14 +8,23 @@ namespace Tangerine.UI
 	public class TriggerPropertyEditor : CommonPropertyEditor<string>
 	{
 		private ComboBox comboBox;
+		public delegate void FillValuesDelegate(IEnumerable<object> objects, ComboBox comboBox);
 
-		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
+		protected TriggerPropertyEditor(IPropertyEditorParams editorParams, FillValuesDelegate fillValues) : base(editorParams)
 		{
 			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			EditorContainer.AddNode(comboBox);
 			EditorContainer.AddNode(Spacer.HStretch());
 			comboBox.Changed += ComboBox_Changed;
-			foreach (var obj in editorParams.Objects) {
+			fillValues(EditorParams.Objects, comboBox);
+			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
+		}
+
+		public TriggerPropertyEditor(IPropertyEditorParams editorParams) : this(editorParams, FillValues) { }
+
+		private static void FillValues (IEnumerable<object> objects, ComboBox comboBox)
+		{
+			foreach (var obj in objects) {
 				var node = (Node)obj;
 				foreach (var a in node.Animations) {
 					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
@@ -26,7 +35,6 @@ namespace Tangerine.UI
 					}
 				}
 			}
-			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
 		}
 
 		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
@@ -58,11 +66,9 @@ namespace Tangerine.UI
 			}
 			var triggers = new List<string>();
 			var added = false;
-			string newMarker, newAnimation;
-			SplitTrigger(newTrigger, out newMarker, out newAnimation);
+			SplitTrigger(newTrigger, out _, out var newAnimation);
 			foreach (var trigger in currentTriggers.Value.Split(',').Select(i => i.Trim())) {
-				string marker, animation;
-				SplitTrigger(trigger, out marker, out animation);
+				SplitTrigger(trigger, out _, out var animation);
 				if (animation == newAnimation) {
 					if (!added) {
 						added = true;
@@ -80,7 +86,7 @@ namespace Tangerine.UI
 			comboBox.Text = newValue;
 		}
 
-		private static void SplitTrigger(string trigger, out string markerId, out string animationId)
+		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
 		{
 			if (!trigger.Contains('@')) {
 				markerId = trigger;
@@ -94,26 +100,18 @@ namespace Tangerine.UI
 
 		private class TriggerStringComparer : IEqualityComparer<string>
 		{
-
 			public bool Equals(string x, string y)
 			{
-				string xMarker;
-				string yMarker;
-				string xAnimation;
-				string yAnimation;
-				SplitTrigger(x, out xMarker, out xAnimation);
-				SplitTrigger(y, out yMarker, out yAnimation);
+				SplitTrigger(x, out _, out var xAnimation);
+				SplitTrigger(y, out _, out var yAnimation);
 				return xAnimation == yAnimation;
 			}
 
 			public int GetHashCode(string obj)
 			{
-				string marker;
-				string animation;
-				SplitTrigger(obj, out marker, out animation);
+				SplitTrigger(obj, out _, out var animation);
 				return animation == null ? 0 : animation.GetHashCode();
 			}
 		}
-
 	}
 }
