@@ -1124,7 +1124,7 @@ namespace Tangerine
 				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
 				Padding = new Thickness(top: AttachmentMetrics.Spacing)
 			};
-			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Id == "Default").SourceAnimationId;
+			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Id == "Default")?.SourceAnimationId;
 			var node = new Node3D {
 				Trigger = attachment.EntryTrigger != null ? attachment.EntryTrigger.Replace($"@{defaultAnimation}", "@Default") : null
 			};

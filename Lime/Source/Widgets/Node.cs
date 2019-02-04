@@ -919,7 +919,7 @@ namespace Lime
 			}
 		}
 
-		private void TriggerMultipleAnimations(double animationTimeCorrection = 0)
+		protected void TriggerMultipleAnimations(double animationTimeCorrection = 0)
 		{
 			if (Trigger.IndexOf(',') >= 0) {
 				foreach (var s in Trigger.Split(',')) {

@@ -32,12 +32,6 @@ namespace Lime
 
 		public override void LoadExternalScenes(Yuzu yuzu = null)
 		{
-			void InvokeTrigger(string trigger)
-			{
-				SplitTrigger(trigger, out var markerId, out var animationId);
-				TryRunAnimation(markerId, animationId);
-			}
-
 			base.LoadExternalScenes(yuzu);
 			yuzu = yuzu ?? Yuzu.Instance.Value;
 			if (ContentsPath != null) {
@@ -46,28 +40,13 @@ namespace Lime
 					using (var stream = AssetBundle.Current.OpenFileLocalized(attachmentPath)) {
 						var attachment = yuzu.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
 						if (string.IsNullOrEmpty(attachment.EntryTrigger)) return;
-						if (attachment.EntryTrigger.IndexOf(',') >= 0) {
-							foreach (var s in attachment.EntryTrigger.Split(',')) {
-								InvokeTrigger(s.Trim());
-							}
-						} else {
-							InvokeTrigger(attachment.EntryTrigger.Trim());
-						}
+						var oldTrigger = Trigger;
+						Trigger = attachment.EntryTrigger;
+						TriggerMultipleAnimations();
 						Update(0);
+						Trigger = oldTrigger;
 					}
 				}
-			}
-		}
-
-		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
-		{
-			if (!trigger.Contains('@')) {
-				markerId = trigger;
-				animationId = null;
-			} else {
-				var t = trigger.Split('@');
-				markerId = t[0];
-				animationId = t[1];
 			}
 		}
 	}
