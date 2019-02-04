@@ -162,5 +162,14 @@ namespace Lime
 					return value.ToString(format, defaultFormat);
 			}
 		}
+
+		public static string Localize(this float value, string format = "")
+		{
+			if (Application.CurrentCultureInfo != null) {
+				return value.ToString(format, Application.CurrentCultureInfo.NumberFormat);
+			} else {
+				return value.ToString(format);
+			}
+		}
 	}
 }
