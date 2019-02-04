@@ -48,7 +48,8 @@ namespace Lime
 				throw new InvalidDataException();
 			}
 			var format = ConvertGLFormat(glInternalFormat, glBaseInternalFormat, glFormat, glType);
-			var etc2Format =
+			var etcFormat =
+				format == Format.ETC1_R8G8B8_UNorm_Block ||
 				format == Format.ETC2_R8G8B8_UNorm_Block ||
 				format == Format.ETC2_R8G8B8A1_UNorm_Block ||
 				format == Format.ETC2_R8G8B8A8_UNorm_Block;
@@ -62,10 +63,10 @@ namespace Lime
 				MemoryUsed = 0;
 				deferredCommands += () => {
 					var formatFeatures = RenderContextManager.CurrentContext.GetFormatFeatures(format);
-					if (etc2Format && (formatFeatures & FormatFeatures.Sample) == 0) {
+					if (etcFormat && (formatFeatures & FormatFeatures.Sample) == 0) {
 						var rgba8Data = Marshal.AllocHGlobal(levelWidth * levelHeight * 4);
 						try {
-							Etc2Decoder.Decode(data, rgba8Data, levelWidth, levelHeight, glInternalFormat);
+							Etc2Decoder.Decode(data, rgba8Data, levelWidth, levelHeight, format);
 							EnsurePlatformTexture(Format.R8G8B8A8_UNorm, pixelWidth, pixelHeight, numberOfMipmapLevels > 1);
 							platformTexture.SetData(levelCopy, rgba8Data);
 						} finally {
