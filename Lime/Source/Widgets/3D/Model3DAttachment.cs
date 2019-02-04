@@ -19,9 +19,7 @@ namespace Lime
 
 		public float ScaleFactor { get; set; }
 
-		public string EntryAnimation { get; set; }
-
-		public string EntryMarker { get; set; }
+		public string EntryTrigger{ get; set; }
 
 		public class MeshOption
 		{
@@ -42,6 +40,18 @@ namespace Lime
 			public ObservableCollection<NodeData> IgnoredNodes = new ObservableCollection<NodeData>();
 			public BlendingOption Blending { get; set; }
 			public readonly ObservableCollection<MarkerBlendingData> MarkersBlendings = new ObservableCollection<MarkerBlendingData>();
+
+			public int GetHashCodeForTrigger()
+			{
+				unchecked {
+					var hashCode = -2079719540;
+					hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id);
+					foreach (var item in Markers) {
+						hashCode = hashCode * 37 + ((item != null) ? item.GetHashCodeForTrigger() : 0);
+					}
+					return hashCode;
+				}
+			}
 		}
 
 		public class NodeData
@@ -53,6 +63,11 @@ namespace Lime
 		{
 			public Marker Marker { get; set; }
 			public BlendingOption Blending { get; set; }
+
+			internal int GetHashCodeForTrigger()
+			{
+				return Marker.Id.GetHashCode();
+			}
 		}
 
 		public class MarkerBlendingData
@@ -411,6 +426,17 @@ namespace Lime
 			}
 			return model.Descendants;
 		}
+
+		public int GetHashCodeForTrigger()
+		{
+			unchecked {
+				int hash = 17;
+				foreach (var item in Animations) {
+					hash = hash * 23 + ((item != null) ? item.GetHashCodeForTrigger() : 0);
+				}
+				return hash;
+			}
+		}
 	}
 
 	public class Model3DAttachmentParser
@@ -460,10 +486,7 @@ namespace Lime
 			public List<Model3DAttachment.MaterialRemap> Materials = null;
 
 			[YuzuMember]
-			public string EntryAnimation = null;
-
-			[YuzuMember]
-			public string EntryMarker = null;
+			public string EntryTrigger = null;
 		}
 
 		public class MeshOptionFormat
@@ -598,8 +621,7 @@ namespace Lime
 				var attachment = new Model3DAttachment {
 					ScaleFactor = modelAttachmentFormat.ScaleFactor
 				};
-				attachment.EntryAnimation = modelAttachmentFormat.EntryAnimation;
-				attachment.EntryMarker = modelAttachmentFormat.EntryMarker;
+				attachment.EntryTrigger = modelAttachmentFormat.EntryTrigger;
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption {
@@ -731,8 +753,7 @@ namespace Lime
 		{
 			var origin = new ModelAttachmentFormat();
 			origin.ScaleFactor = attachment.ScaleFactor;
-			origin.EntryAnimation = attachment.EntryAnimation;
-			origin.EntryMarker = attachment.EntryMarker;
+			origin.EntryTrigger = attachment.EntryTrigger;
 			if (attachment.MeshOptions.Count > 0) {
 				origin.MeshOptions = new Dictionary<string, MeshOptionFormat>();
 			}

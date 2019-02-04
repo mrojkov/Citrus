@@ -1124,55 +1124,37 @@ namespace Tangerine
 				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
 				Padding = new Thickness(top: AttachmentMetrics.Spacing)
 			};
-			new EntryAnimationEditor(content, attachment);
+			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Id == "Default").SourceAnimationId;
+			var node = new Node3D {
+				Trigger = attachment.EntryTrigger != null ? attachment.EntryTrigger.Replace($"@{defaultAnimation}", "@Default") : null
+			};
+			var propEditorParams = new PropertyEditorParams(
+				content, node, nameof(Node.Trigger), displayName: "Entry Animation");
+			var editor = new TriggerPropertyEditor(propEditorParams);
+			void Sync()
+			{
+				node.Animations.Clear();
+				foreach (var a in attachment.Animations) {
+					var newAnimation = new Animation { Id = a.Id };
+					if (a.Id == "Default") {
+						defaultAnimation = a.SourceAnimationId;
+					}
+					var markers = a.Markers.Select(m => new Marker { Id = m.Marker.Id });
+					node.Animations.Add(newAnimation);
+					foreach (var m in markers) {
+						newAnimation.Markers.Add(m);
+					}
+				}
+			}
+
+			content.AddChangeWatcher(() => attachment.GetHashCodeForTrigger(), v => {
+				Sync();
+				editor.Invalidate();
+			});
+			content.AddChangeWatcher(() => node.Trigger, v => {
+				attachment.EntryTrigger = v != null ? v.Replace("@Default", $"@{defaultAnimation}") : null;
+			});
 			return content;
-		}
-
-		private class EntryAnimationEditor : TriggerPropertyEditor
-		{
-			public EntryAnimationEditor(Widget contentWidget, Model3DAttachment attachment) :
-				base(new PropertyEditorParams(contentWidget, new EntryAnimationWrapper(attachment), nameof(EntryAnimationWrapper.EntryAnimation), displayName: "Entry Animation"), FillValues) {
-			}
-
-			private static void FillValues(IEnumerable<object> objects, ComboBox comboBox)
-			{
-				foreach (var obj in objects) {
-					var attachment = ((EntryAnimationWrapper)obj).Attachment;
-					foreach (var a in attachment.Animations) {
-						foreach (var markerData in a.Markers.Where(i =>
-							i.Marker.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Marker.Id))) {
-							var id = a.Id != null
-								? (markerData.Marker.Id + '@' + (a.Id == "Default" ? a.SourceAnimationId : a.Id))
-								: markerData.Marker.Id;
-							if (comboBox.Items.All(i => i.Text != id)) {
-								comboBox.Items.Add(new CommonDropDownList.Item(id));
-							}
-						}
-					}
-				}
-			}
-
-			private class EntryAnimationWrapper
-			{
-				public readonly Model3DAttachment Attachment;
-
-				public string EntryAnimation
-				{
-					get => Attachment.EntryAnimation != null
-						? Attachment.EntryMarker + '@' + Attachment.EntryAnimation
-						: Attachment.EntryMarker;
-					set {
-						SplitTrigger(value, out var makerId, out var anim);
-						Attachment.EntryAnimation = anim;
-						Attachment.EntryMarker = makerId;
-					}
-				}
-
-				public EntryAnimationWrapper(Model3DAttachment attachment)
-				{
-					this.Attachment = attachment;
-				}
-			}
 		}
 
 		private class NodeRow : DeletableRow<Model3DAttachment.NodeData>

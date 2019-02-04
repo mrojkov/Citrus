@@ -10,21 +10,21 @@ namespace Tangerine.UI
 		private ComboBox comboBox;
 		public delegate void FillValuesDelegate(IEnumerable<object> objects, ComboBox comboBox);
 
-		protected TriggerPropertyEditor(IPropertyEditorParams editorParams, FillValuesDelegate fillValues) : base(editorParams)
+		public TriggerPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			EditorContainer.AddNode(comboBox);
 			EditorContainer.AddNode(Spacer.HStretch());
 			comboBox.Changed += ComboBox_Changed;
-			fillValues(EditorParams.Objects, comboBox);
+			Invalidate();
 			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
 		}
 
-		public TriggerPropertyEditor(IPropertyEditorParams editorParams) : this(editorParams, FillValues) { }
 
-		private static void FillValues (IEnumerable<object> objects, ComboBox comboBox)
+		public void Invalidate()
 		{
-			foreach (var obj in objects) {
+			comboBox.Items.Clear();
+			foreach (var obj in EditorParams.Objects) {
 				var node = (Node)obj;
 				foreach (var a in node.Animations) {
 					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {

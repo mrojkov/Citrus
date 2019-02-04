@@ -32,6 +32,12 @@ namespace Lime
 
 		public override void LoadExternalScenes(Yuzu yuzu = null)
 		{
+			void InvokeTrigger(string trigger)
+			{
+				SplitTrigger(trigger, out var markerId, out var animationId);
+				TryRunAnimation(markerId, animationId);
+			}
+
 			base.LoadExternalScenes(yuzu);
 			yuzu = yuzu ?? Yuzu.Instance.Value;
 			if (ContentsPath != null) {
@@ -39,48 +45,29 @@ namespace Lime
 				if (AssetBundle.Current.FileExists(attachmentPath)) {
 					using (var stream = AssetBundle.Current.OpenFileLocalized(attachmentPath)) {
 						var attachment = yuzu.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
-						if (TryRunAnimation(attachment.EntryMarker, attachment.EntryAnimation)) {
-							ApplyAnimationImmediately(this, true);
+						if (string.IsNullOrEmpty(attachment.EntryTrigger)) return;
+						if (attachment.EntryTrigger.IndexOf(',') >= 0) {
+							foreach (var s in attachment.EntryTrigger.Split(',')) {
+								InvokeTrigger(s.Trim());
+							}
+						} else {
+							InvokeTrigger(attachment.EntryTrigger.Trim());
 						}
+						Update(0);
 					}
 				}
 			}
 		}
 
-		private static void ApplyAnimationImmediately(Node node, bool requiredTriggerSelf, Animation animation = null)
+		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
 		{
-			if (animation == null) {
-				foreach (var nodeAnimation in node.Animations) {
-					if (nodeAnimation.IsRunning) {
-						InvokeAnimationTriggers(node, nodeAnimation, requiredTriggerSelf);
-					}
-				}
+			if (!trigger.Contains('@')) {
+				markerId = trigger;
+				animationId = null;
 			} else {
-				if (animation.IsRunning) {
-					InvokeAnimationTriggers(node, animation, requiredTriggerSelf);
-				}
-			}
-			foreach (var child in node.Nodes) {
-				ApplyAnimationImmediately(child, requiredTriggerSelf: false);
-			}
-		}
-
-		private static void InvokeAnimationTriggers(Node node, Animation animation, bool requiredTriggerSelf)
-		{
-			if (requiredTriggerSelf) {
-				for (var animator = node.Animators.First; animator != null; animator = animator.Next) {
-					if (animator.IsTriggerable && animator.AnimationId == animation.Id) {
-						animator.InvokeTrigger(animation.Frame);
-					}
-				}
-			}
-			foreach (var n in node.Nodes) {
-				for (var animator = n.Animators.First; animator != null; animator = animator.Next) {
-					if (animator.IsTriggerable && animator.AnimationId == animation.Id) {
-						animator.InvokeTrigger(animation.Frame);
-						animator.Apply(animation.Time);
-					}
-				}
+				var t = trigger.Split('@');
+				markerId = t[0];
+				animationId = t[1];
 			}
 		}
 	}
