@@ -37,19 +37,23 @@ namespace Tangerine.UI.SceneView.Presenters
 
 				int max = 0, min = 0;
 				foreach (var animator in host.Animators) {
+					if (animator.AnimationId != Document.Current.AnimationId) {
+						continue;
+					}
 					foreach (var k in animator.ReadonlyKeys) {
 						max = max.Max(k.Frame);
 						min = min.Min(k.Frame);
 					}
 				}
 				if (max == min) {
-					return;
+					continue;
 				}
 				for (int i = min; i <= max; i++) {
 					foreach (var animator in host.Animators) {
-						animator.Apply(AnimationUtils.FramesToSeconds(i));
+						if (animator.AnimationId == Document.Current.AnimationId) {
+							animator.Apply(AnimationUtils.FramesToSeconds(i));
+						}
 					}
-
 					var color = Color4.Lerp(
 						((float)i - min) / (max - min),
 						ColorTheme.Current.SceneView.FrameProgressionBeginColor,
@@ -62,9 +66,10 @@ namespace Tangerine.UI.SceneView.Presenters
 						Renderer.DrawLine(a, b, color);
 					}
 				}
-
 				foreach (var animator in host.Animators) {
-					animator.Apply(AnimationUtils.FramesToSeconds(savedAnimationFrame));
+					if (animator.AnimationId == Document.Current.AnimationId) {
+						animator.Apply(AnimationUtils.FramesToSeconds(savedAnimationFrame));
+					}
 				}
 			}
 		}
