@@ -21,6 +21,9 @@ namespace Lime
 		public SecureString Password;
 		public bool OverwriteMode { get; private set; }
 		public bool ProcessInput { get; set; } = true;
+		public bool Enabled => DisplayWidget.GloballyEnabled &&
+		                       FocusableWidget.GloballyEnabled &&
+		                       ClickableWidget.GloballyEnabled;
 
 		public ICaretPosition CaretPos { get; } = new CaretPosition();
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
@@ -516,7 +519,7 @@ namespace Lime
 				}
 				if (FocusableWidget.IsFocused()) {
 					HandleKeys();
-					if (Window.Current.Active) {
+					if (Window.Current.Active && Enabled) {
 						HandleTextInput();
 					}
 				}

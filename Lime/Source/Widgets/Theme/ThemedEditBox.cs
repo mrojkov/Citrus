@@ -90,6 +90,9 @@ namespace Lime
 			};
 			LateTasks.Add(Task.Repeat(() => {
 				dragGesture.Recognized += () => {
+					if (!GloballyEnabled) {
+						return;
+					}
 					if (Focused != null && !this.SameOrDescendantOf(Focused)) {
 						Focused.RevokeFocus();
 					}

@@ -211,7 +211,7 @@ namespace Tangerine.UI
 			IEnumerator<object> SelectTask()
 			{
 				while (true) {
-					if (Widget.Input.WasMousePressed()) {
+					if (Widget.GloballyEnabled && Widget.Input.WasMousePressed()) {
 						var pick = Pick(
 							Widget.Input.MousePosition.X - Widget.GlobalPosition.X,
 							Widget.Input.MousePosition.Y - Widget.GlobalPosition.Y);

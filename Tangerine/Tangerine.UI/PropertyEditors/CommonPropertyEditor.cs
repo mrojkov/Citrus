@@ -67,6 +67,14 @@ namespace Tangerine.UI
 				LayoutCell = new LayoutCell(),
 			};
 			ContainerWidget.AddNode(WarningsContainer);
+			EditorContainer.AddChangeWatcher(() => {
+				foreach (var o in EditorParams.RootObjects) {
+					if (o is Node node && node.EditorState().Locked) {
+						return true;
+					}
+				}
+				return false;
+			}, isAnyLocked => EditorContainer.Enabled = !isAnyLocked);
 			Validate();
 		}
 

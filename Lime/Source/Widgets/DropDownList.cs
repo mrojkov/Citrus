@@ -70,6 +70,9 @@ namespace Lime
 		{
 			RefreshTextWidget();
 			while (true) {
+				if (!GloballyEnabled) {
+					yield return null;
+				}
 				if (Input.WasMousePressed() && IsMouseOver()) {
 					SetFocus();
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);

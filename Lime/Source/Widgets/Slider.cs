@@ -31,7 +31,6 @@ namespace Lime
 		public event Action DragStarted;
 		public event Action DragEnded;
 		public event Action Changed;
-		public bool Enabled;
 
 		private bool isDragActive;
 
@@ -49,7 +48,6 @@ namespace Lime
 			RangeMax = 100;
 			Value = 0;
 			Step = 0;
-			Enabled = true;
 			Awoke += Awake;
 		}
 
@@ -99,7 +97,7 @@ namespace Lime
 				return;
 			}
 			var draggingJustBegun = false;
-			if (Enabled && RangeMax > RangeMin) {
+			if (GloballyEnabled && RangeMax > RangeMin) {
 				if (dragGestureThumb.WasRecognized()) {
 					activeDragGesture = dragGestureThumb;
 					TryStartDrag();
