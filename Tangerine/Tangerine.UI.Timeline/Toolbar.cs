@@ -26,6 +26,7 @@ namespace Tangerine.UI.Timeline
 					CreateCurveEditorButton(),
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
+					CreateFrameProgressionButton(),
 					CreateAnimationSelector(),
 					CreateAnimationIndicator(),
 					new Widget(),
@@ -227,6 +228,14 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => UserPreferences.SlowMotionMode, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.SlowMotionMode = !UserPreferences.SlowMotionMode;
 			button.Components.Add(new DocumentationComponent("SlowMotionMode.md"));
+			return button;
+		}
+
+		private ToolbarButton CreateFrameProgressionButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.FrameProgression")) { Tip = "Frame progression mode" };
+			button.AddChangeWatcher(() => CoreUserPreferences.ShowFrameProgression, i => button.Checked = i);
+			button.Clicked += () => CoreUserPreferences.ShowFrameProgression = !CoreUserPreferences.ShowFrameProgression;
 			return button;
 		}
 
