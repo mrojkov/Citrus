@@ -1,3 +1,7 @@
+##### Changelog 04.02.2019
+
+* Реализовано визуальное отображение изменения виджета на определенном промежутке времени (Frame Progression) [CIT-721](https://gitlab.game-forest.com:2000/browse/CIT-721)
+
 ##### Changelog 22.01.2019
 
 Багфиксы:
