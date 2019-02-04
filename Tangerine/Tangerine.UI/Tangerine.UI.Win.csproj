@@ -107,6 +107,7 @@
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
     <Compile Include="ToolbarModel.cs" />
     <Compile Include="TextEditorWindow.cs" />
+    <Compile Include="TriggerSelectionDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
     <Compile Include="TabbedWidget.cs" />

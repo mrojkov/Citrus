@@ -7,83 +7,37 @@ namespace Tangerine.UI
 {
 	public class TriggerPropertyEditor : CommonPropertyEditor<string>
 	{
-		private ComboBox comboBox;
-		public delegate void FillValuesDelegate(IEnumerable<object> objects, ComboBox comboBox);
-
-		public TriggerPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
-			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
-			EditorContainer.AddNode(comboBox);
+			var button = new ThemedButton {
+				Text = "...",
+				MinMaxWidth = 20,
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			EditorContainer.AddNode(button);
 			EditorContainer.AddNode(Spacer.HStretch());
-			comboBox.Changed += ComboBox_Changed;
-			Invalidate();
-			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
-		}
-
-
-		public void Invalidate()
-		{
-			comboBox.Items.Clear();
-			foreach (var obj in EditorParams.Objects) {
-				var node = (Node)obj;
-				foreach (var a in node.Animations) {
-					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
-						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
-						if (!comboBox.Items.Any(i => i.Text == id)) {
-							comboBox.Items.Add(new DropDownList.Item(id));
+			button.Clicked += () => {
+				var triggers = new Dictionary<string, HashSet<string>>();
+				foreach (var obj in editorParams.Objects) {
+					var node = (Node)obj;
+					foreach (var a in node.Animations) {
+						foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
+							var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
+							var key = a.Id ?? "Primary";
+							if (!triggers.Keys.Contains(key)) {
+								triggers[key] = new HashSet<string>();
+							}
+							if (!triggers[key].Contains(id)) {
+								triggers[key].Add(id);
+							}
 						}
 					}
 				}
-			}
-		}
-
-		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
-		{
-			if (!args.ChangedByUser)
-				return;
-			var newTrigger = (string)args.Value;
-			var currentTriggers = CoalescedPropertyValue().GetValue();
-			if (string.IsNullOrWhiteSpace(currentTriggers.Value) || args.Index < 0) {
-				// Keep existing and remove absent triggers after hand input.
-				var availableTriggers = new HashSet<string>(comboBox.Items.Select(item => item.Text));
-				var setTrigger = string.Join(
-					",",
-					newTrigger.
-						Split(',').
-						Select(el => el.Trim()).
-						Where(el => availableTriggers.Contains(el)).
-						Distinct(new TriggerStringComparer())
+				var current = new HashSet<string>(
+					(CoalescedPropertyValue().GetValue().Value ?? "").Split(',').Select(el => el.Trim()).ToList()
 				);
-				if (setTrigger.Length == 0) {
-					comboBox.Text = currentTriggers.IsDefined ? currentTriggers.Value : ManyValuesText;
-					return;
-				}
-				SetProperty(setTrigger);
-				if (setTrigger != newTrigger) {
-					comboBox.Text = setTrigger;
-				}
-				return;
-			}
-			var triggers = new List<string>();
-			var added = false;
-			SplitTrigger(newTrigger, out _, out var newAnimation);
-			foreach (var trigger in currentTriggers.Value.Split(',').Select(i => i.Trim())) {
-				SplitTrigger(trigger, out _, out var animation);
-				if (animation == newAnimation) {
-					if (!added) {
-						added = true;
-						triggers.Add(newTrigger);
-					}
-				} else {
-					triggers.Add(trigger);
-				}
-			}
-			if (!added) {
-				triggers.Add(newTrigger);
-			}
-			var newValue = string.Join(",", triggers);
-			SetProperty(newValue);
-			comboBox.Text = newValue;
+				var window = new TriggerSelectionDialog(triggers, current, s => SetProperty(s));
+			};
 		}
 
 		protected override void EnabledChanged()
