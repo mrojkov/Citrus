@@ -129,6 +129,7 @@
     <Compile Include="Processors\DragNineGridLineProcessor.cs" />
     <Compile Include="VisualHints.cs" />
     <Compile Include="Processors\ShiftTimelineProcessor.cs" />
+    <Compile Include="Presenters\FrameProgressionPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
