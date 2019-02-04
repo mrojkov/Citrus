@@ -70,9 +70,9 @@ namespace Tangerine.UI
 			Validate();
 		}
 
-		private void AddWarning(string message, ValidationResult validationResult)
+		protected void AddWarning(string message, ValidationResult validationResult)
 		{
-			if (message.IsNullOrWhiteSpace()) {
+			if (message.IsNullOrWhiteSpace() || validationResult == ValidationResult.Ok) {
 				return;
 			}
 			WarningsContainer.AddNode(new Widget {

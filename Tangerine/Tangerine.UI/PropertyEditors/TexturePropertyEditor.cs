@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using Lime;
-using Tangerine.Core;
 
 namespace Tangerine.UI
 {
@@ -12,12 +9,7 @@ namespace Tangerine.UI
 
 		protected override void AssignAsset(string path)
 		{
-			if (IsValid(path)) {
-				SetProperty(new SerializableTexture(path));
-			} else {
-				editor.Text = (CoalescedPropertyValue().GetValue().Value as SerializableTexture)?.SerializationPath;
-				new AlertDialog($"{EditorParams.PropertyName}: Value is not valid", "Ok").Show();
-			}
+			SetProperty(new SerializableTexture(path));
 		}
 
 		protected override string ValueToStringConverter(T obj) {
@@ -26,6 +18,11 @@ namespace Tangerine.UI
 
 		protected override T StringToValueConverter(string path) {
 			return (T)(ITexture)new SerializableTexture(path);
+		}
+
+		protected override bool IsValid(string path)
+		{
+			return TangerineDefaultCharsetAttribute.IsValidPath(path, out var message) == ValidationResult.Ok;
 		}
 	}
 }
