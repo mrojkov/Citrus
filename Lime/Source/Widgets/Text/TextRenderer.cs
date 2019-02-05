@@ -207,7 +207,7 @@ namespace Lime.Text
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
 					TextStyle style = Styles[word.Style];
-					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay) {
+					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay && style.ImageTexture != null) {
 						int k = j + 1;
 						for (; k < count; k++) {
 							if (fittedWords[b + k].IsTagBegin)
