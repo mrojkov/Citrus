@@ -91,6 +91,7 @@ namespace Tangerine.UI
 				var expandButton = new ThemedExpandButton {
 					MinMaxSize = Vector2.One * 20f,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter),
+					Expanded = true
 				};
 				var groupLabel = new ThemedSimpleText {
 					Text = key,
@@ -111,7 +112,7 @@ namespace Tangerine.UI
 				var wrapper = new Frame {
 					Padding = new Thickness(4),
 					Layout = new VBoxLayout(),
-					Visible = false
+					Visible = true
 				};
 				expandButton.Clicked += () => {
 					wrapper.Visible = !wrapper.Visible;

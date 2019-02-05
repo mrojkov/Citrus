@@ -7,8 +7,28 @@ namespace Tangerine.UI
 {
 	public class TriggerPropertyEditor : CommonPropertyEditor<string>
 	{
+		private List<string> CurrentTriggers
+		{
+			get
+			{
+				return (CoalescedPropertyValue().GetValue().Value ?? "").
+					Split(',').
+					Select(el => el.Trim()).
+					ToList();
+			}
+		}
+
 		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
 		{
+			if (EditorParams.Objects.Skip(1).Any()) {
+				EditorContainer.AddNode(CreateWarning("Edit of triggers isn't supported for multiple selection."));
+				return;
+			}
+			var node = (Node)editorParams.Objects.First();
+			if (!EnsureMarkersAvailable(node)) {
+				EditorContainer.AddNode(CreateWarning("No markers to select from."));
+				return;
+			}
 			var button = new ThemedButton {
 				Text = "...",
 				MinMaxWidth = 20,
@@ -18,25 +38,46 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(Spacer.HStretch());
 			button.Clicked += () => {
 				var triggers = new Dictionary<string, HashSet<string>>();
-				foreach (var obj in editorParams.Objects) {
-					var node = (Node)obj;
-					foreach (var a in node.Animations) {
-						foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
-							var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
-							var key = a.Id ?? "Primary";
-							if (!triggers.Keys.Contains(key)) {
-								triggers[key] = new HashSet<string>();
-							}
-							if (!triggers[key].Contains(id)) {
-								triggers[key].Add(id);
-							}
+				foreach (var a in node.Animations) {
+					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
+						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
+						var key = a.Id ?? "Primary";
+						if (!triggers.Keys.Contains(key)) {
+							triggers[key] = new HashSet<string>();
+						}
+						if (!triggers[key].Contains(id)) {
+							triggers[key].Add(id);
 						}
 					}
 				}
-				var current = new HashSet<string>(
-					(CoalescedPropertyValue().GetValue().Value ?? "").Split(',').Select(el => el.Trim()).ToList()
-				);
-				var window = new TriggerSelectionDialog(triggers, current, s => SetProperty(s));
+				var window = new TriggerSelectionDialog(triggers, new HashSet<string>(CurrentTriggers), s => SetProperty(s));
+			};
+		}
+
+		private bool EnsureMarkersAvailable(Node node)
+		{
+			foreach (var a in node.Animations) {
+				if (a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id)).ToList().Count > 0) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private Widget CreateWarning(string message)
+		{
+			return new Widget() {
+				Layout = new HBoxLayout(),
+				Nodes = {
+					new ThemedSimpleText {
+						Text = message,
+						Padding = Theme.Metrics.ControlsPadding,
+						LayoutCell = new LayoutCell(Alignment.Center),
+						VAlignment = VAlignment.Center,
+						ForceUncutText = false
+					}
+				},
+				Presenter = new WidgetFlatFillPresenter(Theme.Colors.WarningBackground)
 			};
 		}
 
