@@ -41,6 +41,8 @@ namespace Lime.Graphics.Platform.Vulkan
 					return SharpVulkan.Format.R8G8B8A8UNorm;
 				case Format.R8G8B8A8_UScaled:
 					return SharpVulkan.Format.R8G8B8A8UScaled;
+				case Format.B8G8R8A8_UNorm:
+					return SharpVulkan.Format.B8G8R8A8UNorm;
 				case Format.R16_SNorm:
 					return SharpVulkan.Format.R16SNorm;
 				case Format.R16_SScaled:

@@ -48,6 +48,17 @@ namespace Lime.Graphics.Platform.Vulkan
 			return color;
 		}
 
+		private static ColorF Decode_B8G8R8A8_UNorm(IntPtr data)
+		{
+			var p = (byte*)data;
+			ColorF color;
+			color.B = p[0] / 255.0f;
+			color.G = p[1] / 255.0f;
+			color.R = p[2] / 255.0f;
+			color.A = p[3] / 255.0f;
+			return color;
+		}
+
 		private static ColorF Decode_R5G6B5_UNorm_Pack16(IntPtr data)
 		{
 			var packed = *(ushort*)data;
@@ -111,6 +122,15 @@ namespace Lime.Graphics.Platform.Vulkan
 			p[3] = (byte)(color.A * 255);
 		}
 
+		private static void Encode_B8G8R8A8_UNorm(IntPtr data, ColorF color)
+		{
+			var p = (byte*)data;
+			p[0] = (byte)(color.B * 255);
+			p[1] = (byte)(color.G * 255);
+			p[2] = (byte)(color.R * 255);
+			p[3] = (byte)(color.A * 255);
+		}
+
 		private static void Encode_R5G6B5_UNorm_Pack16(IntPtr data, ColorF color)
 		{
 			*(ushort*)data = (ushort)(
@@ -148,6 +168,8 @@ namespace Lime.Graphics.Platform.Vulkan
 					return Decode_R8G8B8_UNorm;
 				case Format.R8G8B8A8_UNorm:
 					return Decode_R8G8B8A8_UNorm;
+				case Format.B8G8R8A8_UNorm:
+					return Decode_B8G8R8A8_UNorm;
 				case Format.R5G6B5_UNorm_Pack16:
 					return Decode_R5G6B5_UNorm_Pack16;
 				case Format.R5G5B5A1_UNorm_Pack16:
@@ -170,6 +192,8 @@ namespace Lime.Graphics.Platform.Vulkan
 					return Encode_R8G8B8_UNorm;
 				case Format.R8G8B8A8_UNorm:
 					return Encode_R8G8B8A8_UNorm;
+				case Format.B8G8R8A8_UNorm:
+					return Encode_B8G8R8A8_UNorm;
 				case Format.R5G6B5_UNorm_Pack16:
 					return Encode_R5G6B5_UNorm_Pack16;
 				case Format.R5G5B5A1_UNorm_Pack16:

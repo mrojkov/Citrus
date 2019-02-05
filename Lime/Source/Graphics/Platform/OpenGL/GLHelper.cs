@@ -59,6 +59,14 @@ namespace Lime.Graphics.Platform.OpenGL
 					glFormat = All.Rgba;
 					glType = All.UnsignedByte;
 					break;
+				case Format.B8G8R8A8_UNorm:
+					glInternalFormat = All.Rgba;
+					glFormat = All.BgraExt;
+					glType = All.UnsignedByte;
+					if (ctx.SupportsInternalFormatBgra8) {
+						glInternalFormat = All.BgraExt;
+					}
+					break;
 				case Format.R5G6B5_UNorm_Pack16:
 					glInternalFormat = All.Rgb;
 					glFormat = All.Rgb;

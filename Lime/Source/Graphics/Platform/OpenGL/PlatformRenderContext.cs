@@ -58,6 +58,8 @@ namespace Lime.Graphics.Platform.OpenGL
 		internal int GLMajorVersion;
 		internal int GLMinorVersion;
 		internal bool ESProfile;
+		internal bool SupportsInternalFormatBgra8;
+		internal bool SupportsExternalFormatBgra8;
 
 		public PlatformRenderContext()
 		{
@@ -155,6 +157,8 @@ namespace Lime.Graphics.Platform.OpenGL
 			SupportsPvrtc2 = glExtensions.Contains("GL_IMG_texture_compression_pvrtc2");
 			SupportsEtc1 = glExtensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
 			SupportsEtc2 = (ESProfile && GLMajorVersion >= 3) || glExtensions.Contains("GL_ARB_ES3_compatibility");
+			SupportsInternalFormatBgra8 = ESProfile && glExtensions.Contains("GL_EXT_texture_format_BGRA8888");
+			SupportsExternalFormatBgra8 = SupportsInternalFormatBgra8 || !ESProfile || glExtensions.Contains("GL_APPLE_texture_format_BGRA8888");
 			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
 			GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
 			MaxTextureSlots = Math.Min(MaxTextureSlots, 32);
@@ -569,6 +573,12 @@ namespace Lime.Graphics.Platform.OpenGL
 					features |= FormatFeatures.Sample;
 					features |= FormatFeatures.RenderTarget;
 					features |= FormatFeatures.VertexBuffer;
+					break;
+				case Format.B8G8R8A8_UNorm:
+					if (SupportsInternalFormatBgra8 || SupportsExternalFormatBgra8) {
+						features |= FormatFeatures.Sample;
+						features |= FormatFeatures.RenderTarget;
+					}
 					break;
 				case Format.R5G6B5_UNorm_Pack16:
 				case Format.R5G5B5A1_UNorm_Pack16:
