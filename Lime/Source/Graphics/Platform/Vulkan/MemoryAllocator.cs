@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TreeLib;
 
 namespace Lime.Graphics.Platform.Vulkan
 {
