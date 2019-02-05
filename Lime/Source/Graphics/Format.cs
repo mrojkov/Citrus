@@ -21,6 +21,7 @@ namespace Lime
 		R8G8B8A8_SScaled,
 		R8G8B8A8_UNorm,
 		R8G8B8A8_UScaled,
+		B8G8R8A8_UNorm,
 		R16_SNorm,
 		R16_SScaled,
 		R16_UNorm,
@@ -91,6 +92,7 @@ namespace Lime
 				case Format.R8G8B8A8_SScaled:
 				case Format.R8G8B8A8_UNorm:
 				case Format.R8G8B8A8_UScaled:
+				case Format.B8G8R8A8_UNorm:
 					return 4;
 				case Format.R16_SNorm:
 				case Format.R16_SScaled:
