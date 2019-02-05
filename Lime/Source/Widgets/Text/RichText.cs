@@ -182,7 +182,11 @@ namespace Lime
 			EnsureSpriteLists();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.Objects = new RenderObjectList();
-			ro.CaptureRenderState(this);
+			//ro.CaptureRenderState causes RichText invalidation on every frame,
+			//so use local values for blending and shader
+			ro.LocalToWorldTransform = LocalToWorldTransform;
+			ro.Blending = Blending;
+			ro.Shader = Shader;
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
 				var styleRO = style.GetRenderObject() as TextRenderObject;
@@ -190,7 +194,9 @@ namespace Lime
 				styleRO.RenderMode = TextRenderingMode.TwoPasses;
 				styleRO.Color = GlobalColor;
 				styleRO.GradientMapIndex = style.GradientMapIndex;
-				styleRO.CaptureRenderState(this);
+				styleRO.LocalToWorldTransform = LocalToWorldTransform;
+				styleRO.Shader = Shader;
+				styleRO.Blending = Blending;
 				ro.Objects.Add(styleRO);
 			}
 			return ro;
