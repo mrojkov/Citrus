@@ -76,10 +76,8 @@ namespace Lime
 				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
-				if (i != 0) {
-					width += scale * letterSpacing;
-				}
-				size.X = Math.Max(size.X, width);
+				width += scale * letterSpacing;
+				size.X = width;
 				prevChar = fontChar;
 			}
 			return size;

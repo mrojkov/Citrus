@@ -148,7 +148,9 @@ namespace Lime.Text
 					if (word.IsTagBegin) {
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
-					totalWidth += word.Width;
+					if (j < count - 1 || texts[word.TextIndex][word.Start] != ' ') {
+						totalWidth += word.Width;
+					}
 				}
 				// Calculate offset for horizontal alignment.
 				var offset = new Vector2();
