@@ -565,9 +565,9 @@ namespace Lime
 		[TangerineInspect]
 		public TangerineAnimationCollection TangerineAnimations { get; private set;  }
 
-		protected bool ShouldInspectContentsPath() => ContentsPathTangerineInspectChecker?.Invoke(this) ?? false;
+		protected bool ShouldInspectContentsPath() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 
-		public static Func<object, bool> ContentsPathTangerineInspectChecker;
+		protected bool ShouldInspectPosition() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 
 #endif // TANGERINE
 

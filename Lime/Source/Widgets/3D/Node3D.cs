@@ -77,6 +77,9 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(25)]
+#if TANGERINE
+		[TangerineIgnoreIf(nameof(ShouldInspectPosition))]
+#endif // TANGERINE
 		public Vector3 Position
 		{
 			get { return position; }

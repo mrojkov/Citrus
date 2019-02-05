@@ -215,6 +215,9 @@ namespace Lime
 		[YuzuMember]
 		[TangerineKeyframeColor(4)]
 		[TangerineNumericEditBoxStep(1f)]
+#if TANGERINE
+		[TangerineIgnoreIf(nameof(ShouldInspectPosition))]
+#endif // TANGERINE
 		public Vector2 Position
 		{
 			get { return position; }
