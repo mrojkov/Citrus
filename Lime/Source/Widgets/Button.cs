@@ -141,7 +141,9 @@ namespace Lime
 				}
 				var mouseOver = IsMouseOverThisOrDescendant();
 				if (wasMouseOver && !mouseOver) {
-					TryRunAnimation("Release");
+					if (CurrentAnimation == "Press") {
+						TryRunAnimation("Release");
+					}
 				} else if (!wasMouseOver && mouseOver) {
 					TryRunAnimation("Press");
 				}
