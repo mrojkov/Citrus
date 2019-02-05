@@ -84,6 +84,8 @@ namespace Lime
 			}
 		}
 
+		private static Lime.Graphics.Platform.OpenGL.PlatformRenderContext platformRenderContext;
+
 		private KeyboardHandler keyboardHandler;
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
@@ -275,7 +277,7 @@ namespace Lime
 			keyboardHandler.ProcessTextInput();
 		}
 
-		void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] Format format, int width, int height)
+		void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
 		{
 			var surfaceRect = holder.SurfaceFrame;
 			Size = new System.Drawing.Size(surfaceRect.Right - surfaceRect.Left, surfaceRect.Bottom - surfaceRect.Top);
@@ -300,17 +302,27 @@ namespace Lime
 
 		public void MakeCurrent()
 		{
-			if (TryMakeCurrent()) return;
+			EglMakeCurrent();
+			if (platformRenderContext == null) {
+				platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+			}
+			platformRenderContext.Begin(0);
+			RenderContextManager.MakeCurrent(platformRenderContext);
+		}
+
+		private void EglMakeCurrent()
+		{
+			if (EglTryMakeCurrent()) return;
 			var error = egl.EglGetError();
 			if (error == EGL11.EglContextLost) {
 				OnEglContextLost();
-				if (TryMakeCurrent()) return;
+				if (EglTryMakeCurrent()) return;
 				error = egl.EglGetError();
 			}
 			throw new System.Exception($"Could not make current EGL context, error {GetEglErrorString(error)}");
 		}
 
-		private bool TryMakeCurrent()
+		private bool EglTryMakeCurrent()
 		{
 			EnsureEglContextCreated();
 			return egl.EglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
@@ -318,12 +330,23 @@ namespace Lime
 
 		public void UnbindContext()
 		{
+			RenderContextManager.MakeCurrent(platformRenderContext);
+			EglUnbindContext();
+		}
+
+		private void EglUnbindContext()
+		{
 			if (!egl.EglMakeCurrent(eglDisplay, EGL10.EglNoSurface, EGL10.EglNoSurface, EGL10.EglNoContext)) {
 				throw new System.Exception($"Could not unbind EGL context, error {GetEglErrorString()}");
 			}
 		}
 
 		public void SwapBuffers()
+		{
+			platformRenderContext.End();
+			EglSwapBuffers();
+		}
+		private void EglSwapBuffers()
 		{
 			if (!egl.EglSwapBuffers(eglDisplay, eglSurface)) {
 				var error = egl.EglGetError();

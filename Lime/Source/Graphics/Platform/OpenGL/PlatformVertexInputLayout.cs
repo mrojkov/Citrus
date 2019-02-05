@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-#if !iOS && !MAC
+#if !iOS && !MAC && !ANDROID
 using OpenTK.Graphics.ES20;
 #endif
 

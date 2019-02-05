@@ -3,7 +3,7 @@ using System.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-#if !iOS && !MAC
+#if !iOS && !MAC && !ANDROID
 using OpenTK.Graphics.ES20;
 #endif
 
@@ -256,6 +256,8 @@ namespace Lime.Graphics.Platform.OpenGL
 					return ShaderVariableType.Sampler2D;
 				case ActiveUniformType.SamplerCube:
 					return ShaderVariableType.SamplerCube;
+				case (ActiveUniformType)All.SamplerExternalOes:
+					return ShaderVariableType.SamplerExternal;
 				default:
 					throw new NotSupportedException();
 			}

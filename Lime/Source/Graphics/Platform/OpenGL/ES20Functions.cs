@@ -1,4 +1,4 @@
-#if iOS || MAC
+#if iOS || MAC || ANDROID
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -9,11 +9,14 @@ namespace Lime.Graphics.Platform.OpenGL
 {
 	public sealed class GL
 	{
-#if iOS	
+#if iOS
 		const string library = "__Internal";
-#else
+#elif MAC
 		const string library = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
-#endif		
+#elif ANDROID
+		const string library = "libGLESv2";
+#endif
+
 		internal static class Core
 		{
 			[DllImport(library, EntryPoint = "glActiveShaderProgramEXT", ExactSpelling = true)]

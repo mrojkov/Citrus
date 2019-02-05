@@ -27,7 +27,8 @@ namespace Lime.Graphics.Platform
 		FloatMatrix3,
 		FloatMatrix4,
 		Sampler2D,
-		SamplerCube
+		SamplerCube,
+		SamplerExternal,
 	}
 
 	public struct UniformDesc
@@ -44,6 +45,7 @@ namespace Lime.Graphics.Platform
 			switch (type) {
 				case ShaderVariableType.Sampler2D:
 				case ShaderVariableType.SamplerCube:
+				case ShaderVariableType.SamplerExternal:
 					return true;
 				default:
 					return false;

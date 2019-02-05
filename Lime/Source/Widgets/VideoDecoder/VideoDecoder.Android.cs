@@ -16,8 +16,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Java.Nio;
-using OpenTK.Graphics.ES20;
 using static Android.Media.MediaCodec;
+using Lime.Graphics.Platform.OpenGL;
 
 namespace Lime
 {
@@ -555,25 +555,33 @@ namespace Lime
 			{
 				PlatformRenderer.SetTexture(0, null);
 				GL.ActiveTexture(TextureUnit.Texture0);
-				PlatformRenderer.CheckErrors();
+				GLHelper.CheckGLErrors();
 				GL.BindTexture(TextureTarget, surfaceTextureId);
+				GLHelper.CheckGLErrors();
 			}
 
 			private void PopTexture()
 			{
 				GL.ActiveTexture(TextureUnit.Texture0);
+				GLHelper.CheckGLErrors();
 				GL.BindTexture(TextureTarget, 0);
+				GLHelper.CheckGLErrors();
 				PlatformRenderer.SetTexture(0, null);
 			}
 
 			private void CreateSurface()
 			{
 				surfaceTextureId = (uint)GL.GenTexture();
+				GLHelper.CheckGLErrors();
 				PushTexture();
-				GL.TexParameter(TextureTarget, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-				GL.TexParameter(TextureTarget, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapS, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
-				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapT, (int)OpenTK.Graphics.ES20.TextureWrapMode.ClampToEdge);
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+				GLHelper.CheckGLErrors();
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+				GLHelper.CheckGLErrors();
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
+				GLHelper.CheckGLErrors();
+				GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+				GLHelper.CheckGLErrors();
 				surfaceTexture = new SurfaceTexture((int)surfaceTextureId);
 				Surface = new Surface(surfaceTexture);
 				PopTexture();
@@ -600,7 +608,6 @@ namespace Lime
 				material.Apply(0);
 				mesh.DrawIndexed(0, mesh.Indices.Length);
 				PopTexture();
-
 			}
 		}
 	}

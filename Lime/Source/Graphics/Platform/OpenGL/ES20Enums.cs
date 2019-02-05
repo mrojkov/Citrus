@@ -1,4 +1,4 @@
-#if iOS || MAC
+#if iOS || MAC || ANDROID
 using System;
 
 namespace Lime.Graphics.Platform.OpenGL
@@ -159,7 +159,7 @@ namespace Lime.Graphics.Platform.OpenGL
         BlendSrcRgb = ((int)0x80C9),
         BlendDstAlpha = ((int)0x80CA),
         BlendSrcAlpha = ((int)0x80CB),
-        Bgra = ((int)0x80E1),
+        BgraExt = ((int)0x80E1),
         ClampToEdge = ((int)0x812F),
         GenerateMipmapHint = ((int)0x8192),
         DepthComponent16 = ((int)0x81A5),
@@ -364,6 +364,8 @@ namespace Lime.Graphics.Platform.OpenGL
         HalfFloatOes = ((int)0x8D61),
         Rgb565 = ((int)0x8D62),
         Etc1Rgb8Oes = ((int)0x8D64),
+        TextureExternalOes = ((int)0x8D65),
+        SamplerExternalOes = ((int)0x8D66),
         LowFloat = ((int)0x8DF0),
         MediumFloat = ((int)0x8DF1),
         HighFloat = ((int)0x8DF2),
