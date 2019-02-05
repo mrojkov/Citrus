@@ -46,6 +46,7 @@ namespace Tangerine.UI.Timeline.Components
 			label = new ThemedSimpleText {
 				ForceUncutText = false,
 				VAlignment = VAlignment.Center,
+				OverflowMode = TextOverflowMode.Ellipsis,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
 			};
 			editBoxContainer = new Widget {

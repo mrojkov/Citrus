@@ -17,7 +17,13 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			propRow = row.Components.Get<PropertyRow>();
-			label = new ThemedSimpleText { Text = propRow.Animator.TargetPropertyPath };
+			label = new ThemedSimpleText {
+				Text = propRow.Animator.TargetPropertyPath,
+				ForceUncutText = false,
+				VAlignment = VAlignment.Center,
+				OverflowMode = TextOverflowMode.Ellipsis,
+				LayoutCell = new LayoutCell(Alignment.LeftCenter, float.MaxValue)
+			};
 			propIcon = new Image {
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
@@ -34,7 +40,6 @@ namespace Tangerine.UI.Timeline.Components
 					propIcon,
 					Spacer.HSpacer(3),
 					label,
-					new Widget(),
 					CreateLockAnimationButton(),
 					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
 					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
