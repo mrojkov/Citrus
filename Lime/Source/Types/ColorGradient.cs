@@ -47,17 +47,18 @@ namespace Lime
 		{
 			var pixelCount = pixels.Length;
 			var i = 0;
+			var sorted = Ordered().ToList();
 			for (var j = 0; j < Count - 1; j++) {
-				var lastPixel = (j + 1 < Count) ? this[j + 1].Position * pixelCount : pixelCount;
+				var lastPixel = (j + 1 < Count) ? sorted[j + 1].Position * pixelCount : pixelCount;
 				while (i < lastPixel) {
-					var start = this[j].Position * pixelCount;
+					var start = sorted[j].Position * pixelCount;
 					var ratio = (i - start) / (lastPixel - start);
 					ratio = double.IsInfinity(ratio) ? 0f : ratio.Clamp(0f, 1f);
-					pixels[i++] = Color4.Lerp(ratio, this[j].Color, this[j + 1].Color);
+					pixels[i++] = Color4.Lerp(ratio, sorted[j].Color, sorted[j + 1].Color);
 				}
 			}
 			while (i < pixelCount - 1) {
-				pixels[i++] = this[Count - 1].Color;
+				pixels[i++] = sorted[Count - 1].Color;
 			}
 		}
 
