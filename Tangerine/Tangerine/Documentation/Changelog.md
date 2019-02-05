@@ -1,3 +1,23 @@
+##### Changelog 05.02.2019
+
+* При использовании TiledImage выдаётся предупреждение, если задействованная текстура не имеет `wrap mode: repeat` [CIT-779](https://gitlab.game-forest.com:2000/browse/CIT-779)
+* Реализована возможность конвертировать виджет во внешнюю сцену через контекстное меню в списке таймлайна [CIT-1049](https://gitlab.game-forest.com:2000/browse/CIT-1049)
+* Добавлена возможность игнорировать подгружающиеся типы в `dropdown list` [CIT-1078](https://gitlab.game-forest.com:2000/browse/CIT-1078)
+* Добавлена возможность уменьшать список виджетов таймлайна в ширину [CIT-1094](https://gitlab.game-forest.com:2000/browse/CIT-1094)
+
+Багфиксы:
+
+* Исправлена ошибка, сбрасывающая значения альфа-канала при использовании инструмента "пипетка" [CIT-1001](https://gitlab.game-forest.com:2000/browse/CIT-1001)
+* Исправлена ошибка, при которой виртуальная клавиатура перестается отвечать на ввод [CIT-1057](https://gitlab.game-forest.com:2000/browse/CIT-1057)
+* Исправлено неправильное отображение кнопки удаления анимаций [CIT-1058](https://gitlab.game-forest.com:2000/browse/CIT-1058)
+* Исправлена некорректная работа LetterSpacing у TextStyle [CIT-1063](https://gitlab.game-forest.com:2000/browse/CIT-1063)
+* Исправлен краш при выборе `ImageUsage -> Overlay` в TextStyle [CIT-1076](https://gitlab.game-forest.com:2000/browse/CIT-1076)
+* Исправлены различные краши при использовании Gradient Component [CIT-1083](https://gitlab.game-forest.com:2000/browse/CIT-1083), [CIT-1084](https://gitlab.game-forest.com:2000/browse/CIT-1084)
+* Цвета теперь корректно свапаются при перестановке точек местами в Gradient Component [CIT-1085](https://gitlab.game-forest.com:2000/browse/CIT-1085)
+* Исправлен краш при выборе инструмента "пипетка" при отсутствии открытого проекта [CIT-1088](https://gitlab.game-forest.com:2000/browse/CIT-1088)
+* Исправлена ошибка, позволяющая сбросить развёрнутое на весь экран окно до исходного размера [CIT-1089](https://gitlab.game-forest.com:2000/browse/CIT-1089)
+* Исправлена ошибка, позволяющая отрисовывать несколько Animation Path одновременно при использовании параллельных анимаций [CIT-1093](https://gitlab.game-forest.com:2000/browse/CIT-1093)
+
 ##### Changelog 04.02.2019
 
 * Реализовано визуальное отображение изменения виджета на определенном промежутке времени (Frame Progression) [CIT-721](https://gitlab.game-forest.com:2000/browse/CIT-721)
