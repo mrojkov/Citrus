@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
@@ -64,6 +65,30 @@ namespace Tangerine.UI
 			ManageManyValuesOnFocusChange(editor, currentColor);
 		}
 
+		internal static IEnumerator<object> PickColorProcessor(Widget widget, Action<Color4> setter)
+		{
+			var input = CommonWindow.Current.Input;
+			var drag = new DragGesture();
+			widget.Gestures.Add(drag);
+			yield return null;
+			while (true) {
+				if (drag.WasBegan()) {
+					using (Document.Current?.History?.BeginTransaction()) {
+						input.ConsumeKey(Key.Mouse0);
+						WidgetContext.Current.Root.Input.ConsumeKey(Key.Mouse0);
+						while (!drag.WasEnded()) {
+							Utils.ChangeCursorIfDefault(Cursors.Pipette);
+							setter(ColorPicker.PickAtCursor());
+							yield return null;
+						}
+						Utils.ChangeCursorIfDefault(MouseCursor.Default);
+						Document.Current?.History?.CommitTransaction();
+					}
+				}
+				yield return null;
+			}
+		}
+
 		// TODO: Use Validator
 		private static void CheckEditorText(string value, EditBox editor)
 		{
@@ -96,7 +121,7 @@ namespace Tangerine.UI
 				Texture = IconPool.GetTexture("Tools.Pipette"),
 			};
 			var current = CoalescedPropertyValue();
-			button.Tasks.Add(UIProcessors.PickColorProcessor(button, v => {
+			button.Tasks.Add(PickColorProcessor(button, v => {
 				var value = current.GetValue();
 				v.A = value.IsDefined ? value.Value.A : v.A;
 				SetProperty(v);
