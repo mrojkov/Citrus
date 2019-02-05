@@ -39,6 +39,9 @@ namespace Tangerine.UI.SceneView
 				if (node is IAnimationHost) {
 					var animable = node as IAnimationHost;
 					foreach (var animator in animable.Animators) {
+						if (animator.AnimationId != Document.Current.AnimationId) {
+							continue;
+						}
 						if (
 							animator is Vector2Animator &&
 							animator.TargetPropertyPath == nameof(Widget.Position)

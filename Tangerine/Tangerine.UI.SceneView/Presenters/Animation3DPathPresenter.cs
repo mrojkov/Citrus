@@ -29,6 +29,9 @@ namespace Tangerine.UI.SceneView
 				}
 				var animable = (IAnimationHost)node;
 				foreach (var animator in animable.Animators) {
+					if (animator.AnimationId != Document.Current.AnimationId) {
+						continue;
+					}
 					if (
 						animator is Vector3Animator &&
 						animator.TargetPropertyPath == nameof(Node3D.Position)
