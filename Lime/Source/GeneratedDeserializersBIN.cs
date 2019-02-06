@@ -4794,6 +4794,11 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.EntryTrigger = d.Reader.ReadString();
+				if (result.EntryTrigger == "" && d.Reader.ReadBoolean()) result.EntryTrigger = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
 				result.Materials = (global::System.Collections.Generic.List<global::Lime.Model3DAttachment.MaterialRemap>)null;
 				var tmp4 = d.Reader.ReadInt32();
 				if (tmp4 >= 0) {
@@ -4805,7 +4810,7 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (3 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
 				var tmp6 = d.Reader.ReadInt32();
 				if (tmp6 >= 0) {
@@ -4819,7 +4824,7 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
 				var tmp9 = d.Reader.ReadInt32();
 				if (tmp9 >= 0) {
@@ -4833,7 +4838,7 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (6 == fd.OurIndex) {
 				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp12 = d.Reader.ReadInt32();
 				if (tmp12 >= 0) {
@@ -4846,11 +4851,11 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (6 == fd.OurIndex) {
+			if (7 == fd.OurIndex) {
 				result.ScaleFactor = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (7 == fd.OurIndex) {
+			if (8 == fd.OurIndex) {
 				result.SourceAnimationIds = (global::System.Collections.Generic.List<global::System.String>)null;
 				var tmp14 = d.Reader.ReadInt32();
 				if (tmp14 >= 0) {
@@ -4863,7 +4868,7 @@ namespace GeneratedDeserializersBIN
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (8 == fd.OurIndex) {
+			if (9 == fd.OurIndex) {
 				result.UVAnimations = (global::System.Collections.Generic.List<global::Lime.Model3DAttachmentParser.UVAnimationFormat>)null;
 				var tmp16 = d.Reader.ReadInt32();
 				if (tmp16 >= 0) {

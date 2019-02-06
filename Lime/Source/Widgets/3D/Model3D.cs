@@ -29,5 +29,25 @@ namespace Lime
 				sm.RebuildSkeleton(this);
 			}
 		}
+
+		public override void LoadExternalScenes(Yuzu yuzu = null)
+		{
+			base.LoadExternalScenes(yuzu);
+			yuzu = yuzu ?? Yuzu.Instance.Value;
+			if (ContentsPath != null) {
+				var attachmentPath = System.IO.Path.ChangeExtension(ContentsPath, ".Attachment.txt");
+				if (AssetBundle.Current.FileExists(attachmentPath)) {
+					using (var stream = AssetBundle.Current.OpenFileLocalized(attachmentPath)) {
+						var attachment = yuzu.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
+						if (string.IsNullOrEmpty(attachment.EntryTrigger)) return;
+						var oldTrigger = Trigger;
+						Trigger = attachment.EntryTrigger;
+						TriggerMultipleAnimations();
+						Update(0);
+						Trigger = oldTrigger;
+					}
+				}
+			}
+		}
 	}
 }

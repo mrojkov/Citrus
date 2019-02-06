@@ -919,7 +919,7 @@ namespace Lime
 			}
 		}
 
-		private void TriggerMultipleAnimations(double animationTimeCorrection = 0)
+		protected void TriggerMultipleAnimations(double animationTimeCorrection = 0)
 		{
 			if (Trigger.IndexOf(',') >= 0) {
 				foreach (var s in Trigger.Split(',')) {
@@ -1318,7 +1318,7 @@ namespace Lime
 			return instance;
 		}
 
-		public void LoadExternalScenes(Yuzu yuzu = null)
+		public virtual void LoadExternalScenes(Yuzu yuzu = null)
 		{
 			yuzu = yuzu ?? Yuzu.Instance.Value;
 			if (string.IsNullOrEmpty(ContentsPath)) {

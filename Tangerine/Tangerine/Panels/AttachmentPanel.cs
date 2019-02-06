@@ -554,7 +554,7 @@ namespace Tangerine
 				attachment = new Model3DAttachment { ScaleFactor = 1 };
 				foreach (var a in source.Animations) {
 					attachment.Animations.Add(new Model3DAttachment.Animation {
-						Name = a.Id,
+						Id = a.Id,
 						SourceAnimationId = a.Id,
 						StartFrame = 0,
 						LastFrame = -1
@@ -593,14 +593,14 @@ namespace Tangerine
 
 		private static void CheckErrors(Model3DAttachment attachment, Model3D source)
 		{
-			if (new HashSet<string>(attachment.Animations.Select(a => a.Name)).Count != attachment.Animations.Count) {
+			if (new HashSet<string>(attachment.Animations.Select(a => a.Id)).Count != attachment.Animations.Count) {
 				throw new Lime.Exception("Animations shouldn't have the same names");
 			}
 
 			var errorAnim = attachment.Animations.FirstOrDefault(a =>
 				new HashSet<string>(a.Markers.Select(m => m.Marker.Id)).Count() != a.Markers.Count);
 			if (errorAnim != null) {
-				throw new Lime.Exception($"Markers in '{ errorAnim.Name }' animation shouldn't have the same ids");
+				throw new Lime.Exception($"Markers in '{ errorAnim.Id }' animation shouldn't have the same ids");
 			}
 
 			if (new HashSet<string>(attachment.MeshOptions.Select(a => a.Id)).Count != attachment.MeshOptions.Count) {
@@ -650,6 +650,7 @@ namespace Tangerine
 				Layout = new VBoxLayout(),
 			};
 			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			pane.Content.AddNode(CreateEntryAnimationEditor(attachment));
 			pane.Content.AddNode(list);
 			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
 				w => {
@@ -665,7 +666,7 @@ namespace Tangerine
 				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
 					attachment.Animations,
 					attachment.Animations.Count,
-					new Model3DAttachment.Animation { Name = "Animation", }
+					new Model3DAttachment.Animation { Id = "Animation", }
 				));
 			}));
 			list.Components.Add(widgetFactory);
@@ -991,7 +992,7 @@ namespace Tangerine
 					Decorate(new PropertyEditorParams(
 						Header,
 						animation,
-						nameof(Model3DAttachment.Animation.Name))));
+						nameof(Model3DAttachment.Animation.Id))));
 				animationNamePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
 				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
@@ -1115,6 +1116,45 @@ namespace Tangerine
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, 2.0f),
 				ForceUncutText = false,
 			};
+		}
+
+		private Widget CreateEntryAnimationEditor(Model3DAttachment attachment)
+		{
+			var content = new Widget {
+				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
+				Padding = new Thickness(top: AttachmentMetrics.Spacing)
+			};
+			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Id == "Default")?.SourceAnimationId;
+			var node = new Node3D {
+				Trigger = attachment.EntryTrigger != null ? attachment.EntryTrigger.Replace($"@{defaultAnimation}", "@Default") : null
+			};
+			var propEditorParams = new PropertyEditorParams(
+				content, node, nameof(Node.Trigger), displayName: "Entry Animation");
+			var editor = new TriggerPropertyEditor(propEditorParams);
+			void Sync()
+			{
+				node.Animations.Clear();
+				foreach (var a in attachment.Animations) {
+					var newAnimation = new Animation { Id = a.Id };
+					if (a.Id == "Default") {
+						defaultAnimation = a.SourceAnimationId;
+					}
+					var markers = a.Markers.Select(m => new Marker { Id = m.Marker.Id });
+					node.Animations.Add(newAnimation);
+					foreach (var m in markers) {
+						newAnimation.Markers.Add(m);
+					}
+				}
+			}
+
+			content.AddChangeWatcher(() => attachment.GetHashCodeForTrigger(), v => {
+				Sync();
+				editor.Invalidate();
+			});
+			content.AddChangeWatcher(() => node.Trigger, v => {
+				attachment.EntryTrigger = v != null ? v.Replace("@Default", $"@{defaultAnimation}") : null;
+			});
+			return content;
 		}
 
 		private class NodeRow : DeletableRow<Model3DAttachment.NodeData>
