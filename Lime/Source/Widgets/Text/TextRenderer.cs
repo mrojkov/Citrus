@@ -115,7 +115,7 @@ namespace Lime.Text
 		{
 			var style = Styles[word.Style];
 			Vector2 size = style.Font.MeasureTextLine(
-				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing);
+				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing, word.IsTagBegin || word.LineBreak);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
 		}
 
@@ -148,7 +148,8 @@ namespace Lime.Text
 					if (word.IsTagBegin) {
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
-					if (j < count - 1 || texts[word.TextIndex][word.Start] != ' ') {
+					var ch = texts[word.TextIndex][word.Start];
+					if (!(j == count - 1 && (ch == ' ' || ch == '\n'))) {
 						totalWidth += word.Width;
 					}
 				}
@@ -199,7 +200,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style);
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.IsTagBegin || word.LineBreak);
 					}
 					c += wordLength;
 				}
@@ -397,9 +398,10 @@ namespace Lime.Text
 				}
 
 				if (isLongerThanWidth && isTextOrBullet && x > 0 && !isWordContinue && !fittedWords[i - 1].IsNbsp && t[word.Start] != ' ') {
-					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
+					word.Width = CalcWordWidth(word);
+					x = word.Width;
 				} else {
 					word.X = x;
 					x += word.Width;

@@ -55,7 +55,7 @@ namespace Lime
 			return MeasureTextLine(font, text, fontHeight, 0, text.Length, letterSpacing);
 		}
 
-		public static Vector2 MeasureTextLine(this IFont font, string text, float fontHeight, int start, int length, float letterSpacing)
+		public static Vector2 MeasureTextLine(this IFont font, string text, float fontHeight, int start, int length, float letterSpacing, bool skipFirstLetter = true)
 		{
 			FontChar prevChar = null;
 			var size = new Vector2(0, fontHeight);
@@ -76,7 +76,9 @@ namespace Lime
 				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
-				width += scale * letterSpacing;
+				if (!skipFirstLetter || i != 0) {
+					width += scale * letterSpacing;
+				}
 				size.X = width;
 				prevChar = fontChar;
 			}

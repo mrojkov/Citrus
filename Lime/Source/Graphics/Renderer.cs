@@ -355,7 +355,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
-			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
+			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, bool skipFirstLetter = true)
 		{
 			int j = 0;
 			if (list != null) {
@@ -387,7 +387,7 @@ namespace Lime
 					continue;
 				}
 				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + (i == 0 ? 0.0f : letterSpacing));
+				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + ((!skipFirstLetter || i != 0) ? letterSpacing : 0.0f));
 				position.X += xDelta;
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				Vector2 roundPos;
