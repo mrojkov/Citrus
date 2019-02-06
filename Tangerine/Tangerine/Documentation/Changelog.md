@@ -1,3 +1,12 @@
+##### Changelog 06.02.2019
+
+* Добавлен выбор анимации по-умолчанию для 3d-моделей в 3DAttachment [CIT-1099](https://jira.game-forest.com:2000/browse/CIT-1099)
+
+Багфиксы:
+
+* Исправлен краш при открытии Model3D в сцене через панель Hierarchy [CIT-1100](https://jira.game-forest.com:2000/browse/CIT-1100)
+* В root-сцене убрана возможность менять Position [CIT-1092](https://jira.game-forest.com:2000/browse/CIT-1092)
+
 ##### Changelog 05.02.2019
 
 * При использовании TiledImage выдаётся предупреждение, если задействованная текстура не имеет `wrap mode: repeat` [CIT-779](https://jira.game-forest.com:2000/browse/CIT-779)
