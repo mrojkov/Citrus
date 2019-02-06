@@ -477,7 +477,8 @@ namespace Tangerine.Panels
 						return;
 					}
 					externalSceneDocument.SceneNavigatedFrom = currentScenePath;
-					node = externalSceneDocument.RootNode;
+					var rootNode = externalSceneDocument.RootNode;
+					node = rootNode is Viewport3D ? rootNode.FirstChild : rootNode;
 					foreach (int i in path) {
 						node = node.Nodes[i];
 					}
