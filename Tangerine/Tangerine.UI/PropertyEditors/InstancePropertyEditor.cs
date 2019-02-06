@@ -80,7 +80,6 @@ namespace Tangerine.UI
 					resetToDefaultButton.Visible = !Equals(v.Value, defaultValue);
 				});
 			} else if (Selector.Items.Count == 1) {
-				var t = Selector.Items[0].Value as Type;
 				EditorContainer.Nodes.Insert(0, new ThemedSimpleText {
 					Text = Selector.Items[0].Text,
 					VAlignment = VAlignment.Center,
@@ -90,7 +89,6 @@ namespace Tangerine.UI
 					HitTestTarget = true,
 					TabTravesable = new TabTraversable()
 				});
-				SetProperty<object>(_ => t != null ? Activator.CreateInstance(t) : null);
 				OnValueChanged?.Invoke(ExpandableContent);
 			} else {
 				EditorContainer.Nodes.Insert(0, Selector);
