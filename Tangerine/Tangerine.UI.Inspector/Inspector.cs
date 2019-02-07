@@ -94,6 +94,24 @@ namespace Tangerine.UI.Inspector
 		private void CreateWatchersToRebuild()
 		{
 			RootWidget.AddChangeLateWatcher(CalcSelectedRowsHashcode, _ => Rebuild());
+			RootWidget.Tasks.Add(DisableInspectorTask());
+		}
+
+		private IEnumerator<object> DisableInspectorTask()
+		{
+			while (true) {
+				if (!Document.Current.InspectRootNode) {
+					var enabled = true;
+					foreach (var row in Document.Current.Rows) {
+						if (row.Selected) {
+							var node = row.Components.Get<NodeRow>()?.Node;
+							enabled &= !node?.GetTangerineFlag(TangerineFlags.Locked) ?? true;
+						}
+					}
+					contentWidget.Enabled = enabled;
+				}
+				yield return null;
+			}
 		}
 
 		private static int CalcSelectedRowsHashcode()
