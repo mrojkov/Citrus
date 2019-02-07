@@ -1,3 +1,10 @@
+##### Changelog 07.02.2019
+
+Багфиксы:
+
+* Исправлены проблемы, связанные с конвертацией .scene в .tan [CIT-964](https://jira.game-forest.com:2000/browse/CIT-964), [CIT-1080](https://jira.game-forest.com:2000/browse/CIT-1080)
+* Исправлена ошибка, приводящая к остановке анимации при использовании Animation Mode [CIT-1048](https://jira.game-forest.com:2000/browse/CIT-1048)
+
 ##### Changelog 06.02.2019
 
 * Добавлен выбор анимации по-умолчанию для 3d-моделей в 3DAttachment [CIT-1099](https://jira.game-forest.com:2000/browse/CIT-1099)
