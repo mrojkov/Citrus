@@ -308,8 +308,9 @@ namespace Tangerine
 						attachment.MeshOptions.Clear();
 						foreach (var meshOption in meshOptions) {
 							if (meshOption.Opaque == default &&
-							    meshOption.HitTestTarget == default &&
-							    meshOption.CullMode == CullMode.Front
+								meshOption.HitTestTarget == default &&
+								meshOption.CullMode == CullMode.Front &&
+								meshOption.DisableMerging == default
 							) {
 								continue;
 							}
@@ -405,13 +406,13 @@ namespace Tangerine
 			var content = new Widget {
 				Layout = new VBoxLayout(),
 			};
-			var remapedMaterialsfactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialRemap>(w => {
+			var remappedMaterialsFactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialRemap>(w => {
 				var materialRow = new MaterialRow(w, attachment.Materials);
 				materialRow.WarningText = "Source material not found";
 				materialRow.Tasks.Add(ValidateRowTask(materialRow, () => sourceMaterials.Any(m => m.Id == w.SourceName)));
 				return materialRow;
 			}, attachment.Materials);
-			var remapedMaterialsFooter = MaterialRow.CreateFooter(() => {
+			var remappedMaterialsFooter = MaterialRow.CreateFooter(() => {
 				var menu = new Menu();
 				foreach (var material in GetValidForRemapMaterials(attachment.Materials, sourceMaterials)) {
 					ICommand command = new Command(material.Id, () => {
@@ -427,8 +428,8 @@ namespace Tangerine
 				}
 				menu.Popup();
 			});
-			remapedMaterialsfactory.AddFooter(remapedMaterialsFooter);
-			content.Components.Add(remapedMaterialsfactory);
+			remappedMaterialsFactory.AddFooter(remappedMaterialsFooter);
+			content.Components.Add(remappedMaterialsFactory);
 			pane.Content.AddNode(content);
 			var list = new Widget {
 				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
@@ -953,6 +954,13 @@ namespace Tangerine
 						nameof(Model3DAttachment.MeshOption.HitTestTarget))));
 				hitPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
 				hitPropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
+				var disableMergingPropEditor = new BooleanPropertyEditor(
+					Decorate(new PropertyEditorParams(
+						Header,
+						mesh,
+						nameof(Model3DAttachment.MeshOption.DisableMerging))));
+				disableMergingPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
+				disableMergingPropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				CompoundPresenter.Add(Presenters.StripePresenter);
 				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
@@ -969,6 +977,7 @@ namespace Tangerine
 						CreateLabel("Cull Mode"),
 						CreateLabel("Opaque"),
 						CreateLabel("Hit Test Target"),
+						CreateLabel("Disable Merging"),
 					}
 				};
 			}
