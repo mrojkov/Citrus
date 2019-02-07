@@ -36,8 +36,8 @@ namespace Tangerine.Core
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
 				Animation.IsRunning = false;
-				CurrentFrameSetter.StopAnimationsRecursive(PreviewAnimationContainer);
-				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
+				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
+				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) { 
 					var i = 0;
 					foreach (var node in PreviewAnimationContainer.Descendants) {
 						node.DefaultAnimation.Time = animationMode ? 0 : savedAnimationTimes[i++];
@@ -90,44 +90,47 @@ namespace Tangerine.Core
 		private static class CurrentFrameSetter
 		{
 
-			private class AnimationStateComponent : NodeComponent
+			private class AnimationsStatesComponent : NodeComponent
 			{
 				private struct AnimationState
 				{
 					public bool IsRunning;
 					public double Time;
-					public string AnimationId;
 				}
 
-				private AnimationState state;
-				public int Column => AnimationUtils.SecondsToFrames(state.Time);
+				private AnimationState[] animationsStates;
+				public int Column => AnimationUtils.SecondsToFrames(animationsStates[0].Time);
 
-				public static void Create(Node node, string animationId)
+				public static void Create(Node node)
 				{
-					var component = new AnimationStateComponent {
-						state = new AnimationState()
+					var component = new AnimationsStatesComponent {
+						animationsStates = new AnimationState[node.Animations.Count]
 					};
 					node.Components.Add(component);
-					if (node.Animations.TryFind(animationId, out var animation)) {
+					var i = 0;
+					foreach (var animation in node.Animations) {
 						var state = new AnimationState {
 							IsRunning = animation.IsRunning,
-							Time = animation.Time,
-							AnimationId = animationId
+							Time = animation.Time
 						};
-						component.state = state;
+						component.animationsStates[i] = state;
+						i++;
 					}
+
 					foreach (var child in node.Nodes) {
-						Create(child, animationId);
+						Create(child);
 					}
 				}
 
 				internal static void Restore(Node node)
 				{
-					var component = node.Components.Get<AnimationStateComponent>();
-					if (node.Animations.TryFind(component.state.AnimationId, out var animation)) {
-						var state = component.state;
+					var component = node.Components.Get<AnimationsStatesComponent>();
+					var i = 0;
+					foreach (var animation in node.Animations) {
+						var state = component.animationsStates[i];
 						animation.IsRunning = state.IsRunning;
 						animation.Time = state.Time;
+						i++;
 					}
 
 					foreach (var child in node.Nodes) {
@@ -137,12 +140,12 @@ namespace Tangerine.Core
 
 				public static bool Exists(Node node)
 				{
-					return node.Components.Contains<AnimationStateComponent>();
+					return node.Components.Contains<AnimationsStatesComponent>();
 				}
 
 				public static void Remove(Node node)
 				{
-					node.Components.Remove<AnimationStateComponent>();
+					node.Components.Remove<AnimationsStatesComponent>();
 					foreach (var child in node.Nodes) {
 						Remove(child);
 					}
@@ -157,8 +160,8 @@ namespace Tangerine.Core
 				get { return cacheAnimationsStates; }
 				set {
 					cacheAnimationsStates = value;
-					if (!cacheAnimationsStates && AnimationStateComponent.Exists(Current.Container)) {
-						AnimationStateComponent.Remove(Current.Container);
+					if (!cacheAnimationsStates && AnimationsStatesComponent.Exists(Current.Container)) {
+						AnimationsStatesComponent.Remove(Current.Container);
 					}
 				}
 			}
@@ -171,17 +174,17 @@ namespace Tangerine.Core
 					var node = animation.Owner;
 					if (animationMode && (doc.AnimationFrame != frameIndex || isForced)) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-						var cacheFrame = node.Components.Get<AnimationStateComponent>()?.Column;
+						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.Column;
 						if (cacheFrame.HasValue && (cacheFrame.Value > frameIndex ||
 							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
-							AnimationStateComponent.Remove(node);
+							AnimationsStatesComponent.Remove(node);
 							cacheFrame = null;
 						}
 						if (!cacheFrame.HasValue) {
-							StopAnimationsRecursive(node);
-							SetTimeRecursive(node, animation.Id, 0);
+							StopAnimationRecursive(node);
+							SetTimeRecursive(node, 0);
 						} else {
-							AnimationStateComponent.Restore(node);
+							AnimationsStatesComponent.Restore(node);
 						}
 						ClearParticlesRecursive(doc.RootNode);
 						animation.IsRunning = true;
@@ -189,11 +192,11 @@ namespace Tangerine.Core
 							cacheFrame = frameIndex - OptimalRollbackForCacheAnimationsStates;
 							if (cacheFrame.Value > 0) {
 								FastForwardToFrame(animation, cacheFrame.Value);
-								AnimationStateComponent.Create(node, animation.Id);
+								AnimationsStatesComponent.Create(node);
 							}
 						}
 						FastForwardToFrame(animation, frameIndex);
-						StopAnimationsRecursive(node);
+						StopAnimationRecursive(node);
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 
 						// Force update to reset Animation.NextMarkerOrTriggerTime for parents.
@@ -233,23 +236,23 @@ namespace Tangerine.Core
 				return (float) forwardDelta;
 			}
 
-			internal static void SetTimeRecursive(Node node, string animationId, double time)
+			internal static void SetTimeRecursive(Node node, double time)
 			{
-				if (node.Animations.TryFind(animationId, out var animation)) {
+				foreach (var animation in node.Animations) {
 					animation.Time = time;
 				}
 				foreach (var child in node.Nodes) {
-					SetTimeRecursive(child, animationId, time);
+					SetTimeRecursive(child, time);
 				}
 			}
 
-			internal static void StopAnimationsRecursive(Node node)
+			internal static void StopAnimationRecursive(Node node)
 			{
 				foreach (var animation in node.Animations) {
 					animation.IsRunning = false;
 				}
 				foreach (var child in node.Nodes) {
-					StopAnimationsRecursive(child);
+					StopAnimationRecursive(child);
 				}
 			}
 
