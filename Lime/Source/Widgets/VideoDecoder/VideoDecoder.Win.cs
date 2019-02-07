@@ -127,6 +127,15 @@ namespace Lime
 				mesh.DirtyFlags = MeshDirtyFlags.All;
 			}
 			audioPlayer = new AudioPlayer();
+			Window.Current.InvokeOnRendering(() => {
+				var rt = PlatformRenderer.CurrentRenderTarget;
+				try {
+					PlatformRenderer.SetRenderTarget(texture);
+					PlatformRenderer.Clear(ClearOptions.All, new Color4(0, 0, 0, 0));
+				} finally {
+					PlatformRenderer.SetRenderTarget(rt);
+				}
+			});
 		}
 
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]

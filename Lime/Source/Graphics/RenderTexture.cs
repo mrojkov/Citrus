@@ -87,7 +87,6 @@ namespace Lime
 		{
 			if (platformTexture == null) {
 				platformTexture = RenderContextManager.CurrentContext.CreateRenderTexture2D(Format, size.Width, size.Height, textureParams);
-				// FIXME: Clear texture
 			}
 			return platformTexture;
 		}
