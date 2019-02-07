@@ -16,6 +16,9 @@ namespace Tangerine.UI
 		private ThemedAddButton addButton;
 		private Action removeCallback;
 		private List<Button> buttons;
+		// Terekhov Dmitry: We have to store list of PropertyEditorParams in order to
+		// Terekhov Dmitry: avoid nodes recreation (e.g. for multiple expandable contents)
+		private readonly List<PropertyEditorParams> propertyEditorParamsList = new List<PropertyEditorParams>();
 
 		public ListPropertyEditor(IPropertyEditorParams editorParams, Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd) : base(editorParams)
 		{
@@ -58,20 +61,32 @@ namespace Tangerine.UI
 		{
 			if (list != null) {
 				int prevCount = ExpandableContent.Nodes.Count;
-				for (int i = 0; i < prevCount - newCount; i++) {
-					ExpandableContent.Nodes.Last().UnlinkAndDispose();
-					buttons.RemoveAt(buttons.Count - 1);
-				}
 				for (int i = 0; i < newCount - prevCount; i++) {
 					AfterInsertNewElement(prevCount + i);
 				}
 			}
 		}
 
+		private void AdjustEditors(int startFrom)
+		{
+			propertyEditorParamsList.RemoveAt(startFrom);
+			for (int index = startFrom; index < propertyEditorParamsList.Count; ++index) {
+				var closureIndex = index;
+				propertyEditorParamsList[index].IndexInList = index;
+				propertyEditorParamsList[index].DisplayName = $"{index}:";
+				propertyEditorParamsList[index].PropertySetter = propertyEditorParamsList[index].IsAnimable
+				? (PropertySetterDelegate)((@object, name, value) =>
+						SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
+				: (@object, name, value) => SetIndexedProperty.Perform(@object, name, closureIndex, value);
+			}
+		}
+
 		private void AfterInsertNewElement(int index)
 		{
 			var elementContainer = new Widget { Layout = new VBoxLayout() };
-			var p = new PropertyEditorParams(elementContainer, new[] { list }, EditorParams.RootObjects, EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
+			var p = new PropertyEditorParams(
+				elementContainer, new[] { list }, EditorParams.RootObjects,
+				EditorParams.PropertyInfo.PropertyType, "Item", EditorParams.PropertyPath + $".Item[{index}]"
 			) {
 				NumericEditBoxFactory = EditorParams.NumericEditBoxFactory,
 				History = EditorParams.History,
@@ -81,22 +96,29 @@ namespace Tangerine.UI
 				DisplayName = $"{index}:"
 			};
 			p.PropertySetter = p.IsAnimable
-				? (PropertySetterDelegate)((@object, name, value) => Core.Operations.SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
-				: (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value);
+				? (PropertySetterDelegate)((@object, name, value) =>
+					SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
+				: (@object, name, value) => SetIndexedProperty.Perform(@object, name, index, value);
 			var editor = onAdd(p, elementContainer, list).ToList().First();
 			ThemedDeleteButton removeButton;
 			buttons.Add(removeButton = new ThemedDeleteButton {
 				Enabled = Enabled
 			});
-			Action removeClicked = () => {
+			propertyEditorParamsList.Insert(index, p);
+			void RemoveClicked()
+			{
 				removeCallback = null;
 				using (Document.Current.History.BeginTransaction()) {
-					RemoveFromList.Perform(list, index);
+					RemoveFromList.Perform(list, p.IndexInList);
 					Document.Current.History.CommitTransaction();
+					ExpandableContent.Nodes[p.IndexInList].UnlinkAndDispose();
+					buttons.RemoveAt(p.IndexInList);
+					AdjustEditors(p.IndexInList);
 				}
-			};
+			}
+
 			ExpandableContent.Nodes.Insert(index, elementContainer);
-			removeButton.Clicked += () => removeCallback = removeClicked;
+			removeButton.Clicked += () => removeCallback = RemoveClicked;
 			editor.EditorContainer.AddNode(removeButton);
 		}
 
