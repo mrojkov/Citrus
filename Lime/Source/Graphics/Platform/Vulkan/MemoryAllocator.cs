@@ -364,22 +364,11 @@ namespace Lime.Graphics.Platform.Vulkan
 
 	internal class MemoryBlock
 	{
-		private static readonly Node treeSentinel;
-
-		private Node treeRoot = treeSentinel;
+		private Node treeRoot;
 		private Node first;
 		private Node last;
 
 		public readonly DeviceMemory Memory;
-
-		static MemoryBlock()
-		{
-			treeSentinel = new Node();
-			treeSentinel.Left = treeSentinel;
-			treeSentinel.Right = treeSentinel;
-			treeSentinel.Parent = null;
-			treeSentinel.Color = NodeColor.Black;
-		}
 
 		public MemoryBlock(DeviceMemory memory)
 		{
@@ -492,7 +481,7 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private Node TreeSearch(Node node, ulong size)
 		{
-			if (node == treeSentinel) {
+			if (node == null) {
 				return null;
 			}
 			var cmp = size.CompareTo(node.Size);
@@ -510,7 +499,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			Node parent = null;
 			var current = treeRoot;
 			var order = 0;
-			while (current != treeSentinel) {
+			while (current != null) {
 				order = node.Size.CompareTo(current.Size);
 				if (order == 0) {
 					order = node.Offset.CompareTo(current.Offset);
@@ -525,8 +514,8 @@ namespace Lime.Graphics.Platform.Vulkan
 				}
 			}
 			node.Parent = parent;
-			node.Left = treeSentinel;
-			node.Right = treeSentinel;
+			node.Left = null;
+			node.Right = null;
 			node.Color = NodeColor.Red;
 			if (parent != null) {
 				if (order < 0) {
@@ -542,10 +531,10 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void TreeInsertFixup(Node node)
 		{
-			while (node != treeRoot && node.Parent.Color == NodeColor.Red) {
+			while (node.Parent != null && node.Parent.Color == NodeColor.Red) {
 				if (node.Parent == node.Parent.Parent.Left) {
 					var uncle = node.Parent.Parent.Right;
-					if (uncle.Color == NodeColor.Red) {
+					if (uncle != null && uncle.Color == NodeColor.Red) {
 						node.Parent.Color = NodeColor.Black;
 						uncle.Color = NodeColor.Black;
 						node.Parent.Parent.Color = NodeColor.Red;
@@ -561,7 +550,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					}
 				} else {
 					var uncle = node.Parent.Parent.Left;
-					if (uncle.Color == NodeColor.Red) {
+					if (uncle != null && uncle.Color == NodeColor.Red) {
 						node.Parent.Color = NodeColor.Black;
 						uncle.Color = NodeColor.Black;
 						node.Parent.Parent.Color = NodeColor.Red;
@@ -582,124 +571,121 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		private void TreeRemove(Node node)
 		{
-			Node x, y;
-			if (node.Left == treeSentinel || node.Right == treeSentinel) {
-				y = node;
-			} else {
-				y = node.Right;
-				while (y.Left != treeSentinel) {
-					y = y.Left;
+			var removeNode = node;
+			if (node.Left != null && node.Right != null) {
+				removeNode = node.Right;
+				while (removeNode.Left != null) {
+					removeNode = removeNode.Left;
 				}
 			}
-			if (y.Left != treeSentinel) {
-				x = y.Left;
-			} else {
-				x = y.Right;
-			}
-			x.Parent = y.Parent;
-			if (y.Parent != null) {
-				if (y == y.Parent.Left) {
-					y.Parent.Left = x;
+			var removeNodeChild = removeNode.Left != null ? removeNode.Left : removeNode.Right;
+			if (removeNode.Parent != null) {
+				if (removeNode.Parent.Left == removeNode) {
+					removeNode.Parent.Left = removeNodeChild;
 				} else {
-					y.Parent.Right = x;
+					removeNode.Parent.Right = removeNodeChild;
 				}
 			} else {
-				treeRoot = x;
+				treeRoot = removeNodeChild;
 			}
-			if (y != node) {
-				y.Left = node.Left;
-				y.Right = node.Right;
-				y.Parent = node.Parent;
-				y.Color = node.Color;
-				if (node.Left != null) {
-					node.Left.Parent = y;
+			if (removeNodeChild != null) {
+				removeNodeChild.Parent = removeNode.Parent;
+			}
+			if (removeNode.Color == NodeColor.Black) {
+				TreeRemoveFixup(removeNodeChild, removeNode.Parent);
+			}
+			if (removeNode != node) {
+				removeNode.Color = node.Color;
+				removeNode.Left = node.Left;
+				if (removeNode.Left != null) {
+					removeNode.Left.Parent = removeNode;
 				}
-				if (node.Right != null) {
-					node.Right.Parent = y;
+				removeNode.Right = node.Right;
+				if (removeNode.Right != null) {
+					removeNode.Right.Parent = removeNode;
 				}
+				removeNode.Parent = node.Parent;
 				if (node.Parent != null) {
-					if (node == node.Parent.Left) {
-						node.Parent.Left = y;
+					if (node.Parent.Left == node) {
+						node.Parent.Left = removeNode;
 					} else {
-						node.Parent.Right = y;
+						node.Parent.Right = removeNode;
 					}
 				} else {
-					treeRoot = y;
+					treeRoot = removeNode;
 				}
 			}
+			node.Parent = null;
 			node.Left = null;
 			node.Right = null;
-			node.Parent = null;
-			if (y.Color == NodeColor.Black) {
-				TreeRemoveFixup(x);
-			}
 		}
 
-		private void TreeRemoveFixup(Node node)
+		private void TreeRemoveFixup(Node node, Node parent)
 		{
-			while (node != treeRoot && node.Color == NodeColor.Black) {
-				if (node == node.Parent.Left) {
-					var sibling = node.Parent.Right;
+			while (parent != null && IsNullOrBlack(node)) {
+				if (node == parent.Left) {
+					var sibling = parent.Right;
 					if (sibling.Color == NodeColor.Red) {
 						sibling.Color = NodeColor.Black;
-						node.Parent.Color = NodeColor.Red;
-						TreeRotateLeft(node.Parent);
-						sibling = node.Parent.Right;
+						parent.Color = NodeColor.Red;
+						TreeRotateLeft(parent);
+						sibling = parent.Right;
 					}
-					if (sibling.Left.Color == NodeColor.Black && sibling.Right.Color == NodeColor.Black) {
+					if (IsNullOrBlack(sibling.Left) && IsNullOrBlack(sibling.Right)) {
 						sibling.Color = NodeColor.Red;
-						node = node.Parent;
+						node = parent;
+						parent = parent.Parent;
 					} else {
-						if (sibling.Right.Color == NodeColor.Black) {
+						if (IsNullOrBlack(sibling.Right)) {
 							sibling.Left.Color = NodeColor.Black;
 							sibling.Color = NodeColor.Red;
 							TreeRotateRight(sibling);
-							sibling = node.Parent.Right;
+							sibling = parent.Right;
 						}
-						sibling.Color = node.Parent.Color;
-						node.Parent.Color = NodeColor.Black;
+						sibling.Color = parent.Color;
+						parent.Color = NodeColor.Black;
 						sibling.Right.Color = NodeColor.Black;
-						TreeRotateLeft(node.Parent);
-						node = treeRoot;
+						TreeRotateLeft(parent);
+						break;
 					}
 				} else {
-					var sibling = node.Parent.Left;
+					var sibling = parent.Left;
 					if (sibling.Color == NodeColor.Red) {
 						sibling.Color = NodeColor.Black;
-						node.Parent.Color = NodeColor.Red;
-						TreeRotateRight(node.Parent);
-						sibling = node.Parent.Left;
+						parent.Color = NodeColor.Red;
+						TreeRotateRight(parent);
+						sibling = parent.Left;
 					}
-					if (sibling.Right.Color == NodeColor.Black && sibling.Left.Color == NodeColor.Black) {
+					if (IsNullOrBlack(sibling.Right) && IsNullOrBlack(sibling.Left)) {
 						sibling.Color = NodeColor.Red;
-						node = node.Parent;
+						node = parent;
+						parent = parent.Parent;
 					} else {
-						if (sibling.Left.Color == NodeColor.Black) {
+						if (IsNullOrBlack(sibling.Left)) {
 							sibling.Right.Color = NodeColor.Black;
 							sibling.Color = NodeColor.Red;
 							TreeRotateLeft(sibling);
-							sibling = node.Parent.Left;
+							sibling = parent.Left;
 						}
-						sibling.Color = node.Parent.Color;
-						node.Parent.Color = NodeColor.Black;
+						sibling.Color = parent.Color;
+						parent.Color = NodeColor.Black;
 						sibling.Left.Color = NodeColor.Black;
-						TreeRotateRight(node.Parent);
-						node = treeRoot;
+						TreeRotateRight(parent);
+						break;
 					}
 				}
 			}
-			node.Color = NodeColor.Black;
+			if (node != null) {
+				node.Color = NodeColor.Black;
+			}
 		}
 
 		private void TreeRotateLeft(Node node)
 		{
 			var x = node.Right;
 			node.Right = x.Left;
-			if (x.Left != treeSentinel) {
-				x.Left.Parent = node;
-			}
-			if (x != treeSentinel) {
-				x.Parent = node.Parent;
+			if (node.Right != null) {
+				node.Right.Parent = node;
 			}
 			if (node.Parent != null) {
 				if (node == node.Parent.Left) {
@@ -710,21 +696,17 @@ namespace Lime.Graphics.Platform.Vulkan
 			} else {
 				treeRoot = x;
 			}
+			x.Parent = node.Parent;
 			x.Left = node;
-			if (node != treeSentinel) {
-				node.Parent = x;
-			}
+			node.Parent = x;
 		}
 
 		private void TreeRotateRight(Node node)
 		{
 			var x = node.Left;
 			node.Left = x.Right;
-			if (x.Right != treeSentinel) {
-				x.Right.Parent = node;
-			}
-			if (x != treeSentinel) {
-				x.Parent = node.Parent;
+			if (node.Left != null) {
+				node.Left.Parent = node;
 			}
 			if (node.Parent != null) {
 				if (node == node.Parent.Right) {
@@ -735,10 +717,14 @@ namespace Lime.Graphics.Platform.Vulkan
 			} else {
 				treeRoot = x;
 			}
+			x.Parent = node.Parent;
 			x.Right = node;
-			if (node != treeSentinel) {
-				node.Parent = x;
-			}
+			node.Parent = x;
+		}
+
+		private static bool IsNullOrBlack(Node node)
+		{
+			return node == null || node.Color == NodeColor.Black;
 		}
 
 		public class Node
