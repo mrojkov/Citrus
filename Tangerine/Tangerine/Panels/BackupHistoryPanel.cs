@@ -16,6 +16,8 @@ namespace Tangerine.Panels
 		private List<BackupManager.Backup> history = new List<BackupManager.Backup>();
 		private int selectedIndex;
 
+		public static BackupHistoryPanel Instance;
+
 		private class Cmds
 		{
 			public static readonly ICommand Up = new Command(Key.Up);
@@ -26,6 +28,7 @@ namespace Tangerine.Panels
 
 		public BackupHistoryPanel(Widget panelWidget)
 		{
+			Instance = this;
 			this.panelWidget = panelWidget;
 			scrollView = new ThemedScrollView { TabTravesable = new TabTraversable() };
 			this.rootWidget = new Frame {
@@ -103,7 +106,7 @@ namespace Tangerine.Panels
 			}
 		}
 
-		private void RefreshHistory()
+		public void RefreshHistory()
 		{
 			selectedIndex = 0;
 			resultPane.Nodes.Clear();

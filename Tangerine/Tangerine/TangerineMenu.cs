@@ -203,6 +203,11 @@ namespace Tangerine
 					GenericCommands.HelpMode,
 					GenericCommands.ViewChangelog
 				}),
+				new Command("System", new Menu {
+					GenericCommands.ResetGlobalSettings,
+					GenericCommands.ClearCache,
+					GenericCommands.PurgeBackups,
+				}),
 			};
 			create.Add(customNodes = new Command("Custom Nodes", new Menu()));
 			foreach (var t in Project.GetNodesTypesOrdered("Lime")) {
