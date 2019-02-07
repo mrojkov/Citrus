@@ -691,7 +691,7 @@ namespace Lime
 			}
 		}
 
-		public void RecalcGloballyEnabled()
+		private void RecalcGloballyEnabled()
 		{
 			globallyEnabled = Enabled;
 			if (Parent?.AsWidget != null) {
