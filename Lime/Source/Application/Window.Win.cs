@@ -260,6 +260,7 @@ namespace Lime
 				graphicsContext = new OpenTK.Graphics.GraphicsContext(graphicsMode, windowInfo, major, minor, graphicsContextFlags);
 				graphicsContext.MakeCurrent(windowInfo);
 				graphicsContext.LoadAll();
+				graphicsContext.SwapInterval = 1;
 				if (platformRenderContext == null) {
 					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
 				}
