@@ -9,6 +9,7 @@ namespace Tangerine.UI
 	{
 		private readonly EditBox editBox;
 		private readonly Button button;
+		private readonly Node node;
 
 		private List<string> CurrentTriggers
 		{
@@ -27,37 +28,45 @@ namespace Tangerine.UI
 				EditorContainer.AddNode(CreateWarning("Edit of triggers isn't supported for multiple selection."));
 				return;
 			}
-			var node = (Node)editorParams.Objects.First();
-			if (!EnsureMarkersAvailable(node)) {
-				EditorContainer.AddNode(CreateWarning("No markers to select from."));
-				return;
-			}
+			node = (Node)editorParams.Objects.First();
 			button = new ThemedButton {
 				Text = "...",
 				MinMaxWidth = 20,
 				LayoutCell = new LayoutCell(Alignment.Center)
 			};
+			var color = button.GlobalColor;
 			EditorContainer.AddNode(editBox = editorParams.EditBoxFactory());
 			EditorContainer.AddNode(Spacer.HSpacer(4));
 			EditorContainer.AddNode(button);
 			EditorContainer.AddNode(Spacer.HStretch());
-			editBox.Text = CoalescedPropertyValue().GetValue().Value;
 			editBox.Submitted += text => {
-				EditBox_Submitted(text, node);
+				var newValue = FilterTriggers(text);
+				editBox.Text = newValue;
+				SetProperty(newValue);
 			};
 			button.Clicked += () => {
 				var window = new TriggerSelectionDialog(
-					GetAvailableTriggers(node),
+					GetAvailableTriggers(),
 					new HashSet<string>(CurrentTriggers),
 					s => {
+						s = FilterTriggers(s);
 						SetProperty(s);
-						editBox.Text = CoalescedPropertyValue().GetValue().Value;
+						editBox.Text = s;
 					}
 				);
 			};
+			Invalidate();
 		}
 
-		private Dictionary<string, HashSet<string>> GetAvailableTriggers(Node node)
+		public void Invalidate()
+		{
+			var value = CoalescedPropertyValue().GetValue().Value;
+			if (node != null && editBox != null) {
+				editBox.Text = FilterTriggers(value);
+			}
+		}
+
+		private Dictionary<string, HashSet<string>> GetAvailableTriggers()
 		{
 			var triggers = new Dictionary<string, HashSet<string>>();
 			foreach (var a in node.Animations) {
@@ -75,7 +84,7 @@ namespace Tangerine.UI
 			return triggers;
 		}
 
-		private bool EnsureMarkersAvailable(Node node)
+		private bool EnsureMarkersAvailable()
 		{
 			foreach (var a in node.Animations) {
 				if (a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id)).ToList().Count > 0) {
@@ -108,25 +117,26 @@ namespace Tangerine.UI
 			editBox.Enabled = button.Enabled = Enabled;
 		}
 
-		private void EditBox_Submitted(string text, Node node)
+		private string FilterTriggers(string text)
 		{
 			var newValue = "";
-			var triggersToSet = text.Split(',').ToList();
-			var triggers = GetAvailableTriggers(node);
-			var newTriggers = new Dictionary<string, string>();
-			foreach (var key in triggers.Keys) {
-				foreach (var trigger in triggersToSet) {
-					if (triggers[key].Contains(trigger.Trim(' '))) {
-						newValue += $"{trigger.Trim(' ')},";
-						break;
+			if (!string.IsNullOrEmpty(text)) {
+				var triggersToSet = text.Split(',').ToList();
+				var triggers = GetAvailableTriggers();
+				var newTriggers = new Dictionary<string, string>();
+				foreach (var key in triggers.Keys) {
+					foreach (var trigger in triggersToSet) {
+						if (triggers[key].Contains(trigger.Trim(' '))) {
+							newValue += $"{trigger.Trim(' ')},";
+							break;
+						}
 					}
 				}
+				if (!string.IsNullOrEmpty(newValue)) {
+					newValue = newValue.Trim(',');
+				}
 			}
-			if (!string.IsNullOrEmpty(newValue)) {
-				newValue = newValue.Trim(',');
-			}
-			editBox.Text = newValue;
-			SetProperty(newValue);
+			return newValue;
 		}
 
 		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
