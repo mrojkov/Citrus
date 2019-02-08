@@ -93,7 +93,7 @@ namespace Tangerine.UI.Inspector
 				if (CoreUserPreferences.Instance.SwapMouseButtonsForKeyframeSwitch) {
 					Toolbox.Swap(ref wasClicked, ref wasRightClicked);
 				}
-				if (wasClicked) {
+				if (button.GloballyEnabled && wasClicked) {
 					Document.Current.History.DoTransaction(() => {
 						SetKeyframe(!kf.HasValue);
 						if (!kf.HasValue) {
@@ -102,7 +102,7 @@ namespace Tangerine.UI.Inspector
 						}
 					});
 				}
-				if (wasRightClicked) {
+				if (button.GloballyEnabled && wasRightClicked) {
 					if (kf.HasValue) {
 						var nextKeyFunction = GetNextKeyFunction(kf.GetValueOrDefault());
 						Document.Current.History.DoTransaction(() => {
