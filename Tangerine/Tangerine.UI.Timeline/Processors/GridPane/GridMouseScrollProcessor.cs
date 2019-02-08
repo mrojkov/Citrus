@@ -24,7 +24,7 @@ namespace Tangerine.UI.Timeline
 					} else if (p.X < cw / 2) {
 						timeline.OffsetX = Math.Max(0, timeline.OffsetX - cw);
 					}
-					if (!userPreferences.LockTimelineCursor || !SelectAndDragKeyframesProcessor.IsSelectingOrDragging) {
+					if (!userPreferences.LockTimelineCursor) {
 						Core.Document.Current.History.DoTransaction(() => {
 							Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(p.X));
 						});
