@@ -287,6 +287,9 @@ namespace Tangerine.UI.Timeline.Components
 
 		public void Rename()
 		{
+			if (NodeData.Node.EditorState().Locked) {
+				return;
+			}
 			label.Visible = false;
 			editBoxContainer.Visible = true;
 			// refresh edit box text, since dataflows for coalesced property value wont refresh it when editBox is invisible
