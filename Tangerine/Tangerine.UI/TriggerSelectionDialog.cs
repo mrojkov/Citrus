@@ -47,6 +47,12 @@ namespace Tangerine.UI
 					CreateButtonsPanel()
 				}
 			};
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.LateTasks.AddLoop(() => {
+				if (rootWidget.Input.ConsumeKeyPress(Key.Escape)) {
+					window.Close();
+				}
+			});
 			window.ShowModal();
 		}
 
