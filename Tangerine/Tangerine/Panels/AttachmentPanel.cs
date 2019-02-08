@@ -1135,8 +1135,12 @@ namespace Tangerine
 				Padding = new Thickness(top: AttachmentMetrics.Spacing)
 			};
 			var defaultAnimation = attachment.Animations.FirstOrDefault(a => a.Id == "Default")?.SourceAnimationId;
+			string trigger = attachment.EntryTrigger;
+			if (trigger != null && defaultAnimation != null) {
+				trigger = trigger.Replace($"@{defaultAnimation}", "@Default");
+			}
 			var node = new Node3D {
-				Trigger = attachment.EntryTrigger != null ? attachment.EntryTrigger.Replace($"@{defaultAnimation}", "@Default") : null
+				Trigger = trigger
 			};
 			var propEditorParams = new PropertyEditorParams(
 				content, node, nameof(Node.Trigger), displayName: "Entry Animation");
@@ -1162,7 +1166,10 @@ namespace Tangerine
 				editor.Invalidate();
 			});
 			content.AddChangeWatcher(() => node.Trigger, v => {
-				attachment.EntryTrigger = v != null ? v.Replace("@Default", $"@{defaultAnimation}") : null;
+				attachment.EntryTrigger = v;
+				if (attachment.EntryTrigger != null && defaultAnimation != null) {
+					attachment.EntryTrigger = attachment.EntryTrigger.Replace("@Default", $"@{defaultAnimation}");
+				}
 			});
 			return content;
 		}
