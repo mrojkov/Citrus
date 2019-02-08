@@ -13,15 +13,15 @@ namespace Lime.Graphics.Platform.OpenGL
 	public class PlatformRenderContext : IPlatformRenderContext
 	{
 		private int glDefaultFramebuffer;
-		private Viewport viewport;
-		private BlendState blendState;
-		private DepthState depthState;
-		private StencilState stencilState;
-		private ScissorState scissorState;
-		private ColorWriteMask colorWriteMask;
-		private CullMode cullMode;
-		private FrontFace frontFace;
-		private PrimitiveTopology primitiveTopology;
+		private Viewport viewport = Viewport.Default;
+		private BlendState blendState = BlendState.Default;
+		private DepthState depthState = DepthState.Default;
+		private StencilState stencilState = StencilState.Default;
+		private ScissorState scissorState = ScissorState.Default;
+		private ColorWriteMask colorWriteMask = ColorWriteMask.All;
+		private CullMode cullMode = CullMode.None;
+		private FrontFace frontFace = FrontFace.CW;
+		private PrimitiveTopology primitiveTopology = PrimitiveTopology.TriangleList;
 		private PlatformShaderProgram shaderProgram;
 		private PlatformVertexInputLayout vertexInputLayout;
 		private PlatformTexture2D[] textures;
@@ -32,7 +32,12 @@ namespace Lime.Graphics.Platform.OpenGL
 		private int indexOffset;
 		private IndexFormat indexFormat;
 		private PlatformRenderTexture2D renderTarget;
-		
+
+		private bool blendStateDirty;
+		private bool depthStateDirty;
+		private bool stencilStateDirty;
+		private bool scissorStateDirty;
+		private bool viewportDirty;
 		private bool renderTargetDirty;
 		private bool shaderProgramDirty;
 		private bool indexBufferDirty;
@@ -41,6 +46,18 @@ namespace Lime.Graphics.Platform.OpenGL
 		private long vertexBuffersDirtyMask;
 		private bool vertexInputLayoutDirty;
 		private int boundBaseVertex;
+
+		private BlendState boundBlendState;
+		private DepthState boundDepthState;
+		private StencilState boundStencilState;
+		private ScissorState boundScissorState;
+		private ColorWriteMask boundColorWriteMask;
+		private CullMode boundCullMode;
+		private FrontFace boundFrontFace;
+		private Viewport boundViewport;
+		private Color4 boundClearColor;
+		private float boundClearDepth;
+		private byte boundClearStencil;
 
 		internal int MaxTextureSlots;
 		internal int MaxVertexBufferSlots;
@@ -81,6 +98,8 @@ namespace Lime.Graphics.Platform.OpenGL
 			vertexInputLayoutDirty = true;
 			vertexBuffersDirtyMask = 0;
 			enabledVertexAttribMask = ~0;
+			BindState(true);
+			BindClearValues(true, ClearOptions.All, Color4.Black, 1, 0);
 		}
 
 		internal void InvalidateTextureBinding(int slot)
@@ -169,26 +188,31 @@ namespace Lime.Graphics.Platform.OpenGL
 		public void SetViewport(Viewport vp)
 		{
 			viewport = vp;
+			viewportDirty = true;
 		}
 
 		public void SetBlendState(BlendState state)
 		{
 			blendState = state;
+			blendStateDirty = true;
 		}
 
 		public void SetDepthState(DepthState state)
 		{
 			depthState = state;
+			depthStateDirty = true;
 		}
 
 		public void SetStencilState(StencilState state)
 		{
 			stencilState = state;
+			stencilStateDirty = true;
 		}
 
 		public void SetScissorState(ScissorState state)
 		{
 			scissorState = state;
+			scissorStateDirty = true;
 		}
 
 		public void SetColorWriteMask(ColorWriteMask mask)
@@ -262,38 +286,78 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
+		public void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
 		{
-			if (options == ClearOptions.None) {
+			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
 				return;
 			}
 			EnsureRenderTarget();
+			BindClearValues(false, options, color, depth, stencil);
 			ClearBufferMask glClearBufferMask = 0;
 			if ((options & ClearOptions.ColorBuffer) != 0) {
 				glClearBufferMask |= ClearBufferMask.ColorBufferBit;
-				GL.ColorMask(true, true, true, true);
-				GLHelper.CheckGLErrors();
-				GL.ClearColor(r, g, b, a);
-				GLHelper.CheckGLErrors();
+				if (boundColorWriteMask != ColorWriteMask.All) {
+					GL.ColorMask(true, true, true, true);
+					GLHelper.CheckGLErrors();
+					boundColorWriteMask = ColorWriteMask.All;
+				}
 			}
 			if ((options & ClearOptions.DepthBuffer) != 0) {
 				glClearBufferMask |= ClearBufferMask.DepthBufferBit;
-				GL.DepthMask(true);
-				GLHelper.CheckGLErrors();
-				GL.ClearDepth(depth);
-				GLHelper.CheckGLErrors();
+				if (!boundDepthState.WriteEnable) {
+					GL.DepthMask(true);
+					GLHelper.CheckGLErrors();
+					boundDepthState.WriteEnable = true;
+					depthStateDirty = true;
+				}
 			}
 			if ((options & ClearOptions.StencilBuffer) != 0) {
 				glClearBufferMask |= ClearBufferMask.StencilBufferBit;
-				GL.StencilMask(0xff);
-				GLHelper.CheckGLErrors();
-				GL.ClearStencil(stencil);
-				GLHelper.CheckGLErrors();
+				if (boundStencilState.WriteMask != 0xff) {
+					GL.StencilMask(0xff);
+					GLHelper.CheckGLErrors();
+					boundStencilState.WriteMask = 0xff;
+					stencilStateDirty = true;
+				}
 			}
-			GL.Scissor(viewport.X, viewport.Y, viewport.Width, viewport.Height);
-			GLHelper.CheckGLErrors();
+			var scissor = boundScissorState.Bounds;
+			if (scissor.X != boundViewport.X ||
+				scissor.Y != boundViewport.Y ||
+				scissor.Width != boundViewport.Width ||
+				scissor.Height != boundViewport.Height
+			) {
+				GL.Scissor(scissor.X, scissor.Y, scissor.Width, scissor.Height);
+				GLHelper.CheckGLErrors();
+				boundScissorState.Bounds = scissor;
+				scissorStateDirty = true;
+			}
 			GL.Clear(glClearBufferMask);
 			GLHelper.CheckGLErrors();
+		}
+
+		private void BindClearValues(bool force, ClearOptions options, Color4 color, float depth, byte stencil)
+		{
+			if ((options & ClearOptions.ColorBuffer) != 0) {
+				if (force || color != boundClearColor) {
+					GL.ClearColor(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
+					GLHelper.CheckGLErrors();
+					boundClearColor = color;
+				}
+			}
+			if ((options & ClearOptions.DepthBuffer) != 0) {
+				if (force || depth != boundClearDepth) {
+					GL.ClearDepth(depth);
+					GLHelper.CheckGLErrors();
+					boundClearDepth = depth;
+				}
+			}
+			if ((options & ClearOptions.StencilBuffer) != 0) {
+				if (force || stencil != boundClearStencil) {
+					GL.ClearStencil(stencil);
+					GLHelper.CheckGLErrors();
+					boundClearStencil = stencil;
+				}
+			}
 		}
 
 		public void Draw(int startVertex, int vertexCount)
@@ -328,7 +392,7 @@ namespace Lime.Graphics.Platform.OpenGL
 		private void PreDraw(int baseVertex)
 		{
 			EnsureRenderTarget();
-			BindState();
+			BindState(false);
 			BindShaderProgram();
 			BindTextures();
 			BindVertexAttributes(baseVertex);
@@ -345,96 +409,274 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		private void BindState()
+		private void BindState(bool force)
 		{
-			if (blendState.Enable) {
-				GL.Enable(EnableCap.Blend);
-				GLHelper.CheckGLErrors();
-			} else {
-				GL.Disable(EnableCap.Blend);
-				GLHelper.CheckGLErrors();
+			BindBlendState(force);
+			BindDepthState(force);
+			BindStencilState(force);
+			BindScissorState(force);
+			BindColorWriteMask(force);
+			BindCullMode(force);
+			BindFrontFace(force);
+			BindViewport(force);
+		}
+
+		private void BindBlendState(bool force)
+		{
+			blendStateDirty |= force;
+			if (!blendStateDirty) {
+				return;
 			}
-			GL.BlendEquationSeparate(
-				(BlendEquationMode)GLHelper.GetGLBlendEquationMode(blendState.ColorBlendFunc),
-				(BlendEquationMode)GLHelper.GetGLBlendEquationMode(blendState.AlphaBlendFunc));
-			GLHelper.CheckGLErrors();
-			GL.BlendFuncSeparate(
-				(BlendingFactorSrc)GLHelper.GetGLBlendFactor(blendState.ColorSrcBlend), (BlendingFactorDest)GLHelper.GetGLBlendFactor(blendState.ColorDstBlend),
-				(BlendingFactorSrc)GLHelper.GetGLBlendFactor(blendState.AlphaSrcBlend), (BlendingFactorDest)GLHelper.GetGLBlendFactor(blendState.AlphaDstBlend));
-			GLHelper.CheckGLErrors();
-			GL.BlendColor(
-				blendState.BlendFactor.R / 255f,
-				blendState.BlendFactor.G / 255f,
-				blendState.BlendFactor.B / 255f,
-				blendState.BlendFactor.A / 255f);
-			GLHelper.CheckGLErrors();
-			GL.ColorMask(
-				(colorWriteMask & ColorWriteMask.Red) != 0,
-				(colorWriteMask & ColorWriteMask.Green) != 0,
-				(colorWriteMask & ColorWriteMask.Blue) != 0,
-				(colorWriteMask & ColorWriteMask.Alpha) != 0);
-			GLHelper.CheckGLErrors();
-			if (depthState.Enable) {
-				GL.Enable(EnableCap.DepthTest);
-				GLHelper.CheckGLErrors();
-			} else {
-				GL.Disable(EnableCap.DepthTest);
-				GLHelper.CheckGLErrors();
+			if (force || blendState.Enable != boundBlendState.Enable) {
+				if (blendState.Enable) {
+					GL.Enable(EnableCap.Blend);
+					GLHelper.CheckGLErrors();
+				} else {
+					GL.Disable(EnableCap.Blend);
+					GLHelper.CheckGLErrors();
+				}
+				boundBlendState.Enable = blendState.Enable;
 			}
-			GL.DepthMask(depthState.WriteEnable);
-			GLHelper.CheckGLErrors();
-			GL.DepthFunc((DepthFunction)GLHelper.GetGLCompareFunc(depthState.Comparison));
-			GLHelper.CheckGLErrors();
-			if (stencilState.Enable) {
-				GL.Enable(EnableCap.StencilTest);
-				GLHelper.CheckGLErrors();
-			} else {
-				GL.Disable(EnableCap.StencilTest);
-				GLHelper.CheckGLErrors();
+			if (force || blendState.Enable) {
+				if (force ||
+					blendState.ColorBlendFunc != boundBlendState.ColorBlendFunc ||
+					blendState.AlphaBlendFunc != boundBlendState.AlphaBlendFunc
+				) {
+					GL.BlendEquationSeparate(
+						(BlendEquationMode)GLHelper.GetGLBlendEquationMode(blendState.ColorBlendFunc),
+						(BlendEquationMode)GLHelper.GetGLBlendEquationMode(blendState.AlphaBlendFunc));
+					GLHelper.CheckGLErrors();
+					boundBlendState.ColorBlendFunc = blendState.ColorBlendFunc;
+					boundBlendState.AlphaBlendFunc = blendState.AlphaBlendFunc;
+				}
+				if (force ||
+					blendState.ColorSrcBlend != boundBlendState.ColorSrcBlend ||
+					blendState.ColorDstBlend != boundBlendState.ColorDstBlend ||
+					blendState.AlphaSrcBlend != boundBlendState.AlphaSrcBlend ||
+					blendState.AlphaDstBlend != boundBlendState.AlphaDstBlend
+				) {
+					GL.BlendFuncSeparate(
+						(BlendingFactorSrc)GLHelper.GetGLBlendFactor(blendState.ColorSrcBlend), (BlendingFactorDest)GLHelper.GetGLBlendFactor(blendState.ColorDstBlend),
+						(BlendingFactorSrc)GLHelper.GetGLBlendFactor(blendState.AlphaSrcBlend), (BlendingFactorDest)GLHelper.GetGLBlendFactor(blendState.AlphaDstBlend));
+					GLHelper.CheckGLErrors();
+					boundBlendState.ColorSrcBlend = blendState.ColorSrcBlend;
+					boundBlendState.ColorDstBlend = blendState.ColorDstBlend;
+					boundBlendState.AlphaSrcBlend = blendState.AlphaSrcBlend;
+					boundBlendState.AlphaDstBlend = blendState.AlphaDstBlend;
+				}
+				if (force || blendState.BlendFactor != boundBlendState.BlendFactor) {
+					GL.BlendColor(
+						blendState.BlendFactor.R / 255f,
+						blendState.BlendFactor.G / 255f,
+						blendState.BlendFactor.B / 255f,
+						blendState.BlendFactor.A / 255f);
+					GLHelper.CheckGLErrors();
+					boundBlendState.BlendFactor = blendState.BlendFactor;
+				}
 			}
-			GL.StencilMask(stencilState.WriteMask);
-			GLHelper.CheckGLErrors();
-			GL.StencilFuncSeparate(StencilFace.Front,
-				(StencilFunction)GLHelper.GetGLCompareFunc(stencilState.FrontFaceComparison), stencilState.ReferenceValue, stencilState.ReadMask);
-			GLHelper.CheckGLErrors();
-			GL.StencilOpSeparate(StencilFace.Front,
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFaceFail),
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFaceDepthFail),
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFacePass));
-			GLHelper.CheckGLErrors();
-			GL.StencilFuncSeparate(StencilFace.Back,
-				(StencilFunction)GLHelper.GetGLCompareFunc(stencilState.BackFaceComparison), stencilState.ReferenceValue, stencilState.ReadMask);
-			GLHelper.CheckGLErrors();
-			GL.StencilOpSeparate(StencilFace.Back,
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFaceFail),
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFaceDepthFail),
-				(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFacePass));
-			GLHelper.CheckGLErrors();
-			if (scissorState.Enable) {
-				GL.Enable(EnableCap.ScissorTest);
+			blendStateDirty = false;
+		}
+
+		private void BindColorWriteMask(bool force)
+		{
+			if (force || colorWriteMask != boundColorWriteMask) {
+				GL.ColorMask(
+					(colorWriteMask & ColorWriteMask.Red) != 0,
+					(colorWriteMask & ColorWriteMask.Green) != 0,
+					(colorWriteMask & ColorWriteMask.Blue) != 0,
+					(colorWriteMask & ColorWriteMask.Alpha) != 0);
 				GLHelper.CheckGLErrors();
-			} else {
-				GL.Disable(EnableCap.ScissorTest);
-				GLHelper.CheckGLErrors();
+				boundColorWriteMask = colorWriteMask;
 			}
-			var scissor = scissorState.Bounds;
-			GL.Scissor(scissor.X, scissor.Y, scissor.Width, scissor.Height);
-			GLHelper.CheckGLErrors();
-			if (cullMode != CullMode.None) {
-				GL.Enable(EnableCap.CullFace);
-				GLHelper.CheckGLErrors();
-				GL.CullFace((CullFaceMode)GLHelper.GetGLCullFaceMode(cullMode));
-				GLHelper.CheckGLErrors();
-			} else {
-				GL.Disable(EnableCap.CullFace);
-				GLHelper.CheckGLErrors();
+		}
+
+		private void BindDepthState(bool force)
+		{
+			depthStateDirty |= force;
+			if (!depthStateDirty) {
+				return;
 			}
-			GL.FrontFace((FrontFaceDirection)GLHelper.GetGLFrontFaceDirection(frontFace));
-			GLHelper.CheckGLErrors();
-			GL.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
-			GLHelper.CheckGLErrors();
-			GL.DepthRange(viewport.MinDepth, viewport.MaxDepth);
-			GLHelper.CheckGLErrors();
+			if (force || depthState.Enable != boundDepthState.Enable) {
+				if (depthState.Enable) {
+					GL.Enable(EnableCap.DepthTest);
+					GLHelper.CheckGLErrors();
+				} else {
+					GL.Disable(EnableCap.DepthTest);
+					GLHelper.CheckGLErrors();
+				}
+				boundDepthState.Enable = depthState.Enable;
+			}
+			if (force || depthState.Enable) {
+				if (force || depthState.WriteEnable != boundDepthState.WriteEnable) {
+					GL.DepthMask(depthState.WriteEnable);
+					GLHelper.CheckGLErrors();
+					boundDepthState.WriteEnable = depthState.WriteEnable;
+				}
+				if (force || depthState.Comparison != boundDepthState.Comparison) {
+					GL.DepthFunc((DepthFunction)GLHelper.GetGLCompareFunc(depthState.Comparison));
+					GLHelper.CheckGLErrors();
+					boundDepthState.Comparison = depthState.Comparison;
+				}
+			}
+			depthStateDirty = false;
+		}
+
+		private void BindStencilState(bool force)
+		{
+			stencilStateDirty |= force;
+			if (!stencilStateDirty) {
+				return;
+			}
+			if (force || stencilState.Enable != boundStencilState.Enable) {
+				if (stencilState.Enable) {
+					GL.Enable(EnableCap.StencilTest);
+					GLHelper.CheckGLErrors();
+				} else {
+					GL.Disable(EnableCap.StencilTest);
+					GLHelper.CheckGLErrors();
+				}
+				boundStencilState.Enable = stencilState.Enable;
+			}
+			if (force || stencilState.Enable) {
+				if (force || stencilState.WriteMask != boundStencilState.WriteMask) {
+					GL.StencilMask(stencilState.WriteMask);
+					GLHelper.CheckGLErrors();
+					boundStencilState.WriteMask = stencilState.WriteMask;
+				}
+				var funcDirty = force ||
+					stencilState.ReferenceValue != boundStencilState.ReferenceValue ||
+					stencilState.ReadMask != boundStencilState.ReadMask;
+				if (funcDirty || stencilState.FrontFaceComparison != boundStencilState.FrontFaceComparison) {
+					GL.StencilFuncSeparate(StencilFace.Front,
+						(StencilFunction)GLHelper.GetGLCompareFunc(stencilState.FrontFaceComparison), stencilState.ReferenceValue, stencilState.ReadMask);
+					GLHelper.CheckGLErrors();
+					boundStencilState.FrontFaceComparison = stencilState.FrontFaceComparison;
+				}
+				if (funcDirty || stencilState.BackFaceComparison != boundStencilState.BackFaceComparison) {
+					GL.StencilFuncSeparate(StencilFace.Back,
+						(StencilFunction)GLHelper.GetGLCompareFunc(stencilState.BackFaceComparison), stencilState.ReferenceValue, stencilState.ReadMask);
+					GLHelper.CheckGLErrors();
+					boundStencilState.BackFaceComparison = stencilState.BackFaceComparison;
+				}
+				boundStencilState.ReferenceValue = stencilState.ReferenceValue;
+				boundStencilState.ReadMask = stencilState.ReadMask;
+				if (force ||
+					stencilState.FrontFaceFail != boundStencilState.FrontFaceFail ||
+					stencilState.FrontFaceDepthFail != boundStencilState.FrontFaceDepthFail ||
+					stencilState.FrontFacePass != boundStencilState.FrontFacePass
+				) {
+					GL.StencilOpSeparate(StencilFace.Front,
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFaceFail),
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFaceDepthFail),
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.FrontFacePass));
+					GLHelper.CheckGLErrors();
+					boundStencilState.FrontFaceFail = stencilState.FrontFaceFail;
+					boundStencilState.FrontFaceDepthFail = stencilState.FrontFaceDepthFail;
+					boundStencilState.FrontFacePass = stencilState.FrontFacePass;
+				}
+				if (force ||
+					stencilState.BackFaceFail != boundStencilState.BackFaceFail ||
+					stencilState.BackFaceDepthFail != boundStencilState.BackFaceDepthFail ||
+					stencilState.BackFacePass != boundStencilState.BackFacePass
+				) {
+					GL.StencilOpSeparate(StencilFace.Back,
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFaceFail),
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFaceDepthFail),
+						(GLStencilOp)GLHelper.GetGLStencilOp(stencilState.BackFacePass));
+					GLHelper.CheckGLErrors();
+					boundStencilState.BackFaceFail = stencilState.BackFaceFail;
+					boundStencilState.BackFaceDepthFail = stencilState.BackFaceDepthFail;
+					boundStencilState.BackFacePass = stencilState.BackFacePass;
+				}
+			}
+			stencilStateDirty = false;
+		}
+
+		private void BindScissorState(bool force)
+		{
+			scissorStateDirty |= force;
+			if (!scissorStateDirty) {
+				return;
+			}
+			if (force || scissorState.Enable != boundScissorState.Enable) {
+				if (scissorState.Enable) {
+					GL.Enable(EnableCap.ScissorTest);
+					GLHelper.CheckGLErrors();
+				} else {
+					GL.Disable(EnableCap.ScissorTest);
+					GLHelper.CheckGLErrors();
+				}
+				boundScissorState.Enable = scissorState.Enable;
+			}
+			if (force || (scissorState.Enable && scissorState.Bounds != boundScissorState.Bounds)) {
+				var bounds = scissorState.Bounds;
+				GL.Scissor(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+				GLHelper.CheckGLErrors();
+				boundScissorState.Bounds = bounds;
+			}
+			scissorStateDirty = false;
+		}
+
+		private void BindCullMode(bool force)
+		{
+			if (force || cullMode != boundCullMode) {
+				var enabled = boundCullMode != CullMode.None;
+				var required = cullMode != CullMode.None;
+				if (force || required != enabled) {
+					if (required) {
+						GL.Enable(EnableCap.CullFace);
+						GLHelper.CheckGLErrors();
+					} else {
+						GL.Disable(EnableCap.CullFace);
+						GLHelper.CheckGLErrors();
+					}
+				}
+				if (required) {
+					GL.CullFace((CullFaceMode)GLHelper.GetGLCullFaceMode(cullMode));
+					GLHelper.CheckGLErrors();
+				}
+				boundCullMode = cullMode;
+			}
+		}
+
+		private void BindFrontFace(bool force)
+		{
+			if (force || frontFace != boundFrontFace) {
+				GL.FrontFace((FrontFaceDirection)GLHelper.GetGLFrontFaceDirection(frontFace));
+				GLHelper.CheckGLErrors();
+				boundFrontFace = frontFace;
+			}
+		}
+
+		private void BindViewport(bool force)
+		{
+			viewportDirty |= force;
+			if (!viewportDirty) {
+				return;
+			}
+			if (force ||
+				viewport.X != boundViewport.X ||
+				viewport.Y != boundViewport.Y ||
+				viewport.Width != boundViewport.Width ||
+				viewport.Height != boundViewport.Height
+			) {
+				GL.Viewport(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+				GLHelper.CheckGLErrors();
+				boundViewport.X = viewport.X;
+				boundViewport.Y = viewport.Y;
+				boundViewport.Width = viewport.Width;
+				boundViewport.Height = viewport.Height;
+			}
+			if (force ||
+				viewport.MinDepth != boundViewport.MinDepth ||
+				viewport.MaxDepth != boundViewport.MaxDepth
+			) {
+				GL.DepthRange(viewport.MinDepth, viewport.MaxDepth);
+				GLHelper.CheckGLErrors();
+				boundViewport.MinDepth = viewport.MinDepth;
+				boundViewport.MaxDepth = viewport.MaxDepth;
+			}
+			viewportDirty = false;
 		}
 
 		private void BindTextures()

@@ -372,7 +372,7 @@ namespace Lime
 
 		public static void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
 		{
-			Context.Clear(options, color.R / 255F, color.G / 255F, color.B / 255F, color.A / 255F, depth, stencil);
+			Context.Clear(options, color, depth, stencil);
 		}
 
 		private static void Reset()

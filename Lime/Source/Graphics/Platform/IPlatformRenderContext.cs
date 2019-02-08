@@ -20,7 +20,7 @@ namespace Lime.Graphics.Platform
 
 		FormatFeatures GetFormatFeatures(Format format);
 		void SetRenderTarget(IPlatformRenderTexture2D texture);
-		void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil);
+		void Clear(ClearOptions options, Color4 color, float depth, byte stencil);
 		void Flush();
 		void Finish();
 		void SetViewport(Viewport vp);

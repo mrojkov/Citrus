@@ -862,7 +862,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			clearVertexBuffer = new PlatformBuffer(this, BufferType.Vertex, clearVertices.Length * sizeof(Vector4), true);
 		}
 
-		public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
+		public void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
 		{
 			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
 				return;
@@ -884,7 +884,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				clearVertices[3] = new Vector4(1, -1, depth, 1);
 				clearVertexBuffer.SetData(0, clearVertices, BufferSetDataMode.Discard);
 
-				var clearColor = new Vector4(r, g, b, a);
+				var clearColor = color.ToVector4();
 				clearProgram.SetUniform(clearColorUniformIndex, new IntPtr(&clearColor), 1);
 
 				var clearColorWriteMask = ColorWriteMask.None;
