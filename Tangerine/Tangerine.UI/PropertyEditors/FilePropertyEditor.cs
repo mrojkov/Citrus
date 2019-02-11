@@ -15,13 +15,17 @@ namespace Tangerine.UI
 		}
 
 		protected readonly EditBox editor;
-		protected readonly Button button;
 		protected static string LastOpenedDirectory = Path.GetDirectoryName(Document.Current.FullPath);
+		protected readonly string[] allowedFileTypes;
 
+		private readonly Button button;
 		private readonly PrefixData prefix = new PrefixData();
+
+		public bool ShowPrefix { get; set; } = true;
 
 		protected FilePropertyEditor(IPropertyEditorParams editorParams, string[] allowedFileTypes) : base(editorParams)
 		{
+			this.allowedFileTypes = allowedFileTypes;
 			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
@@ -36,17 +40,7 @@ namespace Tangerine.UI
 			});
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Submitted += text => SetComponent(text);
-			button.Clicked += () => {
-				var dlg = new FileDialog {
-					AllowedFileTypes = allowedFileTypes,
-					Mode = FileDialogMode.Open,
-					InitialDirectory = Directory.Exists(LastOpenedDirectory) ? LastOpenedDirectory : Path.GetDirectoryName(Document.Current.FullPath),
-				};
-				if (dlg.RunModal()) {
-					SetFilePath(dlg.FileName);
-					LastOpenedDirectory = Path.GetDirectoryName(dlg.FileName);
-				}
-			};
+			button.Clicked += OnSelectClicked;
 			ExpandableContent.Padding = new Thickness(24, 10, 2, 2);
 			var prefixEditor = new StringPropertyEditor(new PropertyEditorParams(ExpandableContent, prefix, nameof(PrefixData.Prefix)) { LabelWidth = 180 });
 			prefix.Prefix = GetLongestCommonPrefix(GetPaths());
@@ -57,6 +51,10 @@ namespace Tangerine.UI
 				}
 				SetPathPrefix(oldPrefix, v);
 				prefix.Prefix = v.Trim('/');
+			});
+			ContainerWidget.AddChangeWatcher(() => ShowPrefix, show => {
+				Expanded = show && Expanded;
+				ExpandButton.Visible = show;
 			});
 			var current = CoalescedPropertyValue();
 			editor.AddChangeWatcher(current, v => editor.Text = ValueToStringConverter(v.Value) ?? "");
@@ -157,6 +155,20 @@ namespace Tangerine.UI
 				directoryParts = tempDirectoryParts;
 			}
 			return String.Join(Separator.ToString(), directoryParts);
+		}
+
+		protected virtual void OnSelectClicked()
+		{
+			var dlg = new FileDialog {
+				AllowedFileTypes = allowedFileTypes,
+				Mode = FileDialogMode.Open,
+				InitialDirectory = Directory.Exists(LastOpenedDirectory) ?
+					LastOpenedDirectory : Path.GetDirectoryName(Document.Current.FullPath),
+			};
+			if (dlg.RunModal()) {
+				SetFilePath(dlg.FileName);
+				LastOpenedDirectory = Path.GetDirectoryName(dlg.FileName);
+			}
 		}
 	}
 }

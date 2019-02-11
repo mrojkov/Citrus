@@ -164,6 +164,9 @@ namespace Tangerine
 					SceneViewCommands.GeneratePreview
 				}),
 				new Command("Create", (create = new Menu())),
+				new Command("Tools", new Menu {
+					Tools.RenderToPngSequence,
+				}),
 				new Command("View", (viewMenu = new Menu {
 					new Command("Layouts", (layoutMenu = new Menu {
 						GenericCommands.SaveLayout,
