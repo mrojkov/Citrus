@@ -54,11 +54,12 @@ namespace Lime
 
 		const string lib = "SDL2.dll";
 
-		[SuppressUnmanagedCodeSecurity]
+		// Fix me, Kostya
+		//[SuppressUnmanagedCodeSecurity]
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_Init", ExactSpelling = true)]
 		public static extern int Init(SystemFlags flags);
 
-		[SuppressUnmanagedCodeSecurity]
+		//[SuppressUnmanagedCodeSecurity]
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
 		public static extern int SetAttribute(ContextAttribute attr, int value);
 	}

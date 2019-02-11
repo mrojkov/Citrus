@@ -584,6 +584,10 @@
       <Link>libGLESv2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\3rdParty\ShaderCompilerBinding\ShaderCompiler.dll">
+      <Link>ShaderCompiler.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
