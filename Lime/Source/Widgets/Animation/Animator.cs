@@ -454,4 +454,23 @@ namespace Lime
 			);
 		}
 	}
+
+	public class NumericRangeAnimator : Animator<NumericRange>
+	{
+		protected override NumericRange InterpolateLinear(float t)
+		{
+			NumericRange r;
+			r.Median = Value2.Median + (Value3.Median - Value2.Median) * t;
+			r.Dispersion = Value2.Dispersion + (Value3.Dispersion - Value2.Dispersion) * t;
+			return r;
+		}
+
+		protected override NumericRange InterpolateSplined(float t)
+		{
+			return new NumericRange(
+				Mathf.CatmullRomSpline(t, Value1.Median, Value2.Median, Value3.Median, Value4.Median),
+				Mathf.CatmullRomSpline(t, Value1.Dispersion, Value2.Dispersion, Value3.Dispersion, Value4.Dispersion)
+			);
+		}
+	}
 }
