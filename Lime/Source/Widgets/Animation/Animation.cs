@@ -184,11 +184,7 @@ namespace Lime
 			return d;
 		}
 
-		public static string FixAntPath(string path)
-		{
-			path = path.Replace("|", "_");
-			return path;
-		}
+		public static string FixAntPath(string path) => path.Replace('|', '_');
 
 		public class AnimationData
 		{
