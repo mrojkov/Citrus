@@ -36,7 +36,7 @@ namespace Lime
 			Add(typeof(string), typeof(Animator<string>));
 			Add(typeof(int), typeof(IntAnimator));
 			Add(typeof(bool), typeof(Animator<bool>));
-			Add(typeof(NumericRange), typeof(Animator<NumericRange>));
+			Add(typeof(NumericRange), typeof(NumericRangeAnimator));
 			Add(typeof(Blending), typeof(Animator<Blending>));
 			Add(typeof(ShaderId), typeof(Animator<ShaderId>));
 			Add(typeof(ITexture), typeof(Animator<ITexture>));
