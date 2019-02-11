@@ -1,3 +1,8 @@
+##### Changelog 11.02.2019
+
+* `Lock widgets` теперь блокирует виджет от редактирования [CIT-1095](https://jira.game-forest.com:2000/browse/CIT-1095)
+* Добавлены аниматоры для NumericRange [CIT-1114](https://jira.game-forest.com:2000/browse/CIT-1114)
+
 ##### Changelog 07.02.2019
 
 Багфиксы:
