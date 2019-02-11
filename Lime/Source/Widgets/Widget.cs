@@ -44,6 +44,7 @@ namespace Lime
 		private float rotation;
 		private Vector2 direction;
 		private Color4 color;
+		private bool enabled = true;
 		private bool visible;
 		private Blending blending;
 		private ShaderId shader;
@@ -68,6 +69,7 @@ namespace Lime
 		protected Color4 globalColor;
 		protected Blending globalBlending;
 		protected ShaderId globalShader;
+		protected bool globallyEnabled;
 		protected bool globallyVisible;
 
 		public static Widget Focused { get; private set; }
@@ -511,6 +513,18 @@ namespace Lime
 			}
 		}
 
+		public virtual bool Enabled
+		{
+			get => enabled;
+			set
+			{
+				if (enabled != value) {
+					enabled = value;
+					PropagateDirtyFlags(DirtyFlags.Enabled);
+				}
+			}
+		}
+
 		[YuzuMember]
 		[TangerineKeyframeColor(19)]
 		public bool Visible
@@ -661,6 +675,29 @@ namespace Lime
 		}
 
 		protected virtual void DiscardMaterial() { }
+
+		/// <summary>
+		/// Indicates whether the widget is actually enabled.
+		/// </summary>
+		public bool GloballyEnabled
+		{
+			get
+			{
+				if ((DirtyMask & DirtyFlags.Enabled) != 0) {
+					DirtyMask &= ~DirtyFlags.Enabled;
+					RecalcGloballyEnabled();
+				}
+				return globallyEnabled;
+			}
+		}
+
+		private void RecalcGloballyEnabled()
+		{
+			globallyEnabled = Enabled;
+			if (Parent?.AsWidget != null) {
+				globallyEnabled &= Parent.AsWidget.GloballyEnabled;
+			}
+		}
 
 		/// <summary>
 		/// Indicates whether the widget is actually visible.

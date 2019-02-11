@@ -25,10 +25,15 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(18)]
-		public bool Enabled
+		public override bool Enabled
 		{
-			get { return EnableMask[0]; }
-			set { EnableMask[0] = value; }
+			get => EnableMask[0];
+			set {
+				if (EnableMask[0] != value) {
+					EnableMask[0] = value;
+					PropagateDirtyFlags(DirtyFlags.Enabled);
+				}
+			}
 		}
 
 		public override Action Clicked { get; set; }
@@ -104,7 +109,7 @@ namespace Lime
 			TryRunAnimation("Press");
 			var wasMouseOver = true;
 			while (true) {
-				if (clickGesture.WasRecognized()) {
+				if (GloballyEnabled && EnableMask.All() && clickGesture.WasRecognized()) {
 					Clicked?.Invoke();
 					// buz: don't play release animation
 					// if button's parent became invisible due to
@@ -169,7 +174,7 @@ namespace Lime
 			while (DefaultAnimation.IsRunning) {
 				yield return 0;
 			}
-			while (!EnableMask.All()) {
+			while (!EnableMask.All() || !GloballyEnabled) {
 				yield return 0;
 			}
 			TryRunAnimation("Enable");
@@ -187,11 +192,11 @@ namespace Lime
 				stateHandler.MoveNext();
 				textPresentersFeeder.Update();
 			}
-			if (!EnableMask.All() && !isDisabledState) {
+			if ((!EnableMask.All() || !GloballyEnabled) && !isDisabledState) {
 				SetState(DisabledState());
 			}
 #if WIN || MAC
-			if (Enabled) {
+			if (EnableMask.All() && GloballyEnabled) {
 				if (Input.ConsumeKeyPress(Key.Space) || Input.ConsumeKeyPress(Key.Enter)) {
 					Clicked?.Invoke();
 				}

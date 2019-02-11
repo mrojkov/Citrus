@@ -1,4 +1,5 @@
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI
 {
@@ -35,6 +36,8 @@ namespace Tangerine.UI
 			};
 			ExpandButton.Clicked += () => Expanded = !Expanded;
 			editorParams.InspectorPane.AddNode(ExpandableContent);
+			ExpandableContent.AddChangeWatcher(() => EditorContainer.GloballyEnabled,
+				enabled => ExpandableContent.Enabled = enabled);
 			LabelContainer.Nodes.Insert(0, ExpandButton);
 		}
 	}

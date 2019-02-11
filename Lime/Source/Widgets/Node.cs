@@ -72,6 +72,7 @@ namespace Lime
 			GlobalTransform = 1 << 6,
 			GlobalTransformInverse = 1 << 7,
 			ParentBoundingRect = 1 << 8,
+			Enabled = 1 << 9,
 			All = ~None
 		}
 

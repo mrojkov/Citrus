@@ -47,6 +47,9 @@ namespace Lime
 		{
 			var button = TryFind<Widget>("Button");
 			while (true) {
+				if (!GloballyEnabled) {
+					yield return null;
+				}
 				if (button != null && button.WasClicked()) {
 					SetFocus();
 					ToggleInternal(true);
