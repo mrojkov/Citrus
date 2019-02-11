@@ -55,6 +55,8 @@
   <ItemGroup>
     <Compile Include="AlignPreferences.cs" />
     <Compile Include="CommandHandlers.cs" />
+    <Compile Include="Dialogs\RenderToPngSequenceDialog.cs" />
+    <Compile Include="MainMenu\ToolsMenu.cs" />
     <Compile Include="Panels\AttachmentPanel.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />

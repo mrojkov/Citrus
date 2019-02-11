@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Lime;
 using Tangerine.Core;
+using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
@@ -695,6 +696,7 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 			h.Connect(TimelineCommands.NumericMove, () => new NumericMoveDialog());
 			h.Connect(TimelineCommands.NumericScale, () => new NumericScaleDialog());
+			h.Connect(Tools.RenderToPngSequence, new RenderToPngSequence());
 		}
 
 		private void InitializeHotkeys()

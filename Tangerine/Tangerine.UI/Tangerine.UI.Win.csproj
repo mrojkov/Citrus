@@ -81,6 +81,7 @@
     <Compile Include="PropertyEditors\ExpandablePropertyEditor.cs" />
     <Compile Include="PropertyEditors\FilePropertyEditor.cs" />
     <Compile Include="PropertyEditors\FloatPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\FolderPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FontPropertyEditor.cs" />
     <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntPropertyEditor.cs" />
