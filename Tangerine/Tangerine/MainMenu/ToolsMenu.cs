@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Dialogs;
@@ -16,7 +17,7 @@ namespace Tangerine.MainMenu
 		{
 			var gs = GridSelection.GetSelectionBoundaries();
 			if (!gs.HasValue) {
-				new AlertDialog("Select range on timeline", "Ok").Show();
+				new AlertDialog("Select a range on the timeline", "Ok").Show();
 				return;
 			}
 			var currentWindow = Window.Current;
@@ -24,38 +25,34 @@ namespace Tangerine.MainMenu
 				return;
 			}
 			if (!Directory.Exists(options.Folder)) {
-				new AlertDialog("Folder does not exists.", "Ok").Show();
+				new AlertDialog("Folder does not exist", "Ok").Show();
 				return;
 			}
 			currentWindow.Activate();
-			currentWindow.InvokeOnRendering(() => {
-				var start = AnimationUtils.FramesToSeconds(gs.Value.Left);
-				var savedStart = AnimationUtils.FramesToSeconds(Document.Current.AnimationFrame);
-				var end = AnimationUtils.FramesToSeconds(gs.Value.Right);
-				var delta = 1f / options.FPS;
-				var animationHosts = Document.Current.Container.Nodes.Select(n => n as IAnimationHost).Where(ah => ah != null).ToList();
-				var i = 0;
-				while (start < end) {
-					foreach (var animationHost in animationHosts) {
-						foreach (var animator in animationHost.Animators) {
-							if (animator.AnimationId == Document.Current.AnimationId) {
-								animator.Apply(start);
-							}
-						}
-					}
-					start += delta;
+			WidgetContext.Current.Root.Tasks.Add(RenderPngSequenceTask(currentWindow, options, gs.Value.Left, gs.Value.Right));
+		}
+
+		private static IEnumerator<object> RenderPngSequenceTask(IWindow currentWindow, RenderToPngSequenceDialog.RenderToPngSequenceOptions options, int min, int max)
+		{
+			var start = AnimationUtils.FramesToSeconds(min);
+			Document.Current.AnimationFrame = min;
+			var end = AnimationUtils.FramesToSeconds(max);
+			var delta = 1f / options.FPS;
+			var i = 0;
+			var animation = Document.Current.Animation;
+			animation.IsRunning = true;
+			while (start < end) {
+				currentWindow.InvokeOnRendering(() => {
 					var bitmap = Document.Current.Container.AsWidget.ToBitmap();
 					bitmap.SaveTo(Path.Combine(options.Folder, $"{i:D3}.png"));
-					i += 1;
-				}
-				foreach (var animationHost in animationHosts) {
-					foreach (var animator in animationHost.Animators) {
-						if (animator.AnimationId == Document.Current.AnimationId) {
-							animator.Apply(savedStart);
-						}
-					}
-				}
-			});
+				});
+				yield return null;
+				animation.Owner.Update(delta);
+				start += delta;
+				Application.InvalidateWindows();
+				i += 1;
+			}
+			animation.IsRunning = false;
 		}
 	}
 }
