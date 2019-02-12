@@ -76,7 +76,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			GL.BindTexture(TextureTarget.Texture2D, GLTexture);
 			GLHelper.CheckGLErrors();
 			if (compressed) {
-				var imageSize = GraphicsUtility.CalculateImageDataSize(Format, width, width);
+				var imageSize = GraphicsUtility.CalculateImageDataSize(Format, width, height);
 				GL.CompressedTexSubImage2D(TextureTarget.Texture2D, level, x, y, width, height,
 					(PixelFormat)GLInternalFormat, imageSize, data);
 				GLHelper.CheckGLErrors();
