@@ -71,6 +71,8 @@
     <Compile Include="PropertyEditors\DropDownListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\CustomFilePropertyEditor.cs" />
+    <Compile Include="UIProcessors.cs" />
+    <Compile Include="PropertyEditors\FolderPropertyEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />
