@@ -1,3 +1,12 @@
+##### Changelog 12.02.2019
+
+* Добавлена возможность рендерить анимацию в последовательность PNG-файлов [CIT-1009](https://jira.game-forest.com:2000/browse/CIT-1009)
+* Доработан функционал `Lock timeline cursor` [CIT-1110](https://jira.game-forest.com:2000/browse/CIT-1110)
+
+Багфиксы:
+
+* Исправлена ошибка, при которой настройки шейдеров/блендинга не наследовались в DistortionMesh [CIT-1102](https://jira.game-forest.com:2000/browse/CIT-1102)
+
 ##### Changelog 11.02.2019
 
 * `Lock widgets` теперь блокирует виджет от редактирования [CIT-1095](https://jira.game-forest.com:2000/browse/CIT-1095)
