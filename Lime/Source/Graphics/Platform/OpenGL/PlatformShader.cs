@@ -45,20 +45,15 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 		}
 
-		private static readonly string preamble =
-			"#ifdef GL_ES\n" +
-			"	precision highp float;\n" +
-			"	precision highp int;\n" +
-			"#else\n" +
-			"	#define lowp\n" +
-			"	#define midiump\n" +
-			"	#define highp\n" +
-			"#endif\n" +
-			"#line 1 0\n";
-
 		private string ProcessSource(string source)
 		{
-			return preamble + source;
+			if (!Context.ESProfile) {
+				source = source
+					.Replace("lowp", "")
+					.Replace("mediump", "")
+					.Replace("highp", "");
+			}
+			return source;
 		}
 	}
 }
