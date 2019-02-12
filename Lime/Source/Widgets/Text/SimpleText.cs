@@ -274,7 +274,11 @@ namespace Lime
 			} else {
 				ro = RenderObjectPool<TextRenderObject>.Acquire();
 			}
-			ro.CaptureRenderState(this);
+			//ro.CaptureRenderState causes SimpleText invalidation on every frame,
+			//so use local values for blending and shader
+			ro.LocalToWorldTransform = LocalToWorldTransform;
+			ro.Blending = Blending;
+			ro.Shader = Shader;
 			ro.SpriteList = spriteList;
 			ro.GradientMapIndex = GradientMapIndex;
 			ro.RenderMode = RenderMode;

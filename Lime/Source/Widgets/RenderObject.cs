@@ -66,8 +66,8 @@ namespace Lime
 		public void CaptureRenderState(Widget widget)
 		{
 			LocalToWorldTransform = widget.LocalToWorldTransform;
-			Blending = widget.Blending;
-			Shader = widget.Shader;
+			Blending = widget.GlobalBlending;
+			Shader = widget.GlobalShader;
 		}
 
 		protected void PrepareRenderState()
