@@ -46,7 +46,11 @@ namespace Lime
 		{
 			if (mgleaglContext == null) {
 				ConfigureLayer();
-				mgleaglContext = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
+				try {
+					mgleaglContext = new EAGLContext(EAGLRenderingAPI.OpenGLES3);
+				} catch {
+					mgleaglContext = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
+				}
 				MakeCurrent();
 				renderContext = new PlatformRenderContext();
 				RenderContextManager.MakeCurrent(renderContext);
