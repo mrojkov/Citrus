@@ -5,53 +5,46 @@ namespace Lime.SignedDistanceField
 	class SDFRenderObject : TextRenderObject
 	{
 		private static SDFRenderAction[] RenderActions = new SDFRenderAction[] {
-			new SDFRenderActionOuterShadows(),
+			new SDFRenderActionShadows(),
 			new SDFRenderActionMain(),
-			new SDFRenderActionInnerShadows(),
-			new SDFRenderActionNewInnerShadows()
+			new SDFRenderActionOverlays(),
+			new SDFRenderActionInnerShadows()
 		};
 
 		public SDFMaterialProvider SDFMaterialProvider;
 		public SignedDistanceFieldMaterial SDFMaterial => SDFMaterialProvider.Material;
 		public float Softness;
 		public float Dilate;
-		public Color4 FaceColor;
 		public float Thickness;
 		public Color4 OutlineColor;
-		public List<SDFShadowMaterialProvider> OuterShadowMaterialProviders;
-		public List<SDFShadowMaterialProvider> InnerShadowMaterialProviders;
-		public List<SDFInnerShadowMaterialProvider> NewInnerShadowMaterialProviders;
+		public List<SDFShadowMaterialProvider> ShadowsMaterialProviders;
+		public List<SDFShadowMaterialProvider> OverlaysMaterialProviders;
+		public List<SDFInnerShadowMaterialProvider> InnerShadowsMaterialProviders;
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
 		public float GradientAngle;
-		public bool BevelEnabled;
-		public Color4 LightColor;
-		public float LightAngle;
-		public float ReflectionPower;
-		public float BevelRoundness;
-		public float BevelWidth;
 
 		protected override void OnRelease()
 		{
 			SpriteList = null;
 			SDFMaterialProvider = null;
-			if (InnerShadowMaterialProviders != null) {
-				foreach (var item in InnerShadowMaterialProviders) {
+			if (OverlaysMaterialProviders != null) {
+				foreach (var item in OverlaysMaterialProviders) {
 					item.Release();
 				}
-				InnerShadowMaterialProviders = null;
+				OverlaysMaterialProviders = null;
 			}
-			if (OuterShadowMaterialProviders != null) {
-				foreach (var item in OuterShadowMaterialProviders) {
+			if (ShadowsMaterialProviders != null) {
+				foreach (var item in ShadowsMaterialProviders) {
 					item.Release();
 				}
-				OuterShadowMaterialProviders = null;
+				ShadowsMaterialProviders = null;
 			}
-			if (NewInnerShadowMaterialProviders != null) {
-				foreach (var item in NewInnerShadowMaterialProviders) {
+			if (InnerShadowsMaterialProviders != null) {
+				foreach (var item in InnerShadowsMaterialProviders) {
 					item.Release();
 				}
-				NewInnerShadowMaterialProviders = null;
+				InnerShadowsMaterialProviders = null;
 			}
 		}
 
@@ -65,21 +58,18 @@ namespace Lime.SignedDistanceField
 			GradientEnabled = component.GradientEnabled;
 			Gradient = component.Gradient;
 			GradientAngle = component.GradientAngle;
-			BevelEnabled = component.BevelEnabled;
-			LightAngle = component.LightAngle;
-			LightColor = component.LightColor;
-			ReflectionPower = component.ReflectionPower;
-			BevelRoundness = component.BevelRoundness;
-			BevelWidth = component.BevelWidth;
 			if (component.Shadows != null) {
-				PrepareShadows(component.Shadows);
+				PrepareShadows(component.Shadows, ref ShadowsMaterialProviders);
+			}
+			if (component.Overlays != null) {
+				PrepareShadows(component.Overlays, ref OverlaysMaterialProviders);
 			}
 			if (component.InnerShadows != null) {
 				PrepareInnerShadows(component.InnerShadows);
 			}
 		}
 
-		private void PrepareShadows(List<ShadowParams> shadows)
+		private void PrepareShadows(List<ShadowParams> shadows, ref List<SDFShadowMaterialProvider> providers)
 		{
 			foreach (var s in shadows) {
 				if (!s.Enabled) {
@@ -90,21 +80,14 @@ namespace Lime.SignedDistanceField
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
 				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
-				if (s.Type == ShadowParams.ShadowType.Inner) {
-					if (InnerShadowMaterialProviders == null) {
-						InnerShadowMaterialProviders = new List<SDFShadowMaterialProvider>();
-					}
-					InnerShadowMaterialProviders.Add(materialProvider);
-				} else if (s.Type == ShadowParams.ShadowType.Outer) {
-					if (OuterShadowMaterialProviders == null) {
-						OuterShadowMaterialProviders = new List<SDFShadowMaterialProvider>();
-					}
-					OuterShadowMaterialProviders.Add(materialProvider);
+				if (providers == null) {
+					providers = new List<SDFShadowMaterialProvider>();
 				}
+				providers.Add(materialProvider);
 			}
 		}
 
-		private void PrepareInnerShadows(List<BaseShadowParams> shadows)
+		private void PrepareInnerShadows(List<ShadowParams> shadows)
 		{
 			foreach (var s in shadows) {
 				if (!s.Enabled) {
@@ -117,10 +100,10 @@ namespace Lime.SignedDistanceField
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
 				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
-				if (NewInnerShadowMaterialProviders == null) {
-					NewInnerShadowMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
+				if (InnerShadowsMaterialProviders == null) {
+					InnerShadowsMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
 				}
-				NewInnerShadowMaterialProviders.Add(materialProvider);
+				InnerShadowsMaterialProviders.Add(materialProvider);
 			}
 		}
 

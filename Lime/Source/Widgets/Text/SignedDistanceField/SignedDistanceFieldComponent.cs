@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class BaseShadowParams
+	public class ShadowParams
 	{
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 45f;
@@ -41,18 +41,6 @@ namespace Lime
 		}
 	}
 
-	public class ShadowParams : BaseShadowParams
-	{
-		public enum ShadowType
-		{
-			Outer,
-			Inner
-		}
-
-		[YuzuMember]
-		public ShadowType Type { get; set; }
-	}
-
 	[TangerineRegisterComponent]
 	[AllowedComponentOwnerTypes(typeof(SimpleText), typeof(TextStyle))]
 	public class SignedDistanceFieldComponent : NodeComponent
@@ -60,8 +48,7 @@ namespace Lime
 		private const string GroupFont = "01. Face";
 		private const string GroupOutline = "02. Outline";
 		private const string GroupGradient = "03. Gradient";
-		private const string GroupBevel = "04. Bevel";
-		private const string GroupShadow = "05. Shadows";
+		private const string GroupShadow = "04. Shadows";
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 50f;
 		private const float MinimumDilate = -30f;
@@ -82,10 +69,6 @@ namespace Lime
 		private float softness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
-		private float lightAngle;
-		private float reflectionPower;
-		private float bevelRoundness;
-		private float bevelWidth;
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]
@@ -128,52 +111,16 @@ namespace Lime
 		public float GradientAngle { get; set; }
 
 		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public bool BevelEnabled { get; set; }
-
-		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public Color4 LightColor { get; set; } = Color4.White;
-
-		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public float LightAngle
-		{
-			get => lightAngle;
-			set => lightAngle = Mathf.Clamp(value, MinimumLightAngle, MaximumLightAngle);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public float ReflectionPower
-		{
-			get => reflectionPower;
-			set => reflectionPower = Mathf.Clamp(value, MinimumReflectionPower, MaximumReflectionPower);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public float BevelRoundness
-		{
-			get => bevelRoundness;
-			set => bevelRoundness = Mathf.Clamp(value, MinimumBevelRoundness, MaximumBevelRoundness);
-		}
-
-		[YuzuMember]
-		[TangerineGroup(GroupBevel)]
-		public float BevelWidth
-		{
-			get => bevelWidth;
-			set => bevelWidth = Mathf.Clamp(value, MinimumBevelWidth, MaximumBevelWidth);
-		}
-
-		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
 		public List<ShadowParams> Shadows { get; set; }
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public List<BaseShadowParams> InnerShadows { get; set; }
+		public List<ShadowParams> InnerShadows { get; set; }
+
+		[YuzuMember]
+		[TangerineGroup(GroupShadow)]
+		public List<ShadowParams> Overlays { get; set; }
 
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
