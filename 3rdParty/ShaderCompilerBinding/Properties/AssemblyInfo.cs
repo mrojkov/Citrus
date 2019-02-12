@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
-using Foundation;
+using Android;
 
 // This attribute allows you to mark your assemblies as “safe to link”. 
 // When the attribute is present, the linker—if enabled—will process the assembly 
