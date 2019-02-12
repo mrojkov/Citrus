@@ -7,7 +7,11 @@ namespace Lime
 	{
 		const Int32 ETC2_MODE_ALLOWED_ALL = 0x1F;
 
+#if iOS
+		const string Dll = "__Internal";
+#else
 		const string Dll = "Etc2Decoder";
+#endif
 
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		static extern Int32 draw_block4x4_etc2_eac(byte* bitstring, uint* image_buffer, Int32 flags);

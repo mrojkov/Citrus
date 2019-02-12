@@ -55,4 +55,10 @@
       <DependentUpon>libLemonUniversal.a</DependentUpon>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\3rdParty\Etc2Decoder\libEtc2Decoder.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+  </ItemGroup>
 </Project>
