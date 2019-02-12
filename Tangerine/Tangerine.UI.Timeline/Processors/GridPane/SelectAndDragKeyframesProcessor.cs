@@ -9,8 +9,6 @@ namespace Tangerine.UI.Timeline
 {
 	public class SelectAndDragKeyframesProcessor : ITaskProvider
 	{
-		public static bool IsSelectingOrDragging;
-
 		private static Timeline Timeline => Timeline.Instance;
 		private static GridPane Grid => Timeline.Instance.Grid;
 
@@ -28,13 +26,9 @@ namespace Tangerine.UI.Timeline
 						if (initialCell.Y >= 0 && initialCell.Y < Document.Current.Rows.Count) {
 							if (IsCellSelected(initialCell)) {
 								yield return DragSelectionTask(initialCell);
-								yield return null;
-								IsSelectingOrDragging = false;
 							} else {
 								var r = new HasKeyframeRequest(initialCell);
 								Timeline.Globals.Add(r);
-								// Terekhov Dmitry: Skip one update in order to not rely on task order (same for below)
-								yield return null;
 								Timeline.Globals.Remove<HasKeyframeRequest>();
 								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
@@ -46,8 +40,6 @@ namespace Tangerine.UI.Timeline
 									yield return SelectTask(initialCell, isSelectingKeyframes);
 									lastSelectedCell = initialCell;
 									lastSelectionContainer = Document.Current.Container;
-									yield return null;
-									IsSelectingOrDragging = false;
 								} else {
 									yield return DragSingleKeyframeTask(initialCell);
 									lastSelectedCell = initialCell;
@@ -118,7 +110,6 @@ namespace Tangerine.UI.Timeline
 			float time = 0;
 
 			while (input.IsMousePressed()) {
-				IsSelectingOrDragging = true;
 				time += Lime.Task.Current.Delta;
 				offset = Grid.CellUnderMouse() - initialCell;
 				Timeline.Ruler.MeasuredFrameDistance = Timeline.CurrentColumn - initialCell.X;
@@ -146,9 +137,6 @@ namespace Tangerine.UI.Timeline
 						currentCell.X,
 						currentCell.X + 1
 					);
-					Document.Current.History.DoTransaction(() => {
-						Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(Grid.RootWidget.LocalMousePosition().X));
-					});
 				}
 			}
 			Grid.OnPostRender -= Action;
@@ -173,7 +161,6 @@ namespace Tangerine.UI.Timeline
 			Grid.OnPostRender += RenderSelectionRect;
 			var showMeasuredFrameDistance = false;
 			while (input.IsMousePressed()) {
-				IsSelectingOrDragging = true;
 				selectionRectangle.A = initialCell;
 				selectionRectangle.B = Grid.CellUnderMouse();
 				if (selectionRectangle.Width >= 0) {
@@ -193,11 +180,6 @@ namespace Tangerine.UI.Timeline
 				}
 				Window.Current.Invalidate();
 				yield return null;
-			}
-			if (!showMeasuredFrameDistance) {
-				Document.Current.History.DoTransaction(() => {
-					Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(Grid.RootWidget.LocalMousePosition().X));
-				});
 			}
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			Grid.OnPostRender -= RenderSelectionRect;
