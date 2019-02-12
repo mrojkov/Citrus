@@ -85,11 +85,11 @@ namespace Tangerine.Dialogs
 			};
 		}
 
-		private static ToolbarButton CreateButton(string textureId, string tip, Action clicked, params ListBox[] listBoxes)
+		private static ToolbarButton CreateButton(string textureId, string tooltip, Action clicked, params ListBox[] listBoxes)
 		{
 			var result = new ToolbarButton {
 				Texture = IconPool.GetTexture(textureId),
-				Tip = tip
+				Tooltip = tooltip
 			};
 			result.Clicked += () => {
 				clicked();

@@ -63,7 +63,7 @@ namespace Tangerine.UI
 							button.Texture = command.Icon.AsTexture;
 							button.Checked = command.Checked;
 							button.Enabled = command.Enabled;
-							button.Tip = button.Text = command.Text;
+							button.Tooltip = button.Text = command.Text;
 						};
 						panelWidget.AddNode(button);
 					}

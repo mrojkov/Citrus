@@ -13,17 +13,17 @@ namespace Tangerine.UI.Timeline
 		{
 			public ImageCombinerLinkIndicatorButton() : base(NodeIconPool.GetTexture(typeof(ImageCombiner)))
 			{
-				Tip = "Linked to ImageCombiner";
+				Tooltip = "Linked to ImageCombiner";
 			}
 
-			private void SetTipAndTexture(string tip, ITexture texture)
+			private void SetTooltipAndTexture(string tooltip, ITexture texture)
 			{
-				Tip = tip;
+				Tooltip = tooltip;
 				Texture = texture;
 			}
 
-			public void ShowNormal(string tip = "Has linked arguments") => SetTipAndTexture(tip, NodeIconPool.GetTexture(typeof(ImageCombiner)));
-			public void ShowError(string tip = "No linked arguments") => SetTipAndTexture(tip, IconPool.GetTexture("Timeline.NoEntry"));
+			public void ShowNormal(string tooltip = "Has linked arguments") => SetTooltipAndTexture(tooltip, NodeIconPool.GetTexture(typeof(ImageCombiner)));
+			public void ShowError(string tooltip = "No linked arguments") => SetTooltipAndTexture(tooltip, IconPool.GetTexture("Timeline.NoEntry"));
 		}
 
 		private Node container;

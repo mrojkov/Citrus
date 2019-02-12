@@ -11,7 +11,7 @@ namespace Tangerine.UI.Timeline
 		{
 			public SplineGearLinkIndicatorButton() : base(NodeIconPool.GetTexture(typeof(SplineGear)), clickable: true)
 			{
-				Tip = "Linked to Widget(s)";
+				Tooltip = "Linked to Widget(s)";
 			}
 		}
 
@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 		{
 			public SplineGear3DLinkIndicatorButton() : base(NodeIconPool.GetTexture(typeof(SplineGear3D)), clickable: true)
 			{
-				Tip = "Linked to Node3D(s)";
+				Tooltip = "Linked to Node3D(s)";
 			}
 		}
 
@@ -96,11 +96,11 @@ namespace Tangerine.UI.Timeline
 				if (!(node is TSpline)) {
 					view.Label.Color = indication.Color = Theme.Colors.RedText;
 				}
-				indication.Tip = $"Linked to {gears.Count} {typeof(TGear).Name}s";
+				indication.Tooltip = $"Linked to {gears.Count} {typeof(TGear).Name}s";
 			} else {
 				view.RefreshLabelColor();
 				indication.Color = Color4.White;
-				indication.Tip = $"Linked to {typeof(TGear).Name}";
+				indication.Tooltip = $"Linked to {typeof(TGear).Name}";
 			}
 			foreach (var gear in gears) {
 				indication.AddLinkedNode(gear);

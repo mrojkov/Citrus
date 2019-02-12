@@ -21,9 +21,9 @@ namespace Tangerine.UI
 			group.AddNode(Spacer.HStretch());
 		}
 
-		private ToolbarButton AddButton(Anchors anchor, string tip)
+		private ToolbarButton AddButton(Anchors anchor, string tooltip)
 		{
-			var tb = new AnchorButton { LayoutCell = new LayoutCell(Alignment.Center), Tip = tip };
+			var tb = new AnchorButton { LayoutCell = new LayoutCell(Alignment.Center), Tooltip = tooltip };
 			group.AddNode(tb);
 			var current = CoalescedPropertyValue();
 			tb.CompoundPresenter.Insert(0, new SyncDelegatePresenter<Widget>(w => DrawIcon(w, anchor)));

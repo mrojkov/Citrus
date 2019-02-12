@@ -13,7 +13,7 @@ namespace Tangerine.UI.Timeline
 		{
 			public BoneLinkIndicatorButton() : base(NodeIconPool.GetTexture(typeof(Bone)), clickable: true)
 			{
-				Tip = "Linked to Bone(s)";
+				Tooltip = "Linked to Bone(s)";
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace Tangerine.UI.Timeline
 						foreach (var nodeView in links[bone]) {
 							var node = nodeView.NodeData.Node;
 							indication.AddLinkedNode(node);
-							indication.Tip = "Linked to Node(s)";
+							indication.Tooltip = "Linked to Node(s)";
 							sb.Append(node.Id).Append(", ");
 						}
 						view.Label.Text = sb.Remove(sb.Length - 2, 2).ToString();

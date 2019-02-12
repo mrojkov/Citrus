@@ -1,15 +1,11 @@
-using Lime;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Tangerine.UI
+namespace Lime
 {
-	public static class Tip
+	public static class Tooltip
 	{
-		public static IEnumerator<object> ShowTipOnMouseOverTask(Widget source, Func<string> textGetter)
+		public static IEnumerator<object> ShowTooltipOnMouseOverTask(Widget source, Func<string> textGetter)
 		{
 			while (true) {
 				yield return null;
@@ -23,16 +19,16 @@ namespace Tangerine.UI
 						yield return null;
 					}
 					if (showTip) {
-						WidgetContext.Current.Root.Tasks.Add(ShowTipTask(source, textGetter));
+						WidgetContext.Current.Root.Tasks.Add(ShowTooltipTask(source, textGetter));
 					}
 				}
 			}
 		}
 
-		private static IEnumerator<object> ShowTipTask(Widget source, Func<string> textGetter)
+		private static IEnumerator<object> ShowTooltipTask(Widget source, Func<string> textGetter)
 		{
 			var window = WidgetContext.Current.Root;
-			var tip = new Widget {
+			var tooltip = new Widget {
 				Position = source.CalcPositionInSpaceOf(window) +
 					new Vector2(source.Width * 0.66f, source.Height),
 				Size = Vector2.Zero,
@@ -43,15 +39,15 @@ namespace Tangerine.UI
 					new ThemedFrame()
 				}
 			};
-			tip.Position = new Vector2(tip.Position.X.Truncate(), tip.Position.Y.Truncate());
-			tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
-			window.PushNode(tip);
+			tooltip.Position = new Vector2(tooltip.Position.X.Truncate(), tooltip.Position.Y.Truncate());
+			tooltip.Updated += _ => tooltip.Size = tooltip.EffectiveMinSize;
+			window.PushNode(tooltip);
 			try {
 				while (source.IsMouseOver()) {
 					yield return null;
 				}
 			} finally {
-				tip.Unlink();
+				tooltip.Unlink();
 			}
 		}
 	}
