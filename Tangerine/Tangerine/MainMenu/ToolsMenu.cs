@@ -45,6 +45,7 @@ namespace Tangerine.MainMenu
 				currentWindow.InvokeOnRendering(() => {
 					var bitmap = Document.Current.Container.AsWidget.ToBitmap();
 					bitmap.SaveTo(Path.Combine(options.Folder, $"{i:D3}.png"));
+					bitmap.Dispose();
 				});
 				yield return null;
 				animation.Owner.Update(delta);
