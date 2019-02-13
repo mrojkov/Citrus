@@ -242,6 +242,8 @@ namespace Lime
 			}
 		}
 
+		private bool disposed;
+
 		public void Dispose()
 		{
 			if (!disposed) {
