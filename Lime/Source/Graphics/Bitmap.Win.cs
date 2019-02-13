@@ -41,32 +41,13 @@ namespace Lime
 
 		public SD.Bitmap Bitmap { get; private set; }
 
-		public int Width
-		{
-			get { return Bitmap == null ? 0 : Bitmap.Width; }
-		}
+		public int Width => Bitmap?.Width ?? 0;
 
-		public int Height
-		{
-			get { return Bitmap == null ? 0 : Bitmap.Height; }
-		}
+		public int Height => Bitmap?.Height ?? 0;
 
-		public bool IsValid
-		{
-			get
-			{
-				return
-					!disposed &&
-					Bitmap != null &&
-					Bitmap.Height > 0 &&
-					Bitmap.Width > 0;
-			}
-		}
+		public bool IsValid => Bitmap != null && Bitmap.Height > 0 && Bitmap.Width > 0;
 
-		public bool HasAlpha
-		{
-			get; private set;
-		}
+		public bool HasAlpha { get; private set; }
 
 		public IBitmapImplementation Clone()
 		{
@@ -168,37 +149,17 @@ namespace Lime
 			}
 		}
 
-		#region IDisposable Support
-		private bool disposed;
-
-		private void Dispose(bool disposing)
-		{
-			if (!disposed) {
-				if (disposing) {
-					if (Bitmap != null) {
-						Bitmap.Dispose();
-					}
-				}
-
-				if (data != IntPtr.Zero) {
-					Marshal.FreeHGlobal(data);
-				}
-
-				disposed = true;
-			}
-		}
-
-		~BitmapImplementation()
-		{
-			Dispose(false);
-		}
-
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
+			if (Bitmap != null) {
+				Bitmap.Dispose();
+				Bitmap = null;
+			}
+			if (data != IntPtr.Zero) {
+				Marshal.FreeHGlobal(data);
+				data = IntPtr.Zero;
+			}
 		}
-		#endregion
 	}
 }
 #endif

@@ -248,7 +248,6 @@ namespace Lime
 			GC.SuppressFinalize(this);
 		}
 		
-
 		private void CacheDimensions()
 		{
 			Width = implementation.Width;

@@ -242,34 +242,15 @@ namespace Lime
 			}
 		}
 
-		#region IDisposable Support
-		private bool disposed;
-
-		private void Dispose(bool disposing)
+		public void Dispose()
 		{
 			if (!disposed) {
-				if (disposing) {
-					if (cgImage != null) {
-						cgImage.Dispose();
-					}
+				if (cgImage != null) {
+					cgImage.Dispose();
 				}
 				disposed = true;
 			}
-		}
-
-		~BitmapImplementation()
-		{
-			Dispose(false);
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-		#endregion
-
-		
+		}	
 	}
 }
 #endif
