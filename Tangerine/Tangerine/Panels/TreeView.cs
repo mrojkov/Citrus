@@ -22,15 +22,18 @@ namespace Tangerine.Panels
 			this.parent = parent;
 			scrollView.Content.Layout = new VBoxLayout();
 			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, 0, isLast: true, string.Empty));
+			scrollView.Content.AddChangeLateWatcher(() => scrollView.Content, _ => {
+				root.ForceFilter();
+			});
 		}
 
 		public void Detach() => scrollView.Unlink();
 		public void Attach() => parent.AddNode(scrollView);
 		public bool IsAttached() => scrollView.Parent != null;
 
-		public void Filter(string filter)
+		public void Filter(string filter, bool checkFilter = true)
 		{
-			if (this.filter == filter) {
+			if (checkFilter && this.filter == filter) {
 				return;
 			}
 			this.filter = filter;
@@ -350,9 +353,19 @@ namespace Tangerine.Panels
 			private Widget CreateLabel()
 			{
 				label = new ThemedSimpleText { Padding = new Thickness(DefaultPadding) };
-				label.AddChangeWatcher(() => rootNode.Id, SetLabelText);
+				view.scrollView.AddChangeWatcher(() => rootNode.Id, _ => {
+					SetLabelText(_);
+					ForceFilter();
+				});
 				SetLabelText(rootNode.Id);
 				return label;
+			}
+
+			internal void ForceFilter()
+			{
+				view.root.UpdateChildren();
+				view.Filter(filter, checkFilter: false);
+				view.root.UpdateChildren();
 			}
 
 			private void HighlightText()
@@ -363,14 +376,15 @@ namespace Tangerine.Panels
 				treeNodeWidget.PrepareRendererState();
 				int index;
 				int previousIndex = 0;
-				var filterSize = label.Font.MeasureTextLine(filter, label.FontHeight, label.LetterSpacing);
 				var size = Vector2.Zero;
 				var pos = label.CalcPositionInSpaceOf(treeNodeWidget);
 				pos.X += label.Padding.Left;
 				pos.Y += label.Padding.Top;
 				while ((index = lowercaseId.IndexOf(filter, previousIndex, StringComparison.Ordinal)) >= 0) {
 					string skippedText = lowercaseId.Substring(previousIndex, index - previousIndex);
-					var skippedSize = label.Font.MeasureTextLine(skippedText, label.FontHeight, label.LetterSpacing);
+					var s = label.Text.Substring(index, filter.Length);
+					var filterSize = label.Font.MeasureTextLine(s, label.FontHeight, label.LetterSpacing);
+					var skippedSize = label.Font.MeasureTextLine(label.Text.Substring(previousIndex, index - previousIndex), label.FontHeight, label.LetterSpacing);
 					size.X += skippedSize.X;
 					size.Y = Mathf.Max(size.Y, skippedSize.Y);
 					Renderer.DrawRect(pos.X + size.X, pos.Y, pos.X + size.X + filterSize.X, pos.Y + size.Y, ColorTheme.Current.Hierarchy.MatchColor);
