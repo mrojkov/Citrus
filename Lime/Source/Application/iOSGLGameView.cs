@@ -12,7 +12,6 @@ namespace Lime
 {
 	public class GLGameView : UIView, IGameView
 	{
-		private bool suspended;
 		private bool disposed;
 		private int framebuffer;
 		private int colorRenderbuffer;
@@ -22,8 +21,6 @@ namespace Lime
 		private TimeSpan prevUpdateTime;
 		private EAGLContext mgleaglContext;
 		private PlatformRenderContext renderContext;
-		private WeakReference framebufferWindow;
-		private WeakReference framebufferLayer;
 
 		public Vector2 ClientSize { get; private set; }
 		public float PixelScale { get; private set; }
@@ -57,8 +54,6 @@ namespace Lime
 			}
 			DestroyFramebuffer();
 			CreateFramebuffer();					
-			framebufferWindow = new WeakReference(Window);
-			framebufferLayer = new WeakReference(Layer);
 		}
 		
 		private void ConfigureLayer()
@@ -197,7 +192,6 @@ namespace Lime
 				timeSource.Invalidate();
 				timeSource = null;
 			}
-			suspended = false;
 			DestroyFramebuffer();
 		}
 
@@ -207,7 +201,6 @@ namespace Lime
 				timeSource.Suspend();
 			}
 			stopwatch.Stop();
-			suspended = true;
 		}
 
 		private void Resume()
@@ -216,79 +209,8 @@ namespace Lime
 				timeSource.Resume();
 			}
 			stopwatch.Start();
-			suspended = false;
 		}
 
-		//public UIImage Capture()
-		//{		
-		//	// Source: https://developer.apple.com/library/ios/#qa/qa2010/qa1704.html
-		//	int backingWidth = 0, backingHeight = 0;
-
-		//	// Bind the color renderbuffer used to render the OpenGL ES view
-		//	// If your application only creates a single color renderbuffer which is already bound at this point,
-		//	// this call is redundant, but it is needed if you're dealing with multiple renderbuffers.
-		//	// Note, replace "_colorRenderbuffer" with the actual name of the renderbuffer object defined in your class.
-		//	GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, colorRenderbuffer);
-
-		//	// Get the size of the backing CAEAGLLayer
-		//	GL.GetRenderbufferParameter(RenderbufferTarget.Renderbuffer, RenderbufferParameterName.RenderbufferWidth, out backingWidth);
-		//	GL.GetRenderbufferParameter(RenderbufferTarget.Renderbuffer, RenderbufferParameterName.RenderbufferHeight, out backingHeight);
-
-		//	int width = backingWidth, height = backingHeight;
-		//	int dataLength = width * height * 4;
-		//	var data = new byte[dataLength];
-
-		//	// Read pixel data from the framebuffer
-		//	GL.PixelStore(PixelStoreParameter.PackAlignment, 4);
-		//	GL.ReadPixels(0, 0, width, height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-
-		//	// Create a CGImage with the pixel data
-		//	// If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
-		//	// otherwise, use kCGImageAlphaPremultipliedLast
-		//	using (var data_provider = new CGDataProvider(data, 0, data.Length)) {
-		//		using (var colorspace = CGColorSpace.CreateDeviceRGB()) {
-		//			using (var iref = new CGImage(width, height, 8, 32, width * 4, colorspace,
-		//				(CGImageAlphaInfo)((int)CGBitmapFlags.ByteOrder32Big |(int)CGImageAlphaInfo.PremultipliedLast),
-		//				data_provider, null, true, CGColorRenderingIntent.Default))
-		//			{
-		//				// OpenGL ES measures data in PIXELS
-		//				// Create a graphics context with the target size measured in POINTS
-		//				int widthInPoints, heightInPoints;
-		//				float scale = (float)ContentScaleFactor;
-		//				widthInPoints = (int)(width / scale);
-		//				heightInPoints = (int)(height / scale);
-		//				UIGraphics.BeginImageContextWithOptions(new System.Drawing.SizeF(widthInPoints, heightInPoints), false, scale);
-		//				try {
-		//					var cgcontext = UIGraphics.GetCurrentContext();
-		//					// UIKit coordinate system is upside down to GL/Quartz coordinate system
-		//					// Flip the CGImage by rendering it to the flipped bitmap context
-		//					// The size of the destination area is measured in POINTS
-		//					cgcontext.SetBlendMode(CGBlendMode.Copy);
-		//					cgcontext.DrawImage(new System.Drawing.RectangleF(0, 0, widthInPoints, heightInPoints), iref);
-		//					// Retrieve the UIImage from the current context
-		//					var image = UIGraphics.GetImageFromCurrentImageContext();
-		//					return image;
-		//				} finally {
-		//					UIGraphics.EndImageContext();
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-
-		public override void WillMoveToWindow(UIWindow window)
-		{
-			if (window == null && !suspended) {
-				Suspend();
-			} else if (window != null && suspended) {
-				if (framebufferLayer != null &&((CALayer)framebufferLayer.Target) != Layer ||
-					framebufferWindow != null &&((UIWindow)framebufferWindow.Target) != window) 
-				{
-					SetupContextAndFramebuffer();
-				}
-			}
-		}
-		
 		private void RunIteration(NSTimer timer)
 		{
 			var curUpdateTime = stopwatch.Elapsed;
