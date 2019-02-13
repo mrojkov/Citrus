@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -108,16 +108,11 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				string[] fontExtensions = { ".tft", ".fnt" };
-				foreach (var e in fontExtensions) {
-					string path = DefaultFontDirectory + name + e;
-					if (!AssetBundle.Initialized || !AssetBundle.Current.FileExists(path))
-						continue;
-					font = Serialization.ReadObject<Font>(path);
-					fonts[name] = font;
-					return font;
-				}
-				return Null;
+				if (!AssetBundle.Initialized || !AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Contains(name))
+					return Null;
+				font = Serialization.ReadObject<Font>($"{DefaultFontDirectory}{name}");
+				fonts[name] = font;
+				return font;
 			}
 		}
 
