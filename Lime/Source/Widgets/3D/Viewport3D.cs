@@ -258,6 +258,7 @@ namespace Lime
 					RenderState.CullMode);
 				Renderer.View = View;
 				Renderer.Projection = MakeProjection(Width, Height, Transform * Renderer.Transform2, Projection, Renderer.Projection);
+				Renderer.Clear(ClearOptions.DepthBuffer);
 				foreach (var layer in Layers) {
 					try {
 						for (var i = 0; i < layer.ObjectCount; i++) {
@@ -280,7 +281,6 @@ namespace Lime
 						transparentObjects.Clear();
 					}
 				}
-				Renderer.Clear(ClearOptions.DepthBuffer);
 				Renderer.PopState();
 			}
 

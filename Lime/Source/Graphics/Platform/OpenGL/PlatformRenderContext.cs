@@ -26,7 +26,6 @@ namespace Lime.Graphics.Platform.OpenGL
 		private PlatformVertexInputLayout vertexInputLayout;
 		private PlatformTexture2D[] textures;
 		private PlatformBuffer[] vertexBuffers;
-
 		private int[] vertexOffsets;
 		private PlatformBuffer indexBuffer;
 		private int indexOffset;
@@ -97,7 +96,7 @@ namespace Lime.Graphics.Platform.OpenGL
 			texturesDirtyMask = ~0;
 			vertexInputLayoutDirty = true;
 			vertexBuffersDirtyMask = 0;
-			enabledVertexAttribMask = ~0;
+			enabledVertexAttribMask = 0;
 			BindState(true);
 			BindClearValues(true, ClearOptions.All, Color4.Black, 1, 0);
 		}
@@ -124,6 +123,13 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public void End()
 		{
+			for (var i = 0; i < MaxVertexAttributes; i++) {
+				var mask = 1L << i;
+				if ((enabledVertexAttribMask & mask) != 0) {
+					GL.DisableVertexAttribArray(i);
+					GLHelper.CheckGLErrors();
+				}
+			}
 		}
 
 		public IPlatformBuffer CreateBuffer(BufferType bufferType, int size, bool dynamic)
@@ -320,15 +326,16 @@ namespace Lime.Graphics.Platform.OpenGL
 					stencilStateDirty = true;
 				}
 			}
-			var scissor = boundScissorState.Bounds;
-			if (scissor.X != boundViewport.X ||
-				scissor.Y != boundViewport.Y ||
-				scissor.Width != boundViewport.Width ||
-				scissor.Height != boundViewport.Height
-			) {
-				GL.Scissor(scissor.X, scissor.Y, scissor.Width, scissor.Height);
+			if (!boundScissorState.Enable) {
+				GL.Enable(EnableCap.ScissorTest);
 				GLHelper.CheckGLErrors();
-				boundScissorState.Bounds = scissor;
+				boundScissorState.Enable = true;
+				scissorStateDirty = true;
+			}
+			if (boundScissorState.Bounds != viewport.Bounds) {
+				GL.Scissor(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+				GLHelper.CheckGLErrors();
+				boundScissorState.Bounds = viewport.Bounds;
 				scissorStateDirty = true;
 			}
 			GL.Clear(glClearBufferMask);
@@ -707,53 +714,54 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		private void BindVertexAttributes(int baseVertex)
 		{
+			var dirtyBindingMask = vertexBuffersDirtyMask & vertexInputLayout.BindingMask;
 			if (vertexInputLayoutDirty || baseVertex != boundBaseVertex) {
+				dirtyBindingMask |= vertexInputLayout.BindingMask;
+			}
+			if (dirtyBindingMask != 0) {
 				foreach (var binding in vertexInputLayout.GLBindings) {
-					vertexBuffersDirtyMask |= 1L << binding.Slot;
-				}
-				boundBaseVertex = baseVertex;
-				vertexInputLayoutDirty = false;
-			}
-			if (vertexBuffersDirtyMask == 0) {
-				return;
-			}
-			var attribMask = 0L;
-			foreach (var binding in vertexInputLayout.GLBindings) {
-				var bindingMask = 1 << binding.Slot;
-				if ((vertexBuffersDirtyMask & bindingMask) == 0) {
-					continue;
-				}
-				var buffer = vertexBuffers[binding.Slot];
-				if (buffer != null && !buffer.Disposed) {
-					var offset = vertexOffsets[binding.Slot] + baseVertex * binding.Stride;
-					GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.GLBuffer);
-					GLHelper.CheckGLErrors();
-					foreach (var attrib in binding.Attributes) {
-						var effectiveOffset = offset + attrib.Offset;
-						GL.EnableVertexAttribArray(attrib.Index);
+					var bindingMask = 1 << binding.Slot;
+					if ((dirtyBindingMask & bindingMask) != 0) {
+						var buffer = vertexBuffers[binding.Slot];
+						var offset = vertexOffsets[binding.Slot] + baseVertex * binding.Stride;
+						GL.BindBuffer(BufferTarget.ArrayBuffer, buffer.GLBuffer);
 						GLHelper.CheckGLErrors();
-						GL.VertexAttribPointer(
-							attrib.Index, attrib.Size, (VertexAttribPointerType)attrib.Type,
-							attrib.Normalized, binding.Stride, effectiveOffset);
-						GLHelper.CheckGLErrors();
-						attribMask |= 1L << attrib.Index;
+						foreach (var attrib in binding.Attributes) {
+							var effectiveOffset = offset + attrib.Offset;
+							GL.VertexAttribPointer(
+								attrib.Index, attrib.Size, (VertexAttribPointerType)attrib.Type,
+								attrib.Normalized, binding.Stride, effectiveOffset);
+							GLHelper.CheckGLErrors();
+						}
+						dirtyBindingMask &= ~bindingMask;
+						if (dirtyBindingMask == 0) {
+							break;
+						}
 					}
 				}
-				vertexBuffersDirtyMask &= ~bindingMask;
 			}
-			for (var i = 0; attribMask != enabledVertexAttribMask && i < MaxVertexAttributes; i++) {
-				var mask = 1L << i;
-				if ((attribMask & mask) != (enabledVertexAttribMask & mask)) {
-					if ((attribMask & mask) != 0) {
-						GL.EnableVertexAttribArray(i);
-						GLHelper.CheckGLErrors();
-					} else {
-						GL.DisableVertexAttribArray(i);
-						GLHelper.CheckGLErrors();
+			var attribMask = vertexInputLayout.AttributeMask;
+			if (attribMask != enabledVertexAttribMask) {
+				for (var i = 0; i < MaxVertexAttributes; i++) {
+					var mask = 1L << i;
+					if ((attribMask & mask) != (enabledVertexAttribMask & mask)) {
+						if ((attribMask & mask) != 0) {
+							GL.EnableVertexAttribArray(i);
+							GLHelper.CheckGLErrors();
+						} else {
+							GL.DisableVertexAttribArray(i);
+							GLHelper.CheckGLErrors();
+						}
+						enabledVertexAttribMask ^= mask;
+						if (enabledVertexAttribMask == attribMask) {
+							break;
+						}
 					}
-					enabledVertexAttribMask ^= mask;
 				}
 			}
+			vertexBuffersDirtyMask &= ~vertexInputLayout.BindingMask;
+			vertexInputLayoutDirty = false;
+			boundBaseVertex = baseVertex;	
 		}
 
 		private void BindIndexBuffer()

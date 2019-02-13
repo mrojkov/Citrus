@@ -10,7 +10,9 @@ namespace Lime.Graphics.Platform.OpenGL
 	internal class PlatformVertexInputLayout : IPlatformVertexInputLayout
 	{
 		internal GLVertexInputLayoutBinding[] GLBindings;
-
+		internal long BindingMask;
+		internal long AttributeMask;
+		
 		public PlatformRenderContext Context { get; }
 
 		internal PlatformVertexInputLayout(
@@ -54,6 +56,12 @@ namespace Lime.Graphics.Platform.OpenGL
 				}
 			}
 			GLBindings = glBindings.ToArray();
+			foreach (var binding in GLBindings) {
+				BindingMask |= 1L << binding.Slot;
+				foreach (var attrib in binding.Attributes) {
+					AttributeMask |= 1L << attrib.Index;
+				}
+			}
 		}
 
 		public void Dispose() { }
