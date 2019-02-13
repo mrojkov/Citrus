@@ -111,11 +111,11 @@ namespace Lime.Text
 			return s.Length > 0 ? s[s.Length - 1] : char.MinValue;
 		}
 
-		float CalcWordWidth(Word word)
+		float CalcWordWidth(Word word, bool skipFirstLetter = false)
 		{
 			var style = Styles[word.Style];
 			Vector2 size = style.Font.MeasureTextLine(
-				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing, word.IsTagBegin || word.LineBreak);
+				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing, skipFirstLetter);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
 		}
 
@@ -149,7 +149,7 @@ namespace Lime.Text
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
 					var ch = texts[word.TextIndex][word.Start];
-					if (!(j == count - 1 && (ch == ' ' || ch == '\n'))) {
+					if (!(j == count - 1 && (ch == ' ' || ch == '\n') && !(IsBullet(word) || style.ImageUsage == TextStyle.ImageUsageEnum.Overlay))) {
 						totalWidth += word.Width;
 					}
 				}
@@ -200,7 +200,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.IsTagBegin || word.LineBreak);
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.X == 0);
 					}
 					c += wordLength;
 				}
@@ -363,10 +363,11 @@ namespace Lime.Text
 				var word = fittedWords[i];
 				word = word.Clone();
 				word.LineBreak = word.ForceLineBreak;
-				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
 					x = 0;
 				}
+				var skipFirstLetter = x == 0;
+				word.Width = CalcWordWidth(word, skipFirstLetter);
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
 				var isTextOrBullet = (t.Length > 0 && t[word.Start] > ' ') || IsBullet(word);
@@ -386,10 +387,10 @@ namespace Lime.Text
 						var newWord = word.Clone();
 						newWord.Start = word.Start + fittedCharsCount;
 						newWord.Length = word.Length - fittedCharsCount;
-						newWord.Width = CalcWordWidth(newWord);
+						newWord.Width = CalcWordWidth(newWord, true);
 						newWord.ForceLineBreak = true;
 						word.Length = fittedCharsCount;
-						word.Width = CalcWordWidth(word);
+						word.Width = CalcWordWidth(word, skipFirstLetter);
 						word.X = x;
 						x += word.Width;
 						fittedWords.Insert(i + 1, newWord);
@@ -400,7 +401,7 @@ namespace Lime.Text
 				if (isLongerThanWidth && isTextOrBullet && x > 0 && !isWordContinue && !fittedWords[i - 1].IsNbsp && t[word.Start] != ' ') {
 					word.X = 0;
 					word.LineBreak = true;
-					word.Width = CalcWordWidth(word);
+					word.Width = CalcWordWidth(word, true);
 					x = word.Width;
 				} else {
 					word.X = x;
@@ -450,7 +451,7 @@ namespace Lime.Text
 			float dotsWidth = style.Font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;
-				word.Width = CalcWordWidth(word);
+				word.Width = CalcWordWidth(word, word.X == 0);
 			}
 			var t = texts[word.TextIndex];
 			var newText = t.Substring(word.Start, word.Length) + "...";
