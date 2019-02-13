@@ -29,6 +29,7 @@ namespace Tangerine.UI.Timeline
 							} else {
 								var r = new HasKeyframeRequest(initialCell);
 								Timeline.Globals.Add(r);
+								yield return null;
 								Timeline.Globals.Remove<HasKeyframeRequest>();
 								var isInMultiselectMode = input.IsKeyPressed(Key.Control);
 								var isSelectRangeMode = input.IsKeyPressed(Key.Shift);
