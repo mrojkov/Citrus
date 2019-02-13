@@ -77,8 +77,6 @@ namespace Lime
 			}
 		}
 
-		internal List<IAnimator> AnimatorCache = new List<IAnimator>();
-
 		public void FindAnimators(List<IAnimator> animators)
 		{
 			if (Owner != null) {
