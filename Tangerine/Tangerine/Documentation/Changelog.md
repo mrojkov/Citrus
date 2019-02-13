@@ -1,3 +1,12 @@
+##### Changelog 13.02.2019
+
+* Возвращена возможность таскать ключи анимации без клика на фрейме [CIT-1119](https://jira.game-forest.com:2000/browse/CIT-1119)
+
+Багфиксы:
+
+* Исправлены ошибки и недоработки, связанные с работой Hierarchy [CIT-866](https://jira.game-forest.com:2000/browse/CIT-866), [CIT-1008](https://jira.game-forest.com:2000/browse/CIT-1008)
+* Исправлены ошибки, связанные с LetterSpacing в RichText.
+
 ##### Changelog 12.02.2019
 
 * Добавлена возможность рендерить анимацию в последовательность PNG-файлов [CIT-1009](https://jira.game-forest.com:2000/browse/CIT-1009)
