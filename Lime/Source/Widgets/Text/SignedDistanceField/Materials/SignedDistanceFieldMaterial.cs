@@ -165,21 +165,13 @@ namespace Lime.SignedDistanceField
 			uniform lowp float thickness;
 			uniform lowp vec4 outlineColor;
 
-			uniform lowp vec4 lightColor;
-			uniform lowp vec2 lightdir;
-			uniform lowp float bevelCurvature;
-			uniform lowp float reflection;
-			uniform lowp float bevelWidth;
-
 			uniform lowp float g_angle;
 
 			void main() {
 				lowp vec3 sdf = texture2D(tex1, texCoords1).rgb;
 				lowp float distance = sdf.r;
-				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
 				lowp float alpha = smoothstep(dilate + thickness - softness, dilate + thickness + softness, distance);
 				lowp vec4 inner_color = color;
-				lowp vec4 bevel_color = outlineColor;
 ";
 		private const string FragmentShaderGradientPart2 = @"
 				lowp float g_sin = sin(g_angle);
@@ -189,7 +181,8 @@ namespace Lime.SignedDistanceField
 				inner_color = texture2D(tex2, gradientCoords);
 ";
 		private const string FragmentShaderOutlinePart3 = @"
-				lowp vec4 c = mix(bevel_color, inner_color, outlineFactor);
+				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
+				lowp vec4 c = mix(outlineColor, inner_color, outlineFactor);
 ";
 		private const string FragmentShaderPart3 = @"
 				lowp vec4 c = inner_color;
