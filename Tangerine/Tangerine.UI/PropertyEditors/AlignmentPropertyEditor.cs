@@ -76,5 +76,12 @@ namespace Tangerine.UI
 			SetComponent(EditorParams, typeof(HAlignment));
 			SetComponent(EditorParams, typeof(VAlignment));
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			selectorH.Enabled = Enabled;
+			selectorV.Enabled = Enabled;
+		}
 	}
 }

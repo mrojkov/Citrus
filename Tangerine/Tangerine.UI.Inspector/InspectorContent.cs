@@ -22,6 +22,19 @@ namespace Tangerine.UI.Inspector
 		public Widget Footer { get; set; }
 		public readonly IReadOnlyList<IPropertyEditor> ReadonlyEditors;
 
+		private bool enabled = true;
+		public bool Enabled
+		{
+			get => enabled;
+			set
+			{
+				if (enabled != value) {
+					enabled = value;
+					editors.ForEach(e => e.Enabled = enabled);
+				}
+			}
+		}
+
 		public InspectorContent(Widget widget)
 		{
 			this.widget = widget;
@@ -196,6 +209,7 @@ namespace Tangerine.UI.Inspector
 				) {
 					NumericEditBoxFactory = () => new TransactionalNumericEditBox(History),
 					History = History,
+					Editable = Enabled,
 					DefaultValueGetter = () => {
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr == null) {
@@ -215,6 +229,7 @@ namespace Tangerine.UI.Inspector
 			}
 
 			foreach (var propertyEditor in PopulatePropertyEditors(type, objects, rootObjects, widget, editorParams)) {
+				propertyEditor.Enabled = Enabled;
 				yield return propertyEditor;
 			}
 		}
@@ -247,6 +262,7 @@ namespace Tangerine.UI.Inspector
 					}
 
 					if (editor != null) {
+						editor.Enabled = Enabled;
 						DecoratePropertyEditor(editor, row++);
 						editors.Add(editor);
 						var showCondition = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(type, param.PropertyInfo.Name);
@@ -446,7 +462,7 @@ namespace Tangerine.UI.Inspector
 				};
 				keyframeButton.Clicked += editor.PropertyLabel.SetFocus;
 				editor.LabelContainer.Nodes.Insert(index++, keyframeButton);
-				editor.ContainerWidget.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton));
+				editor.ContainerWidget.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton, editor));
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(

@@ -63,6 +63,12 @@ namespace Tangerine.UI
 			return x;
 		}
 
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			group.Enabled = Enabled;
+		}
+
 		private class AnchorButton : ToolbarButton
 		{
 			protected override void GetColors(State state, out Color4 bgColor, out Color4 borderColor)

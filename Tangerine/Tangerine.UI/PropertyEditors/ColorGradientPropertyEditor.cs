@@ -16,6 +16,23 @@ namespace Tangerine.UI
 		private readonly EditBox colorEditor;
 		private readonly NumericEditBox positionEditor;
 		private GradientControlPoint selectedControlPoint => gradientControlWidget.SelectedControlPoint;
+		private ToolbarButton pipetteButton;
+
+		private bool enabled = true;
+		public bool Enabled
+		{
+			get => enabled;
+			set {
+				if (enabled != value) {
+					enabled = value;
+					colorEditor.Enabled = enabled;
+					colorPanel.Enabled = enabled;
+					positionEditor.Enabled = enabled;
+					gradientControlWidget.Enabled = enabled;
+					pipetteButton.Enabled = enabled;
+				}
+			}
+		}
 
 		public ColorGradientPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -89,15 +106,15 @@ namespace Tangerine.UI
 
 		private Node CreatePipetteButton()
 		{
-			var button = new ToolbarButton {
+			pipetteButton = new ToolbarButton {
 				Texture = IconPool.GetTexture("Tools.Pipette"),
 			};
-			button.Tasks.Add(Color4PropertyEditor.PickColorProcessor(
-				button, v => {
+			pipetteButton.Tasks.Add(Color4PropertyEditor.PickColorProcessor(
+				pipetteButton, v => {
 					v.A = selectedControlPoint.Color.A;
 					SetControlPointProperty(nameof(GradientControlPoint.Color), v);
 				}));
-			return button;
+			return pipetteButton;
 		}
 
 		public void SetColor(string text)
@@ -144,6 +161,8 @@ namespace Tangerine.UI
 		private readonly GradientComponent gradientComponent;
 		private GradientControlPointWidget selectedControlPointWidget;
 		public GradientControlPoint SelectedControlPoint { get; private set; }
+
+
 
 		private ColorGradient gradient;
 

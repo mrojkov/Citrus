@@ -13,6 +13,7 @@ namespace Tangerine.UI
 		Widget EditorContainer { get; }
 		SimpleText PropertyLabel { get; }
 		void DropFiles(IEnumerable<string> files);
+		bool Enabled { get; set; }
 		void Submit();
 	}
 }

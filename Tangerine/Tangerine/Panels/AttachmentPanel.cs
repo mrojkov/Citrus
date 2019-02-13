@@ -500,7 +500,8 @@ namespace Tangerine
 				wrapper.CompoundPostPresenter.Add(Presenters.WidgetBoundsPresenter);
 				AddNode(wrapper);
 				var ic = new InspectorContent(wrapper) {
-					History = history
+					History = history,
+					Enabled = false
 				};
 				ic.BuildForObjects(new[] { source });
 				wrapper.AddChangeWatcher(() => button.Expanded, v => wrapper.Visible = v);

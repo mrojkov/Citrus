@@ -72,11 +72,13 @@ namespace Tangerine.UI.Inspector
 	{
 		private readonly IPropertyEditorParams editorParams;
 		private readonly KeyframeButton button;
+		private readonly IPropertyEditor editor;
 
-		public KeyframeButtonBinding(IPropertyEditorParams editorParams, KeyframeButton button)
+		public KeyframeButtonBinding(IPropertyEditorParams editorParams, KeyframeButton button, IPropertyEditor editor)
 		{
 			this.editorParams = editorParams;
 			this.button = button;
+			this.editor = editor;
 		}
 
 		public IEnumerator<object> Task()
@@ -93,7 +95,7 @@ namespace Tangerine.UI.Inspector
 				if (CoreUserPreferences.Instance.SwapMouseButtonsForKeyframeSwitch) {
 					Toolbox.Swap(ref wasClicked, ref wasRightClicked);
 				}
-				if (button.GloballyEnabled && wasClicked) {
+				if (editor.Enabled && button.GloballyEnabled && wasClicked) {
 					Document.Current.History.DoTransaction(() => {
 						SetKeyframe(!kf.HasValue);
 						if (!kf.HasValue) {

@@ -20,6 +20,20 @@ namespace Tangerine.UI
 		public Widget WarningsContainer { get; private set; }
 		public Widget PropertyContainerWidget { get; private set; }
 
+		private bool enabled = true;
+		public bool Enabled
+		{
+			get => enabled;
+			set {
+				if (value != enabled) {
+					enabled = value;
+					EnabledChanged();
+				}
+			}
+		}
+
+		protected virtual void EnabledChanged() { }
+
 		public CommonPropertyEditor(IPropertyEditorParams editorParams)
 		{
 			EditorParams = editorParams;
@@ -176,13 +190,15 @@ namespace Tangerine.UI
 
 		protected virtual void FillContextMenuItems(Menu menu)
 		{
-			menu.AddRange(new [] {
-				Command.Copy,
-				Command.Paste,
-			});
-			if (EditorParams.DefaultValueGetter != null) {
-				menu.Insert(0, resetToDefault);
+			var commands = new List<ICommand>();
+			if (EditorParams.DefaultValueGetter != null && Enabled) {
+				commands.Insert(0, resetToDefault);
 			}
+			commands.Add(Command.Copy);
+			if (Enabled) {
+				commands.Add(Command.Paste);
+			}
+			menu.AddRange(commands);
 		}
 
 		void ShowPropertyContextMenu()

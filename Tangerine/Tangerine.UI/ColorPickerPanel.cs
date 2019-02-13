@@ -23,6 +23,20 @@ namespace Tangerine.UI
 			set { colorHSVA = ColorHSVA.FromRGBA(value); }
 		}
 
+		private bool enabled = true;
+		public bool Enabled
+		{
+			get => enabled;
+			set
+			{
+				if (enabled != value) {
+					enabled = value;
+					colorWheel.Widget.Enabled = enabled;
+					alphaSlider.Widget.Enabled = enabled;
+				}
+			}
+		}
+
 		public ColorPickerPanel()
 		{
 			var colorProperty = new Property<ColorHSVA>(() => colorHSVA, c => colorHSVA = c);

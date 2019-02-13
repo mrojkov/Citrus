@@ -36,5 +36,11 @@ namespace Tangerine.UI
 		{
 			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			selector.Enabled = Enabled;
+		}
 	}
 }
