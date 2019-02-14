@@ -15,11 +15,20 @@ namespace Tangerine.UI
 		}
 
 		protected readonly EditBox editor;
+		private readonly StringPropertyEditor prefixEditor;
 		protected static string LastOpenedDirectory = Path.GetDirectoryName(Document.Current.FullPath);
 		protected readonly string[] allowedFileTypes;
 
 		private readonly Button button;
 		private readonly PrefixData prefix = new PrefixData();
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editor.Enabled = Enabled;
+			button.Enabled = Enabled;
+			prefixEditor.Enabled = Enabled;
+		}
 
 		public bool ShowPrefix { get; set; } = true;
 
@@ -42,7 +51,7 @@ namespace Tangerine.UI
 			editor.Submitted += text => SetComponent(text);
 			button.Clicked += OnSelectClicked;
 			ExpandableContent.Padding = new Thickness(24, 10, 2, 2);
-			var prefixEditor = new StringPropertyEditor(new PropertyEditorParams(ExpandableContent, prefix, nameof(PrefixData.Prefix)) { LabelWidth = 180 });
+			prefixEditor = new StringPropertyEditor(new PropertyEditorParams(ExpandableContent, prefix, nameof(PrefixData.Prefix)) { LabelWidth = 180 });
 			prefix.Prefix = GetLongestCommonPrefix(GetPaths());
 			ContainerWidget.AddChangeWatcher(() => prefix.Prefix, v => {
 				string oldPrefix = GetLongestCommonPrefix(GetPaths());

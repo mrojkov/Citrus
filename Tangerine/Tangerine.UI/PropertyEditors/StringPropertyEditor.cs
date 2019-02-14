@@ -26,5 +26,10 @@ namespace Tangerine.UI
 			SetProperty(editor.Text);
 		}
 
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editor.Enabled = Enabled;
+		}
 	}
 }

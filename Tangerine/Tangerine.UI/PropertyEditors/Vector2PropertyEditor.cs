@@ -54,5 +54,12 @@ namespace Tangerine.UI
 			SetComponent(EditorParams, 0, editorX, currentX.GetValue());
 			SetComponent(EditorParams, 1, editorY, currentY.GetValue());
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editorX.Enabled = Enabled;
+			editorY.Enabled = Enabled;
+		}
 	}
 }

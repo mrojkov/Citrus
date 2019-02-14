@@ -39,5 +39,11 @@ namespace Tangerine.UI
 			var current = CoalescedPropertyValue();
 			SetComponent(editor.Text, current.GetValue());
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editor.Enabled = Enabled;
+		}
 	}
 }

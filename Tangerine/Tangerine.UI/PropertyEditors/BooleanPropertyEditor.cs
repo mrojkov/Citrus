@@ -20,5 +20,11 @@ namespace Tangerine.UI
 			checkBox.AddChangeWatcher(CoalescedPropertyValue(), v => checkBox.State = v.IsDefined
 				? v.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked : CheckBoxState.Indeterminate);
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			checkBox.Enabled = Enabled;
+		}
 	}
 }

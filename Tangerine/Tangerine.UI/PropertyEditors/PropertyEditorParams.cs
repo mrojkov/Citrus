@@ -44,6 +44,7 @@ namespace Tangerine.UI
 		public PropertySetterDelegate PropertySetter { set => propertySetter = value; }
 		public float LabelWidth { get; set; } = 140;
 		public int IndexInList { get; set; } = -1;
+		public bool Editable { get; set; }
 		public bool IsAnimableByPath { get; set; }
 		public bool IsAnimable => RootObjects.All(a => a is IAnimationHost) &&
 			PropertyAttributes<TangerineStaticPropertyAttribute>.Get(PropertyInfo) == null &&
@@ -54,6 +55,7 @@ namespace Tangerine.UI
 		{
 			PropertySetter = SetProperty;
 			InspectorPane = inspectorPane;
+			Editable = Editable;
 			Objects = objects;
 			RootObjects = rootObjects;
 			Type = type;

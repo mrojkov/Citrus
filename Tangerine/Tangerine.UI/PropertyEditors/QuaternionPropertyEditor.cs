@@ -58,5 +58,13 @@ namespace Tangerine.UI
 			SetComponent(EditorParams, 1, editorY, current.GetValue().Value, q => q.ToEulerAngles().Y);
 			SetComponent(EditorParams, 2, editorZ, current.GetValue().Value, q => q.ToEulerAngles().Z);
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editorX.Enabled = Enabled;
+			editorY.Enabled = Enabled;
+			editorZ.Enabled = Enabled;
+		}
 	}
 }

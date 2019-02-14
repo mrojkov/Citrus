@@ -99,5 +99,16 @@ namespace Tangerine.UI
 				editor.Text = prevWeight.IsDefined ? prevWeight.Value.ToString("0.###") : ManyValuesText;
 			}
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			foreach (var editor in indexEditors) {
+				editor.Enabled = Enabled;
+			}
+			foreach(var editor in weigthsEditors) {
+				editor.Enabled = Enabled;
+			}
+		}
 	}
 }

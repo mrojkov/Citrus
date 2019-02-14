@@ -4,35 +4,42 @@ using System.Runtime.InteropServices;
 
 namespace Orange.FbxImporter
 {
+	public struct FbxMaterialDescriptor
+	{
+		public string Path;
+
+		public string Name;
+
+		public TextureWrapMode WrapModeU;
+
+		public TextureWrapMode WrapModeV;
+
+		public Color4 DiffuseColor;
+	}
+
 	public class FbxMaterial : FbxObject
 	{
 		internal static IMaterial Default = new CommonMaterial {
 			Id = "Default",
 		};
 
-		public string Path { get; }
-
-		public string Name { get; set; }
-
-		public Lime.TextureWrapMode WrapModeU { get; }
-
-		public Lime.TextureWrapMode WrapModeV { get; }
-
-		public Color4 DiffuseColor { get; }
+		public FbxMaterialDescriptor MaterialDescriptor { get; }
 
 		public FbxMaterial(IntPtr ptr) : base(ptr)
 		{
 			if (ptr == IntPtr.Zero) {
-				DiffuseColor = Color4.White;
+				MaterialDescriptor = new FbxMaterialDescriptor { DiffuseColor = Color4.White };
 			} else {
 				var matPtr = FbxNodeSerializeMaterial(NativePtr);
 				if (matPtr == IntPtr.Zero) return;
 				var material = matPtr.ToStruct<Texture>();
-				Path = material.TexturePath;
-				Name = material.Name;
-				WrapModeU = (Lime.TextureWrapMode)material.WrapModeU;
-				WrapModeV = (Lime.TextureWrapMode)material.WrapModeV;
-				DiffuseColor = material.ColorDiffuse.ToStruct<Vec4>().ToLimeColor();
+				MaterialDescriptor = new FbxMaterialDescriptor {
+					Path = material.TexturePath,
+					Name = material.Name,
+					WrapModeU = (Lime.TextureWrapMode)material.WrapModeU,
+					WrapModeV = (Lime.TextureWrapMode)material.WrapModeV,
+					DiffuseColor = material.ColorDiffuse.ToStruct<Vec4>().ToLimeColor(),
+				};
 			}
 
 		}

@@ -21,5 +21,11 @@ namespace Tangerine.UI
 			);
 			ManageManyValuesOnFocusChange(editor, current);
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editor.Enabled = Enabled;
+		}
 	}
 }

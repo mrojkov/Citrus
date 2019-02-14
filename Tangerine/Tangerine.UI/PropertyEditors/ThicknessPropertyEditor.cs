@@ -76,5 +76,14 @@ namespace Tangerine.UI
 			SetComponent(EditorParams, 2, editorTop, currentTop.GetValue());
 			SetComponent(EditorParams, 3, editorBottom, currentBottom.GetValue());
 		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			editorLeft.Enabled = Enabled;
+			editorRight.Enabled = Enabled;
+			editorTop.Enabled = Enabled;
+			editorBottom.Enabled = Enabled;
+		}
 	}
 }

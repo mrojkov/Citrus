@@ -13,12 +13,14 @@ namespace Tangerine.UI
 	{
 		private readonly Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd;
 		private IList list;
+		private ThemedAddButton addButton;
 		private Action removeCallback;
+		private List<Button> buttons;
 
 		public ListPropertyEditor(IPropertyEditorParams editorParams, Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd) : base(editorParams)
 		{
 			this.onAdd = onAdd;
-
+			buttons = new List<Button>();
 			if (EditorParams.Objects.Skip(1).Any()) {
 				// Dont create editor interface if > 1 objects are selected
 				EditorContainer.AddNode(new Widget() {
@@ -31,7 +33,7 @@ namespace Tangerine.UI
 			}
 			ExpandableContent.Padding = new Thickness(left: 4.0f, right: 0.0f, top: 4.0f, bottom: 4.0f);
 			list = (IList)EditorParams.PropertyInfo.GetValue(EditorParams.Objects.First());
-			var addButton = new ThemedAddButton() {
+			addButton = new ThemedAddButton() {
 				Clicked = () => {
 					Expanded = true;
 					if (list == null) {
@@ -58,6 +60,7 @@ namespace Tangerine.UI
 				int prevCount = ExpandableContent.Nodes.Count;
 				for (int i = 0; i < prevCount - newCount; i++) {
 					ExpandableContent.Nodes.Last().UnlinkAndDispose();
+					buttons.RemoveAt(buttons.Count - 1);
 				}
 				for (int i = 0; i < newCount - prevCount; i++) {
 					AfterInsertNewElement(prevCount + i);
@@ -81,8 +84,10 @@ namespace Tangerine.UI
 				? (PropertySetterDelegate)((@object, name, value) => Core.Operations.SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
 				: (@object, name, value) => Core.Operations.SetIndexedProperty.Perform(@object, name, index, value);
 			var editor = onAdd(p, elementContainer, list).ToList().First();
-
-			var removeButton = new ThemedDeleteButton();
+			ThemedDeleteButton removeButton;
+			buttons.Add(removeButton = new ThemedDeleteButton {
+				Enabled = Enabled
+			});
 			Action removeClicked = () => {
 				removeCallback = null;
 				using (Document.Current.History.BeginTransaction()) {
@@ -93,6 +98,13 @@ namespace Tangerine.UI
 			ExpandableContent.Nodes.Insert(index, elementContainer);
 			removeButton.Clicked += () => removeCallback = removeClicked;
 			editor.EditorContainer.AddNode(removeButton);
+		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			buttons.ForEach(b => b.Enabled = Enabled);
+			addButton.Enabled = Enabled;
 		}
 	}
 }

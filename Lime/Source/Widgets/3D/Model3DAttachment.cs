@@ -27,6 +27,7 @@ namespace Lime
 			public bool HitTestTarget { get; set; }
 			public CullMode CullMode { get; set; }
 			public bool Opaque { get; set; }
+			public bool DisableMerging { get; set; }
 		}
 
 		public class Animation
@@ -98,14 +99,158 @@ namespace Lime
 			public IMaterial Material { get; set; }
 		}
 
-		public void Apply(Node3D model)
+		public void Apply(Model3D model)
 		{
 			ProcessMeshOptions(model);
 			ProcessAnimations(model);
 			ProcessComponents(model);
 			ProcessNodeRemovals(model);
 			ProcessMaterials(model);
+			MergeMeshes(model);
 			ApplyScaleFactor(model);
+		}
+
+		private void MergeMeshes(Node3D model)
+		{
+			var meshes = model.Nodes.OfType<Mesh3D>();
+			var map = new Dictionary<int, List<Mesh3D>>();
+			foreach(var mesh in meshes) {
+				if (mesh.Animators.Any() ||
+					mesh.Components.Any() ||
+					(MeshOptions.FirstOrDefault(m => m.Id == mesh.Id)?.DisableMerging ?? mesh.Nodes.Count != 0)
+				) {
+					continue;
+				}
+				var hash = CalcHashForMesh(mesh);
+				if (!map.ContainsKey(hash)) {
+					map[hash] = new List<Mesh3D>();
+				}
+				map[hash].Add(mesh);
+			}
+			MergeMeshes(map, model);
+			foreach (var node in model.Nodes) {
+				MergeMeshes((Node3D)node);
+			}
+		}
+
+		private void MergeMeshes(Dictionary<int, List<Mesh3D>> map, Node3D model)
+		{
+			const int meshLimit = ushort.MaxValue;
+			const int bonesLimit = 50;
+			if (map.Count == 0) return;
+			foreach (var pair in map) {
+				var materialsMap = new Dictionary<IMaterial, Dictionary<Mesh3D, List<Submesh3D>>>();
+				foreach (var mesh in pair.Value) {
+					foreach (var submesh in mesh.Submeshes) {
+						var material = submesh.Material;
+						if (!materialsMap.ContainsKey(material)) {
+							materialsMap[material] = new Dictionary<Mesh3D, List<Submesh3D>>();
+						}
+						if (!materialsMap[material].ContainsKey(mesh)) {
+							materialsMap[material][mesh] = new List<Submesh3D>();
+						}
+						materialsMap[material][mesh].Add(submesh);
+					}
+				}
+
+				foreach (var meshDescriptor in materialsMap.Values) {
+					var first = meshDescriptor.First().Key;
+					var newMesh = new Mesh3D {
+						Opaque = first.Opaque,
+						CullMode = first.CullMode
+					};
+					Submesh3D curSubmesh = null;
+					foreach (var meshAndSubmeshes in meshDescriptor) {
+						var meshIdx = 0;
+						while (meshIdx < meshAndSubmeshes.Value.Count) {
+							var submeshToMerge = meshAndSubmeshes.Value[meshIdx];
+							var meshLocalTransform = meshAndSubmeshes.Key.LocalTransform;
+							MeshUtils.TransformVertices(submeshToMerge.Mesh, (ref Mesh3D.Vertex v) => {
+								if (v.BlendWeights.Equals(default(Mesh3D.BlendWeights))) {
+									v.Pos = meshLocalTransform.TransformVector(v.Pos);
+								}
+							});
+							if (curSubmesh == null) {
+								curSubmesh = submeshToMerge;
+								meshAndSubmeshes.Value.RemoveAt(meshIdx);
+								meshIdx++;
+								continue;
+							}
+							if (curSubmesh.Mesh.Indices.Length + submeshToMerge.Mesh.Indices.Length < meshLimit &&
+								curSubmesh.BoneNames.Count + submeshToMerge.BoneNames.Count < bonesLimit
+							) {
+								curSubmesh = Combine(curSubmesh, submeshToMerge);
+								meshAndSubmeshes.Value.RemoveAt(meshIdx);
+							} else {
+								newMesh.Submeshes.Add(curSubmesh);
+								curSubmesh = null;
+							}
+						}
+						newMesh.Id += (newMesh.Id == null ? "" : "|") + meshAndSubmeshes.Key.Id;
+					}
+					newMesh.Submeshes.Add(curSubmesh);
+					model.AddNode(newMesh);
+				}
+				foreach (var mesh in materialsMap.Values.SelectMany(kv => kv.Keys)) {
+					mesh.UnlinkAndDispose();
+				}
+			}
+		}
+
+
+		public static Submesh3D Combine(params Submesh3D[] submeshes)
+		{
+			var firstMesh = submeshes.First();
+			var newSubmesh = new Submesh3D {
+				Material = firstMesh.Material
+			};
+			var numVertices = submeshes.Select(sm => sm.Mesh).Sum(m => m.Vertices.Length);
+			var numIndices = submeshes.Select(sm => sm.Mesh).Sum(m => m.Indices.Length);
+			var outVertices = new Mesh3D.Vertex[numVertices];
+			var outIndices = new ushort[numIndices];
+			var currentVertex = 0;
+			var currentIndex = 0;
+			foreach (var sm in submeshes) {
+				var m = sm.Mesh;
+				var indices = m.Indices;
+				for (var i = currentIndex; i < currentIndex + indices.Length; i++) {
+					outIndices[i] = (ushort)(indices[i - currentIndex] + currentVertex);
+				}
+				var idx = (byte)newSubmesh.BoneNames.Count;
+				for (var i = 0; i < sm.BoneNames.Count; i++) {
+					newSubmesh.BoneNames.Add(sm.BoneNames[i]);
+					newSubmesh.BoneBindPoses.Add(sm.BoneBindPoses[i]);
+				}
+				currentIndex += indices.Length;
+				var vertices = m.Vertices;
+				vertices.CopyTo(outVertices, currentVertex);
+				for (var j = currentVertex; j < currentVertex + vertices.Length; j++) {
+					var bi = outVertices[j].BlendIndices;
+					bi.Index0 += idx;
+					bi.Index1 += idx;
+					bi.Index2 += idx;
+					bi.Index3 += idx;
+					outVertices[j].BlendIndices = bi;
+				}
+				currentVertex += vertices.Length;
+			}
+
+			newSubmesh.Mesh = new Mesh<Mesh3D.Vertex> {
+				Vertices = outVertices,
+				Indices = outIndices,
+				AttributeLocations = firstMesh.Mesh.AttributeLocations,
+				DirtyFlags = MeshDirtyFlags.All
+			};
+			return newSubmesh;
+		}
+
+		private int CalcHashForMesh(Mesh3D mesh)
+		{
+			int hashCode;
+			unchecked {
+				hashCode = mesh.Opaque.GetHashCode() + 17 * mesh.CullMode.GetHashCode() + 19 * mesh.HitTestTarget.GetHashCode();
+			}
+			return hashCode;
 		}
 
 		private void ProcessMaterials(Node3D model)
@@ -115,7 +260,7 @@ namespace Lime
 				if (submesh.Material != null) {
 					var materialDescriptor = Materials.FirstOrDefault(d => d.SourceName == submesh.Material.Id);
 					if (materialDescriptor != null) {
-						submesh.Material = materialDescriptor.Material.Clone();
+						submesh.Material = materialDescriptor.Material;
 					}
 				}
 			}
@@ -499,6 +644,9 @@ namespace Lime
 
 			[YuzuMember]
 			public string CullMode = null;
+
+			[YuzuMember]
+			public bool DisableMerging = false;
 		}
 
 		public class UVAnimationFormat
@@ -642,6 +790,8 @@ namespace Lime
 									break;
 							}
 						}
+
+						meshOption.DisableMerging = meshOptionFormat.Value.DisableMerging;
 						attachment.MeshOptions.Add(meshOption);
 					}
 				}
@@ -785,6 +935,8 @@ namespace Lime
 						meshOptionFormat.CullMode = "CullCounterClockwise";
 						break;
 				}
+
+				meshOptionFormat.DisableMerging = meshOption.DisableMerging;
 				origin.MeshOptions.Add(meshOption.Id, meshOptionFormat);
 			}
 

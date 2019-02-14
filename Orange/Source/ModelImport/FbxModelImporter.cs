@@ -115,7 +115,7 @@ namespace Orange.FbxImporter
 					}
 				},
 				Material = meshAttribute.MaterialIndex != -1 && node.Materials != null
-					? CreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex])
+					? GetOrCreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex])
 					: FbxMaterial.Default
 			};
 
@@ -128,19 +128,24 @@ namespace Orange.FbxImporter
 			return sm;
 		}
 
-		public CommonMaterial CreateLimeMaterial(FbxMaterial material)
+		private Dictionary<FbxMaterialDescriptor, CommonMaterial> MaterialPool = new Dictionary<FbxMaterialDescriptor, CommonMaterial>();
+
+		public CommonMaterial GetOrCreateLimeMaterial(FbxMaterial material)
 		{
+			if (MaterialPool.ContainsKey(material.MaterialDescriptor)) {
+				return MaterialPool[material.MaterialDescriptor];
+			}
 			var commonMaterial = new CommonMaterial {
-				Id = material.Name
+				Id = material.MaterialDescriptor.Name
 			};
-			if (!string.IsNullOrEmpty(material.Path)) {
-				var tex = CreateSerializableTexture(options.Path, material.Path);
+			if (!string.IsNullOrEmpty(material.MaterialDescriptor.Path)) {
+				var tex = CreateSerializableTexture(options.Path, material.MaterialDescriptor.Path);
 				commonMaterial.DiffuseTexture = tex;
 				var rulesPath = tex.SerializationPath + ".png";
 
 				// TODO: implement U and V wrapping modes separately for cooking rules.
 				// Set "Repeat" wrpap mode if wrap mode of any of the components is set as "Repeat".
-				var mode = material.WrapModeU == TextureWrapMode.Repeat || material.WrapModeV == TextureWrapMode.Repeat ?
+				var mode = material.MaterialDescriptor.WrapModeU == TextureWrapMode.Repeat || material.MaterialDescriptor.WrapModeV == TextureWrapMode.Repeat ?
 						TextureWrapMode.Repeat : TextureWrapMode.Clamp;
 				if (options.CookingRulesMap.ContainsKey(rulesPath)) {
 					var cookingRules = options.CookingRulesMap[rulesPath] = options.CookingRulesMap[rulesPath].InheritClone();
@@ -153,7 +158,8 @@ namespace Orange.FbxImporter
 					}
 				}
 			}
-			commonMaterial.DiffuseColor = material.DiffuseColor;
+			commonMaterial.DiffuseColor = material.MaterialDescriptor.DiffuseColor;
+			MaterialPool[material.MaterialDescriptor] = commonMaterial;
 			return commonMaterial;
 		}
 

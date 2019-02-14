@@ -86,6 +86,12 @@ namespace Tangerine.UI
 			comboBox.Text = newValue;
 		}
 
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			comboBox.Enabled = Enabled;
+		}
+
 		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
 		{
 			if (!trigger.Contains('@')) {
