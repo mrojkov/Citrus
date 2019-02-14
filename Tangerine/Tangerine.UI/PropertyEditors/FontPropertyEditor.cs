@@ -17,7 +17,7 @@ namespace Tangerine.UI
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Current.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
-				Select(i => new DropDownList.Item(RemoveFontExtensions(i), i));
+				Select(i => new DropDownList.Item(GetFontNameWithoutExtension(i), i));
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
@@ -32,25 +32,25 @@ namespace Tangerine.UI
 			});
 		}
 
-		private static string GetFontName(SerializableFont i)
-		{
-			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
-		}
-
 		protected override void EnabledChanged()
 		{
 			base.EnabledChanged();
 			selector.Enabled = Enabled;
 		}
 
-		private static string GetFontNameWithoutExtension(SerializableFont i)
+		private static string GetFontName(SerializableFont i)
 		{
-			return RemoveFontExtensions(GetFontName(i));
+			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 		}
 
-		private static string RemoveFontExtensions(string s)
+		private static string GetFontNameWithoutExtension(SerializableFont i)
 		{
-			return s.Replace(".fnt", string.Empty).Replace(".tft", string.Empty);
+			return GetFontNameWithoutExtension(GetFontName(i));
+		}
+
+		private static string GetFontNameWithoutExtension(string s)
+		{
+			return Path.ChangeExtension(s, null);
 		}
 	}
 }
