@@ -53,11 +53,11 @@
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="TreeLibInterface">
-      <HintPath>..\Samples\EmptyProject\EmptyProject.iOS\packages\TreeLibInterface.1.1.1\lib\TreeLibInterface.dll</HintPath>
+    <Reference Include="MoltenVK.iOS">
+      <HintPath>..\3rdParty\MoltenVK\MoltenVK.iOS.dll</HintPath>
     </Reference>
-    <Reference Include="TreeLib">
-      <HintPath>..\Samples\EmptyProject\EmptyProject.iOS\packages\TreeLib.1.1.1\lib\TreeLib.dll</HintPath>
+    <Reference Include="ShaderCompilerBinding.iOS">
+      <HintPath>..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.iOS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -472,21 +472,10 @@
       <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
       <Name>Yuzu.iOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\3rdParty\MoltenVK\MoltenVK.iOS.csproj">
-      <Project>{84242EF1-42D6-4AA4-AED3-8C26E530F671}</Project>
-      <Name>MoltenVK.iOS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.iOS.csproj">
-      <Project>{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}</Project>
-      <Name>ShaderCompilerBinding.iOS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\Widgets\Theme\" />
     <Folder Include="Source\Widgets\Animation\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Source\packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
