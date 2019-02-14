@@ -150,6 +150,12 @@
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
     </Reference>
+    <Reference Include="ShaderCompilerBinding.Win">
+      <HintPath>..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Win.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVulkan">
+      <HintPath>..\3rdParty\SharpVulkan\SharpVulkan.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -593,14 +599,6 @@
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Win.csproj">
-      <Project>{bc4e4e4b-0ee7-4b97-ac0f-55c559e48e59}</Project>
-      <Name>ShaderCompilerBinding.Win</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\3rdParty\SharpVulkan\Source\SharpVulkan\SharpVulkan.csproj">
-      <Project>{5e203373-9d25-4fab-b1a4-360c13160120}</Project>
-      <Name>SharpVulkan</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
