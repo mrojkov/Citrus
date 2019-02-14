@@ -41,6 +41,12 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ShaderCompilerBinding.Android">
+      <HintPath>..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Android.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVulkan">
+      <HintPath>..\3rdParty\SharpVulkan\SharpVulkan.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -452,14 +458,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Android.csproj">
-      <Project>{11a620b3-8909-4e63-bec4-6d072115e1f3}</Project>
-      <Name>ShaderCompilerBinding.Android</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\3rdParty\SharpVulkan\Source\SharpVulkan\SharpVulkan.csproj">
-      <Project>{5e203373-9d25-4fab-b1a4-360c13160120}</Project>
-      <Name>SharpVulkan</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
       <Project>{B4435A5F-51DA-42BA-9315-61691A5F58AC}</Project>
       <Name>Lemon.Android</Name>
