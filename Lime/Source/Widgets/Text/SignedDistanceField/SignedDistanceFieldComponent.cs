@@ -183,7 +183,7 @@ namespace Lime
 		public override NodeComponent Clone()
 		{
 			var clone = (SignedDistanceFieldComponent)base.Clone();
-			clone.SDFMaterialProvider = (SDFMaterialProvider)SDFMaterialProvider.Clone();
+			clone.SDFMaterialProvider = new SDFMaterialProvider();
 			return clone;
 		}
 	}
