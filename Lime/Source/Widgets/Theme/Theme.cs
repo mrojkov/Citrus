@@ -52,6 +52,8 @@ namespace Lime
 			[YuzuOptional]
 			public Color4 HoveredBackground { get; set; }
 			[YuzuOptional]
+			public Color4 DisabledBackground { get; set; }
+			[YuzuOptional]
 			public Color4 ControlBorder { get; set; }
 			[YuzuOptional]
 			public ColorGradient ButtonDefault { get; set; }
@@ -141,6 +143,7 @@ namespace Lime
 					SelectedBackground = new Color4(86, 86, 86),
 					SelectedBorder = new Color4(153, 209, 255),
 					HoveredBackground = new Color4(86, 86, 86).Lighten(0.25f),
+					DisabledBackground = grayBackground.Darken(.1f),
 					ControlBorder = new Color4(39, 39, 39),
 					ButtonDefault = new ColorGradient(new Color4(107, 107, 107), new Color4(107, 107, 107)),
 					ButtonHover = new ColorGradient(new Color4(133, 133, 133), new Color4(133, 133, 133)),
@@ -193,6 +196,7 @@ namespace Lime
 					SelectedBackground = new Color4(205, 232, 255),
 					SelectedBorder = new Color4(153, 209, 255),
 					HoveredBackground = new Color4(229, 243, 255),
+					DisabledBackground = grayBackground.Lighten(.1f),
 					ControlBorder = new Color4(172, 172, 172).Lighten(0.3f),
 					ButtonDefault = new ColorGradient(new Color4(239, 239, 239), new Color4(229, 229, 229)),
 					ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252)),

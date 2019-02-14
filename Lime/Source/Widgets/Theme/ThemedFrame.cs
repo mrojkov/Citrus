@@ -33,7 +33,7 @@ namespace Lime
 			var ro = RenderObjectPool<RenderObject>.Acquire();
 			ro.CaptureRenderState(widget);
 			ro.Size = widget.Size;
-			ro.InnerColor = innerColor;
+			ro.InnerColor = widget.GloballyEnabled ? innerColor : Theme.Colors.DisabledBackground;
 			ro.BorderColor = borderColor;
 			return ro;
 		}

@@ -49,7 +49,7 @@ namespace Lime
 				var ro = RenderObjectPool<RenderObject>.Acquire();
 				ro.CaptureRenderState(dd);
 				ro.Size = dd.Size;
-				ro.Gradient = Theme.Colors.ButtonDefault;
+				ro.Gradient = dd.GloballyEnabled ? Theme.Colors.ButtonDefault : Theme.Colors.ButtonDisable;
 				ro.BorderColor = Theme.Colors.ControlBorder;
 				ro.IconColor = dd.Items.Count > 0 ? Theme.Colors.BlackText : Theme.Colors.GrayText;
 				return ro;

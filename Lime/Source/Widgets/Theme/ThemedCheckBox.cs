@@ -49,7 +49,8 @@ namespace Lime
 				var ro = RenderObjectPool<RenderObject>.Acquire();
 				ro.CaptureRenderState(widget);
 				ro.Size = widget.Size;
-				ro.BackgroundColor = Theme.Colors.WhiteBackground;
+				ro.BackgroundColor = widget.GloballyEnabled ?
+					Theme.Colors.WhiteBackground : Theme.Colors.DisabledBackground;
 				ro.BorderColor = Theme.Colors.ControlBorder;
 				ro.CheckBoxSize = Theme.Metrics.CheckBoxSize;
 				ro.State = checkBox.State;
