@@ -22,7 +22,7 @@ namespace Tangerine.Panels
 			this.parent = parent;
 			scrollView.Content.Layout = new VBoxLayout();
 			scrollView.Content.AddNode(root = new TreeNode(this, rootNode, null, JointType.LShaped, new List<Joint>(), 0, 0, isLast: true, string.Empty));
-			scrollView.Content.AddChangeLateWatcher(() => scrollView.Content, _ => {
+			scrollView.AddChangeLateWatcher(() => scrollView.Parent, _ => {
 				root.ForceFilter();
 			});
 		}
@@ -314,6 +314,15 @@ namespace Tangerine.Panels
 						UpdateChildren();
 					}
 				});
+				var firstTimeChanged = true && parentTreeNode != null;
+				view.scrollView.AddChangeWatcher(() => rootNode.Id, _ => {
+					SetLabelText(_);
+					if (firstTimeChanged) {
+						firstTimeChanged = false;
+					} else {
+						ForceFilter();
+					}
+				});
 				UpdateChildren();
 			}
 
@@ -353,10 +362,6 @@ namespace Tangerine.Panels
 			private Widget CreateLabel()
 			{
 				label = new ThemedSimpleText { Padding = new Thickness(DefaultPadding) };
-				view.scrollView.AddChangeWatcher(() => rootNode.Id, _ => {
-					SetLabelText(_);
-					ForceFilter();
-				});
 				SetLabelText(rootNode.Id);
 				return label;
 			}
