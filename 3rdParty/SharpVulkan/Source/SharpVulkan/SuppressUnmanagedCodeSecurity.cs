@@ -21,7 +21,7 @@
 namespace System.Security
 {
 	[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Delegate, AllowMultiple = true, Inherited = false)]
-    public class SuppressUnmanagedCodeSecurityAttribute : Attribute
+    internal class SuppressUnmanagedCodeSecurityAttribute : Attribute
     {
     }
 }
