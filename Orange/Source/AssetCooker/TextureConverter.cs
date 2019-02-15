@@ -1,7 +1,8 @@
-﻿﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Security.Cryptography;
 using Lime;
 
 namespace Orange
@@ -10,6 +11,23 @@ namespace Orange
 	{
 		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, byte[] CookingRulesSHA1)
 		{
+			var stream = new MemoryStream();
+			bitmap.SaveTo(stream);
+			stream.WriteByte(mipMaps ? (byte)1 : (byte)0);
+			stream.WriteByte(highQualityCompression ? (byte)1 : (byte)0);
+			if (CookingRulesSHA1 != null) {
+				stream.Write(CookingRulesSHA1, 0, CookingRulesSHA1.Length);
+			}
+			stream.Position = 0;
+			var hashValueString = BitConverter.ToString(SHA256.Create().ComputeHash(stream));
+			var cacheDirectory = Path.Combine(The.Workspace.ProjectCacheDirectory, "etcCache",
+				hashValueString[0].ToString(), hashValueString[1].ToString(), "");
+			var cachePath = Path.Combine(cacheDirectory, hashValueString.Substring(2));
+			if (File.Exists(cachePath)) {
+				bundle.ImportFile(cachePath, path, 0, "", attributes, CookingRulesSHA1);
+				return;
+			}
+
 			var hasAlpha = bitmap.HasAlpha;
 			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
 			var ktxPath = Toolbox.GetTempFilePathWithExtension(".ktx");
@@ -27,6 +45,8 @@ namespace Orange
 					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
 				}
 				bundle.ImportFile(ktxPath, path, 0, "", attributes, CookingRulesSHA1);
+				Directory.CreateDirectory(cacheDirectory);
+				File.Copy(ktxPath, cachePath);
 			} finally {
 				bledBitmap?.Dispose();
 				DeletePossibleLockedFile(pngPath);
