@@ -696,7 +696,7 @@ namespace Tangerine
 			h.Connect(SceneViewCommands.SaveCurrentRuler, new SaveRuler());
 			h.Connect(TimelineCommands.NumericMove, () => new NumericMoveDialog());
 			h.Connect(TimelineCommands.NumericScale, () => new NumericScaleDialog());
-			h.Connect(Tools.RenderToPngSequence, new RenderToPngSequence());
+			h.Connect(ToolsCommands.RenderToPngSequence, new RenderToPngSequence());
 		}
 
 		private void InitializeHotkeys()

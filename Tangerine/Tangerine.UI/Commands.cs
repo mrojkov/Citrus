@@ -150,6 +150,10 @@ namespace Tangerine.UI
 		public static readonly ICommand FitToContainer = new Command("Fit to Container") { Icon = IconPool.GetIcon("Tools.FitToContainer") };
 		public static readonly ICommand FitToContent = new Command("Fit to Content") { Icon = IconPool.GetIcon("Tools.FitToContent") };
 		public static readonly ICommand CenterView = new Command("Center View") { Icon = IconPool.GetIcon("Tools.ToolsCenterView") };
+	}
+
+	public static class ToolsCommands
+	{
 		public static readonly ICommand RenderToPngSequence = new Command("Render to PNG sequence");
 	}
 

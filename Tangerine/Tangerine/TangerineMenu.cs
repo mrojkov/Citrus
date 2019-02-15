@@ -165,7 +165,7 @@ namespace Tangerine
 				}),
 				new Command("Create", (create = new Menu())),
 				new Command("Tools", new Menu {
-					Tools.RenderToPngSequence,
+					ToolsCommands.RenderToPngSequence,
 				}),
 				new Command("View", (viewMenu = new Menu {
 					new Command("Layouts", (layoutMenu = new Menu {
