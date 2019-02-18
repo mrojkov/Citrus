@@ -105,6 +105,14 @@ namespace Tangerine.UI
 			ActivateTab(idx);
 		}
 
+		public override void Dispose()
+		{
+			base.Dispose();
+			foreach (var content in Contents) {
+				content.Dispose();
+			}
+		}
+
 		public void ActivateTab(int index)
 		{
 			var tab = TabBar.Nodes[index] as Tab;

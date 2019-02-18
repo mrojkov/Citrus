@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -106,7 +107,9 @@ namespace Tangerine
 			RootWidget.AddChangeWatcher(CalcSelectedRowsHashcode, _ => {
 				// rebuild
 				model3DContentsPath = null;
-				RootWidget.Nodes.Clear();
+				foreach (var node in RootWidget.Nodes) {
+					node.UnlinkAndDispose();
+				}
 				var rows = Document.Current.Rows;
 				Model3D model3d = null;
 				foreach (var r in rows) {
@@ -146,14 +149,16 @@ namespace Tangerine
 					Top = AttachmentMetrics.Spacing
 				},
 			};
-			container.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<TData>(
+			list.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var widgetFactory = new AttachmentWidgetFactory<TData>(
 				w => (TRow)Activator.CreateInstance(typeof(TRow), new object[] { w, source }), source);
-			widgetFactory.AddHeader(header);
-			widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(source, source.Count, activator()));
+				widgetFactory.AddHeader(header);
+				widgetFactory.AddFooter(DeletableRow<TData>.CreateFooter(() => {
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(source, source.Count, activator()));
+				}));
+				list.Components.Add(widgetFactory);
 			}));
-			list.Components.Add(widgetFactory);
+			container.AddNode(list);
 			container.AddChangeWatcher(() => markersExpandButton.Expanded, (e) => list.Visible = e);
 		}
 
@@ -257,8 +262,7 @@ namespace Tangerine
 			var isFirstInvoke = true;
 			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
-			var materialsPane = CreateMaterialsRemapPane(attachment);
-			content.AddTab("Materials Remap", materialsPane);
+			content.AddTab("Materials Remap", CreateMaterialsRemapPane(attachment));
 			content.AddTab("Mesh Options", CreateMeshOptionsPane());
 			var animationsPane = CreateAnimationsPane(attachment);
 			content.AddTab("Animations", animationsPane);
@@ -267,14 +271,15 @@ namespace Tangerine
 			if (PanelState.ActiveTabIndex != -1) {
 				content.ActivateTab(PanelState.ActiveTabIndex);
 			}
-			content.AddChangeWatcher(() => content.ActiveTabIndex, activeTabIndex => {
+			content.AddChangeLateWatcher(() => content.ActiveTabIndex, activeTabIndex => {
 				PanelState.ActiveTabIndex = activeTabIndex;
 				if (PanelState.ActiveTabIndex == 3) {
 					var t = animationsPane["Container"];
 					foreach (var node in t.Nodes) {
 						if (node is AnimationRow ar) {
-							(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
+							(ar["AnimationRowExpandedButton"] as ThemedExpandButton).Expanded = true;
 							ar.Expand();
+							ar.LateTasks.Add(ExpandMarkers(ar));
 						}
 					}
 					if (panelState.AnimationsScrollPosition != 1) {
@@ -326,6 +331,12 @@ namespace Tangerine
 			return rootWidget;
 		}
 
+		private IEnumerator<object> ExpandMarkers(AnimationRow ar)
+		{
+			(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
+			yield return null;
+		}
+
 		private void SyncSources(Model3DAttachmentMeta meta, Model3DAttachment attachment)
 		{
 			sourceAnimationIds.Clear();
@@ -335,16 +346,21 @@ namespace Tangerine
 				sourceAnimationIds.Add(animationId);
 			}
 			foreach (var material in meta.SourceMaterials) {
-				sourceMaterials.Add(material.Clone());
+				sourceMaterials.Add(material);
+			}
+			var dict = new Dictionary<string, Model3DAttachment.MeshOption>();
+			foreach (var option in attachment.MeshOptions) {
+				dict[option.Id] = option;
 			}
 			foreach (var meshId in meta.MeshIds) {
-				var opt = attachment.MeshOptions.FirstOrDefault(mo => mo.Id == meshId);
-				meshOptions.Add(opt ?? new Model3DAttachment.MeshOption { Id = meshId, CullMode = CullMode.Front });
+				meshOptions.Add(dict.ContainsKey(meshId) ? dict[meshId] : new Model3DAttachment.MeshOption { Id = meshId, CullMode = CullMode.Front });
 			}
-			foreach (var meshOption in attachment.MeshOptions.ToList()) {
-				if (!meta.MeshIds.Contains(meshOption.Id)) {
-					attachment.MeshOptions.Remove(meshOption);
+			var idx = 0;
+			while (idx < attachment.MeshOptions.Count) {
+				if (!meta.MeshIds.Contains(attachment.MeshOptions[idx].Id)) {
+					attachment.MeshOptions.Remove(attachment.MeshOptions[idx]);
 				}
+				idx++;
 			}
 		}
 
@@ -361,17 +377,22 @@ namespace Tangerine
 
 			public MaterialRow(Model3DAttachment.MaterialRemap material, ObservableCollection<Model3DAttachment.MaterialRemap> materials) : base(material, materials)
 			{
+				Nodes.Clear();
 				deleteButton.Unlink();
+				Layout = new VBoxLayout();
 				var ic = new InspectorContent(this) {
 					History = history
 				};
-				Layout = new VBoxLayout();
-				ic.BuildForObjects(new[] { material});
+				ic.BuildForObjects(new[] { material });
 				HeaderContainer = Nodes.First().AsWidget;
+				// Change displayed property name to material name.
 				editor = ic.ReadonlyEditors.OfType<InstancePropertyEditor<IMaterial>>().First();
 				HeaderContainer.Descendants.OfType<ThemedSimpleText>().FirstOrDefault().Text = material.SourceName;
-				HeaderContainer.AddNode(deleteButton);
+				// Remove redundant node.
+				HeaderContainer.Nodes.Last().UnlinkAndDispose();
+				HeaderContainer.Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing };
 				HeaderContainer.Presenter = DefaultPresenter.Instance;
+				HeaderContainer.AddNode(deleteButton);
 				Padding = Thickness.Zero;
 			}
 
@@ -397,69 +418,69 @@ namespace Tangerine
 
 		private ThemedScrollView CreateMaterialsRemapPane(Model3DAttachment attachment)
 		{
-			var pane = new ThemedScrollView {
-				Id = "MaterialsRemapScrollView",
-			};
-			pane.Content.Padding = new Thickness(10, AttachmentMetrics.Spacing);
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.Anchors = Anchors.LeftRightTopBottom;
-			var content = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			var remappedMaterialsFactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialRemap>(w => {
-				var materialRow = new MaterialRow(w, attachment.Materials);
-				materialRow.WarningText = "Source material not found";
-				materialRow.Tasks.Add(ValidateRowTask(materialRow, () => sourceMaterials.Any(m => m.Id == w.SourceName)));
-				return materialRow;
-			}, attachment.Materials);
-			var remappedMaterialsFooter = MaterialRow.CreateFooter(() => {
-				var menu = new Menu();
-				foreach (var material in GetValidForRemapMaterials(attachment.Materials, sourceMaterials)) {
-					ICommand command = new Command(material.Id, () => {
-						history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-							attachment.Materials,
-							attachment.Materials.Count,
-							new Model3DAttachment.MaterialRemap {
-								Material = material.Clone(),
-								SourceName = material.Id,
-						}));
-					});
-					menu.Add(command);
-				}
-				menu.Popup();
-			});
-			remappedMaterialsFactory.AddFooter(remappedMaterialsFooter);
-			content.Components.Add(remappedMaterialsFactory);
-			pane.Content.AddNode(content);
-			var list = new Widget {
-				Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
-				Padding = new Thickness(10f, 5f),
-				Visible = false
-			};
-			var widgetFactory = new AttachmentWidgetFactory<IMaterial>(
-				w => new SourceMaterialRow(w), sourceMaterials);
-			list.Components.Add(widgetFactory);
-			list.CompoundPostPresenter.Add(Presenters.WidgetBoundsPresenter);
-			var button = new ThemedExpandButton {
-				MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
-				LayoutCell = new LayoutCell(Alignment.LeftCenter),
-			};
-			var sourceMaterialNameWidget = new ThemedSimpleText("Source materials") {
-				VAlignment = VAlignment.Center,
-				ForceUncutText = false,
-			};
+			var container = CreateContentWrapper();
+			container.Content.Id = "MaterialsRemapScrollView";
+			container.Content.Padding = new Thickness(10, AttachmentMetrics.Spacing);
+			container.Content.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var content = new Widget {
+					Layout = new VBoxLayout(),
+				};
+				var remappedMaterialsFactory = new AttachmentWidgetFactory<Model3DAttachment.MaterialRemap>(w => {
+					var materialRow = new MaterialRow(w, attachment.Materials);
+					materialRow.WarningText = "Source material not found";
+					materialRow.Tasks.Add(ValidateRowTask(materialRow, () => sourceMaterials.Any(m => m.Id == w.SourceName)));
+					return materialRow;
+				}, attachment.Materials);
+				var remappedMaterialsFooter = MaterialRow.CreateFooter(() => {
+					var menu = new Menu();
+					foreach (var material in GetValidForRemapMaterials(attachment.Materials, sourceMaterials)) {
+						ICommand command = new Command(material.Id, () => {
+							history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+								attachment.Materials,
+								attachment.Materials.Count,
+								new Model3DAttachment.MaterialRemap {
+									Material = material.Clone(),
+									SourceName = material.Id,
+							}));
+						});
+						menu.Add(command);
+					}
+					menu.Popup();
+				});
+				remappedMaterialsFactory.AddFooter(remappedMaterialsFooter);
+				content.Components.Add(remappedMaterialsFactory);
+				container.Content.AddNode(content);
+				var list = new Widget {
+					Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },
+					Padding = new Thickness(10f, 5f),
+					Visible = false
+				};
+				list.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+					var widgetFactory = new AttachmentWidgetFactory<IMaterial>(
+					w => new SourceMaterialRow(w), sourceMaterials);
+					list.Components.Add(widgetFactory);
+					list.CompoundPostPresenter.Add(Presenters.WidgetBoundsPresenter);
+				}));
+				var button = new ThemedExpandButton {
+					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
+					LayoutCell = new LayoutCell(Alignment.LeftCenter),
+				};
+				var sourceMaterialNameWidget = new ThemedSimpleText("Source materials") {
+					VAlignment = VAlignment.Center,
+					ForceUncutText = false,
+				};
+				var header = new Widget {
 
-			var header = new Widget {
-
-				Layout = new HBoxLayout { Spacing =  AttachmentMetrics.Spacing },
-				Padding = new Thickness { Left = 4f, Right = 10f, Top = 15f },
-				Nodes = { button, sourceMaterialNameWidget }
-			};
-			list.AddChangeWatcher(() => button.Expanded, v => list.Visible = v);
-			pane.Content.AddNode(header);
-			pane.Content.AddNode(list);
-			pane.AddChangeWatcher(() => pane.ScrollPosition, sp => panelState.MaterialsScrollPosition = sp);
-			return pane;
+					Layout = new HBoxLayout { Spacing =  AttachmentMetrics.Spacing },
+					Padding = new Thickness { Left = 4f, Right = 10f, Top = 15f },
+					Nodes = { button, sourceMaterialNameWidget }
+				};
+				list.AddChangeWatcher(() => button.Expanded, v => list.Visible = v);
+				container.Content.AddNode(header);
+				container.Content.AddNode(list);
+				container.Content.AddChangeWatcher(() => container.ScrollPosition, sp => panelState.MaterialsScrollPosition = sp);
+			}));
+			return container;
 		}
 
 		private IEnumerator<object> ValidateRowTask<T>(DeletableRow<T> materialRow, Func<bool> validator)
@@ -497,13 +518,15 @@ namespace Tangerine
 					Padding = new Thickness { Left = 4f, Top = 5f, Bottom = 5f, Right = 5f },
 					Visible = false
 				};
-				wrapper.CompoundPostPresenter.Add(Presenters.WidgetBoundsPresenter);
 				AddNode(wrapper);
-				var ic = new InspectorContent(wrapper) {
-					History = history,
-					Enabled = false
-				};
-				ic.BuildForObjects(new[] { source });
+				wrapper.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+					wrapper.CompoundPostPresenter.Add(Presenters.WidgetBoundsPresenter);
+					var ic = new InspectorContent(wrapper) {
+						History = history,
+						Enabled = false
+					};
+					ic.BuildForObjects(new[] { source });
+				}));
 				wrapper.AddChangeWatcher(() => button.Expanded, v => wrapper.Visible = v);
 				Padding = new Thickness(0f, 5f);
 				Presenter = Presenters.StripePresenter;
@@ -571,26 +594,26 @@ namespace Tangerine
 			Model3DAttachmentParser.Save(attachment, Path.Combine(Project.Current.AssetsDirectory, contentPath));
 		}
 
-		private static Widget CreateComponentsPane(Model3DAttachment attachment)
+		private static ThemedScrollView CreateComponentsPane(Model3DAttachment attachment)
 		{
-			var pane = new ThemedScrollView();
-			var list = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			pane.Content.Padding = new Thickness { Right = 10 };
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.NodeComponentCollection>(
-				w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
-			widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
-			widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-					attachment.NodeComponents,
-					attachment.NodeComponents.Count,
-					new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
+			var container = CreateContentWrapper();
+			container.Content.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var list = new Widget {
+					Layout = new VBoxLayout(),
+				};
+				container.Content.AddNode(list);
+				var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.NodeComponentCollection>(
+					w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
+				widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
+				widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+						attachment.NodeComponents,
+						attachment.NodeComponents.Count,
+						new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
+				}));
+				list.Components.Add(widgetFactory);
 			}));
-			list.Components.Add(widgetFactory);
-			return pane;
+			return container;
 		}
 
 		private static void CheckErrors(Model3DAttachment attachment, Model3D source)
@@ -619,89 +642,97 @@ namespace Tangerine
 			}
 		}
 
-		private static Widget CreateNodeRemovalsPane(Model3DAttachment attachment)
+		private static ThemedScrollView CreateNodeRemovalsPane(Model3DAttachment attachment)
 		{
-			var pane = new ThemedScrollView();
-			pane.Content.Padding = new Thickness { Right = 10 };
-			var list = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.NodeRemoval>(
-				w => new NodeRemovalRow(w, attachment.NodeRemovals), attachment.NodeRemovals);
-			widgetFactory.AddHeader(NodeRemovalRow.CreateHeader());
-			widgetFactory.AddFooter(NodeRemovalRow.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-					attachment.NodeRemovals,
-					attachment.NodeRemovals.Count,
-					new Model3DAttachment.NodeRemoval { NodeId = "NodeRemoval" }
-				));
+			var pane = CreateContentWrapper();
+			pane.Content.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var list = new Widget {
+					Layout = new VBoxLayout(),
+				};
+				pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+				pane.Content.AddNode(list);
+				var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.NodeRemoval>(
+					w => new NodeRemovalRow(w, attachment.NodeRemovals), attachment.NodeRemovals);
+				widgetFactory.AddHeader(NodeRemovalRow.CreateHeader());
+				widgetFactory.AddFooter(NodeRemovalRow.CreateFooter(() => {
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+						attachment.NodeRemovals,
+						attachment.NodeRemovals.Count,
+						new Model3DAttachment.NodeRemoval { NodeId = "NodeRemoval" }
+					));
+				}));
+				list.Components.Add(widgetFactory);
 			}));
-			list.Components.Add(widgetFactory);
 			return pane;
 		}
 
 		private ThemedScrollView CreateAnimationsPane(Model3DAttachment attachment)
 		{
-			var pane = new ThemedScrollView {
-				Id = "AnimationsScrollView",
-				Padding = new Thickness { Right = 10 },
-			};
-			var list = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(CreateEntryAnimationEditor(attachment));
-			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
-				w => {
-					var animationRow = new AnimationRow(w, attachment, sourceAnimationIds);
-					animationRow.WarningText = "Source animation not found";
-					animationRow.Tasks.Add(ValidateRowTask(animationRow, () => {
-						return sourceAnimationIds.Any(a => a == w.SourceAnimationId);
-					}));
-					return animationRow;
-				}, attachment.Animations);
-			widgetFactory.AddHeader(AnimationRow.CreateHeader());
-			widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
-				history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-					attachment.Animations,
-					attachment.Animations.Count,
-					new Model3DAttachment.Animation { Id = "Animation", }
-				));
+			var container = CreateContentWrapper();
+			container.Id = "AnimationsScrollView";
+			container.Content.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var list = new Widget {
+					Layout = new VBoxLayout(),
+				};
+				container.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+				container.Content.AddNode(CreateEntryAnimationEditor(attachment));
+				container.Content.AddNode(list);
+				var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.Animation>(
+					w => {
+						var animationRow = new AnimationRow(w, attachment, sourceAnimationIds);
+						animationRow.WarningText = "Source animation not found";
+						animationRow.Tasks.Add(ValidateRowTask(animationRow, () => {
+							return sourceAnimationIds.Any(a => a == w.SourceAnimationId);
+						}));
+						return animationRow;
+					}, attachment.Animations);
+				widgetFactory.AddHeader(AnimationRow.CreateHeader());
+				widgetFactory.AddFooter(AnimationRow.CreateFooter(() => {
+					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+						attachment.Animations,
+						attachment.Animations.Count,
+						new Model3DAttachment.Animation { Id = "Animation", }
+					));
+				}));
+				list.Components.Add(widgetFactory);
+				container.AddChangeWatcher(() => container.ScrollPosition, sp => panelState.AnimationsScrollPosition = sp);
 			}));
-			list.Components.Add(widgetFactory);
-			pane.AddChangeWatcher(() => pane.ScrollPosition, sp => panelState.AnimationsScrollPosition = sp);
-			return pane;
+			return container;
 		}
 
-		private Widget CreateMeshOptionsPane()
+		private ThemedScrollView CreateMeshOptionsPane()
 		{
-			var pane = new ThemedScrollView();
-			pane.Content.Padding = new Thickness { Right = 10 };
-			var list = new Widget {
-				Layout = new VBoxLayout(),
-			};
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
-			pane.Content.AddNode(list);
-			var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MeshOption>(w => new MeshRow(w), meshOptions);
-			widgetFactory.AddHeader(MeshRow.CreateHeader());
-			list.Components.Add(widgetFactory);
-			return pane;
+			var container = CreateContentWrapper();
+			container.Content.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+				var list = new Widget {
+					Layout = new VBoxLayout(),
+				};
+				container.Content.AddNode(list);
+				var widgetFactory = new AttachmentWidgetFactory<Model3DAttachment.MeshOption>(w => new MeshRow(w), meshOptions);
+				widgetFactory.AddHeader(MeshRow.CreateHeader());
+				list.Components.Add(widgetFactory);
+			}));
+			return container;
 		}
 
-		private static Widget CreateGeneralPane(Model3DAttachment attachment)
+		private static ThemedScrollView CreateGeneralPane(Model3DAttachment attachment)
 		{
-			var pane = new ThemedScrollView();
-			pane.Content.Padding = new Thickness(10, AttachmentMetrics.Spacing);
-			pane.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			var container = CreateContentWrapper();
+			container.Content.Padding = new Thickness(10, AttachmentMetrics.Spacing);
 			new FloatPropertyEditor(Decorate(new PropertyEditorParams(
-					pane.Content,
+					container.Content,
 					attachment,
 					nameof(Model3DAttachment.ScaleFactor),
 					nameof(Model3DAttachment.ScaleFactor)), displayLabel: true));
-			return pane;
+			return container;
+		}
+
+		private static ThemedScrollView CreateContentWrapper()
+		{
+			var sv = new ThemedScrollView();
+			sv.Content.Padding = new Thickness { Right = 10 };
+			sv.Content.Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing };
+			return sv;
 		}
 
 		private static void SetProperty(object obj, string propertyname, object value)
@@ -795,7 +826,7 @@ namespace Tangerine
 						deleteButton,
 					}
 				};
-				Nodes.Add(HeaderContainer = new Widget() {
+				Nodes.Add(HeaderContainer = new Widget {
 					Layout = new HBoxLayout(),
 					Nodes = {
 						Header,
@@ -987,13 +1018,18 @@ namespace Tangerine
 		private class AnimationRow : DeletableRow<Model3DAttachment.Animation>
 		{
 			private readonly ThemedExpandButton expandedButton;
+			private readonly ThemedDropDownList sourceAnimationSelector;
+			private readonly ObservableCollection<string> sourceAnimationIds;
+
 			public AnimationRow(Model3DAttachment.Animation animation, Model3DAttachment attachment, ObservableCollection<string> sourceAnimationIds)
 				: base(animation, attachment.Animations)
 			{
+				this.sourceAnimationIds = sourceAnimationIds;
 				Layout = new VBoxLayout();
 				expandedButton = new ThemedExpandButton {
 					MinMaxSize = new Vector2(AttachmentMetrics.ExpandButtonSize),
-					Anchors = Anchors.Left
+					Anchors = Anchors.Left,
+					Id = "AnimationRowExpandedButton"
 				};
 				HeaderContainer.Padding = new Thickness(AttachmentMetrics.Spacing);
 				Header.Nodes.Add(expandedButton);
@@ -1005,7 +1041,7 @@ namespace Tangerine
 						nameof(Model3DAttachment.Animation.Id))));
 				animationNamePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0.0f;
 
-				var sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+				sourceAnimationSelector = new ThemedDropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
 
 				foreach (var sourceAnimationId in sourceAnimationIds) {
 					sourceAnimationSelector.Items.Add(new CommonDropDownList.Item(sourceAnimationId));
@@ -1014,12 +1050,7 @@ namespace Tangerine
 					animation.SourceAnimationId = sourceAnimationIds.FirstOrDefault();
 				}
 
-				sourceAnimationIds.CollectionChanged += (sender, args) => {
-					sourceAnimationSelector.Items.Clear();
-					foreach (var animationId in sourceAnimationIds) {
-						sourceAnimationSelector.Items.Add(new CommonDropDownList.Item(animationId));
-					}
-				};
+				sourceAnimationIds.CollectionChanged +=  SourceAnimationIdsOnCollectionChanged;
 				sourceAnimationSelector.AsWidget.MinWidth = 0.0f;
 				sourceAnimationSelector.Text = animation.SourceAnimationId;
 				Header.AddNode(sourceAnimationSelector);
@@ -1053,8 +1084,8 @@ namespace Tangerine
 					},
 					Visible = false,
 				};
-
-				BuildList<Model3DAttachment.MarkerData, MarkerRow>(
+				expandableContentWrapper.Components.Add(new CreateContentOnVisibleBehaviour(() => {
+					BuildList<Model3DAttachment.MarkerData, MarkerRow>(
 					animation.Markers,
 					expandableContentWrapper,
 					"Markers",
@@ -1066,28 +1097,29 @@ namespace Tangerine
 					},
 					MarkerRow.CreateHeader());
 
-				BuildList<Model3DAttachment.MarkerBlendingData, MarkerBlendingRow>(
-					animation.MarkersBlendings,
-					expandableContentWrapper,
-					"Marker Blendings",
-					() => new Model3DAttachment.MarkerBlendingData {
-						SourceMarkerId = "Marker2",
-						DestMarkerId = "Marker1"
-					},
-					MarkerBlendingRow.CreateHeader());
-				BuildList<Model3DAttachment.NodeData, NodeRow>(
-					animation.Nodes,
-					expandableContentWrapper,
-					"Nodes",
-					() => new Model3DAttachment.NodeData { Id = "NodeId" },
-					NodeRow.CreateHeader());
+					BuildList<Model3DAttachment.MarkerBlendingData, MarkerBlendingRow>(
+						animation.MarkersBlendings,
+						expandableContentWrapper,
+						"Marker Blendings",
+						() => new Model3DAttachment.MarkerBlendingData {
+							SourceMarkerId = "Marker2",
+							DestMarkerId = "Marker1"
+						},
+						MarkerBlendingRow.CreateHeader());
+					BuildList<Model3DAttachment.NodeData, NodeRow>(
+						animation.Nodes,
+						expandableContentWrapper,
+						"Nodes",
+						() => new Model3DAttachment.NodeData { Id = "NodeId" },
+						NodeRow.CreateHeader());
 
-				BuildList<Model3DAttachment.NodeData, NodeRow>(
-					animation.IgnoredNodes,
-					expandableContentWrapper,
-					"Ignored Nodes",
-					() => new Model3DAttachment.NodeData { Id = "NodeId" },
-					NodeRow.CreateHeader());
+					BuildList<Model3DAttachment.NodeData, NodeRow>(
+						animation.IgnoredNodes,
+						expandableContentWrapper,
+						"Ignored Nodes",
+						() => new Model3DAttachment.NodeData { Id = "NodeId" },
+						NodeRow.CreateHeader());
+				}));
 
 				Nodes.Add(expandableContentWrapper);
 				expandableContentWrapper.AddChangeWatcher(
@@ -1095,6 +1127,20 @@ namespace Tangerine
 					(v) => expandableContentWrapper.Visible = v);
 				CompoundPresenter.Add(Presenters.StripePresenter);
 				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
+			}
+
+			private void SourceAnimationIdsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+			{
+				sourceAnimationSelector.Items.Clear();
+				foreach (var animationId in sourceAnimationIds) {
+					sourceAnimationSelector.Items.Add(new CommonDropDownList.Item(animationId));
+				}
+			}
+
+			public override void Dispose()
+			{
+				sourceAnimationIds.CollectionChanged -= SourceAnimationIdsOnCollectionChanged;
+				base.Dispose();
 			}
 
 			public void Expand() => expandedButton.Expanded = true;
@@ -1508,6 +1554,27 @@ namespace Tangerine
 			public void AddFooter(Widget footer)
 			{
 				wrapper.AddNode(footer);
+			}
+		}
+
+		public class CreateContentOnVisibleBehaviour : NodeBehavior
+		{
+			private bool isBuilt;
+			private readonly Action builder;
+
+			public CreateContentOnVisibleBehaviour(Action builder)
+			{
+				this.builder = builder;
+			}
+
+			public override void Update(float delta)
+			{
+				base.Update(delta);
+				if (!isBuilt && Owner.AsWidget.Visible) {
+					isBuilt = true;
+					builder();
+					Owner.Components.Remove(this);
+				}
 			}
 		}
 	}

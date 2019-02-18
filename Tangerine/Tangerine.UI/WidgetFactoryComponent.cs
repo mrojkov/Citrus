@@ -25,6 +25,12 @@ namespace Tangerine.UI
 			Rebuild();
 		}
 
+		public override void Dispose()
+		{
+			Source.CollectionChanged -= OnCollectionChanged;
+			base.Dispose();
+		}
+
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			oldOwner?.Nodes.Clear();
