@@ -82,7 +82,7 @@ namespace Tangerine.UI
 			widget.Gestures.Add(drag);
 			yield return null;
 			while (true) {
-				if (widget.GloballyEnabled && drag.WasBegan()) {
+				if (widget.GloballyEnabled && drag.WasRecognized()) {
 					using (Document.Current?.History?.BeginTransaction()) {
 						input.ConsumeKey(Key.Mouse0);
 						WidgetContext.Current.Root.Input.ConsumeKey(Key.Mouse0);
