@@ -79,7 +79,7 @@ namespace Lime.SignedDistanceField
 				materialProvider.Material.Dilate = s.Dilate;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.1f;
 				if (providers == null) {
 					providers = new List<SDFShadowMaterialProvider>();
 				}
@@ -99,7 +99,7 @@ namespace Lime.SignedDistanceField
 				materialProvider.Material.TextSoftness = Softness;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.1f;
 				if (InnerShadowsMaterialProviders == null) {
 					InnerShadowsMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
 				}
@@ -114,6 +114,16 @@ namespace Lime.SignedDistanceField
 					action.Do(this);
 				}
 			}
+		}
+
+		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
+		{
+			if (offset.X != 0f || offset.Y != 0f) {
+				Renderer.Transform1 = LocalToWorldTransform * Matrix32.Translation(offset);
+			} else {
+				Renderer.Transform1 = LocalToWorldTransform;
+			}
+			SpriteList.Render(Color, materialProvider);
 		}
 
 		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider)

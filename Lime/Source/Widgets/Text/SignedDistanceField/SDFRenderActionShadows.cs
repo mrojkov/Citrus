@@ -11,7 +11,7 @@ namespace Lime.SignedDistanceField
 		public override void Do(SDFRenderObject ro)
 		{
 			foreach (var provider in ro.OverlaysMaterialProviders) {
-				ro.RenderSpriteList(provider);
+				ro.RenderSpriteList(provider, provider.Material.Offset);
 			}
 		}
 	}
@@ -25,7 +25,7 @@ namespace Lime.SignedDistanceField
 		public override void Do(SDFRenderObject ro)
 		{
 			foreach (var provider in ro.ShadowsMaterialProviders) {
-				ro.RenderSpriteList(provider);
+				ro.RenderSpriteList(provider, provider.Material.Offset);
 			}
 		}
 	}
@@ -39,7 +39,7 @@ namespace Lime.SignedDistanceField
 		public override void Do(SDFRenderObject ro)
 		{
 			foreach (var provider in ro.InnerShadowsMaterialProviders) {
-				ro.RenderSpriteList(provider);
+				ro.RenderSpriteList(provider, provider.Material.Offset);
 			}
 		}
 	}
