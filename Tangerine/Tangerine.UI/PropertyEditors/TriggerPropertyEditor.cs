@@ -7,89 +7,136 @@ namespace Tangerine.UI
 {
 	public class TriggerPropertyEditor : CommonPropertyEditor<string>
 	{
-		private ComboBox comboBox;
-		public delegate void FillValuesDelegate(IEnumerable<object> objects, ComboBox comboBox);
+		private readonly EditBox editBox;
+		private readonly Button button;
+		private readonly Node node;
 
-		public TriggerPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		private List<string> CurrentTriggers
 		{
-			comboBox = new ThemedComboBox { LayoutCell = new LayoutCell(Alignment.Center) };
-			EditorContainer.AddNode(comboBox);
-			EditorContainer.AddNode(Spacer.HStretch());
-			comboBox.Changed += ComboBox_Changed;
-			Invalidate();
-			comboBox.AddChangeWatcher(CoalescedPropertyValue(), v => comboBox.Text = v.IsDefined ? v.Value : ManyValuesText);
+			get
+			{
+				return (CoalescedPropertyValue().GetValue().Value ?? "").
+					Split(',').
+					Select(el => el.Trim()).
+					ToList();
+			}
 		}
 
+		public TriggerPropertyEditor(IPropertyEditorParams editorParams, bool multiline = false) : base(editorParams)
+		{
+			if (EditorParams.Objects.Skip(1).Any()) {
+				EditorContainer.AddNode(CreateWarning("Edit of triggers isn't supported for multiple selection."));
+				return;
+			}
+			node = (Node)editorParams.Objects.First();
+			button = new ThemedButton {
+				Text = "...",
+				MinMaxWidth = 20,
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			var color = button.GlobalColor;
+			EditorContainer.AddNode(editBox = editorParams.EditBoxFactory());
+			EditorContainer.AddNode(Spacer.HSpacer(4));
+			EditorContainer.AddNode(button);
+			EditorContainer.AddNode(Spacer.HStretch());
+			editBox.Submitted += text => {
+				var newValue = FilterTriggers(text);
+				editBox.Text = newValue;
+				SetProperty(newValue);
+			};
+			button.Clicked += () => {
+				var window = new TriggerSelectionDialog(
+					GetAvailableTriggers(),
+					new HashSet<string>(CurrentTriggers),
+					s => {
+						s = FilterTriggers(s);
+						SetProperty(s);
+						editBox.Text = s;
+					}
+				);
+			};
+			Invalidate();
+		}
 
 		public void Invalidate()
 		{
-			comboBox.Items.Clear();
-			foreach (var obj in EditorParams.Objects) {
-				var node = (Node)obj;
-				foreach (var a in node.Animations) {
-					foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
-						var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
-						if (!comboBox.Items.Any(i => i.Text == id)) {
-							comboBox.Items.Add(new DropDownList.Item(id));
-						}
-					}
-				}
+			var value = CoalescedPropertyValue().GetValue().Value;
+			if (node != null && editBox != null) {
+				editBox.Text = FilterTriggers(value);
 			}
 		}
 
-		void ComboBox_Changed(DropDownList.ChangedEventArgs args)
+		private Dictionary<string, HashSet<string>> GetAvailableTriggers()
 		{
-			if (!args.ChangedByUser)
-				return;
-			var newTrigger = (string)args.Value;
-			var currentTriggers = CoalescedPropertyValue().GetValue();
-			if (string.IsNullOrWhiteSpace(currentTriggers.Value) || args.Index < 0) {
-				// Keep existing and remove absent triggers after hand input.
-				var availableTriggers = new HashSet<string>(comboBox.Items.Select(item => item.Text));
-				var setTrigger = string.Join(
-					",",
-					newTrigger.
-						Split(',').
-						Select(el => el.Trim()).
-						Where(el => availableTriggers.Contains(el)).
-						Distinct(new TriggerStringComparer())
-				);
-				if (setTrigger.Length == 0) {
-					comboBox.Text = currentTriggers.IsDefined ? currentTriggers.Value : ManyValuesText;
-					return;
-				}
-				SetProperty(setTrigger);
-				if (setTrigger != newTrigger) {
-					comboBox.Text = setTrigger;
-				}
-				return;
-			}
-			var triggers = new List<string>();
-			var added = false;
-			SplitTrigger(newTrigger, out _, out var newAnimation);
-			foreach (var trigger in currentTriggers.Value.Split(',').Select(i => i.Trim())) {
-				SplitTrigger(trigger, out _, out var animation);
-				if (animation == newAnimation) {
-					if (!added) {
-						added = true;
-						triggers.Add(newTrigger);
+			var triggers = new Dictionary<string, HashSet<string>>();
+			foreach (var a in node.Animations) {
+				foreach (var m in a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id))) {
+					var id = a.Id != null ? m.Id + '@' + a.Id : m.Id;
+					var key = a.Id ?? "Primary";
+					if (!triggers.Keys.Contains(key)) {
+						triggers[key] = new HashSet<string>();
 					}
-				} else {
-					triggers.Add(trigger);
+					if (!triggers[key].Contains(id)) {
+						triggers[key].Add(id);
+					}
 				}
 			}
-			if (!added) {
-				triggers.Add(newTrigger);
+			return triggers;
+		}
+
+		private bool EnsureMarkersAvailable()
+		{
+			foreach (var a in node.Animations) {
+				if (a.Markers.Where(i => i.Action != MarkerAction.Jump && !string.IsNullOrEmpty(i.Id)).ToList().Count > 0) {
+					return true;
+				}
 			}
-			var newValue = string.Join(",", triggers);
-			SetProperty(newValue);
-			comboBox.Text = newValue;
+			return false;
+		}
+
+		private Widget CreateWarning(string message)
+		{
+			return new Widget() {
+				Layout = new HBoxLayout(),
+				Nodes = {
+					new ThemedSimpleText {
+						Text = message,
+						Padding = Theme.Metrics.ControlsPadding,
+						LayoutCell = new LayoutCell(Alignment.Center),
+						VAlignment = VAlignment.Center,
+						ForceUncutText = false
+					}
+				},
+				Presenter = new WidgetFlatFillPresenter(Theme.Colors.WarningBackground)
+			};
 		}
 
 		protected override void EnabledChanged()
 		{
 			base.EnabledChanged();
-			comboBox.Enabled = Enabled;
+			editBox.Enabled = button.Enabled = Enabled;
+		}
+
+		private string FilterTriggers(string text)
+		{
+			var newValue = "";
+			if (!string.IsNullOrEmpty(text)) {
+				var triggersToSet = text.Split(',').ToList();
+				var triggers = GetAvailableTriggers();
+				var newTriggers = new Dictionary<string, string>();
+				foreach (var key in triggers.Keys) {
+					foreach (var trigger in triggersToSet) {
+						if (triggers[key].Contains(trigger.Trim(' '))) {
+							newValue += $"{trigger.Trim(' ')},";
+							break;
+						}
+					}
+				}
+				if (!string.IsNullOrEmpty(newValue)) {
+					newValue = newValue.Trim(',');
+				}
+			}
+			return newValue;
 		}
 
 		protected static void SplitTrigger(string trigger, out string markerId, out string animationId)
