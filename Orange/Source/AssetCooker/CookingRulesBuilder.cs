@@ -398,7 +398,7 @@ namespace Orange
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
 			var rulesStack = new Stack<CookingRules>();
-			var map = new Dictionary<string, CookingRules>();
+			var map = new Dictionary<string, CookingRules>(StringComparer.OrdinalIgnoreCase);
 			pathStack.Push("");
 			var rootRules = new CookingRules();
 			rootRules.DeduceEffectiveRules(target);

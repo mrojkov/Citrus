@@ -1042,7 +1042,7 @@ namespace Orange
 
 		static void SyncAtlases()
 		{
-			var textures = new Dictionary<string, DateTime>();
+			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				textures[fileInfo.Path] = fileInfo.LastWriteTime;
 			}
