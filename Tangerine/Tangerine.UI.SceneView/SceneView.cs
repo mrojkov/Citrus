@@ -115,6 +115,16 @@ namespace Tangerine.UI.SceneView
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
+
+			// To allow set custom layers for scene content.
+			Scene.Layer = 1;
+			Frame.Layer = RenderChain.LayerCount - 1;
+			Panel.Layer = RenderChain.LayerCount - 1;
+			InputArea.Layer = RenderChain.LayerCount - 1;
+			RulersWidget.Layer = RenderChain.LayerCount - 1;
+			ZoomWidget.Layer = RenderChain.LayerCount - 1;
+			ShowNodeDecorationsPanelButton.Layer = RenderChain.LayerCount - 1;
+
 			OnCreate?.Invoke(this);
 		}
 
