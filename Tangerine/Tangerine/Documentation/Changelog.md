@@ -1,3 +1,12 @@
+##### Changelog 20.02.2019
+
+* Переделан интерфейс работы с триггерами [CIT-1062](https://jira.game-forest.com:2000/browse/CIT-1062), [CIT-1112](https://jira.game-forest.com:2000/browse/CIT-1112)
+
+Багфиксы:
+
+* Исправлена ошибка, когда из параллельной анимации вызывались неиспользуемые триггеры [CIT-1118](https://jira.game-forest.com:2000/browse/CIT-1118)
+* Исправлена ошибка, при которой вызов "Update XCode Project" пересобирал все доступные бандлы [CIT-1125](https://jira.game-forest.com:2000/browse/CIT-1125)
+
 ##### Changelog 15.02.2019
 
 * Реализована возможность объединять меши с одинаковыми материалами в Model3D [CIT-1115](https://jira.game-forest.com:2000/browse/CIT-1115)
