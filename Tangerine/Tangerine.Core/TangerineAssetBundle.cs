@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -50,7 +51,7 @@ namespace Tangerine.Core
 				foreach (var path in cacheBundle.EnumerateFiles().ToList()) {
 					cacheBundle.DeleteFile(path);
 				}
-				TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, AssetAttributes.None, new byte[0]);
+				TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, DateTime.Now, AssetAttributes.None, new byte[0]);
 			}
 		}
 
@@ -62,7 +63,7 @@ namespace Tangerine.Core
 				var fbxPath = Path.ChangeExtension(path, "fbx");
 				var existsFbx = base.FileExists(fbxPath);
 				if (existsFbx && exists3DScene) {
-					throw new Exception($"Ambiguity between: {path} and {fbxPath}");
+					throw new Lime.Exception($"Ambiguity between: {path} and {fbxPath}");
 				}
 				return exists3DScene ? base.OpenFile(path) : OpenFbx(path);
 			}
@@ -117,7 +118,7 @@ namespace Tangerine.Core
 				var attachmentMetaPath = Path.ChangeExtension(path, Model3DAttachmentMeta.FileExtension);
 				var attachmentMetaCached = cacheBundle.FileExists(attachmentMetaPath);
 				var attachmentMetaUpToDate = attachmentMetaCached &&
-					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) >= base.GetFileLastWriteTime(fbxPath);
+					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) != base.GetFileLastWriteTime(fbxPath);
 				if (!attachmentMetaUpToDate && fbxExists) {
 					using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
 						model = fbxImporter.LoadModel();
@@ -138,6 +139,7 @@ namespace Tangerine.Core
 							cacheBundle,
 							attachmentMetaPath,
 							meta, Serialization.Format.Binary, Model3DAttachmentMeta.FileExtension,
+							base.GetFileLastWriteTime(fbxPath),
 							AssetAttributes.None, new byte[0]);
 					}
 				}
@@ -179,14 +181,16 @@ namespace Tangerine.Core
 						animationPathWithoutExt = Animation.FixAntPath(animationPathWithoutExt);
 						var animationPath = animationPathWithoutExt + ".ant";
 						animation.ContentsPath = animationPathWithoutExt;
-						Serialization.WriteObjectToBundle(cacheBundle, animationPath, animation.GetData(), Serialization.Format.Binary, ".ant", AssetAttributes.None, new byte[0]);
+						Serialization.WriteObjectToBundle(cacheBundle, animationPath, animation.GetData(), Serialization.Format.Binary, ".ant",
+							base.GetFileLastWriteTime(fbxPath), AssetAttributes.None, new byte[0]);
 						var animators = new List<IAnimator>();
 						animation.FindAnimators(animators);
 						foreach (var animator in animators) {
 							animator.Owner.Animators.Remove(animator);
 						}
 					}
-					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d", AssetAttributes.None, new byte[0]);
+					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d",
+						base.GetFileLastWriteTime(fbxPath), AssetAttributes.None, new byte[0]);
 
 				} else if (fbxCached) {
 					cacheBundle.DeleteFile(path);
@@ -198,6 +202,7 @@ namespace Tangerine.Core
 						cacheBundle,
 						attachmentPath,
 						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Serialization.Format.Binary, ".txt",
+						base.GetFileLastWriteTime(attachmentPath),
 						AssetAttributes.None, new byte[0]);
 				} else if (attachmentCached) {
 					cacheBundle.DeleteFile(attachmentPath);
@@ -213,7 +218,7 @@ namespace Tangerine.Core
 				var fbxPath = Path.ChangeExtension(path, "fbx");
 				var existsFbx = base.FileExists(fbxPath);
 				if (existsFbx && exists3DScene) {
-					throw new Exception($"Ambiguity between: {path} and {fbxPath}");
+					throw new Lime.Exception($"Ambiguity between: {path} and {fbxPath}");
 				}
 				return exists3DScene || existsFbx;
 			}

@@ -1060,8 +1060,6 @@ namespace Orange
 				if (bundleSHA1 == null) {
 					throw new InvalidOperationException("CookingRules SHA1 for atlas part shouldn't be null");
 				}
-				var a = AssetBundle.GetFileLastWriteTime(atlasPartPath);
-				var b = textures[srcTexturePath];
 				if (
 					!textures.ContainsKey(srcTexturePath) ||
 					AssetBundle.GetFileLastWriteTime(atlasPartPath) != textures[srcTexturePath] ||
