@@ -157,6 +157,12 @@ namespace Tangerine.UI
 		public static readonly ICommand RenderToPngSequence = new Command("Render to PNG sequence");
 	}
 
+	public static class GitCommands
+	{
+		public static readonly ICommand ForceUpdate = new Command("Force update");
+		public static readonly ICommand Update = new Command("Update");
+	}
+
 	public static class FilesystemCommands
 	{
 		public static readonly ICommand Left = new Command(Key.Left);

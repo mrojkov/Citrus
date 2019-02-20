@@ -16,29 +16,6 @@ namespace Orange
 		private static string targetDirectory;
 		private static string newProjectCitprojPath;
 
-		private static void Exec(string name, string args)
-		{
-			var process = new System.Diagnostics.Process {
-				StartInfo = {
-					FileName = name,
-					Arguments = args,
-					UseShellExecute = false,
-					WorkingDirectory = targetDirectory,
-				}
-			};
-			process.Start();
-			process.WaitForExit();
-			if (process.ExitCode != 0) {
-				Console.WriteLine($"Process {name} {args} exited with code {process.ExitCode}");
-				throw new InvalidOperationException();
-			}
-		}
-
-		private static void Git(string gitArgs)
-		{
-			Exec("git", gitArgs);
-		}
-
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "New Project")]
 		[ExportMetadata("Priority", 3)]
@@ -101,11 +78,11 @@ namespace Orange
 					}
 #if WIN
 // TODO: fix unresponsiveness on mac
-					Git("init");
-					Git("add -A");
-					Git("submodule add https://gitlab.game-forest.com:8888/Common/Citrus.git Citrus");
-					Git("submodule update --init --recursive");
-					Git("commit -m\"Initial commit.\"");
+					Git.Exec(targetDirectory, "init");
+					Git.Exec(targetDirectory, "add -A");
+					Git.Exec(targetDirectory, "submodule add https://gitlab.game-forest.com:8888/Common/Citrus.git Citrus");
+					Git.Exec(targetDirectory, "submodule update --init --recursive");
+					Git.Exec(targetDirectory, "commit -m\"Initial commit.\"");
 #endif // WIN
 				}
 

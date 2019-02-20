@@ -194,6 +194,10 @@ namespace Tangerine
 					GenericCommands.PreviousDocument
 				}),
 				orangeCommand,
+				new Command("Git", new Menu {
+					GitCommands.ForceUpdate,
+					GitCommands.Update,
+				}),
 				new Command("Help", new Menu {
 					GenericCommands.ViewHelp,
 					GenericCommands.HelpMode,

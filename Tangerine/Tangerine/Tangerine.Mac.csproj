@@ -93,6 +93,7 @@
     <Compile Include="Panels\TreeView.cs" />
     <Compile Include="Panels\AttachmentPanel.cs" />
     <Compile Include="Dialogs\RenderToPngSequenceDialog.cs" />
+    <Compile Include="MainMenu\GitMenu.cs" />
     <Compile Include="MainMenu\ToolsMenu.cs" />
   </ItemGroup>
   <ItemGroup>
