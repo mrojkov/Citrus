@@ -15,6 +15,12 @@ namespace Lime
 		public event Action Stopped;
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		public string RunningMarkerId { get; set; }
+		
+		[YuzuMember]
+		public bool IsCompound { get; set; }
+		
+		[YuzuMember]
+		public AnimationTrackList Tracks { get; private set; } = new AnimationTrackList();
 
 		[YuzuMember]
 		[TangerineIgnore]
@@ -139,6 +145,7 @@ namespace Lime
 			clone.Owner = null;
 			clone.Next = null;
 			clone.Markers = MarkerList.DeepClone(Markers, clone);
+			clone.Tracks = Tracks.Clone();
 			return clone;
 		}
 
