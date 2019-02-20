@@ -15,12 +15,13 @@ namespace Lime
 		public event Action Stopped;
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		public string RunningMarkerId { get; set; }
-		
+
 		[YuzuMember]
 		public bool IsCompound { get; set; }
-		
+
 		[YuzuMember]
-		public AnimationTrackList Tracks { get; private set; } = new AnimationTrackList();
+		[TangerineIgnore]
+		public AnimationTrackList Tracks { get; private set; }
 
 		[YuzuMember]
 		[TangerineIgnore]
@@ -74,6 +75,7 @@ namespace Lime
 		public Animation()
 		{
 			Markers = new MarkerList(this);
+			Tracks = new AnimationTrackList(this);
 		}
 
 		public void Advance(float delta)
@@ -145,7 +147,7 @@ namespace Lime
 			clone.Owner = null;
 			clone.Next = null;
 			clone.Markers = MarkerList.DeepClone(Markers, clone);
-			clone.Tracks = Tracks.Clone();
+			clone.Tracks = Tracks.Clone(clone);
 			return clone;
 		}
 

@@ -288,6 +288,8 @@
     <Compile Include="Source\Widgets\3D\RenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Animation\Easing.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationClip.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationTrack.cs" />
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />

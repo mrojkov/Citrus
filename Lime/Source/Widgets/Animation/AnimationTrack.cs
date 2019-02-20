@@ -1,20 +1,54 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
-	public class AnimationTrack : IList<AnimationClip>
+	public class AnimationTrack
 	{
-		private readonly List<AnimationClip> clips;
-		public AnimationTrackList Owner { get; internal set; }
+		public Animation Owner { get; internal set; }
 
-		public int Count => clips.Count;
-		public bool IsReadOnly => false;
+		[YuzuMember]
+		public string Id { get; set; }
+
+		[YuzuMember]
+		public AnimationClipList Clips { get; private set; }
+
+		public AnimationTrack()
+		{
+			Clips = new AnimationClipList(this);
+		}
 
 		public AnimationTrack(int capacity = 0)
 		{
-			clips = new List<AnimationClip>(capacity);
+			Clips = new AnimationClipList(this, capacity);
+		}
+
+		public AnimationTrack Clone()
+		{
+			var result = (AnimationTrack)MemberwiseClone();
+			result.Owner = null;
+			result.Clips = new AnimationClipList(result, Clips.Count);
+			foreach (var clip in Clips) {
+				result.Clips.Add(clip.Clone());
+			}
+			return result;
+		}
+	}
+
+	public class AnimationTrackList : IList<AnimationTrack>
+	{
+		private readonly List<AnimationTrack> tracks;
+		private readonly Animation owner;
+
+		public int Count => tracks.Count;
+		public bool IsReadOnly => false;
+
+		public AnimationTrackList(Animation owner, int capacity = 0)
+		{
+			this.owner = owner;
+			tracks = new List<AnimationTrack>(capacity);
 		}
 
 		public void Clear()
@@ -24,120 +58,71 @@ namespace Lime
 			}
 		}
 
-		public bool Contains(AnimationClip item) => clips.Contains(item);
-		public void CopyTo(AnimationClip[] array, int arrayIndex) => clips.CopyTo(array, arrayIndex);
-		public List<AnimationClip>.Enumerator GetEnumerator() => clips.GetEnumerator();
+		public bool Contains(AnimationTrack item) => tracks.Contains(item);
+		public void CopyTo(AnimationTrack[] array, int arrayIndex) => tracks.CopyTo(array, arrayIndex);
+		public List<AnimationTrack>.Enumerator GetEnumerator() => tracks.GetEnumerator();
 
-		IEnumerator<AnimationClip> IEnumerable<AnimationClip>.GetEnumerator() => clips.GetEnumerator();
-		IEnumerator IEnumerable.GetEnumerator() => clips.GetEnumerator();
+		IEnumerator<AnimationTrack> IEnumerable<AnimationTrack>.GetEnumerator() => tracks.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => tracks.GetEnumerator();
 
-		public int IndexOf(AnimationClip item) => clips.IndexOf(item);
+		public int IndexOf(AnimationTrack item) => tracks.IndexOf(item);
 
-		public void Insert(int index, AnimationClip clip)
+		public void Insert(int index, AnimationTrack track)
 		{
-			if (clip.Owner != null) {
+			if (track.Owner != null) {
 				throw new InvalidOperationException();
 			}
-			clips.Insert(index, clip);
-			clip.Owner = this;
+			tracks.Insert(index, track);
+			track.Owner = owner;
 		}
 
-		public bool Remove(AnimationClip clip)
+		public bool Remove(AnimationTrack track)
 		{
-			int index = GetIndexByFrame(clip.Frame);
-			if (index < 0) {
-				return false;
+			if (tracks.Remove(track)) {
+				track.Owner = null;
+				return true;
 			}
-			if (clip.Owner != this) {
-				throw new InvalidOperationException();
-			}
-			clip.Owner = null;
-			clips.RemoveAt(index);
-			return true;
+			return false;
 		}
 
 		public void RemoveAt(int index)
 		{
-			clips[index].Owner = null;
-			clips.RemoveAt(index);
+			tracks[index].Owner = null;
+			tracks.RemoveAt(index);
 		}
 
-		public AnimationClip this[int index]
+		public AnimationTrack this[int index]
 		{
-			get { return clips[index]; }
+			get { return tracks[index]; }
 			set { throw new NotSupportedException(); }
 		}
 
-		public AnimationTrack Clone()
+		public AnimationTrackList Clone(Animation newOwner)
 		{
-			var result = new AnimationTrack(Count);
-			foreach (var clip in this) {
-				result.Add(clip.Clone());
+			var result = new AnimationTrackList(newOwner, Count);
+			foreach (var track in this) {
+				result.Add(track.Clone());
 			}
 			return result;
 		}
 
-		public AnimationClip GetByFrame(int frame)
+		public int FindIndex(Predicate<AnimationTrack> match)
 		{
-			int index = GetIndexByFrame(frame);
-			return index >= 0 ? clips[index] : null;
+			return tracks.FindIndex(match);
 		}
 
-		private int GetIndexByFrame(int frame)
+		public bool Exists(Predicate<AnimationTrack> match)
 		{
-			int l = 0;
-			int r = clips.Count - 1;
-			while (l <= r) {
-				int m = (l + r) / 2;
-				if (clips[m].Frame < frame) {
-					l = m + 1;
-				} else if (clips[m].Frame > frame) {
-					r = m - 1;
-				} else {
-					return m;
-				}
-			}
-			return -1;
+			return tracks.Exists(match);
 		}
 
-		public int FindIndex(Predicate<AnimationClip> match)
+		public void Add(AnimationTrack track)
 		{
-			return clips.FindIndex(match);
-		}
-
-		public bool Exists(Predicate<AnimationClip> match)
-		{
-			return clips.Exists(match);
-		}
-
-		public void Add(AnimationClip clip)
-		{
-			if (clip.Owner != null) {
+			if (track.Owner != null) {
 				throw new InvalidOperationException();
 			}
-			clip.Owner = this;
-			clips.Add(clip);
-		}
-
-		public void AddOrdered(AnimationClip clip)
-		{
-			if (clip.Owner != null) {
-				throw new InvalidOperationException();
-			}
-			clip.Owner = this;
-			if (Count == 0 || clip.Frame > this[Count - 1].Frame) {
-				clips.Add(clip);
-			} else {
-				int i = 0;
-				while (clips[i].Frame < clip.Frame) {
-					i++;
-				}
-				if (clips[i].Frame == clip.Frame) {
-					clips[i] = clip;
-				} else {
-					clips.Insert(i, clip);
-				}
-			}
+			tracks.Add(track);
+			track.Owner = owner;
 		}
 	}
 }
