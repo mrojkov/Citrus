@@ -1,3 +1,4 @@
+
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -15,7 +16,10 @@ namespace Orange
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
 			}
-			AssetCooker.Cook(TargetPlatform.iOS);
+			AssetCooker.Cook(
+				TargetPlatform.iOS, 
+				new System.Collections.Generic.List<string> () { CookingRulesBuilder.MainBundleName }
+			);
 			var solutionPath = The.Workspace.GetSolutionFilePath(TargetPlatform.iOS);
 			var builder = new SolutionBuilder(TargetPlatform.iOS, solutionPath);
 			var output = new StringBuilder();
