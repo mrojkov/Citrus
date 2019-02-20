@@ -201,10 +201,10 @@ namespace Lime
 			}
 		}
 
-		public void InvokeTriggers(int frame, double animationTimeCorrection = 0)
+		public void InvokeTriggers(int frame, string animationId, double animationTimeCorrection = 0)
 		{
 			for (var a = First; a != null; a = a.Next) {
-				if (a.IsTriggerable) {
+				if (a.IsTriggerable && a.AnimationId == animationId) {
 					a.InvokeTrigger(frame, animationTimeCorrection);
 				}
 			}
