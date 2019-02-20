@@ -32,6 +32,8 @@ namespace Tangerine.UI.Timeline
 				view.RollRow = new RollFolderView(row);
 			} else if (row.Components.Contains<Core.Components.PropertyRow>()) {
 				view.RollRow = new RollPropertyView(row);
+			} else if (row.Components.Contains<Core.Components.AnimationTrackRow>()) {
+				view.RollRow = new RollAnimationTrackView(row);
 			}
 		}
 
@@ -57,6 +59,9 @@ namespace Tangerine.UI.Timeline
 			} else if (row.Components.Contains<Core.Components.PropertyRow>()) {
 				var propRow = row.Components.Get<Core.Components.PropertyRow>();
 				view.GridRow = new GridPropertyView(propRow.Node, propRow.Animator);
+			} else if (row.Components.Contains<Core.Components.AnimationTrackRow>()) {
+				var propRow = row.Components.Get<Core.Components.AnimationTrackRow>();
+				view.GridRow = new GridAnimationTrackView(propRow.Track);
 			}
 		}
 	}

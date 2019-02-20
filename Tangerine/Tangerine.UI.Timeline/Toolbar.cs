@@ -23,7 +23,8 @@ namespace Tangerine.UI.Timeline
 					CreateAnimationModeButton(),
 					CreateResetAnimationsTimes(),
 					CreateAutoKeyframesButton(),
-					CreateNewFolderButton(),
+					CreateFolderButton(),
+					CreateAnimationTrackButton(),
 					CreateCurveEditorButton(),
 					CreateTimelineCursorLockButton(),
 					CreateAnimationStretchButton(),
@@ -145,16 +146,32 @@ namespace Tangerine.UI.Timeline
 			return button;
 		}
 
-		ToolbarButton CreateNewFolderButton()
+		ToolbarButton CreateFolderButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create folder" };
 			button.AddTransactionClickHandler(() => {
-				var newFolder = new Folder { Id = "Folder" };
-				Core.Operations.InsertFolderItem.Perform(newFolder);
+				var folder = new Folder { Id = "Folder" };
+				Core.Operations.InsertFolderItem.Perform(folder);
 				Core.Operations.ClearRowSelection.Perform();
-				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(newFolder));
+				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(folder));
 			});
 			button.Components.Add(new DocumentationComponent("CreateFolder"));
+			return button;
+		}
+
+		ToolbarButton CreateAnimationTrackButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create Animation Track" };
+			button.AddTransactionClickHandler(() => {
+				if (!Document.Current.Animation.IsCompound) {
+					throw new InvalidOperationException("Animation isn't compound");
+				}
+				var track = new AnimationTrack { Id = "Track" };
+				Core.Operations.AddIntoCollection<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, track);
+				Core.Operations.ClearRowSelection.Perform();
+				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(track));
+			});
+			button.Components.Add(new DocumentationComponent("CreateAnimationTrack"));
 			return button;
 		}
 
