@@ -142,7 +142,7 @@ namespace Lime
 				var animators = child.Animators;
 				animators.Apply(animation.Time, animation.Id);
 				if (invokeTriggers) {
-					animators.InvokeTriggers(animation.Frame, animationTimeCorrection);
+					animators.InvokeTriggers(animation.Frame, animation.Id, animationTimeCorrection);
 				}
 				if (animation.Id != null) {
 					ApplyAnimators(child, animation, invokeTriggers);
