@@ -45,7 +45,7 @@ namespace Lime
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			stream.Seek(0, SeekOrigin.Begin);
 			var bytes = new byte[stream.Length];

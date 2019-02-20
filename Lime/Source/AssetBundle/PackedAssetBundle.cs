@@ -376,7 +376,7 @@ namespace Lime
 			wasModified = true;
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			OnModifying?.Invoke();
 			AssetDescriptor d;
@@ -388,7 +388,7 @@ namespace Lime
 				(d.AllocatedSize <= stream.Length + reserve);
 			if (reuseExistingDescriptor) {
 				d.Length = (int)stream.Length;
-				d.ModificationTime = DateTime.Now;
+				d.ModificationTime = time;
 				d.CookingRulesSHA1 = cookingRulesSHA1;
 				d.Attributes = attributes;
 				d.SourceExtension = sourceExtension;
@@ -405,7 +405,7 @@ namespace Lime
 					DeleteFile(path);
 				}
 				d = new AssetDescriptor();
-				d.ModificationTime = DateTime.Now;
+				d.ModificationTime = time;
 				d.CookingRulesSHA1 = cookingRulesSHA1;
 				d.Length = (int)stream.Length;
 				d.Offset = indexOffset;

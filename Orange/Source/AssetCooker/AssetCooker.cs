@@ -357,14 +357,14 @@ namespace Orange
 					// from OGG to Wav/Adpcm
 					var rules = cookingRulesMap[srcPath];
 					if (stream.Length > rules.ADPCMLimit * 1024) {
-						AssetBundle.ImportFile(dstPath, stream, 0, sourceExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+						AssetBundle.ImportFile(dstPath, stream, 0, sourceExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 					} else {
 						Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
 						using (var input = new OggDecoder(stream)) {
 							using (var output = new MemoryStream()) {
 								WaveIMA4Converter.Encode(input, output);
 								output.Seek(0, SeekOrigin.Begin);
-								AssetBundle.ImportFile(dstPath, output, 0, sourceExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+								AssetBundle.ImportFile(dstPath, output, 0, sourceExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 							}
 						}
 					}
@@ -377,7 +377,7 @@ namespace Orange
 		{
 			SyncUpdated(".tan", ".tan", (srcPath, dstPath) => {
 				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".tan", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".tan", File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -386,7 +386,7 @@ namespace Orange
 		{
 			SyncUpdated(".tft", ".tft", (srcPath, dstPath) => {
 				var font = Serialization.ReadObjectFromFile<Font>(srcPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".tft", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".tft", File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -396,7 +396,7 @@ namespace Orange
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 					var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
-					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+					Serialization.WriteObjectToBundle(AssetBundle, dstPath, node, Serialization.Format.Binary, ".scene", File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				}
 				return true;
 			});
@@ -407,7 +407,7 @@ namespace Orange
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
 				var importer = new HotFontImporter(false);
 				var font = importer.ParseFont(srcPath, dstPath);
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".fnt", AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, font, Serialization.Format.Binary, ".fnt", File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -481,7 +481,7 @@ namespace Orange
 				var dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				var bundled = bundle.FileExists(dstPath);
 				var srcRules = cookingRulesMap[srcPath];
-				var needUpdate = !bundled || srcFileInfo.LastWriteTime > bundle.GetFileLastWriteTime(dstPath);
+				var needUpdate = !bundled || srcFileInfo.LastWriteTime != bundle.GetFileLastWriteTime(dstPath);
 				needUpdate = needUpdate || !srcRules.SHA1.SequenceEqual(bundle.GetCookingRulesSHA1(dstPath));
 				needUpdate = needUpdate || (extraOutOfDateChecker?.Invoke(srcPath, dstPath) ?? false);
 				if (needUpdate) {
@@ -503,7 +503,7 @@ namespace Orange
 					} else {
 						Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 						using (Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
-							bundle.ImportFile(dstPath, stream, 0, fileExtension, AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
+							bundle.ImportFile(dstPath, stream, 0, fileExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, cookingRulesMap[srcPath].SHA1);
 						}
 					}
 				}
@@ -824,8 +824,9 @@ namespace Orange
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
 				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
+				var srcPath = Path.ChangeExtension(item.Path, item.SourceExtension);
 				Serialization.WriteObjectToBundle(AssetBundle, item.Path, atlasPart, Serialization.Format.Binary,
-					item.SourceExtension, AssetAttributes.None, item.CookingRules.SHA1);
+					item.SourceExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, item.CookingRules.SHA1);
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (AssetBundle.FileExists(texturePath)) {
@@ -890,7 +891,8 @@ namespace Orange
 					isNeedToRewriteTexParams = !oldTexParams.Equals(textureParams);
 				}
 				if (isNeedToRewriteTexParams) {
-					Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture", AssetAttributes.None, null);
+					Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture",
+						File.GetLastWriteTime(textureParamsPath), AssetAttributes.None, null);
 				}
 			} else {
 				if (AssetBundle.FileExists(textureParamsPath)) {
@@ -1058,9 +1060,11 @@ namespace Orange
 				if (bundleSHA1 == null) {
 					throw new InvalidOperationException("CookingRules SHA1 for atlas part shouldn't be null");
 				}
+				var a = AssetBundle.GetFileLastWriteTime(atlasPartPath);
+				var b = textures[srcTexturePath];
 				if (
 					!textures.ContainsKey(srcTexturePath) ||
-					AssetBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath] ||
+					AssetBundle.GetFileLastWriteTime(atlasPartPath) != textures[srcTexturePath] ||
 					(!cookingRulesMap[srcTexturePath].SHA1.SequenceEqual(bundleSHA1))
 				) {
 					srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
@@ -1139,7 +1143,7 @@ namespace Orange
 				DeleteModelExternalAnimations(animationPathPrefix);
 				ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
 				model.RemoveAnimatorsForExternalAnimations();
-				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", assetAttributes, cookingRules.SHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d", File.GetLastWriteTime(srcPath), assetAttributes, cookingRules.SHA1);
 				return true;
 			}, (srcPath, dstPath) => modelsToRebuild.Contains(dstPath));
 		}
@@ -1165,7 +1169,7 @@ namespace Orange
 				var path = pathWithoutExt + ".ant";
 				var data = animation.GetData();
 				animation.ContentsPath = pathWithoutExt;
-				Serialization.WriteObjectToBundle(AssetBundle, path, data, Serialization.Format.Binary, ".ant", assetAttributes, cookingRulesSHA1);
+				Serialization.WriteObjectToBundle(AssetBundle, path, data, Serialization.Format.Binary, ".ant", File.GetLastWriteTime(path), assetAttributes, cookingRulesSHA1);
 				Console.WriteLine("+ " + path);
 			}
 		}
