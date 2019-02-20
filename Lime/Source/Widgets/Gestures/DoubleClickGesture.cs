@@ -1,88 +1,119 @@
 using System;
-using System.Collections.Generic;
 
 namespace Lime
 {
-	public class DoubleClickGesture : Gesture
+	public class DoubleClickGesture : SelfEndingGesture
 	{
-		enum State
+		private enum State
 		{
-			Initial,
+			Idle,
 			FirstPress,
 			WaitSecondPress,
 		};
 
-		private readonly TimeSpan DoubleClickTimeout =
+		private readonly TimeSpan MaxDelayBetweenClicksSec =
 #if WIN
 			TimeSpan.FromMilliseconds(System.Windows.Forms.SystemInformation.DoubleClickTime);
 #else // WIN
 			TimeSpan.FromSeconds(0.3);
 #endif // WIN
 
-		private readonly Size DoubleClickSize =
+		private readonly Vector2 DoubleClickThreshold =
 #if WIN
-			new Size(System.Windows.Forms.SystemInformation.DoubleClickSize.Width, System.Windows.Forms.SystemInformation.DoubleClickSize.Height);
+			new Vector2(
+				System.Windows.Forms.SystemInformation.DoubleClickSize.Width,
+				System.Windows.Forms.SystemInformation.DoubleClickSize.Height
+			) / 2f;
 #else // WIN
-			new Size(5, 5);
+			new Vector2(5f, 5f) / 2f;
 #endif // WIN
 
-		private State state;
-		private DateTime pressTime;
-		private Vector2 pressPosition;
-		private PollableEvent recognized;
 
-		public event Action Recognized { add { recognized.Handler += value; } remove { recognized.Handler -= value; } }
-		public bool WasRecognized() => recognized.HasOccurred();
+		private State state;
+		private DateTime firstClickTime;
+		private Vector2 firstClickPosition;
+
+		public override bool IsActive => state != State.Idle;
 
 		public int ButtonIndex { get; }
 
-		public DoubleClickGesture(int buttonIndex, Action recognized = null)
+		public DoubleClickGesture() : this(0, null)
+		{
+		}
+
+		public DoubleClickGesture(int buttonIndex) : this(buttonIndex, null)
+		{
+		}
+
+		public DoubleClickGesture(Action onRecognized) : this(0, onRecognized)
+		{
+		}
+
+		public DoubleClickGesture(int buttonIndex, Action onRecognized) : base(onRecognized)
 		{
 			ButtonIndex = buttonIndex;
-			if (recognized != null) {
-				Recognized += recognized;
-			}
 		}
 
-		public DoubleClickGesture(Action recognized = null)
-			: this(0, recognized)
-		{ }
+		protected internal override bool Cancel(Gesture sender)
+		{
+			if (state == State.Idle) {
+				return sender == null || !(sender is TapGesture);
+			}
+			if (sender == null || sender is TapGesture) {
+				return false;
+			}
+			if (state == State.WaitSecondPress) {
+				RaiseCanceled();
+			}
+			return true;
+		}
 
-		internal protected override void Cancel()
-		{ }
-
-		internal protected override void Update(IEnumerable<Gesture> gestures)
+		protected internal override void Update(float delta)
 		{
 			var now = DateTime.Now;
-			var delta = now - pressTime;
-			if (state != State.Initial && delta > DoubleClickTimeout) {
-				state = State.Initial;
+			var elapsedTime = now - firstClickTime;
+
+			if (state != State.Idle && elapsedTime > MaxDelayBetweenClicksSec) {
+				state = State.Idle;
+				if (state == State.WaitSecondPress) {
+					RaiseCanceled();
+				}
+				RaiseEnded();
+				return;
 			}
-			if (state == State.Initial && Input.WasMousePressed(ButtonIndex)) {
-				pressTime = now;
-				pressPosition = Input.MousePosition;
+
+			if (state == State.Idle && Input.WasMousePressed(ButtonIndex)) {
+				if (WasRecognized()) {
+					// Prevent a spurious call on the same frame as the recognition.
+					return;
+				}
+				firstClickTime = now;
+				firstClickPosition = Input.MousePosition;
 				state = State.FirstPress;
 			}
+
 			if (state == State.FirstPress && !Input.IsMousePressed(ButtonIndex)) {
 				state = State.WaitSecondPress;
+				RaiseBegan();
 			}
+
 			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
-				state = State.Initial;
-				var halfSize = (Vector2)DoubleClickSize * 0.5f;
-				var r = new Rectangle(pressPosition - halfSize, pressPosition + halfSize);
-				if (Input.GetNumTouches() == 1 && r.Contains(Input.MousePosition)) {
-					CancelOtherGestures(gestures);
-					recognized.Raise();
+				state = State.Idle;
+				if (Input.GetNumTouches() == 1 && IsNearFirstClick(Input.MousePosition)) {
+					RaiseRecognized();
+				} else {
+					RaiseCanceled();
 				}
+				RaiseEnded();
 			}
 		}
 
-		void CancelOtherGestures(IEnumerable<Gesture> gestures)
+		private bool IsNearFirstClick(in Vector2 mousePosition)
 		{
-			foreach (var r in gestures) {
-				if (r != this)
-					r.Cancel();
-			}
+			return new Rectangle(
+				firstClickPosition - DoubleClickThreshold,
+				firstClickPosition + DoubleClickThreshold
+			).Contains(mousePosition);
 		}
 	}
 }

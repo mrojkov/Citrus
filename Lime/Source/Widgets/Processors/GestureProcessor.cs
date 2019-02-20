@@ -16,7 +16,7 @@ namespace Lime
 
 		protected internal override void Update(float delta)
 		{
-			widgetContext.GestureManager.Process();
+			widgetContext.GestureManager.Update(delta);
 		}
 	}
 }

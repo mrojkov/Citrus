@@ -40,6 +40,11 @@ namespace Lime
 		public static readonly Vector3 UnitY = new Vector3(0f, 1f, 0f);
 		public static readonly Vector3 UnitZ = new Vector3(0f, 0f, 1f);
 
+		/// <summary>
+		/// Returns a vector with components NaN, NaN, NaN.
+		/// </summary>
+		public static readonly Vector3 NaN = new Vector3(float.NaN, float.NaN, float.NaN);
+
 		public Vector3(Vector2 xy, float z)
 			: this(xy.X, xy.Y, z)
 		{

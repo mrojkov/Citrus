@@ -94,7 +94,7 @@ namespace Lime
 		{
 			while (true) {
 				if (AllowReordering) {
-					if (TryGetTabUnderMouse(out var tab) && gesture.WasBegan()) {
+					if (TryGetTabUnderMouse(out var tab) && gesture.WasRecognized()) {
 						ActivateTab(tab);
 						while (!gesture.WasEnded()) {
 							if (TryGetTabUnderMouse(out var tabUnderMouse)) {
