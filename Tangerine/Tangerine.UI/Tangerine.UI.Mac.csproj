@@ -73,6 +73,7 @@
     <Compile Include="PropertyEditors\CustomFilePropertyEditor.cs" />
     <Compile Include="UIProcessors.cs" />
     <Compile Include="PropertyEditors\FolderPropertyEditor.cs" />
+    <Compile Include="Dialogs\TriggerSelectionDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />
