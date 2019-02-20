@@ -228,6 +228,16 @@ namespace Lime
 
 		public static T RandomOf<T>(params T[] objects) => RandomGenerator.RandomOf(objects);
 
+		public static T RandomOf<T>(this System.Random rng, ICollection<T> objects)
+		{
+			return objects.ElementAt(rng.Next(objects.Count));
+		}
+
+		public static T RandomItem<T>(this ICollection<T> objects)
+		{
+			return RandomOf(RandomGenerator, objects);
+		}
+
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng = null)
 		{
 			if (rng == null)
