@@ -443,6 +443,8 @@ namespace Tangerine.Core.Operations
 			Index = index;
 		}
 
+		public static void Perform(TList list, TElement item) => Perform(list, list.IndexOf(item));
+
 		public static void Perform(TList list, int index) => DocumentHistory.Current.Perform(new RemoveFromList<TList, TElement>(list, index));
 
 		public class Processor : OperationProcessor<RemoveFromList<TList, TElement>>

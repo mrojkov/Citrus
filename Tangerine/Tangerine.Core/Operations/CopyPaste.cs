@@ -231,31 +231,32 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
+			var doc = Document.Current;
+			foreach (var row in doc.TopLevelSelectedRows().ToList()) {
 				if (!row.IsCopyPasteAllowed()) {
 					continue;
 				}
 				if (row.Components.Get<PropertyRow>()?.Animator is IAnimator animator) {
-					Document.Current.History.DoTransaction(() => {
+					doc.History.DoTransaction(() => {
 						foreach (var keyframe in animator.Keys.ToList()) {
 							RemoveKeyframe.Perform(animator, keyframe.Frame);
 						}
 					});
-					continue;
-				}
-				var item = Row.GetFolderItem(row);
-				var currentBone = row.Components.Get<BoneRow>()?.Bone;
-				if (currentBone != null) {
-					var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
+				} else if (row.Components.Get<AnimationTrackRow>()?.Track is AnimationTrack track) {
+					doc.History.DoTransaction(() => {
+						RemoveFromList<AnimationTrackList, AnimationTrack>.Perform(doc.Animation.Tracks, track);
+					});
+				} else if (row.Components.Get<BoneRow>()?.Bone is Bone currentBone) {
+					var bones = doc.Container.Nodes.OfType<Bone>().ToList();
 					var dependentBones = BoneUtils.FindBoneDescendats(currentBone, bones).ToList();
 					dependentBones.Insert(0, currentBone);
-					UntieWidgetsFromBones.Perform(dependentBones, Document.Current.Container.Nodes.OfType<Widget>());
+					UntieWidgetsFromBones.Perform(dependentBones, doc.Container.Nodes.OfType<Widget>());
 					foreach (var bone in dependentBones) {
-						UnlinkFolderItem.Perform(Document.Current.Container, bone);
-						Document.Current.Container.AsWidget.BoneArray[bone.Index] = default(BoneArray.Entry);
+						UnlinkFolderItem.Perform(doc.Container, bone);
+						doc.Container.AsWidget.BoneArray[bone.Index] = default;
 					}
-				} else if (item != null) {
-					UnlinkFolderItem.Perform(Document.Current.Container, item);
+				} else if (Row.GetFolderItem(row) is IFolderItem item) {
+					UnlinkFolderItem.Perform(doc.Container, item);
 				}
 			}
 		}
