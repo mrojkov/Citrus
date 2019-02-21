@@ -200,7 +200,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.X == 0);
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.X == 0 || (word.IsTagBegin && IsBullet(word)));
 					}
 					c += wordLength;
 				}
@@ -366,7 +366,7 @@ namespace Lime.Text
 				if (word.LineBreak) {
 					x = 0;
 				}
-				var skipFirstLetter = x == 0;
+				var skipFirstLetter = x == 0 || (word.IsTagBegin && IsBullet(word));
 				word.Width = CalcWordWidth(word, skipFirstLetter);
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
