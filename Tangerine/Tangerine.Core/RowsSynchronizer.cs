@@ -16,6 +16,7 @@ namespace Tangerine.Core
 			rows.Clear();
 			if (Document.Current.Animation.IsCompound) {
 				doc.RowTree = new Row();
+				doc.RowTree.CanHaveChildren = true;
 				foreach (var track in Document.Current.Animation.Tracks) {
 					AddRow(doc.RowTree, GetAnimationTrackRow(track));
 				}
@@ -142,7 +143,6 @@ namespace Tangerine.Core
 			var row = Document.Current.GetRowForObject(track);
 			if (!row.Components.Contains<AnimationTrackRow>()) {
 				row.Components.Add(new AnimationTrackRow(track));
-				row.CanHaveChildren = true;
 			}
 			return row;
 		}
