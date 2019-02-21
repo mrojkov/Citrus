@@ -55,6 +55,7 @@ namespace Tangerine.UI
 					}
 				);
 			};
+			editBox.AddChangeWatcher(CoalescedPropertyValue(), v => editBox.Text = v.Value);
 			Invalidate();
 		}
 
