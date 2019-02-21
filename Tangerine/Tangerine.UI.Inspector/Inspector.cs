@@ -18,7 +18,6 @@ namespace Tangerine.UI.Inspector
 		private readonly ThemedScrollView contentWidget;
 
 		private HashSet<Type> prevTypes = new HashSet<Type>();
-		private float prevPosition;
 
 		public static Inspector Instance { get; private set; }
 
@@ -153,7 +152,7 @@ namespace Tangerine.UI.Inspector
 			var nodes = Document.Current.InspectRootNode
 				? new[] { Document.Current.RootNode }
 				: Document.Current.SelectedNodes().ToArray();
-			
+
 			var types = new HashSet<Type>(InspectorContent.GetTypes(nodes));
 			var areEqual = types.SetEquals(prevTypes);
 			contentWidget.ScrollPosition = areEqual ?
