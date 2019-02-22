@@ -13,7 +13,7 @@ namespace Lime.SignedDistanceField
 
 		public SDFMaterialProvider SDFMaterialProvider;
 		public SignedDistanceFieldMaterial SDFMaterial => SDFMaterialProvider.Material;
-		public float Softness;
+		public float FontSize;
 		public float Dilate;
 		public float Thickness;
 		public Color4 OutlineColor;
@@ -23,6 +23,9 @@ namespace Lime.SignedDistanceField
 		public bool GradientEnabled;
 		public ColorGradient Gradient;
 		public float GradientAngle;
+
+		public Matrix32 LocalToParentTransform;
+		public Matrix32 ParentToWorldTransform;
 
 		protected override void OnRelease()
 		{
@@ -51,7 +54,6 @@ namespace Lime.SignedDistanceField
 		public void Init(SignedDistanceFieldComponent component)
 		{
 			SDFMaterialProvider = component.SDFMaterialProvider;
-			Softness = component.Softness;
 			Dilate = component.Dilate;
 			OutlineColor = component.OutlineColor;
 			Thickness = component.Thickness;
@@ -76,6 +78,7 @@ namespace Lime.SignedDistanceField
 					continue;
 				}
 				var materialProvider = SDFShadowMaterialProviderPool<SDFShadowMaterialProvider>.Acquire();
+				materialProvider.Material.FontSize = FontSize;
 				materialProvider.Material.Dilate = s.Dilate;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
@@ -94,12 +97,12 @@ namespace Lime.SignedDistanceField
 					continue;
 				}
 				var materialProvider = SDFInnerShadowMaterialProviderPool<SDFInnerShadowMaterialProvider>.Acquire();
+				materialProvider.Material.FontSize = FontSize;
 				materialProvider.Material.Dilate = s.Dilate;
 				materialProvider.Material.TextDilate = Dilate;
-				materialProvider.Material.TextSoftness = Softness;
 				materialProvider.Material.Softness = s.Softness;
 				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.1f;
+				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
 				if (InnerShadowsMaterialProviders == null) {
 					InnerShadowsMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
 				}
@@ -119,7 +122,7 @@ namespace Lime.SignedDistanceField
 		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
 		{
 			if (offset.X != 0f || offset.Y != 0f) {
-				Renderer.Transform1 = LocalToWorldTransform * Matrix32.Translation(offset);
+				Renderer.Transform1 = LocalToParentTransform * Matrix32.Translation(offset) * ParentToWorldTransform;
 			} else {
 				Renderer.Transform1 = LocalToWorldTransform;
 			}

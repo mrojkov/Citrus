@@ -6,7 +6,7 @@ namespace Lime.SignedDistanceField
 
 		public override void Do(SDFRenderObject ro)
 		{
-			ro.SDFMaterial.Softness = ro.Softness;
+			ro.SDFMaterial.FontSize = ro.FontSize;
 			ro.SDFMaterial.Dilate = ro.Dilate;
 			ro.SDFMaterial.Thickness = ro.Thickness;
 			ro.SDFMaterial.OutlineColor = ro.OutlineColor;

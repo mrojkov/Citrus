@@ -190,6 +190,11 @@ namespace Lime
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
 				var styleRO = style.GetRenderObject() as TextRenderObject;
+				if (styleRO is SignedDistanceField.SDFRenderObject sdfRO) {
+					sdfRO.FontSize = CalcGlobalBoundingRect().Size.Y;
+					sdfRO.LocalToParentTransform = CalcLocalToParentTransform();
+					sdfRO.ParentToWorldTransform = ParentWidget != null ? ParentWidget.LocalToWorldTransform : Matrix32.Identity;
+				}
 				styleRO.SpriteList = spriteLists[i];
 				styleRO.RenderMode = TextRenderingMode.TwoPasses;
 				styleRO.Color = GlobalColor;
