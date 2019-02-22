@@ -125,6 +125,15 @@ namespace Tangerine.UI.Timeline
 			} else if (pr != Document.Current.RowTree) {
 				y = pr.GridWidget().Bottom() + TimelineMetrics.RowSpacing;
 			}
+
+			var rows = Document.Current.Rows;
+			var indexBefore = RowIndexAtY(y - 3);
+			var indexAfter = RowIndexAtY(y + 3);
+			if (indexBefore != -1 && indexAfter < rows.Count) {
+				if (rows[indexBefore].Selected && rows[indexAfter].Selected)
+					return;
+			}
+
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
@@ -162,6 +171,20 @@ namespace Tangerine.UI.Timeline
 				r += i.GridWidget().Height + TimelineMetrics.RowSpacing + CalcSubtreeHeight(i);
 			}
 			return r;
+		}
+
+		static int RowIndexAtY(float y)
+		{
+			if (y < 0) {
+				return -1;
+			}
+			int index = -1;
+			float current = 0;
+			while (current < y) {
+				current += Document.Current.Rows[0].GridWidget().Height + TimelineMetrics.RowSpacing;
+				index++;
+			}
+			return index;
 		}
 
 		static Row RowUnderMouse(Vector2 position)
