@@ -7,6 +7,9 @@ namespace Orange
 	{
 		public const string ConsoleCommandPassArguments = "--passargs";
 
+		public static event Action OnGameRun;
+		public static event Action OnGameClose;
+
 		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Build and Run")]
 		[ExportMetadata("Priority", 0)]
@@ -22,7 +25,9 @@ namespace Orange
 				return "Can not BuildGame";
 			}
 			The.UI.ScrollLogToEnd();
+			OnGameRun?.Invoke();
 			RunGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, configuration);
+			OnGameClose?.Invoke();
 			return null;
 		}
 

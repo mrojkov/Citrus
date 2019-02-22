@@ -182,11 +182,9 @@ namespace Orange
 		{
 			goButton.Visible = value;
 			abortButton.Visible = !value;
-
 			if (value) {
 				abortButton.Input.DerestrictScope();
-			}
-			else {
+			} else {
 				abortButton.Input.RestrictScope();
 			}
 		}
@@ -196,6 +194,15 @@ namespace Orange
 			platformPicker.Reload();
 			AssetCooker.BeginCookBundles += () => abortButton.Enabled = true;
 			AssetCooker.EndCookBundles += () => abortButton.Enabled = false;
+
+			Actions.OnGameRun += () => {
+				abortButton.Input.DerestrictScope();
+				textView.Input.RestrictScope();
+			};
+			Actions.OnGameClose += () => {
+				textView.Input.DerestrictScope();
+				abortButton.Input.RestrictScope();
+			};
 		}
 
 		public override void ClearLog()
