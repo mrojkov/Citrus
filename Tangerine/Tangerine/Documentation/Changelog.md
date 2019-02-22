@@ -1,3 +1,11 @@
+##### Changelog 22.02.2019
+
+Багфиксы:
+
+* Исправлена ошибка, не позволяющая скроллить вывод Orange [CIT-220](https://jira.game-forest.com:2000/browse/CIT-220)
+* Увеличена производительность при работе с Model3D [CIT-974](https://jira.game-forest.com:2000/browse/CIT-974)
+* Исправлена ошибка, не обновляющая значение триггеров при выборе фреймов [CIT-1130](https://jira.game-forest.com:2000/browse/CIT-1130)
+
 ##### Changelog 20.02.2019
 
 * Переделан интерфейс работы с триггерами [CIT-1062](https://jira.game-forest.com:2000/browse/CIT-1062), [CIT-1112](https://jira.game-forest.com:2000/browse/CIT-1112)
