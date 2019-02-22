@@ -191,7 +191,7 @@ namespace Lime
 				var style = renderer.Styles[i];
 				var styleRO = style.GetRenderObject() as TextRenderObject;
 				if (styleRO is SignedDistanceField.SDFRenderObject sdfRO) {
-					sdfRO.FontSize = CalcGlobalBoundingRect().Size.Y;
+					sdfRO.FontSize = CalcGlobalBoundingRect().Height;
 					sdfRO.LocalToParentTransform = CalcLocalToParentTransform();
 					sdfRO.ParentToWorldTransform = ParentWidget != null ? ParentWidget.LocalToWorldTransform : Matrix32.Identity;
 				}

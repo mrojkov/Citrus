@@ -49,8 +49,6 @@ namespace Lime
 		private const string GroupOutline = "02. Outline";
 		private const string GroupGradient = "03. Gradient";
 		private const string GroupShadow = "04. Shadows";
-		private const float MinimumSoftness = 0f;
-		private const float MaximumSoftness = 50f;
 		private const float MinimumDilate = -30f;
 		private const float MaximumDilate = 30f;
 		private const float MinimumThickness = 0f;
@@ -66,17 +64,8 @@ namespace Lime
 
 		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
 
-		private float softness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
-
-		[YuzuMember]
-		[TangerineGroup(GroupFont)]
-		public float Softness
-		{
-			get => softness;
-			set => softness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
-		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]

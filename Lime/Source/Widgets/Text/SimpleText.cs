@@ -270,7 +270,7 @@ namespace Lime
 			if (sdfComponent != null) {
 				var sdfRO = RenderObjectPool<SignedDistanceField.SDFRenderObject>.Acquire();
 				sdfRO.Init(sdfComponent);
-				sdfRO.FontSize = CalcGlobalBoundingRect().Size.Y;
+				sdfRO.FontSize = CalcGlobalBoundingRect().Height;
 				sdfRO.LocalToParentTransform = CalcLocalToParentTransform();
 				sdfRO.ParentToWorldTransform = ParentWidget != null ? ParentWidget.LocalToWorldTransform : Matrix32.Identity;
 				ro = sdfRO;

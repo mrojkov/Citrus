@@ -154,7 +154,7 @@ namespace Lime.SignedDistanceField
 				lowp float textDistance = texture2D(tex1, texCoords1).r;
 				lowp float textFactor = smoothstep(text_dilate - smoothing, text_dilate + smoothing, textDistance);
 				lowp float shadowDistance = texture2D(tex1, texCoords1 - offset).r;
-				lowp float shadowFactor = smoothstep(dilate - softness, dilate + softness, shadowDistance);
+				lowp float shadowFactor = smoothstep(dilate - softness - smoothing, dilate + softness + smoothing, shadowDistance);
 				lowp float innerShadowFactor = textFactor * (1.0 - shadowFactor);
 				gl_FragColor = vec4(color.rgb, color.a * innerShadowFactor * global_color.a);
 			}";
