@@ -89,7 +89,7 @@ namespace Tangerine.Core
 
 		private static class CurrentFrameSetter
 		{
-
+			[NodeComponentDontSerialize]
 			private class AnimationsStatesComponent : NodeComponent
 			{
 				private struct AnimationState
