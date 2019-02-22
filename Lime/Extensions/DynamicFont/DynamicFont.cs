@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -56,11 +56,6 @@ namespace Lime
 			(Chars as DynamicFontCharSource).ClearCache();
 		}
 
-		public void SetFontHeightResolver(Func<int, int> fontHeightResolver)
-		{
-			((DynamicFontCharSource)Chars).SetFontHeightResolver(fontHeightResolver);
-		}
-
 		public bool RoundCoordinates { get; set; } = true;
 
 		public void Dispose()
@@ -113,11 +108,6 @@ namespace Lime
 			public bool Contains(char code)
 			{
 				return fontRenderer.ContainsGlyph(code);
-			}
-
-			public void SetFontHeightResolver(Func<int, int> fontHeightResolver)
-			{
-				fontRenderer.SetFontHeightResolver(fontHeightResolver);
 			}
 
 			public void ClearCache()

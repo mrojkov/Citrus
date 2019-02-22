@@ -592,19 +592,17 @@ namespace Tangerine
 
 		public static void LoadFont()
 		{
-			// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
-			// so the visual font height for the same fontHeight will be different for different ttf files.
-			// This workaround returns the magic number for the specific current font.
-			var fontResourcePairs = new (string id, float magicNumber)[]{
-				( "Tangerine.Resources.SegoeUI.ttf", 21f / 16f ),
-				( "Tangerine.Resources.NotoSansCJKtc-Regular.ttf", 34f / 16f )
-			};
 			var defaultFonts = new List<IFont>();
-			foreach (var (id, magicNumber) in fontResourcePairs) {
-				var fontData = new EmbeddedResource(id, "Tangerine").GetResourceBytes();
-				var font = new DynamicFont(fontData);
-				font.SetFontHeightResolver(fontHeight => (int)Math.Round(fontHeight * magicNumber));
-				defaultFonts.Add(font);
+			var fontResourcePaths = new string[] {
+				"Tangerine.Resources.SegoeUI.ttf",
+				"Tangerine.Resources.NotoSansCJKtc-Regular.ttf",
+			};
+			foreach (var resource in fontResourcePaths) {
+				try {
+					defaultFonts.Add(new DynamicFont(new EmbeddedResource(resource, "Tangerine").GetResourceBytes()));
+				} catch (SystemException e) {
+					System.Console.WriteLine($"Couldn't load font {resource}: {e}");
+				}
 			}
 			var compoundFont = new CompoundFont(defaultFonts);
 			FontPool.Instance.AddFont(FontPool.DefaultFontName, compoundFont);

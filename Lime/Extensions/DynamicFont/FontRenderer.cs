@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SharpFont;
 using SharpFont.TrueType;
@@ -60,18 +60,9 @@ namespace Lime
 			// See http://www.freetype.org/freetype2/docs/tutorial/step2.html
 			// Chapter: Scaling Distances to Device Space
 			// BBox suits better than Height (baseline-to-baseline distance), because it can enclose all the glyphs in the font face.
-			var designHeight = (float)face.BBox.Top - (float)face.BBox.Bottom;
-			var scale = height / designHeight;
+			var scale = height / (float)face.Height;
 			var pixelSize = scale * face.UnitsPerEM;
 			return pixelSize;
-		}
-
-		public void SetFontHeightResolver(Func<int, int> fontHeightResolver)
-		{
-			if (lastHeight != 0) {
-				throw new InvalidOperationException("Can not set fontHeightResolver after Render was called");
-			}
-			this.fontHeightResolver = fontHeightResolver;
 		}
 
 		/// <summary>
@@ -82,7 +73,7 @@ namespace Lime
 			if (lastHeight != height) {
 				lastHeight = height;
 				var pixelSize = (uint) Math.Abs(
-					CalcPixelSize(face, fontHeightResolver?.Invoke(height) ?? height).Round()
+					CalcPixelSize(face, height).Round()
 				);
 				face.SetPixelSizes(pixelSize, pixelSize);
 			}
