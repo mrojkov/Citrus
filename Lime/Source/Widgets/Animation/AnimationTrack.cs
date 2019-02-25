@@ -13,6 +13,11 @@ namespace Lime
 		public string Id { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0.0f, 1.0f)]
+		public float Weight { get; set; } = 1.0f;
+
+		[YuzuMember]
+		[TangerineIgnore]
 		public AnimationClipList Clips { get; private set; }
 
 		public AnimationTrack()

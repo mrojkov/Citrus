@@ -15,8 +15,7 @@ namespace Tangerine.Core
 			var doc = Document.Current;
 			rows.Clear();
 			if (Document.Current.Animation.IsCompound) {
-				doc.RowTree = new Row();
-				doc.RowTree.CanHaveChildren = true;
+				doc.RowTree = new Row { CanHaveChildren = true };
 				foreach (var track in Document.Current.Animation.Tracks) {
 					AddRow(doc.RowTree, GetAnimationTrackRow(track));
 				}

@@ -33,6 +33,16 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.TimelineGrid.PropertyRowBackground);
+			foreach (var c in track.Clips) {
+				var a = new Vector2(c.Begin * TimelineMetrics.ColWidth, 0);
+				var b = new Vector2(c.End * TimelineMetrics.ColWidth, widget.Height);
+				Renderer.DrawRect(a, b, Color4.Blue.Transparentify(0.75f));
+				Renderer.DrawRectOutline(a, b, Color4.Blue);
+				var textHeight = Mathf.Min(Theme.Metrics.TextHeight, widget.Height);
+				a.X += 1;
+				a.Y = (widget.Height - textHeight) / 2;
+				Renderer.DrawTextLine(a, c.AnimationId, textHeight, Color4.Black, 0);
+			}
 			//var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;
 			//var color = KeyframePalette.Colors[colorIndex];
 			//for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {

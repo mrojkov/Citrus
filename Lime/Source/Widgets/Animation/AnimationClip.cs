@@ -8,10 +8,24 @@ namespace Lime
 	public class AnimationClip
 	{
 		[YuzuMember]
-		public int Frame { get; set; }
+		public string AnimationId { get; set; }
 
 		[YuzuMember]
-		public string AnimationId { get; set; }
+		[TangerineReadOnly]
+		public int Begin { get; set; }
+
+		[YuzuMember]
+		[TangerineReadOnly]
+		public int End { get; set; }
+
+		[YuzuMember]
+		public int Offset { get; set; }
+
+		public int Length
+		{
+			get => End - Begin;
+			set => End = Begin + value;
+		}
 
 		public AnimationTrack Owner { get; internal set; }
 
@@ -70,7 +84,7 @@ namespace Lime
 
 		public bool Remove(AnimationClip clip)
 		{
-			int index = GetIndexByFrame(clip.Frame);
+			int index = GetIndexByFrame(clip.Begin);
 			if (index < 0) {
 				return false;
 			}
@@ -106,9 +120,9 @@ namespace Lime
 			int r = clips.Count - 1;
 			while (l <= r) {
 				int m = (l + r) / 2;
-				if (clips[m].Frame < frame) {
+				if (clips[m].Begin < frame) {
 					l = m + 1;
-				} else if (clips[m].Frame > frame) {
+				} else if (clips[m].Begin > frame) {
 					r = m - 1;
 				} else {
 					return m;
@@ -142,14 +156,14 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			clip.Owner = owner;
-			if (Count == 0 || clip.Frame > this[Count - 1].Frame) {
+			if (Count == 0 || clip.Begin > this[Count - 1].Begin) {
 				clips.Add(clip);
 			} else {
 				int i = 0;
-				while (clips[i].Frame < clip.Frame) {
+				while (clips[i].Begin < clip.Begin) {
 					i++;
 				}
-				if (clips[i].Frame == clip.Frame) {
+				if (clips[i].Begin == clip.Begin) {
 					clips[i] = clip;
 				} else {
 					clips.Insert(i, clip);

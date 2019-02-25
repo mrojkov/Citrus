@@ -58,7 +58,7 @@ namespace Tangerine.UI.Timeline
 					if (enabled) {
 						var cell = CellUnderMouse();
 						var row = Document.Current.Rows[cell.Y];
-						var spans = row.Components.Get<Components.GridSpanListComponent>()?.Spans;
+						var spans = row.Components.Get<Core.Components.GridSpanListComponent>()?.Spans;
 						if (!row.Selected || !spans.Any(i => i.Contains(cell.X))) {
 							Document.Current.History.DoTransaction(() => {
 								Core.Operations.ClearRowSelection.Perform();
@@ -68,20 +68,27 @@ namespace Tangerine.UI.Timeline
 							});
 						}
 					}
-					var menu = new Menu {
-						TimelineCommands.CutKeyframes,
-						TimelineCommands.CopyKeyframes,
-						TimelineCommands.PasteKeyframes,
-						Command.MenuSeparator,
-						TimelineCommands.ReverseKeyframes,
-						Command.MenuSeparator,
-						GenericCommands.InsertTimelineColumn,
-						GenericCommands.RemoveTimelineColumn,
-						TimelineCommands.DeleteKeyframes,
-						Command.MenuSeparator,
-						TimelineCommands.NumericMove,
-						TimelineCommands.NumericScale
-					};
+					Menu menu;
+					if (Document.Current.Animation.IsCompound) {
+						menu = new Menu {
+							TimelineCommands.CreateAnimationClip,
+						};
+					} else {
+						menu = new Menu {
+							TimelineCommands.CutKeyframes,
+							TimelineCommands.CopyKeyframes,
+							TimelineCommands.PasteKeyframes,
+							Command.MenuSeparator,
+							TimelineCommands.ReverseKeyframes,
+							Command.MenuSeparator,
+							GenericCommands.InsertTimelineColumn,
+							GenericCommands.RemoveTimelineColumn,
+							TimelineCommands.DeleteKeyframes,
+							Command.MenuSeparator,
+							TimelineCommands.NumericMove,
+							TimelineCommands.NumericScale
+						};
+					}
 					foreach (var i in menu) {
 						i.Enabled = enabled;
 					}
@@ -213,18 +220,18 @@ namespace Tangerine.UI.Timeline
 		public void RenderSelection(Widget widget, IntVector2 offset)
 		{
 			widget.PrepareRendererState();
-			var gridSpans = new List<Components.GridSpanList>();
+			var gridSpans = new List<Core.Components.GridSpanList>();
 			foreach (var row in Document.Current.Rows) {
-				gridSpans.Add(row.Components.GetOrAdd<Components.GridSpanListComponent>().Spans.GetNonOverlappedSpans());
+				gridSpans.Add(row.Components.GetOrAdd<Core.Components.GridSpanListComponent>().Spans.GetNonOverlappedSpans());
 			}
 
 			for (var row = 0; row < Document.Current.Rows.Count; row++) {
 				var spans = gridSpans[row];
 				int? lastColumn = null;
-				var topSpans = row > 0 ? gridSpans[row - 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
-				var bottomSpans = row + 1 < Document.Current.Rows.Count ? gridSpans[row + 1].GetEnumerator() : (IEnumerator<Components.GridSpan>)null;
-				Components.GridSpan? topSpan = null;
-				Components.GridSpan? bottomSpan = null;
+				var topSpans = row > 0 ? gridSpans[row - 1].GetEnumerator() : (IEnumerator<Core.Components.GridSpan>)null;
+				var bottomSpans = row + 1 < Document.Current.Rows.Count ? gridSpans[row + 1].GetEnumerator() : (IEnumerator<Core.Components.GridSpan>)null;
+				Core.Components.GridSpan? topSpan = null;
+				Core.Components.GridSpan? bottomSpan = null;
 				var offsetRow = row + offset.Y;
 				var gridWidgetBottom = (0 <= offsetRow && offsetRow < Document.Current.Rows.Count) ? (float?)Document.Current.Rows[offsetRow].GridWidget().Bottom() : null;
 				for (var i = 0; i < spans.Count; i++) {

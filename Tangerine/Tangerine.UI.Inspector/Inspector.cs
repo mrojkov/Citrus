@@ -116,7 +116,11 @@ namespace Tangerine.UI.Inspector
 		private static int CalcSelectedRowsHashcode()
 		{
 			var r = 0;
-			if (Document.Current.InspectRootNode) {
+			if (Document.Current.Animation.IsCompound) {
+				foreach (var clip in GetSelectedAnimationClips()) {
+					r ^= clip.GetHashCode();
+				}
+			} else if (Document.Current.InspectRootNode) {
 				var rootNode = Document.Current.RootNode;
 				r ^= rootNode.GetHashCode();
 				foreach (var component in rootNode.Components) {
@@ -140,11 +144,36 @@ namespace Tangerine.UI.Inspector
 
 		private void Rebuild()
 		{
-			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
+			if (Document.Current.Animation.IsCompound) {
+				content.BuildForObjects(GetSelectedAnimationClips().ToList());
+			} else if (Document.Current.InspectRootNode) {
+				content.BuildForObjects(new[] { Document.Current.RootNode });
+			} else {
+				content.BuildForObjects(Document.Current.SelectedNodes().ToList());
+			}
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
 			// Delay UpdateScrollPosition, since contentWidget.MaxScrollPosition is not updated yet.
 			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
+		}
+
+		private static IEnumerable<AnimationClip> GetSelectedAnimationClips()
+		{
+			if (GridSelection.GetSelectionBoundaries(out var boundaries)) {
+				foreach (var row in Document.Current.SelectedRows()) {
+					var track = row.Components.Get<AnimationTrackRow>().Track;
+					if (row.Index < boundaries.Top || row.Index > boundaries.Bottom) {
+						continue;
+					}
+					foreach (var clip in track.Clips) {
+						var a = Math.Max(clip.Begin, boundaries.Left);
+						var b = Math.Min(clip.End, boundaries.Right);
+						if (b >= a) {
+							yield return clip;
+						}
+					}
+				}
+			}
 		}
 
 		private IEnumerator<object> UpdateScrollPositionOnNextUpdate()
