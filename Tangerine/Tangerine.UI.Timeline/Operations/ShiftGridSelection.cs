@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.Timeline.Components;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public class Processor : OperationProcessor<ShiftGridSelection>
 		{
-			class Backup { public List<GridSpanList> Spans; }
+			class Backup { public List<Core.Components.GridSpanList> Spans; }
 
 			protected override void InternalRedo(ShiftGridSelection op)
 			{

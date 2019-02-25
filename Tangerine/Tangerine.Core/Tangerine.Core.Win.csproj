@@ -51,6 +51,8 @@
     <Compile Include="Document.Animation.cs" />
     <Compile Include="ExpressionParser\Tokenizer.cs" />
     <Compile Include="DocumentPreview.cs" />
+    <Compile Include="GridSelection.cs" />
+    <Compile Include="GridSpanList.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />

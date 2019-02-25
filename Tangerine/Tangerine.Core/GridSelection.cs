@@ -1,18 +1,10 @@
 using System;
 using System.Linq;
-using Tangerine.Core;
-using Tangerine.UI.Timeline.Components;
+using Lime;
+using Tangerine.Core.Components;
 
-namespace Tangerine.UI.Timeline
+namespace Tangerine.Core
 {
-	public struct Boundaries
-	{
-		public int Top;
-		public int Bottom;
-		public int Left;
-		public int Right;
-	}
-
 	public static class GridSelection
 	{
 		private static GridSpan? SingleSpan(GridSpanList spans)
@@ -27,18 +19,19 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		public static Boundaries? GetSelectionBoundaries()
+		public static bool GetSelectionBoundaries(out IntRectangle result)
 		{
+			result = new IntRectangle();
 			var rows = Document.Current.SelectedRows().ToList();
 			if (rows.Count == 0) {
-				return null;
+				return false;
 			}
 			var span = SingleSpan(
 				rows[0].Components.Get<GridSpanListComponent>()
 				?.Spans.GetNonOverlappedSpans());
 			var index = rows[0].Index;
 			if (span == null) {
-				return null;
+				return false;
 			}
 			for (int i = 1; i < rows.Count; ++i) {
 				var newSpan = SingleSpan(
@@ -50,16 +43,17 @@ namespace Tangerine.UI.Timeline
 					span?.B != newSpan?.B ||
 					++index != rows[i].Index
 				) {
-					return null;
+					return false;
 				}
 				span = newSpan;
 			}
-			return new Boundaries {
+			result = new IntRectangle {
 				Left = Math.Max(span.Value.A, 0),
 				Right = span.Value.B,
 				Top = rows[0].Index,
 				Bottom = index
 			};
+			return true;
 		}
 	}
 }

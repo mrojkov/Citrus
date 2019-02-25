@@ -55,11 +55,11 @@
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridAnimationTrackView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
-    <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Components\RollFolderView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollAnimationTrackView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="Operations\CreateAnimationClipDialog.cs" />
     <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Operations\CenterTimelineOnCurrentColumn.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
@@ -110,7 +110,6 @@
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
     <Compile Include="TimelineUserPreferences.cs" />
-    <Compile Include="Utils\GridSelection.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
