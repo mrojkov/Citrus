@@ -123,8 +123,16 @@ namespace Tangerine.UI
 				PropertyLabel.SetFocus();
 				ShowPropertyContextMenu();
 			});
+			var clickGesture2 = new ClickGesture(2, () => {
+				PropertyLabel.SetFocus();
+				resetToDefault.Consume();
+				var defaultValue = EditorParams.DefaultValueGetter();
+				if (defaultValue != null)
+					SetProperty(defaultValue);
+			});
 			PropertyLabel.Gestures.Add(clickGesture0);
 			PropertyLabel.Gestures.Add(clickGesture1);
+			PropertyLabel.Gestures.Add(clickGesture2);
 			while (true) {
 				PropertyLabel.Color = PropertyLabel.IsFocused() ? Theme.Colors.KeyboardFocusBorder : Theme.Colors.BlackText;
 				if (PropertyLabel.IsFocused()) {
