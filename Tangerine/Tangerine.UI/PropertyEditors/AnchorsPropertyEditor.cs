@@ -75,7 +75,7 @@ namespace Tangerine.UI
 			{
 				base.GetColors(state, out bgColor, out borderColor);
 				if (state == State.Default && !Checked) {
-					bgColor = Theme.Colors.WhiteBackground;
+					bgColor = GloballyEnabled ? Theme.Colors.WhiteBackground : Theme.Colors.DisabledBackground;
 					borderColor = Theme.Colors.ControlBorder;
 				}
 			}
