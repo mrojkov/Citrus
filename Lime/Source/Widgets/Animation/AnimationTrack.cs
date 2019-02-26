@@ -5,7 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class AnimationTrack
+	public class AnimationTrack : IAnimationHost, IAnimable
 	{
 		public Animation Owner { get; internal set; }
 
@@ -14,15 +14,24 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineValidRange(0.0f, 1.0f)]
+		[TangerineKeyframeColorAttribute(0)]
 		public float Weight { get; set; } = 1.0f;
 
 		[YuzuMember]
 		[TangerineIgnore]
 		public AnimationClipList Clips { get; private set; }
 
+		[YuzuMember]
+		public AnimatorCollection Animators { get; private set; }
+
+		IAnimable IAnimable.Owner { get => null; set => throw new NotSupportedException(); }
+		void IAnimationHost.OnAnimatorAdded(IAnimator animator) { }
+		Component IAnimationHost.GetComponent(Type type) => throw new NotSupportedException();
+
 		public AnimationTrack()
 		{
 			Clips = new AnimationClipList(this);
+			Animators = new AnimatorCollection(this);
 		}
 
 		public AnimationTrack(int capacity = 0)
@@ -30,15 +39,18 @@ namespace Lime
 			Clips = new AnimationClipList(this, capacity);
 		}
 
+		void IAnimationHost.OnTrigger(string property, double animationTimeCorrection = 0) { }
+
 		public AnimationTrack Clone()
 		{
-			var result = (AnimationTrack)MemberwiseClone();
-			result.Owner = null;
-			result.Clips = new AnimationClipList(result, Clips.Count);
+			var clone = (AnimationTrack)MemberwiseClone();
+			clone.Owner = null;
+			clone.Clips = new AnimationClipList(clone, Clips.Count);
+			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			foreach (var clip in Clips) {
-				result.Clips.Add(clip.Clone());
+				clone.Clips.Add(clip.Clone());
 			}
-			return result;
+			return clone;
 		}
 	}
 
