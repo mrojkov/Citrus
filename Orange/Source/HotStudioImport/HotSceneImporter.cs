@@ -1008,13 +1008,15 @@ namespace Orange
 			var viewport = (Viewport3D)node;
 			switch (name) {
 				case "ModelPath":
-					viewport.ContentsPath = lexer.ParsePath();
+					viewport.AddNode(new Node3D() {
+						ContentsPath = lexer.ParsePath()
+					});
 					break;
 				case "Frame":
 					viewport.Frame = lexer.ParseFloat();
 					break;
 				case "Camera":
-					lexer.ParseQuotedString();
+					viewport.CameraRef = new NodeReference<Camera3D>(lexer.ParseQuotedString());
 					break;
 				default:
 					ParseGraphicProperty(node, name);
