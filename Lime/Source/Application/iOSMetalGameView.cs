@@ -58,6 +58,7 @@ namespace Lime
 			}
 			if (vkContext == null) {
 				vkContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
+				PlatformRenderer.Initialize(vkContext);
 			}
 			if (vkSwapChain == null) {
 				var size = metalLayer.Frame.Size;
@@ -119,7 +120,6 @@ namespace Lime
 
 		public void MakeCurrent()
 		{
-			RenderContextManager.MakeCurrent(vkContext);
 			vkContext.Begin(vkSwapChain);
 		}
 

@@ -50,7 +50,7 @@ namespace Lime
 				}
 				MakeCurrent();
 				renderContext = new PlatformRenderContext();
-				RenderContextManager.MakeCurrent(renderContext);
+				PlatformRenderer.Initialize(renderContext);				
 			}
 			DestroyFramebuffer();
 			CreateFramebuffer();					

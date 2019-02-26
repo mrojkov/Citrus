@@ -71,6 +71,7 @@ namespace Lime.Platform
 			openGLContext.MakeCurrentContext();
 			if (platformRenderContext == null) {
 				platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+				PlatformRenderer.Initialize(platformRenderContext);
 			}
 			swapInterval = true;
 		}
@@ -352,7 +353,6 @@ namespace Lime.Platform
 		public void MakeCurrent()
 		{
 			openGLContext.View = this;
-			RenderContextManager.MakeCurrent(platformRenderContext);
 			platformRenderContext.Begin(0);
 		}
 
