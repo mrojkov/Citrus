@@ -1,3 +1,19 @@
+##### Changelog 26.02.2019
+
+* Добавлена возможность использовать Audio во Viewport3D [CIT-1002](https://jira.game-forest.com:2000/browse/CIT-1002)
+* Добавлено отображение свойств в readonly [CIT-1096](https://jira.game-forest.com:2000/browse/CIT-1096)
+* Переработана работа с кешом в режиме Animation Mode [CIT-1121](https://jira.game-forest.com:2000/browse/CIT-1121)
+* Добавлена возможность обновить рабочий проект через Git напрямую через редактор [CIT-1126](https://jira.game-forest.com:2000/browse/CIT-1121)
+
+Багфиксы:
+
+* Исправлена ошибка, при которой выбор SplinePoint3D блокировал ввод с клавиатуры [CIT-754](https://jira.game-forest.com:2000/browse/CIT-754)
+* Исправлено отображение кириллицы в окне вывода Orange [CIT-916](https://jira.game-forest.com:2000/browse/CIT-916)
+* Исправлено отображение иероглифов для различных языков в свойстве Text [CIT-1015](https://jira.game-forest.com:2000/browse/CIT-1015)
+* Исправлена ошибка, приводящая к поломке сцен с Viewport3D при конвертации из .scene в .tan [CIT-1082](https://jira.game-forest.com:2000/browse/CIT-1082)
+* Исправлена ошибка, приводящая к крашу при использовании унарных тегов [CIT-1133](https://jira.game-forest.com:2000/browse/CIT-1133)
+
+
 ##### Changelog 22.02.2019
 
 Багфиксы:
