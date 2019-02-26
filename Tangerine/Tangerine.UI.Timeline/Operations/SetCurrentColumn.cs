@@ -68,7 +68,9 @@ namespace Tangerine.UI.Timeline.Operations
 
 			void SetColumn(int value, Animation animation)
 			{
+				CacheAnimationsStates = true;
 				Document.SetCurrentFrameToNode(value, animation, CoreUserPreferences.Instance.AnimationMode);
+				CacheAnimationsStates = false;
 				if (!isScrollingFrozen) {
 					Timeline.Instance.EnsureColumnVisible(value);
 				}
