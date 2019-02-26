@@ -85,7 +85,7 @@ namespace Lime.Text
 					if (isClosedTag) {
 						string tag = text.Substring(p, pos - p - 1);
 						ProcessOpeningTag(tag);
-						ProcessTextBlock ("");
+						ProcessTextBlock(" ");
 						ProcessClosingTag(tag);
 					} else if (isOpeningTag) {
 						string tag = text.Substring(p, pos - p);
