@@ -43,17 +43,23 @@ namespace Tangerine.UI.Timeline.Components
 				a.Y = (widget.Height - textHeight) / 2;
 				Renderer.DrawTextLine(a, c.AnimationId, textHeight, Color4.Black, 0);
 			}
-			//var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;
-			//var color = KeyframePalette.Colors[colorIndex];
-			//for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {
-			//	var key = animator.ReadonlyKeys[i];
-			//	Renderer.Transform1 =
-			//		Matrix32.RotationRough(Mathf.Pi / 4) *
-			//		Matrix32.Translation((key.Frame + 0.5f) * TimelineMetrics.ColWidth + 0.5f, widget.Height / 2 + 0.5f) *
-			//		widget.LocalToWorldTransform;
-			//	var v = TimelineMetrics.ColWidth / 3 * Vector2.One;
-			//	Renderer.DrawRect(-v, v, color);
-			//}
+			if (track.Animators.TryFind<float>("Weight", out var animator, Document.Current.AnimationId)) {
+				RenderKeyframes(widget, animator);
+			}
+		}
+
+		private static void RenderKeyframes(Widget widget, IAnimator animator)
+		{
+			var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;
+			var color = KeyframePalette.Colors[colorIndex];
+			foreach (var key in animator.ReadonlyKeys) {
+				Renderer.Transform1 =
+					Matrix32.RotationRough(Mathf.Pi / 4) *
+					Matrix32.Translation((key.Frame + 0.5f) * TimelineMetrics.ColWidth + 0.5f, widget.Height / 2 + 0.5f) *
+					widget.LocalToWorldTransform;
+				var v = TimelineMetrics.ColWidth / 3 * Vector2.One;
+				Renderer.DrawRect(-v, v, color);
+			}
 		}
 	}
 }
