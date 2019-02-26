@@ -17,7 +17,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(CanBeRoot = true, Order = 20)]
 	[TangerineNodeBuilder("BuildForTangerine")]
-	[TangerineAllowedChildrenTypes(typeof(Node3D), typeof(SplineGear3D))]
+	[TangerineAllowedChildrenTypes(typeof(Node3D), typeof(SplineGear3D), typeof(Audio))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
 	public class Viewport3D : Widget
 	{
