@@ -484,6 +484,7 @@
     <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
     <Compile Include="Source\Widgets\Materials\GradientComponent.cs" />
     <Compile Include="Source\YuzuGeneratedCloners.cs" />
+    <Compile Include="Source\Tooltip.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

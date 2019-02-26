@@ -831,7 +831,7 @@ namespace Tangerine
 					HitTestTarget = true,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter)
 				};
-				warningIcon.Tasks.Add(Tooltip.ShowTooltipOnMouseOverTask(warningIcon, () => WarningText));
+				warningIcon.Tasks.Add(Tooltip.Instance.ShowOnMouseOverTask(warningIcon, () => WarningText));
 				Header = new Widget {
 					Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing },
 					LayoutCell = new LayoutCell(),

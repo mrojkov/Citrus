@@ -117,7 +117,7 @@ namespace Tangerine.UI
 		private static void Awake(Node owner)
 		{
 			var tb = (ToolbarButton)owner;
-			tb.Tasks.Add(Lime.Tooltip.ShowTooltipOnMouseOverTask(tb, () => tb.Tooltip));
+			tb.Tasks.Add(Lime.Tooltip.Instance.ShowOnMouseOverTask(tb, () => tb.Tooltip));
 			tb.AddChangeWatcher(() => tb.Enabled, _ => Window.Current.Invalidate());
 		}
 

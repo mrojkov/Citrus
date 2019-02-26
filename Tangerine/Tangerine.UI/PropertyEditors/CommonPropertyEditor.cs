@@ -66,7 +66,7 @@ namespace Tangerine.UI
 					}
 				};
 				PropertyLabel.Tasks.Add(ManageLabelTask());
-				PropertyContainerWidget.Tasks.Add(Tooltip.ShowTooltipOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
+				PropertyContainerWidget.Tasks.Add(Tooltip.Instance.ShowOnMouseOverTask(PropertyLabel, () => PropertyLabel.Text));
 				PropertyContainerWidget.AddNode(LabelContainer);
 				EditorContainer = new Widget {
 					Layout = new HBoxLayout(),

@@ -140,7 +140,6 @@
     <Compile Include="PropertyEditors\ThicknessPropertyEditor.cs" />
     <Compile Include="PropertyEditors\InstancePropertyEditor.cs" />
     <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
-    <Compile Include="Utils\Tip.cs" />
     <Compile Include="PropertyEditors\TextPropertyEditor.cs" />
     <Compile Include="TextEditorWindow.cs" />
     <Compile Include="Documentation\CrosslinkExtension.cs" />

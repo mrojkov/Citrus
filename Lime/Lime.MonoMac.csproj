@@ -344,6 +344,7 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderObject.cs" />
+    <Compile Include="Source\Tooltip.cs" />
     <Compile Include="Source\Graphics\Buffer.cs" />
     <Compile Include="Source\Graphics\Etc2Decoder.cs" />
     <Compile Include="Source\Graphics\Format.cs" />
