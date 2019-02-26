@@ -305,9 +305,9 @@ namespace Lime
 			EglMakeCurrent();
 			if (platformRenderContext == null) {
 				platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+				PlatformRenderer.Initialize(platformRenderContext);
 			}
 			platformRenderContext.Begin(0);
-			RenderContextManager.MakeCurrent(platformRenderContext);
 		}
 
 		private void EglMakeCurrent()
@@ -330,7 +330,6 @@ namespace Lime
 
 		public void UnbindContext()
 		{
-			RenderContextManager.MakeCurrent(platformRenderContext);
 			EglUnbindContext();
 		}
 
@@ -361,7 +360,7 @@ namespace Lime
 		private void OnEglContextLost()
 		{
 			eglContext = null;
-			GLObjectRegistry.Instance.DiscardObjects();
+			Logger.Write("EGL context lost");
 		}
 
 		private void EnsureEglDisplayCreated()
