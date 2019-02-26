@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Lime.SignedDistanceField
 {
 
@@ -58,11 +60,64 @@ namespace Lime.SignedDistanceField
 				Offset = Offset,
 			};
 		}
+
+		public static int GetHashCode(
+			float dilate,
+			float softness,
+			Color4 color,
+			Vector2 offset
+		){
+			unchecked {
+				int hash = (int)2166136261;
+				hash = (hash * 16777619) ^ dilate.GetHashCode();
+				hash = (hash * 16777619) ^ softness.GetHashCode();
+				hash = (hash * 16777619) ^ color.GetHashCode();
+				hash = (hash * 16777619) ^ offset.GetHashCode();
+				return hash;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return GetHashCode(
+				Dilate,
+				Softness,
+				Color,
+				Offset
+			);
+		}
 	}
 
 	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		internal bool Free = true;
+		private static Dictionary<int, SDFShadowMaterialProvider> cache = new Dictionary<int, SDFShadowMaterialProvider>();
+
+		public static SDFShadowMaterialProvider GetProvider(
+			float dilate,
+			float softness,
+			Color4 color,
+			Vector2 offset
+		){
+			int hash = SDFShadowMaterial.GetHashCode(
+				dilate,
+				softness,
+				color,
+				offset
+			);
+
+			SDFShadowMaterialProvider result;
+			if (cache.TryGetValue(hash, out result)) {
+				return result;
+			} else {
+				result = new SDFShadowMaterialProvider();
+				result.Material.Dilate = dilate;
+				result.Material.Softness = softness;
+				result.Material.Color = color;
+				result.Material.Offset = offset;
+				cache.Add(hash, result);
+				return result;
+			}
+		}
 
 		public SDFShadowMaterial Material = new SDFShadowMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
@@ -72,44 +127,6 @@ namespace Lime.SignedDistanceField
 		};
 
 		public Sprite ProcessSprite(Sprite s) => s;
-
-		public void Release()
-		{
-			if (Free) return;
-			try {
-				OnRelease();
-			} finally {
-				Free = true;
-			}
-		}
-
-		protected virtual void OnRelease() { }
-	}
-
-	public static class SDFShadowMaterialProviderPool<T> where T : SDFShadowMaterialProvider, new()
-	{
-		private static T[] items = new T[1] { new T() };
-		private static int index;
-
-		public static T Acquire()
-		{
-			for (int i = 0; i < items.Length; i++) {
-				var item = items[index++];
-				if (index == items.Length)
-					index = 0;
-				if (item.Free) {
-					item.Free = false;
-					return item;
-				}
-			}
-			System.Array.Resize(ref items, items.Length * 2);
-			index = items.Length / 2;
-			for (int i = index; i < items.Length; i++) {
-				items[i] = new T();
-			}
-			items[index].Free = false;
-			return items[index];
-		}
 	}
 
 	public class SDFShadowShaderProgram : ShaderProgram

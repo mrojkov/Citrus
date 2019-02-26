@@ -9,7 +9,6 @@ namespace Lime.SignedDistanceField
 	{
 		private const int gradientTexturePixelCount = 256;
 		private static readonly ConcurrentDictionary<int, Texture2D> gradientTexturePool = new ConcurrentDictionary<int, Texture2D>();
-		private static Color4[] gradientTexturePixels = new Color4[gradientTexturePixelCount];
 
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
@@ -59,14 +58,12 @@ namespace Lime.SignedDistanceField
 			thicknessKey = shaderParams.GetParamKey<float>("thickness");
 			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
 			gradientAngleKey = shaderParams.GetParamKey<float>("g_angle");
-
-			Gradient = new ColorGradient(Color4.White, Color4.Black);
 		}
 
 		public void Apply(int pass)
 		{
-			var smoothing = 1f / FontSize * 2f;
-			shaderParams.Set(smoothingKey, Mathf.Min(smoothing, 0.03f));
+			var smoothing = 1f / FontSize * 2.5f;
+			shaderParams.Set(smoothingKey, Mathf.Min(smoothing, 0.1f));
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(thicknessKey, -Thickness * 0.01f);
 			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
@@ -77,7 +74,6 @@ namespace Lime.SignedDistanceField
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 			if (GradientEnabled && Gradient != null) {
 				InvalidateTextureIfNecessary();
-				PlatformRenderer.SetTextureLegacy(1, GradientTexture);
 			}
 		}
 
@@ -89,6 +85,7 @@ namespace Lime.SignedDistanceField
 				if (gradientTexturePool.TryGetValue(hash, out var texture)) {
 					GradientTexture = texture;
 				} else {
+					var gradientTexturePixels = new Color4[gradientTexturePixelCount];
 					Gradient.Rasterize(ref gradientTexturePixels);
 					GradientTexture = new Texture2D {
 						TextureParams = new TextureParams {
@@ -112,10 +109,81 @@ namespace Lime.SignedDistanceField
 				Thickness = Thickness,
 			};
 		}
+
+
+		public static int GetHashCode(
+			float dilate,
+			float thickness,
+			Color4 outlineColor,
+			bool gradientEnabled,
+			ColorGradient gradient,
+			float gradientAngle
+		)
+		{
+			unchecked {
+				int hash = (int)2166136261;
+				hash = (hash * 16777619) ^ dilate.GetHashCode();
+				hash = (hash * 16777619) ^ thickness.GetHashCode();
+				hash = (hash * 16777619) ^ outlineColor.GetHashCode();
+				hash = (hash * 16777619) ^ gradientEnabled.GetHashCode();
+				if (gradientEnabled) {
+					hash = (hash * 16777619) ^ gradient.GetHashCode();
+					hash = (hash * 16777619) ^ gradientAngle.GetHashCode();
+				}
+				return hash;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return GetHashCode(
+				Dilate,
+				Thickness,
+				OutlineColor,
+				GradientEnabled,
+				Gradient,
+				GradientAngle
+			);
+		}
 	}
 
 	public class SDFMaterialProvider : Sprite.IMaterialProvider
 	{
+		private static Dictionary<int, SDFMaterialProvider> cache = new Dictionary<int, SDFMaterialProvider>();
+
+		public static SDFMaterialProvider GetProvider(
+			float dilate,
+			float thickness,
+			Color4 outlineColor,
+			bool gradientEnabled,
+			ColorGradient gradient,
+			float gradientAngle
+		)
+		{
+			int hash = SignedDistanceFieldMaterial.GetHashCode(
+				dilate,
+				thickness,
+				outlineColor,
+				gradientEnabled,
+				gradient,
+				gradientAngle
+			);
+			SDFMaterialProvider result;
+			if (cache.TryGetValue(hash, out result)) {
+				return result;
+			} else {
+				result = new SDFMaterialProvider();
+				result.Material.Dilate = dilate;
+				result.Material.Thickness = thickness;
+				result.Material.OutlineColor = outlineColor;
+				result.Material.GradientEnabled = gradientEnabled;
+				result.Material.Gradient = gradient;
+				result.Material.GradientAngle = gradientAngle;
+				cache.Add(hash, result);
+				return result;
+			}
+		}
+
 		public SignedDistanceFieldMaterial Material = new SignedDistanceFieldMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
 
@@ -127,6 +195,7 @@ namespace Lime.SignedDistanceField
 		{
 			s.UV0T2 = Vector2.Zero;
 			s.UV1T2 = Vector2.One;
+			s.Texture2 = Material.GradientTexture;
 			return s;
 		}
 	}

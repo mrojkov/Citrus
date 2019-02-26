@@ -189,22 +189,39 @@ namespace Lime
 			ro.Shader = Shader;
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
-				var styleRO = style.GetRenderObject() as TextRenderObject;
-				if (styleRO is SignedDistanceField.SDFRenderObject sdfRO) {
-					sdfRO.FontSize = CalcGlobalBoundingRect().Height;
-					sdfRO.LocalToParentTransform = CalcLocalToParentTransform();
-					sdfRO.ParentToWorldTransform = ParentWidget != null ? ParentWidget.LocalToWorldTransform : Matrix32.Identity;
+				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
+				if (sdfComponent != null) {
+					var sdfRO = InitSDFRenderObject(sdfComponent, style.Size);
+					foreach (var obj in sdfRO) {
+						obj.SpriteList = spriteLists[i];
+						obj.RenderMode = TextRenderingMode.TwoPasses;
+						obj.Color = GlobalColor;
+						obj.GradientMapIndex = style.GradientMapIndex;
+						obj.LocalToWorldTransform = LocalToWorldTransform;
+						obj.Shader = Shader;
+						obj.Blending = Blending;
+					}
+					ro.Objects.Add(sdfRO);
+				} else {
+					var styleRO = RenderObjectPool<TextRenderObject>.Acquire();
+					styleRO.SpriteList = spriteLists[i];
+					styleRO.RenderMode = TextRenderingMode.TwoPasses;
+					styleRO.Color = GlobalColor;
+					styleRO.GradientMapIndex = style.GradientMapIndex;
+					styleRO.LocalToWorldTransform = LocalToWorldTransform;
+					styleRO.Shader = Shader;
+					styleRO.Blending = Blending;
+					ro.Objects.Add(styleRO);
 				}
-				styleRO.SpriteList = spriteLists[i];
-				styleRO.RenderMode = TextRenderingMode.TwoPasses;
-				styleRO.Color = GlobalColor;
-				styleRO.GradientMapIndex = style.GradientMapIndex;
-				styleRO.LocalToWorldTransform = LocalToWorldTransform;
-				styleRO.Shader = Shader;
-				styleRO.Blending = Blending;
-				ro.Objects.Add(styleRO);
 			}
 			return ro;
+		}
+
+		private SignedDistanceField.SDFRenderObjectList InitSDFRenderObject(SignedDistanceFieldComponent sdfComponent, float fontHeight)
+		{
+			var scale = Mathf.Sqrt(Math.Max(LocalToWorldTransform.U.SqrLength, LocalToWorldTransform.V.SqrLength));
+			var sdfRO = SignedDistanceField.SDFRenderObject.GetRenderObject(sdfComponent, fontHeight * scale);
+			return sdfRO;
 		}
 
 		private void EnsureSpriteLists()

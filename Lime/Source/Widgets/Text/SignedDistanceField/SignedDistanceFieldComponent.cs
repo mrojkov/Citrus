@@ -62,8 +62,6 @@ namespace Lime
 		private const float MinimumBevelWidth = 0f;
 		private const float MaximumBevelWidth = 30f;
 
-		internal SDFMaterialProvider SDFMaterialProvider { get; private set; } = new SDFMaterialProvider();
-
 		private float dilate = 0f;
 		private float thickness = 0f;
 
@@ -119,7 +117,6 @@ namespace Lime
 		public override NodeComponent Clone()
 		{
 			var clone = (SignedDistanceFieldComponent)base.Clone();
-			clone.SDFMaterialProvider = new SDFMaterialProvider();
 			return clone;
 		}
 	}

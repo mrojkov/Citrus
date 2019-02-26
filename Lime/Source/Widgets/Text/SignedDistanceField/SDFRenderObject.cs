@@ -1,138 +1,198 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Lime.SignedDistanceField
 {
-	class SDFRenderObject : TextRenderObject
+
+	public abstract class BaseSDFRenderObject : TextRenderObject
 	{
-		private static SDFRenderAction[] RenderActions = new SDFRenderAction[] {
-			new SDFRenderActionShadows(),
-			new SDFRenderActionMain(),
-			new SDFRenderActionOverlays(),
-			new SDFRenderActionInnerShadows()
-		};
+		public abstract int GetHash();
 
-		public SDFMaterialProvider SDFMaterialProvider;
-		public SignedDistanceFieldMaterial SDFMaterial => SDFMaterialProvider.Material;
-		public float FontSize;
-		public float Dilate;
-		public float Thickness;
-		public Color4 OutlineColor;
-		public List<SDFShadowMaterialProvider> ShadowsMaterialProviders;
-		public List<SDFShadowMaterialProvider> OverlaysMaterialProviders;
-		public List<SDFInnerShadowMaterialProvider> InnerShadowsMaterialProviders;
-		public bool GradientEnabled;
-		public ColorGradient Gradient;
-		public float GradientAngle;
-
-		public Matrix32 LocalToParentTransform;
-		public Matrix32 ParentToWorldTransform;
-
-		protected override void OnRelease()
-		{
-			SpriteList = null;
-			SDFMaterialProvider = null;
-			if (OverlaysMaterialProviders != null) {
-				foreach (var item in OverlaysMaterialProviders) {
-					item.Release();
-				}
-				OverlaysMaterialProviders = null;
-			}
-			if (ShadowsMaterialProviders != null) {
-				foreach (var item in ShadowsMaterialProviders) {
-					item.Release();
-				}
-				ShadowsMaterialProviders = null;
-			}
-			if (InnerShadowsMaterialProviders != null) {
-				foreach (var item in InnerShadowsMaterialProviders) {
-					item.Release();
-				}
-				InnerShadowsMaterialProviders = null;
-			}
-		}
-
-		public void Init(SignedDistanceFieldComponent component)
-		{
-			SDFMaterialProvider = component.SDFMaterialProvider;
-			Dilate = component.Dilate;
-			OutlineColor = component.OutlineColor;
-			Thickness = component.Thickness;
-			GradientEnabled = component.GradientEnabled;
-			Gradient = component.Gradient;
-			GradientAngle = component.GradientAngle;
-			if (component.Shadows != null) {
-				PrepareShadows(component.Shadows, ref ShadowsMaterialProviders);
-			}
-			if (component.Overlays != null) {
-				PrepareShadows(component.Overlays, ref OverlaysMaterialProviders);
-			}
-			if (component.InnerShadows != null) {
-				PrepareInnerShadows(component.InnerShadows);
-			}
-		}
-
-		private void PrepareShadows(List<ShadowParams> shadows, ref List<SDFShadowMaterialProvider> providers)
-		{
-			foreach (var s in shadows) {
-				if (!s.Enabled) {
-					continue;
-				}
-				var materialProvider = SDFShadowMaterialProviderPool<SDFShadowMaterialProvider>.Acquire();
-				materialProvider.Material.FontSize = FontSize;
-				materialProvider.Material.Dilate = s.Dilate;
-				materialProvider.Material.Softness = s.Softness;
-				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.1f;
-				if (providers == null) {
-					providers = new List<SDFShadowMaterialProvider>();
-				}
-				providers.Add(materialProvider);
-			}
-		}
-
-		private void PrepareInnerShadows(List<ShadowParams> shadows)
-		{
-			foreach (var s in shadows) {
-				if (!s.Enabled) {
-					continue;
-				}
-				var materialProvider = SDFInnerShadowMaterialProviderPool<SDFInnerShadowMaterialProvider>.Acquire();
-				materialProvider.Material.FontSize = FontSize;
-				materialProvider.Material.Dilate = s.Dilate;
-				materialProvider.Material.TextDilate = Dilate;
-				materialProvider.Material.Softness = s.Softness;
-				materialProvider.Material.Color = s.Color;
-				materialProvider.Material.Offset = new Vector2(s.OffsetX, s.OffsetY) * 0.01f;
-				if (InnerShadowsMaterialProviders == null) {
-					InnerShadowsMaterialProviders = new List<SDFInnerShadowMaterialProvider>();
-				}
-				InnerShadowsMaterialProviders.Add(materialProvider);
-			}
-		}
-
-		public override void Render()
-		{
-			foreach (var action in RenderActions) {
-				if (action.EnabledCheck(this)) {
-					action.Do(this);
-				}
-			}
-		}
-
-		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
+		protected void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
 		{
 			if (offset.X != 0f || offset.Y != 0f) {
-				Renderer.Transform1 = LocalToParentTransform * Matrix32.Translation(offset) * ParentToWorldTransform;
+				Renderer.Transform1 = Matrix32.Translation(offset) * LocalToWorldTransform;
 			} else {
 				Renderer.Transform1 = LocalToWorldTransform;
 			}
 			SpriteList.Render(Color, materialProvider);
 		}
 
-		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider)
+		protected void RenderSpriteList(Sprite.IMaterialProvider materialProvider)
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
 			SpriteList.Render(Color, materialProvider);
+		}
+
+		protected override void OnRelease()
+		{
+			base.OnRelease();
+		}
+	}
+
+	internal class SDFShadowRenderObject : BaseSDFRenderObject
+	{
+		private SDFShadowMaterialProvider materialProvider;
+
+		public override int GetHash() => materialProvider.Material.GetHashCode();
+
+		public void Init(ShadowParams shadowParams, float fontSize)
+		{
+			materialProvider = SDFShadowMaterialProvider.GetProvider(
+				shadowParams.Dilate,
+				shadowParams.Softness,
+				shadowParams.Color,
+				new Vector2(shadowParams.OffsetX, shadowParams.OffsetY) * 0.1f
+			);
+			materialProvider.Material.FontSize = fontSize;
+		}
+
+		public override void Render()
+		{
+			RenderSpriteList(materialProvider, materialProvider.Material.Offset);
+		}
+
+		protected override void OnRelease()
+		{
+			materialProvider = null;
+			base.OnRelease();
+		}
+	}
+
+	internal class SDFInnerShadowRenderObject : BaseSDFRenderObject
+	{
+		private SDFInnerShadowMaterialProvider materialProvider;
+
+		public override int GetHash() => materialProvider.Material.GetHashCode();
+
+		public void Init(ShadowParams shadowParams, float fontSize, float textDilate)
+		{
+			materialProvider = SDFInnerShadowMaterialProvider.GetProvider(
+				shadowParams.Dilate,
+				textDilate,
+				shadowParams.Softness,
+				shadowParams.Color,
+				new Vector2(shadowParams.OffsetX, shadowParams.OffsetY) * 0.01f
+			);
+			materialProvider.Material.FontSize = fontSize;
+		}
+
+		public override void Render()
+		{
+			RenderSpriteList(materialProvider, materialProvider.Material.Offset);
+		}
+
+		protected override void OnRelease()
+		{
+			materialProvider = null;
+			base.OnRelease();
+		}
+	}
+
+	internal class SDFMainRenderObject : BaseSDFRenderObject
+	{
+		private SDFMaterialProvider materialProvider;
+
+		public override int GetHash() => materialProvider.Material.GetHashCode();
+
+		public void Init(SignedDistanceFieldComponent component, float fontSize)
+		{
+			materialProvider = SDFMaterialProvider.GetProvider(
+				component.Dilate,
+				component.Thickness,
+				component.OutlineColor,
+				component.GradientEnabled,
+				component.Gradient,
+				component.GradientAngle
+			);
+			materialProvider.Material.FontSize = fontSize;
+		}
+
+		public override void Render()
+		{
+			RenderSpriteList(materialProvider);
+		}
+
+		protected override void OnRelease()
+		{
+			materialProvider = null;
+			base.OnRelease();
+		}
+	}
+
+	public class SDFRenderObjectList : RenderObject, IEnumerable<BaseSDFRenderObject>
+	{
+		private List<BaseSDFRenderObject> objects = new List<BaseSDFRenderObject>();
+
+		public int Count => objects.Count;
+
+		public RenderObject this[int index] => objects[index];
+
+		public void Add(BaseSDFRenderObject obj)
+		{
+			objects.Add(obj);
+		}
+
+		public override void Render()
+		{
+			foreach (var ro in objects) {
+				ro.Render();
+			}
+		}
+
+		protected override void OnRelease()
+		{
+			foreach (var ro in objects) {
+				ro.Release();
+			}
+			objects.Clear();
+			base.OnRelease();
+		}
+
+		public IEnumerator<BaseSDFRenderObject> GetEnumerator() => objects.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => objects.GetEnumerator();
+	}
+
+	public static class SDFRenderObject
+	{
+		public static SDFRenderObjectList GetRenderObject(SignedDistanceFieldComponent component, float fontSize)
+		{
+			var roList = RenderObjectPool<SDFRenderObjectList>.Acquire();
+			if (component.Shadows != null) {
+				foreach (var s in component.Shadows) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
+					ro.Init(s, fontSize);
+					roList.Add(ro);
+				}
+			}
+			var mainRO = RenderObjectPool<SDFMainRenderObject>.Acquire();
+			mainRO.Init(component, fontSize);
+			roList.Add(mainRO);
+			if (component.InnerShadows != null) {
+				foreach (var s in component.InnerShadows) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFInnerShadowRenderObject>.Acquire();
+					ro.Init(s, fontSize, component.Dilate);
+					roList.Add(ro);
+				}
+			}
+			if (component.Overlays != null) {
+				foreach (var s in component.Overlays) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
+					ro.Init(s, fontSize);
+					roList.Add(ro);
+				}
+			}
+			return roList;
 		}
 	}
 }

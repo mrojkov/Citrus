@@ -12,7 +12,7 @@ namespace Lime
 		TwoPasses
 	}
 
-	internal class TextRenderObject : WidgetRenderObject
+	public class TextRenderObject : WidgetRenderObject
 	{
 		public SpriteList SpriteList;
 		public Color4 Color;
@@ -41,6 +41,7 @@ namespace Lime
 		protected override void OnRelease()
 		{
 			SpriteList = null;
+			base.OnRelease();
 		}
 
 

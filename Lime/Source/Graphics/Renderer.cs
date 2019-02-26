@@ -626,13 +626,14 @@ namespace Lime
 						continue;
 					}
 				}
-				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture1 == batchedSprites[0].Texture1 && s.Material == batchedSprites[0].Material) {
+				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture1 == batchedSprites[0].Texture1 && s.Texture2 == batchedSprites[0].Texture2 && s.Material == batchedSprites[0].Material) {
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
-				var texture = batchedSprites[0].Texture1;
+				var texture1 = batchedSprites[0].Texture1;
+				var texture2 = batchedSprites[0].Texture2;
 				var material = batchedSprites[0].Material;
-				var batch = CurrentRenderList.GetBatch<Vertex>(texture, null, material, 4 * batchLength, 6 * batchLength);
+				var batch = CurrentRenderList.GetBatch<Vertex>(texture1, texture2, material, 4 * batchLength, 6 * batchLength);
 				int v = batch.LastVertex;
 				int i = batch.LastIndex;
 				batch.Mesh.DirtyFlags |= MeshDirtyFlags.VerticesIndices;

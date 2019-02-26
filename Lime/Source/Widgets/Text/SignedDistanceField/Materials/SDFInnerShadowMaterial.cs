@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Lime.SignedDistanceField
 {
 
@@ -58,18 +60,79 @@ namespace Lime.SignedDistanceField
 
 		public IMaterial Clone()
 		{
-			return new SDFShadowMaterial(blending) {
+			return new SDFInnerShadowMaterial(blending) {
 				Dilate = Dilate,
+				TextDilate = TextDilate,
 				Color = Color,
 				Softness = Softness,
 				Offset = Offset,
 			};
 		}
+
+		public static int GetHashCode(
+			float dilate,
+			float textDilate,
+			float softness,
+			Color4 color,
+			Vector2 offset
+		){
+			unchecked {
+				int hash = (int)2166136261;
+				hash = (hash * 16777619) ^ dilate.GetHashCode();
+				hash = (hash * 16777619) ^ textDilate.GetHashCode();
+				hash = (hash * 16777619) ^ softness.GetHashCode();
+				hash = (hash * 16777619) ^ color.GetHashCode();
+				hash = (hash * 16777619) ^ offset.GetHashCode();
+				return hash;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return GetHashCode(
+				Dilate,
+				TextDilate,
+				Softness,
+				Color,
+				Offset
+			);
+		}
 	}
 
 	public class SDFInnerShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		internal bool Free = true;
+		private static Dictionary<int, SDFInnerShadowMaterialProvider> cache = new Dictionary<int, SDFInnerShadowMaterialProvider>();
+
+		public static SDFInnerShadowMaterialProvider GetProvider(
+			float dilate,
+			float textDilate,
+			float softness,
+			Color4 color,
+			Vector2 offset
+		)
+		{
+			int hash = SDFInnerShadowMaterial.GetHashCode(
+				dilate,
+				textDilate,
+				softness,
+				color,
+				offset
+			);
+
+			SDFInnerShadowMaterialProvider result;
+			if (cache.TryGetValue(hash, out result)) {
+				return result;
+			} else {
+				result = new SDFInnerShadowMaterialProvider();
+				result.Material.Dilate = dilate;
+				result.Material.TextDilate = textDilate;
+				result.Material.Softness = softness;
+				result.Material.Color = color;
+				result.Material.Offset = offset;
+				cache.Add(hash, result);
+				return result;
+			}
+		}
 
 		public SDFInnerShadowMaterial Material = new SDFInnerShadowMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
@@ -79,44 +142,6 @@ namespace Lime.SignedDistanceField
 		};
 
 		public Sprite ProcessSprite(Sprite s) => s;
-
-		public void Release()
-		{
-			if (Free) return;
-			try {
-				OnRelease();
-			} finally {
-				Free = true;
-			}
-		}
-
-		protected virtual void OnRelease() { }
-	}
-
-	public static class SDFInnerShadowMaterialProviderPool<T> where T : SDFInnerShadowMaterialProvider, new()
-	{
-		private static T[] items = new T[1] { new T() };
-		private static int index;
-
-		public static T Acquire()
-		{
-			for (int i = 0; i < items.Length; i++) {
-				var item = items[index++];
-				if (index == items.Length)
-					index = 0;
-				if (item.Free) {
-					item.Free = false;
-					return item;
-				}
-			}
-			System.Array.Resize(ref items, items.Length * 2);
-			index = items.Length / 2;
-			for (int i = index; i < items.Length; i++) {
-				items[i] = new T();
-			}
-			items[index].Free = false;
-			return items[index];
-		}
 	}
 
 	public class SDFInnerShadowShaderProgram : ShaderProgram
