@@ -123,6 +123,7 @@
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
+    <Compile Include="Source\Git.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
     <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
     <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />

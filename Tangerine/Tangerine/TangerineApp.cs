@@ -704,6 +704,8 @@ namespace Tangerine
 			h.Connect(TimelineCommands.NumericMove, () => new NumericMoveDialog());
 			h.Connect(TimelineCommands.NumericScale, () => new NumericScaleDialog());
 			h.Connect(ToolsCommands.RenderToPngSequence, new RenderToPngSequence());
+			h.Connect(GitCommands.ForceUpdate, new ForceUpdate());
+			h.Connect(GitCommands.Update, new Update());
 		}
 
 		private void InitializeHotkeys()
