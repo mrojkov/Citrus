@@ -39,7 +39,8 @@ namespace Lime
 	{
 		AnimatorCollection Animators { get; }
 		void OnTrigger(string property, double animationTimeCorrection = 0);
-		NodeComponentCollection Components { get; }
+		void OnAnimatorAdded(IAnimator animator);
+		Component GetComponent(Type type);
 	}
 
 	public static class IAnimableExtensions

@@ -9,14 +9,14 @@ namespace Lime
 
 	public sealed class AnimatorCollection : ICollection<IAnimator>, IDisposable
 	{
-		private Node owner;
+		private IAnimationHost owner;
 		public IAnimator First { get; private set; }
 		public int Count { get; private set; }
 #if TANGERINE
 		public int Version { get; private set; }
 #endif // TANGERINE
 
-		public AnimatorCollection(Node owner)
+		public AnimatorCollection(IAnimationHost owner)
 		{
 			this.owner = owner;
 		}
@@ -44,10 +44,7 @@ namespace Lime
 				}
 				a.Next = item;
 			}
-			Animation animation;
-			if (owner.Animations.TryFind(item.AnimationId, out animation)) {
-				animation.NextMarkerOrTriggerTime = null;
-			}
+			owner.OnAnimatorAdded(item);
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -76,7 +73,7 @@ namespace Lime
 #endif // TANGERINE
 		}
 
-		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
+		internal static AnimatorCollection SharedClone(IAnimationHost owner, AnimatorCollection source)
 		{
 			var result = new AnimatorCollection(owner);
 			foreach (var animator in source) {

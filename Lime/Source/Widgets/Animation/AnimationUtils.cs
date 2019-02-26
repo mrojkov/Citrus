@@ -60,7 +60,7 @@ namespace Lime
 				var componentTypeName = propertyPath.Substring(prevIndex + 1, index - prevIndex - 1);
 				var type = global::Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.YuzuCommonOptions)
 				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
-				o = host.Components.Get(type);
+				o = host.GetComponent(type);
 				if (o == null) {
 					return (result, null, -1);
 				}

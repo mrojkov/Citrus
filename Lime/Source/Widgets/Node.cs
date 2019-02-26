@@ -288,6 +288,8 @@ namespace Lime
 		[YuzuMember]
 		public NodeComponentCollection Components { get; private set; }
 
+		Component IAnimationHost.GetComponent(Type type) => Components.Get(type);
+
 		/// <summary>
 		/// Collections of Animators.
 		/// </summary>
@@ -361,6 +363,13 @@ namespace Lime
 				a = new Animation() { IsLegacy = true };
 				Animations.Add(a);
 				return a;
+			}
+		}
+
+		void IAnimationHost.OnAnimatorAdded(IAnimator animator)
+		{
+			if (Animations.TryFind(animator.AnimationId, out var animation)) {
+				animation.NextMarkerOrTriggerTime = null;
 			}
 		}
 
