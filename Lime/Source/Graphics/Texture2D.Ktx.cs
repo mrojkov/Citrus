@@ -62,7 +62,7 @@ namespace Lime
 				GraphicsUtility.CalculateMipLevelSize(levelCopy, pixelWidth, pixelHeight, out var levelWidth, out var levelHeight);
 				MemoryUsed = 0;
 				deferredCommands += () => {
-					var formatFeatures = RenderContextManager.CurrentContext.GetFormatFeatures(format);
+					var formatFeatures = PlatformRenderer.Context.GetFormatFeatures(format);
 					if (etcFormat && (formatFeatures & FormatFeatures.Sample) == 0) {
 						var rgba8Data = Marshal.AllocHGlobal(levelWidth * levelHeight * 4);
 						try {

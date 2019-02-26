@@ -23,6 +23,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		public int Width => width;
 		public int Height => height;
 		public int LevelCount => levelCount;
+		public bool Disposed { get; private set; }
 
 		public PlatformTexture2D(PlatformRenderContext context, Format format, int width, int height, bool mipmaps, TextureParams textureParams)
 			: this(context, format, width, height, mipmaps, false, textureParams)
@@ -48,6 +49,7 @@ namespace Lime.Graphics.Platform.Vulkan
 				context.Release(memory);
 				image = SharpVulkan.Image.Null;
 			}
+			Disposed = true;
 		}
 
 		private void Create(bool renderTarget)

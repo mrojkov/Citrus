@@ -58,9 +58,6 @@ namespace Lime.Graphics.Platform.OpenGL
 		private float boundClearDepth;
 		private byte boundClearStencil;
 
-		internal int MaxTextureSlots;
-		internal int MaxVertexBufferSlots;
-		internal int MaxVertexAttributes;
 		internal bool SupportsTextureRG;
 		internal bool SupportsPackedDepth24Stencil8;
 		internal bool SupportsDepth24;
@@ -76,6 +73,10 @@ namespace Lime.Graphics.Platform.OpenGL
 		internal bool ESProfile;
 		internal bool SupportsInternalFormatBgra8;
 		internal bool SupportsExternalFormatBgra8;
+
+		public int MaxTextureSlots { get; private set; }
+		public int MaxVertexBufferSlots { get; private set; }
+		public int MaxVertexAttributes { get; private set; }
 
 		public PlatformRenderContext()
 		{
@@ -184,10 +185,10 @@ namespace Lime.Graphics.Platform.OpenGL
 			SupportsEtc2 = (ESProfile && GLMajorVersion >= 3) || glExtensions.Contains("GL_ARB_ES3_compatibility");
 			SupportsInternalFormatBgra8 = ESProfile && glExtensions.Contains("GL_EXT_texture_format_BGRA8888");
 			SupportsExternalFormatBgra8 = SupportsInternalFormatBgra8 || !ESProfile || glExtensions.Contains("GL_APPLE_texture_format_BGRA8888");
-			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out MaxTextureSlots);
-			GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-			MaxTextureSlots = Math.Min(MaxTextureSlots, 32);
-			MaxVertexAttributes = Math.Min(MaxVertexAttributes, 64);
+			GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, out var maxTextureSlots);
+			GL.GetInteger(GetPName.MaxVertexAttribs, out var maxVertexAttributes);
+			MaxTextureSlots = Math.Min(maxTextureSlots, 32);
+			MaxVertexAttributes = Math.Min(maxVertexAttributes, 64);
 			MaxVertexBufferSlots = MaxVertexAttributes;
 		}
 

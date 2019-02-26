@@ -226,7 +226,6 @@
     <Compile Include="Source\Graphics\IMesh.cs" />
     <Compile Include="Source\Graphics\Buffer.cs" />
     <Compile Include="Source\Graphics\Etc2Decoder.cs" />
-    <Compile Include="Source\Graphics\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\Platform\Murmur3.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\GLHelper.cs" />
@@ -267,7 +266,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanHelper.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\PlatformShader.cs" />
-    <Compile Include="Source\Graphics\RenderContextManager.cs" />
     <Compile Include="Source\Graphics\VertexInputLayout.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />

@@ -122,7 +122,7 @@ namespace Lime
 				}
 				foreach (var texture in textures) {
 					if (texture != null) {
-						texture.Discard();
+						texture.Dispose();
 					}
 				}
 				textures.Clear();

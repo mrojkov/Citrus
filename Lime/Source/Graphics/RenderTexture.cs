@@ -5,7 +5,7 @@ using Lime.Graphics.Platform;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	public class RenderTexture : CommonTexture, ITexture, IGLObject
+	public class RenderTexture : CommonTexture, ITexture
 	{
 		private IPlatformRenderTexture2D platformTexture;
 
@@ -39,7 +39,6 @@ namespace Lime
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
-			GLObjectRegistry.Instance.Add(this);
 		}
 
 		public Size ImageSize {
@@ -60,7 +59,7 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) {}
 
-		public void Discard()
+		private void DisposeInternal()
 		{
 			MemoryUsed = 0;
 			if (platformTexture != null) {
@@ -74,19 +73,19 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			Discard();
+			DisposeInternal();
 			base.Dispose();
 		}
 
 		~RenderTexture()
 		{
-			Dispose();
+			DisposeInternal();
 		}
 
 		public IPlatformRenderTexture2D GetPlatformTexture()
 		{
 			if (platformTexture == null) {
-				platformTexture = RenderContextManager.CurrentContext.CreateRenderTexture2D(Format, size.Width, size.Height, textureParams);
+				platformTexture = PlatformRenderer.Context.CreateRenderTexture2D(Format, size.Width, size.Height, textureParams);
 			}
 			return platformTexture;
 		}

@@ -39,7 +39,7 @@ namespace Lime
 			foreach (WeakReference r in textures.Values) {
 				var texture = r.Target as ITexture;
 				if (texture != null && !texture.IsDisposed) {
-					texture.Discard();
+					texture.Dispose();
 				}
 			}
 		}
@@ -49,7 +49,7 @@ namespace Lime
 			foreach (WeakReference r in textures.Values) {
 				var target = r.Target as ITexture;
 				if (target != null && target.IsStubTexture && !target.IsDisposed) {
-					target.Discard();
+					target.Dispose();
 
 					//TODO: Вместо следующей строки, нужно реализовать нормальный Discard у StubTexture
 					r.Target = null;

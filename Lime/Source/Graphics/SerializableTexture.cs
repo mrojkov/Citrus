@@ -130,8 +130,6 @@ namespace Lime
 			return texture.GetPlatformTexture();
 		}
 
-		public void Discard() { }
-
 		public void SetAsRenderTarget()
 		{
 			if (texture == null) {

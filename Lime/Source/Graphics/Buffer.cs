@@ -3,7 +3,7 @@ using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public unsafe class Buffer : IGLObject, IDisposable
+	public unsafe class Buffer : IDisposable
 	{
 		private IPlatformBuffer platformBuffer;
 		private BufferType bufferType;
@@ -15,12 +15,11 @@ namespace Lime
 		{
 			this.bufferType = bufferType;
 			Dynamic = dynamic;
-			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~Buffer()
 		{
-			Discard();
+			DisposeInternal();
 		}
 
 		internal IPlatformBuffer GetPlatformBuffer()
@@ -30,11 +29,24 @@ namespace Lime
 
 		private void EnsurePlatformBuffer(int size)
 		{
-			if (platformBuffer == null || platformBuffer.Size < size) {
+			if (platformBuffer == null || platformBuffer.Size != size) {
 				if (platformBuffer != null) {
 					platformBuffer.Dispose();
 				}
-				platformBuffer = RenderContextManager.CurrentContext.CreateBuffer(bufferType, size, Dynamic);
+				platformBuffer = PlatformRenderer.Context.CreateBuffer(bufferType, size, Dynamic);
+				Rebind();
+			}
+		}
+
+		private void Rebind()
+		{
+			switch (bufferType) {
+				case BufferType.Vertex:
+					PlatformRenderer.RebindVertexBuffer(this);
+					break;
+				case BufferType.Index:
+					PlatformRenderer.RebindIndexBuffer(this);
+					break;
 			}
 		}
 
@@ -46,12 +58,12 @@ namespace Lime
 
 		public void Dispose()
 		{
-			Discard();
+			DisposeInternal();
 			IsDisposed = true;
 			GC.SuppressFinalize(this);
 		}
 
-		public void Discard()
+		private void DisposeInternal()
 		{
 			if (platformBuffer != null) {
 				var platformBufferCopy = platformBuffer;

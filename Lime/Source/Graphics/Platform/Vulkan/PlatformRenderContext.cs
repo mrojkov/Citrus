@@ -46,14 +46,12 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.PipelineCache pipelineCache;
 		private UploadBufferAllocator uploadBufferSuballocator;
 		private DescriptorAllocator descriptorAllocator;
-		private const int MaxVertexBufferSlots = 32;
-		private PlatformBuffer[] vertexBuffers = new PlatformBuffer[MaxVertexBufferSlots];
-		private int[] vertexOffsets = new int[MaxVertexBufferSlots];
+		private PlatformBuffer[] vertexBuffers;
+		private int[] vertexOffsets;
 		private PlatformBuffer indexBuffer;
 		private int indexOffset;
 		private IndexFormat indexFormat;
-		private const int MaxTextureSlots = 32;
-		private PlatformTexture2D[] textures = new PlatformTexture2D[MaxTextureSlots];
+		private PlatformTexture2D[] textures;
 		private PlatformRenderTexture2D renderTarget;
 		private SamplerCache samplerCache;
 		private Dictionary<Format, FormatFeatures> formatFeaturesCache = new Dictionary<Format, FormatFeatures>();
@@ -63,7 +61,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private MemoryAlloc readbackBufferMemory;
 		private ulong readbackBufferSize;
 
-		private BoundVertexBuffer[] boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
+		private BoundVertexBuffer[] boundVertexBuffers;
 		private BoundIndexBuffer boundIndexBuffer;
 
 		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
@@ -82,6 +80,10 @@ namespace Lime.Graphics.Platform.Vulkan
 		internal SharpVulkan.Buffer ReadbackBuffer => readbackBuffer;
 		internal MemoryAlloc ReadbackBufferMemory => readbackBufferMemory;
 
+		public int MaxTextureSlots { get; private set; }
+		public int MaxVertexBufferSlots { get; private set; }
+		public int MaxVertexAttributes { get; private set; }
+
 		public PlatformRenderContext()
 		{
 			CreateInstance();
@@ -90,6 +92,10 @@ namespace Lime.Graphics.Platform.Vulkan
 			}
 			CreateDevice();
 			CheckFeatures();
+			textures = new PlatformTexture2D[MaxTextureSlots];
+			vertexBuffers = new PlatformBuffer[MaxVertexBufferSlots];
+			vertexOffsets = new int[MaxVertexBufferSlots];
+			boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
 			CreateCommandPool();
 			CreatePipelineCache();
 			MemoryAllocator = new MemoryAllocator(this, preferPersistentMapping: true);
@@ -116,6 +122,9 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			physicalDevice.GetProperties(out var physicalDeviceProperties);
 			physicalDeviceLimits = physicalDeviceProperties.Limits;
+			MaxTextureSlots = 32;
+			MaxVertexAttributes = 64;
+			MaxVertexBufferSlots = MaxVertexAttributes;
 		}
 
 		private void CreateInstance()
@@ -519,7 +528,10 @@ namespace Lime.Graphics.Platform.Vulkan
 				};
 				switch (templateEntry.DescriptorType) {
 					case SharpVulkan.DescriptorType.CombinedImageSampler:
-						var texture = textures[templateEntry.TextureSlot] ?? placeholderTexture;
+						var texture = textures[templateEntry.TextureSlot];
+						if (texture == null || texture.Disposed) {
+							texture = placeholderTexture;
+						}
 						imageInfos[writeCount].ImageLayout = SharpVulkan.ImageLayout.ShaderReadOnlyOptimal;
 						imageInfos[writeCount].ImageView = texture.ImageView;
 						imageInfos[writeCount].Sampler = texture.Sampler;

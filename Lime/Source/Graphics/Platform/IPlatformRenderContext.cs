@@ -4,6 +4,10 @@ namespace Lime.Graphics.Platform
 {
 	internal interface IPlatformRenderContext : IDisposable
 	{
+		int MaxTextureSlots { get; }
+		int MaxVertexBufferSlots { get; }
+		int MaxVertexAttributes { get; }
+
 		IPlatformBuffer CreateBuffer(BufferType bufferType, int size, bool dynamic);
 		IPlatformTexture2D CreateTexture2D(Format format, int width, int height, bool mipmaps, TextureParams textureParams);
 		IPlatformRenderTexture2D CreateRenderTexture2D(Format format, int width, int height, TextureParams textureParams);

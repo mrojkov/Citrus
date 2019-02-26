@@ -8,81 +8,8 @@ namespace Lime
 	/// Represents 2D texture
 	/// </summary>
 	[YuzuDontGenerateDeserializer]
-	public partial class Texture2D : CommonTexture, ITexture, IGLObject
+	public partial class Texture2D : CommonTexture, ITexture
 	{
-		#region TextureReloader
-		abstract class TextureReloader
-		{
-			public abstract void Reload(Texture2D texture);
-		}
-
-		class TextureStubReloader : TextureReloader
-		{
-			private readonly bool transparent;
-
-			public TextureStubReloader(bool transparent)
-			{
-				this.transparent = transparent;
-			}
-
-			public override void Reload(Texture2D texture)
-			{
-				texture.LoadStubImage(transparent);
-			}
-		}
-
-		class TextureBundleReloader : TextureReloader
-		{
-			public string path;
-
-			public TextureBundleReloader(string path)
-			{
-				this.path = path;
-			}
-
-			public override void Reload(Texture2D texture)
-			{
-				texture.LoadImage(path);
-			}
-		}
-
-		class TexturePixelArrayReloader : TextureReloader
-		{
-			Color4[] pixels;
-			int width;
-			int height;
-
-			public TexturePixelArrayReloader(Color4[] pixels, int width, int height)
-			{
-				this.pixels = pixels;
-				this.width = width;
-				this.height = height;
-			}
-
-			public override void Reload(Texture2D texture)
-			{
-				texture.LoadImage(pixels, width, height);
-			}
-		}
-
-		class TextureStreamReloader : TextureReloader
-		{
-			MemoryStream stream;
-
-			public TextureStreamReloader(Stream stream)
-			{
-				this.stream = new MemoryStream();
-				stream.CopyTo(this.stream);
-				stream.Seek(0, SeekOrigin.Begin);
-			}
-
-			public override void Reload(Texture2D texture)
-			{
-				texture.LoadImage(stream);
-			}
-		}
-		#endregion
-
 		public delegate void TextureMissingDelegate(string path);
 
 		public static bool IsStubTextureTransparent;
@@ -100,7 +27,6 @@ namespace Lime
 		public Size ImageSize { get; protected set; }
 		public Size SurfaceSize { get; protected set; }
 		private Rectangle uvRect;
-		private TextureReloader reloader;
 		private int usedOnRenderCycle;
 
 		public ITexture AtlasTexture => this;
@@ -128,11 +54,6 @@ namespace Lime
 			}
 		}
 
-		public Texture2D()
-		{
-			GLObjectRegistry.Instance.Add(this);
-		}
-
 		private void LoadTextureParams(string path)
 		{
 			var textureParamsPath = path + ".texture";
@@ -149,45 +70,41 @@ namespace Lime
 		{
 			IsStubTexture = false;
 
-			try {
-				foreach (string textureFileExtension in AffordableTextureFileExtensions) {
-					string tryPath = path + textureFileExtension;
-					if (!AssetBundle.Current.FileExists(tryPath)) {
-						continue;
-					}
-
-					Stream stream;
-					try {
-						stream = AssetBundle.Current.OpenFileLocalized(tryPath);
-					} catch (System.Exception e) {
-						Console.WriteLine("Can not open file '{0}':\n{1}", path, e);
-						continue;
-					}
-
-					using (stream) {
-						LoadImageHelper(stream, createReloader: false);
-					}
-
-					LoadTextureParams(path);
-
-					var maskPath = path + ".mask";
-					if (AssetBundle.Current.FileExists(maskPath)) {
-						OpacityMask = new OpacityMask(maskPath);
-					}
-
-					if (Application.IsMain(Application.CurrentThread)) {
-						AudioSystem.Update();
-					}
-
-					return;
+			foreach (string textureFileExtension in AffordableTextureFileExtensions) {
+				string tryPath = path + textureFileExtension;
+				if (!AssetBundle.Current.FileExists(tryPath)) {
+					continue;
 				}
 
-				Console.WriteLine("Missing texture '{0}'", path);
-				onTextureMissing?.Invoke(path);
-				LoadStubImage(IsStubTextureTransparent && !path.IsNullOrWhiteSpace());
-			} finally {
-				reloader = new TextureBundleReloader(path);
+				Stream stream;
+				try {
+					stream = AssetBundle.Current.OpenFileLocalized(tryPath);
+				} catch (System.Exception e) {
+					Console.WriteLine("Can not open file '{0}':\n{1}", path, e);
+					continue;
+				}
+
+				using (stream) {
+					LoadImageHelper(stream, createReloader: false);
+				}
+
+				LoadTextureParams(path);
+
+				var maskPath = path + ".mask";
+				if (AssetBundle.Current.FileExists(maskPath)) {
+					OpacityMask = new OpacityMask(maskPath);
+				}
+
+				if (Application.IsMain(Application.CurrentThread)) {
+					AudioSystem.Update();
+				}
+
+				return;
 			}
+
+			Console.WriteLine("Missing texture '{0}'", path);
+			onTextureMissing?.Invoke(path);
+			LoadStubImage(IsStubTextureTransparent && !path.IsNullOrWhiteSpace());
 		}
 
 		internal void LoadStubImage(bool transparent)
@@ -211,7 +128,6 @@ namespace Lime
 			LoadImage(pixels, side, side);
 
 			IsStubTexture = true;
-			reloader = new TextureStubReloader(transparent);
 		}
 
 		public void LoadImage(byte[] data)
@@ -239,8 +155,6 @@ namespace Lime
 
 		private void LoadImageHelper(Stream stream, bool createReloader)
 		{
-			reloader = createReloader ? new TextureStreamReloader(stream) : null;
-			Discard();
 			if (!stream.CanSeek) {
 				stream = new RewindableStream(stream);
 			}
@@ -282,7 +196,8 @@ namespace Lime
 				if (platformTexture != null) {
 					platformTexture.Dispose();
 				}
-				platformTexture = RenderContextManager.CurrentContext.CreateTexture2D(format, width, height, mipmaps, textureParams);
+				platformTexture = PlatformRenderer.Context.CreateTexture2D(format, width, height, mipmaps, textureParams);
+				PlatformRenderer.RebindTexture(this);
 			}
 		}
 
@@ -292,8 +207,6 @@ namespace Lime
 		public void LoadImage(Color4[] pixels, int width, int height)
 		{
 			IsStubTexture = false;
-
-			reloader = new TexturePixelArrayReloader(pixels, width, height);
 
 			MemoryUsed = 4 * width * height;
 			ImageSize = new Size(width, height);
@@ -344,28 +257,6 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			Discard();
-			base.Dispose();
-		}
-
-		public virtual IPlatformTexture2D GetPlatformTexture()
-		{
-			if (IsDisposed) {
-				throw new ObjectDisposedException(GetType().Name);
-			}
-			if (platformTexture == null) {
-				Reload();
-				if (platformTexture == null) {
-					platformTexture = RenderContextManager.CurrentContext.CreateTexture2D(Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
-					platformTexture.SetData(0, Color4.Black);
-				}
-			}
-			usedOnRenderCycle = Renderer.RenderCycle;
-			return platformTexture;
-		}
-
-		public void Discard()
-		{
 			MemoryUsed = 0;
 			if (platformTexture != null) {
 				var platformTextureCopy = platformTexture;
@@ -374,22 +265,23 @@ namespace Lime
 				});
 				platformTexture = null;
 			}
+			base.Dispose();
+		}
+
+		public virtual IPlatformTexture2D GetPlatformTexture()
+		{
+			if (IsDisposed) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
+			usedOnRenderCycle = Renderer.RenderCycle;
+			return platformTexture;
 		}
 
 		public override void MaybeDiscardUnderPressure()
 		{
 			if (Renderer.RenderCycle - usedOnRenderCycle > 3) {
-				Discard();
+				Dispose();
 			}
-		}
-
-		private void Reload()
-		{
-			Window.Current.InvokeOnRendering(() => {
-				if (reloader != null) {
-					reloader.Reload(this);
-				}
-			});
 		}
 
 		/// <summary>

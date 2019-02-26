@@ -5,7 +5,7 @@ using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public class ShaderProgram : IGLObject
+	public class ShaderProgram
 	{
 		public class AttribLocation
 		{
@@ -33,20 +33,20 @@ namespace Lime
 			this.shaders = shaders.ToArray();
 			this.attribLocations = attribLocations.ToArray();
 			this.samplers = samplers.ToArray();
-			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~ShaderProgram()
 		{
-			Dispose();
+			DisposeInternal();
 		}
 
 		public void Dispose()
 		{
-			Discard();
+			DisposeInternal();
+			GC.SuppressFinalize(this);
 		}
 
-		public void Discard()
+		private void DisposeInternal()
 		{
 			if (platformProgram != null) {
 				var platformProgramCopy = platformProgram;
@@ -68,7 +68,7 @@ namespace Lime
 		private void Create()
 		{
 			var platformShaders = shaders.Select(i => i.GetPlatformShader()).ToArray();
-			platformProgram = RenderContextManager.CurrentContext.CreateShaderProgram(platformShaders, attribLocations, samplers);
+			platformProgram = PlatformRenderer.Context.CreateShaderProgram(platformShaders, attribLocations, samplers);
 			uniforms = ReflectUniforms().OrderBy(i => i.SortingKey).ToArray();
 			paramsToSync = new ShaderParam[uniforms.Length];
 			boundParams = new BoundShaderParam[uniforms.Length];

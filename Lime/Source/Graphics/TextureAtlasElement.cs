@@ -98,8 +98,6 @@ namespace Lime
 			return AtlasTexture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
 
-		public void Discard() { }
-
 		public Color4[] GetPixels()
 		{
 			throw new NotSupportedException();

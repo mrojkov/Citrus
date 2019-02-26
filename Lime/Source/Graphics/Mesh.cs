@@ -7,7 +7,7 @@ using Yuzu;
 namespace Lime
 {
 	[YuzuSpecializeWith(typeof(Lime.Mesh3D.Vertex))]
-	public unsafe partial class Mesh<T> : IMesh, IGLObject, IDisposable where T : unmanaged
+	public unsafe partial class Mesh<T> : IMesh, IDisposable where T : unmanaged
 	{
 		private bool disposed;
 
@@ -30,11 +30,6 @@ namespace Lime
 		private VertexBuffer vertexBuffer;
 		private IndexBuffer indexBuffer;
 
-		~Mesh()
-		{
-			Dispose();
-		}
-
 		public void Dispose()
 		{
 			if (!disposed) {
@@ -48,18 +43,6 @@ namespace Lime
 				}
 				disposed = true;
 			}
-			GC.SuppressFinalize(this);
-		}
-
-		public void Discard()
-		{
-			if (vertexBuffer != null) {
-				vertexBuffer.Discard();
-			}
-			if (indexBuffer != null) {
-				indexBuffer.Discard();
-			}
-			DirtyFlags = MeshDirtyFlags.All;
 		}
 
 		public Mesh<T> ShallowClone()

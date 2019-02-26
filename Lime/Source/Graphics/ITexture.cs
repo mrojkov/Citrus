@@ -85,13 +85,6 @@ namespace Lime
 		int MemoryUsed { get; }
 		TextureParams TextureParams { get; set; }
 
-		/// <summary>
-		/// Unloads the texture from memory, frees OpenGL resources.
-		/// The texture will be loaded again on the next GetHandle().
-		/// RenderTexture.Unload() does nothing.
-		/// </summary>
-		void Discard();
-
 		void MaybeDiscardUnderPressure();
 		Color4[] GetPixels();
 	}

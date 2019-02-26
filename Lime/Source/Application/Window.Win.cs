@@ -263,6 +263,7 @@ namespace Lime
 				graphicsContext.SwapInterval = 1;
 				if (platformRenderContext == null) {
 					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+					PlatformRenderer.Initialize(platformRenderContext);
 				}
 				graphicsContext.MakeCurrent(null);
 			}
@@ -290,7 +291,6 @@ namespace Lime
 			{
 				graphicsContext.MakeCurrent(windowInfo);
 				platformRenderContext.Begin(0);
-				RenderContextManager.MakeCurrent(platformRenderContext);
 			}
 
 			public override void SwapBuffers()
@@ -301,7 +301,6 @@ namespace Lime
 
 			public override void UnbindContext()
 			{
-				RenderContextManager.MakeCurrent(null);
 				OpenTK.Graphics.GraphicsContext.CurrentContext?.MakeCurrent(null);
 			}
 		}
@@ -317,6 +316,7 @@ namespace Lime
 				base.OnHandleCreated(e);
 				if (platformRenderContext == null) {
 					platformRenderContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
+					PlatformRenderer.Initialize(platformRenderContext);
 				}
 				swapchain = new Graphics.Platform.Vulkan.Swapchain(platformRenderContext, Handle, ClientSize.Width, ClientSize.Height);
 			}
@@ -337,7 +337,6 @@ namespace Lime
 
 			public override void Begin()
 			{
-				RenderContextManager.MakeCurrent(platformRenderContext);
 				platformRenderContext.Begin(swapchain);
 			}
 
@@ -348,7 +347,6 @@ namespace Lime
 
 			public override void UnbindContext()
 			{
-				RenderContextManager.MakeCurrent(null);
 			}
 		}
 

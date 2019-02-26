@@ -3,7 +3,7 @@ using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public class Shader : IGLObject, IDisposable
+	public class Shader : IDisposable
 	{
 		private IPlatformShader platformShader;
 		private string source;
@@ -13,20 +13,20 @@ namespace Lime
 		{
 			this.stage = stage;
 			this.source = source;
-			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~Shader()
 		{
-			Dispose();
+			DisposeInternal();
 		}
 
 		public void Dispose()
 		{
-			Discard();
+			DisposeInternal();
+			GC.SuppressFinalize(this);
 		}
 
-		public void Discard()
+		private void DisposeInternal()
 		{
 			if (platformShader != null) {
 				var platformShaderCopy = platformShader;
@@ -40,7 +40,7 @@ namespace Lime
 		internal IPlatformShader GetPlatformShader()
 		{
 			if (platformShader == null) {
-				platformShader = RenderContextManager.CurrentContext.CreateShader(stage, source);
+				platformShader = PlatformRenderer.Context.CreateShader(stage, source);
 			}
 			return platformShader;
 		}

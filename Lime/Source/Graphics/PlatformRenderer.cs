@@ -259,19 +259,32 @@ namespace Lime
 		}
 	}
 
-	public unsafe static class PlatformRenderer
+	public static class PlatformRenderer
 	{
+		private static ITexture[] textures;
+		private static VertexBuffer[] vertexBuffers;
+		private static int[] vertexOffsets;
+		private static IndexBuffer indexBuffer;
+		private static int indexOffset;
+		private static IndexFormat indexFormat;
 		private static ShaderProgram shaderProgram;
 		private static ShaderParams[] shaderParamsArray = new ShaderParams[0];
 		private static int shaderParamsArrayCount;
 
-		private static IPlatformRenderContext Context => RenderContextManager.CurrentContext;
+		internal static IPlatformRenderContext Context { get; private set; }
 
 		public static RenderTexture CurrentRenderTarget { get; private set; }
 		public static int DrawCount { get; private set; } = 0;
 		public static bool OffscreenRendering => CurrentRenderTarget != null;
-
 		public static event Action RenderTargetChanged;
+
+		internal static void Initialize(IPlatformRenderContext context)
+		{
+			Context = context;
+			textures = new ITexture[Context.MaxTextureSlots];
+			vertexBuffers = new VertexBuffer[Context.MaxVertexBufferSlots];
+			vertexOffsets = new int[Context.MaxVertexBufferSlots];
+		}
 
 		public static void BeginFrame()
 		{
@@ -288,6 +301,7 @@ namespace Lime
 		public static void SetTexture(int slot, ITexture texture)
 		{
 			Context.SetTexture(slot, texture?.GetPlatformTexture());
+			textures[slot] = texture;
 		}
 
 		public static void SetVertexInputLayout(VertexInputLayout layout)
@@ -298,11 +312,16 @@ namespace Lime
 		public static void SetVertexBuffer(int slot, VertexBuffer buffer, int offset)
 		{
 			Context.SetVertexBuffer(slot, buffer?.GetPlatformBuffer(), offset);
+			vertexBuffers[slot] = buffer;
+			vertexOffsets[slot] = offset;
 		}
 
 		public static void SetIndexBuffer(IndexBuffer buffer, int offset, IndexFormat format)
 		{
 			Context.SetIndexBuffer(buffer?.GetPlatformBuffer(), offset, format);
+			indexBuffer = buffer;
+			indexOffset = offset;
+			indexFormat = format;
 		}
 
 		public static void SetShaderProgram(ShaderProgram program)
@@ -391,6 +410,31 @@ namespace Lime
 			SetRenderTarget(null);
 			Array.Clear(shaderParamsArray, 0, shaderParamsArray.Length);
 			shaderParamsArrayCount = 0;
+		}
+
+		internal static void RebindIndexBuffer(Buffer buffer)
+		{
+			if (indexBuffer == buffer) {
+				Context.SetIndexBuffer(buffer?.GetPlatformBuffer(), indexOffset, indexFormat);
+			}
+		}
+
+		internal static void RebindVertexBuffer(Buffer buffer)
+		{
+			for (var slot = 0; slot < vertexBuffers.Length; slot++) {
+				if (vertexBuffers[slot] == buffer) {
+					Context.SetVertexBuffer(slot, buffer?.GetPlatformBuffer(), vertexOffsets[slot]);
+				}
+			}
+		}
+
+		internal static void RebindTexture(ITexture texture)
+		{
+			for (var slot = 0; slot < textures.Length; slot++) {
+				if (textures[slot] == texture) {
+					Context.SetTexture(slot, texture?.GetPlatformTexture());
+				}
+			}
 		}
 
 		internal static void SetRenderTarget(RenderTexture texture)

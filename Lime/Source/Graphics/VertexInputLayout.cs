@@ -4,7 +4,7 @@ using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public class VertexInputLayout : IGLObject, IDisposable
+	public class VertexInputLayout : IDisposable
 	{
 		private static Dictionary<long, VertexInputLayout> layoutCache = new Dictionary<long, VertexInputLayout>();
 
@@ -20,21 +20,20 @@ namespace Lime
 			this.attributes = new VertexInputLayoutAttribute[attributeCount];
 			Array.Copy(bindings, this.bindings, bindingCount);
 			Array.Copy(attributes, this.attributes, attributeCount);
-			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~VertexInputLayout()
 		{
-			Discard();
+			DisposeInternal();
 		}
 
 		public void Dispose()
 		{
-			Discard();
+			DisposeInternal();
 			GC.SuppressFinalize(this);
 		}
 
-		public void Discard()
+		private void DisposeInternal()
 		{
 			if (platformLayout != null) {
 				var platformLayoutCopy = platformLayout;
@@ -48,7 +47,7 @@ namespace Lime
 		internal IPlatformVertexInputLayout GetPlatformLayout()
 		{
 			if (platformLayout == null) {
-				platformLayout = RenderContextManager.CurrentContext.CreateVertexInputLayout(bindings, attributes);
+				platformLayout = PlatformRenderer.Context.CreateVertexInputLayout(bindings, attributes);
 			}
 			return platformLayout;
 		}
