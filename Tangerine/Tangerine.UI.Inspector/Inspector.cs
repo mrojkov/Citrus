@@ -117,8 +117,14 @@ namespace Tangerine.UI.Inspector
 		{
 			var r = 0;
 			if (Document.Current.Animation.IsCompound) {
-				foreach (var clip in GetSelectedAnimationClips()) {
-					r ^= clip.GetHashCode();
+				if (Document.Current.GetCompoundAnimationIspectMode == CompoundAnimationInspectionMode.Tracks) {
+					foreach (var track in GetSelectedAnimationTracks()) {
+						r ^= track.GetHashCode();
+					}
+				} else {
+					foreach (var clip in GetSelectedAnimationClips()) {
+						r ^= clip.GetHashCode();
+					}
 				}
 			} else if (Document.Current.InspectRootNode) {
 				var rootNode = Document.Current.RootNode;
@@ -145,7 +151,11 @@ namespace Tangerine.UI.Inspector
 		private void Rebuild()
 		{
 			if (Document.Current.Animation.IsCompound) {
-				content.BuildForObjects(GetSelectedAnimationClips().ToList());
+				if (Document.Current.GetCompoundAnimationIspectMode == CompoundAnimationInspectionMode.Tracks) {
+					content.BuildForObjects(GetSelectedAnimationTracks().ToList());
+				} else {
+					content.BuildForObjects(GetSelectedAnimationClips().ToList());
+				}
 			} else if (Document.Current.InspectRootNode) {
 				content.BuildForObjects(new[] { Document.Current.RootNode });
 			} else {
@@ -155,6 +165,13 @@ namespace Tangerine.UI.Inspector
 			Toolbar.Rebuild();
 			// Delay UpdateScrollPosition, since contentWidget.MaxScrollPosition is not updated yet.
 			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
+		}
+
+		private static IEnumerable<AnimationTrack> GetSelectedAnimationTracks()
+		{
+			foreach (var row in Document.Current.SelectedRows()) {
+				yield return row.Components.Get<AnimationTrackRow>().Track;
+			}
 		}
 
 		private static IEnumerable<AnimationClip> GetSelectedAnimationClips()

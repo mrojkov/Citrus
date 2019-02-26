@@ -21,6 +21,12 @@ namespace Tangerine.Core
 		Fbx
 	}
 
+	public enum CompoundAnimationInspectionMode
+	{
+		Tracks,
+		Clips,
+	}
+
 	public sealed partial class Document
 	{
 		public enum CloseAction
@@ -55,6 +61,7 @@ namespace Tangerine.Core
 		public bool IsModified => History.IsDocumentModified;
 		public event Action<Document> Saving;
 
+		public CompoundAnimationInspectionMode GetCompoundAnimationIspectMode = CompoundAnimationInspectionMode.Tracks;
 
 		/// <summary>
 		/// The list of Tangerine node decorators.
