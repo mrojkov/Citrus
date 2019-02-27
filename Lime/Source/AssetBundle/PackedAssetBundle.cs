@@ -142,7 +142,7 @@ namespace Lime
 		private readonly BinaryWriter writer;
 		private readonly Stream stream;
 		private AssetBundleFlags flags;
-		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
+		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>(StringComparer.OrdinalIgnoreCase);
 		private readonly List<AssetDescriptor> trash = new List<AssetDescriptor>();
 		private readonly System.Reflection.Assembly resourcesAssembly;
 		private bool wasModified { get; set; }

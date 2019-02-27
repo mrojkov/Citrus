@@ -436,7 +436,7 @@ namespace Orange
 
 		static void SyncDeleted()
 		{
-			var assetFiles = new HashSet<string>();
+			var assetFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {
 				assetFiles.Add(fileInfo.Path);
 			}
