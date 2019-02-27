@@ -42,13 +42,25 @@ namespace Lime
 			}
 		}
 
-		public ITexture AtlasTexture { get; private set; }
+		private ITexture atlasTexture;
+
+		public ITexture AtlasTexture
+		{
+			get {
+				if (atlasTexture == null || atlasTexture.IsDisposed) {
+					atlasTexture = TexturePool.Instance.GetTexture(AtlasPath);
+				}
+				return atlasTexture;
+			}
+		}
+
+		public string AtlasPath { get; private set; }
 		public Rectangle AtlasUVRect { get; private set; }
 		public Size ImageSize { get; private set; }
 
 		public TextureAtlasElement(Params @params)
 		{
-			AtlasTexture = TexturePool.Instance.GetTexture(@params.AtlasPath);
+			AtlasPath = @params.AtlasPath;
 			AtlasUVRect = new Rectangle(
 				(Vector2)@params.AtlasRect.A / (Vector2)AtlasTexture.SurfaceSize,
 				(Vector2)@params.AtlasRect.B / (Vector2)AtlasTexture.SurfaceSize
