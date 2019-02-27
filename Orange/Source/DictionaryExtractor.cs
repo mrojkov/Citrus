@@ -34,7 +34,7 @@ namespace Orange
 			}
 		}
 
-		private static string GetFileName()
+		private static string GetDefaultFileName()
 		{
 			return Path.ChangeExtension("Dictionary.txt", CreateSerializer().GetFileExtension());
 		}
@@ -47,18 +47,19 @@ namespace Orange
 				SearchOption.TopDirectoryOnly);
 			return files
 				.Select(f => Path.GetFileName(f))
-				.Where(f => Path.GetFileName(f).StartsWith("Dictionary"));
+				.Where(f => f.StartsWith("Dictionary"));
 		}
 
 		private void CleanupAndSaveDictionary(string path)
 		{
 			var result = new LocalizationDictionary();
 			LoadDictionary(result, path);
-			MergeDictionaries(result, dictionary);
+			var addContext = ShouldAddContextToLocalizedDictionary() || path == GetDefaultFileName();
+			MergeDictionaries(result, dictionary, addContext);
 			SaveDictionary(result, path);
 		}
 
-		private static void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified)
+		private static void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified, bool addContext)
 		{
 			int added = 0, deleted = 0, updated = 0;
 			foreach (var key in modified.Keys.ToList()) {
@@ -74,6 +75,9 @@ namespace Orange
 						updated++;
 						currentEntry.Context = newEntry.Context;
 					}
+				}
+				if (!addContext) {
+					current[key].Context = "";
 				}
 			}
 			foreach (var key in current.Keys.ToList()) {
@@ -159,6 +163,11 @@ namespace Orange
 		private static bool ShouldLocalizeOnlyTaggedSceneTexts()
 		{
 			return The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
+		}
+
+		private static bool ShouldAddContextToLocalizedDictionary()
+		{
+			return The.Workspace.ProjectJson.GetValue("AddContextToLocalizedDictionary", true);
 		}
 
 		private void ProcessSourceFile(string file)
