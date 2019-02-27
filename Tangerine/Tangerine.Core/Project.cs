@@ -491,7 +491,7 @@ namespace Tangerine.Core
 
 		public string GetFullPath(string assetPath, string extension)
 		{
-			return Path.ChangeExtension(Path.Combine(AssetsDirectory, assetPath), extension);
+			return Path.Combine(AssetsDirectory, assetPath) + $".{extension}";
 		}
 
 		public bool GetFullPath(string localPath, out string fullPath)
