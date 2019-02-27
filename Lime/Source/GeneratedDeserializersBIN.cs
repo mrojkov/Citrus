@@ -4913,6 +4913,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.IsRoot = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
 				result.Node = d.Reader.ReadString();
 				if (result.Node == "" && d.Reader.ReadBoolean()) result.Node = null;
 				fd = def.Fields[d.Reader.ReadInt16()];

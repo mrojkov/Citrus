@@ -606,10 +606,23 @@ namespace Tangerine
 					w => new NodeComponentCollectionRow(w, attachment.NodeComponents), attachment.NodeComponents);
 				widgetFactory.AddHeader(NodeComponentCollectionRow.CreateHeader());
 				widgetFactory.AddFooter(DeletableRow<Model3DAttachment.NodeComponentCollection>.CreateFooter(() => {
-					history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
-						attachment.NodeComponents,
-						attachment.NodeComponents.Count,
-						new Model3DAttachment.NodeComponentCollection { NodeId = "Node id", Components = null }));
+
+					void CreateNodeComponent(bool isRoot = false)
+					{
+						history.DoTransaction(() => Core.Operations.InsertIntoList.Perform(
+							attachment.NodeComponents,
+							attachment.NodeComponents.Count,
+							new Model3DAttachment.NodeComponentCollection { NodeId = isRoot ? "" : "Node id", Components = null, IsRoot = isRoot }));
+					}
+
+					if (!attachment.NodeComponents.Any(c => c.IsRoot)) {
+						var menu = new Menu();
+						menu.Add(new Command("Add For Node", () => CreateNodeComponent()));
+						menu.Add(new Command("Add For Root", () => CreateNodeComponent(true)));
+						menu.Popup();
+					} else {
+						CreateNodeComponent();
+					}
 				}));
 				list.Components.Add(widgetFactory);
 			}));
@@ -1385,13 +1398,16 @@ namespace Tangerine
 				};
 				Padding = new Thickness(AttachmentMetrics.Spacing);
 				Header.Nodes.Add(expandedButton);
-
-				var nodeIdPropEditor = new StringPropertyEditor(
+				if (source.IsRoot) {
+					Header.AddNode(new ThemedSimpleText("<Root>"));
+				} else {
+					var nodeIdPropEditor = new StringPropertyEditor(
 					Decorate(new PropertyEditorParams(
 						Header,
 						source,
 						nameof(Model3DAttachment.NodeComponentCollection.NodeId))));
-				nodeIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+					nodeIdPropEditor.ContainerWidget.MinMaxWidth = AttachmentMetrics.EditorWidth;
+				}
 
 				var expandableContentWrapper = new Widget {
 					Layout = new VBoxLayout { Spacing = AttachmentMetrics.Spacing },

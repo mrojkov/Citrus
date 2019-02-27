@@ -80,6 +80,7 @@ namespace Lime
 
 		public class NodeComponentCollection
 		{
+			public bool IsRoot { get; set; }
 			public string NodeId { get; set; }
 			public ObservableCollection<NodeComponent> Components { get; set; }
 		}
@@ -269,8 +270,8 @@ namespace Lime
 		private void ProcessComponents(Node3D model)
 		{
 			foreach (var nodeComponentData in NodeComponents) {
-				Node node;
-				if ((node = model.TryFindNode(nodeComponentData.NodeId)) != null) {
+				var node = nodeComponentData.IsRoot ? model : model.TryFindNode(nodeComponentData.NodeId);
+				if (node != null) {
 					foreach (var component in nodeComponentData.Components) {
 						if (ValidateComponentType(node.GetType(), component.GetType())) {
 							node.Components.Add(component.Clone());
@@ -714,6 +715,9 @@ namespace Lime
 		public class ModelComponentsFormat
 		{
 			[YuzuMember]
+			public bool IsRoot;
+
+			[YuzuMember]
 			public string Node = null;
 
 			[YuzuMember]
@@ -800,7 +804,8 @@ namespace Lime
 					foreach (var nodeComponentFormat in modelAttachmentFormat.NodeComponents) {
 						var componentDescr = new Model3DAttachment.NodeComponentCollection {
 							NodeId = nodeComponentFormat.Key,
-							Components = new ObservableCollection<NodeComponent>(nodeComponentFormat.Value.Components)
+							Components = new ObservableCollection<NodeComponent>(nodeComponentFormat.Value.Components),
+							IsRoot = nodeComponentFormat.Value.IsRoot
 						};
 						attachment.NodeComponents.Add(componentDescr);
 					}
@@ -944,6 +949,7 @@ namespace Lime
 				var componentFormat = new ModelComponentsFormat {
 					Node = component.NodeId,
 					Components = component.Components.ToList(),
+					IsRoot = component.IsRoot
 				};
 				origin.NodeComponents.Add(component.NodeId, componentFormat);
 			}
