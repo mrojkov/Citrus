@@ -355,11 +355,9 @@
     <Compile Include="Source\Graphics\Format.cs" />
     <Compile Include="Source\Graphics\GraphicsUtility.cs" />
     <Compile Include="Source\Graphics\Hasher.cs" />
-    <Compile Include="Source\Graphics\IGLObject.cs" />
     <Compile Include="Source\Graphics\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\PlatformRenderer.cs" />
-    <Compile Include="Source\Graphics\RenderContextManager.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Shader.cs" />
     <Compile Include="Source\Graphics\ShaderParams.cs" />
@@ -458,7 +456,6 @@
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
-    <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
