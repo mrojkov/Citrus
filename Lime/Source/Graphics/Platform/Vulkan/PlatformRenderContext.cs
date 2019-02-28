@@ -31,6 +31,8 @@ namespace Lime.Graphics.Platform.Vulkan
 		private SharpVulkan.RenderPass activeRenderPass;
 		private SharpVulkan.Format activeColorFormat;
 		private SharpVulkan.Format activeDepthStencilFormat;
+		private int activeRenderPassWidth;
+		private int activeRenderPassHeight;
 		private Viewport viewport;
 		private BlendState blendState;
 		private DepthState depthState;
@@ -818,7 +820,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		//	var clearRect = new SharpVulkan.ClearRect {
 		//		BaseArrayLayer = 0,
 		//		LayerCount = 1,
-		//		Rect = new SharpVulkan.Rect2D(0, 0, (uint)viewport.Width, (uint)viewport.Height)
+		//		Rect = new SharpVulkan.Rect2D(0, 0, (uint)activeRenderPassWidth, (uint)activeRenderPassHeight)
 		//	};
 		//	commandBuffer.ClearAttachments(attachmentCount, ref attachments[0], 1, &clearRect);
 		//}
@@ -876,7 +878,7 @@ namespace Lime.Graphics.Platform.Vulkan
 
 		public void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
 		{
-			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
+			if (options == ClearOptions.None) {
 				return;
 			}
 			var oldViewport = viewport;
@@ -917,10 +919,7 @@ namespace Lime.Graphics.Platform.Vulkan
 					clearStencilState.Pass = StencilOp.Replace;
 					clearStencilState.ReferenceValue = stencil;
 				}
-				var clearViewport = viewport;
-				clearViewport.MinDepth = 0;
-				clearViewport.MaxDepth = 1;
-				SetViewport(clearViewport);
+				SetViewport(new Viewport(0, 0, activeRenderPassWidth, activeRenderPassHeight, 0, 1));
 				SetBlendState(new BlendState { Enable = false });
 				SetDepthState(clearDepthState);
 				SetStencilState(clearStencilState);
@@ -958,28 +957,27 @@ namespace Lime.Graphics.Platform.Vulkan
 		{
 			if (activeRenderPass == SharpVulkan.RenderPass.Null) {
 				SharpVulkan.Framebuffer fb;
-				int width, height;
 				if (renderTarget != null) {
 					activeRenderPass = renderTarget.RenderPass;
+					activeRenderPassWidth = renderTarget.Width;
+					activeRenderPassHeight = renderTarget.Height;
 					activeColorFormat = renderTarget.ColorFormat;
 					activeDepthStencilFormat = renderTarget.DepthStencilFormat;
 					fb = renderTarget.Framebuffer;
-					width = renderTarget.Width;
-					height = renderTarget.Height;
 				} else {
 					activeRenderPass = swapchain.RenderPass;
+					activeRenderPassWidth = swapchain.Width;
+					activeRenderPassHeight = swapchain.Height;
 					activeColorFormat = swapchain.BackbufferFormat;
 					activeDepthStencilFormat = swapchain.DepthStencilFormat;
 					fb = swapchain.Framebuffer;
-					width = swapchain.Width;
-					height = swapchain.Height;
 				}
 				EnsureCommandBuffer();
 				var rpBeginInfo = new SharpVulkan.RenderPassBeginInfo {
 					StructureType = SharpVulkan.StructureType.RenderPassBeginInfo,
 					RenderPass = activeRenderPass,
 					Framebuffer = fb,
-					RenderArea = new SharpVulkan.Rect2D(0, 0, (uint)width, (uint)height)
+					RenderArea = new SharpVulkan.Rect2D(0, 0, (uint)activeRenderPassWidth, (uint)activeRenderPassHeight)
 				};
 				commandBuffer.BeginRenderPass(ref rpBeginInfo, SharpVulkan.SubpassContents.Inline);
 			}

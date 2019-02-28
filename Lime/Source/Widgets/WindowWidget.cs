@@ -153,7 +153,6 @@ namespace Lime
 		protected virtual void Render(RenderObjectList renderObjects)
 		{
 			Renderer.Viewport = new Viewport(GetViewport());
-			Renderer.Clear(ClearOptions.All, Color4.Black);
 			renderObjects.Render();
 		}
 

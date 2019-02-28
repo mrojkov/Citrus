@@ -295,7 +295,7 @@ namespace Lime.Graphics.Platform.OpenGL
 
 		public void Clear(ClearOptions options, Color4 color, float depth, byte stencil)
 		{
-			if (options == ClearOptions.None || viewport.Width == 0 || viewport.Height == 0) {
+			if (options == ClearOptions.None) {
 				return;
 			}
 			EnsureRenderTarget();
@@ -327,16 +327,10 @@ namespace Lime.Graphics.Platform.OpenGL
 					stencilStateDirty = true;
 				}
 			}
-			if (!boundScissorState.Enable) {
-				GL.Enable(EnableCap.ScissorTest);
+			if (boundScissorState.Enable) {
+				GL.Disable(EnableCap.ScissorTest);
 				GLHelper.CheckGLErrors();
-				boundScissorState.Enable = true;
-				scissorStateDirty = true;
-			}
-			if (boundScissorState.Bounds != viewport.Bounds) {
-				GL.Scissor(viewport.X, viewport.Y, viewport.Width, viewport.Height);
-				GLHelper.CheckGLErrors();
-				boundScissorState.Bounds = viewport.Bounds;
+				boundScissorState.Enable = false;
 				scissorStateDirty = true;
 			}
 			GL.Clear(glClearBufferMask);

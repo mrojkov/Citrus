@@ -336,6 +336,7 @@ namespace Lime
 			World = Matrix44.Identity;
 			View = Matrix44.Identity;
 			CurrentRenderList = MainRenderList;
+			Clear(ClearOptions.All, Color4.Black);
 			RenderCycle++;
 		}
 
