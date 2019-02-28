@@ -156,7 +156,9 @@ namespace Lime
 		private void LoadImageHelper(Stream stream)
 		{
 			if (!stream.CanSeek) {
-				stream = new RewindableStream(stream);
+				var memoryStream = new MemoryStream();
+				stream.CopyTo(memoryStream);
+				stream = memoryStream;
 			}
 			using (var reader = new BinaryReader(stream)) {
 				stream.Seek(0, SeekOrigin.Begin);

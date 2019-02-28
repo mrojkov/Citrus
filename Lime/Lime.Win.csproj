@@ -376,7 +376,6 @@
     <Compile Include="Source\Widgets\WidgetContext.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Input\Key.cs" />
-    <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />
