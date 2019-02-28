@@ -8,6 +8,7 @@ namespace Lime
 	public enum RenderingBackend
 	{
 		OpenGL,
-		ES20
+		ES20,
+		Vulkan
 	}
 }

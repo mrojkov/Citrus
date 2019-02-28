@@ -1,11 +1,10 @@
- #if WIN
+#if WIN
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using OpenTK.Graphics;
 using WinFormsCloseReason = System.Windows.Forms.CloseReason;
 
 namespace Lime
@@ -31,7 +30,7 @@ namespace Lime
 			Rendered,
 		}
 		private readonly System.Windows.Forms.Timer timer;
-		private GLControl glControl;
+		private RenderControl renderControl;
 		private Form form;
 		private Stopwatch stopwatch;
 		private bool active;
@@ -125,13 +124,13 @@ namespace Lime
 
 		public Vector2 ClientPosition
 		{
-			get { return SDToLime.Convert(glControl.PointToScreen(new Point(0, 0)), PixelScale); }
+			get { return SDToLime.Convert(renderControl.PointToScreen(new Point(0, 0)), PixelScale); }
 			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
 		public Vector2 ClientSize
 		{
-			get { return SDToLime.Convert(glControl.ClientSize, PixelScale); }
+			get { return SDToLime.Convert(renderControl.ClientSize, PixelScale); }
 			set { DecoratedSize = value + DecoratedSize - ClientSize; }
 		}
 
@@ -162,13 +161,13 @@ namespace Lime
 		public Vector2 WorldToWindow(Vector2 wp)
 		{
 			var sp = LimeToSD.ConvertToPoint(wp, PixelScale);
-			return new Vector2(sp.X + glControl.Left, sp.Y + glControl.Top);
+			return new Vector2(sp.X + renderControl.Left, sp.Y + renderControl.Top);
 		}
 
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition, PixelScale)),
+				renderControl.PointToScreen(LimeToSD.ConvertToPoint(localPosition, PixelScale)),
 				PixelScale
 			);
 		}
@@ -176,7 +175,7 @@ namespace Lime
 		public Vector2 DesktopToLocal(Vector2 desktopPosition)
 		{
 			return SDToLime.Convert(
-				glControl.PointToClient(new Point((int) desktopPosition.X, (int) desktopPosition.Y)),
+				renderControl.PointToClient(new Point((int) desktopPosition.X, (int) desktopPosition.Y)),
 				PixelScale
 			);
 		}
@@ -231,15 +230,152 @@ namespace Lime
 			form.Close();
 		}
 
-		private class GLControl : OpenTK.GLControl
+		private class OpenGLRenderControl : RenderControl
 		{
+			private OpenTK.Platform.IWindowInfo windowInfo;
+			private OpenTK.Graphics.GraphicsMode graphicsMode;
+			private OpenTK.Graphics.GraphicsContext graphicsContext;
+			private OpenTK.Graphics.GraphicsContextFlags graphicsContextFlags;
+			private int major;
+			private int minor;
+			private static Graphics.Platform.OpenGL.PlatformRenderContext platformRenderContext;
+
+			static OpenGLRenderControl()
+			{
+				OpenTK.Graphics.GraphicsContext.ShareContexts = true;
+			}
+
+			public OpenGLRenderControl(OpenTK.Graphics.GraphicsMode graphicsMode, int major, int minor, OpenTK.Graphics.GraphicsContextFlags graphicsContextFlags)
+			{
+				this.graphicsMode = graphicsMode;
+				this.graphicsContextFlags = graphicsContextFlags;
+				this.major = major;
+				this.minor = minor;
+			}
+
+			protected override void OnHandleCreated(EventArgs e)
+			{
+				base.OnHandleCreated(e);
+				windowInfo = OpenTK.Platform.Utilities.CreateWindowsWindowInfo(Handle);
+				graphicsContext = new OpenTK.Graphics.GraphicsContext(graphicsMode, windowInfo, major, minor, graphicsContextFlags);
+				graphicsContext.MakeCurrent(windowInfo);
+				graphicsContext.LoadAll();
+				graphicsContext.SwapInterval = 1;
+				if (platformRenderContext == null) {
+					platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+					PlatformRenderer.Initialize(platformRenderContext);
+				}
+				graphicsContext.MakeCurrent(null);
+			}
+
+			protected override void OnHandleDestroyed(EventArgs e)
+			{
+				base.OnHandleDestroyed(e);
+				if (graphicsContext != null) {
+					graphicsContext.Dispose();
+					graphicsContext = null;
+				}
+				if (windowInfo != null) {
+					windowInfo.Dispose();
+					windowInfo = null;
+				}
+			}
+
+			protected override void OnSizeChanged(EventArgs e)
+			{
+				base.OnSizeChanged(e);
+				graphicsContext.Update(windowInfo);
+			}
+
+			public override void Begin()
+			{
+				graphicsContext.MakeCurrent(windowInfo);
+				platformRenderContext.Begin(0);
+			}
+
+			public override void SwapBuffers()
+			{
+				platformRenderContext.End();
+				graphicsContext.SwapBuffers();
+			}
+
+			public override void UnbindContext()
+			{
+				OpenTK.Graphics.GraphicsContext.CurrentContext?.MakeCurrent(null);
+			}
+		}
+
+		private class VulkanRenderControl : RenderControl
+		{
+			private static Graphics.Platform.Vulkan.PlatformRenderContext platformRenderContext;
+
+			private Graphics.Platform.Vulkan.Swapchain swapchain;
+
+			protected override void OnHandleCreated(EventArgs e)
+			{
+				base.OnHandleCreated(e);
+				if (platformRenderContext == null) {
+					platformRenderContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
+					PlatformRenderer.Initialize(platformRenderContext);
+				}
+				swapchain = new Graphics.Platform.Vulkan.Swapchain(platformRenderContext, Handle, ClientSize.Width, ClientSize.Height);
+			}
+
+			protected override void OnHandleDestroyed(EventArgs e)
+			{
+				swapchain.Dispose();
+				base.OnHandleDestroyed(e);
+			}
+
+			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+			{
+				base.SetBoundsCore(x, y, width, height, specified);
+				if (width != 0 && height != 0) {
+					swapchain.Resize(ClientSize.Width, ClientSize.Height);
+				}
+			}
+
+			public override void Begin()
+			{
+				platformRenderContext.Begin(swapchain);
+			}
+
+			public override void SwapBuffers()
+			{
+				platformRenderContext.Present();
+			}
+
+			public override void UnbindContext()
+			{
+			}
+		}
+
+		private abstract class RenderControl : UserControl
+		{
+			public bool VSync { get; set; }
+
 			public event Action BeforeBoundsChanged;
 
-			public GLControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
-				: base(mode, major, minor, flags)
+			public RenderControl()
 			{
-
+				SetStyle(ControlStyles.Opaque, true);
+				SetStyle(ControlStyles.UserPaint, true);
+				SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+				DoubleBuffered = false;
 			}
+
+			protected override CreateParams CreateParams
+			{
+				get {
+					const int CS_VREDRAW = 0x1;
+					const int CS_HREDRAW = 0x2;
+					const int CS_OWNDC = 0x20;
+					var cp = base.CreateParams;
+					cp.ClassStyle |= CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
+					return cp;
+				}
+			}
+
 			// Without this at least Left, Right, Up, Down and Tab keys are not submitted OnKeyDown
 			protected override bool IsInputKey(Keys keyData)
 			{
@@ -251,20 +387,22 @@ namespace Lime
 				BeforeBoundsChanged?.Invoke();
 				base.SetBoundsCore(x, y, width, height, specified);
 			}
+
+			public abstract void Begin();
+			public abstract void SwapBuffers();
+			public abstract void UnbindContext();
 		}
 
-		private static GLControl CreateGLControl()
+		private static RenderControl CreateRenderControl(RenderingBackend backend)
 		{
-			return new GLControl(new GraphicsMode(32, 16, 8), 2, 0,
-				Application.RenderingBackend == RenderingBackend.OpenGL ?
-					OpenTK.Graphics.GraphicsContextFlags.Default :
-					OpenTK.Graphics.GraphicsContextFlags.Embedded
-			);
-		}
-
-		static Window()
-		{
-			GraphicsContext.ShareContexts = true;
+			if (backend == RenderingBackend.Vulkan) {
+				return new VulkanRenderControl();
+			} else {
+				var flags = backend == RenderingBackend.ES20
+					? OpenTK.Graphics.GraphicsContextFlags.Embedded
+					: OpenTK.Graphics.GraphicsContextFlags.Default;
+				return new OpenGLRenderControl(new OpenTK.Graphics.GraphicsMode(32, 16, 8), 2, 0, flags);
+			}
 		}
 
 		public Window()
@@ -306,27 +444,27 @@ namespace Lime
 			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
-			glControl = CreateGLControl();
-			glControl.CreateControl();
-			glControl.Context.MakeCurrent(null);
-			glControl.Dock = DockStyle.Fill;
-			glControl.Paint += OnPaint;
-			glControl.KeyDown += OnKeyDown;
-			glControl.KeyUp += OnKeyUp;
-			glControl.KeyPress += OnKeyPress;
-			glControl.MouseDown += OnMouseDown;
-			glControl.MouseUp += OnMouseUp;
-			glControl.Resize += OnResize;
-			glControl.MouseWheel += OnMouseWheel;
-			glControl.MouseEnter += (sender, args) => {
+			renderControl = CreateRenderControl(Application.RenderingBackend);
+			renderControl.CreateControl();
+			renderControl.UnbindContext();
+			renderControl.Dock = DockStyle.Fill;
+			renderControl.Paint += OnPaint;
+			renderControl.KeyDown += OnKeyDown;
+			renderControl.KeyUp += OnKeyUp;
+			renderControl.KeyPress += OnKeyPress;
+			renderControl.MouseDown += OnMouseDown;
+			renderControl.MouseUp += OnMouseUp;
+			renderControl.Resize += OnResize;
+			renderControl.MouseWheel += OnMouseWheel;
+			renderControl.MouseEnter += (sender, args) => {
 				Application.WindowUnderMouse = this;
 			};
-			glControl.MouseLeave += (sender, args) => {
+			renderControl.MouseLeave += (sender, args) => {
 				if (Application.WindowUnderMouse == this) {
 					Application.WindowUnderMouse = null;
 				}
 			};
-			glControl.BeforeBoundsChanged += WaitForRendering;
+			renderControl.BeforeBoundsChanged += WaitForRendering;
 			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;
@@ -342,13 +480,11 @@ namespace Lime
 				timer.Tick += OnTick;
 			} else {
 				vSync = options.VSync;
-				glControl.MakeCurrent();
-				glControl.VSync = vSync;
-				glControl.Context.MakeCurrent(null);
+				renderControl.VSync = vSync;
 				System.Windows.Forms.Application.Idle += OnTick;
 			}
 
-			form.Controls.Add(glControl);
+			form.Controls.Add(renderControl);
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 
@@ -398,9 +534,7 @@ namespace Lime
 				if (vSync != value && timer == null) {
 					vSync = value;
 					WaitForRendering();
-					glControl.MakeCurrent();
-					glControl.VSync = value;
-					glControl.Context.MakeCurrent(null);
+					renderControl.VSync = value;
 				}
 			}
 		}
@@ -644,10 +778,10 @@ namespace Lime
 				if (renderThreadToken.IsCancellationRequested) {
 					return;
 				}
-				glControl.MakeCurrent();
+				renderControl.Begin();
 				RaiseRendering();
-				glControl.SwapBuffers();
-				glControl.Context.MakeCurrent(null);
+				renderControl.SwapBuffers();
+				renderControl.UnbindContext();
 				renderCompleted.Set();
 			}
 		}
@@ -664,10 +798,10 @@ namespace Lime
 			switch (renderingState) {
 				case RenderingState.Updated:
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
-					if (!AsyncRendering && glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
-						glControl.MakeCurrent();
+					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed) {
+						renderControl.Begin();
 						RaiseRendering();
-						glControl.SwapBuffers();
+						renderControl.SwapBuffers();
 					}
 					renderingState = RenderingState.Rendered;
 					break;
@@ -683,7 +817,7 @@ namespace Lime
 		{
 			var wasInvalidated = isInvalidated;
 			isInvalidated = false;
-			if (!form.Visible || !form.CanFocus) {
+			if (!form.Visible || !form.CanFocus || !renderControl.IsHandleCreated) {
 				return;
 			}
 			UnclampedDelta = (float)stopwatch.Elapsed.TotalSeconds;
@@ -705,7 +839,7 @@ namespace Lime
 				Input.TextInput = null;
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
-				glControl.Invalidate();
+				renderControl.Invalidate();
 			}
 			renderingState = RenderingState.Updated;
 			if (AsyncRendering) {

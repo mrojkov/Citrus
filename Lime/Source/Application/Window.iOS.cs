@@ -11,8 +11,6 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
-		private readonly Display display;
-
 		// This line only suppresses warning: "Window.Current: a name can be simplified".
 		public new static IWindow Current => CommonWindow.Current;
 
@@ -20,33 +18,30 @@ namespace Lime
 		private FPSCounter fpsCounter = new FPSCounter();
 
 		public GameController UIViewController { get; private set; }
-		public GameView UIView { get { return UIViewController.View; } }
+		public UIView UIView { get => UIViewController.View; }
 		public WindowInput Input { get; private set; }
 		public bool AsyncRendering { get { return false; } private set { } }
 		public bool Active { get; private set; }
 		public string Title { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
-		public bool FixedSize { get { return true; } set {} }
-		public bool Fullscreen { get { return true; } set {} }
-		public Vector2 ClientPosition { get { return Vector2.Zero; } set {} }
-		public Vector2 ClientSize
-		{
-			get { return UIView.ClientSize; }
-			set { }
-		}
-		public Vector2 DecoratedPosition { get { return Vector2.Zero; } set {} }
-		public Vector2 DecoratedSize { get { return ClientSize; } set {} }
-		public Vector2 MinimumDecoratedSize { get { return Vector2.Zero; } set {} }
-		public Vector2 MaximumDecoratedSize { get { return Vector2.Zero; } set {} }
-		public bool Visible { get { return true; } set {} }
+		public bool FixedSize { get => true; set {} }
+		public bool Fullscreen { get => true; set {} }
+		public Vector2 ClientPosition { get => Vector2.Zero; set {} }
+		public Vector2 ClientSize { get => ((IGameView)UIView).ClientSize; set {} }
+		public Vector2 DecoratedPosition { get => Vector2.Zero; set {} }
+		public Vector2 DecoratedSize { get => ClientSize; set {} }
+		public Vector2 MinimumDecoratedSize { get => Vector2.Zero; set {} }
+		public Vector2 MaximumDecoratedSize { get => Vector2.Zero; set {} }
+		public bool Visible { get => true; set {} }
 		public MouseCursor Cursor { get; set; }
 		public float UnclampedDelta { get; private set; }
-		public float FPS { get { return fpsCounter.FPS; } }
+		public float FPS { get => fpsCounter.FPS; }
+		public IDisplay Display { get; private set; }
 
 		[Obsolete("Use FPS property instead", true)]
-		public float CalcFPS() { return fpsCounter.FPS; }
+		public float CalcFPS() => fpsCounter.FPS;
 
-		public bool AllowDropFiles { get { return false; } set {} }
+		public bool AllowDropFiles { get => false; set {} }
 
 		public event Action<IEnumerable<string>> FilesDropped;
 
@@ -57,7 +52,7 @@ namespace Lime
 
 		public float PixelScale
 		{
-			get { return (float)UIScreen.MainScreen.Scale; }
+			get { return ((IGameView)UIView).PixelScale; }
 		}
 
 		public Vector2 LocalToDesktop(Vector2 localPosition)
@@ -90,9 +85,10 @@ namespace Lime
 			UIViewController = new GameController(Application.Input);
 			uiWindow.RootViewController = UIViewController;
 			uiWindow.MakeKeyAndVisible();
+			var view = (IGameView)UIView;
 			AppDelegate.Instance.Activated += () => {
 				// Run() creates OpenGL context
-				UIView.Run();
+				view.Run();
 				UIViewController.LockDeviceOrientation = false;
 				Active = true;
 				AudioSystem.Active = true;
@@ -100,7 +96,7 @@ namespace Lime
 				UIKit.UIViewController.AttemptRotationToDeviceOrientation();
 			};
 			AppDelegate.Instance.Deactivated += () => {
-				UIView.Stop();
+				view.Stop();
 				UIViewController.LockDeviceOrientation = true;
 				AudioSystem.Active = false;
 				RaiseDeactivated();
@@ -112,18 +108,10 @@ namespace Lime
 			UIViewController.OnResize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
-			UIView.RenderFrame += OnRenderFrame;
-			UIView.UpdateFrame += OnUpdateFrame;
-			display = new Display(UIScreen.MainScreen);
+			view.RenderFrame += OnRenderFrame;
+			view.UpdateFrame += OnUpdateFrame;
+			Display = new Display(UIScreen.MainScreen);
 			Application.WindowUnderMouse = this;
-		}
-
-		/// <summary>
-		/// Gets the default display device.
-		/// </summary>
-		public IDisplay Display
-		{
-			get { return display; }
 		}
 
 		public void Center() { }
@@ -132,28 +120,29 @@ namespace Lime
 		public void Invalidate() { }
 		public void Activate() { }
 
-		private void OnUpdateFrame(object s, Xamarin.FrameEventArgs e)
+		private void OnUpdateFrame(float delta)
 		{
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {
 				return;
 			}
-			UnclampedDelta = (float)e.Time;
-			var delta = Math.Min(UnclampedDelta, Application.MaxDelta);
-			Input.ProcessPendingKeyEvents(delta);
-			RaiseUpdating(delta);
+			UnclampedDelta = delta;
+			var clampedDelta = Math.Min(UnclampedDelta, Application.MaxDelta);
+			Input.ProcessPendingKeyEvents(clampedDelta);
+			RaiseUpdating(clampedDelta);
 			Input.CopyKeysState();
 			AudioSystem.Update();
 			RaiseSync();
 		}
 
-		private void OnRenderFrame(object s, Xamarin.FrameEventArgs e)
+		private void OnRenderFrame()
 		{
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {
 				return;
 			}
-			UIView.MakeCurrent();
+			var view = (IGameView)UIView;
+			view.MakeCurrent();
 			RaiseRendering();
-			UIView.SwapBuffers();
+			view.SwapBuffers();
 			fpsCounter.Refresh();
 		}
 	}

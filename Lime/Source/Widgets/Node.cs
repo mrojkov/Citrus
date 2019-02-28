@@ -1223,7 +1223,7 @@ namespace Lime
 		{
 			if (animator is Animator<ITexture> textureAnimator) {
 				foreach (var key in textureAnimator.ReadonlyKeys) {
-					key.Value.GetHandle();
+					key.Value.GetPlatformTexture();
 				}
 			}
 		}
@@ -1232,7 +1232,7 @@ namespace Lime
 		{
 			var getter = prop.GetGetMethod();
 			var texture = getter.Invoke(this, new object[]{}) as ITexture;
-			texture?.GetHandle();
+			texture?.GetPlatformTexture();
 		}
 
 		public void RemoveAnimatorsForExternalAnimations()

@@ -14,6 +14,9 @@ namespace Lime
 		private NSObject keyboardDidChangeFrameNotification;
 		private SoftKeyboard softKeyboard;
 		private Input input;
+		private UITouch[] activeTouches = new UITouch[Input.MaxTouches];
+		private CustomUITextView textView;
+		private string pendingTextInput = string.Empty;
 
 		public event EventHandler OnResize;
 
@@ -23,15 +26,144 @@ namespace Lime
 		public GameController(Input input) : base()
 		{
 			this.input = input;
-			base.View = new GameView(input);
-			softKeyboard = new SoftKeyboard(View);
+			if (Application.RenderingBackend == RenderingBackend.Vulkan) {
+				if (!MetalGameView.IsMetalSupported()) {
+					throw new NotSupportedException("Metal is not supported on the device");
+				}
+				View = new MetalGameView(UIScreen.MainScreen.Bounds);
+			} else {
+				View = new GLGameView(UIScreen.MainScreen.Bounds);
+			}
+			View.MultipleTouchEnabled = true;
+			((IGameView)View).UpdateFrame += (delta) => ProcessTextInput();
+			softKeyboard = new SoftKeyboard(this);
 			Application.SoftKeyboard = softKeyboard;
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
 			Application.SupportedDeviceOrientationsChanged += ResetDeviceOrientation;
+			Initialize3DTouchOnTheLeftSideWorkaround();
+			textView = new CustomUITextView(this);
+			textView.Delegate = new TextViewDelegate(input);
+			textView.AutocorrectionType = UITextAutocorrectionType.No;
+			textView.AutocapitalizationType = UITextAutocapitalizationType.None;
+			View.Add(textView);
 		}
 
-		public new GameView View { get { return (GameView)base.View; } }
+		/// <summary>
+		/// This solves the issue when swipes from the left side of a display with 3D Touch enabled work awkwardly.
+		/// A guy from stackoverflow proposed a workaround
+		/// https://stackoverflow.com/questions/39998489/touchesbegan-delay-on-left-hand-side-of-the-display
+		/// </summary>
+		private void Initialize3DTouchOnTheLeftSideWorkaround()
+		{
+			System.Action<UILongPressGestureRecognizer> handler = (recognizer) => {
+				// If touch is registered with TouchesBegan do nothing, 
+				// otherwise register Key.Mouse0 as pressed or not depending on the gesture state
+				if (activeTouches[0] == null) {
+					switch (recognizer.State) {
+						case UIGestureRecognizerState.Began:
+							var pt = recognizer.LocationInView(View);
+							input.DesktopMousePosition = new Vector2((float)pt.X, (float)pt.Y);
+							input.SetKeyState(Key.Mouse0, true);
+							input.SetKeyState(Key.Touch0, true);
+							break;
+						case UIGestureRecognizerState.Ended:
+						case UIGestureRecognizerState.Cancelled:
+							input.SetKeyState(Key.Mouse0, false);
+							input.SetKeyState(Key.Touch0, false);
+							break;
+					}
+				}
+			};
+
+			// Create Long Press gesture recognizer and make it not to interfere with TouchesBegan (usual way to detect touches)
+			var gestureRecognizer = new UILongPressGestureRecognizer(handler) {
+				DelaysTouchesBegan = false,
+				MinimumPressDuration = 0,
+				CancelsTouchesInView = false
+			};
+			gestureRecognizer.ShouldReceiveTouch += (recognizer, touch) => touch.View == View;
+			View.AddGestureRecognizer(gestureRecognizer);
+		}
+
+		public void ShowSoftKeyboard(bool show)
+		{
+			if (show != textView.IsFirstResponder) {
+				if (show) {
+					textView.BecomeFirstResponder();
+				} else {
+					textView.ResignFirstResponder();
+				}
+			}
+		}
+		
+		private void ProcessTextInput()
+		{
+			input.TextInput = pendingTextInput;
+			pendingTextInput = string.Empty;
+		}
+
+		public override void TouchesBegan(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == null) {
+						var pt = touch.LocationInView(View);
+						var position = new Vector2((float)pt.X, (float)pt.Y);
+						if (i == 0) {
+							input.DesktopMousePosition = position;
+							input.SetKeyState(Key.Mouse0, true);
+						}
+						Key key = (Key)((int)Key.Touch0 + i);
+						input.SetDesktopTouchPosition(i, position);
+						activeTouches[i] = touch;
+						input.SetKeyState(key, true);
+						break;
+					}
+				}
+			}
+		}
+
+		public override void TouchesMoved(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = touch.LocationInView(View);
+						var position = new Vector2((float)pt.X, (float)pt.Y);
+						if (i == 0) {
+							input.DesktopMousePosition = position;
+						}
+						input.SetDesktopTouchPosition(i, position);
+					}
+				}
+			}
+		}
+
+		public override void TouchesEnded(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = touch.LocationInView(View);
+						var position = new Vector2((float)pt.X, (float)pt.Y);
+						if (i == 0) {
+							input.SetKeyState(Key.Mouse0, false);
+							input.DesktopMousePosition = position;
+						}
+						activeTouches[i] = null;
+						Key key = (Key)((int)Key.Touch0 + i);
+						input.SetKeyState(key, false);
+						input.SetDesktopTouchPosition(i, position);
+					}
+				}
+			}
+		}
+
+		public override void TouchesCancelled(NSSet touches, UIEvent evt)
+		{
+			TouchesEnded(touches, evt);
+		}
 
 		public override void ViewWillTransitionToSize(CoreGraphics.CGSize toSize, IUIViewControllerTransitionCoordinator coordinator)
 		{
@@ -257,7 +389,8 @@ namespace Lime
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
 			Application.CurrentDeviceOrientation = toOrientation;
 			// The texture stages get invalidated after device rotation. Rebind textures to fix it.
-			PlatformRenderer.MarkAllTextureSlotsAsDirty();
+			// XXX
+			// PlatformRenderer.MarkAllTextureSlotsAsDirty();
 			if (OnResize != null) {
 				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated });
 			}
@@ -269,14 +402,15 @@ namespace Lime
 
 		private class SoftKeyboard : ISoftKeyboard
 		{
-			GameView view;
+			GameController controller;
 
+			#pragma warning disable CS0067
 			public event Action Shown;
 			public event Action Hidden;
 
-			public SoftKeyboard(GameView view)
+			public SoftKeyboard(GameController controller)
 			{
-				this.view = view;
+				this.controller = controller;
 			}
 
 			internal void RaiseHidden()
@@ -288,12 +422,57 @@ namespace Lime
 
 			public void Show(bool show)
 			{
-				view.ShowSoftKeyboard(show);
+				controller.ShowSoftKeyboard(show);
 			}
 
 			public bool Visible { get; internal set; }
 			public float Height { get; internal set; }
 			public bool Supported { get { return true; } }
+		}
+		
+		private class CustomUITextView : UITextView
+		{
+			private readonly GameController controller;
+
+			public CustomUITextView(GameController controller)
+			{
+				this.controller = controller;
+			}
+
+			public override void InsertText(string text)
+			{
+				controller.pendingTextInput += text;
+			}
+
+			public override void DeleteBackward()
+			{
+				controller.pendingTextInput += '\b';
+			}
+		}
+		
+		private class TextViewDelegate : UITextViewDelegate
+		{
+			Input input;
+
+			public TextViewDelegate(Input input)
+			{
+				this.input = input;
+			}
+
+			public override bool ShouldChangeText(UITextView textView, NSRange range, string text)
+			{
+				if (text.Equals("\n")) {
+					input.SetKeyState(Key.Enter, true);
+					input.SetKeyState(Key.Enter, false);
+				}
+				return true;
+			}
+
+			public override void EditingEnded(UITextView textView)
+			{
+				input.SetKeyState(Key.DismissSoftKeyboard, true);
+				input.SetKeyState(Key.DismissSoftKeyboard, false);
+			}
 		}
 	}
 

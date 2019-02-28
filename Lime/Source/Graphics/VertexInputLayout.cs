@@ -1,142 +1,123 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public class VertexInputLayout
+	public class VertexInputLayout : IDisposable
 	{
-		private static Dictionary<VertexInputElement[], VertexInputLayout> layoutCache =
-			new Dictionary<VertexInputElement[], VertexInputLayout>(
-				ArrayEqualityComparer<VertexInputElement>.Default
-			);
+		private static Dictionary<long, VertexInputLayout> layoutCache = new Dictionary<long, VertexInputLayout>();
 
-		internal VertexInputElement[] Elements;
-		internal int AttribMask;
+		private IPlatformVertexInputLayout platformLayout;
+		private VertexInputLayoutBinding[] bindings;
+		private VertexInputLayoutAttribute[] attributes;
 
-		private VertexInputLayout()
-		{ }
-
-		public static VertexInputLayout New(VertexInputElement[] elements)
+		private VertexInputLayout(
+			VertexInputLayoutBinding[] bindings, int bindingCount,
+			VertexInputLayoutAttribute[] attributes, int attributeCount)
 		{
-			VertexInputLayout layout;
-			if (layoutCache.TryGetValue(elements, out layout)) {
-				return layout;
-			}
-			var sortedElements = (VertexInputElement[])elements.Clone();
-			Array.Sort(sortedElements, CompareVertexInputElement);
-			if (layoutCache.TryGetValue(sortedElements, out layout)) {
-				return layout;
-			}
-			var attributeMask = 0;
-			foreach (var e in sortedElements) {
-				attributeMask |= 1 << e.Attribute;
-			}
-			layout = new VertexInputLayout {
-				Elements = sortedElements,
-				AttribMask = attributeMask
-			};
-			layoutCache.Add(sortedElements, layout);
-			return layout;
+			this.bindings = new VertexInputLayoutBinding[bindingCount];
+			this.attributes = new VertexInputLayoutAttribute[attributeCount];
+			Array.Copy(bindings, this.bindings, bindingCount);
+			Array.Copy(attributes, this.attributes, attributeCount);
 		}
 
-		private static int CompareVertexInputElement(VertexInputElement x, VertexInputElement y)
+		~VertexInputLayout()
 		{
-			if (x.Slot < y.Slot) {
-				return -1;
+			DisposeInternal();
+		}
+
+		public void Dispose()
+		{
+			DisposeInternal();
+			GC.SuppressFinalize(this);
+		}
+
+		private void DisposeInternal()
+		{
+			if (platformLayout != null) {
+				var platformLayoutCopy = platformLayout;
+				Window.Current.InvokeOnRendering(() => {
+					platformLayoutCopy.Dispose();
+				});
+				platformLayout = null;
 			}
-			if (x.Slot > y.Slot) {
-				return 1;
+		}
+
+		internal IPlatformVertexInputLayout GetPlatformLayout()
+		{
+			if (platformLayout == null) {
+				platformLayout = PlatformRenderer.Context.CreateVertexInputLayout(bindings, attributes);
 			}
-			if (x.Attribute < y.Attribute) {
-				return -1;
+			return platformLayout;
+		}
+
+		private static VertexInputLayoutBinding[] sortedBindings;
+		private static VertexInputLayoutAttribute[] sortedAttributes;
+
+		private static readonly BindingSortComparer bindingSortComparer = new BindingSortComparer();
+		private static readonly AttributeSortComparer attributeSortComparer = new AttributeSortComparer();
+
+		public static VertexInputLayout New(VertexInputLayoutBinding[] bindings, VertexInputLayoutAttribute[] attributes)
+		{
+			lock (layoutCache) {
+				if (sortedBindings == null || sortedBindings.Length < bindings.Length) {
+					sortedBindings = new VertexInputLayoutBinding[bindings.Length];
+				}
+				if (sortedAttributes == null || sortedAttributes.Length < attributes.Length) {
+					sortedAttributes = new VertexInputLayoutAttribute[attributes.Length];
+				}
+				Array.Copy(bindings, sortedBindings, bindings.Length);
+				Array.Copy(attributes, sortedAttributes, attributes.Length);
+				Array.Sort(sortedBindings, 0, bindings.Length, bindingSortComparer);
+				Array.Sort(sortedAttributes, 0, attributes.Length, attributeSortComparer);
+				var hash = ComputeHash(sortedBindings, bindings.Length, sortedAttributes, attributes.Length);
+				if (!layoutCache.TryGetValue(hash, out var layout)) {
+					layout = new VertexInputLayout(sortedBindings, bindings.Length, sortedAttributes, attributes.Length);
+					layoutCache.Add(hash, layout);
+				}
+				return layout;
 			}
-			if (x.Attribute > y.Attribute) {
-				return 1;
+		}
+
+		private static long ComputeHash(
+			VertexInputLayoutBinding[] bindings, int bindingCount,
+			VertexInputLayoutAttribute[] attributes, int attributeCount)
+		{
+			var hasher = new Hasher();
+			hasher.Write(bindings, 0, bindingCount);
+			hasher.Write(attributes, 0, attributeCount);
+			return hasher.End();
+		}
+
+		private class BindingSortComparer : IComparer<VertexInputLayoutBinding>
+		{
+			public int Compare(VertexInputLayoutBinding x, VertexInputLayoutBinding y)
+			{
+				return x.Slot - y.Slot;
 			}
-			if (x.Offset < y.Offset) {
-				return -1;
+		}
+
+		private class AttributeSortComparer : IComparer<VertexInputLayoutAttribute>
+		{
+			public int Compare(VertexInputLayoutAttribute x, VertexInputLayoutAttribute y)
+			{
+				return x.Location - y.Location;
 			}
-			if (x.Offset > y.Offset) {
-				return 1;
-			}
-			if (x.Format < y.Format) {
-				return -1;
-			}
-			if (x.Format > y.Format) {
-				return 1;
-			}
-			return 0;
 		}
 	}
 
-	public struct VertexInputElement : IEquatable<VertexInputElement>
+	public struct VertexInputLayoutBinding
 	{
 		public int Slot;
-		public int Attribute;
-		public int Offset;
 		public int Stride;
-		public VertexInputElementFormat Format;
-
-		public override bool Equals(object other)
-		{
-			return other is VertexInputElement && Equals((VertexInputElement)other);
-		}
-
-		public bool Equals(VertexInputElement other)
-		{
-			return Slot == other.Slot &&
-				Attribute == other.Attribute &&
-				Offset == other.Offset &&
-				Stride == other.Stride &&
-				Format == other.Format;
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked {
-				var hash = Slot;
-				hash = (hash * 397) ^ Attribute;
-				hash = (hash * 397) ^ Offset;
-				hash = (hash * 397) ^ Stride;
-				hash = (hash * 397) ^ Format.GetHashCode();
-				return hash;
-			}
-		}
 	}
 
-	public enum VertexInputElementFormat
+	public struct VertexInputLayoutAttribute
 	{
-		Byte1,
-		Byte1Norm,
-		Byte2,
-		Byte2Norm,
-		Byte4,
-		Byte4Norm,
-
-		Short1,
-		Short1Norm,
-		Short2,
-		Short2Norm,
-		Short4,
-		Short4Norm,
-
-		UByte1,
-		UByte1Norm,
-		UByte2,
-		UByte2Norm,
-		UByte4,
-		UByte4Norm,
-
-		UShort1,
-		UShort1Norm,
-		UShort2,
-		UShort2Norm,
-		UShort4,
-		UShort4Norm,
-
-		Float1,
-		Float2,
-		Float3,
-		Float4
+		public int Slot;
+		public int Location;
+		public int Offset;
+		public Format Format;
 	}
 }

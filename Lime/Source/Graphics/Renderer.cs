@@ -80,10 +80,16 @@ namespace Lime
 	}
 #pragma warning restore CS0660, CS0661
 
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32)]
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36)]
 	public struct Vertex
 	{
-		public Vector2 Pos;
+		public Vector2 Pos
+		{
+			get { return new Vector2(Pos4.X, Pos4.Y); }
+			set { Pos4 = new Vector4(value.X, value.Y, 0, 1.0f); }
+		}
+
+		public Vector4 Pos4;
 		public Color4 Color;
 		public Vector2 UV1;
 		public Vector2 UV2;
@@ -114,6 +120,7 @@ namespace Lime
 		private static StencilState stencilState;
 		private static ScissorState scissorState;
 		private static Color4 colorFactor;
+		private static FrontFace frontFace;
 
 		public static Blending Blending { private get; set; }
 		public static ShaderId Shader { private get; set; }
@@ -267,6 +274,18 @@ namespace Lime
 			}
 		}
 
+		public static FrontFace FrontFace
+		{
+			private get { return frontFace; }
+			set {
+				if (frontFace != value) {
+					Flush();
+					frontFace = value;
+					PlatformRenderer.SetFrontFace(FixupFrontFace(frontFace));
+				}
+			}
+		}
+
 		public static Color4 ColorFactor
 		{
 			get { return colorFactor; }
@@ -313,6 +332,7 @@ namespace Lime
 			CullMode = CullMode.None;
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
+			FrontFace = FrontFace.CW;
 			World = Matrix44.Identity;
 			View = Matrix44.Identity;
 			CurrentRenderList = MainRenderList;
@@ -678,7 +698,7 @@ namespace Lime
 			scissorRect.A = scissorRect.A * 2 - Vector2.One;
 			scissorRect.B = scissorRect.B * 2 - Vector2.One;
 			// Get the unprojected coordinates
-			var invProjection = Projection.CalcInverted();
+			var invProjection = FixupWVP(Projection).CalcInverted();
 			var v0 = invProjection.ProjectVector(scissorRect.A);
 			var v1 = invProjection.ProjectVector(new Vector2(scissorRect.B.X, scissorRect.A.Y));
 			var v2 = invProjection.ProjectVector(scissorRect.B);
@@ -941,6 +961,7 @@ namespace Lime
 		private static void OnRenderTargetChanged()
 		{
 			FlushWVPMatrix();
+			PlatformRenderer.SetFrontFace(FixupFrontFace(frontFace));
 		}
 
 		public static void MultiplyTransform1(Matrix32 transform)
@@ -953,12 +974,25 @@ namespace Lime
 			Transform2 = transform * Transform2;
 		}
 
+		private static readonly Matrix44 vulkanClipspaceMatrix = Matrix44.CreateScale(1, -1, 0.5f) * Matrix44.CreateTranslation(0, 0, 0.5f);
+		private static readonly Matrix44 openglRenderTextureClipspaceMatrix = Matrix44.CreateScale(1, -1, 1);
+		
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
-			if (PlatformRenderer.OffscreenRendering) {
-				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
+			if (Application.RenderingBackend == RenderingBackend.Vulkan) {
+				projection *= vulkanClipspaceMatrix;
+			} else if (PlatformRenderer.OffscreenRendering) {
+				projection *= openglRenderTextureClipspaceMatrix;
 			}
 			return projection;
+		}
+
+		public static FrontFace FixupFrontFace(FrontFace frontFace)
+		{
+			if (Application.RenderingBackend != RenderingBackend.Vulkan && PlatformRenderer.OffscreenRendering) {
+				frontFace = frontFace.Invert();
+			}
+			return frontFace;
 		}
 
 		private static void FlushWVPMatrix()

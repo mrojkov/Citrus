@@ -10,20 +10,25 @@ namespace Lime
 	public class Mesh3D : Node3D
 	{
 		[YuzuCompact]
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4)]
+		[StructLayout(LayoutKind.Sequential, Size = 16)]
 		public struct BlendIndices
 		{
+			private float index0;
+			private float index1;
+			private float index2;
+			private float index3;
+
 			[YuzuMember("0")]
-			public byte Index0;
+			public byte Index0 { get => (byte)index0; set => index0 = value; }
 
 			[YuzuMember("1")]
-			public byte Index1;
+			public byte Index1 { get => (byte)index1; set => index1 = value; }
 
 			[YuzuMember("2")]
-			public byte Index2;
+			public byte Index2 { get => (byte)index2; set => index2 = value; }
 
 			[YuzuMember("3")]
-			public byte Index3;
+			public byte Index3 { get => (byte)index3; set => index3 = value; }
 		}
 
 		[YuzuCompact]

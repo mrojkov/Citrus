@@ -41,7 +41,7 @@ namespace Lime
 		public void Dispose()
 		{
 			foreach (var texture in Textures) {
-				texture.Discard();
+				texture.Dispose();
 			}
 		}
 

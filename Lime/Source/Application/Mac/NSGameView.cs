@@ -1,27 +1,19 @@
-﻿#if MAC || MONOMAC
+﻿#if MAC
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-#if MAC
 using AppKit;
 using CoreGraphics;
 using CoreVideo;
 using Foundation;
 using OpenGL;
-#else
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-using MonoMac.CoreVideo;
-using MonoMac.Foundation;
-using MonoMac.OpenGL;
-#endif
-using OpenTK;
 
 namespace Lime.Platform
 {
 	public class NSGameView : NSView
 	{
+		private static Lime.Graphics.Platform.OpenGL.PlatformRenderContext platformRenderContext;
 		private static NSOpenGLContext openGLContext;
 		private NSOpenGLPixelFormat pixelFormat;
 		private NSTimer animationTimer;
@@ -77,6 +69,10 @@ namespace Lime.Platform
 				throw new InvalidOperationException(string.Format("Failed to construct NSOpenGLContext {0}", mode));
 			}
 			openGLContext.MakeCurrentContext();
+			if (platformRenderContext == null) {
+				platformRenderContext = new Graphics.Platform.OpenGL.PlatformRenderContext();
+				PlatformRenderer.Initialize(platformRenderContext);
+			}
 			swapInterval = true;
 		}
 
@@ -316,18 +312,6 @@ namespace Lime.Platform
 				openGLContext.View = this;
 		}
 
-		protected NSViewController GetViewController()
-		{
-			NSResponder r = this;
-			while (r != null) {
-				var c = r as NSViewController;
-				if (c != null)
-					return c;
-				r = r.NextResponder;
-			}
-			return null;
-		}
-
 		private void StartAnimation(double updatesPerSecond, bool modal)
 		{
 			if (!running) {
@@ -369,6 +353,7 @@ namespace Lime.Platform
 		public void MakeCurrent()
 		{
 			openGLContext.View = this;
+			platformRenderContext.Begin(0);
 		}
 
 		private void OnRender()
@@ -380,6 +365,7 @@ namespace Lime.Platform
 
 		public virtual void SwapBuffers()
 		{
+			platformRenderContext.End();
 			AssertNonDisposed();
 			AssertContext();
 			openGLContext.FlushBuffer();
@@ -406,7 +392,6 @@ namespace Lime.Platform
 
 		public override bool PerformDragOperation(NSDraggingInfo sender)
 		{
-#if !MONOMAC
 			if (base.PrepareForDragOperation (sender)) {
 				var nsFiles = ((NSArray)sender.DraggingPasteboard.GetPropertyListForType(NSPasteboard.NSFilenamesType));
 				var files = new List<string>();
@@ -416,7 +401,6 @@ namespace Lime.Platform
 				FilesDropped?.Invoke(files);
 				return true;
 			}
-#endif
 			return false;
 		}
 

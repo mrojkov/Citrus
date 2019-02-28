@@ -53,6 +53,12 @@
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="MoltenVK.iOS">
+      <HintPath>..\3rdParty\MoltenVK\MoltenVK.iOS.dll</HintPath>
+    </Reference>
+    <Reference Include="ShaderCompilerBinding.iOS">
+      <HintPath>..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.iOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -61,7 +67,6 @@
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
-    <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
     <Compile Include="Source\Types\IntVector2.cs" />
@@ -114,24 +119,12 @@
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Types\Matrix44.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
-    <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
-    <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
@@ -145,9 +138,6 @@
     <Compile Include="Source\Graphics\Bitmap.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
-    <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
@@ -163,7 +153,6 @@
     <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
-    <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -297,7 +286,6 @@
     <Compile Include="Source\Widgets\3D\Model3D.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Mesh.cs" />
     <Compile Include="Source\Graphics\IMesh.cs" />
     <Compile Include="Source\Application\MessageBox.cs" />
     <Compile Include="Source\AssetBundle\AggregateAssetBundle.cs" />
@@ -310,7 +298,6 @@
     <Compile Include="Source\Widgets\NodeComponentCollection.cs" />
     <Compile Include="Source\ComponentCollection.cs" />
     <Compile Include="Source\Widgets\3D\SplineGear3D.cs" />
-    <Compile Include="Source\Graphics\OpenGL\ShaderPrograms.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
@@ -335,8 +322,6 @@
     <Compile Include="Source\Optimizations\RenderOptimizerHelpers.cs" />
     <Compile Include="Source\Optimizations\ViewProjector.cs" />
     <Compile Include="Source\Types\Bounds.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.Ktx.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Etc2Decoder.cs" />
     <Compile Include="Source\Input\Command.cs" />
     <Compile Include="Source\Input\CommandHandler.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
@@ -366,9 +351,6 @@
     <Compile Include="Source\Widgets\WidgetMaterial.cs" />
     <Compile Include="Source\Graphics\GraphicsExtensions.cs" />
     <Compile Include="Source\Graphics\VertexInputLayout.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Buffer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\GLExtensions.cs" />
-    <Compile Include="Source\Graphics\OpenGL\ShaderParams.cs" />
     <Compile Include="Source\Application\WindowInput.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
     <Compile Include="Source\Widgets\TiledImage.cs" />
@@ -420,6 +402,62 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionShadows.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderObject.cs" />
+    <Compile Include="Source\Graphics\Buffer.cs" />
+    <Compile Include="Source\Graphics\Etc2Decoder.cs" />
+    <Compile Include="Source\Graphics\Format.cs" />
+    <Compile Include="Source\Graphics\GraphicsUtility.cs" />
+    <Compile Include="Source\Graphics\Hasher.cs" />
+    <Compile Include="Source\Graphics\IndexBuffer.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
+    <Compile Include="Source\Graphics\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\Shader.cs" />
+    <Compile Include="Source\Graphics\ShaderParams.cs" />
+    <Compile Include="Source\Graphics\ShaderProgram.cs" />
+    <Compile Include="Source\Graphics\ShaderPrograms.cs" />
+    <Compile Include="Source\Graphics\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\Texture2D.Ktx.cs" />
+    <Compile Include="Source\Graphics\Texture2D.Pvr.cs" />
+    <Compile Include="Source\Graphics\Texture2D.cs" />
+    <Compile Include="Source\Graphics\VertexBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformRenderContext.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformRenderTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformShader.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformShaderProgram.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\IPlatformVertexInputLayout.cs" />
+    <Compile Include="Source\Graphics\Platform\LruCache.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\BackingBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\DescriptorAllocator.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformRenderContext.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformRenderTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformShader.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformShaderProgram.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\PlatformVertexInputLayout.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\SamplerCache.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\Scheduler.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\Swapchain.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\VulkanHelper.cs" />
+    <Compile Include="Source\Application\iOSMetalGameView.cs" />
+    <Compile Include="Source\Application\iOSGLGameView.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\GLHelper.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformBuffer.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformRenderContext.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformRenderTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformShader.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformShaderProgram.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformTexture2D.cs" />
+    <Compile Include="Source\Graphics\Platform\OpenGL\PlatformVertexInputLayout.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\FormatConverter.cs" />
+    <Compile Include="Source\Graphics\Platform\Vulkan\MemoryAllocator.cs" />
+    <Compile Include="Source\Graphics\Platform\Murmur3.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

@@ -28,7 +28,6 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <IOSDebuggerPort></IOSDebuggerPort>
     <CrashReportingDelay>-1</CrashReportingDelay>
-    <DelaySign>false</DelaySign>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">

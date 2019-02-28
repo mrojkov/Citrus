@@ -1,4 +1,5 @@
 using Yuzu;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -50,16 +51,12 @@ namespace Lime
 		{
 			get
 			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.TextureParams;
 			}
 			set
 			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				texture.TextureParams = value;
 			}
 		}
@@ -68,9 +65,7 @@ namespace Lime
 		{
 			get
 			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.IsStubTexture;
 			}
 		}
@@ -78,9 +73,7 @@ namespace Lime
 		public Size ImageSize {
 			get
 			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.ImageSize;
 			}
 		}
@@ -88,70 +81,52 @@ namespace Lime
 		public Size SurfaceSize {
 			get
 			{
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.SurfaceSize;
 			}
 		}
 
 		public ITexture AtlasTexture {
 			get {
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.AtlasTexture;
 			}
 		}
 
 		public Rectangle AtlasUVRect {
 			get {
-				if (texture == null) {
-					texture = LoadTexture();
-				}
+				EnsureTexture();
 				return texture.AtlasUVRect;
 			}
 		}
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
+			EnsureTexture();
 			texture.TransformUVCoordinatesToAtlasSpace(ref uv);
 		}
 
-		public uint GetHandle()
+		public IPlatformTexture2D GetPlatformTexture()
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
-			return texture.GetHandle();
+			EnsureTexture();
+			return texture.GetPlatformTexture();
 		}
-
-		public void Discard() { }
 
 		public void SetAsRenderTarget()
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
+			EnsureTexture();
 			texture.SetAsRenderTarget();
 		}
 
 		public void RestoreRenderTarget()
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
+			EnsureTexture();
 			texture.RestoreRenderTarget();
 		}
 
 		public bool IsTransparentPixel(int x, int y)
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
+			EnsureTexture();
 			return texture.IsTransparentPixel(x, y);
 		}
 
@@ -160,17 +135,17 @@ namespace Lime
 			return path;
 		}
 
-		private ITexture LoadTexture()
-		{
-			return TexturePool.Instance.GetTexture(path);
-		}
-
 		public Color4[] GetPixels()
 		{
-			if (texture == null) {
-				texture = LoadTexture();
-			}
+			EnsureTexture();
 			return texture.GetPixels();
+		}
+
+		private void EnsureTexture()
+		{
+			if (texture == null || texture.IsDisposed) {
+				texture = TexturePool.Instance.GetTexture(path);
+			}
 		}
 	}
 }

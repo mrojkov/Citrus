@@ -63,7 +63,7 @@ namespace Lime
 			isActivityIndicatorVisible = true;
 		}
 
-		private GameView GameView 
+		private UIView GameView 
 		{
 			get { return Window.Current.UIViewController.View; }
 		}

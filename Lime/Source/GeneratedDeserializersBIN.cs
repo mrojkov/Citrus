@@ -9004,10 +9004,14 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.WrapModeU = (global::Lime.TextureWrapMode)d.Reader.ReadInt32();
+				result.MipmapMode = (global::Lime.TextureMipmapMode)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.WrapModeU = (global::Lime.TextureWrapMode)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				result.WrapModeV = (global::Lime.TextureWrapMode)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}

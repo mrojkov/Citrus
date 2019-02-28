@@ -202,8 +202,7 @@ namespace Tangerine.UI.Timeline.Components
 					vertices[0] = new Vertex { Pos = center, Color = color };
 					for (int i = 0; i < numSegments; i++) {
 						var r = Vector2.CosSin(i * Mathf.HalfPi / (numSegments - 1));
-						vertices[i + 1].Pos.X = center.X + r.X * segmentWidth;
-						vertices[i + 1].Pos.Y = center.Y - r.Y * segmentHeight;
+						vertices[i + 1].Pos = new Vector2(center.X + r.X * segmentWidth, center.Y - r.Y * segmentHeight);
 						vertices[i + 1].Color = color;
 					}
 					Renderer.DrawTriangleFan(vertices, numSegments + 1);

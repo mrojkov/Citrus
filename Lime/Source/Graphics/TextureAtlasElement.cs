@@ -1,5 +1,6 @@
 using System;
 using Yuzu;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -41,13 +42,25 @@ namespace Lime
 			}
 		}
 
-		public ITexture AtlasTexture { get; private set; }
+		private ITexture atlasTexture;
+
+		public ITexture AtlasTexture
+		{
+			get {
+				if (atlasTexture == null || atlasTexture.IsDisposed) {
+					atlasTexture = TexturePool.Instance.GetTexture(AtlasPath);
+				}
+				return atlasTexture;
+			}
+		}
+
+		public string AtlasPath { get; private set; }
 		public Rectangle AtlasUVRect { get; private set; }
 		public Size ImageSize { get; private set; }
 
 		public TextureAtlasElement(Params @params)
 		{
-			AtlasTexture = TexturePool.Instance.GetTexture(@params.AtlasPath);
+			AtlasPath = @params.AtlasPath;
 			AtlasUVRect = new Rectangle(
 				(Vector2)@params.AtlasRect.A / (Vector2)AtlasTexture.SurfaceSize,
 				(Vector2)@params.AtlasRect.B / (Vector2)AtlasTexture.SurfaceSize
@@ -72,9 +85,9 @@ namespace Lime
 			uv.Y = AtlasUVRect.Top + height * uv.Y;
 		}
 
-		public uint GetHandle()
+		public IPlatformTexture2D GetPlatformTexture()
 		{
-			return AtlasTexture.GetHandle();
+			return AtlasTexture.GetPlatformTexture();
 		}
 
 		public void SetAsRenderTarget()
@@ -96,8 +109,6 @@ namespace Lime
 			var offset = (IntVector2)(AtlasUVRect.A * (Vector2)AtlasTexture.SurfaceSize);
 			return AtlasTexture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
-
-		public void Discard() { }
 
 		public Color4[] GetPixels()
 		{

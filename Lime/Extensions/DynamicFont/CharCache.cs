@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using Lime.Graphics.Platform;
 
 namespace Lime
 {
@@ -163,13 +164,13 @@ namespace Lime
 				}
 			}
 
-			public override uint GetHandle()
+			public override IPlatformTexture2D GetPlatformTexture()
 			{
 				if (Invalidated) {
 					LoadImage(Data, ImageSize.Width, ImageSize.Height);
 					Invalidated = false;
 				}
-				return base.GetHandle();
+				return base.GetPlatformTexture();
 			}
 		}
 	}

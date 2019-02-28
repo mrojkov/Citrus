@@ -18,7 +18,7 @@ namespace Orange
 				(bledBitmap ?? bitmap).SaveTo(pngPath);
 				var etcTool = GetToolPath("EtcTool");
 				var args =
-					$"{pngPath} -format " + (hasAlpha ? "RGBA8" : "ETC1") +
+					$"{pngPath} -format " + (hasAlpha ? "RGBA8" : "RGB8") +
 					" -jobs 8 " +
 					" -effort " + (highQualityCompression ? "60" : "40") +
 					(mipMaps ? " -mipmaps 4" : "") +

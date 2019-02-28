@@ -15,6 +15,10 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\Emp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.iOS", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD41A2224C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoltenVK.iOS", "..\..\..\3rdParty\MoltenVK\MoltenVK.iOS.csproj", "{84242EF1-42D6-4AA4-AED3-8C26E530F671}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderCompilerBinding.iOS", "..\..\..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.iOS.csproj", "{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -97,18 +101,53 @@ Global
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Ad-Hoc|iPhone.Build.0 = Release|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.AppStore|iPhone.ActiveCfg = Release|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.AppStore|iPhone.Build.0 = Release|iPhone
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Release|iPhone.Build.0 = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{84242EF1-42D6-4AA4-AED3-8C26E530F671}.AppStore|iPhone.Build.0 = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Release|iPhone.Build.0 = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{70D61E3D-D6FF-48B5-B90F-F17EE0D30362}.AppStore|iPhone.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.TextStylePolicy = $1
-		$1.FileWidth = 120
-		$1.TabsToSpaces = False
-		$1.inheritsSet = VisualStudio
-		$1.inheritsScope = text/plain
 		$1.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $2
-		$2.inheritsSet = Mono
-		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
+		$2.IndentSwitchSection = False
+		$2.NewLinesForBracesInProperties = False
+		$2.NewLinesForBracesInAccessors = False
+		$2.NewLinesForBracesInAnonymousMethods = False
+		$2.NewLinesForBracesInControlBlocks = False
+		$2.NewLinesForBracesInAnonymousTypes = False
+		$2.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$2.NewLinesForBracesInLambdaExpressionBody = False
+		$2.NewLineForElse = False
+		$2.NewLineForCatch = False
+		$2.NewLineForFinally = False
+		$2.NewLineForMembersInObjectInit = False
+		$2.NewLineForMembersInAnonymousTypes = False
+		$2.NewLineForClausesInQuery = False
+		$2.SpacingAfterMethodDeclarationName = True
+		$2.SpaceAfterMethodCallName = True
+		$2.SpaceBeforeOpenSquareBracket = True
 	EndGlobalSection
 EndGlobal

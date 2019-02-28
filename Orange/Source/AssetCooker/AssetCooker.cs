@@ -634,20 +634,20 @@ namespace Orange
 			var initialAtlasId = 0;
 			foreach (var kv in items) {
 				if (kv.Value.Any()) {
-					if (Platform == TargetPlatform.iOS) {
-						Predicate<PVRFormat> isRequireSquare = (format) => {
-							return
-								format == PVRFormat.PVRTC2 ||
-								format == PVRFormat.PVRTC4 ||
-								format == PVRFormat.PVRTC4_Forced;
-						};
-						var square = kv.Value.Where(item => isRequireSquare(item.CookingRules.PVRFormat)).ToList();
-						var nonSquare = kv.Value.Where(item => !isRequireSquare(item.CookingRules.PVRFormat)).ToList();
-						initialAtlasId = PackItemsToAtlas(atlasChain, square, kv.Key, initialAtlasId, true);
-						initialAtlasId = PackItemsToAtlas(atlasChain, nonSquare, kv.Key, initialAtlasId, false);
-					} else {
+					//if (Platform == TargetPlatform.iOS) {
+					//	Predicate<PVRFormat> isRequireSquare = (format) => {
+					//		return
+					//			format == PVRFormat.PVRTC2 ||
+					//			format == PVRFormat.PVRTC4 ||
+					//			format == PVRFormat.PVRTC4_Forced;
+					//	};
+					//	var square = kv.Value.Where(item => isRequireSquare(item.CookingRules.PVRFormat)).ToList();
+					//	var nonSquare = kv.Value.Where(item => !isRequireSquare(item.CookingRules.PVRFormat)).ToList();
+					//	initialAtlasId = PackItemsToAtlas(atlasChain, square, kv.Key, initialAtlasId, true);
+					//	initialAtlasId = PackItemsToAtlas(atlasChain, nonSquare, kv.Key, initialAtlasId, false);
+					//} else {
 						initialAtlasId = PackItemsToAtlas(atlasChain, kv.Value, kv.Key, initialAtlasId, false);
-					}
+					//}
 				}
 			}
 			var packers = PluginLoader.CurrentPlugin.AtlasPackers.ToDictionary(i => i.Metadata.Id, i => i.Value);
@@ -907,6 +907,7 @@ namespace Orange
 			}
 			switch (Platform) {
 				case TargetPlatform.Android:
+				case TargetPlatform.iOS:
 					var f = rules.PVRFormat;
 					if (f == PVRFormat.ARGB8 || f == PVRFormat.RGB565 || f == PVRFormat.RGBA4) {
 						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
@@ -914,9 +915,9 @@ namespace Orange
 						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, CookingRulesSHA1);
 					}
 					break;
-				case TargetPlatform.iOS:
-					TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
-					break;
+				//case TargetPlatform.iOS:
+				//	TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
+				//	break;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
 					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps, CookingRulesSHA1);

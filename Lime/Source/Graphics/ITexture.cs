@@ -1,13 +1,6 @@
 using System;
+using Lime.Graphics.Platform;
 using Yuzu;
-#if OPENGL
-#if iOS || ANDROID || WIN
-using OpenTK.Graphics.ES20;
-#elif MAC
-using OpenTK.Graphics.OpenGL;
-#elif MONOMAC
-using MonoMac.OpenGL;
-#endif
 
 namespace Lime
 {
@@ -25,6 +18,12 @@ namespace Lime
 		MirroredRepeat,
 	}
 
+	public enum TextureMipmapMode
+	{
+		Linear,
+		Nearest
+	}
+
 	public class TextureParams : IEquatable<TextureParams>
 	{
 		[YuzuMember]
@@ -37,6 +36,8 @@ namespace Lime
 		public TextureFilter MinFilter { get; set; } = TextureFilter.Linear;
 		[YuzuMember]
 		public TextureFilter MagFilter { get; set; } = TextureFilter.Linear;
+		[YuzuMember]
+		public TextureMipmapMode MipmapMode { get; set; } = TextureMipmapMode.Linear;
 
 		public TextureWrapMode WrapMode
 		{
@@ -61,39 +62,10 @@ namespace Lime
 			return WrapModeU == other.WrapModeU &&
 				WrapModeV == other.WrapModeV &&
 				MinFilter == other.MinFilter &&
-				MagFilter == other.MagFilter;
+				MagFilter == other.MagFilter &&
+				MipmapMode == other.MipmapMode;
 		}
 	}
-
-	internal static class TextureParamsExtensions
-	{
-		public static int ToInt(this TextureFilter filter)
-		{
-			switch (filter) {
-			case TextureFilter.Linear:
-				return (int)All.Linear;
-			case TextureFilter.Nearest:
-				return (int)All.Nearest;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
-			}
-		}
-
-		public static int ToInt(this TextureWrapMode wrapMode)
-		{
-			switch (wrapMode) {
-			case TextureWrapMode.Clamp:
-				return (int)All.ClampToEdge;
-			case TextureWrapMode.Repeat:
-				return (int)All.Repeat;
-			case TextureWrapMode.MirroredRepeat:
-				return (int)All.MirroredRepeat;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(wrapMode), wrapMode, null);
-			}
-		}
-	}
-#endif
 
 	[YuzuDontGenerateDeserializer]
 	public interface ITexture : IDisposable
@@ -105,20 +77,13 @@ namespace Lime
 		bool IsDisposed { get; }
 
 		void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv);
-		uint GetHandle();
+		IPlatformTexture2D GetPlatformTexture();
 		void SetAsRenderTarget();
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
 		bool IsStubTexture { get; }
 		int MemoryUsed { get; }
 		TextureParams TextureParams { get; set; }
-
-		/// <summary>
-		/// Unloads the texture from memory, frees OpenGL resources.
-		/// The texture will be loaded again on the next GetHandle().
-		/// RenderTexture.Unload() does nothing.
-		/// </summary>
-		void Discard();
 
 		void MaybeDiscardUnderPressure();
 		Color4[] GetPixels();

@@ -10,7 +10,7 @@ namespace Lime
 		public bool Empty { get { return lastBatch == null; } }
 
 		public RenderBatch<TVertex> GetBatch<TVertex>(ITexture texture1, ITexture texture2, IMaterial material, int vertexCount, int indexCount)
-			where TVertex : struct
+			where TVertex : unmanaged
 		{
 			var atlas1 = texture1?.AtlasTexture;
 			var atlas2 = texture2?.AtlasTexture;
