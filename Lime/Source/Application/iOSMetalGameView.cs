@@ -53,6 +53,19 @@ namespace Lime
 		
 		public void Draw(MTKView view)
 		{
+			EnsureInitialized();
+			var curUpdateTime = stopwatch.Elapsed;
+			if (prevUpdateTime == TimeSpan.Zero) {
+				prevUpdateTime = curUpdateTime;
+			}
+			var delta = (float)(curUpdateTime - prevUpdateTime).TotalSeconds;
+			UpdateFrame?.Invoke(delta);
+			prevUpdateTime = curUpdateTime;
+			RenderFrame?.Invoke();
+		}
+
+		private void EnsureInitialized()
+		{
 			if (metalLayer == null) {
 				SetupMetal();
 			}
@@ -63,21 +76,14 @@ namespace Lime
 			if (vkSwapChain == null) {
 				var size = metalLayer.Frame.Size;
 				vkSwapChain = new Graphics.Platform.Vulkan.Swapchain(
-					vkContext, this.Handle, 
+					vkContext, this.Handle,
 					(int)(size.Width * PixelScale), (int)(size.Height * PixelScale));
 			}
-			var curUpdateTime = stopwatch.Elapsed;
-			if (prevUpdateTime == TimeSpan.Zero) {
-				prevUpdateTime = curUpdateTime;
-			}
-			var delta = (float)(curUpdateTime - prevUpdateTime).TotalSeconds;
-			UpdateFrame?.Invoke(delta);
-			prevUpdateTime = curUpdateTime;
-			RenderFrame?.Invoke();
 		}
-		
+
 		public void DrawableSizeWillChange(MTKView view, CGSize size)
 		{
+			EnsureInitialized();
 			vkSwapChain.Resize((int)size.Width, (int)size.Height);
 		}
 		
