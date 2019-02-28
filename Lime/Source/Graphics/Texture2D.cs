@@ -85,7 +85,7 @@ namespace Lime
 				}
 
 				using (stream) {
-					LoadImageHelper(stream, createReloader: false);
+					LoadImageHelper(stream);
 				}
 
 				LoadTextureParams(path);
@@ -143,7 +143,7 @@ namespace Lime
 		{
 			IsStubTexture = false;
 
-			LoadImageHelper(stream, createReloader: true);
+			LoadImageHelper(stream);
 		}
 
 		public void LoadImage(Bitmap bitmap)
@@ -153,7 +153,7 @@ namespace Lime
 			LoadImage(bitmap.GetPixels(), bitmap.Width, bitmap.Height);
 		}
 
-		private void LoadImageHelper(Stream stream, bool createReloader)
+		private void LoadImageHelper(Stream stream)
 		{
 			if (!stream.CanSeek) {
 				stream = new RewindableStream(stream);
