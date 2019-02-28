@@ -76,7 +76,7 @@ namespace Orange
 		private static readonly AggregateCatalog catalog;
 		private static readonly List<ComposablePartCatalog> registeredCatalogs = new List<ComposablePartCatalog>();
 		private static readonly Regex ignoredAssemblies = new Regex(
-			"Lime|System.*|mscorlib.*|Microsoft.*",
+			"^(Lime|System.*|mscorlib.*|Microsoft.*)",
 			RegexOptions.Compiled
 		);
 		static PluginLoader()
@@ -221,6 +221,7 @@ namespace Orange
 			if (requiredAssemblies == null) {
 				yield break;
 			}
+
 			foreach (string name in requiredAssemblies()) {
 				AssemblyResolve(null, new ResolveEventArgs(name, null));
 			}
@@ -264,13 +265,47 @@ namespace Orange
 			string foundPath = requiredAssemblies?.FirstOrDefault(assemblyPath =>
 				assemblyPath == name || Path.GetFileName(assemblyPath).Equals(name, StringComparison.InvariantCultureIgnoreCase)
 			);
+
 			if (foundPath == null) {
 				return null;
 			}
 
 			Assembly assembly;
+
 			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
-				var dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+				string dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+
+				var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+				var existedAssemblyByPath = domainAssemblies.Where(i => {
+					try {
+						return string.Equals(i.Location, dllPath, StringComparison.CurrentCultureIgnoreCase);
+					} catch {
+						return false;
+					}
+				});
+
+				if (existedAssemblyByPath.Any()) {
+					assembly = existedAssemblyByPath.First();
+					resolvedAssemblies.Add(name, assembly);
+
+					return assembly;
+				}
+
+				var existedAssemblyByName = domainAssemblies.Where(i => {
+					try {
+						return string.Equals(i.GetName().Name, name, StringComparison.CurrentCultureIgnoreCase);
+					} catch {
+						return false;
+					}
+				});
+
+				if (existedAssemblyByName.Any()) {
+					throw new InvalidOperationException(
+						$"WARNING: Assembly {name} with path {assembly.Location} has already loaded in domain." +
+						$"\nAssembly {name} with path {dllPath} leads to exception.");
+				}
+
 				var readAllDllBytes = File.ReadAllBytes(dllPath);
 				byte[] readAllPdbBytes = null;
 #if DEBUG
