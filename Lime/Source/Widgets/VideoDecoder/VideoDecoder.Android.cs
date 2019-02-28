@@ -212,6 +212,7 @@ namespace Lime
 				Tasks.TaskCreationOptions.LongRunning,
 				Tasks.TaskScheduler.Default
 			);
+			processVideo.ContinueWith(failedTask => HandleError(failedTask), Tasks.TaskContinuationOptions.OnlyOnFaulted);
 
 			processAudio = factory.StartNew(
 				ProcessAudio,
@@ -219,6 +220,21 @@ namespace Lime
 				Tasks.TaskCreationOptions.LongRunning,
 				Tasks.TaskScheduler.Default
 			);
+			processAudio.ContinueWith(failedTask => HandleError(failedTask), Tasks.TaskContinuationOptions.OnlyOnFaulted);
+		}
+
+		private void HandleError(Tasks.Task task)
+		{
+			if (state == State.Started) {
+				stopDecodeCancelationTokenSource?.Cancel();
+				stopwatch?.Stop();
+				state = State.Finished;
+			}
+			if (task.Exception != null) {
+				foreach (var e in task.Exception.InnerExceptions) {
+					Debug.Write(e.Message);
+				}
+			}
 		}
 
 		private void ProcessVideo()
