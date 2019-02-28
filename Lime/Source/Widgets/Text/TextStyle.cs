@@ -219,6 +219,18 @@ namespace Lime
 
 		private void InvalidateRichText() => (Parent as RichText)?.Invalidate();
 
+		protected override void OnParentChanged(Node oldParent)
+		{
+			if (
+				Parent != null &&
+				Components.Contains<SignedDistanceFieldComponent>() &&
+				!(Parent.Presenter is SignedDistanceField.SDFRichTextPresenter)
+			) {
+				Parent.Presenter = new SignedDistanceField.SDFRichTextPresenter();
+			}
+			base.OnParentChanged(oldParent);
+		}
+
 		public override void AddToRenderChain(RenderChain chain)
 		{
 		}

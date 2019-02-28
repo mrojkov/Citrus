@@ -1,11 +1,20 @@
 using Yuzu;
 using Lime.SignedDistanceField;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Lime
 {
 	public class ShadowParams
 	{
+		internal enum Type
+		{
+			Base,
+			Inner,
+		}
+
 		private const float MinimumSoftness = 0f;
 		private const float MaximumSoftness = 45f;
 		private const float MinimumDilate = -40f;
@@ -13,31 +22,123 @@ namespace Lime
 
 		private float softness = 0f;
 		private float dilate = 0f;
+		private int offsetX;
+		private int offsetY;
+		private Color4 color = Color4.Black;
 
 		[YuzuMember]
 		public bool Enabled { get; set; } = true;
 
 		[YuzuMember]
-		public Color4 Color { get; set; } = Color4.Black;
+		public Color4 Color
+		{
+			get => color;
+			set {
+				if (color != value) {
+					isDirty = true;
+				}
+				color = value;
+			}
+		}
 
 		[YuzuMember]
-		public int OffsetX { get; set; }
+		public int OffsetX
+		{
+			get => offsetX;
+			set {
+				if (offsetX != value) {
+					isDirty = true;
+				}
+				offsetX = value;
+			}
+		}
 
 		[YuzuMember]
-		public int OffsetY { get; set; }
+		public int OffsetY
+		{
+			get => offsetY;
+			set {
+				if (offsetY != value) {
+					isDirty = true;
+				}
+				offsetY = value;
+			}
+		}
 
 		[YuzuMember]
 		public float Softness
 		{
 			get => softness;
-			set => softness = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
+			set {
+				var clamped = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
+				if (softness != clamped) {
+					isDirty = true;
+				}
+				softness = clamped;
+			}
 		}
 
 		[YuzuMember]
 		public float Dilate
 		{
 			get => dilate;
-			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+			set {
+				var clamped = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+				if (dilate != clamped) {
+					isDirty = true;
+				}
+				dilate = clamped;
+			}
+		}
+
+		[TangerineIgnore]
+		internal SignedDistanceFieldComponent OwnerComponent;
+
+		[TangerineIgnore]
+		internal Type ShadowType;
+
+		[TangerineIgnore]
+		internal bool isDirty = true;
+
+		private Sprite.IMaterialProvider materialProvider;
+
+		[TangerineIgnore]
+		internal Sprite.IMaterialProvider MaterialProvider
+		{
+			get {
+				if (isDirty) {
+					Invalidate();
+					isDirty = false;
+				}
+				return materialProvider;
+			}
+		}
+
+		private void Invalidate()
+		{
+			switch (ShadowType) {
+				case Type.Base:
+					var shadowKey = new SDFShadowMaterialKey() {
+						Dilate = Dilate,
+						Softness = Softness,
+						Color = Color,
+						Offset = new Vector2(offsetX, offsetY) * 0.1f
+					};
+					materialProvider = SDFMaterialProviderPool.Instance.GetSDFShadowMaterial(shadowKey);
+					break;
+				case Type.Inner:
+					var innerShadowKey = new SDFInnerShadowMaterialKey() {
+						Dilate = Dilate,
+						TextDilate = OwnerComponent.Dilate,
+						Softness = Softness,
+						Color = Color,
+						Offset = new Vector2(offsetX, offsetY) * 0.1f
+					};
+					materialProvider = SDFMaterialProviderPool.Instance.GetSDFInnerShadowMaterial(innerShadowKey);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
@@ -62,40 +163,112 @@ namespace Lime
 		private const float MinimumBevelWidth = 0f;
 		private const float MaximumBevelWidth = 30f;
 
+		private bool isDirty = true;
 		private float dilate = 0f;
 		private float thickness = 0f;
+		private Color4 outlineColor = Color4.Black;
+		private bool gradientEnabled;
+		private ColorGradient gradient = new ColorGradient(Color4.White, Color4.Black);
+		private float gradientAngle;
+		private InnerShadowCollection innerShadows;
+
+		private SDFMaterialProvider materialProvider;
+
+		[TangerineIgnore]
+		internal SDFMaterialProvider MaterialProvider
+		{
+			get
+			{
+				if (isDirty) {
+					Invalidate();
+					isDirty = false;
+				}
+				return materialProvider;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]
 		public float Dilate
 		{
 			get => dilate;
-			set => dilate = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+			set {
+				var clamped =  Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+				if (dilate != clamped) {
+					isDirty = true;
+					foreach (var shadow in InnerShadows) {
+						shadow.isDirty = true;
+					}
+				}
+				dilate = clamped;
+			}
 		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
-		public Color4 OutlineColor { get; set; } = Color4.Black;
+		public Color4 OutlineColor
+		{
+			get => outlineColor;
+			set {
+				if (outlineColor != value) {
+					isDirty = true;
+				}
+				outlineColor = value;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
 		public float Thickness
 		{
 			get => thickness;
-			set => thickness = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
+			set {
+				var clamped = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
+				if (thickness != clamped) {
+					isDirty = true;
+				}
+				thickness = clamped;
+			}
 		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupGradient)]
-		public bool GradientEnabled { get; set; }
+		public bool GradientEnabled
+		{
+			get => gradientEnabled;
+			set {
+				if (gradientEnabled != value) {
+					isDirty = true;
+				}
+				gradientEnabled = value;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupGradient)]
-		public ColorGradient Gradient { get; set; } = new ColorGradient(Color4.White, Color4.Black);
+		public ColorGradient Gradient
+		{
+			get => gradient;
+			set {
+				if (gradient.GetHashCode() != value.GetHashCode()) {
+					isDirty = true;
+				}
+				gradient = value;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupGradient)]
-		public float GradientAngle { get; set; }
+		public float GradientAngle
+		{
+			get => gradientAngle;
+			set {
+				if (gradientAngle != value) {
+					isDirty = true;
+				}
+				gradientAngle = value;
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
@@ -103,21 +276,99 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public List<ShadowParams> InnerShadows { get; set; }
+		public InnerShadowCollection InnerShadows
+		{
+			get => innerShadows;
+			set {
+				innerShadows = value;
+				if (innerShadows != null) {
+					innerShadows.Owner = this;
+				}
+			}
+		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
 		public List<ShadowParams> Overlays { get; set; }
 
+		public SignedDistanceFieldComponent()
+		{
+			if (InnerShadows == null) {
+				InnerShadows = new InnerShadowCollection();
+			}
+			Invalidate();
+		}
+
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
-			
+			base.OnOwnerChanged(oldOwner);
+			if (oldOwner != null) {
+				DettachFromNode(oldOwner);
+			}
+			if (Owner != null) {
+				AttachToNode(Owner);
+			}
+		}
+
+		private void AttachToNode(Node node)
+		{
+			if (node is SimpleText) {
+				node.Presenter = new SDFSimpleTextPresenter();
+			}
+		}
+
+		private void DettachFromNode(Node node)
+		{
+			if (node is SimpleText) {
+				node.Presenter = DefaultPresenter.Instance;
+			}
+		}
+
+		private void Invalidate()
+		{
+			var key = new SDFMaterialKey() {
+				Dilate = Dilate,
+				Thickness = Thickness,
+				OutlineColor = OutlineColor,
+				GradientEnabled = GradientEnabled,
+				Gradient = Gradient,
+				GradientAngle = GradientAngle
+			};
+
+			materialProvider = SDFMaterialProviderPool.Instance.GetSDFMaterial(key);
 		}
 
 		public override NodeComponent Clone()
 		{
 			var clone = (SignedDistanceFieldComponent)base.Clone();
 			return clone;
+		}
+
+		public class InnerShadowCollection : ObservableCollection<ShadowParams>
+		{
+			private SignedDistanceFieldComponent owner;
+			public SignedDistanceFieldComponent Owner
+			{
+				get => owner;
+				set {
+					owner = value;
+					foreach (var item in Items) {
+						item.OwnerComponent = owner;
+					}
+				}
+			}
+
+			protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+			{
+				if (e.Action == NotifyCollectionChangedAction.Add) {
+					foreach (var item in e.NewItems) {
+						var shadow = item as ShadowParams;
+						shadow.OwnerComponent = Owner;
+						shadow.ShadowType = ShadowParams.Type.Inner;
+					}
+				}
+				base.OnCollectionChanged(e);
+			}
 		}
 	}
 }

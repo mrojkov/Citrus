@@ -38,12 +38,7 @@ namespace Lime.SignedDistanceField
 
 		public void Init(ShadowParams shadowParams, float fontSize)
 		{
-			materialProvider = SDFShadowMaterialProvider.GetProvider(
-				shadowParams.Dilate,
-				shadowParams.Softness,
-				shadowParams.Color,
-				new Vector2(shadowParams.OffsetX, shadowParams.OffsetY) * 0.1f
-			);
+			materialProvider = shadowParams.MaterialProvider as SDFShadowMaterialProvider;
 			materialProvider.Material.FontSize = fontSize;
 		}
 
@@ -65,15 +60,9 @@ namespace Lime.SignedDistanceField
 
 		public override int GetHash() => materialProvider.Material.GetHashCode();
 
-		public void Init(ShadowParams shadowParams, float fontSize, float textDilate)
+		public void Init(ShadowParams shadowParams, float fontSize)
 		{
-			materialProvider = SDFInnerShadowMaterialProvider.GetProvider(
-				shadowParams.Dilate,
-				textDilate,
-				shadowParams.Softness,
-				shadowParams.Color,
-				new Vector2(shadowParams.OffsetX, shadowParams.OffsetY) * 0.01f
-			);
+			materialProvider = shadowParams.MaterialProvider as SDFInnerShadowMaterialProvider;
 			materialProvider.Material.FontSize = fontSize;
 		}
 
@@ -97,14 +86,7 @@ namespace Lime.SignedDistanceField
 
 		public void Init(SignedDistanceFieldComponent component, float fontSize)
 		{
-			materialProvider = SDFMaterialProvider.GetProvider(
-				component.Dilate,
-				component.Thickness,
-				component.OutlineColor,
-				component.GradientEnabled,
-				component.Gradient,
-				component.GradientAngle
-			);
+			materialProvider = component.MaterialProvider;
 			materialProvider.Material.FontSize = fontSize;
 		}
 
@@ -149,9 +131,11 @@ namespace Lime.SignedDistanceField
 			base.OnRelease();
 		}
 
-		public IEnumerator<BaseSDFRenderObject> GetEnumerator() => objects.GetEnumerator();
+		public List<BaseSDFRenderObject>.Enumerator GetEnumerator() => objects.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator() => objects.GetEnumerator();
+		IEnumerator<BaseSDFRenderObject> IEnumerable<BaseSDFRenderObject>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
 	public static class SDFRenderObject
@@ -178,7 +162,7 @@ namespace Lime.SignedDistanceField
 						continue;
 					}
 					var ro = RenderObjectPool<SDFInnerShadowRenderObject>.Acquire();
-					ro.Init(s, fontSize, component.Dilate);
+					ro.Init(s, fontSize);
 					roList.Add(ro);
 				}
 			}

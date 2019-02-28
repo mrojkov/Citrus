@@ -60,65 +60,10 @@ namespace Lime.SignedDistanceField
 				Offset = Offset,
 			};
 		}
-
-		public static int GetHashCode(
-			float dilate,
-			float softness,
-			Color4 color,
-			Vector2 offset
-		){
-			unchecked {
-				int hash = (int)2166136261;
-				hash = (hash * 16777619) ^ dilate.GetHashCode();
-				hash = (hash * 16777619) ^ softness.GetHashCode();
-				hash = (hash * 16777619) ^ color.GetHashCode();
-				hash = (hash * 16777619) ^ offset.GetHashCode();
-				return hash;
-			}
-		}
-
-		public override int GetHashCode()
-		{
-			return GetHashCode(
-				Dilate,
-				Softness,
-				Color,
-				Offset
-			);
-		}
 	}
 
 	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		private static Dictionary<int, SDFShadowMaterialProvider> cache = new Dictionary<int, SDFShadowMaterialProvider>();
-
-		public static SDFShadowMaterialProvider GetProvider(
-			float dilate,
-			float softness,
-			Color4 color,
-			Vector2 offset
-		){
-			int hash = SDFShadowMaterial.GetHashCode(
-				dilate,
-				softness,
-				color,
-				offset
-			);
-
-			SDFShadowMaterialProvider result;
-			if (cache.TryGetValue(hash, out result)) {
-				return result;
-			} else {
-				result = new SDFShadowMaterialProvider();
-				result.Material.Dilate = dilate;
-				result.Material.Softness = softness;
-				result.Material.Color = color;
-				result.Material.Offset = offset;
-				cache.Add(hash, result);
-				return result;
-			}
-		}
-
 		public SDFShadowMaterial Material = new SDFShadowMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
 

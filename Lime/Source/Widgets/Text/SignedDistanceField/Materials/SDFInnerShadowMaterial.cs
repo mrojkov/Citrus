@@ -50,7 +50,7 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(textDilateKey, 0.5f - TextDilate * 0.01f);
 			shaderParams.Set(softnessKey, Softness * 0.001f);
 			shaderParams.Set(colorKey, Color.ToVector4());
-			shaderParams.Set(offsetKey, Offset / 100);
+			shaderParams.Set(offsetKey, Offset);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFInnerShadowShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -68,72 +68,10 @@ namespace Lime.SignedDistanceField
 				Offset = Offset,
 			};
 		}
-
-		public static int GetHashCode(
-			float dilate,
-			float textDilate,
-			float softness,
-			Color4 color,
-			Vector2 offset
-		){
-			unchecked {
-				int hash = (int)2166136261;
-				hash = (hash * 16777619) ^ dilate.GetHashCode();
-				hash = (hash * 16777619) ^ textDilate.GetHashCode();
-				hash = (hash * 16777619) ^ softness.GetHashCode();
-				hash = (hash * 16777619) ^ color.GetHashCode();
-				hash = (hash * 16777619) ^ offset.GetHashCode();
-				return hash;
-			}
-		}
-
-		public override int GetHashCode()
-		{
-			return GetHashCode(
-				Dilate,
-				TextDilate,
-				Softness,
-				Color,
-				Offset
-			);
-		}
 	}
 
 	public class SDFInnerShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		private static Dictionary<int, SDFInnerShadowMaterialProvider> cache = new Dictionary<int, SDFInnerShadowMaterialProvider>();
-
-		public static SDFInnerShadowMaterialProvider GetProvider(
-			float dilate,
-			float textDilate,
-			float softness,
-			Color4 color,
-			Vector2 offset
-		)
-		{
-			int hash = SDFInnerShadowMaterial.GetHashCode(
-				dilate,
-				textDilate,
-				softness,
-				color,
-				offset
-			);
-
-			SDFInnerShadowMaterialProvider result;
-			if (cache.TryGetValue(hash, out result)) {
-				return result;
-			} else {
-				result = new SDFInnerShadowMaterialProvider();
-				result.Material.Dilate = dilate;
-				result.Material.TextDilate = textDilate;
-				result.Material.Softness = softness;
-				result.Material.Color = color;
-				result.Material.Offset = offset;
-				cache.Add(hash, result);
-				return result;
-			}
-		}
-
 		public SDFInnerShadowMaterial Material = new SDFInnerShadowMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
 

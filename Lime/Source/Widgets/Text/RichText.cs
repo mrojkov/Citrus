@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using Lime.Text;
 using Yuzu;
 
@@ -181,7 +182,6 @@ namespace Lime
 		{
 			EnsureSpriteLists();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
-			ro.Objects = new RenderObjectList();
 			//ro.CaptureRenderState causes RichText invalidation on every frame,
 			//so use local values for blending and shader
 			ro.LocalToWorldTransform = LocalToWorldTransform;
@@ -189,30 +189,16 @@ namespace Lime
 			ro.Shader = Shader;
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
-				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
-				if (sdfComponent != null) {
-					var sdfRO = InitSDFRenderObject(sdfComponent, style.Size);
-					foreach (var obj in sdfRO) {
-						obj.SpriteList = spriteLists[i];
-						obj.RenderMode = TextRenderingMode.TwoPasses;
-						obj.Color = GlobalColor;
-						obj.GradientMapIndex = style.GradientMapIndex;
-						obj.LocalToWorldTransform = LocalToWorldTransform;
-						obj.Shader = Shader;
-						obj.Blending = Blending;
-					}
-					ro.Objects.Add(sdfRO);
-				} else {
-					var styleRO = RenderObjectPool<TextRenderObject>.Acquire();
-					styleRO.SpriteList = spriteLists[i];
-					styleRO.RenderMode = TextRenderingMode.TwoPasses;
-					styleRO.Color = GlobalColor;
-					styleRO.GradientMapIndex = style.GradientMapIndex;
-					styleRO.LocalToWorldTransform = LocalToWorldTransform;
-					styleRO.Shader = Shader;
-					styleRO.Blending = Blending;
-					ro.Objects.Add(styleRO);
-				}
+				var styleRO = RenderObjectPool<StyleRenderObject>.Acquire();
+				styleRO.Style = style;
+				styleRO.SpriteList = spriteLists[i];
+				styleRO.RenderMode = TextRenderingMode.TwoPasses;
+				styleRO.Color = GlobalColor;
+				styleRO.GradientMapIndex = style.GradientMapIndex;
+				styleRO.LocalToWorldTransform = LocalToWorldTransform;
+				styleRO.Shader = Shader;
+				styleRO.Blending = Blending;
+				ro.Add(styleRO);
 			}
 			return ro;
 		}
@@ -386,24 +372,45 @@ namespace Lime
 			}
 		}
 
-		internal class RenderObject : WidgetRenderObject
+		internal class StyleRenderObject : TextRenderObject
 		{
-			public RenderObjectList Objects;
+			public TextStyle Style;
+		}
+
+		internal class RenderObject : WidgetRenderObject, IEnumerable<StyleRenderObject>
+		{
+			private List<StyleRenderObject> objects = new List<StyleRenderObject>();
+
+			public int Count => objects.Count;
+
+			public Lime.RenderObject this[int index] => objects[index];
+
+			public void Add(StyleRenderObject obj)
+			{
+				objects.Add(obj);
+			}
 
 			public override void Render()
 			{
-				Renderer.Transform1 = LocalToWorldTransform;
-				foreach (var ro in Objects) {
+				foreach (var ro in objects) {
 					ro.Render();
 				}
 			}
 
 			protected override void OnRelease()
 			{
-				foreach (var ro in Objects) {
+				foreach (var ro in objects) {
 					ro.Release();
 				}
+				objects.Clear();
+				base.OnRelease();
 			}
+
+			public List<StyleRenderObject>.Enumerator GetEnumerator() => objects.GetEnumerator();
+
+			IEnumerator<StyleRenderObject> IEnumerable<StyleRenderObject>.GetEnumerator() => GetEnumerator();
+
+			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider

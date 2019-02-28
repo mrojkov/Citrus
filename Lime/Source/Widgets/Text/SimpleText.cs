@@ -265,33 +265,15 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			PrepareSpriteListAndSyncCaret();
-			var sdfComponent = Components.Get<SignedDistanceFieldComponent>();
-			//ro.CaptureRenderState causes SimpleText invalidation on every frame,
-			//so use local values for blending and shader
-			if (sdfComponent != null) {
-				var scale = Mathf.Sqrt(Math.Max(LocalToWorldTransform.U.SqrLength, LocalToWorldTransform.V.SqrLength));
-				var sdfRO = SignedDistanceField.SDFRenderObject.GetRenderObject(sdfComponent, FontHeight * scale);
-				foreach (var ro in sdfRO) {
-					ro.LocalToWorldTransform = LocalToWorldTransform;
-					ro.Blending = Blending;
-					ro.Shader = Shader;
-					ro.SpriteList = spriteList;
-					ro.GradientMapIndex = GradientMapIndex;
-					ro.RenderMode = RenderMode;
-					ro.Color = GlobalColor * textColor;
-				}
-				return sdfRO;
-			} else {
-				var ro = RenderObjectPool<TextRenderObject>.Acquire();
-				ro.LocalToWorldTransform = LocalToWorldTransform;
-				ro.Blending = Blending;
-				ro.Shader = Shader;
-				ro.SpriteList = spriteList;
-				ro.GradientMapIndex = GradientMapIndex;
-				ro.RenderMode = RenderMode;
-				ro.Color = GlobalColor * textColor;
-				return ro;
-			}
+			var ro = RenderObjectPool<TextRenderObject>.Acquire();
+			ro.LocalToWorldTransform = LocalToWorldTransform;
+			ro.Blending = Blending;
+			ro.Shader = Shader;
+			ro.SpriteList = spriteList;
+			ro.GradientMapIndex = GradientMapIndex;
+			ro.RenderMode = RenderMode;
+			ro.Color = GlobalColor * textColor;
+			return ro;
 		}
 
 		void IText.SyncCaretPosition()
