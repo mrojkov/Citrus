@@ -290,7 +290,6 @@ namespace Lime
 		{
 			DrawCount = 0;
 			Reset();
-			Clear(ClearOptions.All, Color4.Black);
 		}
 
 		public static void SetTextureLegacy(int slot, ITexture texture)
