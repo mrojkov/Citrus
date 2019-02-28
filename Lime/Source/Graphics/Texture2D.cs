@@ -159,6 +159,7 @@ namespace Lime
 				stream = new RewindableStream(stream);
 			}
 			using (var reader = new BinaryReader(stream)) {
+				stream.Seek(0, SeekOrigin.Begin);
 				int sign = reader.ReadInt32();
 				stream.Seek(0, SeekOrigin.Begin);
 				if (sign == PVRMagic) {
