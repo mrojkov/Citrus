@@ -329,7 +329,7 @@ namespace Orange
 		private static void SyncRawAssets(string extension, AssetAttributes attributes = AssetAttributes.None)
 		{
 			SyncUpdated(extension, extension, (srcPath, dstPath) => {
-				AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes, cookingRulesMap[srcPath].SHA1);
+				AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes, File.GetLastWriteTime(srcPath), cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -343,7 +343,7 @@ namespace Orange
 				if (modelAttachmentExtIndex >= 0) {
 					modelsToRebuild.Add(dstPath.Remove(modelAttachmentExtIndex) + ".t3d");
 				}
-				AssetBundle.ImportFile(srcPath, dstPath, 0, ".txt", AssetAttributes.Zipped, cookingRulesMap[srcPath].SHA1);
+				AssetBundle.ImportFile(srcPath, dstPath, 0, ".txt", AssetAttributes.Zipped, File.GetLastWriteTime(srcPath), cookingRulesMap[srcPath].SHA1);
 				return true;
 			});
 		}
@@ -427,7 +427,7 @@ namespace Orange
 						bitmap.Dispose();
 						bitmap = scaledBitmap;
 					}
-					ImportTexture(dstPath, bitmap, rules, rules.SHA1);
+					ImportTexture(dstPath, bitmap, rules, File.GetLastWriteTime(srcPath), rules.SHA1);
 					bitmap.Dispose();
 				}
 				return true;
@@ -836,7 +836,7 @@ namespace Orange
 			Console.WriteLine("+ " + atlasPath);
 			var firstItem = items.First(i => i.Allocated);
 			using (var atlas = new Bitmap(atlasPixels, size.Width, size.Height)) {
-				ImportTexture(atlasPath, atlas, firstItem.CookingRules, CookingRulesSHA1: null);
+				ImportTexture(atlasPath, atlas, firstItem.CookingRules, File.GetLastWriteTime(atlasPath), CookingRulesSHA1: null);
 			}
 		}
 
@@ -874,7 +874,7 @@ namespace Orange
 				rules.WrapMode == TextureParams.Default.WrapModeU;
 		}
 
-		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules, byte[] CookingRulesSHA1)
+		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules, DateTime time, byte[] CookingRulesSHA1)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
 			var textureParams = new TextureParams {
@@ -912,17 +912,17 @@ namespace Orange
 				case TargetPlatform.iOS:
 					var f = rules.PVRFormat;
 					if (f == PVRFormat.ARGB8 || f == PVRFormat.RGB565 || f == PVRFormat.RGBA4) {
-						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
+						TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1, time);
 					} else {
-						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, CookingRulesSHA1);
+						TextureConverter.RunEtcTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, CookingRulesSHA1, time);
 					}
 					break;
 				//case TargetPlatform.iOS:
-				//	TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1);
+				//	TextureConverter.RunPVRTexTool(texture, AssetBundle, path, attributes, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat, CookingRulesSHA1, time);
 				//	break;
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
-					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps, CookingRulesSHA1);
+					TextureConverter.RunNVCompress(texture, AssetBundle, path, attributes, rules.DDSFormat, rules.MipMaps, CookingRulesSHA1, time);
 					break;
 				default:
 					throw new Lime.Exception();
