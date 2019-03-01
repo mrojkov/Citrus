@@ -172,9 +172,11 @@ namespace Lime
 			void AddEffectiveAnimatorsRecursively(Node node)
 			{
 				for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-					foreach (var a in child.Animators) {
-						if (a.AnimationId == Id) {
-							effectiveAnimators.Add(a);
+					if (child.Animators.Count > 0) { // Optimization: Animators.GetEnumerator() creates internal storage
+						foreach (var a in child.Animators) {
+							if (a.AnimationId == Id) {
+								effectiveAnimators.Add(a);
+							}
 						}
 					}
 					if (Id != null) {
