@@ -212,7 +212,6 @@ namespace Lime
 			private static readonly Pen pen = new Pen(Colors.Text, 1.75f);
 			private static readonly Brush brush = new SolidBrush(Colors.Text);
 			private static PointF[] checkMark;
-			private static PointF[] arrow;
 
 			protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
 			{
@@ -239,17 +238,15 @@ namespace Lime
 				if (!(e.Item is ToolStripMenuItem)) {
 					return;
 				}
-				if (arrow == null) {
-					int px = e.ArrowRectangle.Left;
-					int py = e.ArrowRectangle.Top;
-					int sizeX = e.ArrowRectangle.Size.Width;
-					int sizeY = e.ArrowRectangle.Size.Height;
-					arrow = new[] {
-						new PointF(px + 0.3f * sizeX, py + 0.3f * sizeY),
-						new PointF(px + 0.3f * sizeX, py + 0.7f * sizeY),
-						new PointF(px + 0.7f * sizeX, py + 0.5f * sizeY)
-					};
-				}
+				int px = e.ArrowRectangle.Left;
+				int py = e.ArrowRectangle.Top;
+				int sizeX = e.ArrowRectangle.Size.Width;
+				int sizeY = e.ArrowRectangle.Size.Height;
+				PointF[] arrow = new[] {
+					new PointF(px + 0.3f * sizeX, py + 0.3f * sizeY),
+					new PointF(px + 0.3f * sizeX, py + 0.7f * sizeY),
+					new PointF(px + 0.7f * sizeX, py + 0.5f * sizeY)
+				};
 				e.Graphics.FillPolygon(brush, arrow);
 			}
 		}
