@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Lime
 {
@@ -10,8 +11,8 @@ namespace Lime
 	public sealed class AnimatorCollection : ICollection<IAnimator>, IDisposable
 	{
 		private IAnimationHost owner;
-		public IAnimator First { get; private set; }
-		public int Count { get; private set; }
+		private List<IAnimator> list;
+		public int Count => list?.Count ?? 0;
 #if TANGERINE
 		public int Version { get; private set; }
 #endif // TANGERINE
@@ -35,20 +36,20 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			item.Owner = owner;
-			if (First == null) {
-				First = item;
-			} else {
-				var a = First;
-				while (a.Next != null) {
-					a = a.Next;
-				}
-				a.Next = item;
-			}
+			CreateListIfNeeded();
+			list.Add(item);
 			owner.OnAnimatorsChanged();
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
-			Count++;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void CreateListIfNeeded()
+		{
+			if (list == null) {
+				list = new List<IAnimator>();
+			}
 		}
 
 		public void AddRange(IEnumerable<IAnimator> collection)
@@ -60,14 +61,12 @@ namespace Lime
 
 		public void Clear()
 		{
-			for (var a = First; a != null; ) {
-				var t = a.Next;
-				a.Owner = null;
-				a.Next = null;
-				a = t;
+			if (list != null) {
+				foreach (var a in list) {
+					a.Owner = null;
+				}
+				list = null;
 			}
-			First = null;
-			Count = 0;
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -85,20 +84,19 @@ namespace Lime
 
 		public bool TryFind(string propertyPath, out IAnimator animator, string animationId = null)
 		{
-			for (var a = First; a != null; a = a.Next) {
+			animator = null;
+			foreach (var a in this) {
 				if (a.TargetPropertyPath == propertyPath && a.AnimationId == animationId) {
 					animator = a;
 					return true;
 				}
 			}
-			animator = null;
 			return false;
 		}
 
 		public bool TryFind<T>(string propertyPath, out Animator<T> animator, string animationId = null)
 		{
-			IAnimator a;
-			TryFind(propertyPath, out a, animationId);
+			TryFind(propertyPath, out var a, animationId);
 			animator = a as Animator<T>;
 			return animator != null;
 		}
@@ -130,7 +128,7 @@ namespace Lime
 
 		public bool Contains(IAnimator item)
 		{
-			for (var a = First; a != null; a = a.Next) {
+			foreach (var a in this) {
 				if (a == item) {
 					return true;
 				}
@@ -138,63 +136,45 @@ namespace Lime
 			return false;
 		}
 
-		void ICollection<IAnimator>.CopyTo(IAnimator[] array, int index)
-		{
-			for (var a = First; a != null; a = a.Next) {
-				array[index++] = a;
-			}
-		}
+		void ICollection<IAnimator>.CopyTo(IAnimator[] array, int index) => list.CopyTo(array, index);
 
 		bool ICollection<IAnimator>.IsReadOnly => false;
 
 		public bool Remove(IAnimator item)
 		{
 			if (item.Owner != owner) {
-				throw new InvalidOperationException();
+				return false;
 			}
-			IAnimator prev = null;
-			for (var a = First; a != null; a = a.Next) {
-				if (a == item) {
-					if (prev == null) {
-						First = a.Next;
-					} else {
-						prev.Next = a.Next;
-					}
-					a.Owner = null;
-					a.Next = null;
-					Count--;
+			if (list?.Remove(item) == true) {
+				item.Owner = null;
 #if TANGERINE
-					Version++;
+				Version++;
 #endif // TANGERINE
-					owner.OnAnimatorsChanged();
-					return true;
-				}
-				prev = a;
+				owner.OnAnimatorsChanged();
+				return true;
 			}
 			return false;
 		}
 
 		public bool Remove(string propertyName, string animationId = null)
 		{
-			IAnimator animator;
-			if (TryFind(propertyName, out animator, animationId)) {
-				return Remove(animator);
-			}
-			return false;
+			return TryFind(propertyName, out var animator, animationId) ? Remove(animator) : false;
 		}
 
-		public int GetOverallDuration()
+		public int GetOverallDuration(string animationId = null)
 		{
 			int val = 0;
-			for (var a = First; a != null; a = a.Next) {
-				val = Math.Max(val, a.Duration);
+			foreach (var a in this) {
+				if (a.AnimationId == animationId) {
+					val = Math.Max(val, a.Duration);
+				}
 			}
 			return val;
 		}
 
 		public void Apply(double time, string animationId = null)
 		{
-			for (var a = First; a != null; a = a.Next) {
+			foreach (var a in this) {
 				if (a.AnimationId == animationId) {
 					a.Apply(time);
 				}
@@ -203,8 +183,8 @@ namespace Lime
 
 		public void InvokeTriggers(int frame, string animationId, double animationTimeCorrection = 0)
 		{
-			for (var a = First; a != null; a = a.Next) {
-				if (a.IsTriggerable && a.AnimationId == animationId) {
+			foreach (var a in this) {
+				if (a.IsTriggerable && && a.AnimationId == animationId) {
 					a.InvokeTrigger(frame, animationTimeCorrection);
 				}
 			}
@@ -217,39 +197,22 @@ namespace Lime
 #endif // TANGERINE
 		}
 
-		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator() => new Enumerator(First);
-		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(First);
-
-		public Enumerator GetEnumerator() => new Enumerator(First);
-
-		public struct Enumerator : IEnumerator<IAnimator>
+		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator()
 		{
-			private IAnimator first;
-			private IAnimator current;
+			CreateListIfNeeded();
+			return list.GetEnumerator();
+		}
 
-			public Enumerator(IAnimator first)
-			{
-				this.first = first;
-				current = null;
-			}
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			CreateListIfNeeded();
+			return list.GetEnumerator();
+		}
 
-			object IEnumerator.Current => current;
-
-			public bool MoveNext()
-			{
-				if (current == null) {
-					current = first;
-				} else {
-					current = current.Next;
-				}
-				return current != null;
-			}
-
-			public void Reset() => current = null;
-
-			public IAnimator Current => current;
-
-			public void Dispose() { }
+		public List<IAnimator>.Enumerator GetEnumerator()
+		{
+			CreateListIfNeeded();
+			return list.GetEnumerator();
 		}
 	}
 }

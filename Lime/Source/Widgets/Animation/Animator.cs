@@ -11,7 +11,6 @@ namespace Lime
 #if TANGERINE
 		IAnimable Animable { get; }
 #endif // TANGERINE
-		IAnimator Next { get; set; }
 
 		IAnimator Clone();
 
@@ -82,8 +81,6 @@ namespace Lime
 		}
 		private IAnimable animable;
 #endif // TANGERINE
-		public IAnimator Next { get; set; }
-
 		private double minTime;
 		private double maxTime;
 		private KeyframeParams @params;
@@ -185,7 +182,6 @@ namespace Lime
 #endif // TANGERINE
 			clone.IsZombie = false;
 			clone.Owner = null;
-			clone.Next = null;
 			clone.boxedKeys = null;
 			boxedKeys = null;
 			ReadonlyKeys.AddRef();
