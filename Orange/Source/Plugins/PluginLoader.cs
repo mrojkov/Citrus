@@ -8,8 +8,10 @@ using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Lime;
 using Action = System.Action;
+using Exception = System.Exception;
 
 namespace Orange
 {
@@ -73,7 +75,10 @@ namespace Orange
 		private static CompositionContainer compositionContainer;
 		private static readonly AggregateCatalog catalog;
 		private static readonly List<ComposablePartCatalog> registeredCatalogs = new List<ComposablePartCatalog>();
-
+		private static readonly Regex ignoredAssemblies = new Regex(
+			"^(Lime|System.*|mscorlib.*|Microsoft.*)",
+			RegexOptions.Compiled
+		);
 		static PluginLoader()
 		{
 			AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
@@ -210,17 +215,38 @@ namespace Orange
 		}
 
 		private static readonly Dictionary<string, Assembly> resolvedAssemblies = new Dictionary<string, Assembly>();
-
 		public static IEnumerable<Type> EnumerateTangerineExportedTypes()
 		{
 			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies;
 			if (requiredAssemblies == null) {
 				yield break;
 			}
-			foreach (var name in requiredAssemblies()) {
-				var aseembly = AssemblyResolve(null, new ResolveEventArgs(name, null));
-				foreach (var t in aseembly.GetExportedTypes()) {
-					if (t.GetCustomAttributes(false).Any(i => i is TangerineRegisterNodeAttribute || i is TangerineRegisterComponentAttribute)) {
+
+			foreach (string name in requiredAssemblies()) {
+				AssemblyResolve(null, new ResolveEventArgs(name, null));
+			}
+
+			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+				string assemblyName = assembly.GetName().Name;
+
+				if (ignoredAssemblies.IsMatch(assemblyName)) {
+					continue;
+				}
+
+				Type[] exportedTypes;
+				try {
+					exportedTypes = assembly.GetExportedTypes();
+				} catch (Exception) {
+					exportedTypes = null;
+				}
+
+				if (exportedTypes == null) {
+					continue;
+				}
+
+				foreach (var t in exportedTypes) {
+					if (t.GetCustomAttributes(false).Any(i =>
+						i is TangerineRegisterNodeAttribute || i is TangerineRegisterComponentAttribute)) {
 						yield return t;
 					}
 				}
@@ -239,13 +265,47 @@ namespace Orange
 			string foundPath = requiredAssemblies?.FirstOrDefault(assemblyPath =>
 				assemblyPath == name || Path.GetFileName(assemblyPath).Equals(name, StringComparison.InvariantCultureIgnoreCase)
 			);
+
 			if (foundPath == null) {
 				return null;
 			}
 
 			Assembly assembly;
+
 			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
-				var dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+				string dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+
+				var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+				var existedAssemblyByPath = domainAssemblies.Where(i => {
+					try {
+						return string.Equals(i.Location, dllPath, StringComparison.CurrentCultureIgnoreCase);
+					} catch {
+						return false;
+					}
+				});
+
+				if (existedAssemblyByPath.Any()) {
+					assembly = existedAssemblyByPath.First();
+					resolvedAssemblies.Add(name, assembly);
+
+					return assembly;
+				}
+
+				var existedAssemblyByName = domainAssemblies.Where(i => {
+					try {
+						return string.Equals(i.GetName().Name, name, StringComparison.CurrentCultureIgnoreCase);
+					} catch {
+						return false;
+					}
+				});
+
+				if (existedAssemblyByName.Any()) {
+					throw new InvalidOperationException(
+						$"WARNING: Assembly {name} with path {assembly.Location} has already loaded in domain." +
+						$"\nAssembly {name} with path {dllPath} leads to exception.");
+				}
+
 				var readAllDllBytes = File.ReadAllBytes(dllPath);
 				byte[] readAllPdbBytes = null;
 #if DEBUG
