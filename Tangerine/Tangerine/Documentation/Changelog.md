@@ -1,3 +1,16 @@
+##### Changelog 1.03.2019
+
+* Добавлена возможность сбрасывать значения свойств виджета кликом средней кнопки мыши [CIT-846](https://jira.game-forest.com:2000/browse/CIT-846)
+* Реализован кэш для файлов, сжатых алгоритмом ETC [CIT-1122](https://jira.game-forest.com:2000/browse/CIT-1122)
+
+Багфиксы:
+
+* Исправлены проблемы с отображением меню [CIT-736](https://jira.game-forest.com:2000/browse/CIT-736)
+* Исправлен некорректный сброс значений пивота [CIT-926](https://jira.game-forest.com:2000/browse/CIT-926)
+* Исправлена ошибка, при которой бандл пересобирался при изменении регистра пути до файлов [CIT-1109](https://jira.game-forest.com:2000/browse/CIT-1109)
+* Исправлена ошибка, при которой файлы, имеющие дату старше, чем в бандлах, не перекукивались [CIT-1127](https://jira.game-forest.com:2000/browse/CIT-1127)
+
+
 ##### Changelog 26.02.2019
 
 * Добавлена возможность использовать Audio во Viewport3D [CIT-1002](https://jira.game-forest.com:2000/browse/CIT-1002)
