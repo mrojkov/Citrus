@@ -122,12 +122,12 @@ namespace Lime
 				WriteObject(path, stream, instance, format);
 		}
 
-		public void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Serialization.Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1)
+		public void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Serialization.Format format, string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance, format);
 				stream.Seek(0, SeekOrigin.Begin);
-				bundle.ImportFile(path, stream, 0, sourceExtension, attributes, cookingRulesSHA1);
+				bundle.ImportFile(path, stream, 0, sourceExtension, time, attributes, cookingRulesSHA1);
 			}
 		}
 
@@ -243,7 +243,7 @@ namespace Lime
 		public static void WriteObject<T>(string path, Stream stream, T instance, Format format) => Yuzu.Instance.Value.WriteObject(path, stream, instance, format);
 		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer) => Yuzu.Instance.Value.WriteObject(path, stream, instance, serializer);
 		public static void WriteObjectToFile<T>(string path, T instance, Format format) => Yuzu.Instance.Value.WriteObjectToFile(path, instance, format);
-		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, AssetAttributes attributes, byte[] cookingRulesSHA1) => Yuzu.Instance.Value.WriteObjectToBundle(bundle, path, instance, format, sourceExtension, attributes, cookingRulesSHA1);
+		public static void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Format format, string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1) => Yuzu.Instance.Value.WriteObjectToBundle(bundle, path, instance, format, sourceExtension, time, attributes, cookingRulesSHA1);
 		public static T ReadObject<T>(string path, Stream stream, object obj = null) => Yuzu.Instance.Value.ReadObject<T>(path, stream, obj);
 		public static T ReadObject<T>(string path, object obj = null) => Yuzu.Instance.Value.ReadObject<T>(path, obj);
 		public static T ReadObjectFromFile<T>(string path, object obj = null) => Yuzu.Instance.Value.ReadObjectFromFile<T>(path, obj);

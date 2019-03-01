@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Lime;
 using System.IO;
 
@@ -41,7 +41,7 @@ namespace Orange
 					writer.Write(mask, 0, mask.Length);
 					writer.Flush();
 					stream.Seek(0, SeekOrigin.Begin);
-					assetBundle.ImportFile(maskPath, stream, 0, "", AssetAttributes.Zipped, null);
+					assetBundle.ImportFile(maskPath, stream, 0, "", File.GetLastWriteTime(maskPath), AssetAttributes.Zipped, null);
 				}
 			}
 		}

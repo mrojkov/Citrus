@@ -9,7 +9,7 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, byte[] CookingRulesSHA1)
+		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, byte[] CookingRulesSHA1, DateTime time)
 		{
 			var stream = new MemoryStream();
 			bitmap.SaveTo(stream);
@@ -24,7 +24,7 @@ namespace Orange
 				hashValueString[0].ToString(), hashValueString[1].ToString(), "");
 			var cachePath = Path.Combine(cacheDirectory, hashValueString.Substring(2));
 			if (File.Exists(cachePath)) {
-				bundle.ImportFile(cachePath, path, 0, "", attributes, CookingRulesSHA1);
+				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
 
@@ -44,7 +44,7 @@ namespace Orange
 				if (Process.Start(etcTool, args) != 0) {
 					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
 				}
-				bundle.ImportFile(ktxPath, path, 0, "", attributes, CookingRulesSHA1);
+				bundle.ImportFile(ktxPath, path, 0, "", attributes, time, CookingRulesSHA1);
 				Directory.CreateDirectory(cacheDirectory);
 				File.Copy(ktxPath, cachePath);
 			} finally {
@@ -54,7 +54,8 @@ namespace Orange
 			}
 		}
 
-		public static void RunPVRTexTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, PVRFormat pvrFormat, byte[] CookingRulesSHA1)
+		public static void RunPVRTexTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression,
+			PVRFormat pvrFormat, byte[] CookingRulesSHA1, DateTime time)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -121,14 +122,14 @@ namespace Orange
 				if (Process.Start(pvrTexTool, args.ToString()) != 0) {
 					throw new Lime.Exception($"PVRTextTool error\nCommand line: {pvrTexTool} {args}\"");
 				}
-				bundle.ImportFile(pvrPath, path, 0, "", attributes, CookingRulesSHA1);
+				bundle.ImportFile(pvrPath, path, 0, "", attributes, time, CookingRulesSHA1);
 			} finally {
 				DeletePossibleLockedFile(tgaPath);
 				DeletePossibleLockedFile(pvrPath);
 			}
 		}
 
-		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps, byte[] CookingRulesSHA1)
+		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps, byte[] CookingRulesSHA1, DateTime time)
 		{
 			bool compressed = format == DDSFormat.DXTi;
 			Bitmap bledBitmap = null;
@@ -143,7 +144,7 @@ namespace Orange
 					bledBitmap.Dispose();
 				}
 				RunNVCompressHelper(tgaPath, ddsPath, bitmap.HasAlpha, compressed, mipMaps);
-				bundle.ImportFile(ddsPath, path, 0, "", attributes, CookingRulesSHA1);
+				bundle.ImportFile(ddsPath, path, 0, "", attributes, time, CookingRulesSHA1);
 			} finally {
 				DeletePossibleLockedFile(ddsPath);
 				DeletePossibleLockedFile(tgaPath);

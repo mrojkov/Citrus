@@ -87,7 +87,7 @@ namespace Lime
 			return false;
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension,
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, DateTime time,
 			AssetAttributes attributes = AssetAttributes.None, byte[] cookingRulesSHA1 = null)
 		{
 			throw new InvalidOperationException("Not supported by aggregate asset bundle.");
