@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +8,7 @@ namespace Lime.SignedDistanceField
 	public class SignedDistanceFieldMaterial : IMaterial
 	{
 		private const int gradientTexturePixelCount = 256;
-		private static Dictionary<int, Texture2D> gradientTexturePool = new Dictionary<int, Texture2D>();
+		private static readonly ConcurrentDictionary<int, Texture2D> gradientTexturePool = new ConcurrentDictionary<int, Texture2D>();
 		private static Color4[] gradientTexturePixels = new Color4[gradientTexturePixelCount];
 
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
@@ -117,7 +118,7 @@ namespace Lime.SignedDistanceField
 						}
 					};
 					GradientTexture.LoadImage(gradientTexturePixels, gradientTexturePixelCount, 1);
-					gradientTexturePool.Add(hash, GradientTexture);
+					gradientTexturePool.GetOrAdd(hash, GradientTexture);
 				}
 			}
 		}
