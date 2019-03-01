@@ -33,15 +33,29 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.IsLegacy = d.Reader.ReadBoolean();
+				result.IsCompound = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.IsLegacy = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Marker)dg.ReadObject<global::Lime.Marker>();
 						result.Markers.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				var tmp3 = d.Reader.ReadInt32();
+				if (tmp3 >= 0) {
+					while (--tmp3 >= 0) {
+						var tmp4 = (global::Lime.AnimationTrack)dg.ReadObject<global::Lime.AnimationTrack>();
+						result.Tracks.Add(tmp4);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
@@ -141,6 +155,84 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.AnimationBlending();
 			Read_Lime__AnimationBlending(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__AnimationClip(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.AnimationClip)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.AnimationId = d.Reader.ReadString();
+				if (result.AnimationId == "" && d.Reader.ReadBoolean()) result.AnimationId = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Begin = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.End = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Offset = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__AnimationClip(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.AnimationClip();
+			Read_Lime__AnimationClip(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__AnimationTrack(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.AnimationTrack)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.IAnimator)dg.ReadObject<global::Lime.IAnimator>();
+						result.Animators.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				var tmp3 = d.Reader.ReadInt32();
+				if (tmp3 >= 0) {
+					while (--tmp3 >= 0) {
+						var tmp4 = (global::Lime.AnimationClip)dg.ReadObject<global::Lime.AnimationClip>();
+						result.Clips.Add(tmp4);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Id = d.Reader.ReadString();
+				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Weight = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__AnimationTrack(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.AnimationTrack();
+			Read_Lime__AnimationTrack(d, def, result);
 			return result;
 		}
 
@@ -10017,6 +10109,8 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Animation.AnimationData)] = Read_Lime__Animation__AnimationData;
 			readCache[typeof(global::Lime.AnimationBlender)] = Read_Lime__AnimationBlender;
 			readCache[typeof(global::Lime.AnimationBlending)] = Read_Lime__AnimationBlending;
+			readCache[typeof(global::Lime.AnimationClip)] = Read_Lime__AnimationClip;
+			readCache[typeof(global::Lime.AnimationTrack)] = Read_Lime__AnimationTrack;
 			readCache[typeof(global::Lime.Animator<global::Lime.Alignment>)] = Read_Lime__Animator_Alignment;
 			readCache[typeof(global::Lime.Animator<global::Lime.Anchors>)] = Read_Lime__Animator_Anchors;
 			readCache[typeof(global::Lime.Animator<global::Lime.AudioAction>)] = Read_Lime__Animator_AudioAction;
@@ -10177,6 +10271,8 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Animation.AnimationData)] = Make_Lime__Animation__AnimationData;
 			makeCache[typeof(global::Lime.AnimationBlender)] = Make_Lime__AnimationBlender;
 			makeCache[typeof(global::Lime.AnimationBlending)] = Make_Lime__AnimationBlending;
+			makeCache[typeof(global::Lime.AnimationClip)] = Make_Lime__AnimationClip;
+			makeCache[typeof(global::Lime.AnimationTrack)] = Make_Lime__AnimationTrack;
 			makeCache[typeof(global::Lime.Animator<global::Lime.Alignment>)] = Make_Lime__Animator_Alignment;
 			makeCache[typeof(global::Lime.Animator<global::Lime.Anchors>)] = Make_Lime__Animator_Anchors;
 			makeCache[typeof(global::Lime.Animator<global::Lime.AudioAction>)] = Make_Lime__Animator_AudioAction;
