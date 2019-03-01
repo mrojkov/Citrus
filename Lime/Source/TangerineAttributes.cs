@@ -271,4 +271,31 @@ namespace Lime
 			return res ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+	public class TangerinePropertyDefaultValueAttribute : Attribute
+	{
+		private readonly Type Type;
+		private readonly string Method;	
+
+		private Func<object> getDefaultValue;
+
+		public TangerinePropertyDefaultValueAttribute(Type type, string method)
+		{
+			Type = type;
+			Method = method;
+		}
+
+		public object GetValue()
+		{ 
+			if (getDefaultValue == null) {
+				var fn = Type.GetMethod(Method);
+				if (fn == null) {
+					throw new System.Exception();
+				}	
+				getDefaultValue = () => fn.Invoke(Type,null);
+			}
+			return getDefaultValue();
+		}
+	}
 }

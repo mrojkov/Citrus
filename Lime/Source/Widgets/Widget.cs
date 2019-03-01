@@ -387,6 +387,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(6)]
+		[TangerinePropertyDefaultValue(typeof(Widget), nameof(GetPivotDefaultValue))]
 		public Vector2 Pivot
 		{
 			get { return pivot; }
@@ -401,6 +402,8 @@ namespace Lime
 				}
 			}
 		}
+
+		public static object GetPivotDefaultValue() => Vector2.Half;
 
 		/// <summary>
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.

@@ -211,6 +211,11 @@ namespace Tangerine.UI.Inspector
 					History = History,
 					Editable = Enabled,
 					DefaultValueGetter = () => {
+						var defaultValueAttribute = type.GetProperty(property.Name).GetCustomAttribute<TangerinePropertyDefaultValueAttribute>();
+						if (defaultValueAttribute != null) {
+							return defaultValueAttribute.GetValue();
+						}				
+
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr == null) {
 							return null;
