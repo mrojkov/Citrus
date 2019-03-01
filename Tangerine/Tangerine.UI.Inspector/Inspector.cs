@@ -185,7 +185,7 @@ namespace Tangerine.UI.Inspector
 					foreach (var clip in track.Clips) {
 						var a = Math.Max(clip.Begin, boundaries.Left);
 						var b = Math.Min(clip.End, boundaries.Right);
-						if (b >= a) {
+						if (b > a) {
 							yield return clip;
 						}
 					}
