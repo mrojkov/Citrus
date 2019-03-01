@@ -881,6 +881,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (options == ClearOptions.None) {
 				return;
 			}
+			EnsureRenderPass();
 			var oldViewport = viewport;
 			var oldBlendState = blendState;
 			var oldDepthState = depthState;
