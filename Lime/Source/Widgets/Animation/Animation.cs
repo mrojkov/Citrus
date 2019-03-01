@@ -13,8 +13,10 @@ namespace Lime
 		internal double TimeInternal;
 		internal double? NextMarkerOrTriggerTime;
 		public event Action Stopped;
-		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		public string RunningMarkerId { get; set; }
+		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
+		private List<IAnimator> effectiveAnimators;
+		private int effectiveAnimatorsVersion;
 
 		[YuzuMember]
 		public bool IsCompound { get; set; }
@@ -148,7 +150,38 @@ namespace Lime
 			clone.Next = null;
 			clone.Markers = MarkerList.DeepClone(Markers, clone);
 			clone.Tracks = Tracks.Clone(clone);
+			clone.effectiveAnimators = null;
+			clone.effectiveAnimatorsVersion = 0;
 			return clone;
+		}
+
+		public List<IAnimator> GetEffectiveAnimators()
+		{
+			if (Owner.DescendantAnimatorsVersion == effectiveAnimatorsVersion && effectiveAnimators != null) {
+				return effectiveAnimators;
+			}
+			if (effectiveAnimators == null) {
+				effectiveAnimators = new List<IAnimator>();
+			} else {
+				effectiveAnimators.Clear();
+			}
+			AddEffectiveAnimatorsRecursively(Owner);
+			effectiveAnimatorsVersion = Owner.DescendantAnimatorsVersion;
+			return effectiveAnimators;
+
+			void AddEffectiveAnimatorsRecursively(Node node)
+			{
+				for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+					foreach (var a in child.Animators) {
+						if (a.AnimationId == Id) {
+							effectiveAnimators.Add(a);
+						}
+					}
+					if (Id != null) {
+						AddEffectiveAnimatorsRecursively(child);
+					}
+				}
+			}
 		}
 
 		object ICloneable.Clone()

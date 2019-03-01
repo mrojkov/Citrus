@@ -22,16 +22,12 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			if (OnAdvanceAnimation != null) {
-				OnAdvanceAnimation(animation, delta);
-			}
+			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
 
 		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			if (OnApplyAnimators != null) {
-				OnApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
-			}
+			OnApplyAnimators?.Invoke(animation, invokeTriggers, animationTimeCorrection);
 		}
 	}
 
@@ -133,19 +129,10 @@ namespace Lime
 
 		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
 		{
-			ApplyAnimators(animation.Owner, animation, invokeTriggers, animationTimeCorrection);
-		}
-
-		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
-		{
-			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-				var animators = child.Animators;
-				animators.Apply(animation.Time, animation.Id);
+			foreach (var a in animation.GetEffectiveAnimators()) {
+				a.Apply(animation.Time);
 				if (invokeTriggers) {
-					animators.InvokeTriggers(animation.Frame, animation.Id, animationTimeCorrection);
-				}
-				if (animation.Id != null) {
-					ApplyAnimators(child, animation, invokeTriggers);
+					a.InvokeTrigger(animation.Frame, animation.Id, animationTimeCorrection);
 				}
 			}
 		}

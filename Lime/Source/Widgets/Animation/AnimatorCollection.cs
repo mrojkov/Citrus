@@ -44,7 +44,7 @@ namespace Lime
 				}
 				a.Next = item;
 			}
-			owner.OnAnimatorAdded(item);
+			owner.OnAnimatorsChanged();
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -71,6 +71,7 @@ namespace Lime
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
+			owner.OnAnimatorsChanged();
 		}
 
 		internal static AnimatorCollection SharedClone(IAnimationHost owner, AnimatorCollection source)
@@ -122,6 +123,7 @@ namespace Lime
 #if TANGERINE
 				Version++;
 #endif // TANGERINE
+				owner.OnAnimatorsChanged();
 				return animator;
 			}
 		}
@@ -164,6 +166,7 @@ namespace Lime
 #if TANGERINE
 					Version++;
 #endif // TANGERINE
+					owner.OnAnimatorsChanged();
 					return true;
 				}
 				prev = a;

@@ -25,7 +25,7 @@ namespace Lime
 		public AnimatorCollection Animators { get; private set; }
 
 		IAnimable IAnimable.Owner { get => null; set => throw new NotSupportedException(); }
-		void IAnimationHost.OnAnimatorAdded(IAnimator animator) { }
+		void IAnimationHost.OnAnimatorsChanged() { }
 		Component IAnimationHost.GetComponent(Type type) => throw new NotSupportedException();
 
 		public AnimationTrack()

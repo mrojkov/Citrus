@@ -38,8 +38,8 @@ namespace Lime
 	public interface IAnimationHost
 	{
 		AnimatorCollection Animators { get; }
+		void OnAnimatorsChanged();
 		void OnTrigger(string property, double animationTimeCorrection = 0);
-		void OnAnimatorAdded(IAnimator animator);
 		Component GetComponent(Type type);
 	}
 

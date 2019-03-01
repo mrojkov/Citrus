@@ -151,9 +151,15 @@ namespace Lime
 			internal set
 			{
 				if (parent != value) {
+					for (var n = Parent; n != null; n = n.Parent) {
+						n.DescendantAnimatorsVersion++;
+					}
 					var oldParent = parent;
 					parent = value;
 					PropagateDirtyFlags();
+					for (var n = Parent; n != null; n = n.Parent) {
+						n.DescendantAnimatorsVersion++;
+					}
 					OnParentChanged(oldParent);
 				}
 			}
@@ -366,13 +372,6 @@ namespace Lime
 			}
 		}
 
-		void IAnimationHost.OnAnimatorAdded(IAnimator animator)
-		{
-			if (Animations.TryFind(animator.AnimationId, out var animation)) {
-				animation.NextMarkerOrTriggerTime = null;
-			}
-		}
-
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
 		/// Can't use obsolete attribute because of Yuzu Generated Binary Deserializers. But its obsolete, dont use it.
@@ -397,6 +396,17 @@ namespace Lime
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
 		public AnimationCollection Animations { get; private set; }
+		internal int DescendantAnimatorsVersion { get; private set; }
+
+		void IAnimationHost.OnAnimatorsChanged()
+		{
+			foreach (var a in Animations) {
+				a.NextMarkerOrTriggerTime = null;
+			}
+			for (var n = Parent; n != null; n = n.Parent) {
+				n.DescendantAnimatorsVersion++;
+			}
+		}
 
 #if TANGERINE
 		public class TangerineAnimationCollection : IList<Animation>, IList
@@ -791,6 +801,7 @@ namespace Lime
 			clone.NextSibling = null;
 			clone.gestures = null;
 			clone.Animations = Animations.Clone(clone);
+			clone.DescendantAnimatorsVersion = 0;
 #if TANGERINE
 			clone.TangerineAnimations = new TangerineAnimationCollection(clone);
 #endif
