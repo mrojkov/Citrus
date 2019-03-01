@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Lime;
 using Yuzu;
 using Yuzu.Json;
@@ -140,7 +141,7 @@ namespace Orange
 		// so adding a field with binary triggers rebuild of all bundles
 		private static Yuzu.Json.JsonSerializer yjs = new Yuzu.Json.JsonSerializer();
 
-		public byte[] SHA1 { get { return sha1.ComputeHash(yjs.ToBytes(this)); } }
+		public byte[] SHA1 { get { return sha1.ComputeHash(Encoding.UTF8.GetBytes(yjs.ToString(this).ToLower())); } }
 
 		public DateTime LastChangeTime;
 
@@ -398,7 +399,7 @@ namespace Orange
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
 			var rulesStack = new Stack<CookingRules>();
-			var map = new Dictionary<string, CookingRules>();
+			var map = new Dictionary<string, CookingRules>(StringComparer.OrdinalIgnoreCase);
 			pathStack.Push("");
 			var rootRules = new CookingRules();
 			rootRules.DeduceEffectiveRules(target);
