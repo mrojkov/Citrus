@@ -706,6 +706,9 @@ namespace Tangerine
 			h.Connect(ToolsCommands.RenderToPngSequence, new RenderToPngSequence());
 			h.Connect(GitCommands.ForceUpdate, new ForceUpdate());
 			h.Connect(GitCommands.Update, new Update());
+			h.Connect(GenericCommands.ClearCache, new ClearCache());
+			h.Connect(GenericCommands.ResetGlobalSettings, new ResetGlobalSettings());
+			h.Connect(GenericCommands.PurgeBackups, new PurgeBackUps());
 		}
 
 		private void InitializeHotkeys()
