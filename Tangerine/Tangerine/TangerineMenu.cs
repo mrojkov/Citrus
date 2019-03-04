@@ -360,7 +360,7 @@ namespace Tangerine
 				var commandHandler = new ProjectLocalization(locale);
 				CommandHandlerList.Global.Connect(command, commandHandler);
 				localizationMenu.Add(command);
-				if (ProjectLocalization.Current == null) {
+				if (ProjectLocalization.Current == null || locale.Code == "Default") {
 					commandHandler.Execute();
 				}
 			}
