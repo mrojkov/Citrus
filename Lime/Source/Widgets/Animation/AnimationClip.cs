@@ -21,6 +21,9 @@ namespace Lime
 		[YuzuMember]
 		public int Offset { get; set; }
 
+		[YuzuMember]
+		public bool Reversed { get; set; }
+
 		internal Animation Animation
 		{
 			get {
@@ -37,6 +40,16 @@ namespace Lime
 		}
 
 		public AnimationTrack Owner { get; internal set; }
+
+		public double RemapTime(double time)
+		{
+			if (!Reversed) {
+				return time;
+			}
+			var relativeTime = time - AnimationUtils.FramesToSeconds(Begin - Offset);
+			var t = 1 - (float)(relativeTime / AnimationUtils.FramesToSeconds(Length));
+			return AnimationUtils.FramesToSeconds(Begin + Offset) + AnimationUtils.FramesToSeconds(Length) * t;
+		}
 
 		public AnimationClip Clone()
 		{

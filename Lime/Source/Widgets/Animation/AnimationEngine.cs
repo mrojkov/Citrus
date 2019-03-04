@@ -159,7 +159,7 @@ namespace Lime
 						continue;
 					}
 					var clipAnimation = clip.Animation;
-					clipAnimation.TimeInternal = animation.Time - AnimationUtils.FramesToSeconds(clip.Begin - clip.Offset);
+					clipAnimation.TimeInternal = clip.RemapTime(animation.Time);
 					clipAnimation.AnimationEngine.CalcEffectiveAnimators(clipAnimation);
 					foreach (var a in clipAnimation.EffectiveAnimators) {
 						if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
