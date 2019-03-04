@@ -125,6 +125,18 @@ namespace Tangerine.UI.Timeline
 			} else if (pr != Document.Current.RowTree) {
 				y = pr.GridWidget().Bottom() + TimelineMetrics.RowSpacing;
 			}
+
+			var rows = Document.Current.Rows;
+			var indexBefore = RowIndexAtY(y - 3);
+			var indexAfter = RowIndexAtY(y + 3);
+			if (indexBefore != -1 && indexAfter < rows.Count) {
+				if (rows[indexBefore].Selected && rows[indexAfter].Selected &&
+					(CalcNestingLevel(rows[indexBefore]) == CalcNestingLevel(rows[indexAfter])) &&
+					!(rows[indexBefore].CanHaveChildren || rows[indexAfter].CanHaveChildren)) {
+					return;
+				}
+			}
+
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
@@ -162,6 +174,31 @@ namespace Tangerine.UI.Timeline
 				r += i.GridWidget().Height + TimelineMetrics.RowSpacing + CalcSubtreeHeight(i);
 			}
 			return r;
+		}
+
+		static int RowIndexAtY(float y)
+		{
+			if (y < 0) {
+				return -1;
+			}
+			int index = -1;
+			float current = 0;
+			while (current < y && index < Document.Current.Rows.Count - 1) {
+				current += Document.Current.Rows[index + 1].GridWidget().Height + TimelineMetrics.RowSpacing;
+				index++;
+			}
+			return index;
+		}
+
+		static int CalcNestingLevel(Row row)
+		{
+			int res = -1;
+			Row cur = row;
+			while (cur != null) {
+				res++;
+				cur = cur.Parent;
+			}
+			return res;
 		}
 
 		static Row RowUnderMouse(Vector2 position)
