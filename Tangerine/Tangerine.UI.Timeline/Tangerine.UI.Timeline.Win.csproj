@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\GridFolderView.cs" />
+    <Compile Include="Components\GridKeyframesRenderer.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridAnimationTrackView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />

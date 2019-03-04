@@ -11,6 +11,7 @@ namespace Tangerine.UI.Timeline.Components
 		public Widget OverviewWidget { get; }
 		public AwakeBehavior GridWidgetAwakeBehavior => GridWidget.Components.Get<AwakeBehavior>();
 		public AwakeBehavior OverviewWidgetAwakeBehavior => OverviewWidget.Components.Get<AwakeBehavior>();
+		private GridKeyframesRenderer keyframesRenderer = new GridKeyframesRenderer();
 
 		public GridAnimationTrackView(AnimationTrack track)
 		{
@@ -33,32 +34,18 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, ColorTheme.Current.TimelineGrid.PropertyRowBackground);
-			foreach (var c in track.Clips) {
-				var a = new Vector2(c.Begin * TimelineMetrics.ColWidth, 0);
-				var b = new Vector2(c.End * TimelineMetrics.ColWidth, widget.Height);
+			keyframesRenderer.ClearCells();
+			keyframesRenderer.GenerateCells(track.Animators, Document.Current.AnimationId);
+			keyframesRenderer.RenderCells(widget);
+			foreach (var clip in track.Clips) {
+				var a = new Vector2(clip.Begin * TimelineMetrics.ColWidth, 0);
+				var b = new Vector2(clip.End * TimelineMetrics.ColWidth, widget.Height);
 				Renderer.DrawRect(a, b, Color4.Blue.Transparentify(0.75f));
 				Renderer.DrawRectOutline(a, b, Color4.Blue);
 				var textHeight = Mathf.Min(Theme.Metrics.TextHeight, widget.Height);
 				a.X += 1;
 				a.Y = (widget.Height - textHeight) / 2;
-				Renderer.DrawTextLine(a, c.AnimationId, textHeight, Color4.Black, 0);
-			}
-			if (track.Animators.TryFind<float>("Weight", out var animator, Document.Current.AnimationId)) {
-				RenderKeyframes(widget, animator);
-			}
-		}
-
-		private static void RenderKeyframes(Widget widget, IAnimator animator)
-		{
-			var colorIndex = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(animator.Animable.GetType(), animator.TargetPropertyPath)?.ColorIndex ?? 0;
-			var color = KeyframePalette.Colors[colorIndex];
-			foreach (var key in animator.ReadonlyKeys) {
-				Renderer.Transform1 =
-					Matrix32.RotationRough(Mathf.Pi / 4) *
-					Matrix32.Translation((key.Frame + 0.5f) * TimelineMetrics.ColWidth + 0.5f, widget.Height / 2 + 0.5f) *
-					widget.LocalToWorldTransform;
-				var v = TimelineMetrics.ColWidth / 3 * Vector2.One;
-				Renderer.DrawRect(-v, v, color);
+				Renderer.DrawTextLine(a, clip.AnimationId, textHeight, Color4.Black, 0);
 			}
 		}
 	}
