@@ -172,11 +172,11 @@ namespace Lime
 			return val;
 		}
 
-		public void Apply(double time, string animationId = null)
+		public void CalcAndApply(double time, string animationId = null)
 		{
 			foreach (var a in this) {
 				if (a.AnimationId == animationId) {
-					a.Apply(time);
+					a.CalcAndApply(time);
 				}
 			}
 		}

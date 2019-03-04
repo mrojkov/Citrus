@@ -153,7 +153,7 @@ namespace Orange
 				}
 				// Make Sure ParticleModifers' animators are at 0.0f
 				if (n is ParticleModifier pm) {
-					pm.Animators.Apply(0.0);
+					pm.Animators.CalcAndApply(0.0);
 				}
 			}
 			void SaveAndSetFlags(Node n)

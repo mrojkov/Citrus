@@ -1173,7 +1173,7 @@ namespace Lime
 				foreach (var k in posAnimator.Keys) {
 					var savedSize = size;
 					foreach (var a in Animators) {
-						a.Apply(AnimationUtils.FramesToSeconds(k.Frame));
+						a.CalcAndApply(AnimationUtils.FramesToSeconds(k.Frame));
 					}
 					StaticScalePositionAndSize(ratio, roundCoordinates);
 					k.Value = position;

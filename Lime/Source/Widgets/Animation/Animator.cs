@@ -26,7 +26,9 @@ namespace Lime
 
 		void InvokeTrigger(int frame, double animationTimeCorrection = 0);
 
-		void Apply(double time);
+		object CalcValue(double time);
+		void Apply();
+		void CalcAndApply(double time);
 
 		void ResetCache();
 
@@ -38,7 +40,9 @@ namespace Lime
 
 		Type GetValueType();
 
-		object CalcValue(double time);
+		float Weight { get; set; }
+
+		void BlendWith(IAnimator animator, float weight);
 
 		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
 
@@ -86,6 +90,10 @@ namespace Lime
 		private KeyframeParams @params;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
+		/// <summary>
+		/// value stored since last CalcValue()
+		/// </summary>
+		public T CalculatedValue { get; protected set; }
 
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
@@ -122,6 +130,8 @@ namespace Lime
 		public string AnimationId { get; set; }
 
 		public object UserData { get; set; }
+
+		public float Weight { get; set; }
 
 		public Animator()
 		{
@@ -202,6 +212,14 @@ namespace Lime
 		protected virtual T InterpolateLinear(float t) => Value2;
 		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
 
+		public virtual void BlendWith(IAnimator animator, float weight)
+		{
+			if (Weight < weight) {
+				CalculatedValue = ((Animator<T>)animator).CalculatedValue;
+				Weight = weight;
+			}
+		}
+
 		public void Clear()
 		{
 			keyIndex = 0;
@@ -218,7 +236,20 @@ namespace Lime
 			}
 		}
 
-		public void Apply(double time)
+		public void Apply()
+		{
+			if (Enabled && !IsZombie) {
+				if (setter == null) {
+					Bind();
+					if (IsZombie) {
+						return;
+					}
+				}
+				setter(CalculatedValue);
+			}
+		}
+
+		public void CalcAndApply(double time)
 		{
 			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
 				if (setter == null) {
@@ -264,7 +295,7 @@ namespace Lime
 				CacheInterpolationParameters(time);
 			}
 			if (@params.Function == KeyFunction.Steep) {
-				return Value2;
+				CalculatedValue = Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
 			if (@params.EasingFunction != EasingFunction.Linear) {
@@ -276,10 +307,11 @@ namespace Lime
 				}
 			}
 			if (@params.Function == KeyFunction.Linear) {
-				return InterpolateLinear(t);
+				CalculatedValue = InterpolateLinear(t);
 			} else {
-				return InterpolateSplined(t);
+				CalculatedValue = InterpolateSplined(t);
 			}
+			return CalculatedValue;
 		}
 
 		object IAnimator.CalcValue(double time) => CalcValue(time);
@@ -376,6 +408,15 @@ namespace Lime
 				Mathf.CatmullRomSpline(t, Value1.Y, Value2.Y, Value3.Y, Value4.Y)
 			);
 		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((Vector2Animator)animator).CalculatedValue;
+				CalculatedValue = Vector2.Lerp(weight / Weight, CalculatedValue, otherValue);
+			}
+		}
 	}
 
 	public class Vector3Animator : Animator<Vector3>
@@ -388,6 +429,15 @@ namespace Lime
 		protected override Vector3 InterpolateSplined(float t)
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
+		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((Vector3Animator)animator).CalculatedValue;
+				CalculatedValue = Vector3.Lerp(weight / Weight, CalculatedValue, otherValue);
+			}
 		}
 	}
 
@@ -402,6 +452,15 @@ namespace Lime
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((NumericAnimator)animator).CalculatedValue;
+				CalculatedValue = Mathf.Lerp(weight / Weight, CalculatedValue, otherValue);
+			}
+		}
 	}
 
 	public class IntAnimator : Animator<int>
@@ -415,6 +474,15 @@ namespace Lime
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4).Round();
 		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((IntAnimator)animator).CalculatedValue;
+				CalculatedValue = Mathf.Lerp(weight / Weight, CalculatedValue, otherValue).Round();
+			}
+		}
 	}
 
 	public class Color4Animator : Animator<Color4>
@@ -422,6 +490,15 @@ namespace Lime
 		protected override Color4 InterpolateLinear(float t)
 		{
 			return Color4.Lerp(t, Value2, Value3);
+		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((Color4Animator)animator).CalculatedValue;
+				CalculatedValue = Color4.Lerp(weight / Weight, CalculatedValue, otherValue);
+			}
 		}
 	}
 
@@ -431,6 +508,15 @@ namespace Lime
 		{
 			return Quaternion.Slerp(Value2, Value3, t);
 		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((QuaternionAnimator)animator).CalculatedValue;
+				CalculatedValue = Quaternion.Lerp(CalculatedValue, otherValue, weight / Weight);
+			}
+		}
 	}
 
 	public class Matrix44Animator : Animator<Matrix44>
@@ -438,6 +524,15 @@ namespace Lime
 		protected override Matrix44 InterpolateLinear(float t)
 		{
 			return Matrix44.Lerp(Value2, Value3, t);
+		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((Matrix44Animator)animator).CalculatedValue;
+				CalculatedValue = Matrix44.Lerp(CalculatedValue, otherValue, weight / Weight);
+			}
 		}
 	}
 
@@ -462,6 +557,21 @@ namespace Lime
 				Mathf.CatmullRomSpline(t, Value1.Bottom, Value2.Bottom, Value3.Bottom, Value4.Bottom)
 			);
 		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((ThicknessAnimator)animator).CalculatedValue;
+				var t = weight / Weight;
+				CalculatedValue = new Thickness(
+					Mathf.Lerp(t, CalculatedValue.Left, otherValue.Left),
+					Mathf.Lerp(t, CalculatedValue.Right, otherValue.Right),
+					Mathf.Lerp(t, CalculatedValue.Top, otherValue.Top),
+					Mathf.Lerp(t, CalculatedValue.Bottom, otherValue.Bottom)
+				);
+			}
+		}
 	}
 
 	public class NumericRangeAnimator : Animator<NumericRange>
@@ -480,6 +590,19 @@ namespace Lime
 				Mathf.CatmullRomSpline(t, Value1.Median, Value2.Median, Value3.Median, Value4.Median),
 				Mathf.CatmullRomSpline(t, Value1.Dispersion, Value2.Dispersion, Value3.Dispersion, Value4.Dispersion)
 			);
+		}
+
+		public override void BlendWith(IAnimator animator, float weight)
+		{
+			Weight += weight;
+			if (Weight > 0) {
+				var otherValue = ((NumericRangeAnimator)animator).CalculatedValue;
+				var t = weight / Weight;
+				CalculatedValue = new NumericRange(
+					Mathf.Lerp(t, CalculatedValue.Median, otherValue.Median),
+					Mathf.Lerp(t, CalculatedValue.Dispersion, otherValue.Dispersion)
+				);
+			}
 		}
 	}
 }
