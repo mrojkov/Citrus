@@ -34,11 +34,6 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 		}
 
-		public AnimationTrack(int capacity = 0)
-		{
-			Clips = new AnimationClipList(this, capacity);
-		}
-
 		void IAnimationHost.OnTrigger(string property, double animationTimeCorrection = 0) { }
 
 		public AnimationTrack Clone()
