@@ -3413,7 +3413,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Alignment>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Alignment));
 			var tmp1 = new global::Lime.Alignment();
 			tmp1.X = (global::Lime.HAlignment)d.Reader.ReadInt32();
@@ -3432,7 +3432,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Anchors>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.Anchors)d.Reader.ReadInt32();
 		}
 
@@ -3447,7 +3447,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.AudioAction>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.AudioAction)d.Reader.ReadInt32();
 		}
 
@@ -3462,7 +3462,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Blending>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.Blending)d.Reader.ReadInt32();
 		}
 
@@ -3477,7 +3477,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ClipMethod>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.ClipMethod)d.Reader.ReadInt32();
 		}
 
@@ -3493,7 +3493,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Color4>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Color4));
 			var tmp1 = new global::Lime.Color4();
 			tmp1.ABGR = d.Reader.ReadUInt32();
@@ -3511,7 +3511,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.EmissionType>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.EmissionType)d.Reader.ReadInt32();
 		}
 
@@ -3526,7 +3526,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.EmitterShape>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.EmitterShape)d.Reader.ReadInt32();
 		}
 
@@ -3541,7 +3541,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.HAlignment>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.HAlignment)d.Reader.ReadInt32();
 		}
 
@@ -3557,7 +3557,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.ITexture>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
 		}
 
@@ -3572,7 +3572,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.LayoutDirection>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.LayoutDirection)d.Reader.ReadInt32();
 		}
 
@@ -3588,7 +3588,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Matrix44>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Matrix44));
 			var tmp1 = new global::Lime.Matrix44();
 			tmp1.M11 = d.Reader.ReadSingle();
@@ -3621,7 +3621,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.MovieAction>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.MovieAction)d.Reader.ReadInt32();
 		}
 
@@ -3637,7 +3637,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Camera3D>>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Camera3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Camera3D>>();
 		}
 
@@ -3653,7 +3653,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Node3D>>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Node3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Node3D>>();
 		}
 
@@ -3669,7 +3669,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline>>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Spline>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Spline>>();
 		}
 
@@ -3685,7 +3685,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline3D>>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Spline3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Spline3D>>();
 		}
 
@@ -3701,7 +3701,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Widget>>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Widget>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Widget>>();
 		}
 
@@ -3717,7 +3717,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.NumericRange>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NumericRange)dg.ReadStruct<global::Lime.NumericRange>();
 		}
 
@@ -3732,7 +3732,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ParticlesLinkage>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.ParticlesLinkage)d.Reader.ReadInt32();
 		}
 
@@ -3748,7 +3748,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Quaternion>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Quaternion));
 			var tmp1 = new global::Lime.Quaternion();
 			tmp1.X = d.Reader.ReadSingle();
@@ -3769,7 +3769,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.RenderTarget>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.RenderTarget)d.Reader.ReadInt32();
 		}
 
@@ -3785,7 +3785,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.SerializableFont>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.SerializableFont)dg.ReadObject<global::Lime.SerializableFont>();
 		}
 
@@ -3801,7 +3801,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.SerializableSample>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.SerializableSample)dg.ReadObject<global::Lime.SerializableSample>();
 		}
 
@@ -3816,7 +3816,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ShaderId>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.ShaderId)d.Reader.ReadInt32();
 		}
 
@@ -3831,7 +3831,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.TextOverflowMode>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.TextOverflowMode)d.Reader.ReadInt32();
 		}
 
@@ -3847,7 +3847,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Thickness>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Thickness));
 			var tmp1 = new global::Lime.Thickness();
 			tmp1.Left = d.Reader.ReadSingle();
@@ -3868,7 +3868,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::Lime.VAlignment>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.VAlignment)d.Reader.ReadInt32();
 		}
 
@@ -3884,7 +3884,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Vector2>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector2));
 			var tmp1 = new global::Lime.Vector2();
 			tmp1.X = d.Reader.ReadSingle();
@@ -3904,7 +3904,7 @@ namespace GeneratedDeserializersBIN
 			var result = (global::Lime.Keyframe<global::Lime.Vector3>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector3));
 			var tmp1 = new global::Lime.Vector3();
 			tmp1.X = d.Reader.ReadSingle();
@@ -3924,7 +3924,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::System.Boolean>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadBoolean();
 		}
 
@@ -3939,7 +3939,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::System.Int32>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadInt32();
 		}
 
@@ -3954,7 +3954,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::System.Single>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadSingle();
 		}
 
@@ -3969,7 +3969,7 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = (global::Lime.Keyframe<global::System.String>)obj;
 			result.Frame = d.Reader.ReadInt32();
-			result.Function = (global::Lime.KeyFunction)d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadString();
 			if (result.Value == "" && d.Reader.ReadBoolean()) result.Value = null;
 		}

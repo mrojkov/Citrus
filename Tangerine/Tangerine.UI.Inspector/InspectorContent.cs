@@ -214,7 +214,7 @@ namespace Tangerine.UI.Inspector
 						var defaultValueAttribute = type.GetProperty(property.Name).GetCustomAttribute<TangerinePropertyDefaultValueAttribute>();
 						if (defaultValueAttribute != null) {
 							return defaultValueAttribute.GetValue();
-						}				
+						}
 
 						var ctr = type.GetConstructor(new Type[] {});
 						if (ctr == null) {
@@ -468,6 +468,14 @@ namespace Tangerine.UI.Inspector
 				keyframeButton.Clicked += editor.PropertyLabel.SetFocus;
 				editor.LabelContainer.Nodes.Insert(index++, keyframeButton);
 				editor.ContainerWidget.Tasks.Add(new KeyframeButtonBinding(editor.EditorParams, keyframeButton, editor));
+				if (editor.EditorParams.IsAnimableWithEasing) {
+					editor.LabelContainer.Nodes.Insert(index++, Spacer.HSpacer(2));
+					var easingButton = new EasingButton {
+						LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+					};
+					editor.LabelContainer.Nodes.Insert(index++, easingButton);
+					editor.ContainerWidget.Tasks.Add(new EasingButtonBinding(editor.EditorParams, easingButton));
+				}
 			}
 			editor.ContainerWidget.Padding = new Thickness { Left = 4, Top = 3, Right = 12, Bottom = 4 };
 			editor.ContainerWidget.CompoundPresenter.Add(new WidgetFlatFillPresenter(

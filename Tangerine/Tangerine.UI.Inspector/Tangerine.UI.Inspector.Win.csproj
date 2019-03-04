@@ -48,6 +48,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EasingButton.cs" />
+    <Compile Include="EasingIcon.cs" />
     <Compile Include="InspectorContent.cs" />
     <Compile Include="InspectorPropertyRegistry.cs" />
     <Compile Include="KeyframeButton.cs" />

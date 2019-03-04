@@ -10,7 +10,7 @@ namespace Tangerine.UI.Inspector
 	{
 		private readonly Image image;
 		private readonly Image fillImage;
-		private readonly Image outlintImage;
+		private readonly Image outlineImage;
 		private static readonly string[] iconNames = new[] { "Linear", "Step", "Catmullrom", "Loop" };
 		private readonly List<ITexture> fillTextures = new List<ITexture>();
 		private readonly List<ITexture> outlineTextures = new List<ITexture>();
@@ -26,9 +26,9 @@ namespace Tangerine.UI.Inspector
 			{
 				@checked = value;
 				fillImage.Visible = value;
-				outlintImage.Visible = value;
+				outlineImage.Visible = value;
 				fillImage.Color = KeyColor;
-				outlintImage.Color = ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox;
+				outlineImage.Color = ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox;
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace Tangerine.UI.Inspector
 		{
 			this.function = function;
 			fillImage.Texture = fillTextures[(int)function];
-			outlintImage.Texture = outlineTextures[(int)function];
+			outlineImage.Texture = outlineTextures[(int)function];
 		}
 
 		private static void Awake(Node owner)
@@ -58,8 +58,8 @@ namespace Tangerine.UI.Inspector
 			Size = MinMaxSize = new Vector2(22, 22);
 			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture(), Color = Theme.Colors.WhiteBackground };
 			fillImage = new Image { Size = Size, Visible = false };
-			outlintImage = new Image { Size = Size, Visible = false };
-			Nodes.Add(outlintImage);
+			outlineImage = new Image { Size = Size, Visible = false };
+			Nodes.Add(outlineImage);
 			Nodes.Add(fillImage);
 			Nodes.Add(image);
 			Layout = new StackLayout();

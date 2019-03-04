@@ -87,6 +87,8 @@ namespace Lime
 		private double minTime;
 		private double maxTime;
 		private KeyFunction function;
+		private EasingFunction easingFunction;
+		private EasingType easingType;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
 
@@ -271,6 +273,9 @@ namespace Lime
 				return Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
+			if (easingFunction != EasingFunction.Linear) {
+				t = Easing.Interpolate(t, easingFunction, easingType);
+			}
 			if (function == KeyFunction.Linear) {
 				return InterpolateLinear(t);
 			} else {
@@ -302,6 +307,7 @@ namespace Lime
 				minTime = -float.MaxValue;
 				maxTime = float.MaxValue;
 				function = KeyFunction.Steep;
+				easingFunction = EasingFunction.Linear;
 				return;
 			}
 			var i = keyIndex;
@@ -324,11 +330,13 @@ namespace Lime
 				minFrame = int.MinValue;
 				Value2 = ReadonlyKeys[0].Value;
 				function = KeyFunction.Steep;
+				easingFunction = EasingFunction.Linear;
 			} else if (i == count - 1) {
 				minFrame = ReadonlyKeys[i].Frame;
 				maxFrame = int.MaxValue;
 				Value2 = ReadonlyKeys[i].Value;
 				function = KeyFunction.Steep;
+				easingFunction = EasingFunction.Linear;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
@@ -337,6 +345,8 @@ namespace Lime
 				Value2 = key1.Value;
 				Value3 = key2.Value;
 				function = key1.Function;
+				easingFunction = key1.EasingFunction;
+				easingType = key1.EasingType;
 				if (function == KeyFunction.Spline) {
 					Value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;

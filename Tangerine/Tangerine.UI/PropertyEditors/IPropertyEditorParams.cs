@@ -30,6 +30,7 @@ namespace Tangerine.UI
 		int IndexInList { get; set; }
 		bool IsAnimableByPath { get; set; }
 		bool IsAnimable { get; }
+		bool IsAnimableWithEasing { get; }
 	}
 
 	public interface IPropertyEditorParamsInternal
