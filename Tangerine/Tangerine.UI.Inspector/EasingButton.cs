@@ -35,7 +35,7 @@ namespace Tangerine.UI.Inspector
 		{
 			Nodes.Clear();
 			Size = MinMaxSize = new Vector2(22, 22);
-			image = new Image { Size = Size, Texture = new SerializableTexture(), Color = Theme.Colors.WhiteBackground, Visible = false };
+			image = new Image { Size = Size, Texture = new SerializableTexture(), Visible = false };
 			Nodes.Add(image);
 			Layout = new StackLayout();
 			PostPresenter = new WidgetBoundsPresenter(ColorTheme.Current.Inspector.BorderAroundKeyframeColorbox);
