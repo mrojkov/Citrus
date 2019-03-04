@@ -449,7 +449,6 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFMaterialProviderPool.cs" />
     <Compile Include="Source\Widgets\IPropertyLocker.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationTrack.cs" />
-    <Compile Include="Source\Widgets\Animation\AnimationTrackList.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationClip.cs" />
   </ItemGroup>
   <ItemGroup>
