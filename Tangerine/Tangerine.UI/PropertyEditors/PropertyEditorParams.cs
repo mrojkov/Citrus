@@ -51,6 +51,13 @@ namespace Tangerine.UI
 			AnimatorRegistry.Instance.Contains(PropertyInfo.PropertyType) &&
 			IsAnimableByPath;
 
+		public bool IsAnimableWithEasing {
+			get {
+				var t = PropertyInfo.PropertyType;
+				return t == typeof(Vector2) || t == typeof(Vector3) || t == typeof(Quaternion) || t == typeof(float);
+			}
+		}
+
 		public PropertyEditorParams(Widget inspectorPane, IEnumerable<object> objects, IEnumerable<object> rootObjects, Type type, string propertyName, string propertyPath)
 		{
 			PropertySetter = SetProperty;

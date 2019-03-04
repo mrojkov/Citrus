@@ -15,6 +15,8 @@ namespace Lime
 	{
 		int Frame { get; set; }
 		KeyFunction Function { get; set; }
+		EasingFunction EasingFunction { get; set; }
+		EasingType EasingType { get; set; }
 		object Value { get; set; }
 		IKeyframe Clone();
 	}
@@ -43,10 +45,22 @@ namespace Lime
 		public int Frame { get; set; }
 
 		[YuzuMember]
+		public int PackedParams
+		{
+			get => (int)Function | ((int)EasingFunction << 4) | ((int)EasingType << 8);
+			set
+			{
+				Function = (KeyFunction)(value & 15);
+				EasingFunction = (EasingFunction)((value >> 4) & 15);
+				EasingType = (EasingType)((value >> 8) & 15);
+			}
+		}
+
 		public KeyFunction Function { get; set; }
+		public EasingFunction EasingFunction { get; set; }
+		public EasingType EasingType { get; set; }
 
 		[YuzuMember]
-		// Field, not property makes deserialization faster.
 		public T Value { get; set; }
 
 		object IKeyframe.Value
@@ -75,6 +89,8 @@ namespace Lime
 			return new Keyframe<T> {
 				Frame = Frame,
 				Function = Function,
+				EasingFunction = EasingFunction,
+				EasingType = EasingType,
 				Value = Value
 			};
 		}
