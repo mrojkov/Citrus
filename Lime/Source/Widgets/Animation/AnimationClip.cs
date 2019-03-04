@@ -21,6 +21,15 @@ namespace Lime
 		[YuzuMember]
 		public int Offset { get; set; }
 
+		internal Animation Animation
+		{
+			get {
+				var node = Owner.Owner.Owner;
+				node.Animations.TryFind(AnimationId, out var animation);
+				return animation;
+			}
+		}
+
 		public int Length
 		{
 			get => End - Begin;

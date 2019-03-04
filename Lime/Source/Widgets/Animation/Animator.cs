@@ -14,6 +14,8 @@ namespace Lime
 
 		IAnimator Clone();
 
+		int TargetPropertyHashCode { get; }
+
 		bool IsTriggerable { get; set; }
 
 		string TargetPropertyPath { get; set; }
@@ -72,11 +74,11 @@ namespace Lime
 	public class Animator<T> : IAnimator
 	{
 		public IAnimationHost Owner { get; set; }
+
 #if TANGERINE
 		public IAnimable Animable
 		{
-			get
-			{
+			get {
 				if (animable == null && !IsZombie) {
 					Bind();
 				}
@@ -120,6 +122,13 @@ namespace Lime
 
 		[YuzuMember("TargetProperty")]
 		public string TargetPropertyPath { get; set; }
+
+		private int targetPropertyHashCode;
+		public int TargetPropertyHashCode
+		{
+			get => targetPropertyHashCode != 0 ? targetPropertyHashCode :
+				(targetPropertyHashCode = Animable.GetHashCode() ^ TargetPropertyPath.GetHashCode());
+		}
 
 		public Type GetValueType() { return typeof(T); }
 
@@ -190,6 +199,7 @@ namespace Lime
 #if TANGERINE
 			clone.animable = null;
 #endif // TANGERINE
+			clone.targetPropertyHashCode = 0;
 			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.boxedKeys = null;
@@ -200,6 +210,7 @@ namespace Lime
 
 		public void Unbind()
 		{
+			targetPropertyHashCode = 0;
 			IsZombie = false;
 			setter = null;
 #if TANGERINE

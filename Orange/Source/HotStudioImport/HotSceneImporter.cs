@@ -14,9 +14,14 @@ namespace Orange
 			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta * 0.5f);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override void CalcEffectiveAnimators(Animation animation)
 		{
-			DefaultAnimationEngine.Instance.ApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
+			DefaultAnimationEngine.Instance.CalcEffectiveAnimators(animation);
+		}
+
+		public override void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		{
+			DefaultAnimationEngine.Instance.ApplyEffectiveAnimators(animation, invokeTriggers, animationTimeCorrection);
 		}
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)

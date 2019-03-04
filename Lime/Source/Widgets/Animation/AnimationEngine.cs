@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -6,14 +7,16 @@ namespace Lime
 	{
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
-		public virtual void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0) { }
+		public virtual void CalcEffectiveAnimators(Animation animation) { }
+		public virtual void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
 	{
 		public Func<Animation, string, double, bool> OnRunAnimation;
 		public Action<Animation, float> OnAdvanceAnimation;
-		public Action<Animation, bool, double> OnApplyAnimators;
+		public Action<Animation> OnCalcEffectiveAnimators;
+		public Action<Animation, bool, double> OnApplyEffectiveAnimators;
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
@@ -25,9 +28,14 @@ namespace Lime
 			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override void CalcEffectiveAnimators(Animation animation)
 		{
-			OnApplyAnimators?.Invoke(animation, invokeTriggers, animationTimeCorrection);
+			OnCalcEffectiveAnimators?.Invoke(animation);
+		}
+
+		public override void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		{
+			OnApplyEffectiveAnimators?.Invoke(animation, invokeTriggers, animationTimeCorrection);
 		}
 	}
 
@@ -64,7 +72,8 @@ namespace Lime
 			}
 
 			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
-				ApplyAnimators(animation, invokeTriggers: false);
+				CalcEffectiveAnimators(animation);
+				ApplyEffectiveAnimators(animation, invokeTriggers: false);
 			} else {
 				var frameTime = animation.NextMarkerOrTriggerTime.Value;
 				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
@@ -73,7 +82,8 @@ namespace Lime
 				if (currentMarker != null) {
 					ProcessMarker(animation, currentMarker);
 				}
-				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
+				CalcEffectiveAnimators(animation);
+				ApplyEffectiveAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
 				if (!animation.IsRunning) {
 					animation.RaiseStopped();
 				}
@@ -94,7 +104,6 @@ namespace Lime
 					if (!animator.Enabled || !animator.IsTriggerable || animator.AnimationId != animation.Id) {
 						continue;
 					}
-
 					if (animator.TryGetNextKeyFrame(nextFrame, out var keyFrame)) {
 						if (!nextMarkerOrTriggerFrame.HasValue || keyFrame < nextMarkerOrTriggerFrame.Value) {
 							nextMarkerOrTriggerFrame = keyFrame;
@@ -127,10 +136,82 @@ namespace Lime
 			marker.CustomAction?.Invoke();
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override void CalcEffectiveAnimators(Animation animation)
 		{
-			foreach (var a in animation.GetEffectiveAnimators()) {
-				a.Apply(animation.Time);
+			if (animation.IsCompound) {
+				CalcEffectiveAnimatorsForCompoundAnimation(animation);
+			} else {
+				CalcEffectiveAnimatorsForPlainAnimation(animation);
+			}
+		}
+
+		private static void CalcEffectiveAnimatorsForCompoundAnimation(Animation animation)
+		{
+			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAnimator>())).Clear();
+			(animation.CollisionMap ?? (animation.CollisionMap = new AnimationCollisionMap())).Clear();
+			int frame = animation.Frame;
+			foreach (var track in animation.Tracks) {
+				foreach (var a in track.Animators) {
+					a.CalcAndApply(animation.Time); // Animate track weight and so on...
+				}
+				foreach (var clip in track.Clips) {
+					if (frame < clip.Begin || frame >= clip.End) {
+						continue;
+					}
+					var clipAnimation = clip.Animation;
+					clipAnimation.TimeInternal = animation.Time - AnimationUtils.FramesToSeconds(clip.Begin - clip.Offset);
+					clipAnimation.AnimationEngine.CalcEffectiveAnimators(clipAnimation);
+					foreach (var a in clipAnimation.EffectiveAnimators) {
+						if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
+							a.Weight = track.Weight;
+							animation.CollisionMap.AddAnimator(a);
+							animation.EffectiveAnimators.Add(a);
+						} else {
+							masterAnimator.BlendWith(a, track.Weight);
+						}
+					}
+				}
+			}
+		}
+
+		private static void CalcEffectiveAnimatorsForPlainAnimation(Animation animation)
+		{
+			foreach (var a in GetEffectiveAnimators()) {
+				a.CalcValue(animation.Time);
+			}
+
+			List<IAnimator> GetEffectiveAnimators()
+			{
+				if (animation.Owner.DescendantAnimatorsVersion == animation.EffectiveAnimatorsVersion && animation.EffectiveAnimators != null) {
+					return animation.EffectiveAnimators;
+				}
+				(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAnimator>())).Clear();
+				AddEffectiveAnimatorsRecursively(animation.Owner);
+				animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
+				return animation.EffectiveAnimators;
+
+				void AddEffectiveAnimatorsRecursively(Node node)
+				{
+					for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+						if (child.Animators.Count > 0) { // Optimization: Animators.GetEnumerator() creates internal storage
+							foreach (var a in child.Animators) {
+								if (a.AnimationId == animation.Id) {
+									animation.EffectiveAnimators.Add(a);
+								}
+							}
+						}
+						if (animation.Id != null) {
+							AddEffectiveAnimatorsRecursively(child);
+						}
+					}
+				}
+			}
+		}
+
+		public override void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		{
+			foreach (var a in animation.EffectiveAnimators) {
+				a.Apply();
 				if (invokeTriggers) {
 					a.InvokeTrigger(animation.Frame, animation.Id, animationTimeCorrection);
 				}
@@ -162,7 +243,8 @@ namespace Lime
 				if (currentMarker != null) {
 					ProcessMarker(animation, currentMarker);
 				}
-				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
+				CalcEffectiveAnimators(animation);
+				ApplyEffectiveAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
 				if (!animation.IsRunning) {
 					animation.RaiseStopped();
 				}
