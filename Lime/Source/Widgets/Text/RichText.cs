@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using Lime.Text;
 using Yuzu;
 
@@ -187,18 +186,32 @@ namespace Lime
 			ro.LocalToWorldTransform = LocalToWorldTransform;
 			ro.Blending = Blending;
 			ro.Shader = Shader;
+			ro.Objects = new RenderObjectList();
+			var scale = Mathf.Sqrt(Math.Max(LocalToWorldTransform.U.SqrLength, LocalToWorldTransform.V.SqrLength));
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
-				var styleRO = RenderObjectPool<StyleRenderObject>.Acquire();
-				styleRO.Style = style;
-				styleRO.SpriteList = spriteLists[i];
-				styleRO.RenderMode = TextRenderingMode.TwoPasses;
-				styleRO.Color = GlobalColor;
-				styleRO.GradientMapIndex = style.GradientMapIndex;
-				styleRO.LocalToWorldTransform = LocalToWorldTransform;
-				styleRO.Shader = Shader;
-				styleRO.Blending = Blending;
-				ro.Add(styleRO);
+				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
+				if (sdfComponent != null) {
+					var sdfRO = InitSDFRenderObject(sdfComponent, style.Size * scale);
+					foreach (var obj in sdfRO.Objects) {
+						obj.SpriteList = spriteLists[i];
+						obj.Color = GlobalColor;
+						obj.LocalToWorldTransform = LocalToWorldTransform;
+						obj.Shader = Shader;
+						obj.Blending = Blending;
+					}
+					ro.Objects.Add(sdfRO);
+				} else {
+					var styleRO = RenderObjectPool<TextRenderObject>.Acquire();
+					styleRO.SpriteList = spriteLists[i];
+					styleRO.RenderMode = TextRenderingMode.TwoPasses;
+					styleRO.Color = GlobalColor;
+					styleRO.GradientMapIndex = style.GradientMapIndex;
+					styleRO.LocalToWorldTransform = LocalToWorldTransform;
+					styleRO.Shader = Shader;
+					styleRO.Blending = Blending;
+					ro.Objects.Add(styleRO);
+				}
 			}
 			return ro;
 		}
@@ -372,45 +385,24 @@ namespace Lime
 			}
 		}
 
-		internal class StyleRenderObject : TextRenderObject
+		internal class RenderObject : WidgetRenderObject
 		{
-			public TextStyle Style;
-		}
-
-		internal class RenderObject : WidgetRenderObject, IEnumerable<StyleRenderObject>
-		{
-			private List<StyleRenderObject> objects = new List<StyleRenderObject>();
-
-			public int Count => objects.Count;
-
-			public Lime.RenderObject this[int index] => objects[index];
-
-			public void Add(StyleRenderObject obj)
-			{
-				objects.Add(obj);
-			}
+			public RenderObjectList Objects;
 
 			public override void Render()
 			{
-				foreach (var ro in objects) {
+				Renderer.Transform1 = LocalToWorldTransform;
+				foreach (var ro in Objects) {
 					ro.Render();
 				}
 			}
 
 			protected override void OnRelease()
 			{
-				foreach (var ro in objects) {
+				foreach (var ro in Objects) {
 					ro.Release();
 				}
-				objects.Clear();
-				base.OnRelease();
 			}
-
-			public List<StyleRenderObject>.Enumerator GetEnumerator() => objects.GetEnumerator();
-
-			IEnumerator<StyleRenderObject> IEnumerable<StyleRenderObject>.GetEnumerator() => GetEnumerator();
-
-			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 
 		private class ColorfulMaterialProvider : Sprite.IMaterialProvider

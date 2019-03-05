@@ -333,6 +333,12 @@ namespace Lime
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
+		public SpriteList GetSpriteList()
+		{
+			PrepareSpriteListAndExtent();
+			return spriteList;
+		}
+
 		private static CaretPosition dummyCaret = new CaretPosition();
 
 		/// <summary>

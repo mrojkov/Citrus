@@ -7381,10 +7381,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.InnerShadows = (global::Lime.SignedDistanceFieldComponent.InnerShadowCollection)null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
-					result.InnerShadows = new global::Lime.SignedDistanceFieldComponent.InnerShadowCollection();
 					while (--tmp3 >= 0) {
 						var tmp4 = (global::Lime.ShadowParams)dg.ReadObject<global::Lime.ShadowParams>();
 						result.InnerShadows.Add(tmp4);

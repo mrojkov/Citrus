@@ -102,40 +102,25 @@ namespace Lime.SignedDistanceField
 		}
 	}
 
-	public class SDFRenderObjectList : RenderObject, IEnumerable<BaseSDFRenderObject>
+	public class SDFRenderObjectList : RenderObject
 	{
-		private List<BaseSDFRenderObject> objects = new List<BaseSDFRenderObject>();
-
-		public int Count => objects.Count;
-
-		public RenderObject this[int index] => objects[index];
-
-		public void Add(BaseSDFRenderObject obj)
-		{
-			objects.Add(obj);
-		}
+		public List<BaseSDFRenderObject> Objects = new List<BaseSDFRenderObject>();
 
 		public override void Render()
 		{
-			foreach (var ro in objects) {
+			foreach (var ro in Objects) {
 				ro.Render();
 			}
 		}
 
 		protected override void OnRelease()
 		{
-			foreach (var ro in objects) {
+			foreach (var ro in Objects) {
 				ro.Release();
 			}
-			objects.Clear();
+			Objects.Clear();
 			base.OnRelease();
 		}
-
-		public List<BaseSDFRenderObject>.Enumerator GetEnumerator() => objects.GetEnumerator();
-
-		IEnumerator<BaseSDFRenderObject> IEnumerable<BaseSDFRenderObject>.GetEnumerator() => GetEnumerator();
-
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
 	public static class SDFRenderObject
@@ -150,12 +135,12 @@ namespace Lime.SignedDistanceField
 					}
 					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
 					ro.Init(s, fontSize);
-					roList.Add(ro);
+					roList.Objects.Add(ro);
 				}
 			}
 			var mainRO = RenderObjectPool<SDFMainRenderObject>.Acquire();
 			mainRO.Init(component, fontSize);
-			roList.Add(mainRO);
+			roList.Objects.Add(mainRO);
 			if (component.InnerShadows != null) {
 				foreach (var s in component.InnerShadows) {
 					if (!s.Enabled) {
@@ -163,7 +148,7 @@ namespace Lime.SignedDistanceField
 					}
 					var ro = RenderObjectPool<SDFInnerShadowRenderObject>.Acquire();
 					ro.Init(s, fontSize);
-					roList.Add(ro);
+					roList.Objects.Add(ro);
 				}
 			}
 			if (component.Overlays != null) {
@@ -173,7 +158,7 @@ namespace Lime.SignedDistanceField
 					}
 					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
 					ro.Init(s, fontSize);
-					roList.Add(ro);
+					roList.Objects.Add(ro);
 				}
 			}
 			return roList;

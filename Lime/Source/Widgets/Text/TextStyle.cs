@@ -221,12 +221,8 @@ namespace Lime
 
 		protected override void OnParentChanged(Node oldParent)
 		{
-			if (
-				Parent != null &&
-				Components.Contains<SignedDistanceFieldComponent>() &&
-				!(Parent.Presenter is SignedDistanceField.SDFRichTextPresenter)
-			) {
-				Parent.Presenter = new SignedDistanceField.SDFRichTextPresenter();
+			if (Parent != null) {
+				InvalidateRichText();
 			}
 			base.OnParentChanged(oldParent);
 		}

@@ -35,7 +35,7 @@ namespace Lime
 			get => color;
 			set {
 				if (color != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				color = value;
 			}
@@ -47,7 +47,7 @@ namespace Lime
 			get => offsetX;
 			set {
 				if (offsetX != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				offsetX = value;
 			}
@@ -59,7 +59,7 @@ namespace Lime
 			get => offsetY;
 			set {
 				if (offsetY != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				offsetY = value;
 			}
@@ -72,7 +72,7 @@ namespace Lime
 			set {
 				var clamped = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
 				if (softness != clamped) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				softness = clamped;
 			}
@@ -85,7 +85,7 @@ namespace Lime
 			set {
 				var clamped = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
 				if (dilate != clamped) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				dilate = clamped;
 			}
@@ -97,25 +97,28 @@ namespace Lime
 		[TangerineIgnore]
 		internal Type ShadowType;
 
-		[TangerineIgnore]
-		internal bool isDirty = true;
-
 		private Sprite.IMaterialProvider materialProvider;
 
 		[TangerineIgnore]
 		internal Sprite.IMaterialProvider MaterialProvider
 		{
 			get {
-				if (isDirty) {
-					Invalidate();
-					isDirty = false;
-				}
+				Invalidate();
 				return materialProvider;
 			}
 		}
 
+		public void InvalidateMaterial()
+		{
+			materialProvider = null;
+		}
+
 		private void Invalidate()
 		{
+			if (materialProvider != null) {
+				return;
+			}
+
 			switch (ShadowType) {
 				case Type.Base:
 					var shadowKey = new SDFShadowMaterialKey() {
@@ -124,7 +127,7 @@ namespace Lime
 						Color = Color,
 						Offset = new Vector2(offsetX, offsetY) * 0.1f
 					};
-					materialProvider = SDFMaterialProviderPool.Instance.GetSDFShadowMaterial(shadowKey);
+					materialProvider = SDFMaterialProviderPool.Instance.GetShadowProvider(shadowKey);
 					break;
 				case Type.Inner:
 					var innerShadowKey = new SDFInnerShadowMaterialKey() {
@@ -132,9 +135,9 @@ namespace Lime
 						TextDilate = OwnerComponent.Dilate,
 						Softness = Softness,
 						Color = Color,
-						Offset = new Vector2(offsetX, offsetY) * 0.1f
+						Offset = new Vector2(offsetX, offsetY) * 0.0001f
 					};
-					materialProvider = SDFMaterialProviderPool.Instance.GetSDFInnerShadowMaterial(innerShadowKey);
+					materialProvider = SDFMaterialProviderPool.Instance.GetInnerShadowProvider(innerShadowKey);
 					break;
 				default:
 					break;
@@ -163,14 +166,12 @@ namespace Lime
 		private const float MinimumBevelWidth = 0f;
 		private const float MaximumBevelWidth = 30f;
 
-		private bool isDirty = true;
 		private float dilate = 0f;
 		private float thickness = 0f;
 		private Color4 outlineColor = Color4.Black;
 		private bool gradientEnabled;
 		private ColorGradient gradient = new ColorGradient(Color4.White, Color4.Black);
 		private float gradientAngle;
-		private InnerShadowCollection innerShadows;
 
 		private SDFMaterialProvider materialProvider;
 
@@ -179,10 +180,7 @@ namespace Lime
 		{
 			get
 			{
-				if (isDirty) {
-					Invalidate();
-					isDirty = false;
-				}
+				Invalidate();
 				return materialProvider;
 			}
 		}
@@ -195,9 +193,9 @@ namespace Lime
 			set {
 				var clamped =  Mathf.Clamp(value, MinimumDilate, MaximumDilate);
 				if (dilate != clamped) {
-					isDirty = true;
+					materialProvider = null;
 					foreach (var shadow in InnerShadows) {
-						shadow.isDirty = true;
+						shadow.InvalidateMaterial();
 					}
 				}
 				dilate = clamped;
@@ -211,7 +209,7 @@ namespace Lime
 			get => outlineColor;
 			set {
 				if (outlineColor != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				outlineColor = value;
 			}
@@ -225,7 +223,7 @@ namespace Lime
 			set {
 				var clamped = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
 				if (thickness != clamped) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				thickness = clamped;
 			}
@@ -238,7 +236,7 @@ namespace Lime
 			get => gradientEnabled;
 			set {
 				if (gradientEnabled != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				gradientEnabled = value;
 			}
@@ -251,7 +249,7 @@ namespace Lime
 			get => gradient;
 			set {
 				if (gradient.GetHashCode() != value.GetHashCode()) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				gradient = value;
 			}
@@ -264,7 +262,7 @@ namespace Lime
 			get => gradientAngle;
 			set {
 				if (gradientAngle != value) {
-					isDirty = true;
+					materialProvider = null;
 				}
 				gradientAngle = value;
 			}
@@ -276,16 +274,7 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public InnerShadowCollection InnerShadows
-		{
-			get => innerShadows;
-			set {
-				innerShadows = value;
-				if (innerShadows != null) {
-					innerShadows.Owner = this;
-				}
-			}
-		}
+		public InnerShadowCollection InnerShadows { get; private set; }
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
@@ -293,9 +282,7 @@ namespace Lime
 
 		public SignedDistanceFieldComponent()
 		{
-			if (InnerShadows == null) {
-				InnerShadows = new InnerShadowCollection();
-			}
+			InnerShadows = new InnerShadowCollection(this);
 			Invalidate();
 		}
 
@@ -326,6 +313,9 @@ namespace Lime
 
 		private void Invalidate()
 		{
+			if (materialProvider != null) {
+				return;
+			}
 			var key = new SDFMaterialKey() {
 				Dilate = Dilate,
 				Thickness = Thickness,
@@ -335,7 +325,7 @@ namespace Lime
 				GradientAngle = GradientAngle
 			};
 
-			materialProvider = SDFMaterialProviderPool.Instance.GetSDFMaterial(key);
+			materialProvider = SDFMaterialProviderPool.Instance.GetProvider(key);
 		}
 
 		public override NodeComponent Clone()
@@ -346,16 +336,11 @@ namespace Lime
 
 		public class InnerShadowCollection : ObservableCollection<ShadowParams>
 		{
-			private SignedDistanceFieldComponent owner;
-			public SignedDistanceFieldComponent Owner
+			private readonly SignedDistanceFieldComponent owner;
+
+			public InnerShadowCollection(SignedDistanceFieldComponent owner)
 			{
-				get => owner;
-				set {
-					owner = value;
-					foreach (var item in Items) {
-						item.OwnerComponent = owner;
-					}
-				}
+				this.owner = owner;
 			}
 
 			protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -363,7 +348,7 @@ namespace Lime
 				if (e.Action == NotifyCollectionChangedAction.Add) {
 					foreach (var item in e.NewItems) {
 						var shadow = item as ShadowParams;
-						shadow.OwnerComponent = Owner;
+						shadow.OwnerComponent = owner;
 						shadow.ShadowType = ShadowParams.Type.Inner;
 					}
 				}

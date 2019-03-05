@@ -42,12 +42,21 @@ namespace Lime.SignedDistanceField
 		}
 	}
 
-	internal struct SDFShadowMaterialKey
+	internal struct SDFShadowMaterialKey : IEquatable<SDFShadowMaterialKey>
 	{
 		public float Dilate;
 		public float Softness;
 		public Color4 Color;
 		public Vector2 Offset;
+
+		public bool Equals(SDFShadowMaterialKey other)
+		{
+			return
+				Dilate == other.Dilate &&
+				Softness == other.Softness &&
+				Color == other.Color &&
+				Offset == other.Offset;
+		}
 
 		public override int GetHashCode()
 		{
@@ -62,13 +71,23 @@ namespace Lime.SignedDistanceField
 		}
 	}
 
-	internal struct SDFInnerShadowMaterialKey
+	internal struct SDFInnerShadowMaterialKey : IEquatable<SDFInnerShadowMaterialKey>
 	{
 		public float Dilate;
 		public float TextDilate;
 		public float Softness;
 		public Color4 Color;
 		public Vector2 Offset;
+
+		public bool Equals(SDFInnerShadowMaterialKey other)
+		{
+			return
+				Dilate == other.Dilate &&
+				TextDilate == other.TextDilate &&
+				Softness == other.Softness &&
+				Color == other.Color &&
+				Offset == other.Offset;
+		}
 
 		public override int GetHashCode()
 		{
@@ -92,7 +111,7 @@ namespace Lime.SignedDistanceField
 
 		public readonly static SDFMaterialProviderPool Instance = new SDFMaterialProviderPool();
 
-		internal SDFMaterialProvider GetSDFMaterial(SDFMaterialKey key)
+		internal SDFMaterialProvider GetProvider(SDFMaterialKey key)
 		{
 			SDFMaterialProvider result;
 			if (mainMaterialsCache.TryGetValue(key, out result)) {
@@ -110,7 +129,7 @@ namespace Lime.SignedDistanceField
 			}
 		}
 
-		internal SDFShadowMaterialProvider GetSDFShadowMaterial(SDFShadowMaterialKey key)
+		internal SDFShadowMaterialProvider GetShadowProvider(SDFShadowMaterialKey key)
 		{
 			SDFShadowMaterialProvider result;
 			if (shadowMaterialsCache.TryGetValue(key, out result)) {
@@ -126,7 +145,7 @@ namespace Lime.SignedDistanceField
 			}
 		}
 
-		internal SDFInnerShadowMaterialProvider GetSDFInnerShadowMaterial(SDFInnerShadowMaterialKey key)
+		internal SDFInnerShadowMaterialProvider GetInnerShadowProvider(SDFInnerShadowMaterialKey key)
 		{
 			SDFInnerShadowMaterialProvider result;
 			if (innerShadowMaterialsCache.TryGetValue(key, out result)) {
