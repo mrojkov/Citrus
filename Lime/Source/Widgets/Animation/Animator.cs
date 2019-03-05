@@ -86,9 +86,7 @@ namespace Lime
 
 		private double minTime;
 		private double maxTime;
-		private KeyFunction function;
-		private EasingFunction easingFunction;
-		private EasingType easingType;
+		private KeyframeParams @params;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
 
@@ -269,14 +267,19 @@ namespace Lime
 			if (time < minTime || time >= maxTime) {
 				CacheInterpolationParameters(time);
 			}
-			if (function == KeyFunction.Steep) {
+			if (@params.Function == KeyFunction.Steep) {
 				return Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
-			if (easingFunction != EasingFunction.Linear) {
-				t = Easing.Interpolate(t, easingFunction, easingType);
+			if (@params.EasingFunction != EasingFunction.Linear) {
+				var origT = t;
+				t = Easing.Interpolate(t, @params.EasingFunction, @params.EasingType);
+				if (@params.EasingSoftness != 0) {
+					var k = (float)@params.EasingSoftness * 0.01f;
+					t = (1 - k) * t + k * origT;
+				}
 			}
-			if (function == KeyFunction.Linear) {
+			if (@params.Function == KeyFunction.Linear) {
 				return InterpolateLinear(t);
 			} else {
 				return InterpolateSplined(t);
@@ -299,6 +302,11 @@ namespace Lime
 			return false;
 		}
 
+		private static KeyframeParams defaultKeyframeParams = new KeyframeParams {
+			Function = KeyFunction.Steep,
+			EasingFunction = EasingFunction.Linear
+		};
+
 		private void CacheInterpolationParameters(double time)
 		{
 			int count = ReadonlyKeys.Count;
@@ -306,8 +314,7 @@ namespace Lime
 				Value2 = default(T);
 				minTime = -float.MaxValue;
 				maxTime = float.MaxValue;
-				function = KeyFunction.Steep;
-				easingFunction = EasingFunction.Linear;
+				@params = defaultKeyframeParams;
 				return;
 			}
 			var i = keyIndex;
@@ -329,14 +336,12 @@ namespace Lime
 				maxFrame = ReadonlyKeys[0].Frame;
 				minFrame = int.MinValue;
 				Value2 = ReadonlyKeys[0].Value;
-				function = KeyFunction.Steep;
-				easingFunction = EasingFunction.Linear;
+				@params = defaultKeyframeParams;
 			} else if (i == count - 1) {
 				minFrame = ReadonlyKeys[i].Frame;
 				maxFrame = int.MaxValue;
 				Value2 = ReadonlyKeys[i].Value;
-				function = KeyFunction.Steep;
-				easingFunction = EasingFunction.Linear;
+				@params = defaultKeyframeParams;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
@@ -344,13 +349,11 @@ namespace Lime
 				maxFrame = key2.Frame;
 				Value2 = key1.Value;
 				Value3 = key2.Value;
-				function = key1.Function;
-				easingFunction = key1.EasingFunction;
-				easingType = key1.EasingType;
-				if (function == KeyFunction.Spline) {
+				@params = key1.Params;
+				if (@params.Function == KeyFunction.Spline) {
 					Value1 = ReadonlyKeys[i < 1 ? 0 : i - 1].Value;
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 2].Value;
-				} else if (function == KeyFunction.ClosedSpline) {
+				} else if (@params.Function == KeyFunction.ClosedSpline) {
 					Value1 = ReadonlyKeys[i < 1 ? count - 2 : i - 1].Value;
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
 				}
