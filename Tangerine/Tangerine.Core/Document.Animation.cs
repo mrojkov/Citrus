@@ -1,3 +1,4 @@
+using System;
 using Lime;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,7 +44,9 @@ namespace Tangerine.Core
 					RestoreAnimationsTimes(animationMode);
 				}
 				AudioSystem.StopAll();
+				CurrentFrameSetter.CacheAnimationsStates = true;
 				ForceAnimationUpdate();
+				CurrentFrameSetter.CacheAnimationsStates = false;
 			} else {
 				SaveAnimationsTimes();
 				foreach (var node in RootNode.Descendants) {
@@ -74,14 +77,12 @@ namespace Tangerine.Core
 			if (Current == null) {
 				return;
 			}
-			CacheAnimationsStates = true;
 			SetCurrentFrameToNode(
 				Current.AnimationFrame,
 				Current.Animation,
 				CoreUserPreferences.Instance.AnimationMode,
 				isForced: true
 			);
-			CacheAnimationsStates = false;
 		}
 
 		private void SaveAnimationsTimes()
@@ -122,10 +123,20 @@ namespace Tangerine.Core
 				{
 					public bool IsRunning;
 					public double Time;
+					public string AnimationId;
 				}
 
 				private AnimationState[] animationsStates;
-				public int Column => AnimationUtils.SecondsToFrames(animationsStates[0].Time);
+
+				public int? GetColumn(string animationId)
+				{
+					foreach (var state in animationsStates) {
+						if (state.AnimationId == animationId) {
+							return AnimationUtils.SecondsToFrames(state.Time);
+						}
+					}
+					return null;
+				}
 
 				public static void Create(Node node, bool initial = false)
 				{
@@ -140,7 +151,8 @@ namespace Tangerine.Core
 					foreach (var animation in node.Animations) {
 						var state = new AnimationState {
 							IsRunning = !initial && animation.IsRunning,
-							Time = animation.Time
+							Time = animation.Time,
+							AnimationId = animation.Id,
 						};
 						component.animationsStates[i] = state;
 						i++;
@@ -157,6 +169,10 @@ namespace Tangerine.Core
 						return false;
 					}
 					var i = 0;
+					// Cuz of lazy evaluation of DefaultAnimation (bug found in StartLevelDialog.tan)
+					if (node.Animations.Count != component.animationsStates.Length) {
+						return false;
+					}
 					foreach (var animation in node.Animations) {
 						var state = component.animationsStates[i];
 						animation.IsRunning = state.IsRunning;
@@ -207,7 +223,7 @@ namespace Tangerine.Core
 					var node = animation.Owner;
 					if (animationMode && (doc.AnimationFrame != frameIndex || isForced)) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.Column;
+						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.GetColumn(animation.Id);
 						// Terekhov Dmitry: First time cache creation that does not set IsRunning
 						// Terekhov Dmitry: In order not to not reset other animations
 						if (CacheAnimationsStates && !cacheFrame.HasValue) {
@@ -215,22 +231,6 @@ namespace Tangerine.Core
 							animation.IsRunning = true;
 							FastForwardToFrame(animation, frameIndex);
 							AnimationsStatesComponent.Create(node, true);
-							cacheFrame = frameIndex;
-						}
-						if (cacheFrame.HasValue && ((movingBack = cacheFrame.Value > frameIndex) ||
-							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
-							AnimationsStatesComponent.Restore(node); // Terekhov Dmitry: Restore old values
-							AnimationsStatesComponent.Remove(node); // Terekhov Dmitry: Delete cache
-							animation.IsRunning = true;
-							if (movingBack) {
-								SetTimeRecursive(node, 0, animation.Id);
-								StopAnimationRecursive(node);
-								animation.IsRunning = true;
-								FastForwardToFrame(animation, (frameIndex - OptimalRollbackForCacheAnimationsStates).Clamp(0, frameIndex));
-							} else {
-								FastForwardToFrame(animation, frameIndex); // Terekhov Dmitry: Optimization - FF from last saved position
-							}
-							AnimationsStatesComponent.Create(node); // Terekhov Dmitry: New cache that keep all animation states
 							cacheFrame = frameIndex;
 						}
 						if (!cacheFrame.HasValue) {
@@ -242,8 +242,21 @@ namespace Tangerine.Core
 								AnimationsStatesComponent.Create(node);
 							}
 						}
-						ClearParticlesRecursive(doc.RootNode);
+						ClearParticlesRecursive(node);
 						animation.IsRunning = true;
+						if (cacheFrame.HasValue && ((movingBack = cacheFrame.Value > frameIndex) ||
+							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
+							AnimationsStatesComponent.Remove(node);
+							if (movingBack) {
+								SetTimeRecursive(node, 0, animation.Id);
+								StopAnimationRecursive(node);
+								animation.IsRunning = true;
+								FastForwardToFrame(animation, (frameIndex - OptimalRollbackForCacheAnimationsStates).Clamp(0, frameIndex));
+							} else {
+								FastForwardToFrame(animation, frameIndex); // Terekhov Dmitry: Optimization - FF from last saved position
+							}
+							AnimationsStatesComponent.Create(node);
+						}
 						FastForwardToFrame(animation, frameIndex);
 						StopAnimationRecursive(node);
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
@@ -296,6 +309,11 @@ namespace Tangerine.Core
 			{
 				if (node.Animations.TryFind(animationId, out var animation)) {
 					animation.Time = time;
+				}
+				if (animationId == null) {
+					foreach (var child in node.Nodes) {
+						SetTimeRecursive(child, time, animationId);
+					}
 				}
 			}
 
