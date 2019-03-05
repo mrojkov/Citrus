@@ -46,14 +46,14 @@ namespace Lime
 
 		public KeyFunction Function
 		{
-			get => (KeyFunction)(Data & 15);
-			set => Data = (Data & ~15) | (int)value;
+			get => (KeyFunction)(Data & 7);
+			set => Data = (Data & ~7) | (int)value;
 		}
 
 		public EasingFunction EasingFunction
 		{
-			get => (EasingFunction)((Data >> 4) & 15);
-			set => Data = (Data & ~(15 << 4)) | ((int)value << 4);
+			get => (EasingFunction)((Data >> 3) & 31);
+			set => Data = (Data & ~(31 << 3)) | ((int)value << 3);
 		}
 
 		public EasingType EasingType
@@ -121,8 +121,7 @@ namespace Lime
 			return new Keyframe<T> {
 				Frame = Frame,
 				Function = Function,
-				EasingFunction = EasingFunction,
-				EasingType = EasingType,
+				Params = Params,
 				Value = Value
 			};
 		}
