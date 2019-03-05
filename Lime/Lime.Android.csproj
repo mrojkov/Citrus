@@ -453,6 +453,7 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\FormatConverter.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\MemoryAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
+    <Compile Include="Source\Widgets\Animation\Easing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

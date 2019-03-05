@@ -95,6 +95,7 @@
     <Compile Include="Dialogs\RenderToPngSequenceDialog.cs" />
     <Compile Include="MainMenu\GitMenu.cs" />
     <Compile Include="MainMenu\ToolsMenu.cs" />
+    <Compile Include="MainMenu\SystemMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

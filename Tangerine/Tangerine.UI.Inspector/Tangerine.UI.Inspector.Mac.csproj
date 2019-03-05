@@ -26,9 +26,12 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements></CodeSignEntitlements>
-    <CodeSignResourceRules></CodeSignResourceRules>
-    <XamMacArch></XamMacArch>
+    <CodeSignEntitlements>
+    </CodeSignEntitlements>
+    <CodeSignResourceRules>
+    </CodeSignResourceRules>
+    <XamMacArch>
+    </XamMacArch>
     <Profiling>true</Profiling>
     <AOTMode>None</AOTMode>
     <LangVersion>7.3</LangVersion>
@@ -36,7 +39,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -45,9 +49,12 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements></CodeSignEntitlements>
-    <CodeSignResourceRules></CodeSignResourceRules>
-    <XamMacArch></XamMacArch>
+    <CodeSignEntitlements>
+    </CodeSignEntitlements>
+    <CodeSignResourceRules>
+    </CodeSignResourceRules>
+    <XamMacArch>
+    </XamMacArch>
     <AOTMode>None</AOTMode>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
@@ -63,6 +70,8 @@
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="InspectorContent.cs" />
     <Compile Include="InspectorPropertyRegistry.cs" />
+    <Compile Include="EasingButton.cs" />
+    <Compile Include="EasingIcon.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">
