@@ -10,12 +10,10 @@ namespace Lime.SignedDistanceField
 		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
-		private readonly ShaderParamKey<float> smoothingKey;
 		private readonly ShaderParamKey<float> dilateKey;
 		private readonly ShaderParamKey<float> softnessKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
 
-		public float FontSize { get; set; } = 0f;
 		public float Dilate { get; set; } = 0f;
 		public float Softness { get; set; } = 0f;
 		public Color4 Color { get; set; } = Color4.Black;
@@ -32,7 +30,6 @@ namespace Lime.SignedDistanceField
 			this.blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
-			smoothingKey = shaderParams.GetParamKey<float>("smoothing");
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
 			softnessKey = shaderParams.GetParamKey<float>("softness");
 			colorKey = shaderParams.GetParamKey<Vector4>("color");
@@ -40,7 +37,6 @@ namespace Lime.SignedDistanceField
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(smoothingKey, Mathf.Min(1f / FontSize * 6f, 0.1f));
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(softnessKey, Softness * 0.01f);
 			shaderParams.Set(colorKey, Color.ToVector4());
@@ -98,14 +94,13 @@ namespace Lime.SignedDistanceField
 			varying lowp vec2 texCoords1;
 			uniform lowp sampler2D tex1;
 
-			uniform lowp float smoothing;
 			uniform lowp float dilate;
 			uniform lowp float softness;
 			uniform lowp vec4 color;
 
 			void main() {
 				lowp float shadowDistance = texture2D(tex1, texCoords1).r;
-				lowp float shadowAlpha = smoothstep(dilate - softness - smoothing, dilate + smoothing, shadowDistance);
+				lowp float shadowAlpha = smoothstep(dilate - softness, dilate + softness, shadowDistance);
 				gl_FragColor = vec4(color.rgb, color.a * shadowAlpha * global_color.a);
 			}";
 

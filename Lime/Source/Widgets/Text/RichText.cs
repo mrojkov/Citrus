@@ -192,7 +192,7 @@ namespace Lime
 				var style = renderer.Styles[i];
 				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
 				if (sdfComponent != null) {
-					var sdfRO = InitSDFRenderObject(sdfComponent, style.Size * scale);
+					var sdfRO = SignedDistanceField.SDFRenderObject.GetRenderObject(sdfComponent);
 					foreach (var obj in sdfRO.Objects) {
 						obj.SpriteList = spriteLists[i];
 						obj.Color = GlobalColor;
@@ -214,13 +214,6 @@ namespace Lime
 				}
 			}
 			return ro;
-		}
-
-		private SignedDistanceField.SDFRenderObjectList InitSDFRenderObject(SignedDistanceFieldComponent sdfComponent, float fontHeight)
-		{
-			var scale = Mathf.Sqrt(Math.Max(LocalToWorldTransform.U.SqrLength, LocalToWorldTransform.V.SqrLength));
-			var sdfRO = SignedDistanceField.SDFRenderObject.GetRenderObject(sdfComponent, fontHeight * scale);
-			return sdfRO;
 		}
 
 		private void EnsureSpriteLists()

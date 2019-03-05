@@ -6,8 +6,6 @@ namespace Lime.SignedDistanceField
 
 	public abstract class BaseSDFRenderObject : TextRenderObject
 	{
-		public abstract int GetHash();
-
 		protected void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
 		{
 			if (offset.X != 0f || offset.Y != 0f) {
@@ -34,12 +32,9 @@ namespace Lime.SignedDistanceField
 	{
 		private SDFShadowMaterialProvider materialProvider;
 
-		public override int GetHash() => materialProvider.Material.GetHashCode();
-
-		public void Init(ShadowParams shadowParams, float fontSize)
+		public void Init(ShadowParams shadowParams)
 		{
 			materialProvider = shadowParams.MaterialProvider as SDFShadowMaterialProvider;
-			materialProvider.Material.FontSize = fontSize;
 		}
 
 		public override void Render()
@@ -58,12 +53,9 @@ namespace Lime.SignedDistanceField
 	{
 		private SDFInnerShadowMaterialProvider materialProvider;
 
-		public override int GetHash() => materialProvider.Material.GetHashCode();
-
-		public void Init(ShadowParams shadowParams, float fontSize)
+		public void Init(ShadowParams shadowParams)
 		{
 			materialProvider = shadowParams.MaterialProvider as SDFInnerShadowMaterialProvider;
-			materialProvider.Material.FontSize = fontSize;
 		}
 
 		public override void Render()
@@ -82,12 +74,9 @@ namespace Lime.SignedDistanceField
 	{
 		private SDFMaterialProvider materialProvider;
 
-		public override int GetHash() => materialProvider.Material.GetHashCode();
-
-		public void Init(SignedDistanceFieldComponent component, float fontSize)
+		public void Init(SignedDistanceFieldComponent component)
 		{
 			materialProvider = component.MaterialProvider;
-			materialProvider.Material.FontSize = fontSize;
 		}
 
 		public override void Render()
@@ -125,7 +114,7 @@ namespace Lime.SignedDistanceField
 
 	public static class SDFRenderObject
 	{
-		public static SDFRenderObjectList GetRenderObject(SignedDistanceFieldComponent component, float fontSize)
+		public static SDFRenderObjectList GetRenderObject(SignedDistanceFieldComponent component)
 		{
 			var roList = RenderObjectPool<SDFRenderObjectList>.Acquire();
 			if (component.Shadows != null) {
@@ -134,12 +123,12 @@ namespace Lime.SignedDistanceField
 						continue;
 					}
 					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
-					ro.Init(s, fontSize);
+					ro.Init(s);
 					roList.Objects.Add(ro);
 				}
 			}
 			var mainRO = RenderObjectPool<SDFMainRenderObject>.Acquire();
-			mainRO.Init(component, fontSize);
+			mainRO.Init(component);
 			roList.Objects.Add(mainRO);
 			if (component.InnerShadows != null) {
 				foreach (var s in component.InnerShadows) {
@@ -147,7 +136,7 @@ namespace Lime.SignedDistanceField
 						continue;
 					}
 					var ro = RenderObjectPool<SDFInnerShadowRenderObject>.Acquire();
-					ro.Init(s, fontSize);
+					ro.Init(s);
 					roList.Objects.Add(ro);
 				}
 			}
@@ -157,7 +146,7 @@ namespace Lime.SignedDistanceField
 						continue;
 					}
 					var ro = RenderObjectPool<SDFShadowRenderObject>.Acquire();
-					ro.Init(s, fontSize);
+					ro.Init(s);
 					roList.Objects.Add(ro);
 				}
 			}

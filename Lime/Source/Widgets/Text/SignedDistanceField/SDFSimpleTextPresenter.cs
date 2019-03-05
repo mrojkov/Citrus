@@ -15,8 +15,7 @@ namespace Lime.SignedDistanceField
 				throw new InvalidOperationException();
 			}
 			var text = node as SimpleText;
-			var scale = Mathf.Sqrt(Math.Max(text.LocalToWorldTransform.U.SqrLength, text.LocalToWorldTransform.V.SqrLength));
-			var ro = SDFRenderObject.GetRenderObject(component, text.FontHeight * scale);
+			var ro = SDFRenderObject.GetRenderObject(component);
 			foreach (var item in ro.Objects) {
 				item.CaptureRenderState(text);
 				item.SpriteList = text.GetSpriteList();

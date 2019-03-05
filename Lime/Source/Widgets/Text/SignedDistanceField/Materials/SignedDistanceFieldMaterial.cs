@@ -15,7 +15,7 @@ namespace Lime.SignedDistanceField
 		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
-		private readonly ShaderParamKey<float> smoothingKey;
+		private readonly ShaderParamKey<float> softnessKey;
 		private readonly ShaderParamKey<float> dilateKey;
 		private readonly ShaderParamKey<float> thicknessKey;
 		private readonly ShaderParamKey<Vector4> outlineColorKey;
@@ -24,7 +24,7 @@ namespace Lime.SignedDistanceField
 		private int currentVersion;
 		private ColorGradient gradient;
 
-		public float FontSize { get; set; } = 0f;
+		public float Softness { get; set; } = 0f;
 		public float Dilate { get; set; } = 0f;
 		public float Thickness { get; set; } = 0f;
 		public Color4 OutlineColor { get; set; } = Color4.Black;
@@ -53,7 +53,7 @@ namespace Lime.SignedDistanceField
 			this.blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
-			smoothingKey = shaderParams.GetParamKey<float>("smoothing");
+			softnessKey = shaderParams.GetParamKey<float>("softness");
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
 			thicknessKey = shaderParams.GetParamKey<float>("thickness");
 			outlineColorKey = shaderParams.GetParamKey<Vector4>("outlineColor");
@@ -62,8 +62,7 @@ namespace Lime.SignedDistanceField
 
 		public void Apply(int pass)
 		{
-			var smoothing = 1f / FontSize * 2.5f;
-			shaderParams.Set(smoothingKey, Mathf.Min(smoothing, 0.1f));
+			shaderParams.Set(softnessKey, Softness * 0.01f);
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(thicknessKey, -Thickness * 0.01f);
 			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
@@ -104,7 +103,7 @@ namespace Lime.SignedDistanceField
 		public IMaterial Clone()
 		{
 			return new SignedDistanceFieldMaterial(blending) {
-				FontSize = FontSize,
+				Softness = Softness,
 				Dilate = Dilate,
 				Thickness = Thickness,
 			};
@@ -230,7 +229,7 @@ namespace Lime.SignedDistanceField
 			uniform lowp sampler2D tex1;
 			uniform lowp sampler2D tex2;
 
-			uniform lowp float smoothing;
+			uniform lowp float softness;
 			uniform lowp float dilate;
 			uniform lowp float thickness;
 			uniform lowp vec4 outlineColor;
@@ -240,7 +239,7 @@ namespace Lime.SignedDistanceField
 			void main() {
 				lowp vec3 sdf = texture2D(tex1, texCoords1).rgb;
 				lowp float distance = sdf.r;
-				lowp float alpha = smoothstep(dilate + thickness - smoothing, dilate + thickness + smoothing, distance);
+				lowp float alpha = smoothstep(dilate + thickness - softness, dilate + thickness + softness, distance);
 				lowp vec4 inner_color = color;
 ";
 		private const string FragmentShaderGradientPart2 = @"
@@ -251,7 +250,7 @@ namespace Lime.SignedDistanceField
 				inner_color = texture2D(tex2, gradientCoords);
 ";
 		private const string FragmentShaderOutlinePart3 = @"
-				lowp float outlineFactor = smoothstep(dilate - smoothing, dilate + smoothing, distance);
+				lowp float outlineFactor = smoothstep(dilate - softness, dilate + softness, distance);
 				lowp vec4 c = mix(outlineColor, inner_color, outlineFactor);
 ";
 		private const string FragmentShaderPart3 = @"

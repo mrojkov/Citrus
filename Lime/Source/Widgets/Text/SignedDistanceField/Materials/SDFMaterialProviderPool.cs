@@ -8,6 +8,7 @@ namespace Lime.SignedDistanceField
 {
 	internal struct SDFMaterialKey : IEquatable<SDFMaterialKey>
 	{
+		public float Softness;
 		public float Dilate;
 		public float Thickness;
 		public Color4 OutlineColor;
@@ -17,7 +18,9 @@ namespace Lime.SignedDistanceField
 
 		public bool Equals(SDFMaterialKey other)
 		{
-			return Dilate.Equals(other.Dilate) &&
+			return
+				Softness.Equals(other.Softness) &&
+				Dilate.Equals(other.Dilate) &&
 				Thickness.Equals(other.Thickness) &&
 				OutlineColor.Equals(other.OutlineColor) &&
 				GradientEnabled.Equals(other.GradientEnabled) &&
@@ -29,6 +32,7 @@ namespace Lime.SignedDistanceField
 		{
 			unchecked {
 				int hash = (int)2166136261;
+				hash = (hash * 16777619) ^ Softness.GetHashCode();
 				hash = (hash * 16777619) ^ Dilate.GetHashCode();
 				hash = (hash * 16777619) ^ Thickness.GetHashCode();
 				hash = (hash * 16777619) ^ OutlineColor.GetHashCode();
@@ -118,6 +122,7 @@ namespace Lime.SignedDistanceField
 				return result;
 			} else {
 				result = new SDFMaterialProvider();
+				result.Material.Softness = key.Softness;
 				result.Material.Dilate = key.Dilate;
 				result.Material.Thickness = key.Thickness;
 				result.Material.OutlineColor = key.OutlineColor;

@@ -153,6 +153,8 @@ namespace Lime
 		private const string GroupOutline = "02. Outline";
 		private const string GroupGradient = "03. Gradient";
 		private const string GroupShadow = "04. Shadows";
+		private const float MinimumSoftness = 0f;
+		private const float MaximumSoftness = 40f;
 		private const float MinimumDilate = -30f;
 		private const float MaximumDilate = 30f;
 		private const float MinimumThickness = 0f;
@@ -166,6 +168,7 @@ namespace Lime
 		private const float MinimumBevelWidth = 0f;
 		private const float MaximumBevelWidth = 30f;
 
+		private float softness = 0f;
 		private float dilate = 0f;
 		private float thickness = 0f;
 		private Color4 outlineColor = Color4.Black;
@@ -182,6 +185,23 @@ namespace Lime
 			{
 				Invalidate();
 				return materialProvider;
+			}
+		}
+
+		[YuzuMember]
+		[TangerineGroup(GroupFont)]
+		public float Softness
+		{
+			get => softness;
+			set {
+				var clamped = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
+				if (softness != clamped) {
+					materialProvider = null;
+					foreach (var shadow in InnerShadows) {
+						shadow.InvalidateMaterial();
+					}
+				}
+				softness = clamped;
 			}
 		}
 
@@ -317,6 +337,7 @@ namespace Lime
 				return;
 			}
 			var key = new SDFMaterialKey() {
+				Softness = Softness,
 				Dilate = Dilate,
 				Thickness = Thickness,
 				OutlineColor = OutlineColor,
