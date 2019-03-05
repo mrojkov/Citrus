@@ -149,17 +149,37 @@ namespace Lime
 			}
 		}
 
-		public void Dispose()
+		#region IDisposable Support
+		private bool disposed;
+
+		private void Dispose(bool disposing)
 		{
-			if (Bitmap != null) {
-				Bitmap.Dispose();
-				Bitmap = null;
-			}
-			if (data != IntPtr.Zero) {
-				Marshal.FreeHGlobal(data);
-				data = IntPtr.Zero;
+			if (!disposed) {
+				if (disposing) {
+					if (Bitmap != null) {
+						Bitmap.Dispose();
+					}
+				}
+
+				if (data != IntPtr.Zero) {
+					Marshal.FreeHGlobal(data);
+				}
+
+				disposed = true;
 			}
 		}
+
+		~BitmapImplementation()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }
 #endif

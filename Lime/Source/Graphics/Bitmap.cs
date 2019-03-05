@@ -221,33 +221,16 @@ namespace Lime
 			}
 		}
 
-		private bool disposed;
-
-		private void Dispose(bool disposing)
+		/// <summary>
+		/// Releases all resources used by this bitmap.
+		/// </summary>
+		public void Dispose()
 		{
-			if (!disposed) {
-				if (disposing) {
-					if (implementation != null) {
-						implementation.Dispose();
-						implementation = null;
-					}
-				}
-
-				disposed = true;
+			if (implementation != null) {
+				implementation.Dispose();
 			}
 		}
 
-		~Bitmap()
-		{
-			Dispose(false);
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-		
 		private void CacheDimensions()
 		{
 			Width = implementation.Width;
