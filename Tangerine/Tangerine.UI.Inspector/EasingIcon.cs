@@ -11,26 +11,30 @@ namespace Tangerine.UI.Inspector
 
 		public static readonly EasingIcons Instance = new EasingIcons();
 
-		private Dictionary<(EasingFunction, EasingType), Texture2D> textures = new Dictionary<(EasingFunction, EasingType), Texture2D>();
+		private Dictionary<(EasingFunction, EasingType, int), Texture2D> textures = new Dictionary<(EasingFunction, EasingType, int), Texture2D>();
 
-		public ITexture Get(EasingFunction function, EasingType type)
+		public ITexture Get(EasingFunction function, EasingType type, int softness)
 		{
 			Texture2D texture;
-			if (textures.TryGetValue((function, type), out texture)) {
+			if (textures.TryGetValue((function, type, softness), out texture)) {
 				return texture;
 			}
 			texture = new Texture2D();
-			var pixels = Render(Width, Height, function, type);
+			var pixels = Render(Width, Height, function, type, softness);
 			texture.LoadImage(pixels, Width, Height);
-			textures.Add((function, type), texture);
+			textures.Add((function, type, softness), texture);
 			return texture;
 		}
 
-		private static Color4[] Render(int width, int height, EasingFunction function, EasingType type)
+		private static Color4[] Render(int width, int height, EasingFunction function, EasingType type, int softness)
 		{
 			var image = new float[width * height];
 			for (float t = 0; t <= 1; t += 0.001f) {
 				var v = Easing.Interpolate(t, function, type);
+				if (softness != 0) {
+					var k = softness * 0.01f;
+					v = (1 - k) * v + k * t;
+				}
 				var x = (t * 0.75f + 0.125f) * width;
 				var y = ((1 - v) * 0.5f + 0.25f) * height;
 				DrawPoint(x, y, image, width);

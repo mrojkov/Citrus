@@ -60,7 +60,7 @@ namespace Lime
 		public IKeyframe GetByFrame(int frame)
 		{
 			int index = GetIndexByFrame(frame);
-			return index >= 0 ? source[GetIndexByFrame(frame)] : null;
+			return index >= 0 ? source[index] : null;
 		}
 
 		private int GetIndexByFrame(int frame)

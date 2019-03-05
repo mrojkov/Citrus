@@ -42,10 +42,10 @@ namespace Tangerine.UI.Inspector
 			Awoke += Awake;
 		}
 
-		public void SetEasing(EasingFunction function, EasingType type)
+		public void SetEasing(EasingFunction function, EasingType type, int softness)
 		{
 			image.Visible = true;
-			image.Texture = EasingIcons.Instance.Get(function, type);
+			image.Texture = EasingIcons.Instance.Get(function, type, softness);
 		}
 	}
 
@@ -62,38 +62,47 @@ namespace Tangerine.UI.Inspector
 
 		public IEnumerator<object> Task()
 		{
-			var easingDataflow = KeyframeDataflow.GetProvider(editorParams, i => (i?.EasingFunction, i?.EasingType)).DistinctUntilChanged().GetDataflow();
+			var easingDataflow = KeyframeDataflow.GetProvider(editorParams, i => i?.Params).DistinctUntilChanged().GetDataflow();
 			while (true) {
 				if (easingDataflow.Poll(out var kf)) {
-					if (kf.EasingFunction.HasValue) {
-						button.SetEasing(kf.EasingFunction.Value, kf.EasingType.Value);
+					if (kf.HasValue) {
+						button.SetEasing(kf.Value.EasingFunction, kf.Value.EasingType, kf.Value.EasingSoftness);
 					}
-					button.Checked = kf.EasingFunction.HasValue;
+					button.Checked = kf.HasValue;
 				}
 				bool wasClicked = button.WasClicked();
 				bool wasRightClicked = button.WasRightClicked();
 				if (CoreUserPreferences.Instance.SwapMouseButtonsForKeyframeSwitch) {
 					Toolbox.Swap(ref wasClicked, ref wasRightClicked);
 				}
-				if (wasClicked && kf.EasingFunction.HasValue) {
+				if (wasClicked && kf.HasValue) {
 					var menu = new Menu();
 					foreach (var i in Enum.GetNames(typeof(EasingFunction))) {
 						var func = (EasingFunction)menu.Count;
-						var cmd = new Command { Text = i, Checked = kf.EasingFunction.Value == func };
+						var cmd = new Command { Text = i, Checked = kf.Value.EasingFunction == func };
 						cmd.Issued += () => {
-							Document.Current.History.DoTransaction(() => SetFunction(func));
+							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingFunction = func));
 						};
 						menu.Add(cmd);
 					}
 					menu.Popup();
 				}
-				if (wasRightClicked && kf.EasingType.HasValue) {
+				if (wasRightClicked && kf.HasValue) {
 					var menu = new Menu();
 					foreach (var i in Enum.GetNames(typeof(EasingType))) {
 						var type = (EasingType)menu.Count;
-						var cmd = new Command { Text = i, Checked = kf.EasingType.Value == type };
+						var cmd = new Command { Text = i, Checked = kf.Value.EasingType == type };
 						cmd.Issued += () => {
-							Document.Current.History.DoTransaction(() => SetType(type));
+							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingType = type));
+						};
+						menu.Add(cmd);
+					}
+					menu.Add(Command.MenuSeparator);
+					for (int softness = 0; softness <= 100; softness += 10) {
+						var cmd = new Command { Text = $"Softness {softness}%", Checked = kf.Value.EasingSoftness == softness };
+						var softnessCopy = softness;
+						cmd.Issued += () => {
+							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingSoftness = softnessCopy));
 						};
 						menu.Add(cmd);
 					}
@@ -103,23 +112,12 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		internal void SetFunction(EasingFunction value)
+		private void ProcessKeyframe(Action<IKeyframe> processor)
 		{
 			foreach (var animable in editorParams.RootObjects.OfType<IAnimationHost>()) {
 				if (animable.Animators.TryFind(editorParams.PropertyPath, out var animator, Document.Current.AnimationId)) {
 					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
-					keyframe.EasingFunction = value;
-					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
-				}
-			}
-		}
-
-		internal void SetType(EasingType value)
-		{
-			foreach (var animable in editorParams.RootObjects.OfType<IAnimationHost>()) {
-				if (animable.Animators.TryFind(editorParams.PropertyPath, out var animator, Document.Current.AnimationId)) {
-					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
-					keyframe.EasingType = value;
+					processor(keyframe);
 					Core.Operations.SetKeyframe.Perform(animable, editorParams.PropertyPath, Document.Current.AnimationId, keyframe);
 				}
 			}
