@@ -32,7 +32,7 @@ namespace Lime
 		public OggDecoder(Stream stream)
 		{
 			this.stream = stream;
-			fileSystem = new Lemon.Api.FileSystem { 
+			fileSystem = new Lemon.Api.FileSystem {
 				ReadFunc = OggRead, CloseFunc = OggClose,
 				SeekFunc = OggSeek, TellFunc = OggTell
 			};
@@ -56,40 +56,28 @@ namespace Lime
 			return result;
 		}
 
-		public void Dispose()
-		{
-			if (stream != null) {
-				stream.Dispose();
-				stream = null;
-			}
-			if (oggFile != IntPtr.Zero) {
-				Lemon.Api.OggDispose(oggFile);
-				oggFile = IntPtr.Zero;
-			}
-			if (handle != 0) {
-				streamMap.Release(handle);
-				handle = 0;
-			}
-		}
-
 		public AudioFormat GetFormat()
 		{
+			ThrowIfDisposed();
 			int channels = Lemon.Api.OggGetChannels(oggFile);
 			return channels == 1 ? AudioFormat.Mono16 : AudioFormat.Stereo16;
 		}
 
 		public int GetFrequency()
 		{
+			ThrowIfDisposed();
 			return Lemon.Api.OggGetFrequency(oggFile);
 		}
 
 		public int GetCompressedSize()
 		{
+			ThrowIfDisposed();
 			return (int)stream.Length;
 		}
 
 		public void Rewind()
 		{
+			ThrowIfDisposed();
 			Lemon.Api.OggResetToBeginning(oggFile);
 		}
 
@@ -100,6 +88,7 @@ namespace Lime
 
 		public int ReadBlocks(IntPtr buffer,int startIndex,int blockCount)
 		{
+			ThrowIfDisposed();
 			int actualCount = 0;
 			int requestCount = blockCount;
 			while (true) {
@@ -117,7 +106,7 @@ namespace Lime
 
 		[ThreadStatic]
 		static byte[] block;
-		
+
 #if iOS
 		[MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
@@ -147,7 +136,7 @@ namespace Lime
 			var stream = streamMap[handle];
 			return (int)stream.Position;
 		}
-		
+
 #if iOS
 		[MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
@@ -156,7 +145,7 @@ namespace Lime
 			var stream = streamMap[handle];
 			return (int)stream.Seek(offset, whence);
 		}
-		
+
 #if iOS
 		[MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
 #endif
@@ -166,6 +155,50 @@ namespace Lime
 			stream.Close();
 			return 0;
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue) {
+				if (disposing) {
+					if (stream != null) {
+						stream.Dispose();
+					}
+				}
+
+				if (oggFile != IntPtr.Zero) {
+					Lemon.Api.OggDispose(oggFile);
+					oggFile = IntPtr.Zero;
+				}
+				if (handle != 0) {
+					streamMap.Release(handle);
+					handle = 0;
+				}
+
+				disposedValue = true;
+			}
+		}
+
+		~OggDecoder()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected void ThrowIfDisposed()
+		{
+			if (disposedValue) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
+		}
+		#endregion
 	}
 
 	class StreamMap
@@ -207,7 +240,9 @@ namespace Lime
 
 		public Stream this[int slot] {
 			get {
-				return map[slot];
+				lock (map) {
+					return map[slot];
+				}
 			}
 		}
 	}
