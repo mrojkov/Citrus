@@ -7398,10 +7398,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (7 == fd.OurIndex) {
-				result.Overlays = (global::System.Collections.Generic.List<global::Lime.ShadowParams>)null;
 				var tmp6 = d.Reader.ReadInt32();
 				if (tmp6 >= 0) {
-					result.Overlays = new global::System.Collections.Generic.List<global::Lime.ShadowParams>();
 					while (--tmp6 >= 0) {
 						var tmp7 = (global::Lime.ShadowParams)dg.ReadObject<global::Lime.ShadowParams>();
 						result.Overlays.Add(tmp7);
@@ -7410,10 +7408,8 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (8 == fd.OurIndex) {
-				result.Shadows = (global::System.Collections.Generic.List<global::Lime.ShadowParams>)null;
 				var tmp8 = d.Reader.ReadInt32();
 				if (tmp8 >= 0) {
-					result.Shadows = new global::System.Collections.Generic.List<global::Lime.ShadowParams>();
 					while (--tmp8 >= 0) {
 						var tmp9 = (global::Lime.ShadowParams)dg.ReadObject<global::Lime.ShadowParams>();
 						result.Shadows.Add(tmp9);

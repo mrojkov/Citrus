@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Collections;
 
 namespace Lime
 {
@@ -290,19 +291,21 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public List<ShadowParams> Shadows { get; set; }
+		public ShadowCollection Shadows { get; private set; }
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public InnerShadowCollection InnerShadows { get; private set; }
+		public ShadowCollection InnerShadows { get; private set; }
 
 		[YuzuMember]
 		[TangerineGroup(GroupShadow)]
-		public List<ShadowParams> Overlays { get; set; }
+		public ShadowCollection Overlays { get; private set; }
 
 		public SignedDistanceFieldComponent()
 		{
-			InnerShadows = new InnerShadowCollection(this);
+			Shadows = new ShadowCollection(this, ShadowParams.Type.Base);
+			InnerShadows = new ShadowCollection(this, ShadowParams.Type.Inner);
+			Overlays = new ShadowCollection(this, ShadowParams.Type.Base);
 			Invalidate();
 		}
 
@@ -355,26 +358,104 @@ namespace Lime
 			return clone;
 		}
 
-		public class InnerShadowCollection : ObservableCollection<ShadowParams>
+		public class ShadowCollection : IList<ShadowParams>
 		{
+			private readonly List<ShadowParams> list = new List<ShadowParams>();
 			private readonly SignedDistanceFieldComponent owner;
+			private readonly ShadowParams.Type type;
 
-			public InnerShadowCollection(SignedDistanceFieldComponent owner)
+			internal ShadowCollection(SignedDistanceFieldComponent owner, ShadowParams.Type shadowType)
 			{
 				this.owner = owner;
+				type = shadowType;
 			}
 
-			protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+			private void RuntimeChecksBeforeInsertion(ShadowParams shadowParams)
 			{
-				if (e.Action == NotifyCollectionChangedAction.Add) {
-					foreach (var item in e.NewItems) {
-						var shadow = item as ShadowParams;
-						shadow.OwnerComponent = owner;
-						shadow.ShadowType = ShadowParams.Type.Inner;
-					}
+				if (shadowParams.OwnerComponent != null) {
+					throw new Lime.Exception("Can't adopt a ShadowParams twice.");
 				}
-				base.OnCollectionChanged(e);
 			}
+
+			public ShadowParams this[int index]
+			{
+				get
+				{
+					return list[index];
+				}
+				set {
+					RuntimeChecksBeforeInsertion(value);
+					value.OwnerComponent = owner;
+					var oldNode = list[index];
+					oldNode.OwnerComponent = null;
+					list[index] = value;
+				}
+			}
+
+			public int Count => list.Count;
+
+			public bool IsReadOnly => false;
+
+			public void Add(ShadowParams item)
+			{
+				RuntimeChecksBeforeInsertion(item);
+				item.OwnerComponent = owner;
+				item.ShadowType = type;
+				list.Add(item);
+			}
+
+			public void Clear()
+			{
+				foreach (var item in list) {
+					item.OwnerComponent = null;
+				}
+				list.Clear();
+			}
+
+			public bool Contains(ShadowParams item)
+			{
+				return IndexOf(item) >= 0;
+			}
+
+			public void CopyTo(ShadowParams[] array, int arrayIndex)
+			{
+				list.CopyTo(array, arrayIndex);
+			}
+
+			public int IndexOf(ShadowParams item)
+			{
+				return list.IndexOf(item);
+			}
+
+			public void Insert(int index, ShadowParams item)
+			{
+				RuntimeChecksBeforeInsertion(item);
+				item.OwnerComponent = owner;
+				item.ShadowType = type;
+				list.Insert(index, item);
+			}
+
+			public bool Remove(ShadowParams item)
+			{
+				int index = IndexOf(item);
+				if (index >= 0) {
+					RemoveAt(index);
+					return true;
+				}
+				return false;
+			}
+
+			public void RemoveAt(int index)
+			{
+				list[index].OwnerComponent = null;
+				list.RemoveAt(index);
+			}
+
+			public List<ShadowParams>.Enumerator GetEnumerator() => list.GetEnumerator();
+
+			IEnumerator<ShadowParams> IEnumerable<ShadowParams>.GetEnumerator() => GetEnumerator();
+
+			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 		}
 	}
 }
