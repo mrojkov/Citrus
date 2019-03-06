@@ -150,7 +150,10 @@ namespace Lime
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAnimator>())).Clear();
 			(animation.CollisionMap ?? (animation.CollisionMap = new AnimationCollisionMap())).Clear();
 			int frame = animation.Frame;
+			var totalWeight = 0f;
 			foreach (var track in animation.Tracks) {
+				totalWeight += track.Weight;
+				var blendFactor = totalWeight > 0 ? track.Weight / totalWeight : 0;
 				foreach (var a in track.Animators) {
 					a.CalcAndApply(animation.Time); // Animate track weight and so on...
 				}
@@ -163,11 +166,10 @@ namespace Lime
 					clipAnimation.AnimationEngine.CalcEffectiveAnimators(clipAnimation);
 					foreach (var a in clipAnimation.EffectiveAnimators) {
 						if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
-							a.Weight = track.Weight;
 							animation.CollisionMap.AddAnimator(a);
 							animation.EffectiveAnimators.Add(a);
 						} else {
-							masterAnimator.BlendWith(a, track.Weight);
+							masterAnimator.BlendWith(a, blendFactor);
 						}
 					}
 				}
