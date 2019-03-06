@@ -255,6 +255,9 @@ namespace Tangerine
 				RestoreDefaultAnimationEngine(Document.Current.RootNode);
 				new UpsampleAnimationTwiceEntireScene().Execute();
 				Document.Current.Save();
+				var path = Document.Current.FullPath;
+				Project.Current.CloseDocument(Document.Current);
+				Project.Current.OpenDocument(path, true);
 			}
 			catch (System.Exception e) {
 				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
