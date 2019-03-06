@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public class PlayParameters
+	public class PlayParameters : IDisposable
 	{
 		public string Path;
 		public IAudioDecoder Decoder;
@@ -14,6 +14,11 @@ namespace Lime
 		public float Priority = 0.5f;
 		public bool Looping = false;
 		public bool Paused = false;
+
+		public void Dispose()
+		{
+			Decoder?.Dispose();
+		}
 	}
 
 	public static class AudioSystem
