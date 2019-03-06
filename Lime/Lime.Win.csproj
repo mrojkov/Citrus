@@ -358,7 +358,6 @@
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFSimpleTextPresenter.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SignedDistanceFieldComponent.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderObject.cs" />
     <Compile Include="Source\Widgets\Text\TextStyle.cs" />

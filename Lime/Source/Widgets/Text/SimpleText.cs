@@ -1,3 +1,4 @@
+using Lime.SignedDistanceField;
 using System;
 using System.Collections.Generic;
 using Yuzu;
@@ -265,15 +266,28 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			PrepareSpriteListAndSyncCaret();
-			var ro = RenderObjectPool<TextRenderObject>.Acquire();
-			ro.LocalToWorldTransform = LocalToWorldTransform;
-			ro.Blending = Blending;
-			ro.Shader = Shader;
-			ro.SpriteList = spriteList;
-			ro.GradientMapIndex = GradientMapIndex;
-			ro.RenderMode = RenderMode;
-			ro.Color = GlobalColor * textColor;
-			return ro;
+			var component = Components.Get<SignedDistanceFieldComponent>();
+			if (component == null) {
+				var ro = RenderObjectPool<TextRenderObject>.Acquire();
+				ro.LocalToWorldTransform = LocalToWorldTransform;
+				ro.Blending = Blending;
+				ro.Shader = Shader;
+				ro.SpriteList = spriteList;
+				ro.GradientMapIndex = GradientMapIndex;
+				ro.RenderMode = RenderMode;
+				ro.Color = GlobalColor * textColor;
+				return ro;
+			} else {
+				var ro = SDFRenderObject.GetRenderObject(component);
+				foreach (var item in ro.Objects) {
+					item.LocalToWorldTransform = LocalToWorldTransform;
+					item.Blending = Blending;
+					item.Shader = Shader;
+					item.SpriteList = spriteList;
+					item.Color = GlobalColor * TextColor;
+				}
+				return ro;
+			}
 		}
 
 		void IText.SyncCaretPosition()
@@ -331,12 +345,6 @@ namespace Lime
 			fontHeight *= ratio;
 			spacing *= ratio;
 			base.StaticScale(ratio, roundCoordinates);
-		}
-
-		public SpriteList GetSpriteList()
-		{
-			PrepareSpriteListAndExtent();
-			return spriteList;
 		}
 
 		private static CaretPosition dummyCaret = new CaretPosition();

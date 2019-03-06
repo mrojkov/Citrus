@@ -309,31 +309,6 @@ namespace Lime
 			Invalidate();
 		}
 
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (oldOwner != null) {
-				DettachFromNode(oldOwner);
-			}
-			if (Owner != null) {
-				AttachToNode(Owner);
-			}
-		}
-
-		private void AttachToNode(Node node)
-		{
-			if (node is SimpleText) {
-				node.Presenter = new SDFSimpleTextPresenter();
-			}
-		}
-
-		private void DettachFromNode(Node node)
-		{
-			if (node is SimpleText) {
-				node.Presenter = DefaultPresenter.Instance;
-			}
-		}
-
 		private void Invalidate()
 		{
 			if (materialProvider != null) {
