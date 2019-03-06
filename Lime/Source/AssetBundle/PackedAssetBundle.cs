@@ -68,14 +68,6 @@ namespace Lime
 			}
 		}
 
-		protected override void Dispose(bool disposing)
-		{
-			if (stream != null) {
-				bundle.ReleaseStream(stream);
-				stream = null;
-			}
-		}
-
 		public override bool CanSeek {
 			get {
 				return true;
@@ -84,6 +76,7 @@ namespace Lime
 
 		public override int Read(byte[] buffer, int offset, int count)
 		{
+			ThrowIfDisposed();
 			count = Math.Min(count, descriptor.Length - position);
 			if (count > 0) {
 				count = stream.Read(buffer, offset, count);
@@ -98,6 +91,7 @@ namespace Lime
 
 		public override long Seek(long offset, SeekOrigin origin)
 		{
+			ThrowIfDisposed();
 			if (origin == SeekOrigin.Begin) {
 				position = (int)offset;
 			} else if (origin == SeekOrigin.Current) {
@@ -124,6 +118,33 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
+
+		#region IDisposable Support
+		private bool disposedValue;
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposedValue) {
+				if (stream != null) {
+					bundle.ReleaseStream(stream);
+					stream = null;
+				}
+				disposedValue = true;
+			}
+		}
+
+		~AssetStream()
+		{
+			Dispose(false);
+		}
+
+		private void ThrowIfDisposed()
+		{
+			if (disposedValue) {
+				throw new ObjectDisposedException(GetType().Name);
+			}
+		}
+		#endregion
 	}
 
 	[Flags]
