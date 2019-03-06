@@ -106,10 +106,14 @@ namespace Orange
 			var pvrPath = Toolbox.GetTempFilePathWithExtension(".pvr");
 			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
 			try {
-				if (hasAlpha) {
-					bitmap = TextureConverterUtils.BleedAlpha(bitmap);
+				Bitmap bledBitmap = null;
+				if (bitmap.HasAlpha) {
+					bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
 				}
-				TextureConverterUtils.SaveToTGA(bitmap, tgaPath, swapRedAndBlue: true);
+				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: true);
+				if (bledBitmap != null && bledBitmap != bitmap) {
+					bledBitmap.Dispose();
+				}
 				if (mipMaps) {
 					args.Append(" -m");
 				}
