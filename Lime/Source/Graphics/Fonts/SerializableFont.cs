@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Yuzu;
 
 namespace Lime
@@ -108,16 +108,12 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				string[] fontExtensions = { ".tft", ".fnt" };
-				foreach (var e in fontExtensions) {
-					string path = DefaultFontDirectory + name + e;
-					if (!AssetBundle.Initialized || !AssetBundle.Current.FileExists(path))
-						continue;
-					font = Serialization.ReadObject<Font>(path);
-					fonts[name] = font;
-					return font;
+				if (!AssetBundle.Initialized || !TryFindName(ref name)) {
+					return Null;
 				}
-				return Null;
+				font = Serialization.ReadObject<Font>($"{DefaultFontDirectory}{name}");
+				fonts[name] = font;
+				return font;
 			}
 		}
 
@@ -141,6 +137,24 @@ namespace Lime
 			foreach (var font in fonts.Values) {
 				font.ClearCache();
 			}
+		}
+
+		private bool TryFindName(ref string name)
+		{
+			var fontPaths = AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft"));
+			if (fontPaths.Contains(name)) {
+				return true;
+			}
+			// Look through all the paths to find one containing font with the same name.
+			// Deprecated, should be removed once formerly serialized values
+			// are updated for all other projects.
+			foreach (var path in fontPaths) {
+				if (System.IO.Path.GetFileNameWithoutExtension(path) == name) {
+					name = path;
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

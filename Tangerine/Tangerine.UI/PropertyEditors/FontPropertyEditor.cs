@@ -17,19 +17,25 @@ namespace Tangerine.UI
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Current.EnumerateFiles("Fonts").
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
-				Select(i => new DropDownList.Item(Path.ChangeExtension(Path.GetFileName(i), null)));
+				Select(i => new DropDownList.Item(GetFontNameWithoutExtension(i), i));
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
 
 			var current = CoalescedPropertyValue().GetValue();
-			selector.Text = current.IsDefined ? GetFontName(current.Value) : ManyValuesText;
+			selector.Text = current.IsDefined ? GetFontNameWithoutExtension(current.Value) : ManyValuesText;
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
-				selector.Text = i.IsDefined ? GetFontName(i.Value) : ManyValuesText;
+				selector.Text = i.IsDefined ? GetFontNameWithoutExtension(i.Value) : ManyValuesText;
 			});
+		}
+
+		protected override void EnabledChanged()
+		{
+			base.EnabledChanged();
+			selector.Enabled = Enabled;
 		}
 
 		private static string GetFontName(SerializableFont i)
@@ -37,10 +43,14 @@ namespace Tangerine.UI
 			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
 		}
 
-		protected override void EnabledChanged()
+		private static string GetFontNameWithoutExtension(SerializableFont i)
 		{
-			base.EnabledChanged();
-			selector.Enabled = Enabled;
+			return GetFontNameWithoutExtension(GetFontName(i));
+		}
+
+		private static string GetFontNameWithoutExtension(string s)
+		{
+			return Path.ChangeExtension(s, null);
 		}
 	}
 }
