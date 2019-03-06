@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections;
+using System;
 
 namespace Lime
 {
@@ -333,7 +334,50 @@ namespace Lime
 			return clone;
 		}
 
-		public class ShadowCollection : IList<ShadowParams>
+		public SDFRenderObjectList GetRenderObject()
+		{
+			var roList = RenderObjectPool<SDFRenderObjectList>.Acquire();
+			if (Shadows != null) {
+				foreach (var s in Shadows) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFRenderObject>.Acquire();
+					ro.MaterialProvider = s.MaterialProvider;
+					ro.Offset = ((SDFShadowMaterialProvider)s.MaterialProvider).Offset;
+					roList.Objects.Add(ro);
+				}
+			}
+			var mainRO = RenderObjectPool<SDFRenderObject>.Acquire();
+			mainRO.MaterialProvider = MaterialProvider;
+			mainRO.Offset = Vector2.Zero;
+			roList.Objects.Add(mainRO);
+			if (InnerShadows != null) {
+				foreach (var s in InnerShadows) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFRenderObject>.Acquire();
+					ro.MaterialProvider = s.MaterialProvider;
+					ro.Offset = Vector2.Zero;
+					roList.Objects.Add(ro);
+				}
+			}
+			if (Overlays != null) {
+				foreach (var s in Overlays) {
+					if (!s.Enabled) {
+						continue;
+					}
+					var ro = RenderObjectPool<SDFRenderObject>.Acquire();
+					ro.MaterialProvider = s.MaterialProvider;
+					ro.Offset = ((SDFShadowMaterialProvider)s.MaterialProvider).Offset;
+					roList.Objects.Add(ro);
+				}
+			}
+			return roList;
+		}
+
+		public class ShadowCollection : IList<ShadowParams>, IList
 		{
 			private readonly List<ShadowParams> list = new List<ShadowParams>();
 			private readonly SignedDistanceFieldComponent owner;
@@ -370,6 +414,14 @@ namespace Lime
 			public int Count => list.Count;
 
 			public bool IsReadOnly => false;
+
+			public bool IsFixedSize => ((IList)list).IsFixedSize;
+
+			public object SyncRoot => ((IList)list).SyncRoot;
+
+			public bool IsSynchronized => ((IList)list).IsSynchronized;
+
+			object IList.this[int index] { get => ((IList)list)[index]; set => ((IList)list)[index] = value; }
 
 			public void Add(ShadowParams item)
 			{
@@ -431,6 +483,36 @@ namespace Lime
 			IEnumerator<ShadowParams> IEnumerable<ShadowParams>.GetEnumerator() => GetEnumerator();
 
 			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+			public int Add(object value)
+			{
+				return ((IList)list).Add(value);
+			}
+
+			public bool Contains(object value)
+			{
+				return ((IList)list).Contains(value);
+			}
+
+			public int IndexOf(object value)
+			{
+				return ((IList)list).IndexOf(value);
+			}
+
+			public void Insert(int index, object value)
+			{
+				((IList)list).Insert(index, value);
+			}
+
+			public void Remove(object value)
+			{
+				((IList)list).Remove(value);
+			}
+
+			public void CopyTo(Array array, int index)
+			{
+				((IList)list).CopyTo(array, index);
+			}
 		}
 	}
 }

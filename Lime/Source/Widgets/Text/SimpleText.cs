@@ -278,7 +278,7 @@ namespace Lime
 				ro.Color = GlobalColor * textColor;
 				return ro;
 			} else {
-				var ro = SDFRenderObject.GetRenderObject(component);
+				var ro = component.GetRenderObject();
 				foreach (var item in ro.Objects) {
 					item.LocalToWorldTransform = LocalToWorldTransform;
 					item.Blending = Blending;
@@ -527,35 +527,5 @@ namespace Lime
 			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}
-
-		//internal class RenderObject : TextRenderObject
-		//{
-		//	public int GradientMapIndex;
-		//	public RenderingMode RenderMode;
-
-		//	public override void Render()
-		//	{
-		//		Renderer.Transform1 = LocalToWorldTransform;
-		//		if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
-		//			SpriteList.Render(Color, Blending, Shader);
-		//		} else {
-		//			if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
-		//				ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
-		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-		//			}
-
-		//			if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
-		//				ColorfulMaterialProvider.Instance.Init(
-		//					Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
-		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-		//			}
-		//		}
-		//	}
-
-		//	protected override void OnRelease()
-		//	{
-		//		SpriteList = null;
-		//	}
-		//}
 	}
 }

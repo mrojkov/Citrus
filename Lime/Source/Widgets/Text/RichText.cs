@@ -192,7 +192,7 @@ namespace Lime
 				var style = renderer.Styles[i];
 				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
 				if (sdfComponent != null) {
-					var sdfRO = SignedDistanceField.SDFRenderObject.GetRenderObject(sdfComponent);
+					var sdfRO = sdfComponent.GetRenderObject();
 					foreach (var obj in sdfRO.Objects) {
 						obj.SpriteList = spriteLists[i];
 						obj.Color = GlobalColor;
