@@ -17,7 +17,6 @@ namespace Lime.SignedDistanceField
 		public float Dilate { get; set; } = 0f;
 		public float Softness { get; set; } = 0f;
 		public Color4 Color { get; set; } = Color4.Black;
-		public Vector2 Offset { get; set; } = new Vector2();
 
 		public int PassCount => 1;
 
@@ -53,7 +52,6 @@ namespace Lime.SignedDistanceField
 				Dilate = Dilate,
 				Color = Color,
 				Softness = Softness,
-				Offset = Offset,
 			};
 		}
 	}
@@ -61,6 +59,7 @@ namespace Lime.SignedDistanceField
 	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider
 	{
 		public SDFShadowMaterial Material = new SDFShadowMaterial();
+		public Vector2 Offset { get; set; }
 		public IMaterial GetMaterial(int tag) => Material;
 
 		public Sprite.IMaterialProvider Clone() => new SDFShadowMaterialProvider() {

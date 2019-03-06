@@ -3,32 +3,24 @@ using System.Collections.Generic;
 
 namespace Lime.SignedDistanceField
 {
-
-	public abstract class BaseSDFRenderObject : TextRenderObject
+	internal class BaseSDFRenderObject : TextRenderObject
 	{
-		protected void RenderSpriteList(Sprite.IMaterialProvider materialProvider, Vector2 offset)
-		{
-			if (offset.X != 0f || offset.Y != 0f) {
-				Renderer.Transform1 = Matrix32.Translation(offset) * LocalToWorldTransform;
-			} else {
-				Renderer.Transform1 = LocalToWorldTransform;
-			}
-			SpriteList.Render(Color, materialProvider);
-		}
+		public Sprite.IMaterialProvider MaterialProvider;
 
-		protected void RenderSpriteList(Sprite.IMaterialProvider materialProvider)
+		public override void Render()
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
-			SpriteList.Render(Color, materialProvider);
+			SpriteList.Render(Color, MaterialProvider);
 		}
 
 		protected override void OnRelease()
 		{
+			MaterialProvider = null;
 			base.OnRelease();
 		}
 	}
 
-	internal class SDFShadowRenderObject : BaseSDFRenderObject
+	internal class SDFShadowRenderObject : TextRenderObject
 	{
 		private SDFShadowMaterialProvider materialProvider;
 
@@ -39,49 +31,8 @@ namespace Lime.SignedDistanceField
 
 		public override void Render()
 		{
-			RenderSpriteList(materialProvider, materialProvider.Material.Offset);
-		}
-
-		protected override void OnRelease()
-		{
-			materialProvider = null;
-			base.OnRelease();
-		}
-	}
-
-	internal class SDFInnerShadowRenderObject : BaseSDFRenderObject
-	{
-		private SDFInnerShadowMaterialProvider materialProvider;
-
-		public void Init(ShadowParams shadowParams)
-		{
-			materialProvider = shadowParams.MaterialProvider as SDFInnerShadowMaterialProvider;
-		}
-
-		public override void Render()
-		{
-			RenderSpriteList(materialProvider, materialProvider.Material.Offset);
-		}
-
-		protected override void OnRelease()
-		{
-			materialProvider = null;
-			base.OnRelease();
-		}
-	}
-
-	internal class SDFMainRenderObject : BaseSDFRenderObject
-	{
-		private SDFMaterialProvider materialProvider;
-
-		public void Init(SignedDistanceFieldComponent component)
-		{
-			materialProvider = component.MaterialProvider;
-		}
-
-		public override void Render()
-		{
-			RenderSpriteList(materialProvider);
+			Renderer.Transform1 = Matrix32.Translation(materialProvider.Offset) * LocalToWorldTransform;
+			SpriteList.Render(Color, materialProvider);
 		}
 
 		protected override void OnRelease()
@@ -93,7 +44,7 @@ namespace Lime.SignedDistanceField
 
 	public class SDFRenderObjectList : RenderObject
 	{
-		public List<BaseSDFRenderObject> Objects = new List<BaseSDFRenderObject>();
+		public List<TextRenderObject> Objects = new List<TextRenderObject>();
 
 		public override void Render()
 		{
@@ -127,16 +78,16 @@ namespace Lime.SignedDistanceField
 					roList.Objects.Add(ro);
 				}
 			}
-			var mainRO = RenderObjectPool<SDFMainRenderObject>.Acquire();
-			mainRO.Init(component);
+			var mainRO = RenderObjectPool<BaseSDFRenderObject>.Acquire();
+			mainRO.MaterialProvider = component.MaterialProvider;
 			roList.Objects.Add(mainRO);
 			if (component.InnerShadows != null) {
 				foreach (var s in component.InnerShadows) {
 					if (!s.Enabled) {
 						continue;
 					}
-					var ro = RenderObjectPool<SDFInnerShadowRenderObject>.Acquire();
-					ro.Init(s);
+					var ro = RenderObjectPool<BaseSDFRenderObject>.Acquire();
+					ro.MaterialProvider = s.MaterialProvider;
 					roList.Objects.Add(ro);
 				}
 			}

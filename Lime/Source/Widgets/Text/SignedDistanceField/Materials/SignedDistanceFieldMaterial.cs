@@ -109,80 +109,10 @@ namespace Lime.SignedDistanceField
 			};
 		}
 
-
-		public static int GetHashCode(
-			float dilate,
-			float thickness,
-			Color4 outlineColor,
-			bool gradientEnabled,
-			ColorGradient gradient,
-			float gradientAngle
-		)
-		{
-			unchecked {
-				int hash = (int)2166136261;
-				hash = (hash * 16777619) ^ dilate.GetHashCode();
-				hash = (hash * 16777619) ^ thickness.GetHashCode();
-				hash = (hash * 16777619) ^ outlineColor.GetHashCode();
-				hash = (hash * 16777619) ^ gradientEnabled.GetHashCode();
-				if (gradientEnabled) {
-					hash = (hash * 16777619) ^ gradient.GetHashCode();
-					hash = (hash * 16777619) ^ gradientAngle.GetHashCode();
-				}
-				return hash;
-			}
-		}
-
-		public override int GetHashCode()
-		{
-			return GetHashCode(
-				Dilate,
-				Thickness,
-				OutlineColor,
-				GradientEnabled,
-				Gradient,
-				GradientAngle
-			);
-		}
 	}
 
 	public class SDFMaterialProvider : Sprite.IMaterialProvider
 	{
-		private static Dictionary<int, SDFMaterialProvider> cache = new Dictionary<int, SDFMaterialProvider>();
-
-		public static SDFMaterialProvider GetProvider(
-			float dilate,
-			float thickness,
-			Color4 outlineColor,
-			bool gradientEnabled,
-			ColorGradient gradient,
-			float gradientAngle
-		)
-		{
-			int hash = SignedDistanceFieldMaterial.GetHashCode(
-				dilate,
-				thickness,
-				outlineColor,
-				gradientEnabled,
-				gradient,
-				gradientAngle
-			);
-			SDFMaterialProvider result;
-			if (cache.TryGetValue(hash, out result)) {
-				return result;
-			} else {
-				result = new SDFMaterialProvider();
-				result.Material.Dilate = dilate;
-				result.Material.Thickness = thickness;
-				result.Material.OutlineColor = outlineColor;
-				result.Material.GradientEnabled = gradientEnabled;
-				result.Material.Gradient = gradient;
-				result.Material.GradientAngle = gradientAngle;
-				cache.Add(hash, result);
-				return result;
-			}
-		}
-
 		public SignedDistanceFieldMaterial Material = new SignedDistanceFieldMaterial();
 		public IMaterial GetMaterial(int tag) => Material;
 

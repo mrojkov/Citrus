@@ -144,7 +144,7 @@ namespace Lime.SignedDistanceField
 				result.Material.Dilate = key.Dilate;
 				result.Material.Softness = key.Softness;
 				result.Material.Color = key.Color;
-				result.Material.Offset = key.Offset;
+				result.Offset = key.Offset;
 				shadowMaterialsCache.Add(key, result);
 				return result;
 			}
