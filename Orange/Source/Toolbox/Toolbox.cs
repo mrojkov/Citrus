@@ -11,18 +11,8 @@ namespace Orange
 	public static class Toolbox
 	{
 		private static readonly char[] CmdArgumentDelimiters = { ':' };
-		private static readonly TangerineFlags[] ignoredTangerineFlags;
-
 		static Toolbox()
 		{
-			var tmpList = new List<TangerineFlags>();
-			foreach (Enum value in Enum.GetValues(typeof(TangerineFlags))) {
-				var memberInfo = typeof(TangerineFlags).GetMember(value.ToString())[0];
-				if (memberInfo.GetCustomAttribute<TangerineIgnoreAttribute>(false) != null) {
-					tmpList.Add((TangerineFlags)value);
-				}
-			}
-			ignoredTangerineFlags = tmpList.ToArray();
 		}
 
 		public static string ToWindowsSlashes(string path)
@@ -111,11 +101,32 @@ namespace Orange
 		public static Node CreateCloneForSerialization(Node node)
 		{
 			var clone = node.Clone();
-			List<(Node, TangerineFlags)> savedNodesAndTangerineFlags = new List<(Node, TangerineFlags)>();
-			Action<Node> f = (n) => {
-				foreach (var tangerineFlag in ignoredTangerineFlags) {
-					n.SetTangerineFlag(tangerineFlag, false);
+			var savedNodesAndTangerineFlags = new List<(Node, TangerineFlags)>();
+
+			CleanNode(clone);
+			SaveAndSetFlags(clone);
+			foreach (var n in clone.Descendants) {
+				CleanNode(n);
+				SaveAndSetFlags(n);
+			}
+			clone.Update(0);
+			foreach (var (n, nTangerineFlags) in savedNodesAndTangerineFlags) {
+				n.TangerineFlags = nTangerineFlags;
+				// Make Sure ParticleModifers' animators are at 0.0f AGAIN
+				// Since Update(0) could spawn and advance some particle beacuse of ParticleEmitter.TimeShift
+				if (n is ParticleModifier pm) {
+					pm.Animators.Apply(0.0);
 				}
+			}
+			// Need to clean the clone twice, because in Update() there can be logic that
+			// creates some content for external scenes.
+			CleanNode(clone);
+			foreach (var n in clone.Descendants) {
+				CleanNode(n);
+			}
+			void CleanNode(Node n)
+			{
+				n.SetTangerineFlag(~TangerineFlags.SerializableMask, false);
 				n.RemoveAnimatorsForExternalAnimations();
 				foreach (var animation in n.Animations) {
 					animation.Frame = 0;
@@ -144,25 +155,15 @@ namespace Orange
 				if (n is ParticleModifier pm) {
 					pm.Animators.Apply(0.0);
 				}
+			}
+			void SaveAndSetFlags(Node n)
+			{
 				// saving flags and setting all nodes' flags to shown
 				// to force globally visible on all nodes to ensure advance animation
 				// from Update(0.0f) further will be applied to all nodes
 				savedNodesAndTangerineFlags.Add((n, n.TangerineFlags));
-				n.TangerineFlags &= ~TangerineFlags.Hidden;
-				n.TangerineFlags |= TangerineFlags.Shown;
-			};
-			f(clone);
-			foreach (var n in clone.Descendants) {
-				f(n);
-			}
-			clone.Update(0);
-			foreach (var (n, tangerineFlags) in savedNodesAndTangerineFlags) {
-				n.TangerineFlags = tangerineFlags;
-				// Make Sure ParticleModifers' animators are at 0.0f AGAIN
-				// Since Update(0) could spawn and advance some particle beacuse of ParticleEmitter.TimeShift
-				if (n is ParticleModifier pm) {
-					pm.Animators.Apply(0.0);
-				}
+				n.SetTangerineFlag(TangerineFlags.Hidden, false);
+				n.SetTangerineFlag(TangerineFlags.Shown, true);
 			}
 			return clone;
 		}
