@@ -30,9 +30,9 @@ namespace Lime
 			RenderChainBuilder = null;
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = (SplineGear)base.Clone();
+			var clone = (SplineGear)base.CloneInternal();
 			clone.WidgetRef = clone.WidgetRef?.Clone();
 			clone.SplineRef = clone.SplineRef?.Clone();
 			return clone;

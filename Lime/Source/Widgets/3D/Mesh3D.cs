@@ -203,9 +203,9 @@ namespace Lime
 			Clicked();
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = base.Clone() as Mesh3D;
+			var clone = base.CloneInternal() as Mesh3D;
 			clone.Submeshes = Submeshes.Clone(clone);
 			clone.BoundingSphere = BoundingSphere;
 			clone.Center = Center;

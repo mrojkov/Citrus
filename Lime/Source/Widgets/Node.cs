@@ -743,7 +743,23 @@ namespace Lime
 		/// <summary>
 		/// Returns a clone of the node hierarchy.
 		/// </summary>
-		public virtual Node Clone()
+		public Node Clone()
+		{
+			foreach (var c in Components) {
+				c.OnBeforeClone();
+			}
+			var clone = CloneInternal();
+			clone.Components = new NodeComponentCollection(clone);
+			foreach (var c in Components) {
+				clone.Components.Add(c.Clone());
+			}
+			foreach (var c in Components) {
+				c.OnAfterClone();
+			}
+			return clone;
+		}
+
+		protected virtual Node CloneInternal()
 		{
 			var clone = (Node)MemberwiseClone();
 			++CreatedCount;
@@ -763,7 +779,6 @@ namespace Lime
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;
 			clone.LateBehaviours = NodeComponentCollection.EmptyBehaviors;
-			clone.Components = Components.Clone(clone);
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
@@ -1341,23 +1356,11 @@ namespace Lime
 
 		public void ReplaceContent(Node content)
 		{
+			foreach (var c in content.Components) {
+				c.OnBeforeClone();
+			}
 			var nodeType = GetType();
 			var contentType = content.GetType();
-			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
-				// Handle legacy case: Replace Button content by external Frame
-				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
-					Components.Remove(typeof(AssetBundlePathComponent));
-					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
-					if (assetBundlePathComponent != null) {
-						Components.Add(assetBundlePathComponent.Clone());
-					}
-				} else {
-					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
-				}
-			} else {
-				Components = content.Components.Clone(this);
-			}
-
 			if (content is IExternalScenePropertyOverrideChecker coordinator) {
 				var properties = nodeType.GetProperties(
 					BindingFlags.Instance |
@@ -1397,6 +1400,26 @@ namespace Lime
 			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
 			Presenter = content.Presenter?.Clone();
 			PostPresenter = content.PostPresenter?.Clone();
+			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
+				// Handle legacy case: Replace Button content by external Frame
+				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
+					Components.Remove(typeof(AssetBundlePathComponent));
+					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
+					if (assetBundlePathComponent != null) {
+						Components.Add(assetBundlePathComponent.Clone());
+					}
+				} else {
+					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
+				}
+			} else {
+				Components.Clear();
+				foreach (var c in content.Components) {
+					Components.Add(c.Clone());
+				}
+			}
+			foreach (var c in content.Components) {
+				c.OnAfterClone();
+			}
 		}
 
 		private static readonly string[] sceneExtensions = { ".scene", ".t3d", ".tan" };

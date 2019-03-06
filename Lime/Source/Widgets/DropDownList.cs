@@ -59,9 +59,9 @@ namespace Lime
 			Awoke += owner => owner.Tasks.Add(((CommonDropDownList)owner).Loop());
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = (CommonDropDownList)base.Clone();
+			var clone = (CommonDropDownList)base.CloneInternal();
 			clone.TextWidgetRef = clone.TextWidgetRef?.Clone();
 			return clone;
 		}

@@ -13,9 +13,9 @@ namespace Lime
 			RebuildSkeleton();
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var model = base.Clone() as Model3D;
+			var model = base.CloneInternal() as Model3D;
 			model.RebuildSkeleton();
 			return model;
 		}

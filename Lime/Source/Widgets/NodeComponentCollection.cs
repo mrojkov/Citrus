@@ -41,6 +41,8 @@ namespace Lime
 			}
 		}
 
+		protected internal virtual void OnBeforeClone() { }
+		protected internal virtual void OnAfterClone() { }
 		protected virtual void OnOwnerChanged(Node oldOwner) { }
 
 		public virtual NodeComponent Clone()
@@ -70,15 +72,6 @@ namespace Lime
 		public NodeComponentCollection(Node owner)
 		{
 			this.owner = owner;
-		}
-
-		public NodeComponentCollection Clone(Node newOwner)
-		{
-			var result = new NodeComponentCollection(newOwner);
-			foreach (var c in this) {
-				result.Add(c.Clone());
-			}
-			return result;
 		}
 
 		public override void Add(NodeComponent component)
