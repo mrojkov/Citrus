@@ -67,28 +67,28 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumSoftness, MaximumSoftness)]
 		public float Softness
 		{
 			get => softness;
 			set {
-				var clamped = Mathf.Clamp(value, MinimumSoftness, MaximumSoftness);
-				if (softness != clamped) {
+				if (softness != value) {
 					materialProvider = null;
 				}
-				softness = clamped;
+				softness = value;
 			}
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumDilate, MaximumDilate)]
 		public float Dilate
 		{
 			get => dilate;
 			set {
-				var clamped = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
-				if (dilate != clamped) {
+				if (dilate != value) {
 					materialProvider = null;
 				}
-				dilate = clamped;
+				dilate = value;
 			}
 		}
 
@@ -191,35 +191,35 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]
+		[TangerineValidRange(MinimumSoftness, MaximumSoftness)]
 		public float Softness
 		{
 			get => softness;
 			set {
-				var clamped = Mathf.Clamp(value, MinimumDilate, MaximumDilate);
-				if (softness != clamped) {
+				if (softness != value) {
 					materialProvider = null;
 					foreach (var shadow in InnerShadows) {
 						shadow.InvalidateMaterial();
 					}
 				}
-				softness = clamped;
+				softness = value;
 			}
 		}
 
 		[YuzuMember]
 		[TangerineGroup(GroupFont)]
+		[TangerineValidRange(MinimumDilate, MaximumDilate)]
 		public float Dilate
 		{
 			get => dilate;
 			set {
-				var clamped =  Mathf.Clamp(value, MinimumDilate, MaximumDilate);
-				if (dilate != clamped) {
+				if (dilate != value) {
 					materialProvider = null;
 					foreach (var shadow in InnerShadows) {
 						shadow.InvalidateMaterial();
 					}
 				}
-				dilate = clamped;
+				dilate = value;
 			}
 		}
 
@@ -238,15 +238,15 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupOutline)]
+		[TangerineValidRange(MinimumThickness, MaximumThickness)]
 		public float Thickness
 		{
 			get => thickness;
 			set {
-				var clamped = Mathf.Clamp(value, MinimumThickness, MaximumThickness);
-				if (thickness != clamped) {
+				if (thickness != value) {
 					materialProvider = null;
 				}
-				thickness = clamped;
+				thickness = value;
 			}
 		}
 
