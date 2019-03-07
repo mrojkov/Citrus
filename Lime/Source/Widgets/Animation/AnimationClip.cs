@@ -43,12 +43,12 @@ namespace Lime
 
 		public double RemapTime(double time)
 		{
-			if (!Reversed) {
-				return time;
-			}
 			var relativeTime = time - AnimationUtils.FramesToSeconds(Begin - Offset);
-			var t = 1 - (float)(relativeTime / AnimationUtils.FramesToSeconds(Length));
-			return AnimationUtils.FramesToSeconds(Begin + Offset) + AnimationUtils.FramesToSeconds(Length) * t;
+			if (!Reversed) {
+				return relativeTime;
+			} else {
+				return AnimationUtils.FramesToSeconds(Length - 1) - relativeTime;
+			}
 		}
 
 		public AnimationClip Clone()
