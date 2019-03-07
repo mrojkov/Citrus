@@ -302,6 +302,7 @@ namespace Lime
 			}
 			if (@params.Function == KeyFunction.Steep) {
 				CalculatedValue = Value2;
+				return CalculatedValue;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
 			if (@params.EasingFunction != EasingFunction.Linear) {
