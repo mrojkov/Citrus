@@ -19,6 +19,7 @@ namespace Orange
 		private ThemedTextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
+		private CheckBoxWithLabel autoscrollCheckBox;
 		private Button goButton;
 		private Button abortButton;
 		private Widget footerSection;
@@ -52,6 +53,7 @@ namespace Orange
 			};
 			mainVBox.AddNode(CreateHeaderSection());
 			mainVBox.AddNode(CreateVcsSection());
+			mainVBox.AddNode(CreateAutoscrollCheckBox());
 			mainVBox.AddNode(CreateTextView());
 			progressBarField = new ProgressBarField();
 			mainVBox.AddNode(progressBarField);
@@ -87,6 +89,14 @@ namespace Orange
 		{
 			updateVcs = new CheckBoxWithLabel("Update project before build");
 			return updateVcs;
+		}
+
+		private Widget CreateAutoscrollCheckBox()
+		{
+			autoscrollCheckBox = new CheckBoxWithLabel("Autoscroll enabled");
+			autoscrollCheckBox.Checked = true;
+			
+			return autoscrollCheckBox;
 		}
 
 		private static void AddPicker(Node table, string name, Node picker)
@@ -130,7 +140,6 @@ namespace Orange
 					Clipboard.Text = textView.Text;
 				}
 			};
-
 			return textView;
 		}
 
@@ -193,7 +202,9 @@ namespace Orange
 				textView.Clear();
 			}, () => {
 				EnableControls(true);
-				The.UI.ScrollLogToEnd();
+				if ((Instance as OrangeInterface).IsAutoscrollEnabled()) {
+					The.UI.ScrollLogToEnd();
+				}
 			}, DoesNeedSvnUpdate,
 				Task.ExecuteAsync
 			);
@@ -206,6 +217,7 @@ namespace Orange
 			EnableChildren(windowWidget, value);
 			mainVBox.Enabled = true;
 			EnableChildren(mainVBox, value);
+			autoscrollCheckBox.Enabled = true;
 			footerSection.Enabled = true;
 			EnableChildren(footerSection, value);
 			abortButton.Enabled = !value;
@@ -269,6 +281,11 @@ namespace Orange
 		public override bool DoesNeedSvnUpdate()
 		{
 			return updateVcs.Checked;
+		}
+
+		public bool IsAutoscrollEnabled()
+		{
+			return autoscrollCheckBox.Checked;
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
@@ -353,7 +370,9 @@ namespace Orange
 					consoleOutput.Write(value);
 					textView.Append(value);
 				});
-				Application.InvokeOnNextUpdate(textView.ScrollToEnd);
+				if ((Instance as OrangeInterface).IsAutoscrollEnabled()) {
+					Application.InvokeOnNextUpdate(textView.ScrollToEnd);
+				}
 			}
 
 			public override Encoding Encoding { get; }
