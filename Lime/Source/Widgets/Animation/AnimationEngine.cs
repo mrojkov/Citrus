@@ -214,8 +214,8 @@ namespace Lime
 		{
 			foreach (var a in animation.EffectiveAnimators) {
 				a.Apply();
-				if (invokeTriggers) {
-					a.InvokeTrigger(animation.Frame, animation.Id, animationTimeCorrection);
+				if (invokeTriggers && a.AnimationId == animation.Id) {
+					a.InvokeTrigger(animation.Frame, animationTimeCorrection);
 				}
 			}
 		}
