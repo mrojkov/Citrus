@@ -491,6 +491,18 @@ namespace Tangerine.Core
 			}
 		}
 
+		public IEnumerable<AnimationTrack> SelectedAnimationTracks()
+		{
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					var nr = row.Components.Get<AnimationTrackRow>();
+					if (nr != null) {
+						yield return nr.Track;
+					}
+				}
+			}
+		}
+
 		public IEnumerable<IFolderItem> SelectedFolderItems()
 		{
 			foreach (var row in Rows) {

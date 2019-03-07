@@ -72,6 +72,7 @@ namespace Tangerine.UI.Timeline
 					if (Document.Current.Animation.IsCompound) {
 						menu = new Menu {
 							TimelineCommands.CreateAnimationClip,
+							TimelineCommands.SplitAnimationClip,
 						};
 					} else {
 						menu = new Menu {

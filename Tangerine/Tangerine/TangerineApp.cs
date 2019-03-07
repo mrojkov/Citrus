@@ -710,6 +710,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.ResetGlobalSettings, new ResetGlobalSettings());
 			h.Connect(GenericCommands.PurgeBackups, new PurgeBackUps());
 			h.Connect(TimelineCommands.CreateAnimationClip, () => new CreateAnimationClipDialog());
+			h.Connect(TimelineCommands.SplitAnimationClip, () => SplitAnimationClip.Perform());
 		}
 
 		private void InitializeHotkeys()
