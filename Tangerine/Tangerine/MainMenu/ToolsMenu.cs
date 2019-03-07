@@ -15,8 +15,7 @@ namespace Tangerine.MainMenu
 	{
 		public override void Execute()
 		{
-			var gs = GridSelection.GetSelectionBoundaries();
-			if (!gs.HasValue) {
+			if (!GridSelection.GetSelectionBoundaries(out var gs)) {
 				new AlertDialog("Select a range on the timeline", "Ok").Show();
 				return;
 			}
@@ -29,7 +28,7 @@ namespace Tangerine.MainMenu
 				return;
 			}
 			currentWindow.Activate();
-			WidgetContext.Current.Root.Tasks.Add(RenderPngSequenceTask(currentWindow, options, gs.Value.Left, gs.Value.Right));
+			WidgetContext.Current.Root.Tasks.Add(RenderPngSequenceTask(currentWindow, options, gs.Left, gs.Right));
 		}
 
 		private static IEnumerator<object> RenderPngSequenceTask(IWindow currentWindow, RenderToPngSequenceDialog.RenderToPngSequenceOptions options, int min, int max)
