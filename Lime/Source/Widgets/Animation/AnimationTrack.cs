@@ -9,6 +9,8 @@ namespace Lime
 	{
 		public Animation Owner { get; internal set; }
 
+		public object UserData { get; set; }
+
 		[YuzuMember]
 		public string Id { get; set; }
 
@@ -27,6 +29,21 @@ namespace Lime
 		IAnimable IAnimable.Owner { get => null; set => throw new NotSupportedException(); }
 		void IAnimationHost.OnAnimatorsChanged() { }
 		Component IAnimationHost.GetComponent(Type type) => throw new NotSupportedException();
+
+		[TangerineIgnore]
+		[YuzuMember]
+		public TangerineFlags TangerineFlags { get; set; }
+
+		public bool GetTangerineFlag(TangerineFlags flag) => (TangerineFlags & flag) != 0;
+
+		public void SetTangerineFlag(TangerineFlags flag, bool value)
+		{
+			if (value) {
+				TangerineFlags |= flag;
+			} else {
+				TangerineFlags &= ~flag;
+			}
+		}
 
 		public AnimationTrack()
 		{
