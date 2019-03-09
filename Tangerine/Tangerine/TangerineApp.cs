@@ -9,7 +9,6 @@ using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
-using Tangerine.UI.Timeline.Processors;
 using Tangerine.UI.Timeline;
 
 namespace Tangerine
@@ -709,8 +708,8 @@ namespace Tangerine
 			h.Connect(GenericCommands.ClearCache, new ClearCache());
 			h.Connect(GenericCommands.ResetGlobalSettings, new ResetGlobalSettings());
 			h.Connect(GenericCommands.PurgeBackups, new PurgeBackUps());
-			h.Connect(TimelineCommands.CreateAnimationClip, () => new CreateAnimationClipDialog());
-			h.Connect(TimelineCommands.SplitAnimationClip, () => SplitAnimationClip.Perform());
+			h.Connect(TimelineCommands.AddAnimationClip, UI.Timeline.Operations.CompoundAnimations.AddAnimationClip.Perform);
+			h.Connect(TimelineCommands.SplitAnimationClip, UI.Timeline.Operations.CompoundAnimations.SplitAnimationClip.Perform);
 		}
 
 		private void InitializeHotkeys()
