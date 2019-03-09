@@ -24,6 +24,10 @@ namespace Lime
 		[YuzuMember]
 		public bool Reversed { get; set; }
 
+#if TANGERINE
+		public bool IsSelected { get; set; }
+#endif
+
 		internal Animation Animation
 		{
 			get {

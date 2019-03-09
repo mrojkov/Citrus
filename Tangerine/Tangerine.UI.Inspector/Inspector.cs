@@ -176,18 +176,11 @@ namespace Tangerine.UI.Inspector
 
 		private static IEnumerable<AnimationClip> GetSelectedAnimationClips()
 		{
-			if (GridSelection.GetSelectionBoundaries(out var boundaries)) {
-				foreach (var row in Document.Current.SelectedRows()) {
-					var track = row.Components.Get<AnimationTrackRow>().Track;
-					if (row.Index < boundaries.Top || row.Index > boundaries.Bottom) {
-						continue;
-					}
-					foreach (var clip in track.Clips) {
-						var a = Math.Max(clip.Begin, boundaries.Left);
-						var b = Math.Min(clip.End, boundaries.Right);
-						if (b > a) {
-							yield return clip;
-						}
+			foreach (var row in Document.Current.Rows) {
+				var track = row.Components.Get<AnimationTrackRow>().Track;
+				foreach (var clip in track.Clips) {
+					if (clip.IsSelected) {
+						yield return clip;
 					}
 				}
 			}
