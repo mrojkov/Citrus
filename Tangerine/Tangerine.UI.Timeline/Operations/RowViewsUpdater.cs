@@ -60,8 +60,7 @@ namespace Tangerine.UI.Timeline
 				var propRow = row.Components.Get<Core.Components.PropertyRow>();
 				view.GridRow = new GridPropertyView(propRow.Node, propRow.Animator);
 			} else if (row.Components.Contains<Core.Components.AnimationTrackRow>()) {
-				var propRow = row.Components.Get<Core.Components.AnimationTrackRow>();
-				view.GridRow = new GridAnimationTrackView(propRow.Track);
+				view.GridRow = new GridAnimationTrackView(row);
 			}
 		}
 	}

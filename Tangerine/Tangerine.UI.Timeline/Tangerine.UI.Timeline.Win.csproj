@@ -60,9 +60,10 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollAnimationTrackView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
-    <Compile Include="Operations\AnimationClipToolbox.cs" />
-    <Compile Include="Operations\SplitAnimationClip.cs" />
-    <Compile Include="Operations\CreateAnimationClipDialog.cs" />
+    <Compile Include="Operations\CompoundAnimations\AnimationClipToolbox.cs" />
+    <Compile Include="Operations\CompoundAnimations\DragAnimationClips.cs" />
+    <Compile Include="Operations\CompoundAnimations\SplitAnimationClip.cs" />
+    <Compile Include="Operations\CompoundAnimations\AddAnimationClip.cs" />
     <Compile Include="CurveEditorPane.cs" />
     <Compile Include="Operations\CenterTimelineOnCurrentColumn.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
@@ -86,6 +87,9 @@
     <Compile Include="Operations\ShiftGridSelection.cs" />
     <Compile Include="Processors\GridPane\AnimationStretchProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
+    <Compile Include="Processors\GridPane\CompoundAnimations\GridContextMenuProcessor.cs" />
+    <Compile Include="Processors\GridPane\GridContextMenuProcessor.cs" />
+    <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
     <Compile Include="Processors\ImageCombinerLinkIndicationProcessor.cs" />
     <Compile Include="Processors\SlowMotionProcessor.cs" />
     <Compile Include="Processors\SplineGearLinkIndicationProcessor.cs" />
@@ -94,7 +98,7 @@
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
     <Compile Include="Processors\GridPane\HasKeyframeRespondentProcessor.cs" />
-    <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
+    <Compile Include="Processors\GridPane\CompoundAnimations\SelectAndDragAnimationClipsProcessor.cs" />
     <Compile Include="Processors\OverviewPane\OverviewScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />

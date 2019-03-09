@@ -6,7 +6,6 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Components;
-using Tangerine.UI.Timeline.Processors;
 
 namespace Tangerine.UI.Timeline
 {
@@ -156,12 +155,15 @@ namespace Tangerine.UI.Timeline
 				new MouseWheelProcessor(this),
 				new RollMouseScrollProcessor(),
 				new SelectAndDragKeyframesProcessor(),
+				new CompoundAnimations.SelectAndDragAnimationClipsProcessor(),
 				new HasKeyframeRespondentProcessor(),
 				new DragKeyframesRespondentProcessor(),
 				new GridMouseScrollProcessor(),
 				new SelectAndDragRowsProcessor(),
 				new RulerbarMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
+				new GridContextMenuProcessor(),
+				new CompoundAnimations.GridContextMenuProcessor(),
 				PanelTitleUpdater()
 			);
 		}

@@ -129,6 +129,10 @@ namespace Tangerine.UI
 			public Color4 SelectedRowBackground { get; set; }
 			[YuzuOptional]
 			public Color4 SelectionBorder { get; set; }
+			[YuzuOptional]
+			public Color4 AnimationClip { get; set; }
+			[YuzuOptional]
+			public Color4 AnimationClipBorder { get; set; }
 		}
 
 		public class TimelineCurveEditorColors : Theme.DefaultColors
@@ -362,6 +366,8 @@ namespace Tangerine.UI
 				AnimatedRangeBackground = new Color4(85, 85, 85),
 				SelectedRowBackground = new Color4(100, 100, 100),
 				SelectionBorder = new Color4(0, 255, 255),
+				AnimationClip = new Color4(50, 50, 255, 80),
+				AnimationClipBorder = new Color4(50, 50, 255),
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
@@ -510,6 +516,8 @@ namespace Tangerine.UI
 				AnimatedRangeBackground = new Color4(240, 240, 240),
 				SelectedRowBackground = new Color4(225, 225, 225),
 				SelectionBorder = new Color4(255, 0, 128),
+				AnimationClip = new Color4(50, 50, 255, 80),
+				AnimationClipBorder = new Color4(50, 50, 255),
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },

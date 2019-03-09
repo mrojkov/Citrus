@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
-namespace Tangerine.UI.Timeline.Processors
+namespace Tangerine.UI.Timeline
 {
 	public class SplineGearLinkIndicationProcessor : SymmetricOperationProcessor
 	{

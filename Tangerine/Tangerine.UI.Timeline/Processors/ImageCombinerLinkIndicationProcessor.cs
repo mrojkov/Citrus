@@ -5,7 +5,7 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
 
-namespace Tangerine.UI.Timeline.Processors
+namespace Tangerine.UI.Timeline
 {
 	public class ImageCombinerLinkIndicationProcessor : SymmetricOperationProcessor
 	{
