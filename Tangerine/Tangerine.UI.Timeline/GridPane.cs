@@ -14,6 +14,8 @@ namespace Tangerine.UI.Timeline
 		RowLocation? rowLocationUnderMouseOnFilesDrop;
 		int animateTextureCellOffset;
 
+		public IntVector2 CellUnderMouseOnContextMenuPopup { get; set; }
+
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
 		public event Action<Widget> OnPostRender;
@@ -44,59 +46,9 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform(Document.Current.History));
 			OnPostRender += RenderSelection;
 			OnPostRender += RenderCursor;
-			RootWidget.Tasks.Add(HandleRightClickTask);
 			timeline.FilesDropHandler.Handling += FilesDropOnHandling;
 			timeline.FilesDropHandler.NodeCreating += FilesDropOnNodeCreating;
 			timeline.FilesDropHandler.NodeCreated += FilesDropOnNodeCreated;
-		}
-
-		IEnumerator<object> HandleRightClickTask()
-		{
-			while (true) {
-				if (RootWidget.Input.WasMouseReleased(1)) {
-					bool enabled = Document.Current.Rows.Count > 0;
-					if (enabled) {
-						var cell = CellUnderMouse();
-						var row = Document.Current.Rows[cell.Y];
-						var spans = row.Components.Get<Core.Components.GridSpanListComponent>()?.Spans;
-						if (!row.Selected || !spans.Any(i => i.Contains(cell.X))) {
-							Document.Current.History.DoTransaction(() => {
-								Core.Operations.ClearRowSelection.Perform();
-								Operations.ClearGridSelection.Perform();
-								Core.Operations.SelectRow.Perform(row);
-								Operations.SelectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
-							});
-						}
-					}
-					Menu menu;
-					if (Document.Current.Animation.IsCompound) {
-						menu = new Menu {
-							TimelineCommands.CreateAnimationClip,
-							TimelineCommands.SplitAnimationClip,
-						};
-					} else {
-						menu = new Menu {
-							TimelineCommands.CutKeyframes,
-							TimelineCommands.CopyKeyframes,
-							TimelineCommands.PasteKeyframes,
-							Command.MenuSeparator,
-							TimelineCommands.ReverseKeyframes,
-							Command.MenuSeparator,
-							GenericCommands.InsertTimelineColumn,
-							GenericCommands.RemoveTimelineColumn,
-							TimelineCommands.DeleteKeyframes,
-							Command.MenuSeparator,
-							TimelineCommands.NumericMove,
-							TimelineCommands.NumericScale
-						};
-					}
-					foreach (var i in menu) {
-						i.Enabled = enabled;
-					}
-					menu.Popup();
-				}
-				yield return null;
-			}
 		}
 
 		private void RenderBackgroundAndGrid(Node node)
@@ -367,12 +319,12 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		public IntVector2 CellUnderMouse(Vector2? position = null, bool ignoreBounds = true)
+		public IntVector2 CellUnderMouse(Vector2? position = null, bool clampRow = true)
 		{
 			var mousePos = position ?? RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
 			var r = new IntVector2((int)(mousePos.X / TimelineMetrics.ColWidth), 0);
 			if (mousePos.Y >= ContentSize.Y) {
-				r.Y = ignoreBounds ? Math.Max(0, Document.Current.Rows.Count - 1) : -1;
+				r.Y = clampRow ? Math.Max(0, Document.Current.Rows.Count - 1) : -1;
 				return r;
 			}
 			foreach (var row in Document.Current.Rows) {
