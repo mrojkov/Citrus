@@ -14,6 +14,8 @@ namespace Tangerine.UI.Timeline.Components
 		readonly AnimationTrackRow trackRow;
 		readonly Widget spacer;
 		readonly Widget widget;
+		readonly ToolbarButton eyeButton;
+		readonly ToolbarButton lockButton;
 		readonly RollNodeView.ObjectIdInplaceEditor trackIdEditor;
 
 		AnimationTrack Track => trackRow.Track;
@@ -42,6 +44,8 @@ namespace Tangerine.UI.Timeline.Components
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
 				MinMaxSize = new Vector2(16, 16)
 			};
+			eyeButton = CreateEyeButton();
+			lockButton = CreateLockButton();
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
@@ -55,7 +59,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBoxContainer,
 					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X),
-					Spacer.HSpacer(Theme.Metrics.DefaultToolbarButtonSize.X)
+					lockButton
 				},
 			};
 			trackIdEditor = new RollNodeView.ObjectIdInplaceEditor(row, Track, label, editBoxContainer);
@@ -75,6 +79,35 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		public void Rename() => trackIdEditor.Rename();
+
+		ToolbarButton CreateEyeButton()
+		{
+			var button = new ToolbarButton { Highlightable = false };
+			button.AddChangeWatcher(() => trackRow.Visibility, i => {
+				var texture = "Timeline.Dot";
+				if (i == AnimationTrackVisibility.Shown) {
+					texture = "Timeline.Eye";
+				} else if (i == AnimationTrackVisibility.Hidden) {
+					texture = "Timeline.Cross";
+				}
+				button.Texture = IconPool.GetTexture(texture);
+			});
+			button.AddTransactionClickHandler(
+				() => Core.Operations.SetProperty.Perform(trackRow, nameof(AnimationTrackRow.Visibility), (AnimationTrackVisibility)(((int)trackRow.Visibility + 1) % 3))
+			);
+			return button;
+		}
+
+		ToolbarButton CreateLockButton()
+		{
+			var button = new ToolbarButton { Highlightable = false };
+			button.AddChangeWatcher(
+				() => trackRow.Locked,
+				i => button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot")
+			);
+			button.AddTransactionClickHandler(() => Core.Operations.SetProperty.Perform(trackRow, nameof(AnimationTrackRow.Locked), !trackRow.Locked));
+			return button;
+		}
 
 		void ShowTrackContextMenu()
 		{
