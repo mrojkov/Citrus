@@ -23,10 +23,13 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				foreach (var clip in track.Clips.Where(i => i.IsSelected).ToList()) {
 					if (removeOriginals) {
 						AnimationClipToolbox.RemoveClip(track, clip);
+					} else {
+						SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), false);
 					}
 					var newClip = clip.Clone();
 					newClip.Begin += offset.X;
 					newClip.End += offset.X;
+					newClip.IsSelected = true;
 					AnimationClipToolbox.InsertClip(track, newClip);
 				}
 			}
