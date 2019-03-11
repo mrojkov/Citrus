@@ -12,6 +12,12 @@ using Yuzu;
 
 namespace Lime
 {
+	public class CyclicDependencyException : Exception
+	{
+		public CyclicDependencyException(string message = null) : base(message) { }
+		public CyclicDependencyException(string format, params object[] args) : base(string.Format(format, args)) { }
+	}
+
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 	public sealed class YuzuSpecializeWithAttribute : Attribute
 	{
@@ -1297,10 +1303,10 @@ namespace Lime
 			}
 			var fullPath = stream != null && sceneExtensions.Any(e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase)) ? path : ResolveScenePath(path);
 			if (fullPath == null) {
-				throw new Exception($"Scene '{path}' not found in current asset bundle");
+				throw new FileNotFoundException($"Scene '{path}' not found in current asset bundle");
 			}
 			if (scenesBeingLoaded.Value.Contains(fullPath)) {
-				throw new Exception($"Cyclic scenes dependency was detected: {fullPath}");
+				throw new CyclicDependencyException($"Cyclic scenes dependency was detected: {fullPath}");
 			}
 			scenesBeingLoaded.Value.Add(fullPath);
 			try {
