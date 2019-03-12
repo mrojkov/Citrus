@@ -202,10 +202,16 @@ namespace Tangerine.Core
 
 		public void GetAnimations(List<Animation> animations)
 		{
+			GetAnimationsHelper(animations);
+			animations.Sort(AnimationsComparer.Instance);
+			animations.Insert(0, Container.DefaultAnimation);
+		}
+
+		private void GetAnimationsHelper(List<Animation> animations)
+		{
 			var ancestor = Container;
-			animations.Add(ancestor.DefaultAnimation);
 			while (true) {
-				foreach (var a in ancestor.TangerineAnimations) {
+				foreach (var a in ancestor.Animations) {
 					var found = false;
 					foreach (var other in animations) {
 						found = other.Id == a.Id;
@@ -213,7 +219,7 @@ namespace Tangerine.Core
 							break;
 						}
 					}
-					if (!found) {
+					if (!found && !a.IsLegacy) {
 						animations.Add(a);
 					}
 				}
@@ -221,6 +227,16 @@ namespace Tangerine.Core
 					return;
 				}
 				ancestor = ancestor.Parent;
+			}
+		}
+
+		class AnimationsComparer : IComparer<Animation>
+		{
+			public static readonly AnimationsComparer Instance = new AnimationsComparer();
+
+			public int Compare(Animation x, Animation y)
+			{
+				return x.Id.CompareTo(y.Id);
 			}
 		}
 
