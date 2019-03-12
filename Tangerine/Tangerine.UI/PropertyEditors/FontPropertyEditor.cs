@@ -8,6 +8,7 @@ namespace Tangerine.UI
 	public class FontPropertyEditor : CommonPropertyEditor<SerializableFont>
 	{
 		private DropDownList selector;
+		private static string defaultFontDirectory = "Fonts/";
 
 		public FontPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
@@ -15,7 +16,7 @@ namespace Tangerine.UI
 			selector.LayoutCell = new LayoutCell(Alignment.Center);
 			EditorContainer.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
-			var items = AssetBundle.Current.EnumerateFiles("Fonts").
+			var items = AssetBundle.Current.EnumerateFiles(defaultFontDirectory).
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
 				Select(i => new DropDownList.Item(GetFontNameWithoutExtension(i), i));
 			foreach (var i in items) {
@@ -40,7 +41,7 @@ namespace Tangerine.UI
 
 		private static string GetFontName(SerializableFont i)
 		{
-			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name;
+			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name.Replace($"{defaultFontDirectory}/", string.Empty);
 		}
 
 		private static string GetFontNameWithoutExtension(SerializableFont i)
@@ -50,7 +51,7 @@ namespace Tangerine.UI
 
 		private static string GetFontNameWithoutExtension(string s)
 		{
-			return Path.ChangeExtension(s, null);
+			return Path.ChangeExtension(s, null).Replace($"{defaultFontDirectory}/", string.Empty);
 		}
 	}
 }
