@@ -224,7 +224,7 @@ namespace Lime
 
 		public void Apply(double time)
 		{
-			if (Enabled && !IsZombie) {
+			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
 				if (setter == null) {
 					Bind();
 					if (IsZombie) {
