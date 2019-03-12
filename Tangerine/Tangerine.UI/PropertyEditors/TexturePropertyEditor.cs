@@ -22,7 +22,7 @@ namespace Tangerine.UI
 
 		protected override bool IsValid(string path)
 		{
-			return TangerineDefaultCharsetAttribute.IsValidPath(path, out var message) == ValidationResult.Ok;
+			return TangerineDefaultCharsetAttribute.IsValid(path, out var message) == ValidationResult.Ok;
 		}
 	}
 }
