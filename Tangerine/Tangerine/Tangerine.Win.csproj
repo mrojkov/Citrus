@@ -59,6 +59,7 @@
     <Compile Include="MainMenu\GitMenu.cs" />
     <Compile Include="MainMenu\ToolsMenu.cs" />
     <Compile Include="MainMenu\SystemMenu.cs" />
+    <Compile Include="Panels\AnimationsPanel.cs" />
     <Compile Include="Panels\AttachmentPanel.cs" />
     <Compile Include="Dialogs\ColorThemeEditor.cs" />
     <Compile Include="Dialogs\ManageRulersDialog.cs" />
