@@ -62,7 +62,7 @@ namespace Lime
 				baseDirectory = Path.Combine(baseDirectory, path);
 			}
 			baseDirectory += '/';
-			var baseUri = new Uri(baseDirectory);
+			var baseUri = new Uri($"{BaseDirectory}/");
 			foreach (var i in Directory.EnumerateFiles(baseDirectory, "*.*", SearchOption.AllDirectories)) {
 				var relativePath = baseUri.MakeRelativeUri(new Uri(i)).ToString();
 				relativePath = Uri.UnescapeDataString(relativePath);
