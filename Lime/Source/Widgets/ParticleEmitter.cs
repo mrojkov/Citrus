@@ -302,9 +302,9 @@ namespace Lime
 			ImmortalParticles = false;
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = base.Clone() as ParticleEmitter;
+			var clone = base.CloneInternal() as ParticleEmitter;
 			clone.particles = new List<Particle>();
 			clone.emitterShapePoints = new List<EmitterShapePoint>();
 			clone.cachedShapePoints = new List<Vector2>();

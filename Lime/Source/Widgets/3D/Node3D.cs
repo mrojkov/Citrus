@@ -270,9 +270,9 @@ namespace Lime
 			return null;
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = base.Clone().AsNode3D;
+			var clone = base.CloneInternal().AsNode3D;
 			clone.Opaque = Opaque;
 			clone.viewport = null;
 			return clone;

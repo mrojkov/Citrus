@@ -921,9 +921,9 @@ namespace Lime
 		/// <summary>
 		/// Returns a copy of the widget's hierarchy.
 		/// </summary>
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = base.Clone().AsWidget;
+			var clone = base.CloneInternal().AsWidget;
 			clone.SkinningWeights = clone.SkinningWeights?.Clone();
 			clone.BoneArray = new BoneArray();
 			clone.input = null;

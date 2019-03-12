@@ -517,9 +517,9 @@ namespace Lime
 			Window.Current?.Invalidate();
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = base.Clone() as SimpleText;
+			var clone = base.CloneInternal() as SimpleText;
 			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}

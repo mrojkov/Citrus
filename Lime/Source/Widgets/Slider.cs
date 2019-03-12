@@ -71,9 +71,9 @@ namespace Lime
 			return thumb;
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var result = base.Clone() as Slider;
+			var result = base.CloneInternal() as Slider;
 			result.thumb = null;
 			return result;
 		}

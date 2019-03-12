@@ -27,9 +27,9 @@ namespace Lime
 			RenderChainBuilder = null;
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var clone = (SplineGear3D)base.Clone();
+			var clone = (SplineGear3D)base.CloneInternal();
 			clone.NodeRef = clone.NodeRef?.Clone();
 			clone.SplineRef = clone.SplineRef?.Clone();
 			return clone;

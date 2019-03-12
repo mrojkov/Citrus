@@ -122,9 +122,9 @@ namespace Lime
 			}
 		}
 
-		public override Node Clone()
+		protected override Node CloneInternal()
 		{
-			var vp = (Viewport3D)base.Clone();
+			var vp = (Viewport3D)base.CloneInternal();
 			vp.CameraRef = CameraRef?.Clone();
 			return vp;
 		}
