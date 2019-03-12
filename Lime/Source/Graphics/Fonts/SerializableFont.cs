@@ -108,11 +108,11 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				if (!AssetBundle.Initialized || !TryFindName(ref name)) {
+				if (!AssetBundle.Initialized || !TryFindOrUpdateBundleFonts(name, out var updatedName)) {
 					return Null;
 				}
-				font = Serialization.ReadObject<Font>($"{DefaultFontDirectory}{name}");
-				fonts[name] = font;
+				font = Serialization.ReadObject<Font>(updatedName);
+				fonts[updatedName] = font;
 				return font;
 			}
 		}
@@ -139,21 +139,21 @@ namespace Lime
 			}
 		}
 
-		private bool TryFindName(ref string name)
+		private bool TryFindOrUpdateBundleFonts(string name, out string updatedName)
 		{
 			var fontPaths = AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft"));
 			if (fontPaths.Contains(name)) {
+				updatedName = name;
 				return true;
 			}
 			// Look through all the paths to find one containing font with the same name.
-			// Deprecated, should be removed once formerly serialized values
-			// are updated for all other projects.
 			foreach (var path in fontPaths) {
 				if (System.IO.Path.GetFileNameWithoutExtension(path) == name) {
-					name = path;
+					updatedName = path;
 					return true;
 				}
 			}
+			updatedName = null;
 			return false;
 		}
 	}
