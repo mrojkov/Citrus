@@ -52,8 +52,8 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				}
 				};
 				rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-				foreach (var a in Document.Current.Container.TangerineAnimations) {
-					if (a.Id != Document.Current.Animation.Id) {
+				foreach (var a in Document.Current.RootNode.Animations) {
+					if (!a.IsLegacy && a.Id != Document.Current.Animation.Id) {
 						animationSelector.Items.Add(new CommonDropDownList.Item(a.Id));
 					}
 				}

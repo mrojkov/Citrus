@@ -17,7 +17,6 @@ namespace Tangerine.UI.Timeline
 			RootWidget = new Frame {
 				Id = nameof(RollPane),
 				Layout = new StackLayout { VerticallySizeable = true },
-				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				ClipChildren = ClipMethod.ScissorTest,
 				HitTestTarget = true,
 			};

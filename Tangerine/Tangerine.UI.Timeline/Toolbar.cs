@@ -16,7 +16,6 @@ namespace Tangerine.UI.Timeline
 			RootWidget = new Widget {
 				Padding = new Thickness(2, 0),
 				MinMaxHeight = Metrics.ToolbarHeight,
-				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				Presenter = new WidgetFlatFillPresenter(ColorTheme.Current.Toolbar.Background),
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
@@ -30,7 +29,6 @@ namespace Tangerine.UI.Timeline
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
 					CreateFrameProgressionButton(),
-					CreateAnimationSelector(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -43,67 +41,6 @@ namespace Tangerine.UI.Timeline
 
 		TimelineUserPreferences UserPreferences => TimelineUserPreferences.Instance;
 		CoreUserPreferences CoreUserPreferences => Core.CoreUserPreferences.Instance;
-
-		Widget CreateAnimationSelector()
-		{
-			var ddl = new ThemedDropDownList { MinWidth = 100 };
-			ddl.Changed += arg => {
-				if (arg.ChangedByUser) {
-					Document.Current.History.DoTransaction(() => {
-						var animation = (Animation)arg.Value;
-						Core.Operations.SetProperty.Perform(Document.Current, nameof(Document.SelectedAnimation), animation);
-					});
-				}
-			};
-			ddl.AddChangeWatcher(() => CalcAnimationIdsHash(), _ => RefreshSelector(ddl));
-			ddl.AddChangeWatcher(() => Document.Current.SelectedAnimation, _ => RefreshSelectedAnimation(ddl));
-			return ddl;
-		}
-
-		List<Animation> tmpAnimations = new List<Animation>();
-
-		void RefreshSelector(CommonDropDownList ddl)
-		{
-			try {
-				Document.Current.GetAnimations(tmpAnimations);
-				ddl.Items.Clear();
-				foreach (var a in tmpAnimations) {
-					var item = a.IsLegacy
-						? new CommonDropDownList.Item(a.Id ?? "Primary", null)
-						: new CommonDropDownList.Item(a.Id, a);
-					ddl.Items.Add(item);
-				}
-				RefreshSelectedAnimation(ddl);
-			} finally {
-				tmpAnimations.Clear();
-			}
-		}
-
-		void RefreshSelectedAnimation(CommonDropDownList ddl)
-		{
-			var item = ddl.Items.FirstOrDefault(i => i.Value == Document.Current.SelectedAnimation);
-			if (item != null) {
-				ddl.Index = ddl.Items.IndexOf(item);
-				Document.ForceAnimationUpdate();
-			}
-		}
-
-		int CalcAnimationIdsHash()
-		{
-			unchecked {
-				try {
-					Document.Current.GetAnimations(tmpAnimations);
-					int result = 17;
-					foreach (var a in tmpAnimations) {
-						var id = a.Id;
-						result = (result * 31) + (id != null ? id.GetHashCode() : 0);
-					}
-					return result;
-				} finally {
-					tmpAnimations.Clear();
-				}
-			}
-		}
 
 		ToolbarButton CreateAnimationModeButton()
 		{
