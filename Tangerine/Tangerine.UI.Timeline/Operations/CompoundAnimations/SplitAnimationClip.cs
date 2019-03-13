@@ -9,16 +9,29 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 {
 	public static class SplitAnimationClip
 	{
-		public static void Perform()
+		public static bool IsEnabled(IntVector2 cell)
 		{
-			Document.Current.History.DoTransaction(() => {
-				foreach (var track in Document.Current.SelectedAnimationTracks()) {
-					int clipIndex = AnimationClipToolbox.FindClipContainingFrame(track, Timeline.Instance.Grid.CellUnderMouse().X);
-					if (clipIndex >= 0) {
-						AnimationClipToolbox.SplitClip(track, clipIndex, Timeline.Instance.Grid.CellUnderMouse().X);
-					}
-				}
-			});
+			return TryFindClip(cell, out var track, out var clip);
+		}
+
+		public static void Perform(IntVector2 cell)
+		{
+			if (TryFindClip(cell, out var track, out var clip)) {
+				Document.Current.History.DoTransaction(() => {
+					AnimationClipToolbox.SplitClip(track, clip, cell.X + 1);
+				});
+			}
+		}
+
+		public static bool TryFindClip(IntVector2 cell, out AnimationTrack track, out AnimationClip clip)
+		{
+			track = null;
+			clip = null;
+			if (cell.Y >= Document.Current.Animation.Tracks.Count) {
+				return false;
+			}
+			track = Document.Current.Animation.Tracks[cell.Y];
+			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip) && cell.X < clip.End - 1;
 		}
 	}
 }

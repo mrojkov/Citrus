@@ -8,10 +8,11 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 {
 	public static class AddAnimationClip
 	{
-		public static void Perform()
+		public static bool IsEnabled() => AddAnimationClipDialog.EnumerateAnimations().Any();
+
+		public static void Perform(IntVector2 cell)
 		{
-			var cell = Timeline.Instance.Grid.CellUnderMouseOnContextMenuPopup;
-			if (cell.Y >= 0) {
+			if (cell.Y >= 0 && IsEnabled()) {
 				new AddAnimationClipDialog(cell);
 			}
 		}
@@ -52,10 +53,8 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				}
 				};
 				rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
-				foreach (var a in Document.Current.RootNode.Animations) {
-					if (!a.IsLegacy && a.Id != Document.Current.Animation.Id) {
-						animationSelector.Items.Add(new CommonDropDownList.Item(a.Id));
-					}
+				foreach (var a in EnumerateAnimations()) {
+					animationSelector.Items.Add(new CommonDropDownList.Item(a.Id));
 				}
 				animationSelector.Index = 0;
 				cancelButton.Clicked += () => {
@@ -76,6 +75,15 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				};
 				cancelButton.SetFocus();
 				window.ShowModal();
+			}
+
+			public static IEnumerable<Animation> EnumerateAnimations()
+			{
+				foreach (var a in Document.Current.Animation.Owner.Animations.OrderBy(i => i.Id)) {
+					if (!a.IsLegacy && a.Id != Document.Current.Animation.Id) {
+						yield return a;
+					}
+				}
 			}
 
 			static int CalcAnimationLength(Node node, string animationId)

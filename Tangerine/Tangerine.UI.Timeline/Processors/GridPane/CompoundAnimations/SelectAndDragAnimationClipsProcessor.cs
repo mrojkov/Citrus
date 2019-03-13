@@ -101,16 +101,7 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 		private static bool TryFindClip(IntVector2 cell, out AnimationClip clip)
 		{
 			var track = Document.Current.Rows[cell.Y].Components.Get<AnimationTrackRow>().Track;
-			if (track != null) {
-				foreach (var c in track.Clips) {
-					if (c.Begin <= cell.X && cell.X < c.End) {
-						clip = c;
-						return true;
-					}
-				}
-			}
-			clip = null;
-			return false;
+			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip);
 		}
 
 		private IEnumerator<object> SelectTask(IntVector2 initialCell)

@@ -10,22 +10,25 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 	{
 		public static void InsertClip(AnimationTrack track, AnimationClip newClip)
 		{
+			AnimationClip clip;
 			using (Document.Current.History.BeginTransaction()) {
-				var index = FindClipContainingFrame(track, newClip.Begin);
-				if (index >= 0 && newClip.Begin > track.Clips[index].Begin) {
-					SplitClip(track, index, newClip.Begin);
+				if (TryFindClip(track, newClip.Begin, out clip)) {
+					if (newClip.Begin > clip.Begin) {
+						SplitClip(track, clip, newClip.Begin);
+					}
 				}
-				index = FindClipContainingFrame(track, newClip.End - 1);
-				if (index >= 0 && newClip.End < track.Clips[index].End) {
-					SplitClip(track, index, newClip.End);
+				if (TryFindClip(track, newClip.End - 1, out clip)) {
+					if (newClip.End < clip.End) {
+						SplitClip(track, clip, newClip.End);
+					}
 				}
 				for (int i = track.Clips.Count - 1; i >= 0; i--) {
 					var c = track.Clips[i];
 					if (c.Begin >= newClip.Begin && c.Begin < newClip.End) {
-						RemoveClip(track, i);
+						RemoveClip(track, c);
 					}
 				}
-				index = FindClipInsertionIndex(track, newClip.Begin);
+				var index = FindClipInsertionIndex(track, newClip.Begin);
 				Core.Operations.InsertIntoList<AnimationClipList, AnimationClip>.Perform(track.Clips, index, newClip);
 				Document.Current.History.CommitTransaction();
 			}
@@ -33,25 +36,15 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 
 		public static void RemoveClip(AnimationTrack track, AnimationClip clip)
 		{
-			RemoveClip(track, track.Clips.IndexOf(clip));
-		}
-
-		public static void RemoveClip(AnimationTrack track, int index)
-		{
-			Core.Operations.RemoveFromList<AnimationClipList, AnimationClip>.Perform(track.Clips, index);
+			Core.Operations.RemoveFromList<AnimationClipList, AnimationClip>.Perform(track.Clips, track.Clips.IndexOf(clip));
 		}
 
 		public static void SplitClip(AnimationTrack track, AnimationClip clip, int frame)
 		{
-			SplitClip(track, track.Clips.IndexOf(clip), frame);
-		}
-
-		public static void SplitClip(AnimationTrack track, int index, int frame)
-		{
-			var clip = track.Clips[index];
 			if (frame <= clip.Begin || frame > clip.End) {
 				throw new InvalidOperationException();
 			}
+			var index = track.Clips.IndexOf(clip);
 			var newClip = clip.Clone();
 			newClip.Begin = frame;
 			newClip.End = clip.End;
@@ -59,16 +52,28 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 			Core.Operations.InsertIntoList<AnimationClipList, AnimationClip>.Perform(track.Clips, index + 1, newClip);
 		}
 
-		public static int FindClipContainingFrame(AnimationTrack track, int frame)
+		public static bool TryFindClip(AnimationTrack track, int frame, out AnimationClip clip)
 		{
+			if (TryFindClipIndex(track, frame, out int index)) {
+				clip = track.Clips[index];
+				return true;
+			}
+			clip = null;
+			return false;
+		}
+
+		public static bool TryFindClipIndex(AnimationTrack track, int frame, out int clipIndex)
+		{
+			clipIndex = -1;
 			int i = 0;
 			foreach (var c in track.Clips) {
 				if (c.Begin <= frame && frame < c.End) {
-					return i;
+					clipIndex = i;
+					return true;
 				}
 				i++;
 			}
-			return -1;
+			return false;
 		}
 
 		private static int FindClipInsertionIndex(AnimationTrack track, int frame)

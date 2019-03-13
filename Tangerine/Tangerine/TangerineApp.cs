@@ -711,8 +711,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.ClearCache, new ClearCache());
 			h.Connect(GenericCommands.ResetGlobalSettings, new ResetGlobalSettings());
 			h.Connect(GenericCommands.PurgeBackups, new PurgeBackUps());
-			h.Connect(TimelineCommands.AddAnimationClip, UI.Timeline.Operations.CompoundAnimations.AddAnimationClip.Perform);
-			h.Connect(TimelineCommands.SplitAnimationClip, UI.Timeline.Operations.CompoundAnimations.SplitAnimationClip.Perform);
 		}
 
 		private void InitializeHotkeys()
