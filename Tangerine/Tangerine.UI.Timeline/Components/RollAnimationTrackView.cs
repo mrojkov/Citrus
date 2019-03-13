@@ -118,6 +118,7 @@ namespace Tangerine.UI.Timeline.Components
 			});
 			var menu = new Menu {
 				new Command("Add", () => AddAnimationTrack(row.Index + 1)),
+				Command.MenuSeparator,
 				Command.Cut,
 				Command.Copy,
 				Command.Paste,
