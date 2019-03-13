@@ -21,8 +21,8 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 				if (input.WasMousePressed() && Document.Current.Animation.IsCompound) {
 					Document.Current.GetCompoundAnimationIspectMode = CompoundAnimationInspectionMode.Clips;
 					using (Document.Current.History.BeginTransaction()) {
-						var initialCell = Grid.CellUnderMouse(clampRow: false);
-						if (initialCell.Y >= 0 && initialCell.Y < Document.Current.Rows.Count) {
+						if (Grid.IsMouseOverRow()) {
+							var initialCell = Grid.CellUnderMouse();
 							if (TryFindClip(initialCell, out var clip) && clip.IsSelected) {
 								yield return DragSelectionTask(initialCell);
 							} else {

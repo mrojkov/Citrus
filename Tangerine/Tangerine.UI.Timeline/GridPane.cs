@@ -255,7 +255,7 @@ namespace Tangerine.UI.Timeline
 		private void FilesDropOnHandling()
 		{
 			animateTextureCellOffset = 0;
-			cellUnderMouseOnFilesDrop = CellUnderMouse(RootWidget.Input.MousePosition - ContentWidget.GlobalPosition);
+			cellUnderMouseOnFilesDrop = CellUnderMouse();
 			rowLocationUnderMouseOnFilesDrop = SelectAndDragRowsProcessor.MouseToRowLocation(RootWidget.Input.MousePosition);
 		}
 
@@ -319,21 +319,19 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		public IntVector2 CellUnderMouse(Vector2? position = null, bool clampRow = true)
+		public IntVector2 CellUnderMouse()
 		{
-			var mousePos = position ?? RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
-			var r = new IntVector2((int)(mousePos.X / TimelineMetrics.ColWidth), 0);
-			if (mousePos.Y >= ContentSize.Y) {
-				r.Y = clampRow ? Math.Max(0, Document.Current.Rows.Count - 1) : -1;
-				return r;
-			}
+			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
+			var x = (int)(mousePos.X / TimelineMetrics.ColWidth);
 			foreach (var row in Document.Current.Rows) {
-				if (mousePos.Y >= row.GridWidget().Top() && mousePos.Y < row.GridWidget().Bottom() + TimelineMetrics.RowSpacing) {
-					r.Y = row.Index;
-					break;
+				var gridWidget = row.GridWidget();
+				if (mousePos.Y >= gridWidget.Top() && mousePos.Y < gridWidget.Bottom() + TimelineMetrics.RowSpacing) {
+					return new IntVector2(x, row.Index);
 				}
 			}
-			return r;
+			return new IntVector2(x, Math.Max(0, Document.Current.Rows.Count - 1));
 		}
+
+		public bool IsMouseOverRow() => RootWidget.Input.MousePosition.Y - ContentWidget.GlobalPosition.Y < ContentSize.Y;
 	}
 }
