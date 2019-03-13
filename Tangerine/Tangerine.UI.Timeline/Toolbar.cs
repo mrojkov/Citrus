@@ -47,6 +47,7 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -56,6 +57,7 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => UserPreferences.EditCurves, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.EditCurves = !UserPreferences.EditCurves;
 			button.Components.Add(new DocumentationComponent("EditCurves"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -79,6 +81,7 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AutoKeyframes = !CoreUserPreferences.AutoKeyframes;
 			button.Components.Add(new DocumentationComponent("AutomaticKeyframes"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -92,6 +95,7 @@ namespace Tangerine.UI.Timeline
 				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(folder));
 			});
 			button.Components.Add(new DocumentationComponent("CreateFolder"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -101,6 +105,7 @@ namespace Tangerine.UI.Timeline
 			button.AddTransactionClickHandler(Core.Operations.LeaveNode.Perform);
 			button.Updating += _ => button.Enabled = Core.Operations.LeaveNode.IsAllowed();
 			button.Components.Add(new DocumentationComponent("ExitContainer"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -120,6 +125,7 @@ namespace Tangerine.UI.Timeline
 				}
 			});
 			button.Components.Add(new DocumentationComponent("ShowWidgets"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -134,6 +140,7 @@ namespace Tangerine.UI.Timeline
 				}
 			});
 			button.Components.Add(new DocumentationComponent("LockWidgets"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -150,6 +157,7 @@ namespace Tangerine.UI.Timeline
 				}
 			});
 			button.Components.Add(new DocumentationComponent("LockAnimation"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -159,6 +167,7 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => UserPreferences.AnimationStretchMode, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.AnimationStretchMode = !UserPreferences.AnimationStretchMode;
 			button.Components.Add(new DocumentationComponent("AnimationStretch.md"));
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -176,6 +185,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.FrameProgression")) { Tip = "Frame progression mode" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ShowFrameProgression, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ShowFrameProgression = !CoreUserPreferences.ShowFrameProgression;
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
@@ -184,6 +194,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tip = "Lock timeline cursor" };
 			button.AddChangeWatcher(() => CoreUserPreferences.LockTimelineCursor, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.LockTimelineCursor = !CoreUserPreferences.LockTimelineCursor;
+			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
 			return button;
 		}
 
