@@ -1,5 +1,6 @@
-using Lime;
 using System.Collections.Generic;
+using System.Linq;
+using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 
@@ -13,15 +14,13 @@ namespace Tangerine.UI.Timeline.Components
 		readonly Image propIcon;
 		readonly AnimationTrackRow trackRow;
 		readonly Widget spacer;
-		readonly Widget widget;
 		readonly ToolbarButton eyeButton;
 		readonly ToolbarButton lockButton;
 		readonly RollNodeView.ObjectIdInplaceEditor trackIdEditor;
 
-		AnimationTrack Track => trackRow.Track;
-
-		public Widget Widget => widget;
-		public AwakeBehavior AwakeBehavior => widget.Components.Get<AwakeBehavior>();
+        public Widget Widget { get; }
+		private AnimationTrack Track => trackRow.Track;
+		public AwakeBehavior AwakeBehavior => Widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
 
 		public RollAnimationTrackView(Row row)
@@ -46,7 +45,7 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			eyeButton = CreateEyeButton();
 			lockButton = CreateLockButton();
-			widget = new Widget {
+			Widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
@@ -63,8 +62,8 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			trackIdEditor = new RollNodeView.ObjectIdInplaceEditor(row, Track, label, editBoxContainer);
-			widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
-			widget.Gestures.Add(new DoubleClickGesture(() => {
+			Widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
+			Widget.Gestures.Add(new DoubleClickGesture(() => {
 				Document.Current.History.DoTransaction(() => {
 					var labelExtent = label.MeasureUncutText();
 					if (label.LocalMousePosition().X < labelExtent.X) {
@@ -73,9 +72,9 @@ namespace Tangerine.UI.Timeline.Components
 				});
 			}));
 			label.AddChangeWatcher(() => Track.Id, s => label.Text = s);
-			widget.Components.Add(new AwakeBehavior());
-			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
+			Widget.Components.Add(new AwakeBehavior());
+			Widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
+			Widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
 		}
 
 		public void Rename() => trackIdEditor.Rename();
@@ -118,12 +117,37 @@ namespace Tangerine.UI.Timeline.Components
 				}
 			});
 			var menu = new Menu {
+				new Command("Add", () => AddAnimationTrack(row.Index + 1)),
 				Command.Cut,
 				Command.Copy,
 				Command.Paste,
 				Command.Delete
 			};
 			menu.Popup();
+		}
+
+		public static void AddAnimationTrack(int index = -1)
+		{
+			if (index < 0) {
+				index = Document.Current.Animation.Tracks.Count;
+			}
+			Document.Current.History.DoTransaction(() => {
+				var track = new AnimationTrack { Id = GenerateTrackId() };
+				Core.Operations.InsertIntoList<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, index, track);
+				Core.Operations.ClearRowSelection.Perform();
+				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(track));
+			});
+
+			string GenerateTrackId()
+			{
+				for (int i = 1; ; i++) {
+					var id = "Track" + ((i > 1) ? i.ToString() : "");
+					if (!Document.Current.Animation.Tracks.Any(t => t.Id == id)) {
+						return id;
+					}
+				}
+				throw new System.Exception();
+			}
 		}
 
 		void RenderBackground(Widget widget)

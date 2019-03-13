@@ -23,7 +23,6 @@ namespace Tangerine.UI.Timeline
 					CreateResetAnimationsTimes(),
 					CreateAutoKeyframesButton(),
 					CreateFolderButton(),
-					CreateAnimationTrackButton(),
 					CreateCurveEditorButton(),
 					CreateTimelineCursorLockButton(),
 					CreateAnimationStretchButton(),
@@ -93,22 +92,6 @@ namespace Tangerine.UI.Timeline
 				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(folder));
 			});
 			button.Components.Add(new DocumentationComponent("CreateFolder"));
-			return button;
-		}
-
-		ToolbarButton CreateAnimationTrackButton()
-		{
-			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create Animation Track" };
-			button.AddTransactionClickHandler(() => {
-				if (!Document.Current.Animation.IsCompound) {
-					throw new InvalidOperationException("Animation isn't compound");
-				}
-				var track = new AnimationTrack { Id = "Track" };
-				Core.Operations.AddIntoCollection<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, track);
-				Core.Operations.ClearRowSelection.Perform();
-				Core.Operations.SelectRow.Perform(Document.Current.GetRowForObject(track));
-			});
-			button.Components.Add(new DocumentationComponent("CreateAnimationTrack"));
 			return button;
 		}
 

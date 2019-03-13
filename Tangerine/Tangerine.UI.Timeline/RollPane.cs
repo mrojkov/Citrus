@@ -31,9 +31,19 @@ namespace Tangerine.UI.Timeline
 			OverlayWidget = new Widget { Presenter = new SyncDelegatePresenter<Widget>(w => OnRenderOverlay?.Invoke(w)) };
 			RootWidget.AddNode(OverlayWidget);
 			RootWidget.AddNode(ContentWidget);
-			ContentWidget.Updating += delta => ContentWidget.Y = -Timeline.Instance.Offset.Y;
+			ContentWidget.Updating += _ => ContentWidget.Y = -Timeline.Instance.Offset.Y;
+			RootWidget.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 		}
-				
+
+		private void ShowContextMenu()
+		{
+			if (Document.Current.Animation.IsCompound) {
+				new Menu {
+					new Command("Add", () => Components.RollAnimationTrackView.AddAnimationTrack())
+				}.Popup();
+			}
+		}
+
 		private void RenderBackground(Node node)
 		{
 			RootWidget.PrepareRendererState();
