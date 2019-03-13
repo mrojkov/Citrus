@@ -15,9 +15,9 @@ namespace Lime
 		public string Id { get; set; }
 
 		[YuzuMember]
-		[TangerineValidRange(0.0f, 1.0f)]
+		[TangerineValidRange(0.0f, 100.0f)]
 		[TangerineKeyframeColorAttribute(0)]
-		public float Weight { get; set; } = 1.0f;
+		public float Weight { get; set; } = 100.0f;
 
 		[YuzuMember]
 		[TangerineIgnore]
