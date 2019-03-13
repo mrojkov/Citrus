@@ -155,6 +155,10 @@ namespace Tangerine.Panels
 					var animation = new Animation { Id = GenerateAnimationId(), IsCompound = compound };
 					Core.Operations.InsertIntoList.Perform(node.Animations, node.Animations.Count, animation);
 					SelectAnimation(GetAnimations().IndexOf(animation));
+					if (compound) {
+						var track = new AnimationTrack { Id = "Track1" };
+						Core.Operations.InsertIntoList<AnimationTrackList, AnimationTrack>.Perform(animation.Tracks, 0, track);
+					}
 				});
 				panelWidget.Tasks.Add(DelayedRenameAnimation());
 			}

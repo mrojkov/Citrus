@@ -142,7 +142,7 @@ namespace Tangerine.UI.Timeline.Components
 			string GenerateTrackId()
 			{
 				for (int i = 1; ; i++) {
-					var id = "Track" + ((i > 1) ? i.ToString() : "");
+					var id = "Track" + i;
 					if (!Document.Current.Animation.Tracks.Any(t => t.Id == id)) {
 						return id;
 					}
