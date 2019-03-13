@@ -136,7 +136,7 @@ namespace Lime.SignedDistanceField
 		internal void RenderSpriteList(Sprite.IMaterialProvider materialProvider)
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
-			SpriteList.Render(Color, materialProvider);
+			SpriteList?.Render(Color, materialProvider);
 		}
 	}
 }
