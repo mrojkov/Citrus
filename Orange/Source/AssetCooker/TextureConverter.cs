@@ -129,7 +129,7 @@ namespace Orange
 
 		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = LocalCache.FindNvTexture(bitmap, mipMaps, format, CookingRulesSHA1);
+			var cachePath = LocalCache.FindDdsTexture(bitmap, mipMaps, format, CookingRulesSHA1);
 			if (File.Exists(cachePath)) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;

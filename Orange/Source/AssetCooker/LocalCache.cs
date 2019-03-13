@@ -9,9 +9,7 @@ namespace Orange
 {
 	public static class LocalCache
 	{
-		public static readonly string EtcCacheDirectory = "etcCache";
-		public static readonly string PvrCacheDirectory = "pvrCache";
-		public static readonly string DdsCacheDirectory = "ddsCache";
+		private static readonly string textureCacheDirectory = "TextureCache";
 
 		private static string cacheDirectory;
 
@@ -19,37 +17,43 @@ namespace Orange
 		{
 			var stream = new MemoryStream();
 			bitmap.SaveTo(stream);
+			var extensionBytes = Encoding.UTF8.GetBytes(".etc");
+			stream.Write(extensionBytes, 0, extensionBytes.Length);
 			stream.WriteByte(mipMaps ? (byte)1 : (byte)0);
 			stream.WriteByte(highQualityCompression ? (byte)1 : (byte)0);
 			if (CookingRulesSHA1 != null) {
 				stream.Write(CookingRulesSHA1, 0, CookingRulesSHA1.Length);
 			}
-			return GetCachedFilePath(stream, EtcCacheDirectory);
+			return GetCachedFilePath(stream);
 		}
 
 		public static string FindPvrTexture(Bitmap bitmap, bool mipMaps, bool highQualityCompression, PVRFormat pvrFormat, byte[] CookingRulesSHA1)
 		{
 			var stream = new MemoryStream();
 			bitmap.SaveTo(stream);
+			var extensionBytes = Encoding.UTF8.GetBytes(".pvr");
+			stream.Write(extensionBytes, 0, extensionBytes.Length);
 			stream.WriteByte(mipMaps ? (byte)1 : (byte)0);
 			stream.WriteByte(highQualityCompression ? (byte)1 : (byte)0);
 			stream.Write(BitConverter.GetBytes((int)pvrFormat), 0, BitConverter.GetBytes((int)pvrFormat).Length);
 			if (CookingRulesSHA1 != null) {
 				stream.Write(CookingRulesSHA1, 0, CookingRulesSHA1.Length);
 			}
-			return GetCachedFilePath(stream, PvrCacheDirectory);
+			return GetCachedFilePath(stream);
 		}
 
-		public static string FindNvTexture(Bitmap bitmap, bool mipMaps, DDSFormat ddsFormat, byte[] CookingRulesSHA1)
+		public static string FindDdsTexture(Bitmap bitmap, bool mipMaps, DDSFormat ddsFormat, byte[] CookingRulesSHA1)
 		{
 			var stream = new MemoryStream();
 			bitmap.SaveTo(stream);
+			var extensionBytes = Encoding.UTF8.GetBytes(".dds");
+			stream.Write(extensionBytes, 0, extensionBytes.Length);
 			stream.WriteByte(mipMaps ? (byte)1 : (byte)0);
 			stream.Write(BitConverter.GetBytes((int)ddsFormat), 0, BitConverter.GetBytes((int)ddsFormat).Length);
 			if (CookingRulesSHA1 != null) {
 				stream.Write(CookingRulesSHA1, 0, CookingRulesSHA1.Length);
 			}
-			return GetCachedFilePath(stream, DdsCacheDirectory);
+			return GetCachedFilePath(stream);
 		}
 
 		/// <summary>
@@ -62,11 +66,11 @@ namespace Orange
 			File.Copy(srcPath, dstPath);
 		}
 
-		private static string GetCachedFilePath(Stream stream, string directory)
+		private static string GetCachedFilePath(Stream stream)
 		{
 			stream.Position = 0;
-			var hashString = BitConverter.ToString(SHA256.Create().ComputeHash(stream));
-			cacheDirectory = Path.Combine(The.Workspace.ProjectCacheDirectory, directory,
+			var hashString = BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty);
+			cacheDirectory = Path.Combine(The.Workspace.ProjectCacheDirectory, textureCacheDirectory,
 				hashString[0].ToString(), hashString[1].ToString(), "");
 			return Path.Combine(cacheDirectory, hashString.Substring(2));
 		}
