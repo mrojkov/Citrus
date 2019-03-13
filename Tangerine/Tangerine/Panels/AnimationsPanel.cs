@@ -41,8 +41,10 @@ namespace Tangerine.Panels
 					w.Width, rowHeight * (selectedIndex + 1),
 					scrollView.IsFocused() ? Theme.Colors.SelectedBackground : Theme.Colors.SelectedInactiveBackground);
 			}));
+			var mouseDownGesture = new ClickGesture(0);
+			mouseDownGesture.Began += SelectAnimationOnMouseDown;
 			scrollView.Gestures.Add(new ClickGesture(1, ShowContextMenu));
-			scrollView.Gestures.Add(new ClickGesture(0, SelectAnimationOnMouseClick));
+			scrollView.Gestures.Add(mouseDownGesture);
 			scrollView.Gestures.Add(new DoubleClickGesture(0, RenameAnimation));
 			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
 			scrollView.AddChangeWatcher(CalcAnimationsHashCode, _ => Refresh());
@@ -113,7 +115,7 @@ namespace Tangerine.Panels
 			}
 		}
 
-		private void SelectAnimationOnMouseClick()
+		private void SelectAnimationOnMouseDown()
 		{
 			scrollView.SetFocus();
 			var index = (scrollView.Content.LocalMousePosition().Y / rowHeight).Floor();
@@ -122,7 +124,7 @@ namespace Tangerine.Panels
 
 		private void ShowContextMenu()
 		{
-			SelectAnimationOnMouseClick();
+			SelectAnimationOnMouseDown();
 			var menu = new Menu();
 			menu.Add(new Command("Add", () => AddAnimation(Document.Current.RootNode, false)));
 			menu.Add(new Command("Add Compound", () => AddAnimation(Document.Current.RootNode, true)));
