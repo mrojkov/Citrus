@@ -133,11 +133,11 @@ namespace Tangerine.UI.Timeline
 					Operations.DeselectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
 				} else {
 					Operations.ClearGridSelection.Perform();
-					var currentCell = Grid.CellUnderMouse();
+					var cell = Grid.CellUnderMouse();
 					Operations.SelectGridSpan.Perform(
-						currentCell.Y,
-						currentCell.X,
-						currentCell.X + 1
+						cell.Y,
+						cell.X,
+						cell.X + 1
 					);
 				}
 			}
