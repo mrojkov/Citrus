@@ -3,6 +3,7 @@
 * Добавлена возможность настраивать плавность анимации через изинги (easings)
 * Добавлена возможность очистить кэш, настройки и проч. прямо из редактора [CIT-874](https://jira.game-forest.com:2000/browse/CIT-874)
 * Убрана возможность сделать Undo после конвертации сцены [CIT-1108](https://jira.game-forest.com:2000/browse/CIT-1108)
+* Реализован прогрессбар для Orange Launcher [CIT-1144](https://jira.game-forest.com:2000/browse/CIT-1144)
 * Реализован кэш для файлов, сжатых алгоритмом DDS [CIT-1146](https://jira.game-forest.com:2000/browse/CIT-1146)
 
 Багфиксы:
