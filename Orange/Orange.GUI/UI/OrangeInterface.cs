@@ -21,6 +21,8 @@ namespace Orange
 		private Button goButton;
 		private Button abortButton;
 
+		private ProgressBarField progressBarField;
+
 		public OrangeInterface()
 		{
 			var windowSize = new Vector2(500, 400);
@@ -49,6 +51,8 @@ namespace Orange
 			mainVBox.AddNode(CreateHeaderSection());
 			mainVBox.AddNode(CreateVcsSection());
 			mainVBox.AddNode(CreateTextView());
+			progressBarField = new ProgressBarField();
+			mainVBox.AddNode(progressBarField);
 			mainVBox.AddNode(CreateFooterSection());
 			windowWidget.AddNode(mainVBox);
 		}
@@ -157,6 +161,21 @@ namespace Orange
 			container.AddNode(abortButton);
 
 			return container;
+		}
+
+		public override void StopProgressBar()
+		{
+			progressBarField.HideAndClear();
+		}
+
+		public override void SetupProgressBar(int maxPosition)
+		{
+			progressBarField.Setup(maxPosition);
+		}
+
+		public override void IncreaseProgressBar(int amount = 1)
+		{
+			progressBarField.Progress(amount);
 		}
 
 		private void Execute(Func<string> action)
@@ -335,6 +354,69 @@ namespace Orange
 			}
 
 			public override Encoding Encoding { get; }
+		}
+
+		private class ProgressBarField : Widget
+		{
+			public int CurrentPosition;
+			public int MaxPosition;
+
+			private ThemedSimpleText textFieldA;
+			private ThemedSimpleText textFieldB;
+
+			public ProgressBarField()
+			{
+				Layout = new HBoxLayout { Spacing = 6 };
+				MinMaxHeight = Theme.Metrics.DefaultButtonSize.Y;
+
+				var bar = new ThemedFrame();
+				var rect = new Widget();
+				rect.CompoundPresenter.Add(new WidgetFlatFillPresenter(Lime.Theme.Colors.SelectedBorder));
+				rect.Tasks.AddLoop(() => {
+					rect.Size = new Vector2(bar.Width * (float)CurrentPosition / MaxPosition, bar.ContentHeight);
+				});
+				bar.AddNode(rect);
+
+				textFieldA = new ThemedSimpleText {
+					VAlignment = VAlignment.Center,
+					HAlignment = HAlignment.Center,
+				};
+				textFieldB = new ThemedSimpleText {
+					VAlignment = VAlignment.Center,
+					HAlignment = HAlignment.Center,
+				};
+
+				AddNode(bar);
+				AddNode(textFieldA);
+				AddNode(textFieldB);
+
+				HideAndClear();
+			}
+
+			public void Progress(int amount = 1)
+			{
+				CurrentPosition += amount;
+				Mathf.Clamp(CurrentPosition, 0, MaxPosition);
+				Application.InvokeOnMainThread(() => {
+					textFieldA.Text = (int)((float)CurrentPosition / MaxPosition * 100) + "%";
+					textFieldB.Text = CurrentPosition + " / " + MaxPosition;
+				});
+			}
+
+			public void Setup(int maxPosition)
+			{
+				CurrentPosition = 0;
+				MaxPosition = maxPosition;
+				Progress(0);
+				Visible = true;
+			}
+
+			public void HideAndClear()
+			{
+				CurrentPosition = 100;
+				MaxPosition = 100;
+				Visible = false;
+			}
 		}
 	}
 }

@@ -130,8 +130,20 @@ namespace Orange
 				}
 			}
 
-			try {
-				BeginCookBundles?.Invoke();
+			try {			
+				int s = 0;
+				// Drop cooking rules, they shouldn't be counting as assets, but The.Workspace.AssetFiles includes them
+				foreach (var asset in The.Workspace.AssetFiles.Enumerate()) {
+					if (string.Equals(Path.GetExtension(asset.Path), ".txt", StringComparison.OrdinalIgnoreCase)) {
+						if (string.Equals(Path.GetFileName(asset.Path), "#CookingRules.txt", StringComparison.OrdinalIgnoreCase) ||
+							!string.Equals(Path.GetExtension(Path.GetFileNameWithoutExtension(asset.Path)), string.Empty, StringComparison.OrdinalIgnoreCase))
+							continue;
+					}
+					s++;
+				}
+				
+				UserInterface.Instance.SetupProgressBar(s);
+				BeginCookBundles?.Invoke();			
 
 				CookBundle(CookingRulesBuilder.MainBundleName);
 				foreach (var extraBundle in extraBundles) {
@@ -151,6 +163,7 @@ namespace Orange
 				cookCanceled = false;
 				RemoveBackups();
 				EndCookBundles?.Invoke();
+				UserInterface.Instance.StopProgressBar();
 			}
 		}
 
@@ -214,7 +227,7 @@ namespace Orange
 
 			public void Rescan()
 			{
-
+				
 			}
 		}
 
@@ -417,6 +430,8 @@ namespace Orange
 			SyncUpdated(".png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
 				var rules = cookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
 				if (rules.TextureAtlas != null) {
+					// Reverse double counting
+					UserInterface.Instance.IncreaseProgressBar(-1);
 					// No need to cache this texture since it is a part of texture atlas.
 					return false;
 				}
@@ -477,6 +492,7 @@ namespace Orange
 		static void SyncUpdated(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
 		{
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {
+				UserInterface.Instance.IncreaseProgressBar();
 				var srcPath = srcFileInfo.Path;
 				var dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				var bundled = bundle.FileExists(dstPath);
@@ -832,6 +848,7 @@ namespace Orange
 				if (AssetBundle.FileExists(texturePath)) {
 					DeleteFileFromBundle(texturePath);
 				}
+				UserInterface.Instance.IncreaseProgressBar();
 			}
 			Console.WriteLine("+ " + atlasPath);
 			var firstItem = items.First(i => i.Allocated);
@@ -1089,6 +1106,9 @@ namespace Orange
 				var atlasNeedRebuld = cookingRules.TextureAtlas != null && !AssetBundle.FileExists(atlasPartPath);
 				if (atlasNeedRebuld) {
 					atlasChainsToRebuild.Add(cookingRules.TextureAtlas);
+				}
+				else {
+					UserInterface.Instance.IncreaseProgressBar();
 				}
 			}
 			foreach (var atlasChain in atlasChainsToRebuild) {

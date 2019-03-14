@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +28,10 @@ namespace Orange
 		public abstract void ShowError(string message);
 
 		public abstract Target GetActiveTarget();
+
+		public abstract void StopProgressBar();
+		public abstract void SetupProgressBar(int maxPosition);
+		public abstract void IncreaseProgressBar(int amount = 1);
 
 		public virtual void ExitWithErrorIfPossible() { }
 

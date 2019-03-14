@@ -186,6 +186,10 @@ namespace Orange
 		{
 		}
 
+		public override void SetupProgressBar(int maxPosition) { }
+		public override void StopProgressBar() { }
+		public override void IncreaseProgressBar(int amount = 1) { }
+
 		private class PluginUIBuilder : IPluginUIBuilder
 		{
 			public IPluginPanel SidePanel { get; } = new PluginPanel();
