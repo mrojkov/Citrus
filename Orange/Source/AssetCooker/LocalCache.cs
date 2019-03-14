@@ -56,10 +56,6 @@ namespace Orange
 			return GetCachedFilePath(stream);
 		}
 
-		/// <summary>
-		/// Make sure that you tried to find cache before saving or
-		/// this won't work because it won't know full path to file
-		/// </summary>
 		public static void Save(string srcPath, string dstPath)
 		{
 			Directory.CreateDirectory(cacheDirectory);
@@ -69,10 +65,10 @@ namespace Orange
 		private static string GetCachedFilePath(Stream stream)
 		{
 			stream.Position = 0;
-			var hashString = BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty);
+			var hashString = BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty).ToLower();
 			cacheDirectory = Path.Combine(The.Workspace.ProjectCacheDirectory, textureCacheDirectory,
-				hashString[0].ToString(), hashString[1].ToString(), "");
-			return Path.Combine(cacheDirectory, hashString.Substring(2));
+				hashString.Substring(0, 2), hashString.Substring(2, 2), "");
+			return Path.Combine(cacheDirectory, hashString);
 		}
 	}
 }
