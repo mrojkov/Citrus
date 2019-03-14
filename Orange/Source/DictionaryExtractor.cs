@@ -66,7 +66,10 @@ namespace Orange
 				if (!current.ContainsKey(key)) {
 					Logger.Write("+ " + key);
 					added++;
-					current[key] = modified[key];
+					current[key] = new LocalizationEntry() {
+						Text = modified[key].Text,
+						Context = modified[key].Context
+					};
 				} else {
 					var currentEntry = current[key];
 					var newEntry = modified[key];
