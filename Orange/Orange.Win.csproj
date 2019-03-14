@@ -104,6 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\AssetCooker\LocalCache.cs" />
     <Compile Include="Source\Git.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
