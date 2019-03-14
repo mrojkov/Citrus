@@ -58,9 +58,9 @@ namespace Tangerine
 			PlatformPicker.Reload();
 		}
 
-		public override void SetupProgressBar(int maxCount) { }
+		public override void SetupProgressBar(int maxPosition) { }
 		public override void StopProgressBar() { }
-		public override void UpdateProgressBar(int amount = 1) { }
+		public override void IncreaseProgressBar(int amount = 1) { }
 	}
 
 	public class PlatformPicker : ThemedDropDownList

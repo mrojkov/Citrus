@@ -10,68 +10,6 @@ namespace Orange
 {
 	public class OrangeInterface: UserInterface
 	{
-		private class ProgressBarField: Widget
-		{
-			public int CurrentPosition;
-			public int MaxPosition;
-
-			private ThemedSimpleText textFieldA;
-			private ThemedSimpleText textFieldB;
-
-			public ProgressBarField()
-			{
-				Layout = new HBoxLayout { Spacing = 6 };
-				MinHeight = Theme.Metrics.DefaultButtonSize.Y;
-				MaxHeight = Theme.Metrics.DefaultButtonSize.Y;
-
-				var bar = new ThemedFrame();
-				var rect = new Widget();
-				rect.CompoundPresenter.Add(new WidgetFlatFillPresenter(new Color4(30, 225, 30)));
-				rect.Tasks.AddLoop(() => {
-					rect.Size = new Vector2(bar.Width * (float)CurrentPosition / MaxPosition, bar.ContentHeight);
-				});
-				bar.AddNode(rect);
-
-				textFieldA = new ThemedSimpleText() {
-					VAlignment = VAlignment.Center,
-					HAlignment = HAlignment.Center,
-				};
-				textFieldB = new ThemedSimpleText() {
-					VAlignment = VAlignment.Center,
-					HAlignment = HAlignment.Center,
-				};
-
-				AddNode(bar);
-				AddNode(textFieldA);
-				AddNode(textFieldB);
-
-				SetWaiting();
-			}
-
-			public void Progress(int amount = 1)
-			{
-				CurrentPosition += amount;
-				Mathf.Clamp(CurrentPosition, 0, MaxPosition);
-				textFieldA.Text = (int)((float)CurrentPosition / MaxPosition * 100) + "%";
-				textFieldB.Text = CurrentPosition + " / " + MaxPosition;
-			}
-
-			public void SetReady(int maxPosition)
-			{
-				CurrentPosition = 0;
-				MaxPosition = maxPosition;
-				Progress(0);
-			}
-
-			public void SetWaiting()
-			{
-				CurrentPosition = 100;
-				MaxPosition = 100;
-				textFieldA.Text = "Waiting for asset cooking...";
-				textFieldB.Text = "";
-			}
-		}
-
 		private readonly Window window;
 		private readonly WindowWidget windowWidget;
 		private FileChooser projectPicker;
@@ -227,15 +165,15 @@ namespace Orange
 
 		public override void StopProgressBar()
 		{
-			progressBarField.SetWaiting();
+			progressBarField.HideAndClear();
 		}
 
-		public override void SetupProgressBar(int maxCount)
+		public override void SetupProgressBar(int maxPosition)
 		{
-			progressBarField.SetReady(maxCount);
+			progressBarField.Setup(maxPosition);
 		}
 
-		public override void UpdateProgressBar(int amount = 1)
+		public override void IncreaseProgressBar(int amount = 1)
 		{
 			progressBarField.Progress(amount);
 		}
@@ -416,6 +354,69 @@ namespace Orange
 			}
 
 			public override Encoding Encoding { get; }
+		}
+
+		private class ProgressBarField : Widget
+		{
+			public int CurrentPosition;
+			public int MaxPosition;
+
+			private ThemedSimpleText textFieldA;
+			private ThemedSimpleText textFieldB;
+
+			public ProgressBarField()
+			{
+				Layout = new HBoxLayout { Spacing = 6 };
+				MinMaxHeight = Theme.Metrics.DefaultButtonSize.Y;
+
+				var bar = new ThemedFrame();
+				var rect = new Widget();
+				rect.CompoundPresenter.Add(new WidgetFlatFillPresenter(Lime.Theme.Colors.SelectedBorder));
+				rect.Tasks.AddLoop(() => {
+					rect.Size = new Vector2(bar.Width * (float)CurrentPosition / MaxPosition, bar.ContentHeight);
+				});
+				bar.AddNode(rect);
+
+				textFieldA = new ThemedSimpleText {
+					VAlignment = VAlignment.Center,
+					HAlignment = HAlignment.Center,
+				};
+				textFieldB = new ThemedSimpleText {
+					VAlignment = VAlignment.Center,
+					HAlignment = HAlignment.Center,
+				};
+
+				AddNode(bar);
+				AddNode(textFieldA);
+				AddNode(textFieldB);
+
+				HideAndClear();
+			}
+
+			public void Progress(int amount = 1)
+			{
+				CurrentPosition += amount;
+				Mathf.Clamp(CurrentPosition, 0, MaxPosition);
+				Application.InvokeOnMainThread(() => {
+					textFieldA.Text = (int)((float)CurrentPosition / MaxPosition * 100) + "%";
+					textFieldB.Text = CurrentPosition + " / " + MaxPosition;
+				});
+			}
+
+			public void Setup(int maxPosition)
+			{
+				CurrentPosition = 0;
+				MaxPosition = maxPosition;
+				Progress(0);
+				Visible = true;
+			}
+
+			public void HideAndClear()
+			{
+				CurrentPosition = 100;
+				MaxPosition = 100;
+				Visible = false;
+			}
 		}
 	}
 }

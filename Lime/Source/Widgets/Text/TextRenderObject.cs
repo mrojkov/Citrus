@@ -23,17 +23,17 @@ namespace Lime
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
 			if (GradientMapIndex < 0 || RenderMode == TextRenderingMode.Common) {
-				SpriteList?.Render(Color, Blending, Shader);
+				SpriteList.Render(Color, Blending, Shader);
 			} else {
 				if (RenderMode == TextRenderingMode.OnePassWithOutline || RenderMode == TextRenderingMode.TwoPasses) {
 					ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
-					SpriteList?.Render(Color, ColorfulMaterialProvider.Instance);
+					SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
 				}
 
 				if (RenderMode == TextRenderingMode.OnePassWithoutOutline || RenderMode == TextRenderingMode.TwoPasses) {
 					ColorfulMaterialProvider.Instance.Init(
 						Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
-					SpriteList?.Render(Color, ColorfulMaterialProvider.Instance);
+					SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
 				}
 			}
 		}

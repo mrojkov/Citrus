@@ -30,8 +30,8 @@ namespace Orange
 		public abstract Target GetActiveTarget();
 
 		public abstract void StopProgressBar();
-		public abstract void SetupProgressBar(int maxCount);
-		public abstract void UpdateProgressBar(int amount = 1);
+		public abstract void SetupProgressBar(int maxPosition);
+		public abstract void IncreaseProgressBar(int amount = 1);
 
 		public virtual void ExitWithErrorIfPossible() { }
 
