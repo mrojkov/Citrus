@@ -90,6 +90,7 @@ namespace Tangerine.Core
 				return false;
 			}
 			instance = t.Node.Clone();
+			Document.Current?.Decorate(instance);
 			return true;
 		}
 

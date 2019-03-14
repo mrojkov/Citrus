@@ -104,7 +104,7 @@ namespace Tangerine.Core.Operations
 			}
 
 			foreach (var node in Document.Current.SelectedNodes()) {
-				Document.Current.RefreshExternalScenes(node);
+				node.LoadExternalScenes();
 			}
 		}
 

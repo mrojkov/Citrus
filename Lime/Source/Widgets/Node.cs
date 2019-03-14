@@ -119,6 +119,7 @@ namespace Lime
 		[TangerineStaticProperty]
 #if TANGERINE
 		[TangerineIgnoreIf(nameof(ShouldInspectContentsPath))]
+		[TangerineOnPropertySet(nameof(OnContentsPathChange))]
 #endif // TANGERINE
 		public string ContentsPath
 		{
@@ -570,6 +571,15 @@ namespace Lime
 		protected bool ShouldInspectContentsPath() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 
 		protected bool ShouldInspectPosition() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
+
+		protected void OnContentsPathChange()
+		{
+			if (string.IsNullOrEmpty(ContentsPath)) {
+				Nodes.Clear();
+				Components.Clear();
+			}
+			LoadExternalScenes();
+		}
 
 #endif // TANGERINE
 

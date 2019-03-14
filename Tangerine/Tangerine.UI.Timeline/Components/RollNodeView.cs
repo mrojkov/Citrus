@@ -359,6 +359,7 @@ namespace Tangerine.UI.Timeline.Components
 						Core.Operations.PropagateMarkers.Perform(nodeData.Node);
 					});
 				}));
+				menu.Insert(0, GenericCommands.InlineExternalScene);
 			}
 
 			menu.Popup();

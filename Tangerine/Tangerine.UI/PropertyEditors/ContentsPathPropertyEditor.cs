@@ -31,7 +31,6 @@ namespace Tangerine.UI
 			if (IsValid(path)) {
 				DoTransaction(() => {
 					SetProperty(path);
-					Document.Current.RefreshExternalScenes();
 					Project.Current.SceneCache.CheckCyclicDependencies(path);
 				});
 			} else {

@@ -372,6 +372,28 @@ namespace Tangerine
 		}
 	}
 
+	public class InlineExternalScene : DocumentCommandHandler
+	{
+		public override void ExecuteTransaction()
+		{
+			var nodes = Document.Current?.SelectedNodes().Editable().ToList();
+			if (nodes.Count != 1) {
+				AlertDialog.Show("Please, select a single node");
+				return;
+			}
+			if (!(nodes[0] is Widget w && NodeCompositionValidator.CanHaveChildren(w.GetType()) && Document.Current != null)) {
+				AlertDialog.Show($"Can't inline {nodes[0].GetType()}");
+				return;
+			}
+			var node = nodes[0];
+			var clone = node.Clone();
+			clone.ContentsPath = null;
+			var location = Document.Current.Container.RootFolder().Find(node);
+			UnlinkFolderItem.Perform(Document.Current.Container, node);
+			InsertFolderItem.Perform(Document.Current.Container, location, clone);
+		}
+	}
+
 	public class UpsampleAnimationTwiceEntireScene : UpsampleAnimationTwice
 	{
 		public override void ExecuteTransaction()
