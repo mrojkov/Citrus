@@ -4,9 +4,10 @@ namespace Lime
 {
 	// See https://easings.net
 
-	public enum EasingFunction
+	public enum EasingFunction : byte
 	{
 		Linear,
+		Hermite,
 		Quadratic,
 		Cubic,
 		Quartic,
@@ -19,7 +20,7 @@ namespace Lime
 		Bounce,
 	}
 
-	public enum EasingType
+	public enum EasingType : byte
 	{
 		In,
 		Out,
@@ -33,6 +34,7 @@ namespace Lime
 			switch (function) {
 				default:
 				case EasingFunction.Linear: return Linear(p);
+				case EasingFunction.Hermite: return HermiteEase(p, type);
 				case EasingFunction.Quadratic: return QuadraticEase(p, type);
 				case EasingFunction.Cubic: return CubicEase(p, type);
 				case EasingFunction.Quartic: return QuarticEase(p, type);
@@ -49,6 +51,34 @@ namespace Lime
 		public static float Linear(float p)
 		{
 			return p;
+		}
+
+		public static float HermiteEase(float p, EasingType type)
+		{
+			if (type == EasingType.In) {
+				return SmoothStepEaseIn(p);
+			} else if (type == EasingType.Out) {
+				return SmoothStepEaseOut(p);
+			} else {
+				return SmoothStepEaseInOut(p);
+			}
+		}
+
+		public static float SmoothStepEaseIn(float p)
+		{
+			p *= 0.5f;
+			return (p * p * (3 - 2 * p)) * 2;
+		}
+
+		public static float SmoothStepEaseOut(float p)
+		{
+			p = p * 0.5f + 0.5f;
+			return ((p * p * (3 - 2 * p)) - 0.5f) * 2;
+		}
+
+		public static float SmoothStepEaseInOut(float p)
+		{
+			return p * p * (3 - 2 * p);
 		}
 
 		public static float QuadraticEase(float p, EasingType type)

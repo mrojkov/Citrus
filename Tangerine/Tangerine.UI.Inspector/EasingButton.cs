@@ -42,10 +42,10 @@ namespace Tangerine.UI.Inspector
 			Awoke += Awake;
 		}
 
-		public void SetEasing(EasingFunction function, EasingType type, int softness)
+		public void SetEasing(EasingFunction function, EasingType type)
 		{
 			image.Visible = true;
-			image.Texture = EasingIcons.Instance.Get(function, type, softness);
+			image.Texture = EasingIcons.Instance.Get(function, type);
 		}
 	}
 
@@ -66,28 +66,11 @@ namespace Tangerine.UI.Inspector
 			while (true) {
 				if (easingDataflow.Poll(out var kf)) {
 					if (kf.HasValue) {
-						button.SetEasing(kf.Value.EasingFunction, kf.Value.EasingType, kf.Value.EasingSoftness);
+						button.SetEasing(kf.Value.EasingFunction, kf.Value.EasingType);
 					}
 					button.Checked = kf.HasValue;
 				}
-				bool wasClicked = button.WasClicked();
-				bool wasRightClicked = button.WasRightClicked();
-				if (CoreUserPreferences.Instance.SwapMouseButtonsForKeyframeSwitch) {
-					Toolbox.Swap(ref wasClicked, ref wasRightClicked);
-				}
-				if (wasClicked && kf.HasValue) {
-					var menu = new Menu();
-					foreach (var i in Enum.GetNames(typeof(EasingFunction))) {
-						var func = (EasingFunction)menu.Count;
-						var cmd = new Command { Text = i, Checked = kf.Value.EasingFunction == func };
-						cmd.Issued += () => {
-							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingFunction = func));
-						};
-						menu.Add(cmd);
-					}
-					menu.Popup();
-				}
-				if (wasRightClicked && kf.HasValue) {
+				if (button.WasClicked() && kf.HasValue) {
 					var menu = new Menu();
 					foreach (var i in Enum.GetNames(typeof(EasingType))) {
 						var type = (EasingType)menu.Count;
@@ -98,11 +81,12 @@ namespace Tangerine.UI.Inspector
 						menu.Add(cmd);
 					}
 					menu.Add(Command.MenuSeparator);
-					for (int softness = 0; softness <= 100; softness += 10) {
-						var cmd = new Command { Text = $"Softness {softness}%", Checked = kf.Value.EasingSoftness == softness };
-						var softnessCopy = softness;
+					int j = 0;
+					foreach (var i in Enum.GetNames(typeof(EasingFunction))) {
+						var func = (EasingFunction)j++;
+						var cmd = new Command { Text = i, Checked = kf.Value.EasingFunction == func };
 						cmd.Issued += () => {
-							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingSoftness = softnessCopy));
+							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingFunction = func));
 						};
 						menu.Add(cmd);
 					}

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Yuzu;
 
 namespace Lime
@@ -18,7 +19,6 @@ namespace Lime
 		KeyFunction Function { get; set; }
 		EasingFunction EasingFunction { get; set; }
 		EasingType EasingType { get; set; }
-		int EasingSoftness { get; set; }
 		object Value { get; set; }
 		IKeyframe Clone();
 	}
@@ -40,39 +40,20 @@ namespace Lime
 		}
 	}
 
+	[StructLayout(LayoutKind.Explicit)]
 	public struct KeyframeParams
 	{
-		public int Data;
+		[FieldOffset(0)]
+		public int Packed;
 
-		public KeyFunction Function
-		{
-			get => (KeyFunction)(Data & 7);
-			set => Data = (Data & ~7) | (int)value;
-		}
+		// Yuzu doesn't allow serialize byte enums, so hack it.
+		public KeyFunction Function { get => (KeyFunction)(Packed & 255); set { Packed = (Packed & ~255) | (int)value; } }
 
-		public EasingFunction EasingFunction
-		{
-			get => (EasingFunction)((Data >> 3) & 31);
-			set => Data = (Data & ~(31 << 3)) | ((int)value << 3);
-		}
+		[FieldOffset(1)]
+		public EasingFunction EasingFunction;
 
-		public EasingType EasingType
-		{
-			get => (EasingType)((Data >> 8) & 3);
-			set => Data = (Data & ~(3 << 8)) | ((int)value << 8);
-		}
-
-		public int EasingSoftness
-		{
-			get => (Data >> 10) & 127;
-			set
-			{
-				if (value < 0 || value > 100) {
-					throw new ArgumentOutOfRangeException();
-				}
-				Data = (Data & ~(127 << 10)) | (value << 10);
-			}
-		}
+		[FieldOffset(2)]
+		public EasingType EasingType;
 	}
 
 	[YuzuCompact]
@@ -85,7 +66,16 @@ namespace Lime
 		public int Frame { get; set; }
 
 		[YuzuMember]
-		public int PackedParams { get => p.Data; set => p.Data = value; }
+		public int PackedParams {
+			get => p.Packed;
+			set {
+				// Protect us is someone has used previous version of easings
+				if ((value & 255) >= (int)KeyFunction.ClosedSpline) {
+					value &= 7;
+				}
+				p.Packed = value;
+			}
+		}
 
 		[YuzuMember]
 		public T Value { get; set; }
@@ -93,7 +83,6 @@ namespace Lime
 		public KeyFunction Function { get => p.Function; set => p.Function = value; }
 		public EasingFunction EasingFunction { get => p.EasingFunction; set => p.EasingFunction = value; }
 		public EasingType EasingType { get => p.EasingType; set => p.EasingType = value; }
-		public int EasingSoftness { get => p.EasingSoftness; set => p.EasingSoftness = value; }
 
 		object IKeyframe.Value
 		{

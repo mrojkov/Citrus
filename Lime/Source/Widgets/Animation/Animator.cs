@@ -306,12 +306,7 @@ namespace Lime
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
 			if (@params.EasingFunction != EasingFunction.Linear) {
-				var origT = t;
 				t = Easing.Interpolate(t, @params.EasingFunction, @params.EasingType);
-				if (@params.EasingSoftness != 0) {
-					var k = (float)@params.EasingSoftness * 0.01f;
-					t = (1 - k) * t + k * origT;
-				}
 			}
 			if (@params.Function == KeyFunction.Linear) {
 				CalculatedValue = InterpolateLinear(t);
