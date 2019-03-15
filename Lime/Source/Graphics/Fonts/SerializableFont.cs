@@ -5,7 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class SerializableFont: IFont
+	public class SerializableFont : IFont
 	{
 		private IFont font;
 
@@ -25,7 +25,8 @@ namespace Lime
 			}
 		}
 
-		public string About {
+		public string About
+		{
 			get
 			{
 				if (font == null)
@@ -34,7 +35,8 @@ namespace Lime
 			}
 		}
 
-		public IFontCharSource Chars {
+		public IFontCharSource Chars
+		{
 			get
 			{
 				if (font == null)
@@ -108,11 +110,11 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				if (!AssetBundle.Initialized || !TryFindOrUpdateBundleFonts(name, out var updatedName)) {
+				if (!AssetBundle.Initialized || !TryGetOrUpdateBundleFontPath(name, out var fontPath)) {
 					return Null;
 				}
-				font = Serialization.ReadObject<Font>(updatedName);
-				fonts[updatedName] = font;
+				font = Serialization.ReadObject<Font>(fontPath);
+				fonts[name] = font;
 				return font;
 			}
 		}
@@ -139,22 +141,27 @@ namespace Lime
 			}
 		}
 
-		private bool TryFindOrUpdateBundleFonts(string name, out string updatedName)
+		public static bool TryGetOrUpdateBundleFontPath(string fontName, out string fontPath)
 		{
 			var fontPaths = AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft"));
-			if (fontPaths.Contains(name)) {
-				updatedName = name;
+			if (fontPaths.Contains(fontName)) {
+				fontPath = fontName;
 				return true;
 			}
 			// Look through all the paths to find one containing font with the same name.
 			foreach (var path in fontPaths) {
-				if (System.IO.Path.GetFileNameWithoutExtension(path) == name) {
-					updatedName = path;
+				if (ExtractFontNameFromPath(path) == fontName) {
+					fontPath = path;
 					return true;
 				}
 			}
-			updatedName = null;
+			fontPath = null;
 			return false;
+		}
+
+		public static string ExtractFontNameFromPath(string path, string defaultFontDirectory = DefaultFontDirectory)
+		{
+			return System.IO.Path.ChangeExtension(path.Substring(defaultFontDirectory.Length).TrimStart('/'), null);
 		}
 	}
 }

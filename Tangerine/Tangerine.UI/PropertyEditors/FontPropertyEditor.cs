@@ -18,18 +18,18 @@ namespace Tangerine.UI
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Current.EnumerateFiles(defaultFontDirectory).
 				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
-				Select(i => new DropDownList.Item(GetFontNameWithoutExtension(i), i));
+				Select(i => new DropDownList.Item(FontPool.ExtractFontNameFromPath(i, defaultFontDirectory)));
 			foreach (var i in items) {
 				selector.Items.Add(i);
 			}
 
 			var current = CoalescedPropertyValue().GetValue();
-			selector.Text = current.IsDefined ? GetFontNameWithoutExtension(current.Value) : ManyValuesText;
+			selector.Text = current.IsDefined ? GetFontName(current.Value) : ManyValuesText;
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
 			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
-				selector.Text = i.IsDefined ? GetFontNameWithoutExtension(i.Value) : ManyValuesText;
+				selector.Text = i.IsDefined ? GetFontName(i.Value): ManyValuesText;
 			});
 		}
 
@@ -41,7 +41,7 @@ namespace Tangerine.UI
 
 		private static string GetFontName(SerializableFont i)
 		{
-			return string.IsNullOrEmpty(i?.Name) ? "Default" : i.Name.Replace($"{defaultFontDirectory}/", string.Empty);
+			return string.IsNullOrEmpty(i?.Name) ? "Default" : (i.Name.EndsWith(".fnt") || i.Name.EndsWith(".tft")) ? UpdateFontName(i.Name) : i.Name;
 		}
 
 		private static string GetFontNameWithoutExtension(SerializableFont i)
@@ -51,7 +51,15 @@ namespace Tangerine.UI
 
 		private static string GetFontNameWithoutExtension(string s)
 		{
-			return Path.ChangeExtension(s, null).Replace($"{defaultFontDirectory}/", string.Empty);
+			return Path.ChangeExtension(s, null);
+		}
+
+		private static string UpdateFontName(string s)
+		{
+			return
+				FontPool.TryGetOrUpdateBundleFontPath(s, out var path) ?
+				FontPool.ExtractFontNameFromPath(path, defaultFontDirectory) :
+				"Default";
 		}
 	}
 }
