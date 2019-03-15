@@ -126,17 +126,10 @@ namespace Tangerine.UI.Timeline
 				y = pr.GridWidget().Bottom() + TimelineMetrics.RowSpacing;
 			}
 
-			var rows = Document.Current.Rows;
-			var indexBefore = RowIndexAtY(y - 3);
-			var indexAfter = RowIndexAtY(y + 3);
-			if (indexBefore != -1 && indexAfter < rows.Count) {
-				if (rows[indexBefore].Selected && rows[indexAfter].Selected &&
-					(CalcNestingLevel(rows[indexBefore]) == CalcNestingLevel(rows[indexAfter])) &&
-					!(rows[indexBefore].CanHaveChildren || rows[indexAfter].CanHaveChildren)) {
-					return;
-				}
+			if (ShouldSkipDragCursorRendering(y, CalcIndentation(pr))) {
+				return;
 			}
-
+			
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
@@ -156,6 +149,42 @@ namespace Tangerine.UI.Timeline
 					ColorTheme.Current.TimelineRoll.DragTarget
 				);
 			}
+		}
+
+		static bool ShouldSkipDragCursorRendering(float dragCursorPositionY, int indentation)
+		{
+			var rows = Document.Current.Rows;
+			var beforeIndex = RowIndexAtY(dragCursorPositionY - TimelineMetrics.RowSpacing - 1);
+			var afterIndex = RowIndexAtY(dragCursorPositionY + TimelineMetrics.RowSpacing + 1);
+			if (beforeIndex != -1 && afterIndex < rows.Count) {
+				var before = rows[beforeIndex];
+				var after = rows[afterIndex];
+				bool betweenSelected = before.Selected && after.Selected;
+				bool onSameIndentation = CalcIndentation(before) == CalcIndentation(after);
+				bool cannotBecomeAChild = !(before.CanHaveChildren || after.CanHaveChildren);
+				if (betweenSelected && onSameIndentation && cannotBecomeAChild) {
+					return true;
+				}
+
+				bool boneBefore = before.Components.Contains<Core.Components.BoneRow>();
+				bool boneIsSelected = false;
+				foreach (var row in rows) {
+					boneIsSelected = boneIsSelected || (row.Selected && row.Components.Contains<Core.Components.BoneRow>());
+				}
+
+				if (!boneIsSelected) {
+					if (boneBefore) {
+						if (indentation >= CalcIndentation(before)) {
+							return true;
+						} else {
+							if (!(indentation < CalcIndentation(after) && !after.Parent.Components.Contains<Core.Components.BoneRow>())) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+			return false;
 		}
 
 		static int CalcIndentation(Row row)
@@ -188,17 +217,6 @@ namespace Tangerine.UI.Timeline
 				index++;
 			}
 			return index;
-		}
-
-		static int CalcNestingLevel(Row row)
-		{
-			int res = -1;
-			Row cur = row;
-			while (cur != null) {
-				res++;
-				cur = cur.Parent;
-			}
-			return res;
 		}
 
 		static Row RowUnderMouse(Vector2 position)
