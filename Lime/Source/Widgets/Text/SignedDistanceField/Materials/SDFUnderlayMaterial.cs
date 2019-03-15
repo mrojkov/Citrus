@@ -37,7 +37,7 @@ namespace Lime.SignedDistanceField
 		public void Apply(int pass)
 		{
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
-			shaderParams.Set(softnessKey, Softness * 0.01f);
+			shaderParams.Set(softnessKey, Mathf.Max(Softness * 0.01f, 0.001f));
 			shaderParams.Set(colorKey, Color.ToVector4());
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShadowShaderProgram.GetInstance());

@@ -44,7 +44,7 @@ namespace Lime.SignedDistanceField
 		{
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(textDilateKey, 0.5f - TextDilate * 0.01f);
-			shaderParams.Set(softnessKey, Softness * 0.001f);
+			shaderParams.Set(softnessKey, Mathf.Max(Softness * 0.001f, 0.001f));
 			shaderParams.Set(colorKey, Color.ToVector4());
 			shaderParams.Set(offsetKey, Offset);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
