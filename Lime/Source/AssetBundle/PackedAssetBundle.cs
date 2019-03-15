@@ -133,11 +133,6 @@ namespace Lime
 			}
 		}
 
-		~AssetStream()
-		{
-			Dispose(false);
-		}
-
 		private void ThrowIfDisposed()
 		{
 			if (disposedValue) {

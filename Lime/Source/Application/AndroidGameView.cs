@@ -86,6 +86,8 @@ namespace Lime
 
 		private static Lime.Graphics.Platform.OpenGL.PlatformRenderContext platformRenderContext;
 
+		private readonly IWindowManager windowManager;
+
 		private KeyboardHandler keyboardHandler;
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
@@ -119,6 +121,8 @@ namespace Lime
 			holder = Holder;
 			holder.AddCallback(this);
 			holder.SetType(SurfaceType.Gpu);
+
+			windowManager = context.GetSystemService(Android.Content.Context.WindowService).JavaCast<IWindowManager>();
 		}
 
 		protected override void Dispose(bool disposing)
@@ -281,8 +285,18 @@ namespace Lime
 		{
 			var surfaceRect = holder.SurfaceFrame;
 			Size = new System.Drawing.Size(surfaceRect.Right - surfaceRect.Left, surfaceRect.Bottom - surfaceRect.Top);
-			// Determine orientation using screen dimensions, because Amazon FireOS sometimes reports wrong device orientation.
-			var orientation = Width < Height ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
+			// We don't use Display's rotation to determine orientation because it shows rotation
+			// from "natural" orientation. On some devices 0 degrees may refer to portrait and on some devices
+			// 0 degrees may refer to landscape.
+			DeviceOrientation orientation;
+			using (var realSize = new Android.Graphics.Point()) {
+				// On some tablets Surface may be created twice after resuming game if orientation is restricted -
+				// For example if you use tablet in landscape and game is restricted to portrait,
+				// surface will be created for landscape and on a next frame recreated for portrait.
+				// So we prefer to use Display's Real Size which seems always follow restricted orientation.
+				windowManager.DefaultDisplay.GetRealSize(realSize);
+				orientation = realSize.X < realSize.Y ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
+			}
 			var deviceRotated = Application.CurrentDeviceOrientation != orientation;
 			Application.CurrentDeviceOrientation = orientation;
 			Resize?.Invoke(this, new ResizeEventArgs { DeviceRotated = deviceRotated });

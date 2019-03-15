@@ -279,7 +279,10 @@ namespace Orange
 
 				var existedAssemblyByPath = domainAssemblies.Where(i => {
 					try {
-						return string.Equals(i.Location, dllPath, StringComparison.CurrentCultureIgnoreCase);
+						return string.Equals(
+							Path.GetFullPath(i.Location),
+							Path.GetFullPath(dllPath),
+							StringComparison.CurrentCultureIgnoreCase);
 					} catch {
 						return false;
 					}
@@ -301,6 +304,7 @@ namespace Orange
 				});
 
 				if (existedAssemblyByName.Any()) {
+					assembly = existedAssemblyByName.First();
 					throw new InvalidOperationException(
 						$"WARNING: Assembly {name} with path {assembly.Location} has already loaded in domain." +
 						$"\nAssembly {name} with path {dllPath} leads to exception.");
