@@ -19,7 +19,9 @@ namespace Tangerine.UI.Timeline.Operations
 			if (Document.Current.PreviewAnimation) {
 				Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, false);
 			}
+			Document.CacheAnimationsStates = true;
 			DocumentHistory.Current.Perform(new SetCurrentColumn(column, animation));
+			Document.CacheAnimationsStates = false;
 		}
 
 		public static void Perform(int column)
