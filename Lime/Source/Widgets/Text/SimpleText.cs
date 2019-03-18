@@ -266,6 +266,8 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			PrepareSpriteListAndSyncCaret();
+			//ro.CaptureRenderState causes SimpleText invalidation on every frame,
+			//so use local values for blending and shader
 			var component = Components.Get<SignedDistanceFieldComponent>();
 			if (component == null) {
 				var ro = RenderObjectPool<TextRenderObject>.Acquire();
