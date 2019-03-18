@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 #if iOS || MAC || ANDROID
 using GLStencilOp = Lime.Graphics.Platform.OpenGL.StencilOp;
@@ -873,6 +874,14 @@ namespace Lime.Graphics.Platform.OpenGL
 					break;
 			}
 			return features;
+		}
+
+		public void SerializePipelineCache(BinaryWriter writer)
+		{
+		}
+
+		public void DeserializePipelineCache(BinaryReader reader)
+		{
 		}
 	}
 }

@@ -17,6 +17,14 @@ namespace Lime
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Write(string data)
+		{
+			fixed (char* p = data) {
+				WriteInternal((byte*)p, sizeof(char) * data.Length);
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Write<T>(T[] data) where T : unmanaged
 		{
 			Write(data, 0, data.Length);

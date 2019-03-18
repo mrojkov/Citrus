@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
 
 using static SharpVulkan.ResultExtensions;
 
@@ -45,7 +46,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		private PrimitiveTopology primitiveTopology;
 		private PlatformVertexInputLayout vertexInputLayout;
 		private LruCache<Hash128, SharpVulkan.Pipeline> pipelineLruCache = new LruCache<Hash128, SharpVulkan.Pipeline>();
-		private SharpVulkan.PipelineCache pipelineCache;
 		private UploadBufferAllocator uploadBufferSuballocator;
 		private DescriptorAllocator descriptorAllocator;
 		private PlatformBuffer[] vertexBuffers;
@@ -66,6 +66,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private BoundVertexBuffer[] boundVertexBuffers;
 		private BoundIndexBuffer boundIndexBuffer;
 
+		internal PipelineCache PipelineCache;
 		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
 		internal bool SupportsDedicatedAllocation;
 		internal SharpVulkan.Instance Instance => instance;
@@ -99,7 +100,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			vertexOffsets = new int[MaxVertexBufferSlots];
 			boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
 			CreateCommandPool();
-			CreatePipelineCache();
+			PipelineCache = new PipelineCache(this);
 			var preferPersistentMapping = true;
 #if iOS || MAC
 			preferPersistentMapping = false;
@@ -257,14 +258,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				QueueFamilyIndex = queueFamilyIndex
 			};
 			commandPool = device.CreateCommandPool(ref createInfo);
-		}
-
-		private void CreatePipelineCache()
-		{
-			var createInfo = new SharpVulkan.PipelineCacheCreateInfo {
-				StructureType = SharpVulkan.StructureType.PipelineCacheCreateInfo,
-			};
-			pipelineCache = device.CreatePipelineCache(ref createInfo);
 		}
 
 		internal void EnsureReadbackBuffer(ulong size)
@@ -785,11 +778,21 @@ namespace Lime.Graphics.Platform.Vulkan
 						Layout = shaderProgram.PipelineLayout,
 						Subpass = 0
 					};
-					return device.CreateGraphicsPipelines(pipelineCache, 1, &createInfo);
+					return device.CreateGraphicsPipelines(PipelineCache.VKPipelineCache, 1, &createInfo);
 				}
 			} finally {
 				Marshal.FreeHGlobal(shaderEntryPointNamePtr);
 			}
+		}
+
+		public void SerializePipelineCache(BinaryWriter writer)
+		{
+			PipelineCache.Serialize(writer);
+		}
+
+		public void DeserializePipelineCache(BinaryReader reader)
+		{
+			PipelineCache.Deserialize(reader);
 		}
 
 		//public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)

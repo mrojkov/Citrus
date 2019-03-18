@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Lime.Graphics.Platform
 {
@@ -43,5 +44,7 @@ namespace Lime.Graphics.Platform
 		void SetIndexBuffer(IPlatformBuffer buffer, int offset, IndexFormat format);
 		void Draw(int startVertex, int vertexCount);
 		void DrawIndexed(int startIndex, int indexCount, int baseVertex);
+		void SerializePipelineCache(BinaryWriter writer);
+		void DeserializePipelineCache(BinaryReader reader);
 	}
 }

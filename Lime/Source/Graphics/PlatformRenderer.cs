@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Lime.Graphics.Platform;
 
 namespace Lime
@@ -466,6 +467,16 @@ namespace Lime
 			PreDraw(topology);
 			Context.DrawIndexed(startIndex, indexCount, baseVertex);
 			DrawCount++;
+		}
+
+		public static void SerializePipelineCache(BinaryWriter writer)
+		{
+			Context.SerializePipelineCache(writer);
+		}
+
+		public static void DeserializePipelineCache(BinaryReader reader)
+		{
+			Context.DeserializePipelineCache(reader);
 		}
 	}
 }

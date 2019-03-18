@@ -58,6 +58,9 @@ typedef void* ProgramHandle;
 API ShaderHandle C_DECL CreateShader();
 API int C_DECL CompileShader(ShaderHandle shaderHandle, ShaderStage stage, const char* source);
 API const char* C_DECL GetShaderInfoLog(ShaderHandle shaderHandle);
+API unsigned int C_DECL GetShaderSpvSize(ShaderHandle shaderHandle);
+API const void* C_DECL GetShaderSpv(ShaderHandle shaderHandle);
+API void C_DECL SetShaderSpv(ShaderHandle shaderHandle, const void* spv, unsigned int size);
 API void C_DECL DestroyShader(ShaderHandle shaderHandle);
 
 API ProgramHandle C_DECL CreateProgram();
@@ -65,7 +68,7 @@ API void C_DECL BindAttribLocation(ProgramHandle programHandle, const char* name
 API int C_DECL LinkProgram(ProgramHandle programHandle, ShaderHandle vsHandle, ShaderHandle fsHandle);
 API const char* C_DECL GetProgramInfoLog(ProgramHandle programHandle);
 API unsigned int C_DECL GetSpvSize(ProgramHandle programHandle, ShaderStage stage);
-API const unsigned int* C_DECL GetSpv(ProgramHandle programHandle, ShaderStage stage);
+API const void* C_DECL GetSpv(ProgramHandle programHandle, ShaderStage stage);
 API int C_DECL GetActiveAttribCount(ProgramHandle programHandle);
 API const char* C_DECL GetActiveAttribName(ProgramHandle programHandle, int index);
 API ShaderVariableType C_DECL GetActiveAttribType(ProgramHandle programHandle, int index);
