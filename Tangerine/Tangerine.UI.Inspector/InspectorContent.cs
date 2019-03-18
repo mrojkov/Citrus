@@ -156,14 +156,15 @@ namespace Tangerine.UI.Inspector
 				if (Document.Current.InspectRootNode && property.Name == nameof(Widget.Visible)) {
 					return false;
 				}
-				if (objects.Any(obj =>
-					obj is Node node &&
-					!string.IsNullOrEmpty(node.ContentsPath) &&
-					obj is IExternalScenePropertyOverrideChecker checker &&
-					!checker.IsPropertyOverridden(property)
-				)) {
-					return false;
-				}
+			}
+			if (objects.Any(obj =>
+				obj is IPropertyLocker propertyLocker &&
+				propertyLocker.IsPropertyLocked(property,
+					(obj is Node node && !string.IsNullOrEmpty(node.ContentsPath)) ||
+					(obj is NodeComponent component && !string.IsNullOrEmpty(component.Owner?.ContentsPath))
+				)
+			)) {
+				return false;
 			}
 			return true;
 		}

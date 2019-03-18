@@ -1361,14 +1361,17 @@ namespace Lime
 			}
 			var nodeType = GetType();
 			var contentType = content.GetType();
-			if (content is IExternalScenePropertyOverrideChecker coordinator) {
+			if (content is IPropertyLocker propertyLocker) {
 				var properties = nodeType.GetProperties(
 					BindingFlags.Instance |
 					BindingFlags.Public
 				);
 
 				foreach (var property in properties) {
-					if (coordinator.IsPropertyOverridden(property)) {
+					if (!propertyLocker.IsPropertyLocked(property, true)) {
+						if (property.Name == nameof(Widget.Size)) {
+							property.SetValue(content, property.GetValue(this));
+						}
 						continue;
 					}
 
