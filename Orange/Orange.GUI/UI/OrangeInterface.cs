@@ -12,6 +12,7 @@ namespace Orange
 	{
 		private readonly Window window;
 		private readonly WindowWidget windowWidget;
+		private Widget mainVBox;
 		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
@@ -20,6 +21,7 @@ namespace Orange
 		private CheckBoxWithLabel updateVcs;
 		private Button goButton;
 		private Button abortButton;
+		private Widget footerSection;
 
 		private ProgressBarField progressBarField;
 
@@ -43,7 +45,7 @@ namespace Orange
 				Padding = new Thickness(6),
 				Size = windowSize
 			};
-			var mainVBox = new Widget {
+			mainVBox = new Widget {
 				Layout = new VBoxLayout {
 					Spacing = 6
 				}
@@ -136,7 +138,7 @@ namespace Orange
 
 		private Widget CreateFooterSection()
 		{
-			var container = new Widget {
+			footerSection = new Widget {
 				Layout = new HBoxLayout {
 					Spacing = 5
 				},
@@ -147,20 +149,20 @@ namespace Orange
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
 			}
 			actionPicker.Index = 0;
-			container.AddNode(actionPicker);
+			footerSection.AddNode(actionPicker);
 
 			goButton = new ThemedButton("Go");
 			goButton.Clicked += () => Execute((Func<string>) actionPicker.Value);
-			container.AddNode(goButton);
+			footerSection.AddNode(goButton);
 
 			abortButton = new ThemedButton("Abort") {
 				Enabled = false,
 				Visible = false
 			};
 			abortButton.Clicked += () => AssetCooker.CancelCook();
-			container.AddNode(abortButton);
+			footerSection.AddNode(abortButton);
 
-			return container;
+			return footerSection;
 		}
 
 		public override void StopProgressBar()
@@ -201,10 +203,20 @@ namespace Orange
 		{
 			goButton.Visible = value;
 			abortButton.Visible = !value;
-			if (value) {
-				abortButton.Input.DerestrictScope();
-			} else {
-				abortButton.Input.RestrictScope();
+			EnableChildren(windowWidget, value);
+			mainVBox.Enabled = true;
+			EnableChildren(mainVBox, value);
+			footerSection.Enabled = true;
+			EnableChildren(footerSection, value);
+			abortButton.Enabled = !value;
+			textView.Enabled = true;
+			progressBarField.Enabled = true;
+		}
+
+		private void EnableChildren(Widget widget, bool value)
+		{
+			foreach (var node in widget.Nodes) {
+				(node as Widget).Enabled = value;
 			}
 		}
 
@@ -213,15 +225,6 @@ namespace Orange
 			platformPicker.Reload();
 			AssetCooker.BeginCookBundles += () => abortButton.Enabled = true;
 			AssetCooker.EndCookBundles += () => abortButton.Enabled = false;
-
-			Actions.OnGameRun += () => {
-				abortButton.Input.DerestrictScope();
-				textView.Input.RestrictScope();
-			};
-			Actions.OnGameClose += () => {
-				textView.Input.DerestrictScope();
-				abortButton.Input.RestrictScope();
-			};
 		}
 
 		public override void ClearLog()
