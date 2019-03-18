@@ -1,6 +1,5 @@
 using System;
 using Lime;
-using Tangerine.Core.Operations;
 
 namespace Tangerine.Core
 {
@@ -139,19 +138,5 @@ namespace Tangerine.Core
 		public static float Right(this Widget widget) => widget.X + widget.Width;
 		public static float Top(this Widget widget) => widget.Y;
 		public static float Bottom(this Widget widget) => widget.Y + widget.Height;
-
-		public static bool IsPropertyVirtual(this Node widget, string propertyName, bool isExternal)
-		{
-			if (widget is IExternalScenePropertyOverrideChecker checker) {
-				var contentType = widget.GetType();
-				var property = contentType.GetProperty(propertyName);
-				if (property != null && !checker.IsPropertyOverridden(property, isExternal)) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 	}
 }

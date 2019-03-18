@@ -158,8 +158,8 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			if (objects.Any(obj =>
-				obj is IExternalScenePropertyOverrideChecker checker &&
-				!checker.IsPropertyOverridden(property,
+				obj is IPropertyLocker propertyLocker &&
+				propertyLocker.IsPropertyLocked(property,
 					(obj is Node node && !string.IsNullOrEmpty(node.ContentsPath)) ||
 					(obj is NodeComponent component && !string.IsNullOrEmpty(component.Owner?.ContentsPath))
 				)

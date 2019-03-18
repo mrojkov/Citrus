@@ -21,8 +21,13 @@ namespace Tangerine.UI
 					() => {
 						var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
 						var node = CreateNode.Perform(scene.GetType());
+
 						SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
-						SetProperty.Perform(node, nameof(Node.Id), scene.IsPropertyVirtual("Id", true) ? fileName : scene.Id);
+
+						if (node is IPropertyLocker propertyLocker) {
+							string id = propertyLocker.IsPropertyLocked("Id", true) ? fileName : scene.Id;
+							SetProperty.Perform(node, nameof(Node.Id), id);
+						}
 
 						if (scene is Widget) {
 							SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
