@@ -270,7 +270,11 @@ namespace Lime
 		{
 			get => gradient;
 			set {
-				if (gradient.GetHashCode() != value.GetHashCode()) {
+				if (
+					value == null ||
+					gradient == null ||
+					gradient.GetHashCode() != value.GetHashCode()
+				) {
 					materialProvider = null;
 				}
 				gradient = value;
