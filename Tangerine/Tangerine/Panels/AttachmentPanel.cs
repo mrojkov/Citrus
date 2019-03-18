@@ -387,7 +387,7 @@ namespace Tangerine
 				HeaderContainer = Nodes.First().AsWidget;
 				// Change displayed property name to material name.
 				editor = ic.ReadonlyEditors.OfType<InstancePropertyEditor<IMaterial>>().First();
-				HeaderContainer.Descendants.OfType<ThemedSimpleText>().FirstOrDefault().Text = material.SourceName;
+				editor.EditorParams.DisplayName = material.SourceName;
 				// Remove redundant node.
 				HeaderContainer.Nodes.Last().UnlinkAndDispose();
 				HeaderContainer.Layout = new HBoxLayout { Spacing = AttachmentMetrics.Spacing };

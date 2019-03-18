@@ -151,6 +151,7 @@ namespace Tangerine.UI
 							SetProperty(defaultValue);
 					}
 				}
+				PropertyLabel.Text = EditorParams.DisplayName ?? EditorParams.PropertyName;
 				yield return null;
 			}
 		}

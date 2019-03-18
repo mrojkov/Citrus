@@ -93,7 +93,6 @@ namespace Tangerine.UI
 			} else {
 				EditorContainer.Nodes.Insert(0, Selector);
 			}
-			PropertyLabel?.AddChangeWatcher(() => EditorParams.IndexInList, index => PropertyLabel.Text = $"{index}:");
 		}
 
 		protected override void EnabledChanged()
