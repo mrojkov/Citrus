@@ -361,23 +361,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		public void RefreshExternalScenes() => RefreshExternalScenes(RootNode);
-
-		public void RefreshExternalScenes(Node node)
-		{
-			node.LoadExternalScenes();
-			//if (!string.IsNullOrEmpty(node.ContentsPath)) {
-			//	var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == node.ContentsPath);
-			//	if (doc != null && doc.IsModified) {
-			//		node.ReplaceContent(doc.RootNodeUnwrapped.Clone());
-			//	} else {
-			//		node.LoadExternalScenes();
-			//	}
-			//}
-			//foreach (var child in node.Nodes) {
-			//	RefreshExternalScenes(child);
-			//}
-		}
+		public void RefreshExternalScenes() => RootNode.LoadExternalScenes();
 
 		private static void DetachViews()
 		{

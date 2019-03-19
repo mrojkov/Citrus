@@ -924,7 +924,7 @@ namespace Lime
 		protected override Node CloneInternal()
 		{
 			var clone = base.CloneInternal().AsWidget;
-			clone.SkinningWeights = clone.SkinningWeights?.Clone();
+			clone.SkinningWeights = SkinningWeights?.Clone();
 			clone.BoneArray = new BoneArray();
 			clone.input = null;
 			return clone;

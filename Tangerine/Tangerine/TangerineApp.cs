@@ -642,6 +642,7 @@ namespace Tangerine
 			h.Connect(GenericCommands.LoadLayout, new LoadLayout());
 			h.Connect(GenericCommands.GroupContentsToMorphableMeshes, new GroupContentsToMorphableMeshes());
 			h.Connect(GenericCommands.ExportScene, new ExportScene());
+			h.Connect(GenericCommands.InlineExternalScene, new InlineExternalScene());
 			h.Connect(GenericCommands.UpsampleAnimationTwice, new UpsampleAnimationTwice());
 			h.Connect(GenericCommands.ViewHelp, () => Documentation.ShowHelp(Documentation.StartPageName));
 			h.Connect(GenericCommands.HelpMode, () => Documentation.IsHelpModeOn = !Documentation.IsHelpModeOn);
