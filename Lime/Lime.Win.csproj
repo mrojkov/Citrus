@@ -563,7 +563,6 @@
     <Compile Include="Source\Application\iOSMetalGameView.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
-    <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
