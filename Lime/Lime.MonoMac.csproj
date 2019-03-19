@@ -341,13 +341,9 @@
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SignedDistanceFieldComponent.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionShadows.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderObject.cs" />
     <Compile Include="Source\Graphics\Buffer.cs" />
@@ -407,6 +403,7 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
     <Compile Include="Source\Graphics\Platform\Murmur3.cs" />
     <Compile Include="Source\Widgets\Animation\Easing.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFMaterialProviderPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

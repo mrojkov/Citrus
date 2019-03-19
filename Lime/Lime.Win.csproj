@@ -354,12 +354,9 @@
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFInnerShadowMaterial.cs" />
+    <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFMaterialProviderPool.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFUnderlayMaterial.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SignedDistanceFieldMaterial.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderAction.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionMain.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderActionShadows.cs" />
-    <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SDFRenderObject.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\SignedDistanceFieldComponent.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderObject.cs" />

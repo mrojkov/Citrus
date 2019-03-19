@@ -181,23 +181,37 @@ namespace Lime
 		{
 			EnsureSpriteLists();
 			var ro = RenderObjectPool<RenderObject>.Acquire();
-			ro.Objects = new RenderObjectList();
 			//ro.CaptureRenderState causes RichText invalidation on every frame,
 			//so use local values for blending and shader
 			ro.LocalToWorldTransform = LocalToWorldTransform;
 			ro.Blending = Blending;
 			ro.Shader = Shader;
+			ro.Objects = new RenderObjectList();
+			var scale = Mathf.Sqrt(Math.Max(LocalToWorldTransform.U.SqrLength, LocalToWorldTransform.V.SqrLength));
 			for (int i = 0; i < renderer.Styles.Count; i++) {
 				var style = renderer.Styles[i];
-				var styleRO = style.GetRenderObject() as TextRenderObject;
-				styleRO.SpriteList = spriteLists[i];
-				styleRO.RenderMode = TextRenderingMode.TwoPasses;
-				styleRO.Color = GlobalColor;
-				styleRO.GradientMapIndex = style.GradientMapIndex;
-				styleRO.LocalToWorldTransform = LocalToWorldTransform;
-				styleRO.Shader = Shader;
-				styleRO.Blending = Blending;
-				ro.Objects.Add(styleRO);
+				var sdfComponent = style.Components.Get<SignedDistanceFieldComponent>();
+				if (sdfComponent != null) {
+					var sdfRO = sdfComponent.GetRenderObject();
+					foreach (var obj in sdfRO.Objects) {
+						obj.SpriteList = spriteLists[i];
+						obj.Color = GlobalColor;
+						obj.LocalToWorldTransform = LocalToWorldTransform;
+						obj.Shader = Shader;
+						obj.Blending = Blending;
+					}
+					ro.Objects.Add(sdfRO);
+				} else {
+					var styleRO = RenderObjectPool<TextRenderObject>.Acquire();
+					styleRO.SpriteList = spriteLists[i];
+					styleRO.RenderMode = TextRenderingMode.TwoPasses;
+					styleRO.Color = GlobalColor;
+					styleRO.GradientMapIndex = style.GradientMapIndex;
+					styleRO.LocalToWorldTransform = LocalToWorldTransform;
+					styleRO.Shader = Shader;
+					styleRO.Blending = Blending;
+					ro.Objects.Add(styleRO);
+				}
 			}
 			return ro;
 		}

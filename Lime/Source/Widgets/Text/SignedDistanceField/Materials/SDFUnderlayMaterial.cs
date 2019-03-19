@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Lime.SignedDistanceField
 {
 
@@ -11,12 +13,10 @@ namespace Lime.SignedDistanceField
 		private readonly ShaderParamKey<float> dilateKey;
 		private readonly ShaderParamKey<float> softnessKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
-		private readonly ShaderParamKey<Vector2> offsetKey;
 
 		public float Dilate { get; set; } = 0f;
 		public float Softness { get; set; } = 0f;
 		public Color4 Color { get; set; } = Color4.Black;
-		public Vector2 Offset { get; set; } = new Vector2();
 
 		public int PassCount => 1;
 
@@ -32,15 +32,13 @@ namespace Lime.SignedDistanceField
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
 			softnessKey = shaderParams.GetParamKey<float>("softness");
 			colorKey = shaderParams.GetParamKey<Vector4>("color");
-			offsetKey = shaderParams.GetParamKey<Vector2>("offset");
 		}
 
 		public void Apply(int pass)
 		{
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
-			shaderParams.Set(softnessKey, Softness * 0.01f);
+			shaderParams.Set(softnessKey, Mathf.Max(Softness * 0.01f, 0.001f));
 			shaderParams.Set(colorKey, Color.ToVector4());
-			shaderParams.Set(offsetKey, Offset / 100);
 			PlatformRenderer.SetBlendState(blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShadowShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
@@ -54,16 +52,14 @@ namespace Lime.SignedDistanceField
 				Dilate = Dilate,
 				Color = Color,
 				Softness = Softness,
-				Offset = Offset,
 			};
 		}
 	}
 
 	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider
 	{
-		internal bool Free = true;
-
 		public SDFShadowMaterial Material = new SDFShadowMaterial();
+		public Vector2 Offset { get; set; }
 		public IMaterial GetMaterial(int tag) => Material;
 
 		public Sprite.IMaterialProvider Clone() => new SDFShadowMaterialProvider() {
@@ -71,44 +67,6 @@ namespace Lime.SignedDistanceField
 		};
 
 		public Sprite ProcessSprite(Sprite s) => s;
-
-		public void Release()
-		{
-			if (Free) return;
-			try {
-				OnRelease();
-			} finally {
-				Free = true;
-			}
-		}
-
-		protected virtual void OnRelease() { }
-	}
-
-	public static class SDFShadowMaterialProviderPool<T> where T : SDFShadowMaterialProvider, new()
-	{
-		private static T[] items = new T[1] { new T() };
-		private static int index;
-
-		public static T Acquire()
-		{
-			for (int i = 0; i < items.Length; i++) {
-				var item = items[index++];
-				if (index == items.Length)
-					index = 0;
-				if (item.Free) {
-					item.Free = false;
-					return item;
-				}
-			}
-			System.Array.Resize(ref items, items.Length * 2);
-			index = items.Length / 2;
-			for (int i = index; i < items.Length; i++) {
-				items[i] = new T();
-			}
-			items[index].Free = false;
-			return items[index];
-		}
 	}
 
 	public class SDFShadowShaderProgram : ShaderProgram
@@ -138,10 +96,9 @@ namespace Lime.SignedDistanceField
 			uniform lowp float dilate;
 			uniform lowp float softness;
 			uniform lowp vec4 color;
-			uniform lowp vec2 offset;
 
 			void main() {
-				lowp float shadowDistance = texture2D(tex1, texCoords1 - offset).r;
+				lowp float shadowDistance = texture2D(tex1, texCoords1).r;
 				lowp float shadowAlpha = smoothstep(dilate - softness, dilate + softness, shadowDistance);
 				gl_FragColor = vec4(color.rgb, color.a * shadowAlpha * global_color.a);
 			}";

@@ -1,3 +1,4 @@
+using Lime.SignedDistanceField;
 using System;
 using System.Collections.Generic;
 using Yuzu;
@@ -265,25 +266,30 @@ namespace Lime
 		protected internal override Lime.RenderObject GetRenderObject()
 		{
 			PrepareSpriteListAndSyncCaret();
-			TextRenderObject ro;
-			var sdfComponent = Components.Get<SignedDistanceFieldComponent>();
-			if (sdfComponent != null) {
-				var sdfRO = RenderObjectPool<SignedDistanceField.SDFRenderObject>.Acquire();
-				sdfRO.Init(sdfComponent);
-				ro = sdfRO;
-			} else {
-				ro = RenderObjectPool<TextRenderObject>.Acquire();
-			}
 			//ro.CaptureRenderState causes SimpleText invalidation on every frame,
 			//so use local values for blending and shader
-			ro.LocalToWorldTransform = LocalToWorldTransform;
-			ro.Blending = Blending;
-			ro.Shader = Shader;
-			ro.SpriteList = spriteList;
-			ro.GradientMapIndex = GradientMapIndex;
-			ro.RenderMode = RenderMode;
-			ro.Color = GlobalColor * textColor;
-			return ro;
+			var component = Components.Get<SignedDistanceFieldComponent>();
+			if (component == null) {
+				var ro = RenderObjectPool<TextRenderObject>.Acquire();
+				ro.LocalToWorldTransform = LocalToWorldTransform;
+				ro.Blending = Blending;
+				ro.Shader = Shader;
+				ro.SpriteList = spriteList;
+				ro.GradientMapIndex = GradientMapIndex;
+				ro.RenderMode = RenderMode;
+				ro.Color = GlobalColor * textColor;
+				return ro;
+			} else {
+				var ro = component.GetRenderObject();
+				foreach (var item in ro.Objects) {
+					item.LocalToWorldTransform = LocalToWorldTransform;
+					item.Blending = Blending;
+					item.Shader = Shader;
+					item.SpriteList = spriteList;
+					item.Color = GlobalColor * TextColor;
+				}
+				return ro;
+			}
 		}
 
 		void IText.SyncCaretPosition()
@@ -523,35 +529,5 @@ namespace Lime
 			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}
-
-		//internal class RenderObject : TextRenderObject
-		//{
-		//	public int GradientMapIndex;
-		//	public RenderingMode RenderMode;
-
-		//	public override void Render()
-		//	{
-		//		Renderer.Transform1 = LocalToWorldTransform;
-		//		if (GradientMapIndex < 0 || RenderMode == RenderingMode.Common) {
-		//			SpriteList.Render(Color, Blending, Shader);
-		//		} else {
-		//			if (RenderMode == RenderingMode.OnePassWithOutline || RenderMode == RenderingMode.TwoPasses) {
-		//				ColorfulMaterialProvider.Instance.Init(Blending, GradientMapIndex);
-		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-		//			}
-
-		//			if (RenderMode == RenderingMode.OnePassWithoutOutline || RenderMode == RenderingMode.TwoPasses) {
-		//				ColorfulMaterialProvider.Instance.Init(
-		//					Blending, ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - GradientMapIndex - 1);
-		//				SpriteList.Render(Color, ColorfulMaterialProvider.Instance);
-		//			}
-		//		}
-		//	}
-
-		//	protected override void OnRelease()
-		//	{
-		//		SpriteList = null;
-		//	}
-		//}
 	}
 }

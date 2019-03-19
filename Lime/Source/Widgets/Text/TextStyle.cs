@@ -219,21 +219,16 @@ namespace Lime
 
 		private void InvalidateRichText() => (Parent as RichText)?.Invalidate();
 
-		public override void AddToRenderChain(RenderChain chain)
+		protected override void OnParentChanged(Node oldParent)
 		{
+			if (Parent != null) {
+				InvalidateRichText();
+			}
+			base.OnParentChanged(oldParent);
 		}
 
-		protected internal override RenderObject GetRenderObject()
+		public override void AddToRenderChain(RenderChain chain)
 		{
-			var sdfComponent = Components.Get<SignedDistanceFieldComponent>();
-			if (sdfComponent != null) {
-				var ro = RenderObjectPool<SignedDistanceField.SDFRenderObject>.Acquire();
-				ro.Init(sdfComponent);
-				return ro;
-			} else {
-				var ro = RenderObjectPool<TextRenderObject>.Acquire();
-				return ro;
-			}
 		}
 	}
 }
