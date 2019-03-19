@@ -74,7 +74,7 @@ namespace Tangerine.Core
 		/// <summary>
 		/// Document name to be displayed.
 		/// </summary>
-		public string DisplayName => (IsModified ? "*" : string.Empty) + System.IO.Path.GetFileName(System.IO.Path.ChangeExtension(Path ?? "Untitled", null));
+		public string DisplayName => (IsModified ? "*" : string.Empty) + System.IO.Path.GetFileName(Path ?? "Untitled");
 
 		/// <summary>
 		/// Gets or sets the file format the document should be saved to.
@@ -221,7 +221,7 @@ namespace Tangerine.Core
 		{
 			try {
 				if (preloadedSceneStream != null) {
-					RootNodeUnwrapped = Node.CreateFromStream(System.IO.Path.ChangeExtension(Path, GetFileExtension(Format)), yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
+					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
 				} else {
 					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
 				}
@@ -313,7 +313,7 @@ namespace Tangerine.Core
 
 		public string GetFileExtension() => GetFileExtension(Format);
 
-		static bool AssetExists(string path, string ext) => AssetBundle.Current.FileExists(System.IO.Path.ChangeExtension(path, ext));
+		static bool AssetExists(string path, string ext) => AssetBundle.Current.FileExists(path + $".{ext}");
 
 		public void MakeCurrent()
 		{
