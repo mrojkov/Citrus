@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -563,6 +563,7 @@
     <Compile Include="Source\Application\iOSMetalGameView.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
+    <Compile Include="Source\Widgets\IExternalScenePropertyOverrideChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

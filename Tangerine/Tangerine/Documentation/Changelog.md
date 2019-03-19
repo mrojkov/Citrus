@@ -1,3 +1,14 @@
+##### Changelog 19.03.2019
+
+* Реализован автоскролл в Orange [CIT-1152](https://jira.game-forest.com:2000/browse/CIT-1152)
+* ContentsPath теперь проверяется на наличие внешней сцены [CIT-1156](https://jira.game-forest.com:2000/browse/CIT-1156)
+* Widget.Input.RestrictScope заменены Widget.Enabled в Orange [CIT-1160](https://jira.game-forest.com:2000/browse/CIT-1160)
+* Реворк реализации SDF-шрифтов (SDFCleanup)
+
+Багфиксы:
+
+* Исправлена ошибка, при которой невозможно открыть файлы, в пути которых содержится больше одной точки [CIT-1139](https://jira.game-forest.com:2000/browse/CIT-1139)
+
 ##### Changelog 1.03.2019 - 14.03.2019
 
 * Добавлена возможность настраивать плавность анимации через изинги (easings)
