@@ -141,7 +141,10 @@ namespace Tangerine.Core
 				public static void Create(Node node, bool initial = false)
 				{
 					var component = node.Components.Get<AnimationsStatesComponent>();
-					if (component == null) {
+					if (component == null || component.animationsStates.Length != node.Animations.Count) {
+						if (component != null) {
+							node.Components.Remove(component);
+						}
 						component = new AnimationsStatesComponent {
 							animationsStates = new AnimationState[node.Animations.Count]
 						};
@@ -165,14 +168,10 @@ namespace Tangerine.Core
 				internal static bool Restore(Node node)
 				{
 					var component = node.Components.Get<AnimationsStatesComponent>();
-					if (component == null) {
+					if (component == null || component.animationsStates.Length != node.Animations.Count) {
 						return false;
 					}
 					var i = 0;
-					// Cuz of lazy evaluation of DefaultAnimation (bug found in StartLevelDialog.tan)
-					if (node.Animations.Count != component.animationsStates.Length) {
-						return false;
-					}
 					foreach (var animation in node.Animations) {
 						var state = component.animationsStates[i];
 						animation.IsRunning = state.IsRunning;
