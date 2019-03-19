@@ -159,7 +159,7 @@ namespace Tangerine.UI.Inspector
 			}
 			if (objects.Any(obj =>
 				obj is IPropertyLocker propertyLocker &&
-				propertyLocker.IsPropertyLocked(property,
+				propertyLocker.IsPropertyLocked(property.Name,
 					(obj is Node node && !string.IsNullOrEmpty(node.ContentsPath)) ||
 					(obj is NodeComponent component && !string.IsNullOrEmpty(component.Owner?.ContentsPath))
 				)
