@@ -126,6 +126,17 @@ namespace Lime
 			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
 			set => contentsPath = Yuzu.Current?.ExpandPath(value) ?? value;
 		}
+#if TANGERINE
+		protected void OnContentsPathChange()
+		{
+			if (string.IsNullOrEmpty(ContentsPath)) {
+				Nodes.Clear();
+				Components.Clear();
+			}
+			LoadExternalScenes();
+		}
+#endif
+
 
 		internal static long NodeReferenceCacheValidationCode = 1;
 
