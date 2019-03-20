@@ -123,7 +123,8 @@ namespace Tangerine.Core
 				var files = Directory.EnumerateFiles(overlaysPath)
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
 				foreach (var file in files) {
-					Project.Current.Overlays.Add(Path.GetFileNameWithoutExtension(file), (Widget)Node.CreateFromAssetBundle(file, null, TangerineYuzu.Instance.Value));
+					Current.Overlays.Add(Path.GetFileNameWithoutExtension(file),
+						(Widget)Node.CreateFromAssetBundle(Path.ChangeExtension(file, null), null, TangerineYuzu.Instance.Value));
 				}
 			}
 
