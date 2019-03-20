@@ -41,6 +41,19 @@ namespace Lime
 		public Blending Blending { get; set; }
 
 		[YuzuMember]
+		public SkinningMode SkinningMode
+		{
+			get => skinningMode;
+			set
+			{
+				if (skinningMode != value) {
+					skinningMode = value;
+					program = null;
+				}
+			}
+		}
+
+		[YuzuMember]
 		public ITexture DiffuseTexture
 		{
 			get { return diffuseTexture; }
@@ -96,11 +109,21 @@ namespace Lime
 			this.boneCount = boneCount;
 		}
 
+		public void SetBones(Vector4[] dualQuaternionPartA, Vector4[] dualQuaternionPartB, int boneCount)
+		{
+			this.dualQuaternionPartA = dualQuaternionPartA;
+			this.dualQuaternionPartB = dualQuaternionPartB;
+			this.boneCount = boneCount;
+		}
+
 		public int PassCount => 1;
 
 		private ShaderParams[] shaderParamsArray;
 		private ShaderParams shaderParams;
 		private ShaderParamKeys shaderParamKeys;
+		private Vector4[] dualQuaternionPartA;
+		private Vector4[] dualQuaternionPartB;
+		private SkinningMode skinningMode;
 
 		public void Apply(int pass)
 		{
@@ -115,7 +138,12 @@ namespace Lime
 			shaderParams.Set(shaderParamKeys.FogEnd, FogEnd);
 			shaderParams.Set(shaderParamKeys.FogDensity, FogDensity);
 			if (skinEnabled) {
-				shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
+				if (SkinningMode == SkinningMode.Linear) {
+					shaderParams.Set(shaderParamKeys.Bones, boneTransforms, boneCount);
+				} else {
+					shaderParams.Set(shaderParamKeys.DualQuaternionA, dualQuaternionPartA, boneCount);
+					shaderParams.Set(shaderParamKeys.DualQuaternionB, dualQuaternionPartB, boneCount);
+				}
 			}
 			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
@@ -131,7 +159,8 @@ namespace Lime
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
-				FogMode = FogMode
+				FogMode = FogMode,
+				SkinningMode = SkinningMode
 			};
 			if (programCache.TryGetValue(spec, out program)) {
 				return;
@@ -157,7 +186,8 @@ namespace Lime
 				FogDensity = FogDensity,
 				Blending = Blending,
 				DiffuseTexture = DiffuseTexture,
-				SkinEnabled = SkinEnabled
+				SkinEnabled = SkinEnabled,
+				SkinningMode = SkinningMode
 			};
 		}
 
@@ -176,6 +206,8 @@ namespace Lime
 			public readonly ShaderParamKey<Matrix44> LightWorldViewProj;
 			public readonly ShaderParamKey<Vector4> ShadowColor;
 			public readonly ShaderParamKey<Matrix44> Bones;
+			public readonly ShaderParamKey<Vector4> DualQuaternionA;
+			public readonly ShaderParamKey<Vector4> DualQuaternionB;
 			public readonly ShaderParamKey<Vector4> FogColor;
 			public readonly ShaderParamKey<float> FogStart;
 			public readonly ShaderParamKey<float> FogEnd;
@@ -196,6 +228,8 @@ namespace Lime
 				LightWorldViewProj = parameters.GetParamKey<Matrix44>("u_LightWorldViewProjection");
 				ShadowColor = parameters.GetParamKey<Vector4>("u_ShadowColor");
 				Bones = parameters.GetParamKey<Matrix44>("u_Bones");
+				DualQuaternionA = parameters.GetParamKey<Vector4>("u_DualQuaternionPartA");
+				DualQuaternionB = parameters.GetParamKey<Vector4>("u_DualQuaternionPartB");
 				FogColor = parameters.GetParamKey<Vector4>("u_FogColor");
 				FogStart = parameters.GetParamKey<float>("u_FogStart");
 				FogEnd = parameters.GetParamKey<float>("u_FogEnd");

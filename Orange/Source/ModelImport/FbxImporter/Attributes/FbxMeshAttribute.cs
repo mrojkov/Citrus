@@ -34,16 +34,16 @@ namespace Orange.FbxImporter
 
 		public override FbxNodeType Type { get; } = FbxNodeType.Mesh;
 
-		private FbxMeshAttribute() : base(IntPtr.Zero)
-		{
-		}
+		public SkinningMode SkinningMode;
+
+		private FbxMeshAttribute() : base(IntPtr.Zero) { }
 
 		public FbxMeshAttribute(IntPtr ptr) : base(ptr)
 		{
 			Submeshes = ImportSubmeshes(ptr);
 		}
 
-		private static List<FbxSubmesh> ImportSubmeshes(IntPtr ptr)
+		private List<FbxSubmesh> ImportSubmeshes(IntPtr ptr)
 		{
 			var list = new List<FbxSubmesh>();
 			var mesh = FbxNodeGetMeshAttribute(ptr, WindingOrder.CW, true);
@@ -57,7 +57,7 @@ namespace Orange.FbxImporter
 			var colors = colorsContainer.GetData<Vec4>();
 			var normals = normalsContainer.GetData<Vec3>();
 			var uv = uvContainer.GetData<Vec2>();
-
+			SkinningMode = GetSkinningMode(mesh.SkinningMode);
 			var size = ushort.MaxValue;
 			var count = indices.Length / size;
 			var bones = new FbxBone[boneData.Length];
@@ -137,6 +137,18 @@ namespace Orange.FbxImporter
 			return list;
 		}
 
+		private SkinningMode GetSkinningMode(FbxSkinningMode meshSkinningMode)
+		{
+			switch (meshSkinningMode) {
+				case FbxSkinningMode.Linear:
+					return SkinningMode.Linear;
+				case FbxSkinningMode.DualQuaternion:
+					return SkinningMode.DualQuaternion;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(meshSkinningMode), meshSkinningMode, null);
+			}
+		}
+
 		public static FbxMeshAttribute Combine(FbxMeshAttribute meshAttribute1, FbxMeshAttribute meshAttribute2)
 		{
 			var sm = new List<FbxSubmesh>();
@@ -166,6 +178,12 @@ namespace Orange.FbxImporter
 			PolygonVertex
 		}
 
+		private enum FbxSkinningMode
+		{
+			Linear,
+			DualQuaternion,
+		}
+
 		private enum WindingOrder
 		{
 			CCW,
@@ -188,6 +206,8 @@ namespace Orange.FbxImporter
 			public IntPtr Normals;
 
 			public IntPtr Bones;
+
+			public FbxSkinningMode SkinningMode;
 
 			[MarshalAs(UnmanagedType.I4)]
 			public int MaterialIndex;

@@ -11,10 +11,19 @@ namespace Lime
 		void Invalidate();
 	}
 
+	public enum SkinningMode
+	{
+		Default,
+		Linear,
+		DualQuaternion
+	}
+
 	public interface IMaterialSkin
 	{
 		bool SkinEnabled { get; set; }
+		SkinningMode SkinningMode { get; set; }
 		void SetBones(Matrix44[] boneTransforms, int boneCount);
+		void SetBones(Vector4[] dualQuaternionPartA, Vector4[] dualQuaternionPartB, int boneCount);
 	}
 
 	public interface IMaterialFog

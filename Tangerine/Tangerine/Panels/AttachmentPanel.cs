@@ -315,7 +315,8 @@ namespace Tangerine
 							if (meshOption.Opaque == default &&
 								meshOption.HitTestTarget == default &&
 								meshOption.CullMode == CullMode.Front &&
-								meshOption.DisableMerging == default
+								meshOption.DisableMerging == default &&
+								meshOption.SkinningMode == SkinningMode.Linear
 							) {
 								continue;
 							}
@@ -1006,6 +1007,13 @@ namespace Tangerine
 						nameof(Model3DAttachment.MeshOption.DisableMerging))));
 				disableMergingPropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
 				disableMergingPropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
+				var skinningModePropEditor = new EnumPropertyEditor<SkinningMode>(
+					Decorate(new PropertyEditorParams(
+						Header,
+						mesh,
+						nameof(Model3DAttachment.MeshOption.SkinningMode))));
+				skinningModePropEditor.ContainerWidget.Nodes[0].AsWidget.MinWidth = 0f;
+				skinningModePropEditor.ContainerWidget.Nodes[0].AsWidget.MaxWidth = float.PositiveInfinity;
 				CompoundPresenter.Add(Presenters.StripePresenter);
 				Header.LayoutCell.StretchX = Header.Nodes.Count * 2.0f;
 			}
@@ -1023,6 +1031,7 @@ namespace Tangerine
 						CreateLabel("Opaque"),
 						CreateLabel("Hit Test Target"),
 						CreateLabel("Disable Merging"),
+						CreateLabel("Skinning Mode"),
 					}
 				};
 			}

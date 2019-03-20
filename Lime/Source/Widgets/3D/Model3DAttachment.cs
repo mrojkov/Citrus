@@ -28,6 +28,7 @@ namespace Lime
 			public CullMode CullMode { get; set; }
 			public bool Opaque { get; set; }
 			public bool DisableMerging { get; set; }
+			public SkinningMode SkinningMode { get; set; }
 		}
 
 		public class Animation
@@ -158,7 +159,9 @@ namespace Lime
 					var first = meshDescriptor.First().Key;
 					var newMesh = new Mesh3D {
 						Opaque = first.Opaque,
-						CullMode = first.CullMode
+						CullMode = first.CullMode,
+						SkinningMode = first.SkinningMode,
+						HitTestTarget = first.HitTestTarget
 					};
 					Submesh3D curSubmesh = null;
 					foreach (var meshAndSubmeshes in meshDescriptor) {
@@ -249,7 +252,10 @@ namespace Lime
 		{
 			int hashCode;
 			unchecked {
-				hashCode = mesh.Opaque.GetHashCode() + 17 * mesh.CullMode.GetHashCode() + 19 * mesh.HitTestTarget.GetHashCode();
+				hashCode = mesh.Opaque.GetHashCode() +
+					17 * mesh.CullMode.GetHashCode() +
+					19 * mesh.HitTestTarget.GetHashCode() +
+					23 * mesh.SkinningMode.GetHashCode();
 			}
 			return hashCode;
 		}
@@ -356,6 +362,9 @@ namespace Lime
 					}
 					mesh.Opaque = meshOption.Opaque;
 					mesh.CullMode = meshOption.CullMode;
+					if (meshOption.SkinningMode != SkinningMode.Default) {
+						mesh.SkinningMode = meshOption.SkinningMode;
+					}
 					break;
 				}
 			}
@@ -648,6 +657,9 @@ namespace Lime
 
 			[YuzuMember]
 			public bool DisableMerging = false;
+
+			[YuzuMember]
+			public SkinningMode SkinningMode;
 		}
 
 		public class UVAnimationFormat
@@ -796,6 +808,7 @@ namespace Lime
 						}
 
 						meshOption.DisableMerging = meshOptionFormat.Value.DisableMerging;
+						meshOption.SkinningMode = meshOptionFormat.Value.SkinningMode;
 						attachment.MeshOptions.Add(meshOption);
 					}
 				}
@@ -942,6 +955,7 @@ namespace Lime
 				}
 
 				meshOptionFormat.DisableMerging = meshOption.DisableMerging;
+				meshOptionFormat.SkinningMode = meshOption.SkinningMode;
 				origin.MeshOptions.Add(meshOption.Id, meshOptionFormat);
 			}
 

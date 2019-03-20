@@ -20,18 +20,44 @@ namespace Lime
 			uniform vec4 u_ColorFactor;
 			uniform mat4 u_WorldView;
 			uniform mat4 u_WorldViewProj;
-			uniform mat4 u_Bones[50];
+			#ifdef LINEAR_SKINNING
+				uniform mat4 u_Bones[50];
+			#endif
+			#ifdef DUAL_QUATERNION_SKINNING
+				uniform vec4 u_DualQuaternionPartA[50];
+				uniform vec4 u_DualQuaternionPartB[50];
+			#endif
 
 			void main()
 			{
 				vec4 position = a_Position;
 			#ifdef SKIN_ENABLED
-				mat4 skinTransform =
-					u_Bones[int(a_BlendIndices.x)] * a_BlendWeights.x +
-					u_Bones[int(a_BlendIndices.y)] * a_BlendWeights.y +
-					u_Bones[int(a_BlendIndices.z)] * a_BlendWeights.z +
-					u_Bones[int(a_BlendIndices.w)] * a_BlendWeights.w;
-				position = skinTransform * position;
+				#ifdef DUAL_QUATERNION_SKINNING
+					vec4 b_0 =
+						u_DualQuaternionPartA[int(a_BlendIndices.x)] * a_BlendWeights.x +
+						u_DualQuaternionPartA[int(a_BlendIndices.y)] * a_BlendWeights.y +
+						u_DualQuaternionPartA[int(a_BlendIndices.z)] * a_BlendWeights.z +
+						u_DualQuaternionPartA[int(a_BlendIndices.w)] * a_BlendWeights.w;
+					vec4 b_e =
+						u_DualQuaternionPartB[int(a_BlendIndices.x)] * a_BlendWeights.x +
+						u_DualQuaternionPartB[int(a_BlendIndices.y)] * a_BlendWeights.y +
+						u_DualQuaternionPartB[int(a_BlendIndices.z)] * a_BlendWeights.z +
+						u_DualQuaternionPartB[int(a_BlendIndices.w)] * a_BlendWeights.w;
+					vec4 c_0 = b_0 / length(b_0);
+					vec4 c_e = b_e / length(b_0);
+					vec3 pos = position.xyz +
+						cross(2.0 * c_0.xyz, cross(c_0.xyz, position.xyz) + c_0.w * position.xyz) +
+						2.0 * (c_0.w * c_e.xyz - c_e.w * c_0.xyz + cross(c_0.xyz, c_e.xyz));
+					position = vec4(pos, 1.0);
+				#endif
+				#ifdef LINEAR_SKINNING
+					mat4 skinTransform =
+						u_Bones[int(a_BlendIndices.x)] * a_BlendWeights.x +
+						u_Bones[int(a_BlendIndices.y)] * a_BlendWeights.y +
+						u_Bones[int(a_BlendIndices.z)] * a_BlendWeights.z +
+						u_Bones[int(a_BlendIndices.w)] * a_BlendWeights.w;
+					position = skinTransform * position;
+				#endif
 			#endif
 				v_Color = a_Color * u_ColorFactor;
 				v_UV = a_UV;
@@ -105,6 +131,14 @@ namespace Lime
 			if (spec.DiffuseTextureEnabled) {
 				preamble += "#define DIFFUSE_TEXTURE_ENABLED\n";
 			}
+			switch(spec.SkinningMode) {
+				case SkinningMode.Linear:
+					preamble += "#define LINEAR_SKINNING\n";
+					break;
+				case SkinningMode.DualQuaternion:
+					preamble += "#define DUAL_QUATERNION_SKINNING\n";
+					break;
+			}
 			if (spec.FogMode != FogMode.None) {
 				preamble += "#define FOG_ENABLED\n";
 				if (spec.FogMode == FogMode.Linear) {
@@ -142,5 +176,7 @@ namespace Lime
 		public bool SkinEnabled;
 		public bool DiffuseTextureEnabled;
 		public FogMode FogMode;
+		public SkinningMode SkinningMode;
+
 	}
 }
