@@ -490,32 +490,32 @@ namespace Lime
 
 			public int Add(object value)
 			{
-				return ((IList)list).Add(value);
+				return IndexOf(value);
 			}
 
 			public bool Contains(object value)
 			{
-				return ((IList)list).Contains(value);
+				return Contains(value as ShadowParams);
 			}
 
 			public int IndexOf(object value)
 			{
-				return ((IList)list).IndexOf(value);
+				return IndexOf(value as ShadowParams);
 			}
 
 			public void Insert(int index, object value)
 			{
-				((IList)list).Insert(index, value);
+				Insert(index, value as ShadowParams);
 			}
 
 			public void Remove(object value)
 			{
-				((IList)list).Remove(value);
+				Remove(value as ShadowParams);
 			}
 
 			public void CopyTo(Array array, int index)
 			{
-				((IList)list).CopyTo(array, index);
+				CopyTo((ShadowParams[])array, index);
 			}
 		}
 	}
