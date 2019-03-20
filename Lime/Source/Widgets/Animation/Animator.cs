@@ -8,9 +8,7 @@ namespace Lime
 	public interface IAnimator : IDisposable
 	{
 		IAnimationHost Owner { get; set; }
-#if TANGERINE
 		IAnimable Animable { get; }
-#endif // TANGERINE
 
 		IAnimator Clone();
 
@@ -26,11 +24,11 @@ namespace Lime
 
 		int Duration { get; }
 
-		void InvokeTrigger(int frame, double animationTimeCorrection = 0);
-
 		object CalcValue(double time);
 		void Apply();
 		void CalcAndApply(double time);
+		void InvokeTrigger(int frame, double animationTimeCorrection);
+		void AddTriggersInRange(List<Action> triggers, double minTime, double maxTime, bool inclusiveRange);
 
 		void ResetCache();
 
@@ -73,7 +71,6 @@ namespace Lime
 	{
 		public IAnimationHost Owner { get; set; }
 
-#if TANGERINE
 		public IAnimable Animable
 		{
 			get {
@@ -84,7 +81,6 @@ namespace Lime
 			}
 		}
 		private IAnimable animable;
-#endif // TANGERINE
 		private double minTime;
 		private double maxTime;
 		private KeyframeParams @params;
@@ -232,19 +228,42 @@ namespace Lime
 			Keys.Clear();
 		}
 
-		public void InvokeTrigger(int frame, double animationTimeCorrection = 0)
+		public void InvokeTrigger(int frame, double animationTimeCorrection)
 		{
-			if (ReadonlyKeys.Count > 0 && Enabled) {
-				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				if (ReadonlyKeys[keyIndex].Frame == frame) {
-					Owner.OnTrigger(TargetPropertyPath, animationTimeCorrection);
+			if (!Enabled || IsZombie || !IsTriggerable) {
+				return;
+			}
+			foreach (var key in ReadonlyKeys) {
+				if (key.Frame == frame) {
+					Owner?.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: animationTimeCorrection);
+					break;
+				}
+			}
+		}
+
+		public void AddTriggersInRange(List<Action> triggers, double minTime, double maxTime, bool inclusiveRange)
+		{
+			if (!Enabled || IsZombie || !IsTriggerable) {
+				return;
+			}
+			int minFrame = AnimationUtils.SecondsToFramesCeiling(minTime);
+			int maxFrame = AnimationUtils.SecondsToFramesCeiling(maxTime) + (inclusiveRange ? 1 : 0);
+			if (minFrame >= maxFrame) {
+				return;
+			}
+			foreach (var key in ReadonlyKeys) {
+				if (key.Frame >= maxFrame) {
+					break;
+				} else if (key.Frame >= minFrame) {
+					var t = minTime - AnimationUtils.FramesToSeconds(key.Frame);
+					triggers.Add(() => Owner?.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: t));
 				}
 			}
 		}
 
 		public void Apply()
 		{
-			if (Enabled && !IsZombie) {
+			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
 				if (setter == null) {
 					Bind();
 					if (IsZombie) {
@@ -257,15 +276,8 @@ namespace Lime
 
 		public void CalcAndApply(double time)
 		{
-			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
-				if (setter == null) {
-					Bind();
-					if (IsZombie) {
-						return;
-					}
-				}
-				setter(CalcValue(time));
-			}
+			CalcValue(time);
+			Apply();
 		}
 
 		private void Bind()

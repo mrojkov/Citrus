@@ -11,11 +11,12 @@ namespace Lime
 		private bool animatorsArePropagated;
 		internal Animation Next;
 		internal double TimeInternal;
-		internal double? NextMarkerOrTriggerTime;
+		internal Marker NextMarker;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		internal List<IAnimator> EffectiveAnimators;
+		internal List<Action> EffectiveTriggers;
 		internal int EffectiveAnimatorsVersion;
 		internal AnimationCollisionMap CollisionMap;
 
@@ -46,9 +47,9 @@ namespace Lime
 			set
 			{
 				TimeInternal = value;
-				NextMarkerOrTriggerTime = null;
+				NextMarker = null;
 				RunningMarkerId = null;
-				ApplyAnimators(invokeTriggers: false);
+				ApplyAnimators();
 			}
 		}
 
@@ -133,11 +134,12 @@ namespace Lime
 			return false;
 		}
 
-		public void ApplyAnimators(bool invokeTriggers)
+		public void ApplyAnimators()
 		{
 			Load();
-			AnimationEngine.CalcEffectiveAnimators(this);
-			AnimationEngine.ApplyEffectiveAnimators(this, invokeTriggers);
+			var time = AnimationEngine.EaseTime(this, Time);
+			AnimationEngine.CalcEffectiveAnimatorsAndTriggers(this, time, time, false);
+			AnimationEngine.ApplyEffectiveAnimators(this);
 		}
 
 		internal void RaiseStopped()

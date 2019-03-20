@@ -7,7 +7,7 @@ namespace Lime
 		Play,
 		Stop
 	}
-	
+
 	[TangerineRegisterNode(Order = 3)]
 	public class Audio : Node
 	{
@@ -101,7 +101,7 @@ namespace Lime
 		{
 			sound.Stop(FadeTime);
 		}
-		
+
 		private bool ShouldStop()
 		{
 			return !Continuous && (GetRoot() != WidgetContext.Current.Root || !((Parent as Widget)?.GloballyVisible ?? false));
@@ -116,18 +116,19 @@ namespace Lime
 		{
 		}
 
-		public override void OnTrigger(string property, double animationTimeCorrection = 0)
+		public override void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
 			if (property == "Action") {
+				var action = (AudioAction)value;
 				if (GloballyEnable) {
-					if (Action == AudioAction.Play) {
+					if (action == AudioAction.Play) {
 						Play();
 					} else {
 						Stop();
 					}
 				}
 			} else {
-				base.OnTrigger(property);
+				base.OnTrigger(property, value, animationTimeCorrection);
 			}
 		}
 	}

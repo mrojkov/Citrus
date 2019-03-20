@@ -39,7 +39,7 @@ namespace Lime
 	{
 		AnimatorCollection Animators { get; }
 		void OnAnimatorsChanged();
-		void OnTrigger(string property, double animationTimeCorrection = 0);
+		void OnTrigger(string property, object value, double animationTimeCorrection = 0);
 		Component GetComponent(Type type);
 	}
 

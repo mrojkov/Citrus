@@ -181,7 +181,7 @@ namespace Lime
 			}
 		}
 
-		public void InvokeTriggers(int frame, string animationId, double animationTimeCorrection = 0)
+		public void InvokeTriggers(int frame, string animationId = null, double animationTimeCorrection = 0)
 		{
 			foreach (var a in this) {
 				if (a.IsTriggerable && a.AnimationId == animationId) {

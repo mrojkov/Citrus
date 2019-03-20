@@ -17,6 +17,11 @@ namespace Lime
 			return (int)(seconds * FramesPerSecond + 0.000001);
 		}
 
+		public static int SecondsToFramesCeiling(double seconds)
+		{
+			return (int)(seconds * FramesPerSecond + (1 - 0.000001));
+		}
+
 		public static double FramesToSeconds(int frame)
 		{
 			return frame * SecondsPerFrame;

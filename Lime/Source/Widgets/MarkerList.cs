@@ -128,7 +128,7 @@ namespace Lime
 		public void Add(Marker marker)
 		{
 			markers.Add(marker);
-			owner.NextMarkerOrTriggerTime = null;
+			owner.NextMarker = null;
 		}
 
 		public void AddOrdered(Marker marker)
@@ -146,7 +146,7 @@ namespace Lime
 					markers.Insert(i, marker);
 				}
 			}
-			owner.NextMarkerOrTriggerTime = null;
+			owner.NextMarker = null;
 		}
 	}
 }

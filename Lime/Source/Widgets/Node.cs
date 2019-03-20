@@ -400,9 +400,6 @@ namespace Lime
 
 		void IAnimationHost.OnAnimatorsChanged()
 		{
-			foreach (var a in Animations) {
-				a.NextMarkerOrTriggerTime = null;
-			}
 			for (var n = Parent; n != null; n = n.Parent) {
 				n.DescendantAnimatorsVersion++;
 			}
@@ -759,27 +756,27 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		public virtual void OnTrigger(string property, double animationTimeCorrection = 0)
+		public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
 			if (property != "Trigger") {
 				return;
 			}
-			if (string.IsNullOrEmpty(Trigger)) {
+			if (string.IsNullOrEmpty(value as string)) {
 				DefaultAnimation.Time = animationTimeCorrection;
 				DefaultAnimation.IsRunning = true;
 			} else {
-				TriggerMultipleAnimations(animationTimeCorrection);
+				TriggerMultipleAnimations((string)value, animationTimeCorrection);
 			}
 		}
 
-		protected void TriggerMultipleAnimations(double animationTimeCorrection = 0)
+		protected void TriggerMultipleAnimations(string trigger, double animationTimeCorrection = 0)
 		{
-			if (Trigger.IndexOf(',') >= 0) {
-				foreach (var s in Trigger.Split(',')) {
+			if (trigger.IndexOf(',') >= 0) {
+				foreach (var s in trigger.Split(',')) {
 					TriggerAnimation(s.Trim(), animationTimeCorrection);
 				}
 			} else {
-				TriggerAnimation(Trigger, animationTimeCorrection);
+				TriggerAnimation(trigger, animationTimeCorrection);
 			}
 		}
 

@@ -7,16 +7,36 @@ namespace Lime
 	{
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
-		public virtual void CalcEffectiveAnimators(Animation animation) { }
-		public virtual void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0) { }
+		/// <summary>
+		/// 1. Refreshes animation.EffectiveAnimators;
+		/// 2. Calculates each animator at currTime;
+		/// 3. Adds triggers in given range to animation.Triggers.
+		/// The range is [prevTime, currTime) or [prevTime, currTime] depending on inclusiveRange flag.
+		/// This method doesn't depend on animation.Time value.
+		/// </summary>
+		public virtual void CalcEffectiveAnimatorsAndTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange) { }
+		public virtual double EaseTime(Animation animation, double time) => time;
+
+		public void ApplyEffectiveAnimators(Animation animation)
+		{
+			foreach (var a in animation.EffectiveAnimators) {
+				a.Apply();
+			}
+		}
+
+		public void InvokeTriggers(Animation animation)
+		{
+			foreach (var i in animation.EffectiveTriggers) {
+				i();
+			}
+		}
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
 	{
 		public Func<Animation, string, double, bool> OnRunAnimation;
 		public Action<Animation, float> OnAdvanceAnimation;
-		public Action<Animation> OnCalcEffectiveAnimators;
-		public Action<Animation, bool, double> OnApplyEffectiveAnimators;
+		public Action<Animation, double, double, bool> OnCalcEffectiveAnimatorsAndTriggers;
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
@@ -28,14 +48,9 @@ namespace Lime
 			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
 
-		public override void CalcEffectiveAnimators(Animation animation)
+		public override void CalcEffectiveAnimatorsAndTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange)
 		{
-			OnCalcEffectiveAnimators?.Invoke(animation);
-		}
-
-		public override void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
-		{
-			OnApplyEffectiveAnimators?.Invoke(animation, invokeTriggers, animationTimeCorrection);
+			OnCalcEffectiveAnimatorsAndTriggers?.Invoke(animation, prevTime, currTime, inclusiveRange);
 		}
 	}
 
@@ -53,6 +68,8 @@ namespace Lime
 				}
 				frame = marker.Frame;
 			}
+			// Easings may give huge animationTimeCorrection values, clamp it.
+			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame, 0);
 			animation.Time = AnimationUtils.FramesToSeconds(frame) + animationTimeCorrection;
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
@@ -61,57 +78,47 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var previousTime = animation.TimeInternal;
-			var currentTime = previousTime + delta;
-			animation.TimeInternal = currentTime;
-			if (!animation.NextMarkerOrTriggerTime.HasValue) {
-				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
-				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
-				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
-				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
-			}
-
-			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
-				CalcEffectiveAnimators(animation);
-				ApplyEffectiveAnimators(animation, invokeTriggers: false);
+			var prevTime = animation.Time;
+			var currTime = prevTime + delta;
+			animation.TimeInternal = currTime;
+			animation.NextMarker = animation.NextMarker ?? GetNextMarker(animation, prevTime);
+			if (animation.NextMarker == null || currTime < animation.NextMarker.Time) {
+				AdvanceAnimationHelper(animation, prevTime, currTime, inclusiveRange: false);
 			} else {
-				var frameTime = animation.NextMarkerOrTriggerTime.Value;
-				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
-				animation.NextMarkerOrTriggerTime = null;
-				var currentMarker = animation.Markers.GetByFrame(frameIndex);
-				if (currentMarker != null) {
-					ProcessMarker(animation, currentMarker);
-				}
-				CalcEffectiveAnimators(animation);
-				ApplyEffectiveAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
-				if (!animation.IsRunning) {
+				var marker = animation.NextMarker;
+				animation.NextMarker = null;
+				ProcessMarker(animation, marker);
+				if (marker.Action == MarkerAction.Stop) {
+					AdvanceAnimationHelper(animation, prevTime, animation.Time, inclusiveRange: true);
 					animation.RaiseStopped();
+				} else if (marker.Action == MarkerAction.Play) {
+					AdvanceAnimationHelper(animation, prevTime, currTime, inclusiveRange: false);
 				}
 			}
 		}
 
-		protected static double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
+		protected void AdvanceAnimationHelper(Animation animation, double prevTime, double currTime, bool inclusiveRange)
 		{
-			int? nextMarkerOrTriggerFrame = null;
+			CalcEffectiveAnimatorsAndTriggers(animation,
+				EaseTime(animation, prevTime),
+				EaseTime(animation, currTime),
+				inclusiveRange);
+			ApplyEffectiveAnimators(animation);
+			InvokeTriggers(animation);
+		}
+
+		protected static Marker GetNextMarker(Animation animation, double time)
+		{
+			if (animation.Markers.Count == 0) {
+				return null;
+			}
+			var frame = AnimationUtils.SecondsToFramesCeiling(time);
 			foreach (var marker in animation.Markers) {
-				if (marker.Frame >= nextFrame) {
-					nextMarkerOrTriggerFrame = marker.Frame;
-					break;
+				if (marker.Frame >= frame) {
+					return marker;
 				}
 			}
-			for (var child = animation.Owner.FirstChild; child != null; child = child.NextSibling) {
-				foreach (var animator in child.Animators) {
-					if (!animator.Enabled || !animator.IsTriggerable || animator.AnimationId != animation.Id) {
-						continue;
-					}
-					if (animator.TryGetNextKeyFrame(nextFrame, out var keyFrame)) {
-						if (!nextMarkerOrTriggerFrame.HasValue || keyFrame < nextMarkerOrTriggerFrame.Value) {
-							nextMarkerOrTriggerFrame = keyFrame;
-						}
-					}
-				}
-			}
-			return nextMarkerOrTriggerFrame * AnimationUtils.SecondsPerFrame;
+			return null;
 		}
 
 		protected virtual void ProcessMarker(Animation animation, Marker marker)
@@ -136,35 +143,37 @@ namespace Lime
 			marker.CustomAction?.Invoke();
 		}
 
-		public override void CalcEffectiveAnimators(Animation animation)
+		public override void CalcEffectiveAnimatorsAndTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange)
 		{
 			if (animation.IsCompound) {
-				CalcEffectiveAnimatorsForCompoundAnimation(animation);
+				CalcEffectiveAnimatorsAndTriggersForCompoundAnimation(animation, prevTime, currTime, inclusiveRange);
 			} else {
-				CalcEffectiveAnimatorsForPlainAnimation(animation);
+				CalcEffectiveAnimatorsAndTriggersForSimpleAnimation(animation, prevTime, currTime, inclusiveRange);
 			}
 		}
 
-		private static void CalcEffectiveAnimatorsForCompoundAnimation(Animation animation)
+		private static void CalcEffectiveAnimatorsAndTriggersForCompoundAnimation(Animation animation, double prevTime, double currTime, bool inclusiveRange)
 		{
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAnimator>())).Clear();
+			(animation.EffectiveTriggers ?? (animation.EffectiveTriggers = new List<Action>())).Clear();
 			(animation.CollisionMap ?? (animation.CollisionMap = new AnimationCollisionMap())).Clear();
-			int frame = animation.Frame;
+			int frame = AnimationUtils.SecondsToFrames(currTime);
 			var totalWeight = 0f;
 			foreach (var track in animation.Tracks) {
 				totalWeight += track.Weight;
 				var blendFactor = totalWeight > 0 ? track.Weight / totalWeight : 0;
 				foreach (var a in track.Animators) {
-					a.CalcAndApply(animation.Time); // Animate track weight and so on...
+					a.CalcAndApply(currTime); // Animate track weight and so on...
 				}
 				foreach (var clip in track.Clips) {
 					if (frame < clip.Begin || frame >= clip.End) {
 						continue;
 					}
-					var clipAnimation = clip.Animation;
-					clipAnimation.TimeInternal = clip.RemapTime(animation.Time);
-					clipAnimation.AnimationEngine.CalcEffectiveAnimators(clipAnimation);
-					foreach (var a in clipAnimation.EffectiveAnimators) {
+					var clipEngine = clip.Animation.AnimationEngine;
+					var clipPrevTime = clipEngine.EaseTime(clip.Animation, clip.RemapTime(prevTime));
+					var clipCurrTime = clipEngine.EaseTime(clip.Animation, clip.RemapTime(currTime));
+					clipEngine.CalcEffectiveAnimatorsAndTriggers(clip.Animation, clipPrevTime, clipCurrTime, inclusiveRange);
+					foreach (var a in clip.Animation.EffectiveAnimators) {
 						if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
 							animation.CollisionMap.AddAnimator(a);
 							animation.EffectiveAnimators.Add(a);
@@ -172,14 +181,21 @@ namespace Lime
 							masterAnimator.BlendWith(a, blendFactor);
 						}
 					}
+					foreach (var t in clip.Animation.EffectiveTriggers) {
+						animation.EffectiveTriggers.Add(t);
+					}
 				}
 			}
 		}
 
-		private static void CalcEffectiveAnimatorsForPlainAnimation(Animation animation)
+		private static void CalcEffectiveAnimatorsAndTriggersForSimpleAnimation(Animation animation, double prevTime, double currTime, bool inclusiveRange)
 		{
+			(animation.EffectiveTriggers ?? (animation.EffectiveTriggers = new List<Action>())).Clear();
 			foreach (var a in GetEffectiveAnimators()) {
-				a.CalcValue(animation.Time);
+				a.CalcValue(currTime);
+				if (a.IsTriggerable) {
+					a.AddTriggersInRange(animation.EffectiveTriggers, prevTime, currTime, inclusiveRange);
+				}
 			}
 
 			List<IAnimator> GetEffectiveAnimators()
@@ -209,46 +225,27 @@ namespace Lime
 				}
 			}
 		}
-
-		public override void ApplyEffectiveAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
-		{
-			foreach (var a in animation.EffectiveAnimators) {
-				a.Apply();
-				if (invokeTriggers && a.AnimationId == animation.Id) {
-					a.InvokeTrigger(animation.Frame, animationTimeCorrection);
-				}
-			}
-		}
 	}
 
 	public class FastForwardAnimationEngine : DefaultAnimationEngine
 	{
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var previousTime = animation.TimeInternal;
-			var currentTime = previousTime + delta;
-			animation.TimeInternal = currentTime;
-			if (!animation.NextMarkerOrTriggerTime.HasValue) {
-				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
-				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
-				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
-				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
-			}
-
-			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
-				// do nothing
+			var prevTime = animation.Time;
+			var currTime = prevTime + delta;
+			animation.TimeInternal = currTime;
+			animation.NextMarker = animation.NextMarker ?? GetNextMarker(animation, prevTime);
+			if (animation.NextMarker == null || currTime < animation.NextMarker.Time) {
+				// Do nothing
 			} else {
-				var frameTime = animation.NextMarkerOrTriggerTime.Value;
-				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
-				animation.NextMarkerOrTriggerTime = null;
-				var currentMarker = animation.Markers.GetByFrame(frameIndex);
-				if (currentMarker != null) {
-					ProcessMarker(animation, currentMarker);
-				}
-				CalcEffectiveAnimators(animation);
-				ApplyEffectiveAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
-				if (!animation.IsRunning) {
+				var marker = animation.NextMarker;
+				animation.NextMarker = null;
+				ProcessMarker(animation, marker);
+				if (marker.Action == MarkerAction.Stop) {
+					AdvanceAnimationHelper(animation, prevTime, animation.Time, inclusiveRange: true);
 					animation.RaiseStopped();
+				} else if (marker.Action == MarkerAction.Play) {
+					AdvanceAnimationHelper(animation, prevTime, currTime, inclusiveRange: false);
 				}
 			}
 		}

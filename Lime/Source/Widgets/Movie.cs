@@ -88,18 +88,18 @@ namespace Lime
 			return ro;
 		}
 
-		public override void OnTrigger(string property, double animationTimeCorrection = 0)
+		public override void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
 			if (property == "Action") {
-				HandleAction();
+				HandleAction((MovieAction)value);
 			} else {
-				base.OnTrigger(property);
+				base.OnTrigger(property, value, animationTimeCorrection);
 			}
 		}
 
-		private void HandleAction()
+		private void HandleAction(MovieAction action)
 		{
-			switch (Action) {
+			switch (action) {
 				case MovieAction.Play:
 					Play();
 					break;
