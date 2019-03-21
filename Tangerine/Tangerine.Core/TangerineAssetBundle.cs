@@ -118,7 +118,7 @@ namespace Tangerine.Core
 				var attachmentMetaPath = Path.ChangeExtension(path, Model3DAttachmentMeta.FileExtension);
 				var attachmentMetaCached = cacheBundle.FileExists(attachmentMetaPath);
 				var attachmentMetaUpToDate = attachmentMetaCached &&
-					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) != base.GetFileLastWriteTime(fbxPath);
+					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) >= base.GetFileLastWriteTime(fbxPath);
 				if (!attachmentMetaUpToDate && fbxExists) {
 					using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
 						model = fbxImporter.LoadModel();
