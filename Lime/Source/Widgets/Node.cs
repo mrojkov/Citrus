@@ -1378,7 +1378,7 @@ namespace Lime
 				);
 
 				foreach (var property in properties) {
-					if (!propertyLocker.IsPropertyLocked(property, true)) {
+					if (!propertyLocker.IsPropertyLocked(property.Name, true)) {
 						if (property.Name == nameof(Widget.Size)) {
 							property.SetValue(content, property.GetValue(this));
 						}
