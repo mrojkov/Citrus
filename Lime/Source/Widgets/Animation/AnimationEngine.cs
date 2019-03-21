@@ -76,17 +76,36 @@ namespace Lime
 			return true;
 		}
 
+		public override double EaseTime(Animation animation, double time)
+		{
+			if (animation.CubicBezier != null) {
+				var ma = animation.MarkerAhead;
+				var mb = animation.MarkerBehind;
+				if (ma != null && mb != null) {
+					var t1 = mb.Time;
+					var t2 = ma.Time;
+					var d = t2 - t1;
+					var p = (time - t1) / d;
+					var p2 = animation.CubicBezier.SolveWithEpsilon(p, 1e-5);
+					return p2 * d + t1;
+				}
+			}
+			return time;
+		}
+
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
 			var prevTime = animation.Time;
 			var currTime = prevTime + delta;
 			animation.TimeInternal = currTime;
-			animation.NextMarker = animation.NextMarker ?? GetNextMarker(animation, prevTime);
-			if (animation.NextMarker == null || currTime < animation.NextMarker.Time) {
+			if (animation.MarkerAhead == null && animation.MarkerBehind == null) {
+				CacheMarkers(animation, prevTime);
+			}
+			if (animation.MarkerAhead == null || currTime < animation.MarkerAhead.Time) {
 				AdvanceAnimationHelper(animation, prevTime, currTime, inclusiveRange: false);
 			} else {
-				var marker = animation.NextMarker;
-				animation.NextMarker = null;
+				var marker = animation.MarkerAhead;
+				animation.MarkerAhead = animation.MarkerBehind = null;
 				ProcessMarker(animation, marker);
 				if (marker.Action == MarkerAction.Stop) {
 					AdvanceAnimationHelper(animation, prevTime, animation.Time, inclusiveRange: true);
@@ -107,18 +126,28 @@ namespace Lime
 			InvokeTriggers(animation);
 		}
 
-		protected static Marker GetNextMarker(Animation animation, double time)
+		protected static void CacheMarkers(Animation animation, double time)
 		{
+			animation.MarkerBehind = null;
+			animation.MarkerAhead = null;
+			animation.CubicBezier = null;
 			if (animation.Markers.Count == 0) {
-				return null;
+				return;
 			}
 			var frame = AnimationUtils.SecondsToFramesCeiling(time);
+			Marker prevMarker = null;
 			foreach (var marker in animation.Markers) {
 				if (marker.Frame >= frame) {
-					return marker;
+					animation.MarkerAhead = marker;
+					animation.MarkerBehind = prevMarker;
+					if (prevMarker != null && !prevMarker.Easing.IsDefault()) {
+						var ep = prevMarker.Easing;
+						animation.CubicBezier = new CubicBezier(ep.P1X, ep.P1Y, ep.P2X, ep.P2Y);
+					}
+					return;
 				}
+				prevMarker = marker;
 			}
-			return null;
 		}
 
 		protected virtual void ProcessMarker(Animation animation, Marker marker)
@@ -234,12 +263,14 @@ namespace Lime
 			var prevTime = animation.Time;
 			var currTime = prevTime + delta;
 			animation.TimeInternal = currTime;
-			animation.NextMarker = animation.NextMarker ?? GetNextMarker(animation, prevTime);
-			if (animation.NextMarker == null || currTime < animation.NextMarker.Time) {
+			if (animation.MarkerAhead == null && animation.MarkerBehind == null) {
+				CacheMarkers(animation, prevTime);
+			}
+			if (animation.MarkerAhead == null || currTime < animation.MarkerAhead.Time) {
 				// Do nothing
 			} else {
-				var marker = animation.NextMarker;
-				animation.NextMarker = null;
+				var marker = animation.MarkerAhead;
+				animation.MarkerAhead = animation.MarkerBehind = null;
 				ProcessMarker(animation, marker);
 				if (marker.Action == MarkerAction.Stop) {
 					AdvanceAnimationHelper(animation, prevTime, animation.Time, inclusiveRange: true);

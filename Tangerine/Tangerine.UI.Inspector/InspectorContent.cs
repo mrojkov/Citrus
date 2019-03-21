@@ -49,6 +49,9 @@ namespace Tangerine.UI.Inspector
 				widget.SetFocus();
 			}
 			Clear();
+			if (CoreUserPreferences.Instance.InspectEasing) {
+				AddEasingEditor();
+			}
 			BuildForObjectsHelper(objects).ToList();
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
@@ -69,6 +72,18 @@ namespace Tangerine.UI.Inspector
 
 			if (Footer != null) {
 				widget.AddNode(Footer);
+			}
+		}
+
+		private void AddEasingEditor()
+		{
+			var marker = Inspector.FindMarkerBehind();
+			if (marker != null) {
+				new EasingParamsPropertyEditor(new PropertyEditorParams(widget, marker, nameof(Marker.Easing)) {
+					ShowLabel = false,
+					History = History,
+					PropertySetter = SetProperty
+				});
 			}
 		}
 

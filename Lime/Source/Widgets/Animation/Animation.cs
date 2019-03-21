@@ -11,7 +11,9 @@ namespace Lime
 		private bool animatorsArePropagated;
 		internal Animation Next;
 		internal double TimeInternal;
-		internal Marker NextMarker;
+		internal Marker MarkerAhead;
+		internal Marker MarkerBehind;
+		internal CubicBezier CubicBezier;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
@@ -47,7 +49,7 @@ namespace Lime
 			set
 			{
 				TimeInternal = value;
-				NextMarker = null;
+				MarkerAhead = MarkerBehind = null;
 				RunningMarkerId = null;
 				ApplyAnimators();
 			}

@@ -35,6 +35,20 @@ namespace Tangerine.UI.Inspector
 		public static void RegisterGlobalCommands()
 		{
 			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Document.Current.InspectRootNode = !Document.Current.InspectRootNode);
+			CommandHandlerList.Global.Connect(InspectorCommands.InspectEasing, new InspectEasingCommandHandler());
+		}
+
+		class InspectEasingCommandHandler : CommandHandler
+		{
+			public override void RefreshCommand(ICommand command)
+			{
+				command.Checked = CoreUserPreferences.Instance.InspectEasing;
+			}
+
+			public override void Execute()
+			{
+				CoreUserPreferences.Instance.InspectEasing = !CoreUserPreferences.Instance.InspectEasing;
+			}
 		}
 
 		public void Attach()
@@ -82,7 +96,7 @@ namespace Tangerine.UI.Inspector
 								Index = 0,
 								Title = "Inspector Toolbar Panel",
 								Draggable = false,
-								CommandIds = { "InspectRootNodeCommand" }
+								CommandIds = { "InspectRootNodeCommand", "InspectEasing" }
 							}
 						}
 					}
@@ -116,6 +130,9 @@ namespace Tangerine.UI.Inspector
 		private static int CalcSelectedRowsHashcode()
 		{
 			var r = 0;
+			if (CoreUserPreferences.Instance.InspectEasing) {
+				r ^= FindMarkerBehind()?.GetHashCode() ?? 0;
+			}
 			if (Document.Current.Animation.IsCompound) {
 				if (Document.Current.GetCompoundAnimationIspectMode == CompoundAnimationInspectionMode.Tracks) {
 					foreach (var track in GetSelectedAnimationTracks()) {
@@ -139,6 +156,9 @@ namespace Tangerine.UI.Inspector
 						var node = row.Components.Get<NodeRow>()?.Node;
 						if (node != null) {
 							foreach (var component in node.Components) {
+								if (ClassAttributes<NodeComponentDontSerializeAttribute>.Get(component.GetType()) != null) {
+									continue;
+								}
 								r ^= component.GetHashCode();
 							}
 						}
@@ -146,6 +166,18 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			return r;
+		}
+
+		public static Marker FindMarkerBehind()
+		{
+			Marker marker = null;
+			foreach (var m in Document.Current.Animation.Markers) {
+				if (m.Frame > Document.Current.Animation.Frame) {
+					break;
+				}
+				marker = m;
+			}
+			return marker;
 		}
 
 		private void Rebuild()

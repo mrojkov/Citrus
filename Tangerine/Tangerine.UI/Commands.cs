@@ -47,6 +47,7 @@ namespace Tangerine.UI
 	public static class InspectorCommands
 	{
 		public static readonly ICommand InspectRootNodeCommand = new Command("Inspect Root Node");
+		public static readonly ICommand InspectEasing = new Command("Inspect Easing Between Markers") { Icon = IconPool.GetIcon("Inspector.Easing") };
 	}
 
 	public static class GenericCommands

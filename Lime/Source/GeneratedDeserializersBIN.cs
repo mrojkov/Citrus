@@ -181,6 +181,10 @@ namespace GeneratedDeserializersBIN
 				result.Offset = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (5 == fd.OurIndex) {
+				result.Reversed = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
@@ -223,6 +227,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.TangerineFlags = (global::Lime.TangerineFlags)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				result.Weight = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -2594,6 +2602,16 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static object Make_Lime__EasingParams(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.EasingParams();
+			result.P1X = d.Reader.ReadSingle();
+			result.P1Y = d.Reader.ReadSingle();
+			result.P2X = d.Reader.ReadSingle();
+			result.P2Y = d.Reader.ReadSingle();
+			return result;
+		}
+
 		private static void Read_Lime__EmitterShapePoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.EmitterShapePoint)obj;
@@ -4153,15 +4171,25 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.Frame = d.Reader.ReadInt32();
+				dg.EnsureClassDef(typeof(global::Lime.EasingParams));
+				var tmp1 = new global::Lime.EasingParams();
+				tmp1.P1X = d.Reader.ReadSingle();
+				tmp1.P1Y = d.Reader.ReadSingle();
+				tmp1.P2X = d.Reader.ReadSingle();
+				tmp1.P2Y = d.Reader.ReadSingle();
+				result.Easing = tmp1;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
+				result.Frame = d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
 				result.Id = d.Reader.ReadString();
 				if (result.Id == "" && d.Reader.ReadBoolean()) result.Id = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				result.JumpTo = d.Reader.ReadString();
 				if (result.JumpTo == "" && d.Reader.ReadBoolean()) result.JumpTo = null;
 				fd = def.Fields[d.Reader.ReadInt16()];
@@ -10323,6 +10351,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
+			makeCache[typeof(global::Lime.EasingParams)] = Make_Lime__EasingParams;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;
 			makeCache[typeof(global::Lime.Font)] = Make_Lime__Font;
 			makeCache[typeof(global::Lime.FontChar)] = Make_Lime__FontChar;
