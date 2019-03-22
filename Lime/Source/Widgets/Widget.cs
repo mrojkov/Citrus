@@ -736,6 +736,13 @@ namespace Lime
 #endif // TANGERINE
 		}
 
+		// Temporary property for changing bounding rectangle in game code
+		public Rectangle BoundingRect
+		{
+			get => boundingRect;
+			set => boundingRect = value;
+		}
+
 		/// <summary>
 		/// Gets the axis-aligned bounding rectangle based on LocalToWorldTransform.
 		/// </summary>
@@ -1104,7 +1111,7 @@ namespace Lime
 			}
 		}
 
-		private void ExpandParentBoundingRect()
+		public void ExpandParentBoundingRect()
 		{
 			if (ParentWidget == null) {
 				return;
