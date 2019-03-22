@@ -91,6 +91,7 @@ namespace Orange
 
 		public static void Cook(TargetPlatform platform, List<string> bundles = null)
 		{
+			Cache.Instance.ConnectToRemote();
 			AssetCooker.Platform = platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
 			CookBundles(bundles: bundles);

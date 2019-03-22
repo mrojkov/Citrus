@@ -11,11 +11,12 @@ namespace Orange
 	{
 		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = LocalCache.FindEtcTexture(bitmap, mipMaps, highQualityCompression, CookingRulesSHA1);
-			if (File.Exists(cachePath)) {
+			var cachePath = Cache.Instance.GetEtcTexture(bitmap, mipMaps, highQualityCompression, CookingRulesSHA1);
+			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
+
 			var hasAlpha = bitmap.HasAlpha;
 			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
 			var ktxPath = Toolbox.GetTempFilePathWithExtension(".ktx");
@@ -33,7 +34,7 @@ namespace Orange
 					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
 				}
 				bundle.ImportFile(ktxPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				LocalCache.Save(ktxPath, cachePath);
+				Cache.Instance.Save(ktxPath);
 			} finally {
 				bledBitmap?.Dispose();
 				DeletePossibleLockedFile(pngPath);
@@ -44,8 +45,8 @@ namespace Orange
 		public static void RunPVRTexTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression,
 			PVRFormat pvrFormat, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = LocalCache.FindPvrTexture(bitmap, mipMaps, highQualityCompression, pvrFormat, CookingRulesSHA1);
-			if (File.Exists(cachePath)) {
+			var cachePath = Cache.Instance.GetPvrTexture(bitmap, mipMaps, highQualityCompression, pvrFormat, CookingRulesSHA1);
+			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
@@ -120,7 +121,7 @@ namespace Orange
 					throw new Lime.Exception($"PVRTextTool error\nCommand line: {pvrTexTool} {args}\"");
 				}
 				bundle.ImportFile(pvrPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				LocalCache.Save(pvrPath, cachePath);
+				Cache.Instance.Save(pvrPath);
 			} finally {
 				DeletePossibleLockedFile(tgaPath);
 				DeletePossibleLockedFile(pvrPath);
@@ -129,8 +130,8 @@ namespace Orange
 
 		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = LocalCache.FindDdsTexture(bitmap, mipMaps, format, CookingRulesSHA1);
-			if (File.Exists(cachePath)) {
+			var cachePath = Cache.Instance.GetDdsTexture(bitmap, mipMaps, format, CookingRulesSHA1);
+			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
@@ -149,7 +150,7 @@ namespace Orange
 				}
 				RunNVCompressHelper(tgaPath, ddsPath, bitmap.HasAlpha, compressed, mipMaps);
 				bundle.ImportFile(ddsPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				LocalCache.Save(ddsPath, cachePath);
+				Cache.Instance.Save(ddsPath);
 			} finally {
 				DeletePossibleLockedFile(ddsPath);
 				DeletePossibleLockedFile(tgaPath);
