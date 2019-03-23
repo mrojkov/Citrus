@@ -24,7 +24,12 @@ namespace Lime
 			markers = new List<Marker>(capacity);
 		}
 
-		public void Clear() => markers.Clear();
+		public void Clear()
+		{
+			markers.Clear();
+			owner?.OnMarkersChanged();
+		}
+
 		public bool Contains(Marker item) => markers.Contains(item);
 		public void CopyTo(Marker[] array, int arrayIndex) => markers.CopyTo(array, arrayIndex);
 		public List<Marker>.Enumerator GetEnumerator() => markers.GetEnumerator();
@@ -46,6 +51,7 @@ namespace Lime
 				return false;
 			}
 			markers.RemoveAt(index);
+			owner?.OnMarkersChanged();
 			return true;
 		}
 
@@ -128,7 +134,7 @@ namespace Lime
 		public void Add(Marker marker)
 		{
 			markers.Add(marker);
-			owner.MarkerAhead = owner.MarkerBehind = null;
+			owner?.OnMarkersChanged();
 		}
 
 		public void AddOrdered(Marker marker)
@@ -146,7 +152,7 @@ namespace Lime
 					markers.Insert(i, marker);
 				}
 			}
-			owner.MarkerAhead = owner.MarkerBehind = null;
+			owner?.OnMarkersChanged();
 		}
 	}
 }

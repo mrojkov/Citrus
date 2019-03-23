@@ -12,8 +12,9 @@ namespace Lime
 		internal Animation Next;
 		internal double TimeInternal;
 		internal Marker MarkerAhead;
-		internal Marker MarkerBehind;
-		internal CubicBezier CubicBezier;
+		internal double EasingStartTime;
+		internal double EasingEndTime;
+		internal CubicBezier EasingCurve;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
@@ -49,9 +50,9 @@ namespace Lime
 			set
 			{
 				TimeInternal = value;
-				MarkerAhead = MarkerBehind = null;
+				MarkerAhead = null;
 				RunningMarkerId = null;
-				ApplyAnimators();
+				CalcAndApplyAnimators();
 			}
 		}
 
@@ -136,11 +137,18 @@ namespace Lime
 			return false;
 		}
 
-		public void ApplyAnimators()
+		internal void OnMarkersChanged()
+		{
+			MarkerAhead = null;
+			EasingCurve = null;
+			EasingStartTime = 0;
+			EasingEndTime = 0;
+		}
+
+		public void CalcAndApplyAnimators()
 		{
 			Load();
-			var time = AnimationEngine.EaseTime(this, Time);
-			AnimationEngine.CalcEffectiveAnimatorsAndTriggers(this, time, time, false);
+			AnimationEngine.CalcEffectiveAnimatorsAndTriggers(this, Time, Time, false);
 			AnimationEngine.ApplyEffectiveAnimators(this);
 		}
 
