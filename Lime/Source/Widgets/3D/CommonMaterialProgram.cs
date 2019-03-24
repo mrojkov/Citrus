@@ -33,16 +33,20 @@ namespace Lime
 				vec4 position = a_Position;
 			#ifdef SKIN_ENABLED
 				#ifdef DUAL_QUATERNION_SKINNING
+					// Take in account antipodality
+					float xySign = sign(dot(u_DualQuaternionPartA[int(a_BlendIndices.y)], u_DualQuaternionPartA[int(a_BlendIndices.x)]));
+					float xzSign = sign(dot(u_DualQuaternionPartA[int(a_BlendIndices.z)], u_DualQuaternionPartA[int(a_BlendIndices.x)]));
+					float xwSign = sign(dot(u_DualQuaternionPartA[int(a_BlendIndices.w)], u_DualQuaternionPartA[int(a_BlendIndices.x)]));
 					vec4 b_0 =
 						u_DualQuaternionPartA[int(a_BlendIndices.x)] * a_BlendWeights.x +
-						u_DualQuaternionPartA[int(a_BlendIndices.y)] * a_BlendWeights.y +
-						u_DualQuaternionPartA[int(a_BlendIndices.z)] * a_BlendWeights.z +
-						u_DualQuaternionPartA[int(a_BlendIndices.w)] * a_BlendWeights.w;
+						u_DualQuaternionPartA[int(a_BlendIndices.y)] * xySign * a_BlendWeights.y +
+						u_DualQuaternionPartA[int(a_BlendIndices.z)] * xzSign * a_BlendWeights.z +
+						u_DualQuaternionPartA[int(a_BlendIndices.w)] * xwSign * a_BlendWeights.w;
 					vec4 b_e =
 						u_DualQuaternionPartB[int(a_BlendIndices.x)] * a_BlendWeights.x +
-						u_DualQuaternionPartB[int(a_BlendIndices.y)] * a_BlendWeights.y +
-						u_DualQuaternionPartB[int(a_BlendIndices.z)] * a_BlendWeights.z +
-						u_DualQuaternionPartB[int(a_BlendIndices.w)] * a_BlendWeights.w;
+						u_DualQuaternionPartB[int(a_BlendIndices.y)] * xySign * a_BlendWeights.y +
+						u_DualQuaternionPartB[int(a_BlendIndices.z)] * xzSign * a_BlendWeights.z +
+						u_DualQuaternionPartB[int(a_BlendIndices.w)] * xwSign * a_BlendWeights.w;
 					vec4 c_0 = b_0 / length(b_0);
 					vec4 c_e = b_e / length(b_0);
 					vec3 pos = position.xyz +
