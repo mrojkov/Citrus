@@ -100,6 +100,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumSaturation, MaximumSaturation)]
 		[TangerineGroup(GroupColorCorrection)]
 		public float Saturation
 		{
@@ -108,6 +109,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumLightness, MaximumLightness)]
 		[TangerineGroup(GroupColorCorrection)]
 		public float Lightness
 		{
@@ -120,6 +122,7 @@ namespace Lime
 		public Vector3 HSL { get; set; } = Vector3.Zero;
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumBrightness, MaximumBrightness)]
 		[TangerineGroup(GroupColorCorrection)]
 		public float Brightness
 		{
@@ -128,6 +131,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumContrast, MaximumContrast)]
 		[TangerineGroup(GroupColorCorrection)]
 		public float Contrast
 		{
@@ -140,6 +144,7 @@ namespace Lime
 		public bool BlurEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0f, MaximumBlurRadius)]
 		[TangerineGroup(GroupBlur)]
 		public float BlurRadius
 		{
@@ -152,6 +157,7 @@ namespace Lime
 		public BlurShaderId BlurShader { get; set; } = BlurShaderId.GaussOneDimensionalWith5Samples;
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumTextureScaling * 100f, MaximumTextureScaling * 100f)]
 		[TangerineGroup(GroupBlur)]
 		public float BlurTextureScaling
 		{
@@ -176,6 +182,7 @@ namespace Lime
 		public bool BloomEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0f, MaximumBlurRadius)]
 		[TangerineGroup(GroupBloom)]
 		public float BloomStrength
 		{
@@ -188,6 +195,7 @@ namespace Lime
 		public BlurShaderId BloomShaderId { get; set; } = BlurShaderId.GaussOneDimensionalWith5Samples;
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupBloom)]
 		public float BloomBrightThreshold
 		{
@@ -208,6 +216,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumTextureScaling * 100f, MaximumTextureScaling * 100f)]
 		[TangerineGroup(GroupBloom)]
 		public float BloomTextureScaling
 		{
@@ -224,6 +233,7 @@ namespace Lime
 		public bool DistortionEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(-100f, 100f)]
 		[TangerineGroup(GroupDistortion)]
 		public float DistortionBarrelPincushion
 		{
@@ -232,6 +242,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupDistortion)]
 		public float DistortionChromaticAberration
 		{
@@ -240,6 +251,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(-100f, 100f)]
 		[TangerineGroup(GroupDistortion)]
 		public float DistortionRed
 		{
@@ -248,6 +260,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(-100f, 100f)]
 		[TangerineGroup(GroupDistortion)]
 		public float DistortionGreen
 		{
@@ -256,6 +269,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(-100f, 100f)]
 		[TangerineGroup(GroupDistortion)]
 		public float DistortionBlue
 		{
@@ -268,6 +282,7 @@ namespace Lime
 		public bool SharpenEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 10f)]
 		[TangerineGroup(GroupSharpen)]
 		public float SharpenStrength
 		{
@@ -276,6 +291,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 1f)]
 		[TangerineGroup(GroupSharpen)]
 		public float SharpenLimit
 		{
@@ -284,6 +300,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 10f)]
 		[TangerineGroup(GroupSharpen)]
 		public float SharpenStep
 		{
@@ -296,6 +313,7 @@ namespace Lime
 		public bool NoiseEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupNoise)]
 		public float NoiseBrightThreshold
 		{
@@ -304,6 +322,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupNoise)]
 		public float NoiseDarkThreshold
 		{
@@ -312,6 +331,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupNoise)]
 		public float NoiseSoftLight
 		{
@@ -353,6 +373,7 @@ namespace Lime
 		public bool FXAAEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumFXAALumaTreshold, MaximumFXAALumaTreshold)]
 		[TangerineGroup(GroupFXAA)]
 		public float FXAALumaTreshold
 		{
@@ -361,6 +382,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumFXAAMulReduce, MaximumFXAAMulReduce)]
 		[TangerineGroup(GroupFXAA)]
 		public float FXAAMulReduce
 		{
@@ -369,6 +391,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumFXAAMinReduce, MaximumFXAAMinReduce)]
 		[TangerineGroup(GroupFXAA)]
 		public float FXAAMinReduce
 		{
@@ -377,6 +400,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(MinimumFXAAMaxSpan, MaximumFXAAMaxSpan)]
 		[TangerineGroup(GroupFXAA)]
 		public float FXAAMaxSpan
 		{
@@ -389,6 +413,7 @@ namespace Lime
 		public bool VignetteEnabled { get; set; }
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupVignette)]
 		public float VignetteRadius
 		{
@@ -397,6 +422,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
+		[TangerineValidRange(0f, 100f)]
 		[TangerineGroup(GroupVignette)]
 		public float VignetteSoftness
 		{
@@ -443,6 +469,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumTextureSize, MaximumTextureSize)]
 		[TangerineGroup(GroupSourceTexture)]
 		public int SourceTextureWidth
 		{
@@ -454,6 +481,7 @@ namespace Lime
 		}
 
 		[TangerineInspect]
+		[TangerineValidRange(MinimumTextureSize, MaximumTextureSize)]
 		[TangerineGroup(GroupSourceTexture)]
 		public int SourceTextureHeight
 		{
