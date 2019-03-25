@@ -5,6 +5,9 @@ namespace Lime
 {
 	public class AnimationEngine
 	{
+#if TANGERINE
+		public static Func<Animation, bool> EasingEnabledChecker;
+#endif
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
 		/// <summary>
@@ -180,6 +183,11 @@ namespace Lime
 
 			double EaseTime(double time)
 			{
+#if TANGERINE
+				if (!EasingEnabledChecker?.Invoke(animation) ?? true) {
+					return time;
+				}
+#endif
 				var d = animation.EasingEndTime - animation.EasingStartTime;
 				var p = (time - animation.EasingStartTime) / d;
 				var p2 = animation.EasingCurve.SolveWithEpsilon(p, 1e-5);

@@ -221,7 +221,10 @@ namespace Tangerine
 					(n as PointObject).SkinningWeights = new SkinningWeights();
 				}
 			});
-
+			AnimationEngine.EasingEnabledChecker = (animation) => {
+				var doc = Document.Current;
+				return doc == null || doc.PreviewAnimation || animation != doc.Animation;
+			};
 			if (SceneUserPreferences.Instance.VisualHintsRegistry != null) {
 				VisualHintsRegistry.Instance = SceneUserPreferences.Instance.VisualHintsRegistry;
 			}
