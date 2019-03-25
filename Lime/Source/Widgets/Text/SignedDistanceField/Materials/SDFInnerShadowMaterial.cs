@@ -98,6 +98,7 @@ namespace Lime.SignedDistanceField
 			}";
 
 		private const string FragmentShader = @"
+			#extension GL_OES_standard_derivatives : enable
 			varying lowp vec4 global_color;
 			varying lowp vec2 texCoords1;
 			uniform lowp sampler2D tex1;
@@ -110,9 +111,11 @@ namespace Lime.SignedDistanceField
 
 			void main() {
 				lowp float textDistance = texture2D(tex1, texCoords1).r;
-				lowp float textFactor = smoothstep(text_dilate - softness, text_dilate + softness, textDistance);
+				lowp float textSmoothing = clamp(abs(dFdx(textDistance)) + abs(dFdy(textDistance)), 0.0001, 0.05);
+				lowp float textFactor = smoothstep(text_dilate - textSmoothing, text_dilate + textSmoothing, textDistance);
 				lowp float shadowDistance = texture2D(tex1, texCoords1 - offset).r;
-				lowp float shadowFactor = smoothstep(dilate - softness, dilate + softness, shadowDistance);
+				lowp float smoothing = clamp(abs(dFdx(shadowDistance)) + abs(dFdy(shadowDistance)), 0.0001, 0.05);
+				lowp float shadowFactor = smoothstep(dilate - smoothing, dilate + smoothing, shadowDistance);
 				lowp float innerShadowFactor = textFactor * (1.0 - shadowFactor);
 				gl_FragColor = vec4(color.rgb, color.a * innerShadowFactor * global_color.a);
 			}";
