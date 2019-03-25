@@ -14,7 +14,7 @@ namespace Lime
 			Began
 		};
 
-		private readonly TimeSpan ClickBeginDelay = TimeSpan.FromSeconds(0.15);
+		private readonly TimeSpan ClickBeginDelay = TimeSpan.FromSeconds(0.064);
 
 		private State state;
 		private DateTime pressTime;
