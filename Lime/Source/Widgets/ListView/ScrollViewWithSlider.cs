@@ -12,6 +12,8 @@ namespace Lime
 		private Widget slider;
 		private float sliderTimeToLive;
 
+		public bool SliderIsDragging;
+
 		public ScrollViewWithSlider(Frame frame, Widget slider = null, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 			: base(frame, scrollDirection, processChildrenFirst)
 		{
@@ -33,10 +35,12 @@ namespace Lime
 		IEnumerator<object> DragSliderTask()
 		{
 			while (true) {
+				SliderIsDragging = false;
 				if (CanScroll && ScrollBySlider && slider != null) {
 					slider.HitTestTarget = true;
 					var input = slider.Input;
 					if (input.WasMousePressed()) {
+						SliderIsDragging = true;
 						var iniMousePos = input.MousePosition;
 						var iniScrollPos = ScrollPosition;
 						while (input.IsMousePressed()) {

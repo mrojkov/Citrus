@@ -19,7 +19,6 @@ namespace Orange
 		private ThemedTextView textView;
 		private TextWriter textWriter;
 		private CheckBoxWithLabel updateVcs;
-		private CheckBoxWithLabel autoscrollCheckBox;
 		private Button goButton;
 		private Button abortButton;
 		private Widget footerSection;
@@ -53,7 +52,6 @@ namespace Orange
 			};
 			mainVBox.AddNode(CreateHeaderSection());
 			mainVBox.AddNode(CreateVcsSection());
-			mainVBox.AddNode(CreateAutoscrollCheckBox());
 			mainVBox.AddNode(CreateTextView());
 			progressBarField = new ProgressBarField();
 			mainVBox.AddNode(progressBarField);
@@ -89,14 +87,6 @@ namespace Orange
 		{
 			updateVcs = new CheckBoxWithLabel("Update project before build");
 			return updateVcs;
-		}
-
-		private Widget CreateAutoscrollCheckBox()
-		{
-			autoscrollCheckBox = new CheckBoxWithLabel("Autoscroll enabled");
-			autoscrollCheckBox.Checked = true;
-			
-			return autoscrollCheckBox;
 		}
 
 		private static void AddPicker(Node table, string name, Node picker)
@@ -202,7 +192,7 @@ namespace Orange
 				textView.Clear();
 			}, () => {
 				EnableControls(true);
-				if ((Instance as OrangeInterface).IsAutoscrollEnabled()) {
+				if (textView.ScrollPosition == textView.MaxScrollPosition) {
 					The.UI.ScrollLogToEnd();
 				}
 			}, DoesNeedSvnUpdate,
@@ -217,7 +207,6 @@ namespace Orange
 			EnableChildren(windowWidget, value);
 			mainVBox.Enabled = true;
 			EnableChildren(mainVBox, value);
-			autoscrollCheckBox.Enabled = true;
 			footerSection.Enabled = true;
 			EnableChildren(footerSection, value);
 			abortButton.Enabled = !value;
@@ -281,11 +270,6 @@ namespace Orange
 		public override bool DoesNeedSvnUpdate()
 		{
 			return updateVcs.Checked;
-		}
-
-		public bool IsAutoscrollEnabled()
-		{
-			return autoscrollCheckBox.Checked;
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
@@ -354,6 +338,7 @@ namespace Orange
 			{
 				this.consoleOutput = consoleOutput;
 				this.textView = textView;
+				this.textView.Behaviour.Content.Gestures.Add(new DragGesture());
 			}
 
 			public override void WriteLine(string value)
@@ -361,18 +346,21 @@ namespace Orange
 				Write(value + '\n');
 			}
 
+			private bool autoscrollEnabled = false;
+
 			public override void Write(string value)
 			{
 				Application.InvokeOnMainThread(() => {
 #if DEBUG
 					System.Diagnostics.Debug.Write(value);
 #endif // DEBUG
+					if (autoscrollEnabled && !textView.Behaviour.IsScrolling() && !(textView.Behaviour as ScrollViewWithSlider).SliderIsDragging) {
+						textView.ScrollToEnd();
+					}
+					autoscrollEnabled = textView.ScrollPosition == textView.MaxScrollPosition;
 					consoleOutput.Write(value);
 					textView.Append(value);
 				});
-				if ((Instance as OrangeInterface).IsAutoscrollEnabled()) {
-					Application.InvokeOnNextUpdate(textView.ScrollToEnd);
-				}
 			}
 
 			public override Encoding Encoding { get; }
