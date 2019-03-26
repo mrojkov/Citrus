@@ -409,10 +409,11 @@ namespace Lime
 		{
 			private static int counter = 1;
 			private static ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
+			private static Func<string, int> uidFactory = _ => counter++;
 
 			public static int Generate(string targetPath)
 			{
-				return map.GetOrAdd(targetPath, _ => counter++);
+				return map.GetOrAdd(targetPath, uidFactory);
 			}
 		}
 	}
