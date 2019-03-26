@@ -18,7 +18,7 @@ namespace Lime
 				if (a == null) {
 					break;
 				}
-				if (a.Animable == key.Animable && a.TargetPropertyPath == key.TargetPropertyPath) {
+				if (a.Animable == key.Animable && a.TargetPropertyPathUID == key.TargetPropertyPathUID) {
 					animator = a;
 					return true;
 				}
@@ -38,7 +38,7 @@ namespace Lime
 					Animators[j] = animator;
 					count++;
 					break;
-				} else if (a.Animable == animator.Animable && a.TargetPropertyPath == animator.TargetPropertyPath) {
+				} else if (a.Animable == animator.Animable && a.TargetPropertyPathUID == animator.TargetPropertyPathUID) {
 					if (replace) {
 						Animators[j] = animator;
 					}
