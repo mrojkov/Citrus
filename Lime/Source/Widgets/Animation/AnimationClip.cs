@@ -5,6 +5,15 @@ using Yuzu;
 
 namespace Lime
 {
+	public enum AnimationClipExtrapolation
+	{
+		[TangerineIgnore]
+		None,
+		Hold,
+		Repeat,
+		PingPong
+	}
+
 	public class AnimationClip
 	{
 		[YuzuMember]
@@ -23,6 +32,9 @@ namespace Lime
 
 		[YuzuMember]
 		public bool Reversed { get; set; }
+
+		[YuzuMember]
+		public AnimationClipExtrapolation PostExtrapolation { get; set; } = AnimationClipExtrapolation.Hold;
 
 #if TANGERINE
 		public bool IsSelected { get; set; }
@@ -48,6 +60,15 @@ namespace Lime
 		public double RemapTime(double time)
 		{
 			var relativeTime = time - AnimationUtils.FramesToSeconds(Begin - Offset);
+			if (PostExtrapolation == AnimationClipExtrapolation.Repeat) {
+				relativeTime %= AnimationUtils.FramesToSeconds(Length);
+			} else if (PostExtrapolation == AnimationClipExtrapolation.PingPong) {
+				var period = AnimationUtils.FramesToSeconds(Length) * 2;
+				relativeTime %= period;
+				if (relativeTime > period * 0.5) {
+					relativeTime = period - relativeTime;
+				}
+			}
 			if (!Reversed) {
 				return relativeTime;
 			} else {

@@ -217,10 +217,8 @@ namespace Lime
 					foreach (var a in clip.Animation.EffectiveAnimators) {
 						track.CollisionMap.AddAnimator(a, replace: clip.Begin <= frame);
 					}
-					if (frame >= clip.Begin && frame < clip.End) {
-						foreach (var t in clip.Animation.EffectiveTriggers) {
-							animation.EffectiveTriggers.Add(t);
-						}
+					foreach (var t in clip.Animation.EffectiveTriggers) {
+						animation.EffectiveTriggers.Add(t);
 					}
 				}
 				foreach (var a in track.CollisionMap.Animators) {
