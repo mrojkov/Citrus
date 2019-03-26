@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Yuzu;
+using System.Collections.Concurrent;
 
 namespace Lime
 {
@@ -12,11 +13,10 @@ namespace Lime
 
 		IAnimator Clone();
 
-		int TargetPropertyHashCode { get; }
-
 		bool IsTriggerable { get; set; }
 
 		string TargetPropertyPath { get; set; }
+		int TargetPropertyPathUID { get; }
 
 		string AnimationId { get; set; }
 
@@ -114,15 +114,18 @@ namespace Lime
 		public int Version { get => version + ReadonlyKeys.Version; }
 #endif // TANGERINE
 
+		private string targetPropertyPath;
 		[YuzuMember("TargetProperty")]
-		public string TargetPropertyPath { get; set; }
-
-		private int targetPropertyHashCode;
-		public int TargetPropertyHashCode
+		public string TargetPropertyPath
 		{
-			get => targetPropertyHashCode != 0 ? targetPropertyHashCode :
-				(targetPropertyHashCode = Animable.GetHashCode() ^ TargetPropertyPath.GetHashCode());
+			get => targetPropertyPath;
+			set {
+				targetPropertyPath = value;
+				TargetPropertyPathUID = TargetPropertyPathUIDGenerator.Generate(value);
+			}
 		}
+
+		public int TargetPropertyPathUID { get; private set; }
 
 		public Type GetValueType() { return typeof(T); }
 
@@ -191,7 +194,6 @@ namespace Lime
 #if TANGERINE
 			clone.animable = null;
 #endif // TANGERINE
-			clone.targetPropertyHashCode = 0;
 			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.boxedKeys = null;
@@ -202,7 +204,6 @@ namespace Lime
 
 		public void Unbind()
 		{
-			targetPropertyHashCode = 0;
 			IsZombie = false;
 			setter = null;
 #if TANGERINE
@@ -402,6 +403,17 @@ namespace Lime
 			}
 			minTime = minFrame * AnimationUtils.SecondsPerFrame;
 			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
+		}
+
+		internal static class TargetPropertyPathUIDGenerator
+		{
+			private static int counter = 1;
+			private static ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
+
+			public static int Generate(string targetPath)
+			{
+				return map.GetOrAdd(targetPath, _ => counter++);
+			}
 		}
 	}
 

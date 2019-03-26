@@ -12,7 +12,7 @@ namespace Lime
 		/// </summary>
 		public bool TryGetAnimator(IAnimator key, out IAnimator animator)
 		{
-			var hashCode = key.TargetPropertyHashCode;
+			var hashCode = key.Animable.GetHashCode() ^ key.TargetPropertyPathUID;
 			for (var i = 0; i < Animators.Length; i++) {
 				var a = Animators[(hashCode + i) & (Animators.Length - 1)];
 				if (a == null) {
@@ -29,8 +29,8 @@ namespace Lime
 
 		public void AddAnimator(IAnimator animator, bool replace)
 		{
-			ResizeIfNeeded();
-			var hashCode = animator.TargetPropertyHashCode;
+			EnsureEnoughRoom();
+			var hashCode = animator.Animable.GetHashCode() ^ animator.TargetPropertyPathUID;
 			for (var i = 0; i < Animators.Length; i++) {
 				var j = (hashCode + i) & (Animators.Length - 1);
 				var a = Animators[j];
@@ -47,7 +47,7 @@ namespace Lime
 			}
 		}
 
-		private void ResizeIfNeeded()
+		private void EnsureEnoughRoom()
 		{
 			if (count > Animators.Length / 2) {
 				var newAnimators = new IAnimator[Animators.Length * 2];
@@ -55,7 +55,7 @@ namespace Lime
 					if (a == null) {
 						continue;
 					}
-					var hashCode = a.TargetPropertyHashCode;
+					var hashCode = a.Animable.GetHashCode() ^ a.TargetPropertyPathUID;
 					for (var i = 0; i < newAnimators.Length; i++) {
 						var j = (hashCode + i) & (newAnimators.Length - 1);
 						if (newAnimators[j] == null) {
