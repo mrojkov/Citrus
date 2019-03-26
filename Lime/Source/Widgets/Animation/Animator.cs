@@ -404,18 +404,15 @@ namespace Lime
 			minTime = minFrame * AnimationUtils.SecondsPerFrame;
 			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
+	}
 
-		internal static class TargetPropertyPathUIDGenerator
-		{
-			private static int counter = 1;
-			private static ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
-			private static Func<string, int> uidFactory = _ => counter++;
+	internal static class TargetPropertyPathUIDGenerator
+	{
+		private static int counter = 1;
+		private static ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
+		private static Func<string, int> uidFactory = _ => counter++;
 
-			public static int Generate(string targetPath)
-			{
-				return map.GetOrAdd(targetPath, uidFactory);
-			}
-		}
+		public static int Generate(string targetPath) => map.GetOrAdd(targetPath, uidFactory);
 	}
 
 	public class Vector2Animator : Animator<Vector2>
