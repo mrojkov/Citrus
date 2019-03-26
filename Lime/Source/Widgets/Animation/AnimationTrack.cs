@@ -11,6 +11,8 @@ namespace Lime
 
 		public object UserData { get; set; }
 
+		internal AnimationCollisionMap CollisionMap;
+
 		[YuzuMember]
 		public string Id { get; set; }
 
@@ -59,6 +61,7 @@ namespace Lime
 			clone.Owner = null;
 			clone.Clips = new AnimationClipList(clone, Clips.Count);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
+			clone.CollisionMap = null;
 			foreach (var clip in Clips) {
 				clone.Clips.Add(clip.Clone());
 			}

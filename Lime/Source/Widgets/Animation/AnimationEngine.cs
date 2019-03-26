@@ -208,24 +208,30 @@ namespace Lime
 				foreach (var a in track.Animators) {
 					a.CalcAndApply(currTime); // Animate track weight and so on...
 				}
+				(track.CollisionMap ?? (track.CollisionMap = new AnimationCollisionMap())).Clear();
 				foreach (var clip in track.Clips) {
-					if (frame < clip.Begin || frame >= clip.End) {
-						continue;
-					}
 					var clipEngine = clip.Animation.AnimationEngine;
 					var clipPrevTime = clip.RemapTime(prevTime);
 					var clipCurrTime = clip.RemapTime(currTime);
 					clipEngine.CalcEffectiveAnimatorsAndTriggers(clip.Animation, clipPrevTime, clipCurrTime, inclusiveRange);
 					foreach (var a in clip.Animation.EffectiveAnimators) {
-						if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
-							animation.CollisionMap.AddAnimator(a);
-							animation.EffectiveAnimators.Add(a);
-						} else {
-							masterAnimator.BlendWith(a, blendFactor);
+						track.CollisionMap.AddAnimator(a, replace: clip.Begin <= frame);
+					}
+					if (frame >= clip.Begin && frame < clip.End) {
+						foreach (var t in clip.Animation.EffectiveTriggers) {
+							animation.EffectiveTriggers.Add(t);
 						}
 					}
-					foreach (var t in clip.Animation.EffectiveTriggers) {
-						animation.EffectiveTriggers.Add(t);
+				}
+				foreach (var a in track.CollisionMap.Animators) {
+					if (a == null) {
+						continue;
+					}
+					if (!animation.CollisionMap.TryGetAnimator(a, out var masterAnimator)) {
+						animation.CollisionMap.AddAnimator(a, replace: false);
+						animation.EffectiveAnimators.Add(a);
+					} else {
+						masterAnimator.BlendWith(a, blendFactor);
 					}
 				}
 			}
