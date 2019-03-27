@@ -1328,7 +1328,7 @@ namespace Lime
 			}
 			var fullPath = stream != null && sceneExtensions.Any(e => path.EndsWith(e, StringComparison.OrdinalIgnoreCase)) ? path : ResolveScenePath(path);
 			if (fullPath == null) {
-				throw new FileNotFoundException($"Scene '{path}' not found in current asset bundle");
+				throw new FileNotFoundException($"None of {string.Join(", ", sceneExtensions.Select(e => $"{path}{e}"))} exists");
 			}
 			if (scenesBeingLoaded.Value.Contains(fullPath)) {
 				throw new CyclicDependencyException($"Cyclic scenes dependency was detected: {fullPath}");
