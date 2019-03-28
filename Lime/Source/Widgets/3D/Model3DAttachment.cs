@@ -363,6 +363,17 @@ namespace Lime
 					mesh.Opaque = meshOption.Opaque;
 					mesh.CullMode = meshOption.CullMode;
 					if (meshOption.SkinningMode != SkinningMode.Default) {
+						if (meshOption.SkinningMode == SkinningMode.DualQuaternion) {
+							var scaleTransform = Matrix44.CreateScale(mesh.Scale);
+							var scaleTransformForNormals = scaleTransform.CalcInverted().Transpose();
+							foreach (var submesh in mesh.Submeshes) {
+								MeshUtils.TransformVertices(submesh.Mesh, (ref Mesh3D.Vertex v) => {
+									v.Pos *= scaleTransform;
+									v.Normal *= scaleTransformForNormals;
+								});
+							}
+							mesh.Scale = Vector3.One;
+						}
 						mesh.SkinningMode = meshOption.SkinningMode;
 					}
 					break;
