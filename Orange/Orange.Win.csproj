@@ -120,8 +120,7 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncTextures.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncTxtAssets.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
-    <Compile Include="Source\AssetCooker\CookStages\TextureTools.cs" />
-    <Compile Include="Source\AssetCooker\CookStages\WarnAboutNPOTTextures.cs" />
+    <Compile Include="Source\AssetCooker\TextureTools.cs" />
     <Compile Include="Source\AssetCooker\LocalCache.cs" />
     <Compile Include="Source\Git.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />

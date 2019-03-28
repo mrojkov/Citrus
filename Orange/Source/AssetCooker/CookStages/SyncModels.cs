@@ -15,11 +15,13 @@ namespace Orange
 		protected override void SetExtensions()
 		{
 			Extensions = new string[] { ".fbx", ".t3d" };
+			ImportedExtension = Extensions[0];
+			ExportedExtension = Extensions[1];
 		}
 
 		public override void Action()
 		{
-			SyncUpdated.Sync(".fbx", ".t3d", AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
+			SyncUpdated.Sync(ImportedExtension, ExportedExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 		}
 
 		private bool Converter(string srcPath, string dstPath)
@@ -53,7 +55,7 @@ namespace Orange
 			AssetCooker.DeleteModelExternalAnimations(animationPathPrefix);
 			AssetCooker.ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
 			model.RemoveAnimatorsForExternalAnimations();
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Serialization.Format.Binary, ".t3d",
+			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Serialization.Format.Binary, ExportedExtension,
 				File.GetLastWriteTime(srcPath), assetAttributes, cookingRules.SHA1);
 			return true;
 		}

@@ -18,16 +18,18 @@ namespace Orange
 		protected override void SetExtensions()
 		{
 			Extensions = new string[] { ".png" };
+			ImportedExtension = Extensions[0];
+			ExportedExtension = AssetCooker.GetPlatformTextureExtension();
 		}
 
 		public override void Action()
 		{
-			SyncUpdated.Sync(".png", AssetCooker.GetPlatformTextureExtension(), AssetBundle.Current, Converter);
+			SyncUpdated.Sync(ImportedExtension, ExportedExtension, AssetBundle.Current, Converter);
 		}
 
 		private bool Converter(string srcPath, string dstPath)
 		{
-			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
+			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, ImportedExtension)];
 			if (rules.TextureAtlas != null) {
 				// Reverse double counting
 				UserInterface.Instance.IncreaseProgressBar(-1);

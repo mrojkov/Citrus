@@ -15,6 +15,8 @@ namespace Orange
 			this.attributes = attributes;
 		}
 
+		protected override void SetExtensions() { }
+
 		protected void SetExtensions(string extension)
 		{
 			Extensions = new string[] { extension };

@@ -259,6 +259,13 @@ namespace Orange
 						CheckCookCancelation();
 						stage.Action();
 					}
+
+					// Warn about non-power of two textures
+					foreach (var path in AssetBundle.EnumerateFiles()) {
+						if ((AssetBundle.GetAttributes(path) & AssetAttributes.NonPowerOf2Texture) != 0) {
+							Console.WriteLine("Warning: non-power of two texture: {0}", path);
+						}
+					}
 				}
 			} finally {
 				The.Workspace.AssetFiles = assetFilesEnumerator;
@@ -297,7 +304,6 @@ namespace Orange
 			AddStage(new SyncRawAssets(".shader"));
 			AddStage(new SyncRawAssets(".xml"));
 			AddStage(new SyncRawAssets(".raw"));
-			AddStage(new WarnAboutNPOTTextures(), CookingProfile.Total);
 			AddStage(new SyncRawAssets(".bin"));
 			AddStage(new SyncModels());
 		}
