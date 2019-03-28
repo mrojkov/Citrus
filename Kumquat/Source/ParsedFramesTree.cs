@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lime;
 
@@ -33,7 +34,7 @@ namespace Kumquat
 		{
 			var result = isRootNode ? scenesCodeCooker.SceneCodeTemplate : scenesCodeCooker.FrameCodeTemplate;
 			result = result.Replace("<%CLASS_NAME%>", ClassName);
-			result = result.Replace("<%SCENE_PATH%>", "\"" + ScenePath + "\"");
+			result = result.Replace("<%SCENE_PATH%>", "\"" + Path.ChangeExtension(ScenePath, null) + "\"");
 			result = result.Replace("<%FIELDS%>", GenerateFields(scenesCodeCooker));
 			result = result.Replace("<%INIT_FIELDS%>", GenerateFieldsInitialization(scenesCodeCooker));
 			result = result.Replace("<%INNER_CLASSES%>", GenerateInnerClasses(scenesCodeCooker));

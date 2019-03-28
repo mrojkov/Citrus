@@ -88,7 +88,7 @@ namespace Orange
 				AssetBundle.Current = new AggregateAssetBundle(cookingBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray());
 				var loadedScenes = new Dictionary<string, Node>();
 				foreach (var scene in scenesToCook) {
-					loadedScenes.Add(scene, Node.CreateFromAssetBundle(scene));
+					loadedScenes.Add(scene, Node.CreateFromAssetBundle(Path.ChangeExtension(scene, null)));
 				}
 				new ScenesCodeCooker(
 					The.Workspace.ProjectDirectory,
