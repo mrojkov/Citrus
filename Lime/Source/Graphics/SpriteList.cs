@@ -202,6 +202,7 @@ namespace Lime
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
 					s.Texture1 = cd.FontChar.Texture;
+					s.Texture2 = null;
 					s.UV0T1 = cd.FontChar.UV0;
 					s.UV1T1 = cd.FontChar.UV1;
 					s.Texture1.TransformUVCoordinatesToAtlasSpace(ref s.UV0T1);
