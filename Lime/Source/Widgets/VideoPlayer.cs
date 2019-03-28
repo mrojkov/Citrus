@@ -17,50 +17,68 @@ namespace Lime
 
 	public class VideoPlayer : Image
 	{
-		public bool Looped { get { return decoder.Looped; } set { decoder.Looped = value; } }
-		public bool MuteAudio { get { return decoder.MuteAudio; } set { decoder.MuteAudio = value; } }
+		public bool Looped
+		{
+			get => decoder?.Looped ?? false;
+			set {
+				if (decoder != null) {
+					decoder.Looped = value;
+				}
+			}
+		}
+		public bool MuteAudio {
+			get => decoder?.MuteAudio ?? false;
+			set {
+				if (decoder != null) {
+					decoder.MuteAudio = value;
+				}
+			}
+		}
 
 		private VideoDecoder decoder;
 
-		public VideoPlayerStatus Status => decoder == null ? VideoPlayerStatus.None : decoder.Status;
+		public VideoPlayerStatus Status => decoder?.Status ?? VideoPlayerStatus.None;
 
 		public float CurrentPosition
 		{
-			get => decoder.CurrentPosition;
+			get => decoder?.CurrentPosition ?? 0f;
 			set => decoder.CurrentPosition = value;
 		}
 
-		public float Duration => decoder.Duration;
+		public float Duration => decoder?.Duration ?? 0f;
 
 		public VideoPlayer()
 		{
-			Anchors = Anchors.LeftRight | Anchors.TopBottom;
+			Anchors = Anchors.LeftRightTopBottom;
 		}
 
 		public VideoPlayer(Widget parentWidget)
 		{
 			parentWidget.Nodes.Add(this);
 			Size = parentWidget.Size;
-			Anchors = Anchors.LeftRight | Anchors.TopBottom;
+			Anchors = Anchors.LeftRightTopBottom;
 		}
 
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			decoder.Update(delta);
-			Texture = decoder.Texture;
+			if (decoder != null) {
+				decoder.Update(delta);
+				Texture = decoder.Texture;
+			}
 		}
 
 		public void InitPlayer(string sourcePath)
 		{
-			if (decoder != null) {
-				decoder.Dispose();
-			}
+			decoder?.Dispose();
 			decoder = new VideoDecoder(sourcePath);
 		}
 
 		public void Start(Action onStart)
 		{
+			if (decoder == null) {
+				return;
+			}
 			decoder.OnStart = onStart;
 			decoder.Start();
 		}
@@ -98,7 +116,7 @@ namespace Lime
 
 			public override void Render()
 			{
-				Decoder.UpdateTexture();
+				Decoder?.UpdateTexture();
 				base.Render();
 			}
 

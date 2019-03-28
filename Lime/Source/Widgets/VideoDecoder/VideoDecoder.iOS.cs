@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
+using Tasks = System.Threading.Tasks;
+
 namespace Lime
 {
 	public class VideoDecoder : IDisposable
@@ -106,52 +108,59 @@ namespace Lime
 			Status = VideoPlayerStatus.Playing;
 		}
 
-		public async System.Threading.Tasks.Task Start()
+		public void Start()
 		{
 			if (state == State.Started) {
 				return;
 			}
 
-			do {
-				if (state == State.Finished) {
-					SeekTo(0f);
-				}
+			if (state == State.Finished) {
+				SeekTo(0f);
+			}
 
-				stopDecodeCancelationTokenSource = new CancellationTokenSource();
-				var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
-				player.Play();
-				state = State.Started;
-				Status = VideoPlayerStatus.Playing;
-				OnStart?.Invoke();
-				stopwatch.Start();
-				var workTask = System.Threading.Tasks.Task.Run(() => {
-					while (true) {
-						var time = player.CurrentTime;
-						while (!videoOutput.HasNewPixelBufferForItemTime(time)) {
-							checkVideoEvent.WaitOne();
-							checkVideoEvent.Reset();
-							stopDecodeCancelationToken.ThrowIfCancellationRequested();
-							time = player.CurrentTime;
-						}
-						var timeForDisplay = default(CMTime);
-						var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
-						lock (locker) {
-							if (currentPixelBuffer != null) {
-								currentPixelBuffer.Dispose();
-								currentPixelBuffer = null;
-							}
-							currentPixelBuffer = pixelBuffer;
-							HasNewTexture = true;
-						}
+			stopDecodeCancelationTokenSource = new CancellationTokenSource();
+			var stopDecodeCancelationToken = stopDecodeCancelationTokenSource.Token;
+			player.Play();
+			state = State.Started;
+			Status = VideoPlayerStatus.Playing;
+			OnStart?.Invoke();
+			stopwatch.Start();
+			var workTask = Tasks.Task.Run(() => {
+				while (true) {
+					var time = player.CurrentTime;
+					while (!videoOutput.HasNewPixelBufferForItemTime(time)) {
+						checkVideoEvent.WaitOne();
+						checkVideoEvent.Reset();
+						stopDecodeCancelationToken.ThrowIfCancellationRequested();
+						time = player.CurrentTime;
 					}
-				}, stopDecodeCancelationToken);
-				try {
-					await workTask;
-				} catch (OperationCanceledException e) {
-					Debug.Write("VideoPlayer: work task canceled!");
+					var timeForDisplay = default(CMTime);
+					var pixelBuffer = videoOutput.CopyPixelBuffer(time, ref timeForDisplay);
+					lock (locker) {
+						if (currentPixelBuffer != null) {
+							currentPixelBuffer.Dispose();
+							currentPixelBuffer = null;
+						}
+						currentPixelBuffer = pixelBuffer;
+						HasNewTexture = true;
+					}
 				}
-			} while (Looped && state == State.Finished);
-			Debug.Write("Video player loop ended!");
+			}, stopDecodeCancelationToken);
+			workTask.ContinueWith(failedTask => HandleError(failedTask), Tasks.TaskContinuationOptions.OnlyOnFaulted);
+		}
+
+		private void HandleError(Tasks.Task task)
+		{
+			if (state == State.Started) {
+				stopDecodeCancelationTokenSource?.Cancel();
+				stopwatch?.Stop();
+				state = State.Finished;
+			}
+			if (task.Exception != null) {
+				foreach (var e in task.Exception.InnerExceptions) {
+					Debug.Write(e.Message);
+				}
+			}
 		}
 
 		private void SeekTo(float time)
