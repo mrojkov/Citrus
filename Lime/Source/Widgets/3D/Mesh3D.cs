@@ -317,42 +317,56 @@ namespace Lime
 				Renderer.World = World;
 				Renderer.CullMode = CullMode;
 				Renderer.ColorFactor = ColorFactor;
-				foreach (var submesh in Submeshes) {
-					var mesh = Meshes[submesh.Mesh];
-					var material = Materials[submesh.Material];
-					var skin = material as IMaterialSkin;
-					if (skin != null) {
-						if (SkinningMode == SkinningMode.Linear) {
-							if (boneTransforms.Length < submesh.BoneCount || boneTransforms.Length < submesh.BoneCount) {
+				if (SkinningMode == SkinningMode.Linear) {
+					foreach (var submesh in Submeshes) {
+						var mesh = Meshes[submesh.Mesh];
+						var material = Materials[submesh.Material];
+						var skin = material as IMaterialSkin;
+						if (skin != null) {
+							if (boneTransforms.Length < submesh.BoneCount ||
+							    boneTransforms.Length < submesh.BoneCount) {
 								boneTransforms = new Matrix44[submesh.BoneCount];
 							}
-						} else {
-							if (dualQuaternionPartA.Length < submesh.BoneCount || dualQuaternionPartB.Length < submesh.BoneCount) {
+							for (var i = 0; i < submesh.BoneCount; i++) {
+								var bone = submesh.FirstBone + i;
+								boneTransforms[i] = BoneBindPoses[bone] * Bones[bone] * WorldInverse;
+							}
+							skin.SkinEnabled = submesh.BoneCount > 0;
+							skin.SkinningMode = SkinningMode;
+							skin.SetBones(boneTransforms, submesh.BoneCount);
+						}
+						for (var i = 0; i < material.PassCount; i++) {
+							material.Apply(i);
+							mesh.DrawIndexed(0, mesh.Indices.Length);
+						}
+						Renderer.PolyCount3d += mesh.Indices.Length / 3;
+					}
+				} else if (SkinningMode == SkinningMode.DualQuaternion) {
+					foreach (var submesh in Submeshes) {
+						var mesh = Meshes[submesh.Mesh];
+						var material = Materials[submesh.Material];
+						var skin = material as IMaterialSkin;
+						if (skin != null) {
+							if (dualQuaternionPartA.Length < submesh.BoneCount ||
+								dualQuaternionPartB.Length < submesh.BoneCount) {
 								dualQuaternionPartA = new Vector4[submesh.BoneCount];
 								dualQuaternionPartB = new Vector4[submesh.BoneCount];
 							}
-						}
-						for (var i = 0; i < submesh.BoneCount; i++) {
-							var bone = submesh.FirstBone + i;
-							if (SkinningMode == SkinningMode.Linear) {
-								boneTransforms[i] = BoneBindPoses[bone] * Bones[bone] * WorldInverse;
-							} else {
-								DecomposeToDoubleQuaternions(BoneBindPoses[bone] * Bones[bone] * WorldInverse, out dualQuaternionPartA[i], out dualQuaternionPartB[i]);
+							for (var i = 0; i < submesh.BoneCount; i++) {
+								var bone = submesh.FirstBone + i;
+								DecomposeToDoubleQuaternions(BoneBindPoses[bone] * Bones[bone] * WorldInverse,
+									out dualQuaternionPartA[i], out dualQuaternionPartB[i]);
 							}
-						}
-						skin.SkinEnabled = submesh.BoneCount > 0;
-						skin.SkinningMode = SkinningMode;
-						if (SkinningMode == SkinningMode.Linear) {
-							skin.SetBones(boneTransforms, submesh.BoneCount);
-						} else {
+							skin.SkinEnabled = submesh.BoneCount > 0;
+							skin.SkinningMode = SkinningMode;
 							skin.SetBones(dualQuaternionPartA, dualQuaternionPartB, submesh.BoneCount);
 						}
+						for (var i = 0; i < material.PassCount; i++) {
+							material.Apply(i);
+							mesh.DrawIndexed(0, mesh.Indices.Length);
+						}
+						Renderer.PolyCount3d += mesh.Indices.Length / 3;
 					}
-					for (var i = 0; i < material.PassCount; i++) {
-						material.Apply(i);
-						mesh.DrawIndexed(0, mesh.Indices.Length);
-					}
-					Renderer.PolyCount3d += mesh.Indices.Length / 3;
 				}
 				Renderer.PopState();
 			}
