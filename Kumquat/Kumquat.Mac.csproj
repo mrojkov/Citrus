@@ -57,18 +57,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
-    <None Include="Templates\GeneratedScenes.Android.csproj.kumquat">
+    <EmbeddedResource Include="Templates\GeneratedScenes.Android.csproj.kumquat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\GeneratedScenes.iOS.csproj.kumquat">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\GeneratedScenes.iOS.csproj.kumquat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\GeneratedScenes.Win.csproj.kumquat">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\GeneratedScenes.Win.csproj.kumquat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\ParsedWidget.cs.kumquat">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\ParsedWidget.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\CodeFormatter.cs" />

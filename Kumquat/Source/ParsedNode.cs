@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -22,6 +22,7 @@ namespace Kumquat
 		public readonly string Id;
 		public readonly string Name;
 		public string Type;
+		public string TypeFullName;
 		public readonly string ClassName;
 		public readonly string FieldName;
 		public readonly string ContentsPath;
@@ -35,6 +36,7 @@ namespace Kumquat
 			Id = parsedNode.Id;
 			Name = parsedNode.Name;
 			Type = parsedNode.Type;
+			TypeFullName = parsedNode.TypeFullName;
 			ClassName = parsedNode.ClassName;
 			FieldName = parsedNode.FieldName;
 			ContentsPath = parsedNode.ContentsPath;
@@ -47,6 +49,7 @@ namespace Kumquat
 			Id = node.Id;
 			Name = name;
 			Type = node.GetType().Name;
+			TypeFullName = node.GetType().FullName;
 			ClassName = name;
 			FieldName = "_" + name;
 			ContentsPath = AssetPath.CorrectSlashes(node.ContentsPath ?? "");
@@ -80,7 +83,7 @@ namespace Kumquat
 
 		public string GenerateIt()
 		{
-			var result = string.Format("public Lime.{0} It => (Lime.{0})Node;", Type);
+			var result = string.Format("public {0} It => ({0})Node;", TypeFullName);
 			return result;
 		}
 
@@ -92,14 +95,14 @@ namespace Kumquat
 				if (safeMarker.StartsWith("@")) {
 					safeMarker = safeMarker.Substring(1);
 				}
-				result += $"public {customType ?? Type} Run{marker.AnimationId ?? "Animation"}{safeMarker}() \n";
+				result += $"public {customType ?? TypeFullName} Run{marker.AnimationId ?? "Animation"}{safeMarker}() \n";
 				result += "{ \n";
 				if (marker.AnimationId == null) {
 					result += $"Node.RunAnimation(\"{marker.Name}\");\n";
 				} else {
 					result += $"Node.RunAnimation(\"{marker.Name}\", \"{marker.AnimationId}\");\n";
 				}
-				result += $"return ({customType ?? Type})Node;\n";
+				result += $"return ({customType ?? TypeFullName})Node;\n";
 				result += "} \n";
 			}
 			return result;

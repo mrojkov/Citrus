@@ -92,6 +92,7 @@ namespace Orange
 				}
 				new ScenesCodeCooker(
 					The.Workspace.ProjectDirectory,
+					The.Workspace.GeneratedScenesPath,
 					The.Workspace.Title,
 					CookingRulesBuilder.MainBundleName,
 					sceneToBundleMap,
@@ -115,7 +116,7 @@ namespace Orange
 
 		public static CodeCookerCache LoadCodeCookerCache()
 		{
-			var scenesPath = $@"{The.Workspace.ProjectDirectory}/{The.Workspace.Title}.GeneratedScenes/Scenes";
+			var scenesPath = $@"{The.Workspace.ProjectDirectory}/{The.Workspace.Title}.{The.Workspace.GeneratedScenesPath}/Scenes";
 			var codeCachePath = GetCodeCachePath();
 			if (!File.Exists(codeCachePath)) {
 				return InvalidateCache(scenesPath);
@@ -135,7 +136,7 @@ namespace Orange
 						var projectName = The.Workspace.Title;
 						foreach (var platform in Enum.GetValues(typeof(TargetPlatform))) {
 							var platformName = Enum.GetName(typeof(TargetPlatform), platform);
-							var projectPath = $"{projectName}.GeneratedScenes/{projectName}.GeneratedScenes.{platformName}.csproj";
+							var projectPath = $"{projectName}.{The.Workspace.GeneratedScenesPath}/{projectName}.GeneratedScenes.{platformName}.csproj";
 							if (File.Exists(projectPath)) {
 								var projectFilesCache = cache.GeneratedProjectFileToModificationDate;
 								if (!projectFilesCache.ContainsKey(projectPath) || File.GetLastWriteTime(projectPath) > projectFilesCache[projectPath]) {
@@ -159,7 +160,7 @@ namespace Orange
 				var projectName = The.Workspace.Title;
 				foreach (var platform in Enum.GetValues(typeof(TargetPlatform))) {
 					var platformName = Enum.GetName(typeof(TargetPlatform), platform);
-					var projectPath = $"{projectName}.GeneratedScenes/{projectName}.GeneratedScenes.{platformName}.csproj";
+					var projectPath = $"{projectName}.{The.Workspace.GeneratedScenesPath}/{projectName}.GeneratedScenes.{platformName}.csproj";
 					if (File.Exists(projectPath)) {
 						CsprojSynchronization.SynchronizeProject(projectPath);
 						codeCookerCache.GeneratedProjectFileToModificationDate.Add(projectPath, File.GetLastWriteTime(projectPath));
