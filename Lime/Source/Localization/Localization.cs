@@ -64,7 +64,7 @@ namespace Lime
 		/// </summary>
 		public static string GetString(string format, params object[] args)
 		{
-			string s = GetString(format);
+			string s = Pluralizer.Pluralize(GetString(format), args);
 			for (int i = 0; i < args.Length; i++) {
 				if (args[i] is string) {
 					args[i] = GetString((string)args[i]);
