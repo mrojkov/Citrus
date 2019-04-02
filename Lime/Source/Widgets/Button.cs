@@ -18,11 +18,23 @@ namespace Lime
 		private bool isDisabledState;
 		private bool awoken;
 
+		private string text;
+
 		public BitSet32 EnableMask = BitSet32.Full;
 
 		[YuzuMember]
 		[TangerineKeyframeColor(9)]
-		public override string Text { get; set; }
+		public override string Text
+		{
+			get => text;
+			set
+			{
+				if (text != value) {
+					text = value;
+					textPresentersFeeder?.Update();
+				}
+			}
+		}
 
 		[YuzuMember]
 		[TangerineKeyframeColor(18)]
