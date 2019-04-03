@@ -263,9 +263,16 @@ namespace Tangerine.UI.Docking
 			splitter.SeparatorActiveAreaWidth = 6f;
 			Widget rootWidget = splitter;
 			bool hasTabBarPlacement = false;
-			for (int i = 0; i < placement.Placements.Count; ++i) {
+			// Due to the mechanism of docking size refreshing, Placements[i] does not
+			// correspond to Stretches[i]. In fact, in Stretches elements ordered by visibility and
+			// location in their splitter. Visible widgets at first, hidden at last.
+			for (int i = 0, j = 0; i < placement.Placements.Count; ++i) {
+				if (!placement.Placements[i].AnyVisiblePanel()) {
+					continue;
+				}
 				hasTabBarPlacement |= placement.Placements[i] is TabBarPlacement;
-				CreateWidgetForPlacement(splitter, placement.Placements[i], placement.Stretches[i]);
+				CreateWidgetForPlacement(splitter, placement.Placements[i], placement.Stretches[j]);
+				j++;
 			}
 			splitter.DragEnded += () => RefreshDockedSize(placement, splitter);
 			if (requestTitle && !(hasTabBarPlacement && placement.Placements.Count == 1)) {
