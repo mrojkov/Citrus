@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Foundation;
 using UIKit;
 
 #pragma warning disable 0067
@@ -105,6 +106,11 @@ namespace Lime
 			AppDelegate.Instance.WillTerminateEvent += () => {
 				RaiseClosed();
 			};
+
+			UIApplication.Notifications.ObserveDidChangeStatusBarFrame(OnStatusBarChanged);
+			UIApplication.Notifications.ObserveDidChangeStatusBarOrientation(OnStatusBarChanged);
+			SafeAreaInsets = FetchSafeAreaInsets();
+
 			UIViewController.OnResize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
@@ -146,7 +152,22 @@ namespace Lime
 			fpsCounter.Refresh();
 		}
 
-		public void WaitForRendering() { }
+		private void OnStatusBarChanged(object sender, NSNotificationEventArgs e)
+		{
+			SafeAreaInsets = FetchSafeAreaInsets();
+			RaiseSafeAreaInsetsChanged();
+		}
+
+		private Rectangle FetchSafeAreaInsets()
+		{
+			var insets = UIApplication.SharedApplication.KeyWindow.SafeAreaInsets;
+			return new Rectangle(
+				(float) insets.Left,
+				(float) insets.Top,
+				(float) insets.Right,
+				(float) insets.Bottom
+			);
+		}
 	}
 }
 #endif

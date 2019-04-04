@@ -5,10 +5,6 @@ namespace Lime
 {
 	public abstract class CommonWindow
 	{
-		public Rectangle SafeAreaInsets { get; set; }
-
-		public event Action<Rectangle> SafeAreaInsetsChanged;
-
 		public event Action Activated;
 		public event Action Deactivated;
 		public event ClosingDelegate Closing;
@@ -18,11 +14,14 @@ namespace Lime
 		public event UpdatingDelegate Updating;
 		public event Action Rendering;
 		public event Action Sync;
+		public event SafeAreaInsetsChangedDelegate SafeAreaInsetsChanged;
 		public event VisibleChangingDelegate VisibleChanging;
 		public object Tag { get; set; }
 
 		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
+
+		public Rectangle SafeAreaInsets { get; protected set; }
 
 		/// <summary>
 		/// Keeps refresh rate the same as monitor's refresh rate.
@@ -105,6 +104,13 @@ namespace Lime
 		{
 			using (Context.Activate().Scoped()) {
 				Sync?.Invoke();
+			}
+		}
+
+		protected void RaiseSafeAreaInsetsChanged()
+		{
+			using (Context.Activate().Scoped()) {
+				SafeAreaInsetsChanged?.Invoke(SafeAreaInsets);
 			}
 		}
 

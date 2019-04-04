@@ -1,9 +1,9 @@
 #if ANDROID
 using System;
-using System.Threading;
 using System.Collections.Generic;
-
+using System.Threading;
 using Android.Content.Res;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using AndroidApp = Android.App.Application;
@@ -15,6 +15,33 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private class InsetsListener : Java.Lang.Object, View.IOnApplyWindowInsetsListener
+		{
+			private readonly Window owner;
+
+			public InsetsListener(Window window) => owner = window;
+
+			public WindowInsets OnApplyWindowInsets(View view, WindowInsets insets)
+			{
+				if (Build.VERSION.SdkInt < BuildVersionCodes.P || insets.DisplayCutout == null) {
+					owner.SafeAreaInsets = Rectangle.Empty;
+				} else {
+					var displayCutout = insets.DisplayCutout;
+					float pixelScale = Current.PixelScale;
+
+					owner.SafeAreaInsets = new Rectangle(
+						displayCutout.SafeInsetLeft / pixelScale,
+						displayCutout.SafeInsetTop / pixelScale,
+						displayCutout.SafeInsetRight / pixelScale,
+						displayCutout.SafeInsetBottom / pixelScale
+					);
+				}
+
+				owner.RaiseSafeAreaInsetsChanged();
+				return view.OnApplyWindowInsets(insets);
+			}
+		}
+
 		private Thread renderThread;
 		private ManualResetEvent renderReady = new ManualResetEvent(false);
 		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
@@ -102,7 +129,11 @@ namespace Lime
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
 			ActivityDelegate.Instance.GameView.SurfaceCreating += () => requestForRedraw = true;
-			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRendering;
+			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRender;
+
+			ActivityDelegate.Instance.GameView.SetOnApplyWindowInsetsListener(new InsetsListener(this));
+			ActivityDelegate.Instance.GameView.RequestApplyInsets();
+
 			PixelScale = Resources.System.DisplayMetrics.Density;
 
 			if (AsyncRendering) {

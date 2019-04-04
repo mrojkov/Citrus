@@ -30,6 +30,12 @@ namespace Lime
 	public delegate void VisibleChangingDelegate(bool value, bool modal);
 
 	/// <summary>
+	/// Delegate used by <see cref="IWindow.SafeAreaInsetsChanged"/> event.
+	/// <param name="safeAreaInsets">New value of sinsets.</param>
+	/// </summary>
+	public delegate void SafeAreaInsetsChangedDelegate(Rectangle safeAreaInsets);
+
+	/// <summary>
 	/// Enumerates available window states.
 	/// </summary>
 	public enum WindowState
@@ -157,6 +163,11 @@ namespace Lime
 		/// </summary>
 		IDisplay Display { get; }
 
+		/// <summary>
+		/// Gets the safe area insets for this window.
+		/// </summary>s
+		Rectangle SafeAreaInsets { get; }
+
 		[Obsolete("Use FPS property instead", true)]
 		float CalcFPS();
 
@@ -232,6 +243,11 @@ namespace Lime
 		event Action Sync;
 
 		/// <summary>
+		/// Occurs when safe area insets changed.
+		/// </summary>
+		event SafeAreaInsetsChangedDelegate SafeAreaInsetsChanged;
+
+		/// <summary>
 		/// Sets a flag indicating whether the current frame should be rendered.
 		/// </summary>
 		void Invalidate();
@@ -304,9 +320,5 @@ namespace Lime
 		/// Converts desktop coordinates into local window coordinates.
 		/// </summary>
 		Vector2 DesktopToLocal(Vector2 desktopPosition);
-
-		Rectangle SafeAreaInsets { get; set; }
-
-		event Action<Rectangle> SafeAreaInsetsChanged;
 	}
 }
