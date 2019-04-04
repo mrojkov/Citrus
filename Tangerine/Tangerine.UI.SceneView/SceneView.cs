@@ -257,7 +257,8 @@ namespace Tangerine.UI.SceneView
 				new MouseSelectionProcessor(),
 				new ShiftClickProcessor(),
 				new PreviewAnimationProcessor(),
-				new ResolutionPreviewProcessor()
+				new ResolutionPreviewProcessor(),
+				new FrameProgressionProcessor()
 			);
 		}
 
@@ -277,7 +278,6 @@ namespace Tangerine.UI.SceneView
 			new InspectRootNodePresenter(this);
 			new NineGridLinePresenter(this);
 			new Animation2DPathPresenter(this);
-			new FrameProgressionPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)
