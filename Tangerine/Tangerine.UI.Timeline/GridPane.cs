@@ -125,8 +125,9 @@ namespace Tangerine.UI.Timeline
 			var a = new Vector2(0.0f, 1.0f);
 			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
 			timeline.GetVisibleColumnRange(out var minColumn, out var maxColumn);
+			var offset = Document.Current.Animation.IsCompound ? 0.5f : 0;
 			for (int columnIndex = minColumn; columnIndex <= maxColumn; columnIndex++) {
-				a.X = b.X = 0.5f + columnIndex * TimelineMetrics.ColWidth;
+				a.X = b.X = 0.5f + (columnIndex + offset) * TimelineMetrics.ColWidth;
 				Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.LinesLight);
 			}
 		}
@@ -146,9 +147,10 @@ namespace Tangerine.UI.Timeline
 		{
 			var a = new Vector2(0.0f, 1.0f);
 			var b = new Vector2(0.0f, ContentWidget.Height - 2.0f);
+			var offset = Document.Current.Animation.IsCompound ? 0.5f : 0;
 			foreach (var marker in Document.Current.Animation.Markers) {
 				if (timeline.IsColumnVisible(marker.Frame)) {
-					a.X = b.X = 0.5f + TimelineMetrics.ColWidth * marker.Frame;
+					a.X = b.X = 0.5f + TimelineMetrics.ColWidth * (marker.Frame + offset);
 					Renderer.DrawLine(a, b, ColorTheme.Current.TimelineGrid.Lines);
 				}
 			}
@@ -247,9 +249,10 @@ namespace Tangerine.UI.Timeline
 
 		public Vector2 CellToGridCoordinates(int row, int col)
 		{
-			var rows = Document.Current.Rows;
+			var doc = Document.Current;
+			var rows = doc.Rows;
 			var y = row < rows.Count ? rows[Math.Max(row, 0)].GridWidget().Top() : rows[rows.Count - 1].GridWidget().Bottom();
-			return new Vector2(col * TimelineMetrics.ColWidth, y);
+			return new Vector2((col + (doc.Animation.IsCompound ? 0.5f : 0)) * TimelineMetrics.ColWidth, y);
 		}
 
 		private void FilesDropOnHandling()
