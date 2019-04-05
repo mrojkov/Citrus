@@ -52,7 +52,8 @@ namespace Tangerine.UI.Inspector
 			if (CoreUserPreferences.Instance.InspectEasing) {
 				AddEasingEditor();
 			}
-			BuildForObjectsHelper(objects).ToList();
+			foreach (var _ in BuildForObjectsHelper(objects)) {
+			}
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
