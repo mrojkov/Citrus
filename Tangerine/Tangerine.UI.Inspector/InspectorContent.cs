@@ -502,7 +502,6 @@ namespace Tangerine.UI.Inspector
 						Padding = new Thickness(12, 0),
 						VAlignment = VAlignment.Center,
 						ForceUncutText = false,
-						FontHeight = 14
 					}
 				}
 			};
