@@ -40,7 +40,18 @@ namespace Tangerine.UI.Timeline
 		public float OffsetX { get { return Offset.X; } set { Offset = new Vector2(value, Offset.Y); } }
 		public float OffsetY { get { return Offset.Y; } set { Offset = new Vector2(Offset.X, value); } }
 
-		public int CurrentColumn => Document.Current.AnimationFrame;
+		public int CurrentColumn
+		{
+			get {
+				if (Document.Current.PreviewAnimation) {
+					var time = Document.Current.Animation.Time;
+					time = Document.Current.Animation.EasingCalculator.EaseTime(time);
+					return AnimationUtils.SecondsToFrames(time);
+				} else {
+					return Document.Current.AnimationFrame;
+				}
+			}
+		}
 		public int ColumnCount { get; set; }
 		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
@@ -155,6 +166,7 @@ namespace Tangerine.UI.Timeline
 				new MouseWheelProcessor(this),
 				new RollMouseScrollProcessor(),
 				new SelectAndDragKeyframesProcessor(),
+				new CompoundAnimations.CreateAnimationTrackWeightRampProcessor(),
 				new CompoundAnimations.SelectAndDragAnimationClipsProcessor(),
 				new HasKeyframeRespondentProcessor(),
 				new DragKeyframesRespondentProcessor(),
