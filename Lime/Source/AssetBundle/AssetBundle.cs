@@ -49,7 +49,7 @@ namespace Lime
 		public virtual void Dispose()
 		{
 			if (current == this) {
-				Current = null;
+				SetCurrent(null, false);
 			}
 		}
 

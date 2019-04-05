@@ -85,7 +85,7 @@ namespace Orange
 			try {
 				// Don't return early even if there's nothing modified since there may be stuff to delete
 				// Also, don't bother with loading ony usedBundles for now, just load all of them
-				AssetBundle.Current = new AggregateAssetBundle(cookingBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray());
+				AssetBundle.SetCurrent(new AggregateAssetBundle(cookingBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(bundleName))).ToArray()), false);
 				var loadedScenes = new Dictionary<string, Node>();
 				foreach (var scene in scenesToCook) {
 					loadedScenes.Add(scene, Node.CreateFromAssetBundle(Path.ChangeExtension(scene, null)));
@@ -104,7 +104,7 @@ namespace Orange
 				SaveCodeCookerCache(cache);
 			} finally {
 				AssetBundle.Current.Dispose();
-				AssetBundle.Current = null;
+				AssetBundle.SetCurrent(null, false);
 			}
 		}
 

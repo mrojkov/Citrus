@@ -12,7 +12,7 @@ namespace Lime
 
 		public static event Texture2D.TextureMissingDelegate TextureMissing;
 
-		private readonly ConcurrentDictionary<string, WeakReference> textures = new ConcurrentDictionary<string, WeakReference>();
+		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
 
 		public readonly static TexturePool Instance = new TexturePool();
 
@@ -26,56 +26,64 @@ namespace Lime
 
 		public void DiscardTexturesUnderPressure()
 		{
-			foreach (WeakReference r in textures.Values) {
-				var texture = r.Target as ITexture;
-				if (texture != null && !texture.IsDisposed) {
-					texture.MaybeDiscardUnderPressure();
+			lock (textures) {
+				foreach (WeakReference r in textures.Values) {
+					var texture = r.Target as ITexture;
+					if (texture != null && !texture.IsDisposed) {
+						texture.MaybeDiscardUnderPressure();
+					}
 				}
 			}
 		}
 
 		public void DiscardAllTextures()
 		{
-			foreach (WeakReference r in textures.Values) {
-				var texture = r.Target as ITexture;
-				if (texture != null && !texture.IsDisposed) {
-					texture.Dispose();
+			lock (textures) {
+				foreach (WeakReference r in textures.Values) {
+					var texture = r.Target as ITexture;
+					if (texture != null && !texture.IsDisposed) {
+						texture.Dispose();
+					}
 				}
 			}
 		}
 
 		public void DiscardAllStubTextures()
 		{
-			foreach (WeakReference r in textures.Values) {
-				var target = r.Target as ITexture;
-				if (target != null && target.IsStubTexture && !target.IsDisposed) {
-					target.Dispose();
+			lock (textures) {
+				foreach (WeakReference r in textures.Values) {
+					var target = r.Target as ITexture;
+					if (target != null && target.IsStubTexture && !target.IsDisposed) {
+						target.Dispose();
 
-					//TODO: Вместо следующей строки, нужно реализовать нормальный Discard у StubTexture
-					r.Target = null;
+						//TODO: Вместо следующей строки, нужно реализовать нормальный Discard у StubTexture
+						r.Target = null;
+					}
 				}
 			}
 		}
 
 		public ITexture GetTexture(string path)
 		{
-			ITexture texture;
-			WeakReference r;
-			if (path == null) {
-				path = string.Empty;
-			}
-			if (!textures.TryGetValue(path, out r)) {
-				texture = CreateTexture(path);
-				textures[path] = new WeakReference(texture);
+			lock (textures) {
+				ITexture texture;
+				WeakReference r;
+				if (path == null) {
+					path = string.Empty;
+				}
+				if (!textures.TryGetValue(path, out r)) {
+					texture = CreateTexture(path);
+					textures[path] = new WeakReference(texture);
+					return texture;
+				}
+				texture = r.Target as ITexture;
+				if (texture == null || texture.IsDisposed) {
+					texture = CreateTexture(path);
+					textures[path] = new WeakReference(texture);
+					return texture;
+				}
 				return texture;
 			}
-			texture = r.Target as ITexture;
-			if (texture == null || texture.IsDisposed) {
-				texture = CreateTexture(path);
-				textures[path] = new WeakReference(texture);
-				return texture;
-			}
-			return texture;
 		}
 
 		private static ITexture CreateTexture(string path)
