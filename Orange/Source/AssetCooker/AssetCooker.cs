@@ -171,7 +171,8 @@ namespace Orange
 		{
 			string bundlePath = The.Workspace.GetBundlePath(bundleName);
 			bool wasBundleModified = false;
-			using (AssetBundle.Current = CreateBundle(bundleName)) {
+			using (var bundle = CreateBundle(bundleName)) {
+				AssetBundle.SetCurrent(bundle, false);
 				(AssetBundle.Current as PackedAssetBundle).OnModifying += () => {
 					if (!wasBundleModified) {
 						wasBundleModified = true;

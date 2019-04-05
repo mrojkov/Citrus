@@ -31,7 +31,8 @@ namespace Orange
 		private static void UnpackBundle(string bundlePath)
 		{
 			string outputDirectory = bundlePath + ".Unpacked";
-			using (AssetBundle.Current = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
+			using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
+				AssetBundle.SetCurrent(bundle, false);
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
 				if (Directory.Exists(outputDirectory)) {
 					Directory.Delete(outputDirectory, true);
@@ -77,7 +78,8 @@ namespace Orange
 		{
 			string bundlePath = The.Workspace.GetMainBundlePath();
 			string outputDirectory = The.Workspace.AssetsDirectory;
-			using (AssetBundle.Current = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
+			using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
+				AssetBundle.SetCurrent(bundle, false);
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {
 					foreach (string asset in AssetBundle.Current.EnumerateFiles()) {
