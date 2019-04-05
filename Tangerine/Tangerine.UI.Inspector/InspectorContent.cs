@@ -112,7 +112,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.All(_ => _ is IAnimable), widget, propertyPath)) {
+				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.Any(_ => _ is IAnimable), widget, propertyPath)) {
 					yield return e;
 				}
 			}
