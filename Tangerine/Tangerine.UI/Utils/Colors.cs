@@ -130,6 +130,10 @@ namespace Tangerine.UI
 			[YuzuOptional]
 			public Color4 SelectionBorder { get; set; }
 			[YuzuOptional]
+			public Color4 AnimationTrackWeightCurveKey { get; set; }
+			[YuzuOptional]
+			public Color4 AnimationTrackWeightCurve { get; set; }
+			[YuzuOptional]
 			public Color4 AnimationClip { get; set; }
 			[YuzuOptional]
 			public Color4 AnimationClipBorder { get; set; }
@@ -366,6 +370,8 @@ namespace Tangerine.UI
 				AnimatedRangeBackground = new Color4(85, 85, 85),
 				SelectedRowBackground = new Color4(100, 100, 100),
 				SelectionBorder = new Color4(0, 255, 255),
+				AnimationTrackWeightCurveKey = new Color4(20, 200, 200, 255),
+				AnimationTrackWeightCurve = new Color4(20, 200, 200, 100),
 				AnimationClip = new Color4(50, 50, 255, 80),
 				AnimationClipBorder = new Color4(50, 50, 255),
 			};
@@ -516,7 +522,9 @@ namespace Tangerine.UI
 				AnimatedRangeBackground = new Color4(240, 240, 240),
 				SelectedRowBackground = new Color4(225, 225, 225),
 				SelectionBorder = new Color4(255, 0, 128),
-				AnimationClip = new Color4(50, 50, 255, 80),
+				AnimationTrackWeightCurveKey = new Color4(0, 100, 100, 200),
+				AnimationTrackWeightCurve = new Color4(20, 200, 200, 100),
+				AnimationClip = new Color4(50, 50, 255, 60),
 				AnimationClipBorder = new Color4(50, 50, 255),
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {

@@ -26,6 +26,7 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 					});
 					var menu = new Menu {
 						new Command("Add", () => AddAnimationClip.Perform(c)) { Enabled = AddAnimationClip.IsEnabled() },
+						new Command("Delete", () => DeleteAnimationClip.Perform(c)) { Enabled = DeleteAnimationClip.IsEnabled(c) },
 						new Command("Split", () => SplitAnimationClip.Perform(c)) { Enabled = SplitAnimationClip.IsEnabled(c) },
 					};
 					menu.Popup();

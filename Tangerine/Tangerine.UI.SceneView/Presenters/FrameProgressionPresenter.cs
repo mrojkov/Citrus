@@ -11,7 +11,7 @@ namespace Tangerine.UI.SceneView.Presenters
 		public FrameProgressionPresenter(SceneView sceneView)
 		{
 			this.sceneView = sceneView;
-			sceneView.Scene.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(Render));
+			sceneView.Scene.CompoundPostPresenter.Push(new SyncDelegatePresenter<Widget>(Render));
 		}
 
 		public void Render(Widget canvas)
@@ -51,7 +51,7 @@ namespace Tangerine.UI.SceneView.Presenters
 				for (int i = min; i <= max; i++) {
 					foreach (var animator in host.Animators) {
 						if (animator.AnimationId == Document.Current.AnimationId) {
-							animator.CalcAndApply(AnimationUtils.FramesToSeconds(i));
+							animator.Apply(AnimationUtils.FramesToSeconds(i));
 						}
 					}
 					var color = Color4.Lerp(
@@ -68,7 +68,7 @@ namespace Tangerine.UI.SceneView.Presenters
 				}
 				foreach (var animator in host.Animators) {
 					if (animator.AnimationId == Document.Current.AnimationId) {
-						animator.CalcAndApply(AnimationUtils.FramesToSeconds(savedAnimationFrame));
+						animator.Apply(AnimationUtils.FramesToSeconds(savedAnimationFrame));
 					}
 				}
 			}

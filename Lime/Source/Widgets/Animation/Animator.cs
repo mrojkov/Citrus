@@ -2,52 +2,46 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Yuzu;
-using System.Collections.Concurrent;
 
 namespace Lime
 {
-	public interface IAnimator : IDisposable
+	public interface IAbstractAnimator
+	{
+		IAnimable Animable { get; }
+		int TargetPropertyPathComparisonCode { get; }
+		int Duration { get; }
+		bool IsTriggerable { get; }
+		Type ValueType { get; }
+		void Apply(double time);
+		void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange);
+	}
+
+	internal interface IAbstractAnimator<T> : IAbstractAnimator
+	{
+		T CalcValue(double time);
+		IAbstractAnimatorSetter<T> Setter { get; }
+	}
+
+	internal interface IAbstractAnimatorSetter<T>
+	{
+		void SetValue(T value);
+	}
+
+	public interface IAnimator : IDisposable, IAbstractAnimator
 	{
 		IAnimationHost Owner { get; set; }
-		IAnimable Animable { get; }
-
 		IAnimator Clone();
-
-		bool IsTriggerable { get; set; }
-
 		string TargetPropertyPath { get; set; }
-		int TargetPropertyPathUID { get; }
-
 		string AnimationId { get; set; }
-
 		bool Enabled { get; set; }
-
-		int Duration { get; }
-
-		object CalcValue(double time);
-		void Apply();
-		void CalcAndApply(double time);
-		void InvokeTrigger(int frame, double animationTimeCorrection);
-		void AddTriggersInRange(List<Action> triggers, double minTime, double maxTime, bool inclusiveRange);
-
-		void ResetCache();
-
 		IKeyframeList ReadonlyKeys { get; }
-
 		IKeyframeList Keys { get; }
-
 		object UserData { get; set; }
-
-		Type GetValueType();
-
-		void BlendWith(IAnimator animator, float blendFactor);
-
-		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
-
 		void Unbind();
-
 		bool IsZombie { get; }
-
+		object CalcValue(double time);
+		void ExecuteTrigger(int frame, double animationTimeCorrection);
+		void ResetCache();
 #if TANGERINE
 		int Version { get; }
 #endif // TANGERINE
@@ -56,7 +50,6 @@ namespace Lime
 	public interface IKeyframeList : IList<IKeyframe>
 	{
 		IKeyframe CreateKeyframe();
-
 		IKeyframe GetByFrame(int frame);
 
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
@@ -67,10 +60,9 @@ namespace Lime
 #endif // TANGERINE
 	}
 
-	public class Animator<T> : IAnimator
+	public class Animator<T> : IAnimator, IAbstractAnimator<T>, IAbstractAnimatorSetter<T>
 	{
 		public IAnimationHost Owner { get; set; }
-
 		public IAnimable Animable
 		{
 			get {
@@ -86,11 +78,6 @@ namespace Lime
 		private KeyframeParams @params;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
-		/// <summary>
-		/// value stored since last CalcValue()
-		/// </summary>
-		public T CalculatedValue { get; protected set; }
-
 		public bool IsTriggerable { get; set; }
 		public bool Enabled { get; set; } = true;
 		private delegate void SetterDelegate(T value);
@@ -121,13 +108,13 @@ namespace Lime
 			get => targetPropertyPath;
 			set {
 				targetPropertyPath = value;
-				TargetPropertyPathUID = TargetPropertyPathUIDGenerator.Generate(value);
+				TargetPropertyPathComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
 			}
 		}
 
-		public int TargetPropertyPathUID { get; private set; }
+		public int TargetPropertyPathComparisonCode { get; private set; }
 
-		public Type GetValueType() { return typeof(T); }
+		public Type ValueType => typeof(T);
 
 		[YuzuMember]
 		public TypedKeyframeList<T> ReadonlyKeys { get; private set; }
@@ -136,6 +123,8 @@ namespace Lime
 		public string AnimationId { get; set; }
 
 		public object UserData { get; set; }
+
+		IAbstractAnimatorSetter<T> IAbstractAnimator<T>.Setter => this;
 
 		public Animator()
 		{
@@ -216,20 +205,13 @@ namespace Lime
 		protected virtual T InterpolateLinear(float t) => Value2;
 		protected virtual T InterpolateSplined(float t) => InterpolateLinear(t);
 
-		public virtual void BlendWith(IAnimator animator, float blendFactor)
-		{
-			if (blendFactor >= 0.5f) {
-				CalculatedValue = ((Animator<T>)animator).CalculatedValue;
-			}
-		}
-
 		public void Clear()
 		{
 			keyIndex = 0;
 			Keys.Clear();
 		}
 
-		public void InvokeTrigger(int frame, double animationTimeCorrection)
+		public void ExecuteTrigger(int frame, double animationTimeCorrection)
 		{
 			if (!Enabled || IsZombie || !IsTriggerable) {
 				return;
@@ -242,9 +224,9 @@ namespace Lime
 			}
 		}
 
-		public void AddTriggersInRange(List<Action> triggers, double minTime, double maxTime, bool inclusiveRange)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange)
 		{
-			if (!Enabled || IsZombie || !IsTriggerable) {
+			if (!Enabled || IsZombie || !IsTriggerable || Owner == null) {
 				return;
 			}
 			int minFrame = AnimationUtils.SecondsToFramesCeiling(minTime);
@@ -257,12 +239,12 @@ namespace Lime
 					break;
 				} else if (key.Frame >= minFrame) {
 					var t = minTime - AnimationUtils.FramesToSeconds(key.Frame);
-					triggers.Add(() => Owner?.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: t));
+					Owner.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: t);
 				}
 			}
 		}
 
-		public void Apply()
+		public void SetValue(T value)
 		{
 			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
 				if (setter == null) {
@@ -271,14 +253,13 @@ namespace Lime
 						return;
 					}
 				}
-				setter(CalculatedValue);
+				setter(value);
 			}
 		}
 
-		public void CalcAndApply(double time)
+		public void Apply(double time)
 		{
-			CalcValue(time);
-			Apply();
+			SetValue(CalcValue(time));
 		}
 
 		private void Bind()
@@ -314,36 +295,20 @@ namespace Lime
 				CacheInterpolationParameters(time);
 			}
 			if (@params.Function == KeyFunction.Steep) {
-				CalculatedValue = Value2;
-				return CalculatedValue;
+				return Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
 			if (@params.EasingFunction != EasingFunction.Linear) {
 				t = Easing.Interpolate(t, @params.EasingFunction, @params.EasingType);
 			}
 			if (@params.Function == KeyFunction.Linear) {
-				CalculatedValue = InterpolateLinear(t);
+				return InterpolateLinear(t);
 			} else {
-				CalculatedValue = InterpolateSplined(t);
+				return InterpolateSplined(t);
 			}
-			return CalculatedValue;
 		}
 
 		object IAnimator.CalcValue(double time) => CalcValue(time);
-
-		public bool TryGetNextKeyFrame(int nextFrame, out int keyFrame)
-		{
-			foreach (var key in ReadonlyKeys) {
-				if (key.Frame < nextFrame) {
-					continue;
-				}
-
-				keyFrame = key.Frame;
-				return true;
-			}
-			keyFrame = -1;
-			return false;
-		}
 
 		private static KeyframeParams defaultKeyframeParams = new KeyframeParams {
 			Function = KeyFunction.Steep,
@@ -406,15 +371,6 @@ namespace Lime
 		}
 	}
 
-	internal static class TargetPropertyPathUIDGenerator
-	{
-		private static int counter = 1;
-		private static ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
-		private static Func<string, int> uidFactory = _ => counter++;
-
-		public static int Generate(string targetPath) => map.GetOrAdd(targetPath, uidFactory);
-	}
-
 	public class Vector2Animator : Animator<Vector2>
 	{
 		protected override Vector2 InterpolateLinear(float t)
@@ -432,12 +388,6 @@ namespace Lime
 				Mathf.CatmullRomSpline(t, Value1.Y, Value2.Y, Value3.Y, Value4.Y)
 			);
 		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((Vector2Animator)animator).CalculatedValue;
-			CalculatedValue = Vector2.Lerp(blendFactor, CalculatedValue, otherValue);
-		}
 	}
 
 	public class Vector3Animator : Animator<Vector3>
@@ -450,12 +400,6 @@ namespace Lime
 		protected override Vector3 InterpolateSplined(float t)
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
-		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((Vector3Animator)animator).CalculatedValue;
-			CalculatedValue = Vector3.Lerp(blendFactor, CalculatedValue, otherValue);
 		}
 	}
 
@@ -470,12 +414,6 @@ namespace Lime
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4);
 		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((NumericAnimator)animator).CalculatedValue;
-			CalculatedValue = Mathf.Lerp(blendFactor, CalculatedValue, otherValue);
-		}
 	}
 
 	public class IntAnimator : Animator<int>
@@ -489,12 +427,6 @@ namespace Lime
 		{
 			return Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4).Round();
 		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((IntAnimator)animator).CalculatedValue;
-			CalculatedValue = Mathf.Lerp(blendFactor, CalculatedValue, otherValue).Round();
-		}
 	}
 
 	public class Color4Animator : Animator<Color4>
@@ -502,12 +434,6 @@ namespace Lime
 		protected override Color4 InterpolateLinear(float t)
 		{
 			return Color4.Lerp(t, Value2, Value3);
-		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((Color4Animator)animator).CalculatedValue;
-			CalculatedValue = Color4.Lerp(blendFactor, CalculatedValue, otherValue);
 		}
 	}
 
@@ -517,12 +443,6 @@ namespace Lime
 		{
 			return Quaternion.Slerp(Value2, Value3, t);
 		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((QuaternionAnimator)animator).CalculatedValue;
-			CalculatedValue = Quaternion.Lerp(CalculatedValue, otherValue, blendFactor);
-		}
 	}
 
 	public class Matrix44Animator : Animator<Matrix44>
@@ -530,12 +450,6 @@ namespace Lime
 		protected override Matrix44 InterpolateLinear(float t)
 		{
 			return Matrix44.Lerp(Value2, Value3, t);
-		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((Matrix44Animator)animator).CalculatedValue;
-			CalculatedValue = Matrix44.Lerp(CalculatedValue, otherValue, blendFactor);
 		}
 	}
 
@@ -560,17 +474,6 @@ namespace Lime
 				Mathf.CatmullRomSpline(t, Value1.Bottom, Value2.Bottom, Value3.Bottom, Value4.Bottom)
 			);
 		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((ThicknessAnimator)animator).CalculatedValue;
-			CalculatedValue = new Thickness(
-				Mathf.Lerp(blendFactor, CalculatedValue.Left, otherValue.Left),
-				Mathf.Lerp(blendFactor, CalculatedValue.Right, otherValue.Right),
-				Mathf.Lerp(blendFactor, CalculatedValue.Top, otherValue.Top),
-				Mathf.Lerp(blendFactor, CalculatedValue.Bottom, otherValue.Bottom)
-			);
-		}
 	}
 
 	public class NumericRangeAnimator : Animator<NumericRange>
@@ -588,15 +491,6 @@ namespace Lime
 			return new NumericRange(
 				Mathf.CatmullRomSpline(t, Value1.Median, Value2.Median, Value3.Median, Value4.Median),
 				Mathf.CatmullRomSpline(t, Value1.Dispersion, Value2.Dispersion, Value3.Dispersion, Value4.Dispersion)
-			);
-		}
-
-		public override void BlendWith(IAnimator animator, float blendFactor)
-		{
-			var otherValue = ((NumericRangeAnimator)animator).CalculatedValue;
-			CalculatedValue = new NumericRange(
-				Mathf.Lerp(blendFactor, CalculatedValue.Median, otherValue.Median),
-				Mathf.Lerp(blendFactor, CalculatedValue.Dispersion, otherValue.Dispersion)
 			);
 		}
 	}

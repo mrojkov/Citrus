@@ -30,7 +30,7 @@ namespace Lime
 				m.Owner = null;
 			}
 			markers.Clear();
-			owner?.OnMarkersChanged();
+			owner?.InvalidateCache();
 		}
 
 		public bool Contains(Marker item) => markers.Contains(item);
@@ -61,7 +61,7 @@ namespace Lime
 		{
 			markers[index].Owner = null;
 			markers.RemoveAt(index);
-			owner?.OnMarkersChanged();
+			owner?.InvalidateCache();
 		}
 
 		public Marker this[int index]
@@ -146,7 +146,7 @@ namespace Lime
 			}
 			marker.Owner = owner;
 			markers.Add(marker);
-			owner?.OnMarkersChanged();
+			owner?.InvalidateCache();
 		}
 
 		public void AddOrdered(Marker marker)
@@ -168,7 +168,7 @@ namespace Lime
 				}
 			}
 			marker.Owner = owner;
-			owner?.OnMarkersChanged();
+			owner?.InvalidateCache();
 		}
 	}
 }

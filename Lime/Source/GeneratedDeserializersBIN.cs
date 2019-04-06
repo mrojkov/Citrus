@@ -170,15 +170,15 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.Begin = d.Reader.ReadInt32();
+				result.BeginFrame = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.End = d.Reader.ReadInt32();
+				result.EndFrame = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.Offset = d.Reader.ReadInt32();
+				result.InFrame = d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {

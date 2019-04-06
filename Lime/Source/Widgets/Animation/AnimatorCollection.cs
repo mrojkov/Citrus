@@ -176,7 +176,7 @@ namespace Lime
 		{
 			foreach (var a in this) {
 				if (a.AnimationId == animationId) {
-					a.CalcAndApply(time);
+					a.Apply(time);
 				}
 			}
 		}
@@ -185,7 +185,7 @@ namespace Lime
 		{
 			foreach (var a in this) {
 				if (a.IsTriggerable && a.AnimationId == animationId) {
-					a.InvokeTrigger(frame, animationTimeCorrection);
+					a.ExecuteTrigger(frame, animationTimeCorrection);
 				}
 			}
 		}

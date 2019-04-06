@@ -27,7 +27,7 @@ namespace Lime
 			set {
 				if (frame != value) {
 					frame = value;
-					Owner?.OnMarkersChanged();
+					Owner?.InvalidateCache();
 				}
 			}
 		}
@@ -47,7 +47,7 @@ namespace Lime
 			set {
 				if (!easing.Equals(value)) {
 					easing = value;
-					Owner?.OnMarkersChanged();
+					Owner?.InvalidateCache();
 				}
 			}
 		}

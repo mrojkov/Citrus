@@ -134,14 +134,8 @@ namespace Tangerine.UI.Inspector
 				r ^= FindMarkerBehind()?.GetHashCode() ?? 0;
 			}
 			if (Document.Current.Animation.IsCompound) {
-				if (Document.Current.GetCompoundAnimationIspectMode == CompoundAnimationInspectionMode.Tracks) {
-					foreach (var track in GetSelectedAnimationTracks()) {
-						r ^= track.GetHashCode();
-					}
-				} else {
-					foreach (var clip in GetSelectedAnimationClips()) {
-						r ^= clip.GetHashCode();
-					}
+				foreach (var track in GetSelectedAnimationTracksAndClips()) {
+					r ^= track.GetHashCode();
 				}
 			} else if (Document.Current.InspectRootNode) {
 				var rootNode = Document.Current.RootNode;
@@ -183,11 +177,7 @@ namespace Tangerine.UI.Inspector
 		private void Rebuild()
 		{
 			if (Document.Current.Animation.IsCompound) {
-				if (Document.Current.GetCompoundAnimationIspectMode == CompoundAnimationInspectionMode.Tracks) {
-					content.BuildForObjects(GetSelectedAnimationTracks().ToList());
-				} else {
-					content.BuildForObjects(GetSelectedAnimationClips().ToList());
-				}
+				content.BuildForObjects(GetSelectedAnimationTracksAndClips().ToList());
 			} else if (Document.Current.InspectRootNode) {
 				content.BuildForObjects(new[] { Document.Current.RootNode });
 			} else {
@@ -199,15 +189,11 @@ namespace Tangerine.UI.Inspector
 			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
 		}
 
-		private static IEnumerable<AnimationTrack> GetSelectedAnimationTracks()
+		private static IEnumerable<object> GetSelectedAnimationTracksAndClips()
 		{
 			foreach (var row in Document.Current.SelectedRows()) {
 				yield return row.Components.Get<AnimationTrackRow>().Track;
 			}
-		}
-
-		private static IEnumerable<AnimationClip> GetSelectedAnimationClips()
-		{
 			foreach (var row in Document.Current.Rows) {
 				var track = row.Components.Get<AnimationTrackRow>().Track;
 				foreach (var clip in track.Clips) {

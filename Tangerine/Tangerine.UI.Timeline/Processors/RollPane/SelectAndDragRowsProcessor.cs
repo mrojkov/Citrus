@@ -28,7 +28,6 @@ namespace Tangerine.UI.Timeline
 				if (!input.WasMousePressed() || input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					continue;
 				}
-				Document.Current.GetCompoundAnimationIspectMode = CompoundAnimationInspectionMode.Tracks;
 				var initialMousePosition = input.MousePosition;
 				var row = RowUnderMouse(initialMousePosition);
 				if (row == null) {

@@ -27,8 +27,8 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 						SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), false);
 					}
 					var newClip = clip.Clone();
-					newClip.Begin += offset.X;
-					newClip.End += offset.X;
+					newClip.BeginFrame += offset.X;
+					newClip.EndFrame += offset.X;
 					newClip.IsSelected = true;
 					AnimationClipToolbox.InsertClip(track, newClip);
 				}

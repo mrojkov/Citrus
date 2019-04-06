@@ -4,7 +4,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 {
-	public static class SplitAnimationClip
+	public static class DeleteAnimationClip
 	{
 		public static bool IsEnabled(IntVector2 cell)
 		{
@@ -15,7 +15,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 		{
 			if (TryFindClip(cell, out var track, out var clip)) {
 				Document.Current.History.DoTransaction(() => {
-					AnimationClipToolbox.SplitClip(track, clip, cell.X + 1);
+					AnimationClipToolbox.RemoveClip(track, clip);
 				});
 			}
 		}
@@ -28,7 +28,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				return false;
 			}
 			track = Document.Current.Animation.Tracks[cell.Y];
-			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip) && cell.X < clip.EndFrame - 1;
+			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip);
 		}
 	}
 }

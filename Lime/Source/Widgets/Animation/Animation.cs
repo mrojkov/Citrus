@@ -7,21 +7,25 @@ namespace Lime
 {
 	public class Animation : ICloneable
 	{
+#if TANGERINE
+		public static Func<Animation, bool> EasingEnabledChecker;
+#endif
+		private string id;
 		private bool isRunning;
 		private bool animatorsArePropagated;
+		private bool? hasEasings;
 		internal Animation Next;
 		internal double TimeInternal;
 		internal Marker MarkerAhead;
-		internal double EasingStartTime;
-		internal double EasingEndTime;
-		internal CubicBezier EasingCurve;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
+		public EasingCalculator EasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
-		internal List<IAnimator> EffectiveAnimators;
-		internal List<Action> EffectiveTriggers;
+		internal List<IAbstractAnimator> EffectiveAnimators;
+		internal List<IAbstractAnimator> EffectiveTriggableAnimators;
 		internal int EffectiveAnimatorsVersion;
-		internal AnimationCollisionMap CollisionMap;
+		public int DurationInFrames { get; internal set; }
+		public double DurationInSeconds => DurationInFrames * AnimationUtils.SecondsPerFrame;
 
 		[YuzuMember]
 		public bool IsCompound { get; set; }
@@ -35,7 +39,18 @@ namespace Lime
 		public MarkerList Markers { get; private set; }
 
 		[YuzuMember]
-		public string Id { get; set; }
+		public string Id
+		{
+			get => id;
+			set {
+				if (id != value) {
+					IdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
+					id = value;
+				}
+			}
+		}
+
+		public int IdComparisonCode { get; private set; }
 
 		[YuzuMember]
 		[TangerineIgnore]
@@ -52,7 +67,7 @@ namespace Lime
 				TimeInternal = value;
 				MarkerAhead = null;
 				RunningMarkerId = null;
-				CalcAndApplyAnimators();
+				ApplyAnimators();
 			}
 		}
 
@@ -83,6 +98,7 @@ namespace Lime
 		{
 			Markers = new MarkerList(this);
 			Tracks = new AnimationTrackList(this);
+			EasingCalculator = new EasingCalculator(Markers, this);
 		}
 
 		public void Advance(float delta)
@@ -124,7 +140,7 @@ namespace Lime
 		public void Run(string markerId = null)
 		{
 			if (!TryRun(markerId)) {
-				throw new Lime.Exception("Unknown marker '{0}'", markerId);
+				throw new Exception($"Unknown marker '{markerId}'");
 			}
 		}
 
@@ -137,19 +153,18 @@ namespace Lime
 			return false;
 		}
 
-		internal void OnMarkersChanged()
+		internal void InvalidateCache()
 		{
 			MarkerAhead = null;
-			EasingCurve = null;
-			EasingStartTime = 0;
-			EasingEndTime = 0;
+			EffectiveAnimators = null;
+			hasEasings = null;
+			EasingCalculator.Invalidate();
 		}
 
-		public void CalcAndApplyAnimators()
+		public void ApplyAnimators()
 		{
 			Load();
-			AnimationEngine.CalcEffectiveAnimatorsAndTriggers(this, Time, Time, false);
-			AnimationEngine.ApplyEffectiveAnimators(this);
+			AnimationEngine.ApplyAnimatorsAndExecuteTriggers(this, Time, Time, false);
 		}
 
 		internal void RaiseStopped()
@@ -165,8 +180,9 @@ namespace Lime
 			clone.Markers = MarkerList.DeepClone(Markers, clone);
 			clone.Tracks = Tracks.Clone(clone);
 			clone.EffectiveAnimators = null;
+			clone.EffectiveTriggableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
-			clone.CollisionMap = null;
+			clone.EasingCalculator = new EasingCalculator(clone.Markers, clone);
 			return clone;
 		}
 
@@ -214,6 +230,19 @@ namespace Lime
 
 		public static string FixAntPath(string path) => path.Replace('|', '_');
 
+		public bool HasEasings()
+		{
+			if (!hasEasings.HasValue) {
+				hasEasings = false;
+				foreach (var marker in Markers) {
+					if (!marker.Easing.IsDefault()) {
+						hasEasings = true;
+					}
+				}
+			}
+			return hasEasings.Value;
+		}
+
 		public class AnimationData
 		{
 			public delegate bool LoadingDelegate(string path, ref AnimationData instance);
@@ -237,6 +266,101 @@ namespace Lime
 				Loaded?.Value?.Invoke(path, instance);
 				return instance;
 			}
+		}
+	}
+
+	public class EasingCalculator
+	{
+		private Animation owner;
+		private MarkerList markers;
+		private double easingStartTime;
+		private double easingEndTime;
+		private double prevTime;
+		private double easedPrevTime;
+		private double currTime;
+		private double easedCurrTime;
+		private CubicBezier easingCurve;
+
+		public EasingCalculator(MarkerList markers, Animation owner)
+		{
+			this.owner = owner;
+			this.markers = markers;
+			Invalidate();
+		}
+
+		public void Invalidate()
+		{
+			easingCurve = null;
+			easingStartTime = easingEndTime = 0;
+			currTime = prevTime = float.NaN;
+		}
+
+		private void CacheEasing(double time)
+		{
+			easingCurve = null;
+			easingStartTime = 0;
+			easingEndTime = 0;
+			if (markers.Count == 0) {
+				easingStartTime = double.NegativeInfinity;
+				easingEndTime = double.PositiveInfinity;
+				return;
+			}
+			var frame = AnimationUtils.SecondsToFrames(time);
+			int i = -1;
+			foreach (var marker in markers) {
+				if (marker.Frame > frame) {
+					break;
+				}
+				i++;
+			}
+			if (i == -1) {
+				easingStartTime = double.NegativeInfinity;
+				easingEndTime = markers[i + 1].Time;
+				return;
+			}
+			if (i == markers.Count - 1) {
+				easingStartTime = markers[i].Time;
+				easingEndTime = double.PositiveInfinity;
+				return;
+			}
+			var currMarker = markers[i];
+			var nextMarker = markers[i + 1];
+			easingStartTime = currMarker.Time;
+			easingEndTime = nextMarker.Time;
+			if (!currMarker.Easing.IsDefault()) {
+				var e = currMarker.Easing;
+				easingCurve = new CubicBezier(e.P1X, e.P1Y, e.P2X, e.P2Y);
+			}
+		}
+
+		public double EaseTime(double time)
+		{
+#if TANGERINE
+			if (!Animation.EasingEnabledChecker?.Invoke(owner) ?? true) {
+				return time;
+			}
+#endif
+			if (time == prevTime) {
+				return easedPrevTime;
+			}
+			if (time == currTime) {
+				return easedCurrTime;
+			}
+			if (time < easingStartTime || time >= easingEndTime) {
+				CacheEasing(time);
+			}
+			prevTime = currTime;
+			easedPrevTime = easedCurrTime;
+			currTime = time;
+			if (easingCurve != null) {
+				var d = easingEndTime - easingStartTime;
+				var p = (time - easingStartTime) / d;
+				var p2 = easingCurve.SolveWithEpsilon(p, 1e-5);
+				easedCurrTime = p2 * d + easingStartTime;
+			} else {
+				easedCurrTime = time;
+			}
+			return easedCurrTime;
 		}
 	}
 }

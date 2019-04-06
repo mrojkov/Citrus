@@ -57,17 +57,20 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 					animationSelector.Items.Add(new CommonDropDownList.Item(a.Id));
 				}
 				animationSelector.Index = 0;
-				cancelButton.Clicked += () => {
-					window.Close();
-				};
+				cancelButton.Clicked += () => window.Close();
 				okButton.Clicked += () => {
 					var track = Document.Current.Rows[cell.Y].Components.Get<Core.Components.AnimationTrackRow>().Track;
 					Document.Current.History.DoTransaction(() => {
+						var animation = Document.Current.Container.Animations.Find(animationSelector.Text);
+						if (!animation.AnimationEngine.AreEffectiveAnimatorsValid(animation)) {
+							// Refreshes animation duration either
+							animation.AnimationEngine.BuildEffectiveAnimators(animation);
+						}
 						var clip = new AnimationClip {
 							AnimationId = animationSelector.Text,
-							Begin = cell.X,
-							Offset = 0,
-							Length = CalcAnimationLength(Document.Current.Container, animationSelector.Text) + 1
+							BeginFrame = cell.X,
+							InFrame = 0,
+							DurationInFrames = animation.DurationInFrames + 1
 						};
 						AnimationClipToolbox.InsertClip(track, clip);
 					});
@@ -84,20 +87,6 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 						yield return a;
 					}
 				}
-			}
-
-			static int CalcAnimationLength(Node node, string animationId)
-			{
-				int result = 0;
-				foreach (var a in node.Animators) {
-					if (a.AnimationId == animationId) {
-						result = Math.Max(result, a.Duration);
-					}
-				}
-				foreach (var n in node.Nodes) {
-					result = Math.Max(result, CalcAnimationLength(n, animationId));
-				}
-				return result;
 			}
 		}
 	}

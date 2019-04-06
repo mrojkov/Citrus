@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline
 		public static bool CanEditRow(Row row)
 		{
 			var animator = row.Components.Get<PropertyRow>()?.Animator;
-			return animator != null && adapters.ContainsKey(animator.GetValueType());
+			return animator != null && adapters.ContainsKey(animator.ValueType);
 		}
 
 		public CurveEditorPane(Timeline timeline)
@@ -78,7 +78,7 @@ namespace Tangerine.UI.Timeline
 		public void EditRow(Row row)
 		{
 			property = row?.Components.Get<PropertyRow>();
-			var adapter = adapters[property.Animator.GetValueType()];
+			var adapter = adapters[property.Animator.ValueType];
 			float min, max;
 			CalcRange(property.Animator, adapter, out min, out max);
 			MinValue = min;

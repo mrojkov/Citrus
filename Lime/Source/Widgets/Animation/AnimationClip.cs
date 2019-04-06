@@ -16,64 +16,160 @@ namespace Lime
 
 	public class AnimationClip
 	{
+		private double cachedTime = double.NaN;
+		private double cachedLocalTime;
+		private string animationId;
+		private int beginFrame;
+		private int endFrame;
+		private int inFrame;
+		private bool reversed;
+		private AnimationClipExtrapolation postExtrapolation = AnimationClipExtrapolation.Hold;
+
+		public double BeginTime { get; private set; }
+		public double EndTime { get; private set; }
+		public double DurationInSeconds { get; private set; }
+		public double InTime { get; private set; }
+
 		[YuzuMember]
-		public string AnimationId { get; set; }
+		[TangerineGroup("Clip")]
+		public string AnimationId
+		{
+			get => animationId;
+			set {
+				if (animationId != value) {
+					animationId = value;
+					AnimationIdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
+					Owner?.InvalidateCache();
+				}
+			}
+		}
+
+		public int AnimationIdComparisonCode { get; private set; }
 
 		[YuzuMember]
 		[TangerineReadOnly]
-		public int Begin { get; set; }
+		[TangerineGroup("Clip")]
+		public int BeginFrame
+		{
+			get => beginFrame;
+			set {
+				if (beginFrame != value) {
+					beginFrame = value;
+					BeginTime = value * AnimationUtils.SecondsPerFrame;
+					DurationInSeconds = EndTime - BeginTime;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
 
 		[YuzuMember]
 		[TangerineReadOnly]
-		public int End { get; set; }
+		[TangerineGroup("Clip")]
+		public int EndFrame
+		{
+			get => endFrame;
+			set {
+				if (endFrame != value) {
+					endFrame = value;
+					EndTime = value * AnimationUtils.SecondsPerFrame;
+					DurationInSeconds = EndTime - BeginTime;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public int Offset { get; set; }
+		[TangerineGroup("Clip")]
+		public int InFrame
+		{
+			get => inFrame;
+			set {
+				if (inFrame != value) {
+					inFrame = value;
+					InTime = value * AnimationUtils.SecondsPerFrame;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public bool Reversed { get; set; }
+		[TangerineGroup("Clip")]
+		public bool Reversed
+		{
+			get => reversed;
+			set {
+				if (reversed != value) {
+					reversed = value;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
 
 		[YuzuMember]
-		public AnimationClipExtrapolation PostExtrapolation { get; set; } = AnimationClipExtrapolation.Hold;
+		[TangerineGroup("Clip")]
+		public AnimationClipExtrapolation PostExtrapolation
+		{
+			get => postExtrapolation;
+			set {
+				if (postExtrapolation != value) {
+					postExtrapolation = value;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
 
 #if TANGERINE
 		public bool IsSelected { get; set; }
 #endif
 
+		internal Animation CachedAnimation { get; set; }
+
 		internal Animation Animation
 		{
 			get {
 				var node = Owner.Owner.Owner;
-				node.Animations.TryFind(AnimationId, out var animation);
+				node.Animations.TryFind(AnimationIdComparisonCode, out var animation);
 				return animation;
 			}
 		}
 
-		public int Length
+		public int DurationInFrames
 		{
-			get => End - Begin;
-			set => End = Begin + value;
+			get => EndFrame - BeginFrame;
+			set => EndFrame = BeginFrame + value;
 		}
 
 		public AnimationTrack Owner { get; internal set; }
 
-		public double RemapTime(double time)
+		public double ToLocalTime(double time)
 		{
-			var relativeTime = time - AnimationUtils.FramesToSeconds(Begin - Offset);
-			if (PostExtrapolation == AnimationClipExtrapolation.Repeat) {
-				relativeTime %= AnimationUtils.FramesToSeconds(Length);
-			} else if (PostExtrapolation == AnimationClipExtrapolation.PingPong) {
-				var period = AnimationUtils.FramesToSeconds(Length) * 2;
-				relativeTime %= period;
-				if (relativeTime > period * 0.5) {
-					relativeTime = period - relativeTime;
-				}
+			if (time == cachedTime) {
+				return cachedLocalTime;
+			}
+			cachedTime = time;
+			var localTime = time - BeginTime - InTime;
+			switch (PostExtrapolation) {
+				case AnimationClipExtrapolation.Hold:
+				case AnimationClipExtrapolation.None:
+					localTime = Mathf.Clamp(localTime, 0, DurationInSeconds);
+					break;
+				case AnimationClipExtrapolation.Repeat:
+					localTime %= CachedAnimation.DurationInSeconds;
+					break;
+				case AnimationClipExtrapolation.PingPong:
+					var period = CachedAnimation.DurationInSeconds * 2;
+					localTime %= period;
+					if (localTime > period * 0.5) {
+						localTime = period - localTime;
+					}
+					break;
 			}
 			if (!Reversed) {
-				return relativeTime;
+				cachedLocalTime = localTime;
 			} else {
-				return AnimationUtils.FramesToSeconds(Length - 1) - relativeTime;
+				cachedLocalTime = DurationInSeconds - AnimationUtils.SecondsPerFrame - localTime;
 			}
+			return cachedLocalTime;
 		}
 
 		public AnimationClip Clone()
@@ -120,18 +216,19 @@ namespace Lime
 
 		public int IndexOf(AnimationClip item) => clips.IndexOf(item);
 
-		public void Insert(int index, AnimationClip clip)
+		public void Insert(int index, AnimationClip item)
 		{
-			if (clip.Owner != null) {
+			if (item.Owner != null) {
 				throw new InvalidOperationException();
 			}
-			clips.Insert(index, clip);
-			clip.Owner = owner;
+			clips.Insert(index, item);
+			item.Owner = owner;
+			owner?.InvalidateCache();
 		}
 
 		public bool Remove(AnimationClip clip)
 		{
-			int index = GetIndexByFrame(clip.Begin);
+			int index = GetIndexByFrame(clip.BeginFrame);
 			if (index < 0) {
 				return false;
 			}
@@ -140,6 +237,7 @@ namespace Lime
 			}
 			clip.Owner = null;
 			clips.RemoveAt(index);
+			owner?.InvalidateCache();
 			return true;
 		}
 
@@ -147,6 +245,7 @@ namespace Lime
 		{
 			clips[index].Owner = null;
 			clips.RemoveAt(index);
+			owner?.InvalidateCache();
 		}
 
 		public AnimationClip this[int index]
@@ -167,9 +266,9 @@ namespace Lime
 			int r = clips.Count - 1;
 			while (l <= r) {
 				int m = (l + r) / 2;
-				if (clips[m].Begin < frame) {
+				if (clips[m].BeginFrame < frame) {
 					l = m + 1;
-				} else if (clips[m].Begin > frame) {
+				} else if (clips[m].BeginFrame > frame) {
 					r = m - 1;
 				} else {
 					return m;
@@ -195,6 +294,7 @@ namespace Lime
 			}
 			clip.Owner = owner;
 			clips.Add(clip);
+			owner?.InvalidateCache();
 		}
 
 		public void AddOrdered(AnimationClip clip)
@@ -203,19 +303,20 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			clip.Owner = owner;
-			if (Count == 0 || clip.Begin > this[Count - 1].Begin) {
+			if (Count == 0 || clip.BeginFrame > this[Count - 1].BeginFrame) {
 				clips.Add(clip);
 			} else {
 				int i = 0;
-				while (clips[i].Begin < clip.Begin) {
+				while (clips[i].BeginFrame < clip.BeginFrame) {
 					i++;
 				}
-				if (clips[i].Begin == clip.Begin) {
+				if (clips[i].BeginFrame == clip.BeginFrame) {
 					clips[i] = clip;
 				} else {
 					clips.Insert(i, clip);
 				}
 			}
+			owner?.InvalidateCache();
 		}
 	}
 

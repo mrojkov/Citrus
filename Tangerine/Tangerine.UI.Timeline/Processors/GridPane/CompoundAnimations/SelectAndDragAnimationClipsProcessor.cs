@@ -19,7 +19,6 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 			var input = Grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed() && Document.Current.Animation.IsCompound) {
-					Document.Current.GetCompoundAnimationIspectMode = CompoundAnimationInspectionMode.Clips;
 					using (Document.Current.History.BeginTransaction()) {
 						if (Grid.IsMouseOverRow()) {
 							var initialCell = Grid.CellUnderMouse();
@@ -79,8 +78,8 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 					gw.PrepareRendererState();
 					foreach (var clip in track.Clips.Where(i => i.IsSelected)) {
 						var s = new Vector2(TimelineMetrics.ColWidth, gw.Height);
-						var a = new Vector2(clip.Begin + offset.X, offset.Y) * s;
-						var b = a + new Vector2(clip.Length, 1) * s;
+						var a = new Vector2(clip.BeginFrame + offset.X + 0.5f, offset.Y) * s;
+						var b = a + new Vector2(clip.DurationInFrames, 1) * s;
 						Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.AnimationClip);
 						Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.AnimationClipBorder);
 					}
@@ -137,15 +136,17 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 			Grid.OnPostRender -= RenderSelectionRect;
 			if (!input.IsKeyPressed(Key.Control)) {
 				DeselectAllClips();
+				Core.Operations.ClearRowSelection.Perform();
 			}
 			for (var r = rect.Top; r < rect.Bottom; r++) {
 				var track = Document.Current.Rows[r].Components.Get<AnimationTrackRow>().Track;
 				foreach (var clip in track.Clips) {
-					if (Math.Max(clip.Begin, rect.Left) >= Math.Min(clip.End, rect.Right)) {
+					if (Math.Max(clip.BeginFrame, rect.Left) >= Math.Min(clip.EndFrame, rect.Right)) {
 						continue;
 					}
 					Core.Operations.SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), true);
 				}
+				Core.Operations.SelectRow.Perform(Document.Current.Rows[r]);
 			}
 
 			void RenderSelectionRect(Widget widget)

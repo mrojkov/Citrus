@@ -366,7 +366,7 @@ namespace Orange
 				WriteAnimator(owner, aspectRatioAnimator);
 				return;
 			}
-			var type = GetHotStudioValueType(animator.GetValueType());
+			var type = GetHotStudioValueType(animator.ValueType);
 			writer.BeginStruct($"Hot::TypedAnimator<{type}>");
 			WriteProperty("Property", GetAnimatorPropertyReference(owner, animator), null);
 			if (animator.ReadonlyKeys.Count == 0) {

@@ -11,15 +11,20 @@ namespace Lime
 
 		public object UserData { get; set; }
 
-		internal AnimationCollisionMap CollisionMap;
-
 		[YuzuMember]
+		[TangerineGroup("Track")]
 		public string Id { get; set; }
 
 		[YuzuMember]
+		[TangerineGroup("Track")]
 		[TangerineValidRange(0.0f, 100.0f)]
-		[TangerineKeyframeColorAttribute(0)]
+		[TangerineKeyframeColor(1)]
 		public float Weight { get; set; } = 100.0f;
+
+		internal void InvalidateCache()
+		{
+			Owner?.InvalidateCache();
+		}
 
 		[YuzuMember]
 		[TangerineIgnore]
@@ -47,6 +52,24 @@ namespace Lime
 			}
 		}
 
+		private double cachedTime = double.NaN;
+		private float cachedWeight;
+
+		public float CalcWeight(double time)
+		{
+			if (time == cachedTime) {
+				return cachedWeight;
+			}
+			if (Animators.Count > 0) {
+				foreach (var a in Animators) {
+					a.Apply(time);
+				}
+			}
+			cachedTime = time;
+			cachedWeight = Weight.Clamp(0, 100);
+			return cachedWeight;
+		}
+
 		public AnimationTrack()
 		{
 			Clips = new AnimationClipList(this);
@@ -61,7 +84,6 @@ namespace Lime
 			clone.Owner = null;
 			clone.Clips = new AnimationClipList(clone, Clips.Count);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.CollisionMap = null;
 			foreach (var clip in Clips) {
 				clone.Clips.Add(clip.Clone());
 			}
@@ -106,12 +128,14 @@ namespace Lime
 			}
 			tracks.Insert(index, track);
 			track.Owner = owner;
+			owner?.InvalidateCache();
 		}
 
 		public bool Remove(AnimationTrack track)
 		{
 			if (tracks.Remove(track)) {
 				track.Owner = null;
+				owner?.InvalidateCache();
 				return true;
 			}
 			return false;
@@ -121,6 +145,7 @@ namespace Lime
 		{
 			tracks[index].Owner = null;
 			tracks.RemoveAt(index);
+			owner?.InvalidateCache();
 		}
 
 		public AnimationTrack this[int index]
@@ -155,6 +180,7 @@ namespace Lime
 			}
 			tracks.Add(track);
 			track.Owner = owner;
+			owner?.InvalidateCache();
 		}
 	}
 }

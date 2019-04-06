@@ -221,7 +221,7 @@ namespace Tangerine
 					(n as PointObject).SkinningWeights = new SkinningWeights();
 				}
 			});
-			AnimationEngine.EasingEnabledChecker = (animation) => {
+			Animation.EasingEnabledChecker = (animation) => {
 				var doc = Document.Current;
 				return doc == null || doc.PreviewAnimation || animation != doc.Animation;
 			};

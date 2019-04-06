@@ -11,15 +11,16 @@ namespace Lime
 	{
 		public const double FramesPerSecond = 30.0;
 		public const double SecondsPerFrame = 1 / FramesPerSecond;
+		public const double Threshold = 0.000001;
 
 		public static int SecondsToFrames(double seconds)
 		{
-			return (int)(seconds * FramesPerSecond + 0.000001);
+			return (int)(seconds * FramesPerSecond + Threshold);
 		}
 
 		public static int SecondsToFramesCeiling(double seconds)
 		{
-			return (int)(seconds * FramesPerSecond + (1 - 0.000001));
+			return (int)(seconds * FramesPerSecond + (1 - Threshold));
 		}
 
 		public static double FramesToSeconds(int frame)

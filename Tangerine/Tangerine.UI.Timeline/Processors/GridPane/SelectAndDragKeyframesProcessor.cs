@@ -21,7 +21,6 @@ namespace Tangerine.UI.Timeline
 			Node lastSelectionContainer = null;
 			while (true) {
 				if (input.WasMousePressed() && !Document.Current.Animation.IsCompound) {
-					Document.Current.GetCompoundAnimationIspectMode = CompoundAnimationInspectionMode.Clips;
 					using (Document.Current.History.BeginTransaction()) {
 						if (Grid.IsMouseOverRow()) {
 							var initialCell = Grid.CellUnderMouse();
