@@ -94,7 +94,7 @@ namespace Tangerine.UI.Timeline
 
 		void RenderCursor()
 		{
-			var r = GetRectangle(Timeline.Instance.CurrentColumn);
+			var r = GetRectangle(Timeline.Instance.CurrentColumnEased);
 			Renderer.DrawRect(
 				r.A, r.B,
 				Document.Current.PreviewAnimation ?
@@ -139,7 +139,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private Rectangle GetRectangle(int frame)
+		private Rectangle GetRectangle(float frame)
 		{
 			return new Rectangle {
 				A = new Vector2(frame * TimelineMetrics.ColWidth + 0.5f, 0),

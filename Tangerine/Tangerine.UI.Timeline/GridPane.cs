@@ -158,7 +158,7 @@ namespace Tangerine.UI.Timeline
 
 		private void RenderCursor(Node node)
 		{
-			var x = TimelineMetrics.ColWidth * (timeline.CurrentColumn + 0.5f);
+			var x = TimelineMetrics.ColWidth * (timeline.CurrentColumnEased + 0.5f);
 			ContentWidget.PrepareRendererState();
 			Renderer.DrawLine(
 				x, 0, x, ContentWidget.Height - 1,
