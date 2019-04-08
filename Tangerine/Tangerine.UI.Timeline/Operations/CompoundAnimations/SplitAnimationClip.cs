@@ -15,7 +15,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 		{
 			if (TryFindClip(cell, out var track, out var clip)) {
 				Document.Current.History.DoTransaction(() => {
-					AnimationClipToolbox.SplitClip(track, clip, cell.X + 1);
+					AnimationClipToolbox.SplitClip(track, clip, cell.X);
 				});
 			}
 		}
@@ -28,7 +28,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				return false;
 			}
 			track = Document.Current.Animation.Tracks[cell.Y];
-			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip) && cell.X < clip.EndFrame - 1;
+			return AnimationClipToolbox.TryFindClip(track, cell.X, out clip) && cell.X > clip.BeginFrame;
 		}
 	}
 }
