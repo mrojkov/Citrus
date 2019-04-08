@@ -13,16 +13,22 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 	{
 		private static Timeline Timeline => Timeline.Instance;
 		private static GridPane Grid => Timeline.Instance.Grid;
+		private int buttonIndex;
+
+		public SelectAndDragAnimationClipsProcessor(int buttonIndex)
+		{
+			this.buttonIndex = buttonIndex;
+		}
 
 		public IEnumerator<object> Task()
 		{
 			var input = Grid.RootWidget.Input;
 			while (true) {
-				if (input.WasMousePressed() && Document.Current.Animation.IsCompound) {
+				if (Document.Current.Animation.IsCompound && input.WasMousePressed(buttonIndex)) {
 					using (Document.Current.History.BeginTransaction()) {
 						if (Grid.IsMouseOverRow()) {
 							var initialCell = Grid.CellUnderMouse();
-							if (TryFindClip(initialCell, out var clip) && clip.IsSelected) {
+							if (buttonIndex == 0 && TryFindClip(initialCell, out var clip) && clip.IsSelected) {
 								yield return DragSelectionTask(initialCell);
 							} else {
 								yield return SelectTask(initialCell);
@@ -108,7 +114,7 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 			var showSelection = false;
 			var showMeasuredFrameDistance = false;
 			Grid.OnPostRender += RenderSelectionRect;
-			while (input.IsMousePressed()) {
+			while (input.IsMousePressed(buttonIndex)) {
 				rect.A = initialCell;
 				rect.B = Grid.CellUnderMouse();
 				if (rect.Width >= 0) {
@@ -132,7 +138,10 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 			}
 			Timeline.Instance.Ruler.MeasuredFrameDistance = 0;
 			Grid.OnPostRender -= RenderSelectionRect;
-			if (!input.IsKeyPressed(Key.Control)) {
+			var shouldDeselectAll =
+				buttonIndex == 0 && !input.IsKeyPressed(Key.Control) ||
+				buttonIndex == 1 && TryFindClip(initialCell, out var clip2) && !clip2.IsSelected;
+			if (shouldDeselectAll) {
 				DeselectAllClips();
 				Core.Operations.ClearRowSelection.Perform();
 			}
