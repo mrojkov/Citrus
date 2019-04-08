@@ -73,6 +73,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 							DurationInFrames = animation.DurationInFrames + 1
 						};
 						AnimationClipToolbox.InsertClip(track, clip);
+						Core.Operations.SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), true);
 					});
 					window.Close();
 				};
