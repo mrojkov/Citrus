@@ -5,7 +5,6 @@ using System.Linq;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
-using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 {
@@ -20,12 +19,15 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				if (track?.EditorState().Locked != false) {
 					continue;
 				}
-				foreach (var clip in track.Clips.Where(i => i.IsSelected).ToList()) {
+				var clips = track.Clips.Where(i => i.IsSelected).ToList();
+				foreach (var clip in clips) {
 					if (removeOriginals) {
 						AnimationClipToolbox.RemoveClip(track, clip);
 					} else {
 						SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), false);
 					}
+				}
+				foreach (var clip in clips) {
 					var newClip = clip.Clone();
 					newClip.BeginFrame += offset.X;
 					newClip.EndFrame += offset.X;
