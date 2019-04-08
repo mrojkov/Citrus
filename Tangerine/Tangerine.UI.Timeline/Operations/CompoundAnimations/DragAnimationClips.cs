@@ -12,8 +12,6 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 	{
 		public static void Perform(IntVector2 offset, bool removeOriginals)
 		{
-			var processedKeys = new HashSet<IKeyframe>();
-			var operations = new List<Action>();
 			var rows = Document.Current.Rows.ToList();
 			if (offset.Y > 0) {
 				rows.Reverse();
@@ -24,6 +22,15 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 					continue;
 				}
 				var clips = track.Clips.Where(i => i.IsSelected).ToList();
+				var keys = new List<IKeyframe>();
+				if (track.Animators.TryFind(nameof(AnimationTrack.Weight), out var weightAnimator, Document.Current.AnimationId)) {
+					keys = weightAnimator.ReadonlyKeys.Where(k => clips.Any(c => c.BeginFrame <= k.Frame && k.Frame <= c.EndFrame)).ToList();
+				}
+				if (removeOriginals) {
+					foreach (var key in keys) {
+						RemoveKeyframe.Perform(weightAnimator, key.Frame);
+					}
+				}
 				foreach (var clip in clips) {
 					if (removeOriginals) {
 						AnimationClipToolbox.RemoveClip(track, clip);
@@ -40,6 +47,11 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 					newClip.EndFrame += offset.X;
 					newClip.IsSelected = true;
 					AnimationClipToolbox.InsertClip(destTrack, newClip);
+				}
+				foreach (var k in keys) {
+					var key = k.Clone();
+					key.Frame += offset.X;
+					SetKeyframe.Perform(destTrack, nameof(AnimationTrack.Weight), Document.Current.AnimationId, key);
 				}
 			}
 		}
