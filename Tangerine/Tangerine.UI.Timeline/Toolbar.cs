@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
+					CreateResetAnimationsTimes(),
 					CreateAutoKeyframesButton(),
 					CreateNewFolderButton(),
 					CreateCurveEditorButton(),
@@ -245,6 +246,14 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tip = "Lock timeline cursor" };
 			button.AddChangeWatcher(() => CoreUserPreferences.LockTimelineCursor, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.LockTimelineCursor = !CoreUserPreferences.LockTimelineCursor;
+			return button;
+		}
+
+		private ToolbarButton CreateResetAnimationsTimes()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tip = "Reset Animations Times" };
+			button.AddChangeWatcher(() => CoreUserPreferences.ResetAnimationsTimes, i => button.Checked = i);
+			button.Clicked += () => CoreUserPreferences.ResetAnimationsTimes = !CoreUserPreferences.ResetAnimationsTimes;
 			return button;
 		}
 

@@ -107,7 +107,7 @@ namespace Tangerine.Core
 		private void RestoreAnimationsTimes(bool animationMode)
 		{
 			foreach (var at in savedAnimationsTimes) {
-				at.Key.Time = at.Value;
+				at.Key.Time = animationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : at.Value;
 			}
 			SetCurrentFrameToNode(
 				PreviewAnimationBegin, Animation, animationMode
@@ -226,7 +226,11 @@ namespace Tangerine.Core
 						// Terekhov Dmitry: First time cache creation that does not set IsRunning
 						// Terekhov Dmitry: In order not to not reset other animations
 						if (CacheAnimationsStates && !cacheFrame.HasValue) {
-							SetTimeRecursive(node, 0, animation.Id);
+							if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
+								SetTimeRecursive(node, 0);
+							} else {
+								SetTimeRecursive(node, 0, animation.Id);
+							}
 							animation.IsRunning = true;
 							FastForwardToFrame(animation, frameIndex);
 							AnimationsStatesComponent.Create(node, true);
@@ -297,10 +301,32 @@ namespace Tangerine.Core
 				return (float) forwardDelta;
 			}
 
-			internal static void SetTimeRecursive(Node node, double time)
+			private static void SetTimeRecursiveDownstream(Node node, double time)
 			{
 				foreach (var animation in node.Animations) {
 					animation.Time = time;
+				}
+				foreach (var child in node.Nodes) {
+					SetTimeRecursiveDownstream(child, time);
+				}
+			}
+
+			internal static void SetTimeRecursive(Node node, double time)
+			{
+				void Set(Node n, double t)
+				{
+					foreach (var animation in n.Animations) {
+						animation.Time = t;
+					}
+				}
+				Set(node, time);
+				var current = node;
+				while (current != Current.RootNode.Parent) {
+					Set(current, time);
+					current = current.Parent;
+				}
+				foreach (var child in node.Nodes) {
+					SetTimeRecursiveDownstream(child, time);
 				}
 			}
 
