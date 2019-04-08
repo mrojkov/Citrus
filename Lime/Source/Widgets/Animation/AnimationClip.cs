@@ -23,6 +23,7 @@ namespace Lime
 		private int endFrame;
 		private int inFrame;
 		private bool reversed;
+		private float speed = 1;
 		private AnimationClipExtrapolation postExtrapolation = AnimationClipExtrapolation.Hold;
 
 		public double BeginTime { get; private set; }
@@ -118,6 +119,20 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		[TangerineGroup("Clip")]
+		[TangerineValidRange(0, float.MaxValue)]
+		public float Speed
+		{
+			get => speed;
+			set {
+				if (speed != value) {
+					speed = value;
+					Owner?.InvalidateCache();
+				}
+			}
+		}
+
 #if TANGERINE
 		public bool IsSelected { get; set; }
 #endif
@@ -147,7 +162,7 @@ namespace Lime
 				return cachedLocalTime;
 			}
 			cachedTime = time;
-			var localTime = time - BeginTime - InTime;
+			var localTime = (time - BeginTime - InTime) * Speed;
 			switch (PostExtrapolation) {
 				case AnimationClipExtrapolation.Hold:
 				case AnimationClipExtrapolation.None:

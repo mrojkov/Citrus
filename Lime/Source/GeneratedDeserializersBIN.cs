@@ -182,7 +182,15 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
+				result.PostExtrapolation = (global::Lime.AnimationClipExtrapolation)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
 				result.Reversed = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.Speed = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
