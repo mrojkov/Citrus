@@ -74,12 +74,10 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 					if (track?.EditorState().Locked != false) {
 						continue;
 					}
-					var gw = row.Components.Get<RowView>().GridRow.GridWidget;
-					gw.PrepareRendererState();
+					widget.PrepareRendererState();
 					foreach (var clip in track.Clips.Where(i => i.IsSelected)) {
-						var s = new Vector2(TimelineMetrics.ColWidth, gw.Height);
-						var a = new Vector2(clip.BeginFrame + offset.X + 0.5f, offset.Y) * s;
-						var b = a + new Vector2(clip.DurationInFrames, 1) * s;
+						var a = Timeline.Instance.Grid.CellToGridCoordinates(offset.Y + row.Index, offset.X + clip.BeginFrame);
+						var b = Timeline.Instance.Grid.CellToGridCoordinates(offset.Y + row.Index + 1, offset.X + clip.EndFrame);
 						Renderer.DrawRect(a, b, ColorTheme.Current.TimelineGrid.AnimationClip);
 						Renderer.DrawRectOutline(a, b, ColorTheme.Current.TimelineGrid.AnimationClipBorder);
 					}

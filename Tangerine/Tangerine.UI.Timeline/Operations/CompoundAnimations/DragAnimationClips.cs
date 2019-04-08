@@ -14,7 +14,11 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 		{
 			var processedKeys = new HashSet<IKeyframe>();
 			var operations = new List<Action>();
-			foreach (var row in Document.Current.Rows) {
+			var rows = Document.Current.Rows.ToList();
+			if (offset.Y > 0) {
+				rows.Reverse();
+			}
+			foreach (var row in rows) {
 				var track = row.Components.Get<AnimationTrackRow>()?.Track;
 				if (track?.EditorState().Locked != false) {
 					continue;
@@ -27,12 +31,15 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 						SetProperty.Perform(clip, nameof(AnimationClip.IsSelected), false);
 					}
 				}
+				int numRows = Document.Current.Rows.Count;
+				var destRow = Document.Current.Rows[(row.Index + offset.Y).Clamp(0, numRows - 1)];
+				var destTrack = destRow.Components.Get<AnimationTrackRow>()?.Track;
 				foreach (var clip in clips) {
 					var newClip = clip.Clone();
 					newClip.BeginFrame += offset.X;
 					newClip.EndFrame += offset.X;
 					newClip.IsSelected = true;
-					AnimationClipToolbox.InsertClip(track, newClip);
+					AnimationClipToolbox.InsertClip(destTrack, newClip);
 				}
 			}
 		}

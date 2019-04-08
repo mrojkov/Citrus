@@ -326,6 +326,9 @@ namespace Tangerine.UI.Timeline
 		{
 			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
 			var x = (int)(mousePos.X / TimelineMetrics.ColWidth);
+			if (mousePos.Y <= 0) {
+				return new IntVector2(x, Document.Current.Rows.Count > 0 ? 0 : -1);
+			}
 			foreach (var row in Document.Current.Rows) {
 				var gridWidget = row.GridWidget();
 				if (mousePos.Y >= gridWidget.Top() && mousePos.Y < gridWidget.Bottom() + TimelineMetrics.RowSpacing) {
