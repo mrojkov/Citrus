@@ -35,7 +35,7 @@ namespace Lime
 		}
 		private bool scrollBySlider;
 		public bool RejectOrtogonalSwipes { get; set; }
-		public float BounceZoneThickness = 100;
+		public float BounceZoneThickness = 0;
 		public float ScrollToItemVelocity = 800;
 		public float InertialScrollingStopVelocity = 40;
 		public float InertialScrollingDamping = 2;
@@ -126,10 +126,6 @@ namespace Lime
 				if (lastSize < frameSize) {
 					ScrollPosition -= frameSize - lastSize;
 				}
-				ScrollPosition =
-					ProjectToScrollAxis(Content.Size) >= frameSize ?
-					Mathf.Clamp(ScrollPosition, 0, MaxScrollPosition) :
-					0;
 				lastSize = ProjectToScrollAxis(Frame.Size);
 				yield return null;
 			}

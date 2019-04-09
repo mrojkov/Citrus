@@ -136,10 +136,12 @@ namespace Lime
 			}
 			float length = ProjectToScrollAxis(Frame.Size) / pagesCount;
 			float t = 0;
-			if (ScrollPosition > MaxScrollPosition) {
-				t = (ScrollPosition - MaxScrollPosition) / BounceZoneThickness;
-			} else if (ScrollPosition < MinScrollPosition) {
-				t = (MinScrollPosition - ScrollPosition) / BounceZoneThickness;
+			if (BounceZoneThickness != 0) {
+				if (ScrollPosition > MaxScrollPosition) {
+					t = (ScrollPosition - MaxScrollPosition) / BounceZoneThickness;
+				} else if (ScrollPosition < MinScrollPosition) {
+					t = (MinScrollPosition - ScrollPosition) / BounceZoneThickness;
+				}
 			}
 			length = t.Lerp(length, sliderMinLength);
 			length = length.Clamp(sliderMinLength, ProjectToScrollAxis(Frame.Size));
