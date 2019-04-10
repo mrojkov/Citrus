@@ -78,7 +78,16 @@ namespace Lime
 		private KeyframeParams @params;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
-		public bool IsTriggerable { get; set; }
+		private bool isTriggerable;
+		public bool IsTriggerable
+		{
+			get {
+				if (animable == null && !IsZombie) {
+					Bind();
+				}
+				return isTriggerable;
+			}
+		}
 		public bool Enabled { get; set; } = true;
 		private delegate void SetterDelegate(T value);
 		private delegate void IndexedSetterDelegate(int index, T value);
@@ -273,7 +282,7 @@ namespace Lime
 #if TANGERINE
 			animable = a;
 #endif // TANGERINE
-			IsTriggerable = p.Triggerable;
+			isTriggerable = p.Triggerable;
 			if (index == -1) {
 				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), a, mi);
 			} else {
