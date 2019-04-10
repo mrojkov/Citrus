@@ -122,7 +122,30 @@ namespace Orange
 			ResetPlugins();
 			try {
 				if (Directory.Exists(CurrentPluginDirectory)) {
-					catalog.Catalogs.Add(new DirectoryCatalog(CurrentPluginDirectory));
+					var orangePluginAssemblies = The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies");
+					if (orangePluginAssemblies == null) {
+						var msg = "Warning: Field 'OrangePluginAssemblies' not found in " + citrusProjectFile;
+						The.UI.ShowError(msg);
+						Console.WriteLine(msg);
+					} else if (orangePluginAssemblies.Length == 0) {
+						Console.WriteLine("Warning: Field 'OrangePluginAssemblies' in " + citrusProjectFile + " is empty");
+					} else {
+						foreach (var path in The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies")) {
+							if (!path.Contains("$CONFIGURATION")) {
+								Console.WriteLine(
+									"Warning: Using '$CONFIGURATION' instead of 'Debug' or 'Release' in dll path" +
+									$" is strictly recommended ($CONFIGURATION line not found in {path}");
+							}
+							var absPath = Path.Combine(The.Workspace.ProjectDirectory,
+								path.Replace("$CONFIGURATION", pluginConfiguration));
+							if (!File.Exists(absPath)) {
+								var msg = "File not found on attempt to import OrangePluginAssemblies: " + absPath;
+								The.UI.ShowError(msg);
+								throw new FileNotFoundException(msg);
+							}
+							catalog.Catalogs.Add(new AssemblyCatalog(Assembly.LoadFrom(absPath)));
+						}
+					}
 					ValidateComposition();
 				}
 			} catch (BadImageFormatException e) {
