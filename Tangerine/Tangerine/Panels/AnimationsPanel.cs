@@ -264,7 +264,7 @@ namespace Tangerine.Panels
 				ColumnDefaults = new List<DefaultLayoutCell> { new DefaultLayoutCell { StretchY = 0 } }
 			};
 			foreach (var a in animations) {
-				var label = a.IsLegacy ? legacyAnimationId : (a.IsCompound ? '@' + a.Id : a.Id);
+				var label = a.IsLegacy ? legacyAnimationId : (a.IsCompound ? a.Id + " (Compound)" : a.Id);
 				var path = GetNodePath(a.Owner);
 				if (!a.IsLegacy && !string.IsNullOrEmpty(path)) {
 					label += " (" + path + ')';
