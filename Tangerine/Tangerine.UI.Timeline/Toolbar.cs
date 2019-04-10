@@ -83,6 +83,7 @@ namespace Tangerine.UI.Timeline
 			var item = ddl.Items.FirstOrDefault(i => i.Value == Document.Current.SelectedAnimation);
 			if (item != null) {
 				ddl.Index = ddl.Items.IndexOf(item);
+				Document.ForceAnimationUpdate();
 			}
 		}
 
