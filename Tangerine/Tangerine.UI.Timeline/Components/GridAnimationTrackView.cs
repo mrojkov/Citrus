@@ -43,6 +43,7 @@ namespace Tangerine.UI.Timeline.Components
 					r = r * -1521134295 + clip.AnimationIdComparisonCode;
 					r = r * -1521134295 + clip.BeginFrame;
 					r = r * -1521134295 + clip.EndFrame;
+					r = r * -1521134295 + clip.InFrame;
 				}
 				return r;
 			}
@@ -52,10 +53,18 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			widget.Nodes.Clear();
 			foreach (var clip in track.Clips) {
+				var clipLabel = clip.AnimationId;
+				var beginMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame);
+				var endMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
+				if (beginMarker != null || endMarker != null) {
+					clipLabel +=
+						" (" + (beginMarker?.Id ?? clip.InFrame.ToString()) + ".." +
+						(endMarker?.Id ?? (clip.InFrame + clip.DurationInFrames).ToString()) + ")";
+				}
 				widget.AddNode(new SimpleText {
 					Position = new Vector2((clip.BeginFrame + 0.5f) * TimelineMetrics.ColWidth, 0),
 					Size = new Vector2((clip.DurationInFrames + 0.5f) * TimelineMetrics.ColWidth, widget.Height),
-					Text = clip.AnimationId,
+					Text = clipLabel,
 					Padding = new Thickness(4),
 					VAlignment = VAlignment.Center,
 					OverflowMode = TextOverflowMode.Ellipsis,

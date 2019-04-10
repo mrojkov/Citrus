@@ -139,7 +139,7 @@ namespace Lime
 
 		internal Animation CachedAnimation { get; set; }
 
-		internal Animation Animation
+		public Animation Animation
 		{
 			get {
 				var node = Owner.Owner.Owner;
