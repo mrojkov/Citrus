@@ -321,8 +321,8 @@ namespace Lime
 			int count = ReadonlyKeys.Count;
 			if (count == 0) {
 				Value2 = default(T);
-				minTime = -float.MaxValue;
-				maxTime = float.MaxValue;
+				minTime = -double.MaxValue;
+				maxTime = double.MaxValue;
 				@params = defaultKeyframeParams;
 				return;
 			}
@@ -339,23 +339,22 @@ namespace Lime
 				i--;
 			}
 			keyIndex = i;
-			int minFrame, maxFrame;
 			if (i < 0) {
 				keyIndex = 0;
-				maxFrame = ReadonlyKeys[0].Frame;
-				minFrame = int.MinValue;
+				maxTime = ReadonlyKeys[0].Frame * AnimationUtils.SecondsPerFrame;
+				minTime = double.MinValue;
 				Value2 = ReadonlyKeys[0].Value;
 				@params = defaultKeyframeParams;
 			} else if (i == count - 1) {
-				minFrame = ReadonlyKeys[i].Frame;
-				maxFrame = int.MaxValue;
+				minTime = ReadonlyKeys[i].Frame * AnimationUtils.SecondsPerFrame;
+				maxTime = double.MaxValue;
 				Value2 = ReadonlyKeys[i].Value;
 				@params = defaultKeyframeParams;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
-				minFrame = key1.Frame;
-				maxFrame = key2.Frame;
+				minTime = key1.Frame * AnimationUtils.SecondsPerFrame;
+				maxTime = key2.Frame * AnimationUtils.SecondsPerFrame;
 				Value2 = key1.Value;
 				Value3 = key2.Value;
 				@params = key1.Params;
@@ -367,8 +366,6 @@ namespace Lime
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
 				}
 			}
-			minTime = minFrame * AnimationUtils.SecondsPerFrame;
-			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
 	}
 
