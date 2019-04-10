@@ -18,9 +18,9 @@ namespace Tangerine.Core
 			set { CurrentFrameSetter.CacheAnimationsStates = value; }
 		}
 
-		public static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode, bool isForced = false)
+		public static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
 		{
-			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, animation, animationMode, isForced);
+			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, animation, animationMode);
 		}
 
 		private static void FastForwardToFrame(Animation animation, int frameIndex)
@@ -80,9 +80,7 @@ namespace Tangerine.Core
 			SetCurrentFrameToNode(
 				Current.AnimationFrame,
 				Current.Animation,
-				CoreUserPreferences.Instance.AnimationMode,
-				isForced: true
-			);
+				CoreUserPreferences.Instance.AnimationMode);
 		}
 
 		private void SaveAnimationsTimes()
@@ -213,14 +211,14 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode, bool isForced)
+			internal static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					bool movingBack;
 					var doc = Current;
 					var node = animation.Owner;
-					if (animationMode && (doc.AnimationFrame != frameIndex || isForced)) {
+					if (animationMode) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.GetColumn(animation.Id);
 						// Terekhov Dmitry: First time cache creation that does not set IsRunning
@@ -229,7 +227,7 @@ namespace Tangerine.Core
 							if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
 								SetTimeRecursive(node, 0);
 							} else {
-								SetTimeRecursive(node, 0, animation.Id);
+								SetTime(node, 0, animation.Id);
 							}
 							animation.IsRunning = true;
 							FastForwardToFrame(animation, frameIndex);
@@ -237,7 +235,11 @@ namespace Tangerine.Core
 							cacheFrame = frameIndex;
 						}
 						if (!cacheFrame.HasValue) {
-							SetTimeRecursive(node, 0);
+							if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
+								SetTimeRecursive(node, 0);
+							} else {
+								SetTime(node, 0, animation.Id);
+							}
 						} else {
 							// Terekhov Dmitry: In case we've created a new container that doesn't have a
 							// cache component
@@ -251,7 +253,7 @@ namespace Tangerine.Core
 							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
 							AnimationsStatesComponent.Remove(node);
 							if (movingBack) {
-								SetTimeRecursive(node, 0, animation.Id);
+								SetTime(node, 0, animation.Id);
 								StopAnimationRecursive(node);
 								animation.IsRunning = true;
 								FastForwardToFrame(animation, (frameIndex - OptimalRollbackForCacheAnimationsStates).Clamp(0, frameIndex));
@@ -313,32 +315,18 @@ namespace Tangerine.Core
 
 			internal static void SetTimeRecursive(Node node, double time)
 			{
-				void Set(Node n, double t)
-				{
-					foreach (var animation in n.Animations) {
-						animation.Time = t;
-					}
-				}
-				Set(node, time);
-				var current = node;
-				while (current != Current.RootNode.Parent) {
-					Set(current, time);
-					current = current.Parent;
+				foreach (var animation in node.Animations) {
+					animation.Time = time;
 				}
 				foreach (var child in node.Nodes) {
 					SetTimeRecursiveDownstream(child, time);
 				}
 			}
 
-			internal static void SetTimeRecursive(Node node, double time, string animationId)
+			internal static void SetTime(Node node, double time, string animationId)
 			{
 				if (node.Animations.TryFind(animationId, out var animation)) {
 					animation.Time = time;
-				}
-				if (animationId == null) {
-					foreach (var child in node.Nodes) {
-						SetTimeRecursive(child, time, animationId);
-					}
 				}
 			}
 
