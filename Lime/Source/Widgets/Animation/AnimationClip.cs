@@ -162,17 +162,17 @@ namespace Lime
 				return cachedLocalTime;
 			}
 			cachedTime = time;
-			var localTime = (time - BeginTime - InTime) * Speed;
+			var localTime = (time - BeginTime) * Speed;
 			switch (PostExtrapolation) {
 				case AnimationClipExtrapolation.Hold:
 				case AnimationClipExtrapolation.None:
 					localTime = Mathf.Clamp(localTime, 0, DurationInSeconds);
 					break;
 				case AnimationClipExtrapolation.Repeat:
-					localTime %= CachedAnimation.DurationInSeconds;
+					localTime %= DurationInSeconds;
 					break;
 				case AnimationClipExtrapolation.PingPong:
-					var period = CachedAnimation.DurationInSeconds * 2;
+					var period = DurationInSeconds * 2;
 					localTime %= period;
 					if (localTime > period * 0.5) {
 						localTime = period - localTime;
@@ -180,9 +180,9 @@ namespace Lime
 					break;
 			}
 			if (!Reversed) {
-				cachedLocalTime = localTime;
+				cachedLocalTime = localTime + InTime;
 			} else {
-				cachedLocalTime = DurationInSeconds - AnimationUtils.SecondsPerFrame - localTime;
+				cachedLocalTime = DurationInSeconds - localTime + InTime;
 			}
 			return cachedLocalTime;
 		}
