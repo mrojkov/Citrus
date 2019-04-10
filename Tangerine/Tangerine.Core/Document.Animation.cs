@@ -25,12 +25,15 @@ namespace Tangerine.Core
 
 		private static void FastForwardToFrame(Animation animation, int frameIndex)
 		{
+			bool savedAudioGloballyEnable = Audio.GloballyEnable;
+			Audio.GloballyEnable = false;
 			var node = animation.OwnerNode;
 			node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 			try {
 				CurrentFrameSetter.FastForwardToFrame(animation, frameIndex);
 			} finally {
 				node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+				Audio.GloballyEnable = savedAudioGloballyEnable;
 			}
 		}
 
