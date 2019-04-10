@@ -35,7 +35,7 @@ namespace Lime
 		}
 		private bool scrollBySlider;
 		public bool RejectOrtogonalSwipes { get; set; }
-		public float BounceZoneThickness = 0;
+		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public float InertialScrollingStopVelocity = 40;
 		public float InertialScrollingDamping = 2;
@@ -115,20 +115,6 @@ namespace Lime
 			Frame.Layout = new Layout(scrollDirection, Content);
 			dragGesture = new DragGesture(0, (DragDirection)ScrollDirection);
 			Frame.Gestures.Add(dragGesture);
-			Content.LateTasks.Add(ClampScrollPositionWithinFrameBoundsTask);
-		}
-
-		private IEnumerator<object> ClampScrollPositionWithinFrameBoundsTask()
-		{
-			var lastSize = ProjectToScrollAxis(Frame.Size);
-			while (true) {
-				var frameSize = ProjectToScrollAxis(Frame.Size);
-				if (lastSize < frameSize) {
-					ScrollPosition -= frameSize - lastSize;
-				}
-				lastSize = ProjectToScrollAxis(Frame.Size);
-				yield return null;
-			}
 		}
 
 		public bool IsItemOnscreen(Widget item)
@@ -250,12 +236,12 @@ namespace Lime
 
 		private void Bounce()
 		{
-			if (IsScrolling() || ScrollBySlider)
+			if (IsScrolling())
 				return;
 			if (ScrollPosition < MinScrollPosition)
-				ScrollTo(MinScrollPosition);
+				ScrollTo(MinScrollPosition, ScrollBySlider);
 			else if (ScrollPosition > MaxScrollPosition)
-				ScrollTo(MaxScrollPosition);
+				ScrollTo(MaxScrollPosition, ScrollBySlider);
 		}
 
 		private IEnumerator<object> MainTask()
