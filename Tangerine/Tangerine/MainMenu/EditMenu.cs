@@ -224,7 +224,7 @@ namespace Tangerine
 			}
 			foreach (var node in bones) {
 				node.DefaultAnimation.Frame = frame;
-				node.Animators.CalcAndApply(node.DefaultAnimation.Time);
+				node.Animators.Apply(node.DefaultAnimation.Time);
 				node.Update(0);
 			}
 		}

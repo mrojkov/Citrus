@@ -115,7 +115,7 @@ namespace Orange
 				// Make Sure ParticleModifers' animators are at 0.0f AGAIN
 				// Since Update(0) could spawn and advance some particle beacuse of ParticleEmitter.TimeShift
 				if (n is ParticleModifier pm) {
-					pm.Animators.CalcAndApply(0.0);
+					pm.Animators.Apply(0.0);
 				}
 			}
 			// Need to clean the clone twice, because in Update() there can be logic that
@@ -153,7 +153,7 @@ namespace Orange
 				}
 				// Make Sure ParticleModifers' animators are at 0.0f
 				if (n is ParticleModifier pm) {
-					pm.Animators.CalcAndApply(0.0);
+					pm.Animators.Apply(0.0);
 				}
 			}
 			void SaveAndSetFlags(Node n)

@@ -770,7 +770,7 @@ namespace Lime
 		{
 			p.Age += delta;
 			if (p.AgeToAnimationTime > 0) {
-				p.Modifier.Animators.CalcAndApply(p.Age * p.AgeToAnimationTime);
+				p.Modifier.Animators.Apply(p.Age * p.AgeToAnimationTime);
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)

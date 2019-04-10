@@ -133,7 +133,7 @@ namespace Lime
 #if TANGERINE
 			foreach (var track in animation.Tracks) {
 				// To edit the track weight in the inspector, it must be animated
-				track.Animators.CalcAndApply(animation.Time, animation.Id);
+				track.Animators.Apply(animation.Time, animation.Id);
 			}
 #endif
 		}
