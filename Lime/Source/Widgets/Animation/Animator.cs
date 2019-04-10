@@ -287,6 +287,7 @@ namespace Lime
 		public void ResetCache()
 		{
 			minTime = maxTime = 0;
+			Owner?.OnAnimatorsChanged();
 		}
 
 		public T CalcValue(double time)
