@@ -7,16 +7,16 @@ namespace Lime
 	{
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
-		public virtual bool AreEffectiveAnimatorsValid(Animation animation) => false;
-		public virtual void BuildEffectiveAnimators(Animation animation) { }
 		/// <summary>
 		/// 1. Refreshes animation.EffectiveAnimators;
-		/// 2. Applies each animator at currTime;
+		/// 2. Applies each animator at currentTime;
 		/// 3. Executes triggers in given range.
-		/// The range is [prevTime, currTime) or [prevTime, currTime] depending on inclusiveRange flag.
+		/// The range is [previousTime, currentTime) or [previousTime, currentTime] depending on executeTriggersAtCurrentTime flag.
 		/// This method doesn't depend on animation.Time value.
 		/// </summary>
-		public virtual void ApplyAnimatorsAndExecuteTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange) { }
+		public virtual void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime) { }
+		public virtual bool AreEffectiveAnimatorsValid(Animation animation) => false;
+		public virtual void BuildEffectiveAnimators(Animation animation) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
@@ -35,9 +35,9 @@ namespace Lime
 			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
 
-		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange)
+		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)
 		{
-			OnApplyEffectiveAnimatorsAndBuildTriggersList?.Invoke(animation, prevTime, currTime, inclusiveRange);
+			OnApplyEffectiveAnimatorsAndBuildTriggersList?.Invoke(animation, previousTime, currentTime, executeTriggersAtCurrentTime);
 		}
 	}
 
@@ -65,21 +65,21 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var prevTime = animation.Time;
-			var currTime = prevTime + delta;
-			animation.TimeInternal = currTime;
-			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, prevTime);
-			if (animation.MarkerAhead == null || currTime < animation.MarkerAhead.Time) {
-				ApplyAnimatorsAndExecuteTriggers(animation, prevTime, currTime, inclusiveRange: false);
+			var previousTime = animation.Time;
+			var currentTime = previousTime + delta;
+			animation.TimeInternal = currentTime;
+			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, previousTime);
+			if (animation.MarkerAhead == null || currentTime < animation.MarkerAhead.Time) {
+				ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
 				ProcessMarker(animation, marker);
 				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, prevTime, animation.Time, inclusiveRange: true);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.RaiseStopped();
 				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, prevTime, currTime, inclusiveRange: false);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 				}
 			}
 		}
@@ -119,16 +119,16 @@ namespace Lime
 			marker.CustomAction?.Invoke();
 		}
 
-		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange)
+		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)
 		{
 			if (!AreEffectiveAnimatorsValid(animation)) {
 				BuildEffectiveAnimators(animation);
 			}
 			foreach (var a in animation.EffectiveAnimators) {
-				a.Apply(currTime);
+				a.Apply(currentTime);
 			}
 			foreach (var a in animation.EffectiveTriggableAnimators) {
-				a.ExecuteTriggersInRange(prevTime, currTime, inclusiveRange);
+				a.ExecuteTriggersInRange(previousTime, currentTime, executeTriggersAtCurrentTime);
 			}
 #if TANGERINE
 			foreach (var track in animation.Tracks) {
@@ -303,21 +303,21 @@ namespace Lime
 	{
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var prevTime = animation.Time;
-			var currTime = prevTime + delta;
-			animation.TimeInternal = currTime;
-			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, prevTime);
-			if (animation.MarkerAhead == null || currTime < animation.MarkerAhead.Time) {
+			var previousTime = animation.Time;
+			var currentTime = previousTime + delta;
+			animation.TimeInternal = currentTime;
+			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, previousTime);
+			if (animation.MarkerAhead == null || currentTime < animation.MarkerAhead.Time) {
 				// Do nothing
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
 				ProcessMarker(animation, marker);
 				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, prevTime, animation.Time, inclusiveRange: true);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.RaiseStopped();
 				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, prevTime, currTime, inclusiveRange: false);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 				}
 			}
 		}
