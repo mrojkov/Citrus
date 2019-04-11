@@ -175,6 +175,7 @@ namespace Tangerine.UI.Inspector
 			var editorParams = new Dictionary<string, List<PropertyEditorParams>>();
 			bool isSubclassOfNode = type.IsSubclassOf(typeof(Node));
 			bool isSubclassOfNodeComponent = type.IsSubclassOf(typeof(NodeComponent));
+			var objectsCount = objects.Count();
 			if (isSubclassOfNodeComponent) {
 				var label = CreateComponentLabel(type, objects.Cast<NodeComponent>());
 				if (label != null) {
@@ -196,7 +197,7 @@ namespace Tangerine.UI.Inspector
 						text += $" of type '{objects.First().GetType().Name}'";
 					}
 					if (totalObjectCount > 1) {
-						text += $" ({objects.Count()}/{totalObjectCount})";
+						text += $" ({objectsCount}/{totalObjectCount})";
 					}
 					var label = CreateCategoryLabel(text, ColorTheme.Current.Inspector.CategoryLabelBackground);
 					if (label != null) {
@@ -372,6 +373,30 @@ namespace Tangerine.UI.Inspector
 								ICommand command = new Command(CamelCaseToLabel(type.Name), () => CreateComponent(type, nodes));
 								menu.Add(command);
 							}
+							menu.Insert(0, Command.MenuSeparator);
+							menu.Insert(0, new Command("Paste from clipboard", () => {
+								var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(Clipboard.Text));
+								NodeComponent component;
+								try {
+									component = TangerineYuzu.Instance.Value.ReadObject<NodeComponent>(Document.Current.Path, stream);
+								} catch {
+									new AlertDialog("Clipboard does not contain a component.", "Ok").Show();
+									return;
+								}
+								var type = component.GetType();
+								if (!types.Contains(type)) {
+									new AlertDialog($"Component of type {type} can't be added", "Ok").Show();
+									return;
+								}
+								using (Document.Current.History.BeginTransaction()) {
+									foreach (var node in nodes) {
+										if (!node.Components.Contains(type)) {
+											SetComponent.Perform(node, component.Clone());
+										}
+									}
+									Document.Current.History.CommitTransaction();
+								}
+							}));
 							menu.Popup();
 						},
 						Enabled = types.Count > 0
@@ -423,12 +448,25 @@ namespace Tangerine.UI.Inspector
 		private Widget CreateComponentLabel(Type type, IEnumerable<NodeComponent> components)
 		{
 			var text = CamelCaseToLabel(type.Name);
+			var componentsCount = components.Count();
 			if (totalObjectCount > 1) {
-				text += $"({components.Count()}/{totalObjectCount})";
+				text += $"({componentsCount}/{totalObjectCount})";
 			}
 			var label = CreateCategoryLabel(text, ColorTheme.Current.Inspector.ComponentHeaderLabelBackground);
-			label.Nodes.Insert(0, new ThemedDeleteButton {
-				Clicked = () => RemoveComponents(components)
+			label.Padding += new Thickness { Right = 10 };
+			label.Nodes.Add(new ToolbarButton(IconPool.GetTexture("Inspector.Options")) {
+				LayoutCell = new LayoutCell(Alignment.Center),
+				Clicked = () => {
+					var menu = new Menu { new Command("Remove component", () => RemoveComponents(components)) };
+					if (componentsCount == 1) {
+						menu.Add(new Command("Copy to clipboard", () => {
+							var stream = new System.IO.MemoryStream();
+							TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, components.First().Clone(), Serialization.Format.JSON);
+							Clipboard.Text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+						}));
+					}
+					menu.Popup();
+				}
 			});
 			return label;
 		}
