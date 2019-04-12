@@ -528,7 +528,6 @@ namespace Kumquat
 				ParseCommonName(Path.GetFileNameWithoutExtension(parsedFramesTree.ParsedNode.ContentsPath), out externalName, out externalBaseName);
 				parsedFramesTree.ClassName = externalName;
 				parsedFramesTree.BaseClassName = externalBaseName;
-
 			}
 			if (!baseName.IsNullOrWhiteSpace()) {
 				if (!commonParts.ContainsKey(baseName)) {
@@ -573,7 +572,12 @@ namespace Kumquat
 						}
 						if (parsedNode != null && parsedNode.IsExternalScene) {
 							AddReferringSceneSafe(parsedNode.ContentsPath, currentCookingScene);
-						} else if (n.Nodes.Count > 0 && (parsedNode == null || !parsedNode.IsExternalScene)) {
+						}
+						if (
+							n.Nodes.Count > 0 &&
+							(parsedNode == null || !parsedNode.IsExternalScene) &&
+							string.IsNullOrEmpty(n.ContentsPath)
+						) {
 							nodesToParse.Add((
 								n, !string.IsNullOrEmpty(current.node.ContentsPath) || current.isInExternalScene
 							));
