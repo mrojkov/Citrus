@@ -17,7 +17,6 @@ namespace Orange
 		public Json ProjectJson { get; private set; }
 		public List<Target> Targets { get; private set; }
 		public string TangerineCacheBundle { get; private set; }
-		public string ProjectCacheDirectory => Path.Combine(ProjectDirectory, ".orange");
 
 		private string dataFolderName;
 		private string pluginName;

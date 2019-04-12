@@ -11,30 +11,28 @@ namespace Orange
 	{
 		public static void RunEtcTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = Cache.Instance.GetEtcTexture(bitmap, mipMaps, highQualityCompression, CookingRulesSHA1);
+			var hasAlpha = bitmap.HasAlpha;
+			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
+			var args = "{0} -format " + (hasAlpha ? "RGBA8" : "RGB8") + " -jobs 8 " +
+			           " -effort " + (highQualityCompression ? "60" : "40") +
+			           (mipMaps ? " -mipmaps 4" : "") + " -output {1}";
+
+			var cachePath = AssetCache.Instance.GetTexture(bledBitmap ?? bitmap, ".etc", args);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
-
-			var hasAlpha = bitmap.HasAlpha;
-			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
+		
 			var ktxPath = Toolbox.GetTempFilePathWithExtension(".ktx");
 			var pngPath = Path.ChangeExtension(ktxPath, ".png");
+			var etcTool = GetToolPath("EtcTool");
 			try {
 				(bledBitmap ?? bitmap).SaveTo(pngPath);
-				var etcTool = GetToolPath("EtcTool");
-				var args =
-					$"{pngPath} -format " + (hasAlpha ? "RGBA8" : "RGB8") +
-					" -jobs 8 " +
-					" -effort " + (highQualityCompression ? "60" : "40") +
-					(mipMaps ? " -mipmaps 4" : "") +
-					$" -output {ktxPath}";
-				if (Process.Start(etcTool, args) != 0) {
+				if (Process.Start(etcTool, args.Format(pngPath, ktxPath)) != 0) {
 					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
 				}
 				bundle.ImportFile(ktxPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				Cache.Instance.Save(ktxPath);
+				AssetCache.Instance.Save(ktxPath);
 			} finally {
 				bledBitmap?.Dispose();
 				DeletePossibleLockedFile(pngPath);
@@ -45,12 +43,6 @@ namespace Orange
 		public static void RunPVRTexTool(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, bool mipMaps, bool highQualityCompression,
 			PVRFormat pvrFormat, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = Cache.Instance.GetPvrTexture(bitmap, mipMaps, highQualityCompression, pvrFormat, CookingRulesSHA1);
-			if (cachePath != null) {
-				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
-				return;
-			}
-
 			int width = bitmap.Width;
 			int height = bitmap.Height;
 			bool hasAlpha = bitmap.HasAlpha;
@@ -81,7 +73,7 @@ namespace Orange
 				case PVRFormat.RGB565:
 					if (hasAlpha) {
 						Console.WriteLine("WARNING: texture has alpha channel. " +
-							"Used 'RGBA4444' format instead of 'RGB565'.");
+						                  "Used 'RGBA4444' format instead of 'RGB565'.");
 						args.Append(" -f r4g4b4a4 -dither");
 					} else {
 						args.Append(" -f r5g6b5");
@@ -94,24 +86,35 @@ namespace Orange
 					args.Append(" -f r8g8b8a8");
 					break;
 			}
-			if (highQualityCompression && (new [] { PVRFormat.PVRTC2, PVRFormat.PVRTC4, PVRFormat.PVRTC4_Forced }.Contains (pvrFormat))) {
+			if (highQualityCompression && (new[] { PVRFormat.PVRTC2, PVRFormat.PVRTC4, PVRFormat.PVRTC4_Forced }.Contains(pvrFormat))) {
 				args.Append(" -q pvrtcbest");
 			}
 			var pvrPath = Toolbox.GetTempFilePathWithExtension(".pvr");
 			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
+
+			Bitmap bledBitmap = null;
+			if (bitmap.HasAlpha) {
+				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
+			}
+			if (mipMaps) {
+				args.Append(" -m");
+			}
+
+			args.AppendFormat("-r {0},{1} -shh", width, height);
+
+			var cachePath = AssetCache.Instance.GetTexture(bitmap, ".pvr", args.ToString());
+			if (cachePath != null) {
+				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
+				return;
+			}
+
 			try {
-				Bitmap bledBitmap = null;
-				if (bitmap.HasAlpha) {
-					bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
-				}
 				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: true);
 				if (bledBitmap != null && bledBitmap != bitmap) {
 					bledBitmap.Dispose();
 				}
-				if (mipMaps) {
-					args.Append(" -m");
-				}
-				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tgaPath, pvrPath, width, height);
+
+				args.AppendFormat(" -i \"{0}\" -o \"{1}\"", tgaPath, pvrPath);
 #if MAC
 				var pvrTexTool = GetToolPath("PVRTexTool");
 #else
@@ -121,7 +124,7 @@ namespace Orange
 					throw new Lime.Exception($"PVRTextTool error\nCommand line: {pvrTexTool} {args}\"");
 				}
 				bundle.ImportFile(pvrPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				Cache.Instance.Save(pvrPath);
+				AssetCache.Instance.Save(pvrPath);
 			} finally {
 				DeletePossibleLockedFile(tgaPath);
 				DeletePossibleLockedFile(pvrPath);
@@ -130,12 +133,6 @@ namespace Orange
 
 		public static void RunNVCompress(Bitmap bitmap, AssetBundle bundle, string path, AssetAttributes attributes, DDSFormat format, bool mipMaps, byte[] CookingRulesSHA1, DateTime time)
 		{
-			var cachePath = Cache.Instance.GetDdsTexture(bitmap, mipMaps, format, CookingRulesSHA1);
-			if (cachePath != null) {
-				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
-				return;
-			}
-
 			bool compressed = format == DDSFormat.DXTi;
 			Bitmap bledBitmap = null;
 			if (bitmap.HasAlpha) {
@@ -143,27 +140,11 @@ namespace Orange
 			}
 			var ddsPath = Toolbox.GetTempFilePathWithExtension(".dds");
 			var tgaPath = Path.ChangeExtension(ddsPath, ".tga");
-			try {
-				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: compressed);
-				if (bledBitmap != null && bledBitmap != bitmap) {
-					bledBitmap.Dispose();
-				}
-				RunNVCompressHelper(tgaPath, ddsPath, bitmap.HasAlpha, compressed, mipMaps);
-				bundle.ImportFile(ddsPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				Cache.Instance.Save(ddsPath);
-			} finally {
-				DeletePossibleLockedFile(ddsPath);
-				DeletePossibleLockedFile(tgaPath);
-			}
-		}
 
-		private static void RunNVCompressHelper(
-			string srcPath, string dstPath, bool hasAlpha, bool compressed, bool mipMaps)
-		{
 			string mipsFlag = mipMaps ? string.Empty : "-nomips";
 			string compressionMethod;
 			if (compressed) {
-				compressionMethod = hasAlpha ? "-bc3" : "-bc1";
+				compressionMethod = bitmap.HasAlpha ? "-bc3" : "-bc1";
 			} else {
 #if WIN
 				compressionMethod = "-rgb";
@@ -172,11 +153,32 @@ namespace Orange
 #endif
 			}
 			var nvcompress = GetToolPath("nvcompress");
-			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
-			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);
-			string args = string.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionMethod, srcPath, dstPath);
-			if (Process.Start(nvcompress, args, workingDirectory: null, Process.Options.RedirectErrors) != 0) {
-				throw new Lime.Exception($"NVCompress error\nCommand line: {nvcompress} {args}\"");
+			var srcPath = Path.Combine(Directory.GetCurrentDirectory(), tgaPath);
+			var dstPath = Path.Combine(Directory.GetCurrentDirectory(), ddsPath);
+
+			string args = "{0} {1} \"{2}\" \"{3}\"";
+
+			var cachePath = AssetCache.Instance.GetTexture(bledBitmap ?? bitmap, ".dds", args.Format(mipsFlag, compressionMethod, "", ""));
+			if (cachePath != null) {
+				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
+				return;
+			}
+
+			try {
+				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: compressed);
+				if (bledBitmap != null && bledBitmap != bitmap) {
+					bledBitmap.Dispose();
+				}
+
+				if (Process.Start(nvcompress, args.Format(mipsFlag, compressionMethod, srcPath, dstPath), options: Process.Options.RedirectErrors) != 0) {
+					throw new Lime.Exception($"NVCompress error\nCommand line: {nvcompress} {args}\"");
+				}
+
+				bundle.ImportFile(ddsPath, path, 0, "", attributes, time, CookingRulesSHA1);
+				AssetCache.Instance.Save(ddsPath);
+			} finally {
+				DeletePossibleLockedFile(ddsPath);
+				DeletePossibleLockedFile(tgaPath);
 			}
 		}
 
@@ -187,7 +189,7 @@ namespace Orange
 			var pngOptimizerPath = GetToolPath("PngOptimizerCL");
 			dstPath = MakeAbsolutePath(dstPath);
 			var args = $"--KeepPixels \"{dstPath}\"";
-			if (Process.Start(pngOptimizerPath, args, workingDirectory: null, Process.Options.RedirectErrors) != 0) {
+			if (Process.Start(pngOptimizerPath, args, options: Process.Options.RedirectErrors) != 0) {
 				throw new Lime.Exception($"Error converting '{dstPath}'\nCommand line: {pngOptimizerPath} {args}");
 			}
 		}
