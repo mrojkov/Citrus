@@ -7,7 +7,6 @@ namespace Tangerine.UI.Timeline.Components
 {
 	public class GridAnimationTrackView : IGridRowView
 	{
-		private readonly Row row;
 		private readonly AnimationTrack track;
 
 		public Widget GridWidget { get; }
@@ -18,7 +17,6 @@ namespace Tangerine.UI.Timeline.Components
 
 		public GridAnimationTrackView(Row row)
 		{
-			this.row = row;
 			track = row.Components.Get<AnimationTrackRow>().Track;
 			GridWidget = new Widget {
 				LayoutCell = new LayoutCell { StretchY = 0 },
@@ -44,6 +42,14 @@ namespace Tangerine.UI.Timeline.Components
 					r = r * -1521134295 + clip.BeginFrame;
 					r = r * -1521134295 + clip.EndFrame;
 					r = r * -1521134295 + clip.InFrame;
+					var beginMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame);
+					if (beginMarker != null) {
+						r = r * -1521134295 + beginMarker.Id.GetHashCode();
+					}
+					var endMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
+					if (endMarker != null) {
+						r = r * -1521134295 + endMarker.Id.GetHashCode();
+					}
 				}
 				return r;
 			}
@@ -83,7 +89,6 @@ namespace Tangerine.UI.Timeline.Components
 
 		private void RenderClips(Widget widget)
 		{
-			var spans = row.Components.GetOrAdd<GridSpanListComponent>().Spans.GetNonOverlappedSpans();
 			foreach (var clip in track.Clips) {
 				var a = new Vector2((clip.BeginFrame + .5f) * TimelineMetrics.ColWidth + .5f, 0);
 				var b = new Vector2((clip.EndFrame + .5f) * TimelineMetrics.ColWidth + .5f, widget.Height);
