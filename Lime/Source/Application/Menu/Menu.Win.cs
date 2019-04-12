@@ -139,11 +139,15 @@ namespace Lime
 
 		public void Popup()
 		{
-			Refresh();
-			var w = Window.Current as Window;
-			w.Input.ClearKeyState();
-			var mp = w.WorldToWindow(w.Input.MousePosition);
-			NativeContextMenu.Show(w.Form, new Point(mp.X.Round(), mp.Y.Round()));
+			// Popup the context menu on the next update to make sure all
+			// commands are correctly enabled/disabled by currently executing tasks
+			Application.InvokeOnNextUpdate(() => {
+				Refresh();
+				var w = Window.Current as Window;
+				w.Input.ClearKeyState();
+				var mp = w.WorldToWindow(w.Input.MousePosition);
+				NativeContextMenu.Show(w.Form, new Point(mp.X.Round(), mp.Y.Round()));
+			});
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
