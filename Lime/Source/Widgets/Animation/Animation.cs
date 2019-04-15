@@ -22,7 +22,7 @@ namespace Lime
 		public EasingCalculator EasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		internal List<IAbstractAnimator> EffectiveAnimators;
-		internal List<IAbstractAnimator> EffectiveTriggableAnimators;
+		internal List<IAbstractAnimator> EffectiveTriggerableAnimators;
 		internal int EffectiveAnimatorsVersion;
 
 		[YuzuMember]
@@ -178,7 +178,7 @@ namespace Lime
 			clone.Markers = MarkerList.DeepClone(Markers, clone);
 			clone.Tracks = Tracks.Clone(clone);
 			clone.EffectiveAnimators = null;
-			clone.EffectiveTriggableAnimators = null;
+			clone.EffectiveTriggerableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
 			clone.EasingCalculator = new EasingCalculator(clone.Markers, clone);
 			return clone;

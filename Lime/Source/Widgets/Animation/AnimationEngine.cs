@@ -127,7 +127,7 @@ namespace Lime
 			foreach (var a in animation.EffectiveAnimators) {
 				a.Apply(currentTime);
 			}
-			foreach (var a in animation.EffectiveTriggableAnimators) {
+			foreach (var a in animation.EffectiveTriggerableAnimators) {
 				a.ExecuteTriggersInRange(previousTime, currentTime, executeTriggersAtCurrentTime);
 			}
 #if TANGERINE
@@ -180,7 +180,7 @@ namespace Lime
 		private static void BuildEffectiveAnimatorsForCompoundAnimation(Animation animation)
 		{
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
-			(animation.EffectiveTriggableAnimators ?? (animation.EffectiveTriggableAnimators = new List<IAbstractAnimator>())).Clear();
+			(animation.EffectiveTriggerableAnimators ?? (animation.EffectiveTriggerableAnimators = new List<IAbstractAnimator>())).Clear();
 			var animationBindings = new Dictionary<AnimatorBinding, (IAbstractAnimator Animator, AnimationTrack Track)>();
 			var trackBindings = new Dictionary<AnimatorBinding, IChainedAnimator>();
 			foreach (var track in animation.Tracks) {
@@ -229,7 +229,7 @@ namespace Lime
 				}
 				animation.EffectiveAnimators.Add(a);
 				if (a.IsTriggerable) {
-					animation.EffectiveTriggableAnimators.Add(a);
+					animation.EffectiveTriggerableAnimators.Add(a);
 				}
 			}
 		}
@@ -264,7 +264,7 @@ namespace Lime
 		private static void BuildEffectiveAnimatorsForSimpleAnimation(Animation animation)
 		{
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
-			(animation.EffectiveTriggableAnimators ?? (animation.EffectiveTriggableAnimators = new List<IAbstractAnimator>())).Clear();
+			(animation.EffectiveTriggerableAnimators ?? (animation.EffectiveTriggerableAnimators = new List<IAbstractAnimator>())).Clear();
 			animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
 			AddEffectiveAnimatorsRecursively(animation.Owner);
 
@@ -283,7 +283,7 @@ namespace Lime
 								}
 								animation.EffectiveAnimators.Add(a2);
 								if (a2.IsTriggerable) {
-									animation.EffectiveTriggableAnimators.Add(a2);
+									animation.EffectiveTriggerableAnimators.Add(a2);
 								}
 							}
 						}
