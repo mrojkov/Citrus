@@ -263,7 +263,8 @@ namespace Lime
 			void AddEffectiveAnimatorsRecursively(Node node)
 			{
 				foreach (var child in node.Nodes) {
-					if (child.Animators.Count > 0) { // Optimization: Animators.GetEnumerator() creates internal storage
+					// Optimization: avoid calling Animators.GetEnumerator() for empty collection since it allocates memory
+					if (child.Animators.Count > 0) {
 						foreach (var a in child.Animators) {
 							if (a.AnimationId == animation.Id) {
 								var a2 = (IAbstractAnimator)a;
