@@ -210,7 +210,7 @@ namespace Lime
 				}
 				foreach (var a in trackBindings.Values) {
 					if (animationBindings.TryGetValue(new AnimatorBinding(a), out var i)) {
-						if (i.Item1 is IBlendedAnimator blended) {
+						if (i.Animator is IBlendedAnimator blended) {
 							blended.Add(track, a);
 						} else {
 							animationBindings.Remove(new AnimatorBinding(a));
