@@ -181,7 +181,7 @@ namespace Lime
 		{
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
 			(animation.EffectiveTriggableAnimators ?? (animation.EffectiveTriggableAnimators = new List<IAbstractAnimator>())).Clear();
-			var animationBindings = new Dictionary<AnimatorBinding, (IAbstractAnimator, AnimationTrack)>();
+			var animationBindings = new Dictionary<AnimatorBinding, (IAbstractAnimator Animator, AnimationTrack Track)>();
 			var trackBindings = new Dictionary<AnimatorBinding, IChainedAnimator>();
 			foreach (var track in animation.Tracks) {
 				trackBindings.Clear();
@@ -211,7 +211,7 @@ namespace Lime
 						} else {
 							animationBindings.Remove(new AnimatorBinding(a));
 							blended = AnimatorRegistry.Instance.CreateBlendedAnimator(a.ValueType);
-							blended.Add(i.Item2, i.Item1);
+							blended.Add(i.Track, i.Animator);
 							blended.Add(track, a);
 							animationBindings.Add(new AnimatorBinding(a), (blended, track));
 						}
@@ -221,7 +221,7 @@ namespace Lime
 				}
 			}
 			foreach (var b in animationBindings.Values) {
-				var a = b.Item1;
+				var a = b.Animator;
 				if (animation.HasEasings()) {
 					var a2 = AnimatorRegistry.Instance.CreateEasedAnimator(a.ValueType);
 					a2.Initialize(animation, a);
