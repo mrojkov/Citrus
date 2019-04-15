@@ -42,11 +42,11 @@ namespace Tangerine.UI.Timeline.Components
 					r = r * -1521134295 + clip.BeginFrame;
 					r = r * -1521134295 + clip.EndFrame;
 					r = r * -1521134295 + clip.InFrame;
-					var beginMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame);
+					var beginMarker = clip.FindAnimation()?.Markers.GetByFrame(clip.InFrame);
 					if (beginMarker != null) {
 						r = r * -1521134295 + beginMarker.Id.GetHashCode();
 					}
-					var endMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
+					var endMarker = clip.FindAnimation()?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
 					if (endMarker != null) {
 						r = r * -1521134295 + endMarker.Id.GetHashCode();
 					}
@@ -60,8 +60,8 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Nodes.Clear();
 			foreach (var clip in track.Clips) {
 				var clipLabel = clip.AnimationId;
-				var beginMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame);
-				var endMarker = clip.Animation?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
+				var beginMarker = clip.FindAnimation()?.Markers.GetByFrame(clip.InFrame);
+				var endMarker = clip.FindAnimation()?.Markers.GetByFrame(clip.InFrame + clip.DurationInFrames);
 				if (beginMarker != null || endMarker != null) {
 					clipLabel +=
 						" (" + (beginMarker?.Id ?? clip.InFrame.ToString()) + ".." +

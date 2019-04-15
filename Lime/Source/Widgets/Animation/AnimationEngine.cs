@@ -146,8 +146,16 @@ namespace Lime
 				}
 				foreach (var track in animation.Tracks) {
 					foreach (var clip in track.Clips) {
-						var clipAnimation = clip.Animation;
-						if (clipAnimation != clip.CachedAnimation || (clipAnimation != null && !AreEffectiveAnimatorsValid(clipAnimation))) {
+						var clipAnimation = clip.CachedAnimation;
+						if (clipAnimation == null) {
+							if (clip.FindAnimation() != null) {
+								return false;
+							}
+						} else if (
+							(clipAnimation.IdComparisonCode != clip.AnimationIdComparisonCode) ||
+							(clipAnimation.Owner != animation.Owner) ||
+							(clipAnimation != null && !AreEffectiveAnimatorsValid(clipAnimation))
+						) {
 							return false;
 						}
 					}
@@ -178,7 +186,7 @@ namespace Lime
 			foreach (var track in animation.Tracks) {
 				trackBindings.Clear();
 				foreach (var clip in track.Clips) {
-					var clipAnimation = clip.Animation;
+					var clipAnimation = clip.FindAnimation();
 					clip.CachedAnimation = clipAnimation;
 					if (clipAnimation == null) {
 						continue;

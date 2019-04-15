@@ -30,6 +30,7 @@ namespace Lime
 		public double EndTime { get; private set; }
 		public double DurationInSeconds { get; private set; }
 		public double InTime { get; private set; }
+		internal Animation CachedAnimation { get; set; }
 
 		[YuzuMember]
 		[TangerineGroup("Clip")]
@@ -137,15 +138,11 @@ namespace Lime
 		public bool IsSelected { get; set; }
 #endif
 
-		internal Animation CachedAnimation { get; set; }
-
-		public Animation Animation
+		public Animation FindAnimation()
 		{
-			get {
-				var node = Owner.Owner.Owner;
-				node.Animations.TryFind(AnimationIdComparisonCode, out var animation);
-				return animation;
-			}
+			var node = Owner.Owner.Owner;
+			node.Animations.TryFind(AnimationIdComparisonCode, out var animation);
+			return animation;
 		}
 
 		public int DurationInFrames
