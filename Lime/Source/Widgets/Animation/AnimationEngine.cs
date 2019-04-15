@@ -167,18 +167,6 @@ namespace Lime
 			} else {
 				BuildEffectiveAnimatorsForSimpleAnimation(animation);
 			}
-			RefreshDuration();
-
-			void RefreshDuration()
-			{
-				animation.DurationInFrames = 0;
-				foreach (var a in animation.EffectiveAnimators) {
-					animation.DurationInFrames = Math.Max(animation.DurationInFrames, a.Duration);
-				}
-				if (animation.Markers.Count > 0) {
-					animation.DurationInFrames = Math.Max(animation.DurationInFrames, animation.Markers[animation.Markers.Count - 1].Frame);
-				}
-			}
 		}
 
 		private static void BuildEffectiveAnimatorsForCompoundAnimation(Animation animation)

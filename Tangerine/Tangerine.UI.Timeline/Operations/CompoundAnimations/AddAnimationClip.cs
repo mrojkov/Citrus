@@ -90,12 +90,12 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 						// Refreshes animation duration either
 						animation.AnimationEngine.BuildEffectiveAnimators(animation);
 					}
-					if (animation.DurationInFrames == 0) {
+					if (animation.CalcDurationInFrames() == 0) {
 						AlertDialog.Show("Please select an animation with non-zero duration", "Ok");
 						return;
 					}
 					int beginFrame = (int?)beginMarkerSelector.Value ?? 0;
-					int endFrame = (int?)endMarkerSelector.Value ?? animation.DurationInFrames;
+					int endFrame = (int?)endMarkerSelector.Value ?? animation.CalcDurationInFrames();
 					if (beginFrame >= endFrame) {
 						AlertDialog.Show("Please select markers in ascending order", "Ok");
 						return;

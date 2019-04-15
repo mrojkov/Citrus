@@ -96,7 +96,7 @@ namespace Lime
 				if (a <= b) {
 					i.Animator.ExecuteTriggersInRange(a, b, inclusiveRange);
 				} else if (clip.PostExtrapolation == AnimationClipExtrapolation.Repeat && !clip.Reversed) {
-					i.Animator.ExecuteTriggersInRange(a, clip.Animation.DurationInSeconds, true);
+					i.Animator.ExecuteTriggersInRange(a, clip.DurationInSeconds, true);
 					i.Animator.ExecuteTriggersInRange(0, b, inclusiveRange);
 				} else if (clip.PostExtrapolation == AnimationClipExtrapolation.PingPong) {
 					// No idea how to process triggers for the pingpong extrapolation...

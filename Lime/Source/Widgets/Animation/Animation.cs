@@ -24,8 +24,6 @@ namespace Lime
 		internal List<IAbstractAnimator> EffectiveAnimators;
 		internal List<IAbstractAnimator> EffectiveTriggableAnimators;
 		internal int EffectiveAnimatorsVersion;
-		public int DurationInFrames { get; internal set; }
-		public double DurationInSeconds => DurationInFrames * AnimationUtils.SecondsPerFrame;
 
 		[YuzuMember]
 		public bool IsCompound { get; set; }
@@ -185,6 +183,23 @@ namespace Lime
 			clone.EasingCalculator = new EasingCalculator(clone.Markers, clone);
 			return clone;
 		}
+
+		public int CalcDurationInFrames()
+		{
+			if (!AnimationEngine.AreEffectiveAnimatorsValid(this)) {
+				AnimationEngine.BuildEffectiveAnimators(this);
+			}
+			var durationInFrames = 0;
+			foreach (var a in EffectiveAnimators) {
+				durationInFrames = Math.Max(durationInFrames, a.Duration);
+			}
+			if (Markers.Count > 0) {
+				durationInFrames = Math.Max(durationInFrames, Markers[Markers.Count - 1].Frame);
+			}
+			return durationInFrames;
+		}
+
+		public double CalcDurationInSeconds() => CalcDurationInFrames() * AnimationUtils.SecondsPerFrame;
 
 		object ICloneable.Clone()
 		{
