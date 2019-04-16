@@ -8,17 +8,20 @@ namespace Orange
 {
 	class SyncDeleted: CookStage
 	{
-		public SyncDeleted(): base()
+		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public override IEnumerable<string> BundleExtensions
 		{
-
+			get
+			{
+				foreach (var i in toDeleteExtensions) {
+					yield return i;
+				}
+				yield return modelTanExtension;
+			}
 		}
 
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".atlasPart", ".mask", ".texture", ".ant", ".t3d" };
-			ImportedExtension = null;
-			ExportedExtension = null;
-		}
+		private readonly string[] toDeleteExtensions = { ".atlasPart", ".mask", ".texture", ".ant" };
+		private readonly string modelTanExtension = ".t3d";
 
 		public override void Action()
 		{
@@ -33,17 +36,17 @@ namespace Orange
 				}
 				// Ignore atlas parts, masks, animations
 				var ext = Path.GetExtension(path);
-				if (Extensions.ToList().Contains(ext, StringComparer.OrdinalIgnoreCase) && ext != Extensions.Last()) {
+				if (toDeleteExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase)) {
 					continue;
 				}
 				var assetPath = Path.ChangeExtension(path, AssetCooker.GetOriginalAssetExtension(path));
 				if (!assetFiles.Contains(assetPath)) {
-					if (path.EndsWith(Extensions.Last(), StringComparison.OrdinalIgnoreCase)) {
+					if (path.EndsWith(modelTanExtension, StringComparison.OrdinalIgnoreCase)) {
 						AssetCooker.DeleteModelExternalAnimations(AssetCooker.GetModelAnimationPathPrefix(path));
 					}
 					var modelAttachmentExtIndex = path.LastIndexOf(Model3DAttachment.FileExtension);
 					if (modelAttachmentExtIndex >= 0) {
-						AssetCooker.ModelsToRebuild.Add(path.Remove(modelAttachmentExtIndex) + Extensions.Last());
+						AssetCooker.ModelsToRebuild.Add(path.Remove(modelAttachmentExtIndex) + modelTanExtension);
 					}
 					AssetCooker.DeleteFileFromBundle(path);
 				}

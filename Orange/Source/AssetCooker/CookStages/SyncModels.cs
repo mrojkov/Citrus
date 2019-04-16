@@ -1,27 +1,22 @@
 using System;
 using System.IO;
 using Lime;
+using System.Collections.Generic;
 using Orange.FbxImporter;
 
 namespace Orange
 {
 	class SyncModels : CookStage
 	{
-		public SyncModels() : base()
-		{
+		public override IEnumerable<string> ImportedExtensions { get { yield return fbxExtension; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return t3dExtension; } }
 
-		}
-
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".fbx", ".t3d" };
-			ImportedExtension = Extensions[0];
-			ExportedExtension = Extensions[1];
-		}
+		private readonly string fbxExtension = ".fbx";
+		private readonly string t3dExtension = ".t3d";
 
 		public override void Action()
 		{
-			SyncUpdated.Sync(ImportedExtension, ExportedExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
+			SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 		}
 
 		private bool Converter(string srcPath, string dstPath)
@@ -55,7 +50,7 @@ namespace Orange
 			AssetCooker.DeleteModelExternalAnimations(animationPathPrefix);
 			AssetCooker.ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
 			model.RemoveAnimatorsForExternalAnimations();
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Serialization.Format.Binary, ExportedExtension,
+			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Serialization.Format.Binary, t3dExtension,
 				File.GetLastWriteTime(srcPath), assetAttributes, cookingRules.SHA1);
 			return true;
 		}

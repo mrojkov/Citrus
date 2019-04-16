@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Lime;
 
@@ -5,21 +6,16 @@ namespace Orange
 {
 	class SyncRawAssets: CookStage
 	{
-		private string extension;
-		private AssetAttributes attributes;
+		public override IEnumerable<string> ImportedExtensions { get { yield return extension; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return extension; } }
+
+		private readonly string extension;
+		private readonly AssetAttributes attributes;
 
 		public SyncRawAssets(string extension, AssetAttributes attributes = AssetAttributes.None)
 		{
-			SetExtensions(extension);
 			this.extension = extension;
 			this.attributes = attributes;
-		}
-
-		protected override void SetExtensions() { }
-
-		protected void SetExtensions(string extension)
-		{
-			Extensions = new string[] { extension };
 		}
 
 		public override void Action()

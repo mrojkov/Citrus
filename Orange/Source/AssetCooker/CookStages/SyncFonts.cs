@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Lime;
 
@@ -5,27 +6,20 @@ namespace Orange
 {
 	class SyncFonts: CookStage
 	{
-		public SyncFonts() : base()
-		{
+		public override IEnumerable<string> ImportedExtensions { get { yield return fontExtension; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return fontExtension; } }
 
-		}
-
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".tft" };
-			ImportedExtension = Extensions[0];
-			ExportedExtension = Extensions[0];
-		}
+		private readonly string fontExtension = ".tft";
 
 		public override void Action()
 		{
-			SyncUpdated.Sync(ImportedExtension, ExportedExtension, AssetBundle.Current, Converter);
+			SyncUpdated.Sync(fontExtension, fontExtension, AssetBundle.Current, Converter);
 		}
 
 		private bool Converter(string srcPath, string dstPath)
 		{
 			var font = Serialization.ReadObjectFromFile<Font>(srcPath);
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Serialization.Format.Binary, ExportedExtension,
+			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Serialization.Format.Binary, fontExtension,
 				File.GetLastWriteTime(srcPath), AssetAttributes.None, AssetCooker.CookingRulesMap[srcPath].SHA1);
 			return true;
 		}

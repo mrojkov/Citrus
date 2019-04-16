@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Lime;
 
@@ -6,21 +7,14 @@ namespace Orange
 {
 	class RemoveDeprecatedModels: CookStage
 	{
-		public RemoveDeprecatedModels() : base()
-		{
+		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return modelExtension; } }
 
-		}
-
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".model" };
-			ImportedExtension = null;
-			ExportedExtension = null;
-		}
+		private readonly string modelExtension = ".model";
 
 		public override void Action()
 		{
-			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(Extensions[0])) {
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(modelExtension)) {
 				var path = fileInfo.Path;
 				if (AssetCooker.CookingRulesMap.ContainsKey(path)) {
 					AssetCooker.CookingRulesMap.Remove(path);

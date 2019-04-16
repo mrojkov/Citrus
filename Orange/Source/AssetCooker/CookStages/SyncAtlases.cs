@@ -8,32 +8,26 @@ namespace Orange
 {
 	class SyncAtlases : CookStage
 	{
-		public SyncAtlases() : base()
-		{
+		public override IEnumerable<string> ImportedExtensions { get { yield return textureExtension; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return atlasPartExtension; } }
 
-		}
-
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".png", ".atlasPart" };
-			ImportedExtension = Extensions[0];
-			ExportedExtension = Extensions[1];
-		}
+		private readonly string textureExtension = ".png";
+		private readonly string atlasPartExtension = ".atlasPart";
 
 		public override void Action()
 		{
 			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
-			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(ImportedExtension)) {
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(textureExtension)) {
 				textures[fileInfo.Path] = fileInfo.LastWriteTime;
 			}
 			var atlasChainsToRebuild = new HashSet<string>();
 			// Figure out atlas chains to rebuild
 			foreach (var atlasPartPath in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
-				if (!atlasPartPath.EndsWith(ExportedExtension, StringComparison.OrdinalIgnoreCase))
+				if (!atlasPartPath.EndsWith(atlasPartExtension, StringComparison.OrdinalIgnoreCase))
 					continue;
 
 				// If atlas part has been outdated we should rebuild full atlas chain
-				var srcTexturePath = Path.ChangeExtension(atlasPartPath, ImportedExtension);
+				var srcTexturePath = Path.ChangeExtension(atlasPartPath, textureExtension);
 				var bundleSHA1 = AssetCooker.AssetBundle.GetCookingRulesSHA1(atlasPartPath);
 				if (bundleSHA1 == null) {
 					throw new InvalidOperationException("CookingRules SHA1 for atlas part shouldn't be null");
@@ -51,7 +45,7 @@ namespace Orange
 						AssetCooker.DeleteFileFromBundle(atlasPartPath);
 					}
 					else {
-						srcTexturePath = Path.ChangeExtension(atlasPartPath, ImportedExtension);
+						srcTexturePath = Path.ChangeExtension(atlasPartPath, textureExtension);
 						if (AssetCooker.CookingRulesMap[srcTexturePath].TextureAtlas != null) {
 							var rules = AssetCooker.CookingRulesMap[srcTexturePath];
 							atlasChainsToRebuild.Add(rules.TextureAtlas);
@@ -64,7 +58,7 @@ namespace Orange
 			}
 			// Find which new textures must be added to the atlas chain
 			foreach (var t in textures) {
-				var atlasPartPath = Path.ChangeExtension(t.Key, ExportedExtension);
+				var atlasPartPath = Path.ChangeExtension(t.Key, atlasPartExtension);
 				var cookingRules = AssetCooker.CookingRulesMap[t.Key];
 				var atlasNeedRebuld = cookingRules.TextureAtlas != null && !AssetCooker.AssetBundle.FileExists(atlasPartPath);
 				if (atlasNeedRebuld) {
@@ -95,12 +89,12 @@ namespace Orange
 			var items = new Dictionary<AtlasOptimization, List<TextureTools.AtlasItem>>();
 			items[AtlasOptimization.Memory] = new List<TextureTools.AtlasItem>();
 			items[AtlasOptimization.DrawCalls] = new List<TextureTools.AtlasItem>();
-			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(ImportedExtension)) {
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(textureExtension)) {
 				var cookingRules = AssetCooker.CookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
 
 					var item = new TextureTools.AtlasItem {
-						Path = Path.ChangeExtension(fileInfo.Path, ExportedExtension),
+						Path = Path.ChangeExtension(fileInfo.Path, atlasPartExtension),
 						CookingRules = cookingRules,
 						SourceExtension = Path.GetExtension(fileInfo.Path)
 					};

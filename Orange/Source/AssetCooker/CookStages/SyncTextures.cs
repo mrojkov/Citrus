@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using Lime;
 
@@ -10,26 +6,20 @@ namespace Orange
 {
 	class SyncTextures: CookStage
 	{
-		public SyncTextures() : base()
-		{
+		public override IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
+		public override IEnumerable<string> BundleExtensions { get { yield return platformTextureExtension; } }
 
-		}
-
-		protected override void SetExtensions()
-		{
-			Extensions = new string[] { ".png" };
-			ImportedExtension = Extensions[0];
-			ExportedExtension = AssetCooker.GetPlatformTextureExtension();
-		}
+		private readonly string originalTextureExtension = ".png";
+		private readonly string platformTextureExtension = AssetCooker.GetPlatformTextureExtension();
 
 		public override void Action()
 		{
-			SyncUpdated.Sync(ImportedExtension, ExportedExtension, AssetBundle.Current, Converter);
+			SyncUpdated.Sync(originalTextureExtension, platformTextureExtension, AssetBundle.Current, Converter);
 		}
 
 		private bool Converter(string srcPath, string dstPath)
 		{
-			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, ImportedExtension)];
+			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, originalTextureExtension)];
 			if (rules.TextureAtlas != null) {
 				// Reverse double counting
 				UserInterface.Instance.IncreaseProgressBar(-1);
