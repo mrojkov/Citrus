@@ -534,6 +534,7 @@ namespace Lime.Graphics.Platform.Vulkan
 						if (texture == null || texture.Disposed) {
 							texture = placeholderTexture;
 						}
+						texture.WriteFenceValue = NextFenceValue;
 						imageInfos[writeCount].ImageLayout = SharpVulkan.ImageLayout.ShaderReadOnlyOptimal;
 						imageInfos[writeCount].ImageView = texture.ImageView;
 						imageInfos[writeCount].Sampler = texture.Sampler;
@@ -959,6 +960,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			if (activeRenderPass == SharpVulkan.RenderPass.Null) {
 				SharpVulkan.Framebuffer fb;
 				if (renderTarget != null) {
+					renderTarget.WriteFenceValue = NextFenceValue;
 					activeRenderPass = renderTarget.RenderPass;
 					activeRenderPassWidth = renderTarget.Width;
 					activeRenderPassHeight = renderTarget.Height;
