@@ -78,7 +78,7 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 		}
 
-		void IAnimationHost.OnTrigger(string property, object value, double animationTimeCorrection = 0) { }
+		void IAnimationHost.OnTrigger(string property, object value, double animationTimeCorrection) { }
 
 		public AnimationTrack Clone()
 		{
