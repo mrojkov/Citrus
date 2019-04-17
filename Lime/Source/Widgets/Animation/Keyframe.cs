@@ -69,7 +69,7 @@ namespace Lime
 		public int PackedParams {
 			get => p.Packed;
 			set {
-				// Protect us is someone has used previous version of easings
+				// Protect us if someone has used previous version of easings
 				if ((value & 255) >= (int)KeyFunction.ClosedSpline) {
 					value &= 7;
 				}
