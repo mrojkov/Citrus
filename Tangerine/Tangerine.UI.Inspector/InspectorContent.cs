@@ -80,7 +80,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var marker = Inspector.FindMarkerBehind();
 			if (marker != null) {
-				new EasingParamsPropertyEditor(new PropertyEditorParams(widget, marker, nameof(Marker.Easing)) {
+				new BezierEasingPropertyEditor(new PropertyEditorParams(widget, marker, nameof(Marker.BezierEasing)) {
 					ShowLabel = false,
 					History = History,
 					PropertySetter = SetProperty

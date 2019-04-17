@@ -13,7 +13,7 @@ namespace Lime
 	public class Marker
 	{
 		private int frame;
-		private EasingParams easing;
+		private BezierEasing bezierEasing;
 
 		public Animation Owner { get; internal set; }
 
@@ -41,12 +41,12 @@ namespace Lime
 		public string JumpTo { get; set; }
 
 		[YuzuMember]
-		public EasingParams Easing
+		public BezierEasing BezierEasing
 		{
-			get => easing;
+			get => bezierEasing;
 			set {
-				if (!easing.Equals(value)) {
-					easing = value;
+				if (!bezierEasing.Equals(value)) {
+					bezierEasing = value;
 					Owner?.InvalidateCache();
 				}
 			}
@@ -56,7 +56,7 @@ namespace Lime
 
 		public Marker()
 		{
-			Easing = EasingParams.Default;
+			BezierEasing = BezierEasing.Default;
 		}
 
 		public Marker(string id, int frame, MarkerAction action, string jumpTo = null)
@@ -65,7 +65,7 @@ namespace Lime
 			this.Frame = frame;
 			this.Action = action;
 			this.JumpTo = jumpTo;
-			this.Easing = EasingParams.Default;
+			this.BezierEasing = BezierEasing.Default;
 		}
 
 		public Marker Clone()

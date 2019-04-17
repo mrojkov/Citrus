@@ -4,7 +4,7 @@ using Yuzu;
 namespace Lime
 {
 	[YuzuCompact]
-	public struct EasingParams : IEquatable<EasingParams>
+	public struct BezierEasing : IEquatable<BezierEasing>
 	{
 		[YuzuMember]
 		public float P1X { get; set; }
@@ -23,17 +23,17 @@ namespace Lime
 
 		public bool IsDefault() => P1X == 0 && P1Y == 0 && P2X == 1 && P2Y == 1;
 
-		public EasingParams Clone()
+		public BezierEasing Clone()
 		{
-			return (EasingParams)MemberwiseClone();
+			return (BezierEasing)MemberwiseClone();
 		}
 
-		public bool Equals(EasingParams other)
+		public bool Equals(BezierEasing other)
 		{
 			return P1X == other.P1X && P2X == other.P2X && P1Y == other.P1Y && P2Y == other.P2Y;
 		}
 
-		public static readonly EasingParams Default = new EasingParams { P1X = 0, P1Y = 0, P2X = 1, P2Y = 1 };
+		public static readonly BezierEasing Default = new BezierEasing { P1X = 0, P1Y = 0, P2X = 1, P2Y = 1 };
 
 		public float this[int component]
 		{

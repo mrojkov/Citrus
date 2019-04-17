@@ -2,18 +2,17 @@ using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.UI
 {
-	public class EasingParamsPropertyEditor : CommonPropertyEditor<EasingParams>
+	public class BezierEasingPropertyEditor : CommonPropertyEditor<BezierEasing>
 	{
-		public EasingParamsPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		public BezierEasingPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
-			EditorContainer.AddNode(new EasingEditorPanel(this, CoalescedPropertyValue(), (EasingParams p) => SetProperty(p)).Widget);
+			EditorContainer.AddNode(new EasingEditorPanel(this, CoalescedPropertyValue(), (BezierEasing p) => SetProperty(p)).Widget);
 			EditorContainer.Gestures.Add(new ClickGesture(1, () => {
 				var reset = new Command("Reset", () => {
-					DoTransaction(() => SetProperty<EasingParams>(_ => EasingParams.Default));
+					DoTransaction(() => SetProperty<BezierEasing>(_ => BezierEasing.Default));
 				});
 				new Menu { reset }.Popup();
 			}));
@@ -22,13 +21,13 @@ namespace Tangerine.UI
 		private class EasingEditorPanel
 		{
 			public Widget Widget { get; }
-			private IDataflowProvider<CoalescedValue<EasingParams>> valueProvider;
+			private IDataflowProvider<CoalescedValue<BezierEasing>> valueProvider;
 			private Widget canvas;
 
 			public EasingEditorPanel(
-				CommonPropertyEditor<EasingParams> editor,
-				IDataflowProvider<CoalescedValue<EasingParams>> valueProvider,
-				Action<EasingParams> propertySetter)
+				CommonPropertyEditor<BezierEasing> editor,
+				IDataflowProvider<CoalescedValue<BezierEasing>> valueProvider,
+				Action<BezierEasing> propertySetter)
 			{
 				this.valueProvider = valueProvider;
 				canvas = new Widget {
@@ -80,16 +79,16 @@ namespace Tangerine.UI
 			private class BezierHandle
 			{
 				private int index;
-				private readonly CommonPropertyEditor<EasingParams> editor;
-				private readonly IDataflowProvider<CoalescedValue<EasingParams>> valueProvider;
-				private readonly Action<EasingParams> propertySetter;
+				private readonly CommonPropertyEditor<BezierEasing> editor;
+				private readonly IDataflowProvider<CoalescedValue<BezierEasing>> valueProvider;
+				private readonly Action<BezierEasing> propertySetter;
 				private readonly Widget canvas;
 
 				public BezierHandle(
 					int index,
-					CommonPropertyEditor<EasingParams> editor,
-					IDataflowProvider<CoalescedValue<EasingParams>> valueProvider,
-					Action<EasingParams> propertySetter,
+					CommonPropertyEditor<BezierEasing> editor,
+					IDataflowProvider<CoalescedValue<BezierEasing>> valueProvider,
+					Action<BezierEasing> propertySetter,
 					Widget canvas)
 				{
 					this.index = index;

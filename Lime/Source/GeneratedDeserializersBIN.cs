@@ -2612,7 +2612,7 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__EasingParams(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.EasingParams();
+			var result = new global::Lime.BezierEasing();
 			result.P1X = d.Reader.ReadSingle();
 			result.P1Y = d.Reader.ReadSingle();
 			result.P2X = d.Reader.ReadSingle();
@@ -4179,13 +4179,13 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				dg.EnsureClassDef(typeof(global::Lime.EasingParams));
-				var tmp1 = new global::Lime.EasingParams();
+				dg.EnsureClassDef(typeof(global::Lime.BezierEasing));
+				var tmp1 = new global::Lime.BezierEasing();
 				tmp1.P1X = d.Reader.ReadSingle();
 				tmp1.P1Y = d.Reader.ReadSingle();
 				tmp1.P2X = d.Reader.ReadSingle();
 				tmp1.P2Y = d.Reader.ReadSingle();
-				result.Easing = tmp1;
+				result.BezierEasing = tmp1;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
@@ -10359,7 +10359,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
-			makeCache[typeof(global::Lime.EasingParams)] = Make_Lime__EasingParams;
+			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__EasingParams;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;
 			makeCache[typeof(global::Lime.Font)] = Make_Lime__Font;
 			makeCache[typeof(global::Lime.FontChar)] = Make_Lime__FontChar;
