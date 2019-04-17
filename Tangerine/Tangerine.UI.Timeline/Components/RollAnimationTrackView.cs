@@ -62,7 +62,6 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			trackIdEditor = new RollNodeView.ObjectIdInplaceEditor(row, Track, label, editBoxContainer);
-			Widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
 			Widget.Gestures.Add(new DoubleClickGesture(() => {
 				Document.Current.History.DoTransaction(() => {
 					var labelExtent = label.MeasureUncutText();
@@ -108,7 +107,7 @@ namespace Tangerine.UI.Timeline.Components
 			return button;
 		}
 
-		void ShowTrackContextMenu()
+		private void ShowTrackContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {
