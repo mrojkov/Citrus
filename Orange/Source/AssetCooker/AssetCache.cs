@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
@@ -8,6 +9,7 @@ using FluentFTP;
 using Lime;
 using Debug = System.Diagnostics.Debug;
 using Environment = System.Environment;
+using Exception = Lime.Exception;
 
 namespace Orange
 {
@@ -26,67 +28,154 @@ namespace Orange
 			}
 		}
 
-		private readonly FtpClient ftpClient;
-		private readonly string serverAddress;
-		private readonly string serverUsername;
-		private readonly string serverPath;
-		private readonly string localPath;
-		private readonly bool isActive;
-		private readonly bool remoteEnabled;
+		private FtpClient ftpClient;
+		private string serverAddress;
+		private string serverUsername;
+		private string serverPath;
+		private string localPath = ".orange/Cache";
+		private EnableState enableState;
 
+		private bool RemoteEnabled => enableState == EnableState.Both || enableState == EnableState.Remote;
+		private bool LocalEnabled => enableState == EnableState.Both || enableState == EnableState.Local;
 		private string lastHandledHashString;
 
-		private AssetCache()
+		private AssetCache() { }
+
+		private void GetSettings()
 		{
 			var data = The.Workspace.ProjectJson.AsDynamic.AssetCache;
 			if (data == null) {
-				isActive = false;
-				Console.WriteLine("Warning: 'AssetCache' field not presented in .citproj. Caching disabled");
+				enableState = EnableState.None;
+				Console.WriteLine($"[Cache] Warning: 'AssetCache' field not found in {The.Workspace.ProjectFile}. Caching disabled");
+				return;
+			}
+			string temp = (string) data.Enabled;
+			switch (temp) {
+				case "None":
+					enableState = EnableState.None;
+					Console.WriteLine($"[Cache] Caching disabled via {The.Workspace.ProjectFile}");
+					return;
+				case "Local":
+					enableState = EnableState.Local;
+					break;
+				case "Remote":
+					enableState = EnableState.Remote;
+					break;
+				case "Both":
+					enableState = EnableState.Both;
+					break;
+				case null:
+					enableState = EnableState.None;
+					Console.WriteLine($"[Cache] Error: 'Enabled' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
+					return;
+				default:
+					enableState = EnableState.None;
+					throw new ArgumentException($"[Cache] Error: '{temp}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
+			}
+			if (enableState == EnableState.Local) {
+				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
 			}
 			serverAddress = (string)data.ServerAddress;
-			serverUsername = (string)data.ServerUsername;
-			serverPath = (string)data.ServerPath;
-			localPath = (string)data.LocalPath;
-			remoteEnabled = (bool)data.RemoteEnabled;
-			if (!remoteEnabled) {
-				Console.WriteLine("Remote cache disabled by .citproj");
+			if (serverAddress == null) {
+				if (enableState == EnableState.Both) {
+					enableState = EnableState.Local;
+					Console.WriteLine($"[Cache] Warning: 'ServerAddress' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
+					return;
+				}
+				enableState = EnableState.None;
+				Console.WriteLine($"[Cache] Error: 'ServerAddress' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
+				return;
 			}
 
-			ftpClient = new FtpClient(serverAddress) {
-				Credentials = new NetworkCredential(serverUsername, Environment.UserName)
-			};
-			FtpTrace.EnableTracing = false;
-			isActive = true;
+			serverUsername = (string)data.ServerUsername;
+			if (serverUsername == null) {
+				if (enableState == EnableState.Both) {
+					enableState = EnableState.Local;
+					Console.WriteLine($"[Cache] Error: 'ServerUsername' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
+					return;
+				}
+				enableState = EnableState.None;
+				Console.WriteLine($"[Cache] Error: 'ServerUsername' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
+				return;
+			}
+
+			serverPath = (string)data.ServerPath;
+			if (serverPath == null) {
+				if (enableState == EnableState.Both) {
+					enableState = EnableState.Local;
+					Console.WriteLine($"[Cache] Error: 'ServerPath' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
+					return;
+				}
+				enableState = EnableState.None;
+				Console.WriteLine($"[Cache] Error: 'ServerPath' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
+				return;
+			}
+
+			if (enableState == EnableState.Remote) {
+				Console.WriteLine("[Cache] Using REMOTE cache");
+			}
+
+			if (enableState == EnableState.Both) {
+				Console.WriteLine("[Cache] Using LOCAL and REMOTE cache");
+			}
 		}
 
-		public void ConnectToRemote()
+		public void Initialize()
 		{
-			if (!isActive || !remoteEnabled) {
+			GetSettings();
+
+			if (RemoteEnabled) {
+				ftpClient = new FtpClient(serverAddress) {
+					Credentials = new NetworkCredential(serverUsername, Environment.UserName)
+				};
+				FtpTrace.EnableTracing = false;
+				ftpClient.SocketPollInterval = 3000;
+				ftpClient.ConnectTimeout = 3000;
+				ftpClient.ReadTimeout = 3000;
+			}
+
+			if (!RemoteEnabled) {
 				return;
 			}
 
 			if (!ftpClient.IsConnected) {
-				ftpClient.Connect();
+				try {
+					ftpClient.Connect();
+				}
+				catch (System.Exception e) {
+					Console.WriteLine(e.Message);
+					string ending;
+					if (enableState == EnableState.Both) {
+						enableState = EnableState.Local;
+						ending = "LOCAL cache will be used";
+					} else {
+						enableState = EnableState.None;
+						ending = "Caching disabled";
+					}
+					Console.WriteLine($"[Cache] Error: Can't connect to {serverUsername}@{serverAddress}. {ending}");
+				}
 			}
 
 			if (ftpClient.IsConnected) {
-				Console.WriteLine($"FTP: {serverUsername}@{serverAddress}: Connection established");
-			} else {
-				Console.WriteLine($"FTP: {serverUsername}@{serverAddress}: Connection failed");
+				Console.WriteLine($"[Cache] {serverUsername}@{serverAddress}: Connection established");
 			}
 		}
 
 		public void DisconnectFromRemote()
 		{
-			if (!isActive || !remoteEnabled) {
+			if (!RemoteEnabled) {
 				return;
 			}
-
 			if (ftpClient.IsConnected) {
 				ftpClient.Disconnect();
 			}
-			Console.WriteLine("FTP: Disconnected");
+			if (enableState == EnableState.Both) {
+				enableState = EnableState.Local;
+			} else {
+				enableState = EnableState.None;
+			}
+			Console.WriteLine($"[Cache] Disconnected from {serverUsername}@{serverAddress}");
 		}
 
 		public string GetTexture(Bitmap bitmap, string extension, string commandLineArgs)
@@ -107,17 +196,21 @@ namespace Orange
 		/// <seealso cref="GetCachedFile"/>
 		public void Save(string srcPath)
 		{
-			if (!isActive) {
+			if (enableState == EnableState.None) {
 				return;
 			}
+			// Maybe we should not save files locally when local cache is disabled
 			var path = GetLocalPath(lastHandledHashString);
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 			File.Copy(srcPath, path);
-			if (remoteEnabled) {
+			if (RemoteEnabled) {
 				UploadFromLocal(lastHandledHashString);
 			}
 		}
 
+		/// <summary>
+		/// Uploads file to remote server if it doesn't exists there
+		/// </summary>
 		private string GetCachedFile(string hashString)
 		{
 			lastHandledHashString = hashString;
@@ -126,7 +219,9 @@ namespace Orange
 				return GetLocalPath(hashString);
 			}
 			if (ExistsRemote(hashString)) {
-				DownloadFromRemote(hashString);
+				if (!DownloadFromRemote(hashString)) {
+					return null;
+				}
 				return GetLocalPath(hashString);
 			}
 			return null;
@@ -156,23 +251,62 @@ namespace Orange
 
 		private bool ExistsRemote(string hashString)
 		{
-			if (isActive && remoteEnabled && ftpClient.IsConnected) {
-				return ftpClient.FileExists(GetRemotePath(hashString));
+			if (RemoteEnabled && ftpClient.IsConnected) {
+				try {
+					return ftpClient.FileExists(GetRemotePath(hashString));
+				}
+				catch(System.Exception e) {
+					Console.WriteLine(e.Message);
+					string ending;
+					if (enableState == EnableState.Both) {
+						enableState = EnableState.Local;
+						ending = "LOCAL cache will be used";
+					} else {
+						enableState = EnableState.None;
+						ending = "Caching disabled";
+					}
+					Console.WriteLine($"[Cache] Error: Can't check existance of file {hashString} at {serverUsername}@{serverAddress}. {ending}");
+					return false;
+				}
 			}
 			return false;
 		}
 
 		private bool UploadFromLocal(string hashString)
 		{
-			if (isActive && remoteEnabled && ftpClient.IsConnected) {
-				bool successful = ftpClient.UploadFile(GetLocalPath(hashString), GetRemotePath(hashString), FtpExists.Overwrite, true);
-				if (!successful) {
-					ftpClient.Disconnect();
-					Console.WriteLine("FTP: Failed to upload cache. Connection cut off");
+			if (enableState == EnableState.Both && ftpClient.IsConnected) {
+				try {
+					bool successful = ftpClient.UploadFile(GetLocalPath(hashString), GetRemotePath(hashString),
+						FtpExists.Overwrite, true);
+					if (!successful) {
+						ftpClient.Disconnect();
+						string ending;
+						if (enableState == EnableState.Both) {
+							enableState = EnableState.Local;
+							ending = "LOCAL cache will be used";
+						} else {
+							enableState = EnableState.None;
+							ending = "Caching disabled";
+						}
+						Console.WriteLine($"[Cache] Failed to upload {hashString} to {serverUsername}@{serverAddress}. Disconnected. {ending}");
+						return false;
+					}
+				}
+				catch (System.Exception e) {
+					Console.WriteLine(e.Message);
+					string ending;
+					if (enableState == EnableState.Both) {
+						enableState = EnableState.Local;
+						ending = "LOCAL cache will be used";
+					} else {
+						enableState = EnableState.None;
+						ending = "Caching disabled";
+					}
+					Console.WriteLine($"[Cache] Error: Failed to upload {hashString} to {serverUsername}@{serverAddress}. {ending}");
 					return false;
 				}
 #if DEBUG
-				Debug.WriteLine($"[Debug] FTP: {hashString} uploaded");
+				Debug.WriteLine($"[Debug][Cache] Uploaded {hashString}");
 #endif
 				return true;
 			}
@@ -181,19 +315,53 @@ namespace Orange
 
 		private bool DownloadFromRemote(string hashString)
 		{
-			if (isActive && remoteEnabled && ftpClient.IsConnected) {
-				bool successful = ftpClient.DownloadFile(GetLocalPath(hashString), GetRemotePath(hashString));
-				if (!successful) {
-					ftpClient.Disconnect();
-					Console.WriteLine("FTP: Failed to download cache. Connection cut off");
+			if (RemoteEnabled && ftpClient.IsConnected) {
+				try {
+					bool successful = ftpClient.DownloadFile(GetLocalPath(hashString), GetRemotePath(hashString));
+					if (!successful) {
+						ftpClient.Disconnect();
+						string ending;
+						if (enableState == EnableState.Both) {
+							enableState = EnableState.Local;
+							ending = "LOCAL cache will be used";
+						} else {
+							enableState = EnableState.None;
+							ending = "Caching disabled";
+						}
+						Console.WriteLine(
+							$"[Cache] Failed to download {hashString} from {serverUsername}@{serverAddress}. Disconnected. {ending}");
+						return false;
+					}
+				}
+				catch (System.Exception e) {
+					Console.WriteLine(e.Message);
+					string ending;
+					if (enableState == EnableState.Both) {
+						enableState = EnableState.Local;
+						ending = "LOCAL cache will be used";
+					} else {
+						enableState = EnableState.None;
+						ending = "Caching disabled";
+					}
+					Console.WriteLine($"[Cache] Error: Failed to download {hashString} from {serverUsername}@{serverAddress}. {ending}");
 					return false;
 				}
+
 #if DEBUG
-				Debug.WriteLine($"[Debug] FTP: {hashString} uploaded");
+				Debug.WriteLine($"[Debug][Cache] Downloaded {hashString}");
 #endif
 				return true;
 			}
 			return false;
 		}
+
+		public enum EnableState
+		{
+			None,
+			Local,
+			Remote,
+			Both
+		}
+
 	}
 }
