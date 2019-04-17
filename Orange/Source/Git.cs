@@ -1,58 +1,24 @@
 using System;
-using System.Diagnostics;
+using System.Text;
 using System.Threading;
-using Lime;
 
 namespace Orange
 {
 	public static class Git
 	{
-		public static bool Exec(string gitDir, string gitArgs)
+		public static bool Exec(string workingDirectory, string gitArgs, StringBuilder output = null)
 		{
-			return Exec(gitDir, gitArgs, out var stdout, out var stderr);
-		}
-
-		public static bool Exec(string gitDir, string gitArgs, out string stdout, out string stderr)
-		{
-			var process = new System.Diagnostics.Process {
-				StartInfo = {
-					FileName = "git",
-					Arguments = gitArgs,
-					UseShellExecute = false,
-					WorkingDirectory = gitDir,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true,
-					CreateNoWindow = true,
-		}
-			};
-			// Terekhov Dmitry: cause out parameters can't be used in closure
-			string stdoutAccumulator = "", stderrAccumulator = "";
-			Console.WriteLine($"git {gitArgs}");
-			process.OutputDataReceived += (sender, args) => {
-				if (args.Data != null) {
-					stdoutAccumulator += args.Data;
-					Console.WriteLine(args.Data);
-				}
-			};
-			process.ErrorDataReceived += (sender, args) => {
-				if (args.Data != null) {
-					stderrAccumulator += args.Data;
-					Console.WriteLine(args.Data);
-				}
-			};
-			process.Start();
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
-			process.WaitForExit();
-			stdout = stdoutAccumulator;
-			stderr = stderrAccumulator;
-			return process.ExitCode != 0;
+			return Process.Start("git", gitArgs, workingDirectory, Process.Options.RedirectErrors | Process.Options.RedirectOutput, output) == 0;
 		}
 
 		public static string GetCurrentBranch(string gitDir)
 		{
-			Exec(gitDir, "rev-parse --abbrev-ref HEAD", out var stdout, out var stderr);
-			return stdout.Trim();
+			var sb = new StringBuilder();
+			if (Exec(gitDir, "rev-parse --abbrev-ref HEAD", sb)) {
+				return sb.ToString().Trim();
+			} else {
+				return null;
+			}
 		}
 
 		public static void ForceUpdate(string gitDir)

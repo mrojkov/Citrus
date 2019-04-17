@@ -16,7 +16,8 @@ namespace Orange
 			RedirectErrors = 2
 		}
 
-		public static int Start(string app, string args, Options options = Options.RedirectOutput | Options.RedirectErrors, StringBuilder output = null)
+		public static int Start(string app, string args, string workingDirectory = null,
+			Options options = Options.RedirectOutput | Options.RedirectErrors, StringBuilder output = null)
 		{
 			if (output == null) {
 				output = new StringBuilder();
@@ -27,10 +28,11 @@ namespace Orange
 			p.StartInfo.UseShellExecute = false;
 #if WIN
 			p.StartInfo.CreateNoWindow = true;
-			p.StartInfo.WorkingDirectory = Path.GetDirectoryName(app);
+			p.StartInfo.WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(app);
 			int cp = System.Text.Encoding.Default.CodePage;
-			if (cp == 1251)
+			if (cp == 1251) {
 				cp = 866;
+			}
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(cp);
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding(cp);
 #else

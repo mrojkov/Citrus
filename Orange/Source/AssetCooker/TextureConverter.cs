@@ -174,7 +174,7 @@ namespace Orange
 			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);
 			string args = string.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionMethod, srcPath, dstPath);
-			if (Process.Start(nvcompress, args, Process.Options.RedirectErrors) != 0) {
+			if (Process.Start(nvcompress, args, workingDirectory: null, Process.Options.RedirectErrors) != 0) {
 				throw new Lime.Exception($"NVCompress error\nCommand line: {nvcompress} {args}\"");
 			}
 		}
@@ -186,7 +186,7 @@ namespace Orange
 			var pngOptimizerPath = GetToolPath("PngOptimizerCL");
 			dstPath = MakeAbsolutePath(dstPath);
 			var args = $"--KeepPixels \"{dstPath}\"";
-			if (Process.Start(pngOptimizerPath, args, Process.Options.RedirectErrors) != 0) {
+			if (Process.Start(pngOptimizerPath, args, workingDirectory: null, Process.Options.RedirectErrors) != 0) {
 				throw new Lime.Exception($"Error converting '{dstPath}'\nCommand line: {pngOptimizerPath} {args}");
 			}
 		}
