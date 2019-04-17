@@ -38,7 +38,7 @@ namespace Lime
 			item.Owner = owner;
 			CreateListIfNeeded();
 			list.Add(item);
-			owner.OnAnimatorsChanged();
+			owner.OnAnimatorCollectionChanged();
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -70,7 +70,7 @@ namespace Lime
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
-			owner.OnAnimatorsChanged();
+			owner.OnAnimatorCollectionChanged();
 		}
 
 		internal static AnimatorCollection SharedClone(IAnimationHost owner, AnimatorCollection source)
@@ -121,7 +121,7 @@ namespace Lime
 #if TANGERINE
 				Version++;
 #endif // TANGERINE
-				owner.OnAnimatorsChanged();
+				owner.OnAnimatorCollectionChanged();
 				return animator;
 			}
 		}
@@ -150,7 +150,7 @@ namespace Lime
 #if TANGERINE
 				Version++;
 #endif // TANGERINE
-				owner.OnAnimatorsChanged();
+				owner.OnAnimatorCollectionChanged();
 				return true;
 			}
 			return false;

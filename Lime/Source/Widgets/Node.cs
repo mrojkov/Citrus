@@ -409,7 +409,7 @@ namespace Lime
 		public AnimationCollection Animations { get; private set; }
 		internal int DescendantAnimatorsVersion { get; private set; }
 
-		void IAnimationHost.OnAnimatorsChanged()
+		void IAnimationHost.OnAnimatorCollectionChanged()
 		{
 			for (var n = Parent; n != null; n = n.Parent) {
 				n.DescendantAnimatorsVersion++;

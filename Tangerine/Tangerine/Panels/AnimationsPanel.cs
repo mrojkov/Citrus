@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lime;
@@ -7,7 +8,7 @@ namespace Tangerine.Panels
 {
 	public class AnimationsPanel : IDocumentView
 	{
-		const string legacyAnimationId = "<Legacy>";
+		private const string legacyAnimationId = "<Legacy>";
 		private readonly Widget panelWidget;
 		private readonly Frame rootWidget;
 		private readonly ThemedScrollView scrollView;
@@ -19,7 +20,7 @@ namespace Tangerine.Panels
 		{
 			public static readonly ICommand Up = new Command(Key.Up);
 			public static readonly ICommand Down = new Command(Key.Down);
-			public static readonly List<ICommand> All = new List<ICommand> { Up, Down };
+			public static readonly ICommand Delete = Command.Delete;
 		}
 
 		public AnimationsPanel(Widget panelWidget)
@@ -42,11 +43,11 @@ namespace Tangerine.Panels
 					scrollView.IsFocused() ? Theme.Colors.SelectedBackground : Theme.Colors.SelectedInactiveBackground);
 			}));
 			var mouseDownGesture = new ClickGesture(0);
-			mouseDownGesture.Began += SelectAnimationOnMouseDown;
+			mouseDownGesture.Began += SelectAnimationBasedOnMousePosition;
 			scrollView.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 			scrollView.Gestures.Add(mouseDownGesture);
 			scrollView.Gestures.Add(new DoubleClickGesture(0, RenameAnimation));
-			scrollView.LateTasks.Add(new KeyRepeatHandler(ScrollView_KeyRepeated));
+			scrollView.LateTasks.Add(ProcessCommandsTask);
 			scrollView.AddChangeWatcher(CalcAnimationsHashCode, _ => Refresh());
 		}
 
@@ -115,7 +116,7 @@ namespace Tangerine.Panels
 			}
 		}
 
-		private void SelectAnimationOnMouseDown()
+		private void SelectAnimationBasedOnMousePosition()
 		{
 			scrollView.SetFocus();
 			var index = (scrollView.Content.LocalMousePosition().Y / rowHeight).Floor();
@@ -124,7 +125,7 @@ namespace Tangerine.Panels
 
 		private void ShowContextMenu()
 		{
-			SelectAnimationOnMouseDown();
+			SelectAnimationBasedOnMousePosition();
 			var menu = new Menu();
 			menu.Add(new Command("Add", () => AddAnimation(Document.Current.RootNode, false)));
 			menu.Add(new Command("Add Compound", () => AddAnimation(Document.Current.RootNode, true)));
@@ -135,18 +136,7 @@ namespace Tangerine.Panels
 			}
 			menu.Add(Command.MenuSeparator);
 			menu.Add(new Command("Rename", RenameAnimation));
-			menu.Add(new Command("Delete", () => {
-				Document.Current.History.DoTransaction(() => {
-					var index = GetSelectedAnimationIndex();
-					if (index > 0) {
-						SelectAnimation(index - 1);
-					} else {
-						SelectAnimation(index + 1);
-					}
-					var animation = GetAnimations()[index];
-					Core.Operations.RemoveFromList.Perform(animation.Owner.Animations, animation.Owner.Animations.IndexOf(animation));
-				});
-			}) { Enabled = !Document.Current.Animation.IsLegacy });
+			menu.Add(Command.Delete);
 			menu.Popup();
 
 			void AddAnimation(Node node, bool compound)
@@ -179,6 +169,20 @@ namespace Tangerine.Panels
 				}
 				throw new System.Exception();
 			}
+		}
+
+		private void Delete()
+		{
+			Document.Current.History.DoTransaction(() => {
+				var index = GetSelectedAnimationIndex();
+				if (index > 0) {
+					SelectAnimation(index - 1);
+				} else {
+					SelectAnimation(index + 1);
+				}
+				var animation = GetAnimations()[index];
+				Core.Operations.RemoveFromList.Perform(animation.Owner.Animations, animation.Owner.Animations.IndexOf(animation));
+			});
 		}
 
 		private static string GetNodePath(Node node)
@@ -214,20 +218,27 @@ namespace Tangerine.Panels
 			return h.End();
 		}
 
-		private void ScrollView_KeyRepeated(WidgetInput input, Key key)
+		IEnumerator<object> ProcessCommandsTask()
 		{
-			var index = GetSelectedAnimationIndex();
-			if (Commands.Down.WasIssued()) {
-				scrollView.SetFocus();
-				index++;
-				SelectAnimation(index);
+			while (true) {
+				yield return null;
+				if (!scrollView.IsFocused()) {
+					continue;
+				}
+				if (Commands.Down.Consume()) {
+					SelectAnimation(GetSelectedAnimationIndex() + 1);
+				}
+				if (Commands.Up.Consume()) {
+					scrollView.SetFocus();
+					SelectAnimation(GetSelectedAnimationIndex() - 1);
+				}
+				if (!Commands.Delete.IsConsumed()) {
+					Command.Delete.Enabled = !Document.Current.Animation.IsLegacy;
+					if (Commands.Delete.Consume()) {
+						Delete();
+					}
+				}
 			}
-			if (Commands.Up.WasIssued()) {
-				scrollView.SetFocus();
-				index--;
-				SelectAnimation(index);
-			}
-			Command.ConsumeRange(Commands.All);
 		}
 
 		private void SelectAnimation(int index)
