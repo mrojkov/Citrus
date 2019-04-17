@@ -311,8 +311,8 @@ namespace Lime
 				return Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
-			if (@params.EasingFunction != EasingFunction.Linear) {
-				t = Easing.Interpolate(t, @params.EasingFunction, @params.EasingType);
+			if (@params.EasingFunction != Mathf.EasingFunction.Linear) {
+				t = Mathf.Easings.Interpolate(t, @params.EasingFunction, @params.EasingType);
 			}
 			if (@params.Function == KeyFunction.Linear) {
 				return InterpolateLinear(t);
@@ -325,7 +325,7 @@ namespace Lime
 
 		private static KeyframeParams defaultKeyframeParams = new KeyframeParams {
 			Function = KeyFunction.Steep,
-			EasingFunction = EasingFunction.Linear
+			EasingFunction = Mathf.EasingFunction.Linear
 		};
 
 		private void CacheInterpolationParameters(double time)

@@ -17,8 +17,8 @@ namespace Lime
 		int Frame { get; set; }
 		KeyframeParams Params { get; set; }
 		KeyFunction Function { get; set; }
-		EasingFunction EasingFunction { get; set; }
-		EasingType EasingType { get; set; }
+		Mathf.EasingFunction EasingFunction { get; set; }
+		Mathf.EasingType EasingType { get; set; }
 		object Value { get; set; }
 		IKeyframe Clone();
 	}
@@ -50,10 +50,10 @@ namespace Lime
 		public KeyFunction Function { get => (KeyFunction)(Packed & 255); set { Packed = (Packed & ~255) | (int)value; } }
 
 		[FieldOffset(1)]
-		public EasingFunction EasingFunction;
+		public Mathf.EasingFunction EasingFunction;
 
 		[FieldOffset(2)]
-		public EasingType EasingType;
+		public Mathf.EasingType EasingType;
 	}
 
 	[YuzuCompact]
@@ -81,8 +81,8 @@ namespace Lime
 		public T Value { get; set; }
 
 		public KeyFunction Function { get => p.Function; set => p.Function = value; }
-		public EasingFunction EasingFunction { get => p.EasingFunction; set => p.EasingFunction = value; }
-		public EasingType EasingType { get => p.EasingType; set => p.EasingType = value; }
+		public Mathf.EasingFunction EasingFunction { get => p.EasingFunction; set => p.EasingFunction = value; }
+		public Mathf.EasingType EasingType { get => p.EasingType; set => p.EasingType = value; }
 
 		object IKeyframe.Value
 		{

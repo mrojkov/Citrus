@@ -11,9 +11,9 @@ namespace Tangerine.UI.Inspector
 
 		public static readonly EasingIcons Instance = new EasingIcons();
 
-		private Dictionary<(EasingFunction, EasingType), Texture2D> textures = new Dictionary<(EasingFunction, EasingType), Texture2D>();
+		private Dictionary<(Mathf.EasingFunction, Mathf.EasingType), Texture2D> textures = new Dictionary<(Mathf.EasingFunction, Mathf.EasingType), Texture2D>();
 
-		public ITexture Get(EasingFunction function, EasingType type)
+		public ITexture Get(Mathf.EasingFunction function, Mathf.EasingType type)
 		{
 			Texture2D texture;
 			if (textures.TryGetValue((function, type), out texture)) {
@@ -26,12 +26,12 @@ namespace Tangerine.UI.Inspector
 			return texture;
 		}
 
-		private static Color4[] Render(int width, int height, EasingFunction function, EasingType type)
+		private static Color4[] Render(int width, int height, Mathf.EasingFunction function, Mathf.EasingType type)
 		{
 			var image = new float[width * height];
 			float py = 0, px = 0;
 			for (float t = 0; t <= 1; t += 0.001f) {
-				var v = Easing.Interpolate(t, function, type);
+				var v = Mathf.Easings.Interpolate(t, function, type);
 				var x = (t * 0.75f + 0.125f) * width;
 				var y = ((1 - v) * 0.5f + 0.25f) * height;
 				var ix = (int)x;

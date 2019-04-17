@@ -42,7 +42,7 @@ namespace Tangerine.UI.Inspector
 			Awoke += Awake;
 		}
 
-		public void SetEasing(EasingFunction function, EasingType type)
+		public void SetEasing(Mathf.EasingFunction function, Mathf.EasingType type)
 		{
 			image.Visible = true;
 			image.Texture = EasingIcons.Instance.Get(function, type);
@@ -72,8 +72,8 @@ namespace Tangerine.UI.Inspector
 				}
 				if (button.WasClicked() && kf.HasValue) {
 					var menu = new Menu();
-					foreach (var i in Enum.GetNames(typeof(EasingType))) {
-						var type = (EasingType)menu.Count;
+					foreach (var i in Enum.GetNames(typeof(Mathf.EasingType))) {
+						var type = (Mathf.EasingType)menu.Count;
 						var cmd = new Command { Text = i, Checked = kf.Value.EasingType == type };
 						cmd.Issued += () => {
 							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingType = type));
@@ -82,8 +82,8 @@ namespace Tangerine.UI.Inspector
 					}
 					menu.Add(Command.MenuSeparator);
 					int j = 0;
-					foreach (var i in Enum.GetNames(typeof(EasingFunction))) {
-						var func = (EasingFunction)j++;
+					foreach (var i in Enum.GetNames(typeof(Mathf.EasingFunction))) {
+						var func = (Mathf.EasingFunction)j++;
 						var cmd = new Command { Text = i, Checked = kf.Value.EasingFunction == func };
 						cmd.Issued += () => {
 							Document.Current.History.DoTransaction(() => ProcessKeyframe(k => k.EasingFunction = func));

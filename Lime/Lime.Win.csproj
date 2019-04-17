@@ -269,6 +269,7 @@
     <Compile Include="Source\Graphics\VertexInputLayout.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\Mathf.Easings.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
@@ -291,7 +292,6 @@
     <Compile Include="Source\Widgets\Animation\ChainedAnimator.cs" />
     <Compile Include="Source\Widgets\Animation\CubicBezier.cs" />
     <Compile Include="Source\Widgets\Animation\EasedAnimator.cs" />
-    <Compile Include="Source\Widgets\Animation\Easing.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationClip.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationTrack.cs" />
     <Compile Include="Source\Widgets\Animation\BezierEasing.cs" />

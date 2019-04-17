@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
-	public static class Mathf
+	public static partial class Mathf
 	{
 		public static System.Random RandomGenerator = new System.Random();
 
