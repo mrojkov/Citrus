@@ -18,7 +18,7 @@ namespace Tangerine.UI.Timeline.Components
 		readonly ToolbarButton lockButton;
 		readonly RollNodeView.ObjectIdInplaceEditor trackIdEditor;
 
-        public Widget Widget { get; }
+		public Widget Widget { get; }
 		private AnimationTrack Track => trackRow.Track;
 		public AwakeBehavior AwakeBehavior => Widget.Components.Get<AwakeBehavior>();
 		public float Indentation { set { spacer.MinMaxWidth = value; } }
