@@ -253,7 +253,7 @@ namespace Tangerine.Core
 							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
 							AnimationsStatesComponent.Remove(node);
 							if (movingBack) {
-								SetTime(node, 0, animation.Id);
+								SetTimeRecursive(node, 0);
 								StopAnimationRecursive(node);
 								animation.IsRunning = true;
 								FastForwardToFrame(animation, (frameIndex - OptimalRollbackForCacheAnimationsStates).Clamp(0, frameIndex));
