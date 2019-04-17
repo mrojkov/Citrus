@@ -4,7 +4,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public enum KeyFunction
+	public enum KeyFunction : byte
 	{
 		Linear,
 		Steep,
@@ -46,8 +46,8 @@ namespace Lime
 		[FieldOffset(0)]
 		public int Packed;
 
-		// Yuzu doesn't allow serialize byte enums, so hack it.
-		public KeyFunction Function { get => (KeyFunction)(Packed & 255); set { Packed = (Packed & ~255) | (int)value; } }
+		[FieldOffset(0)]
+		public KeyFunction Function;
 
 		[FieldOffset(1)]
 		public Mathf.EasingFunction EasingFunction;

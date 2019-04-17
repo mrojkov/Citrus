@@ -51,8 +51,8 @@ namespace Tangerine.UI.Inspector
 		public KeyframeButton()
 		{
 			foreach (var v in Enum.GetValues(typeof(KeyFunction))) {
-				fillTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(int)v] + "Fill"));
-				outlineTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(int)v] + "Outline"));
+				fillTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(byte)v] + "Fill"));
+				outlineTextures.Add(IconPool.GetTexture("Inspector." + iconNames[(byte)v] + "Outline"));
 			}
 			Nodes.Clear();
 			Size = MinMaxSize = new Vector2(22, 22);
