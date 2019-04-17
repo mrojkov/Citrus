@@ -7,6 +7,8 @@ namespace Lime
 {
 	public class AnimationTrack : IAnimationHost, IAnimable
 	{
+		public const float MaxWeight = 100;
+
 		public Animation Owner { get; internal set; }
 
 		public object UserData { get; set; }
@@ -17,9 +19,9 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup("Track")]
-		[TangerineValidRange(0.0f, 100.0f)]
+		[TangerineValidRange(0.0f, MaxWeight)]
 		[TangerineKeyframeColor(1)]
-		public float Weight { get; set; } = 100.0f;
+		public float Weight { get; set; } = MaxWeight;
 
 		internal void InvalidateCache()
 		{
@@ -66,7 +68,7 @@ namespace Lime
 				}
 			}
 			cachedTime = time;
-			cachedWeight = Weight.Clamp(0, 100);
+			cachedWeight = Weight.Clamp(0, MaxWeight);
 			return cachedWeight;
 		}
 
@@ -81,6 +83,7 @@ namespace Lime
 		public AnimationTrack Clone()
 		{
 			var clone = (AnimationTrack)MemberwiseClone();
+			clone.cachedTime = double.NaN;
 			clone.Owner = null;
 			clone.Clips = new AnimationClipList(clone, Clips.Count);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
