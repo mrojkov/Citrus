@@ -187,6 +187,7 @@ namespace Lime
 		public AnimationClip Clone()
 		{
 			var clone = (AnimationClip)MemberwiseClone();
+			clone.cachedTime = double.NaN;
 			clone.Owner = null;
 			return clone;
 		}
