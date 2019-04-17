@@ -57,7 +57,10 @@ namespace Orange.FbxImporter
 			switch (root.Attribute.Type) {
 				case FbxNodeAttribute.FbxNodeType.Mesh:
 					var meshAttribute = root.Attribute as FbxMeshAttribute;
-					var mesh = new Mesh3D { Id = root.Name };
+					var mesh = new Mesh3D {
+						Id = root.Name,
+						SkinningMode = meshAttribute.SkinningMode
+					};
 					foreach (var submesh in meshAttribute.Submeshes) {
 						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
 					}
