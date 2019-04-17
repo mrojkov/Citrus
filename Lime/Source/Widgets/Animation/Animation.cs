@@ -19,7 +19,7 @@ namespace Lime
 		internal Marker MarkerAhead;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
-		public EasingCalculator EasingCalculator { get; private set; }
+		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 		internal List<IAbstractAnimator> EffectiveAnimators;
 		internal List<IAbstractAnimator> EffectiveTriggerableAnimators;
@@ -40,7 +40,8 @@ namespace Lime
 		public string Id
 		{
 			get => id;
-			set {
+			set
+			{
 				if (id != value) {
 					IdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
 					id = value;
@@ -96,7 +97,7 @@ namespace Lime
 		{
 			Markers = new MarkerList(this);
 			Tracks = new AnimationTrackList(this);
-			EasingCalculator = new EasingCalculator(Markers, this);
+			BezierEasingCalculator = new AnimationBezierEasingCalculator(Markers, this);
 		}
 
 		public void Advance(float delta)
@@ -156,7 +157,7 @@ namespace Lime
 			MarkerAhead = null;
 			EffectiveAnimators = null;
 			hasEasings = null;
-			EasingCalculator.Invalidate();
+			BezierEasingCalculator.Invalidate();
 		}
 
 		public void ApplyAnimators()
@@ -180,7 +181,7 @@ namespace Lime
 			clone.EffectiveAnimators = null;
 			clone.EffectiveTriggerableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
-			clone.EasingCalculator = new EasingCalculator(clone.Markers, clone);
+			clone.BezierEasingCalculator = new AnimationBezierEasingCalculator(clone.Markers, clone);
 			return clone;
 		}
 
@@ -250,7 +251,7 @@ namespace Lime
 			if (!hasEasings.HasValue) {
 				hasEasings = false;
 				foreach (var marker in Markers) {
-					if (!marker.Easing.IsDefault()) {
+					if (!marker.BezierEasing.IsDefault()) {
 						hasEasings = true;
 					}
 				}
@@ -282,100 +283,100 @@ namespace Lime
 				return instance;
 			}
 		}
-	}
 
-	public class EasingCalculator
-	{
-		private Animation owner;
-		private MarkerList markers;
-		private double easingStartTime;
-		private double easingEndTime;
-		private double previousTime;
-		private double easedPreviousTime;
-		private double currentTime;
-		private double easedCurrentTime;
-		private CubicBezier easingCurve;
-
-		public EasingCalculator(MarkerList markers, Animation owner)
+		public class AnimationBezierEasingCalculator
 		{
-			this.owner = owner;
-			this.markers = markers;
-			Invalidate();
-		}
+			private readonly Animation owner;
+			private readonly MarkerList markers;
+			private double easingStartTime;
+			private double easingEndTime;
+			private double previousTime;
+			private double easedPreviousTime;
+			private double currentTime;
+			private double easedCurrentTime;
+			private CubicBezier easingCurve;
 
-		public void Invalidate()
-		{
-			easingCurve = null;
-			easingStartTime = easingEndTime = 0;
-			currentTime = previousTime = float.NaN;
-		}
-
-		private void CacheEasing(double time)
-		{
-			easingCurve = null;
-			easingStartTime = 0;
-			easingEndTime = 0;
-			if (markers.Count == 0) {
-				easingStartTime = double.NegativeInfinity;
-				easingEndTime = double.PositiveInfinity;
-				return;
+			public AnimationBezierEasingCalculator(MarkerList markers, Animation owner)
+			{
+				this.owner = owner;
+				this.markers = markers;
+				Invalidate();
 			}
-			var frame = AnimationUtils.SecondsToFrames(time);
-			int i = -1;
-			foreach (var marker in markers) {
-				if (marker.Frame > frame) {
-					break;
+
+			public void Invalidate()
+			{
+				easingCurve = null;
+				easingStartTime = easingEndTime = 0;
+				currentTime = previousTime = float.NaN;
+			}
+
+			private void CacheEasing(double time)
+			{
+				easingCurve = null;
+				easingStartTime = 0;
+				easingEndTime = 0;
+				if (markers.Count == 0) {
+					easingStartTime = double.NegativeInfinity;
+					easingEndTime = double.PositiveInfinity;
+					return;
 				}
-				i++;
+				var frame = AnimationUtils.SecondsToFrames(time);
+				int i = -1;
+				foreach (var marker in markers) {
+					if (marker.Frame > frame) {
+						break;
+					}
+					i++;
+				}
+				if (i == -1) {
+					easingStartTime = double.NegativeInfinity;
+					easingEndTime = markers[0].Time;
+					return;
+				}
+				if (i == markers.Count - 1) {
+					easingStartTime = markers[i].Time;
+					easingEndTime = double.PositiveInfinity;
+					return;
+				}
+				var currentMarker = markers[i];
+				var nextMarker = markers[i + 1];
+				easingStartTime = currentMarker.Time;
+				easingEndTime = nextMarker.Time;
+				if (!currentMarker.BezierEasing.IsDefault()) {
+					var e = currentMarker.BezierEasing;
+					easingCurve = new CubicBezier(e.P1X, e.P1Y, e.P2X, e.P2Y);
+				}
 			}
-			if (i == -1) {
-				easingStartTime = double.NegativeInfinity;
-				easingEndTime = markers[0].Time;
-				return;
-			}
-			if (i == markers.Count - 1) {
-				easingStartTime = markers[i].Time;
-				easingEndTime = double.PositiveInfinity;
-				return;
-			}
-			var currentMarker = markers[i];
-			var nextMarker = markers[i + 1];
-			easingStartTime = currentMarker.Time;
-			easingEndTime = nextMarker.Time;
-			if (!currentMarker.Easing.IsDefault()) {
-				var e = currentMarker.Easing;
-				easingCurve = new CubicBezier(e.P1X, e.P1Y, e.P2X, e.P2Y);
-			}
-		}
 
-		public double EaseTime(double time)
-		{
+			public double EaseTime(double time)
+			{
 #if TANGERINE
-			if (!Animation.EasingEnabledChecker?.Invoke(owner) ?? true) {
-				return time;
-			}
+				if (!EasingEnabledChecker?.Invoke(owner) ?? true) {
+					return time;
+				}
 #endif
-			if (time == previousTime) {
-				return easedPreviousTime;
-			}
-			if (time == currentTime) {
+				if (time == previousTime) {
+					return easedPreviousTime;
+				}
+				if (time == currentTime) {
+					return easedCurrentTime;
+				}
+				if (time < easingStartTime || time >= easingEndTime) {
+					CacheEasing(time);
+				}
+				previousTime = currentTime;
+				easedPreviousTime = easedCurrentTime;
+				currentTime = time;
+				if (easingCurve != null) {
+					var d = easingEndTime - easingStartTime;
+					var p = (time - easingStartTime) / d;
+					var p2 = easingCurve.SolveWithEpsilon(p, 1e-5);
+					easedCurrentTime = p2 * d + easingStartTime;
+				} else {
+					easedCurrentTime = time;
+				}
 				return easedCurrentTime;
 			}
-			if (time < easingStartTime || time >= easingEndTime) {
-				CacheEasing(time);
-			}
-			previousTime = currentTime;
-			easedPreviousTime = easedCurrentTime;
-			currentTime = time;
-			if (easingCurve != null) {
-				var d = easingEndTime - easingStartTime;
-				var p = (time - easingStartTime) / d;
-				var p2 = easingCurve.SolveWithEpsilon(p, 1e-5);
-				easedCurrentTime = p2 * d + easingStartTime;
-			} else {
-				easedCurrentTime = time;
-			}
-			return easedCurrentTime;
 		}
 	}
 }

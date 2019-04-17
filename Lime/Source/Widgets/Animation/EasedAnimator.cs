@@ -33,8 +33,8 @@ namespace Lime
 
 		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
 		{
-			minTime = animation.EasingCalculator.EaseTime(minTime);
-			maxTime = animation.EasingCalculator.EaseTime(maxTime);
+			minTime = animation.BezierEasingCalculator.EaseTime(minTime);
+			maxTime = animation.BezierEasingCalculator.EaseTime(maxTime);
 			animator.ExecuteTriggersInRange(minTime, maxTime, executeTriggerAtMaxTime);
 		}
 
@@ -45,7 +45,7 @@ namespace Lime
 
 		public T CalcValue(double time)
 		{
-			time = animation.EasingCalculator.EaseTime(time);
+			time = animation.BezierEasingCalculator.EaseTime(time);
 			return animator.CalcValue(time);
 		}
 	}

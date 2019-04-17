@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline
 			get {
 				if (Document.Current.PreviewAnimation) {
 					var time = Document.Current.Animation.Time;
-					time = Document.Current.Animation.EasingCalculator.EaseTime(time);
+					time = Document.Current.Animation.BezierEasingCalculator.EaseTime(time);
 					return (float)(time * AnimationUtils.FramesPerSecond);
 				} else {
 					return Document.Current.AnimationFrame;
