@@ -124,7 +124,7 @@ namespace Lime
 	{
 		protected override void Blend(ref Quaternion value1, Quaternion value2, float blendFactor)
 		{
-			value1 = Quaternion.Lerp(value1, value2, blendFactor);
+			value1 = Quaternion.Slerp(value1, value2, blendFactor);
 		}
 	}
 
