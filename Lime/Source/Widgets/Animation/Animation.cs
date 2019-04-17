@@ -290,10 +290,10 @@ namespace Lime
 		private MarkerList markers;
 		private double easingStartTime;
 		private double easingEndTime;
-		private double prevTime;
-		private double easedPrevTime;
-		private double currTime;
-		private double easedCurrTime;
+		private double previousTime;
+		private double easedPreviousTime;
+		private double currentTime;
+		private double easedCurrentTime;
 		private CubicBezier easingCurve;
 
 		public EasingCalculator(MarkerList markers, Animation owner)
@@ -307,7 +307,7 @@ namespace Lime
 		{
 			easingCurve = null;
 			easingStartTime = easingEndTime = 0;
-			currTime = prevTime = float.NaN;
+			currentTime = previousTime = float.NaN;
 		}
 
 		private void CacheEasing(double time)
@@ -330,7 +330,7 @@ namespace Lime
 			}
 			if (i == -1) {
 				easingStartTime = double.NegativeInfinity;
-				easingEndTime = markers[i + 1].Time;
+				easingEndTime = markers[0].Time;
 				return;
 			}
 			if (i == markers.Count - 1) {
@@ -338,12 +338,12 @@ namespace Lime
 				easingEndTime = double.PositiveInfinity;
 				return;
 			}
-			var currMarker = markers[i];
+			var currentMarker = markers[i];
 			var nextMarker = markers[i + 1];
-			easingStartTime = currMarker.Time;
+			easingStartTime = currentMarker.Time;
 			easingEndTime = nextMarker.Time;
-			if (!currMarker.Easing.IsDefault()) {
-				var e = currMarker.Easing;
+			if (!currentMarker.Easing.IsDefault()) {
+				var e = currentMarker.Easing;
 				easingCurve = new CubicBezier(e.P1X, e.P1Y, e.P2X, e.P2Y);
 			}
 		}
@@ -355,27 +355,27 @@ namespace Lime
 				return time;
 			}
 #endif
-			if (time == prevTime) {
-				return easedPrevTime;
+			if (time == previousTime) {
+				return easedPreviousTime;
 			}
-			if (time == currTime) {
-				return easedCurrTime;
+			if (time == currentTime) {
+				return easedCurrentTime;
 			}
 			if (time < easingStartTime || time >= easingEndTime) {
 				CacheEasing(time);
 			}
-			prevTime = currTime;
-			easedPrevTime = easedCurrTime;
-			currTime = time;
+			previousTime = currentTime;
+			easedPreviousTime = easedCurrentTime;
+			currentTime = time;
 			if (easingCurve != null) {
 				var d = easingEndTime - easingStartTime;
 				var p = (time - easingStartTime) / d;
 				var p2 = easingCurve.SolveWithEpsilon(p, 1e-5);
-				easedCurrTime = p2 * d + easingStartTime;
+				easedCurrentTime = p2 * d + easingStartTime;
 			} else {
-				easedCurrTime = time;
+				easedCurrentTime = time;
 			}
-			return easedCurrTime;
+			return easedCurrentTime;
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace Lime
 		bool IsTriggerable { get; }
 		Type ValueType { get; }
 		void Apply(double time);
-		void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange);
+		void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime);
 	}
 
 	internal interface IAbstractAnimator<T> : IAbstractAnimator
@@ -65,7 +65,8 @@ namespace Lime
 		public IAnimationHost Owner { get; set; }
 		public IAnimable Animable
 		{
-			get {
+			get
+			{
 				if (animable == null && !IsZombie) {
 					Bind();
 				}
@@ -81,7 +82,8 @@ namespace Lime
 		private bool isTriggerable;
 		public bool IsTriggerable
 		{
-			get {
+			get
+			{
 				if (animable == null && !IsZombie) {
 					Bind();
 				}
@@ -115,7 +117,8 @@ namespace Lime
 		public string TargetPropertyPath
 		{
 			get => targetPropertyPath;
-			set {
+			set
+			{
 				targetPropertyPath = value;
 				TargetPropertyPathComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
 			}
@@ -233,13 +236,13 @@ namespace Lime
 			}
 		}
 
-		public void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
 		{
 			if (!Enabled || IsZombie || !IsTriggerable || Owner == null) {
 				return;
 			}
 			int minFrame = AnimationUtils.SecondsToFramesCeiling(minTime);
-			int maxFrame = AnimationUtils.SecondsToFramesCeiling(maxTime) + (inclusiveRange ? 1 : 0);
+			int maxFrame = AnimationUtils.SecondsToFramesCeiling(maxTime) + (executeTriggerAtMaxTime ? 1 : 0);
 			if (minFrame >= maxFrame) {
 				return;
 			}

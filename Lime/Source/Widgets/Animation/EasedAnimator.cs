@@ -31,11 +31,11 @@ namespace Lime
 
 		public Type ValueType => typeof(T);
 
-		public void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
 		{
 			minTime = animation.EasingCalculator.EaseTime(minTime);
 			maxTime = animation.EasingCalculator.EaseTime(maxTime);
-			animator.ExecuteTriggersInRange(minTime, maxTime, inclusiveRange);
+			animator.ExecuteTriggersInRange(minTime, maxTime, executeTriggerAtMaxTime);
 		}
 
 		public void Apply(double time)

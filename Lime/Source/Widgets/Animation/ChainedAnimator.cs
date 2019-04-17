@@ -18,8 +18,8 @@ namespace Lime
 		}
 
 		private Item listHead;
-		private Item currItem;
-		private double currClipBegin;
+		private Item currentItem;
+		private double currentClipBegin;
 		private double nextClipBegin;
 
 		public IAnimable Animable => listHead.Animator.Animable;
@@ -59,28 +59,28 @@ namespace Lime
 
 		public T CalcValue(double time)
 		{
-			if (time < currClipBegin || time >= nextClipBegin) {
-				currItem = null;
+			if (time < currentClipBegin || time >= nextClipBegin) {
+				currentItem = null;
 				for (var i = listHead; i != null; i = i.Next) {
 					if (i.Clip.BeginTime - AnimationUtils.Threshold > time) {
 						break;
 					}
-					currItem = i;
+					currentItem = i;
 				}
-				if (currItem != null) {
-					currClipBegin = currItem.Clip.BeginTime - AnimationUtils.Threshold;
-					nextClipBegin = currItem.Next?.Clip.BeginTime - AnimationUtils.Threshold ?? double.PositiveInfinity;
+				if (currentItem != null) {
+					currentClipBegin = currentItem.Clip.BeginTime - AnimationUtils.Threshold;
+					nextClipBegin = currentItem.Next?.Clip.BeginTime - AnimationUtils.Threshold ?? double.PositiveInfinity;
 				} else {
-					currItem = listHead;
-					currClipBegin = 0;
+					currentItem = listHead;
+					currentClipBegin = 0;
 					nextClipBegin = listHead.Clip.BeginTime - AnimationUtils.Threshold;
 				}
 			}
-			time = currItem.Clip.ToLocalTime(time);
-			return currItem.Animator.CalcValue(time);
+			time = currentItem.Clip.ToLocalTime(time);
+			return currentItem.Animator.CalcValue(time);
 		}
 
-		public void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
 		{
 			for (var i = listHead; i != null; i = i.Next) {
 				var nextClipBegin = i.Next?.Clip.BeginTime ?? double.PositiveInfinity;
@@ -94,10 +94,10 @@ namespace Lime
 				var a = clip.ToLocalTime(minTime);
 				var b = clip.ToLocalTime(maxTime);
 				if (a <= b) {
-					i.Animator.ExecuteTriggersInRange(a, b, inclusiveRange);
+					i.Animator.ExecuteTriggersInRange(a, b, executeTriggerAtMaxTime);
 				} else if (clip.PostExtrapolation == AnimationClipExtrapolation.Repeat && !clip.Reversed) {
 					i.Animator.ExecuteTriggersInRange(a, clip.DurationInSeconds, true);
-					i.Animator.ExecuteTriggersInRange(0, b, inclusiveRange);
+					i.Animator.ExecuteTriggersInRange(0, b, executeTriggerAtMaxTime);
 				} else if (clip.PostExtrapolation == AnimationClipExtrapolation.PingPong) {
 					// No idea how to process triggers for the pingpong extrapolation...
 				}

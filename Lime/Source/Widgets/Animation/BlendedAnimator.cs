@@ -72,10 +72,10 @@ namespace Lime
 			}
 		}
 
-		public void ExecuteTriggersInRange(double minTime, double maxTime, bool inclusiveRange)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
 		{
 			for (var item = listHead; item != null; item = item.Next) {
-				item.Animator.ExecuteTriggersInRange(minTime, maxTime, inclusiveRange);
+				item.Animator.ExecuteTriggersInRange(minTime, maxTime, executeTriggerAtMaxTime);
 			}
 		}
 	}

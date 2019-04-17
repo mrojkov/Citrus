@@ -14,9 +14,9 @@ namespace Orange
 			DefaultAnimationEngine.Instance.AdvanceAnimation(animation, delta * 0.5f);
 		}
 
-		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double prevTime, double currTime, bool inclusiveRange)
+		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggerAtCurrentTime)
 		{
-			DefaultAnimationEngine.Instance.ApplyAnimatorsAndExecuteTriggers(animation, prevTime, currTime, inclusiveRange);
+			DefaultAnimationEngine.Instance.ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggerAtCurrentTime);
 		}
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
