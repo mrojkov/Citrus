@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Lime
 {
-	internal unsafe struct Hasher
+	public unsafe struct Hasher
 	{
 		private const long FnvPrime = unchecked((long)1099511628211);
 		private const long FnvOffset = unchecked((long)14695981039346656037);
