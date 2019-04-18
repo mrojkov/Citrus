@@ -32,7 +32,7 @@ namespace Orange
 		private string serverAddress;
 		private string serverUsername;
 		private string serverPath;
-		private string localPath = ".orange/Cache";
+		private string localPath = Path.Combine(".orange", "Cache");
 		private EnableState enableState;
 
 		private bool RemoteEnabled => enableState == EnableState.Both || enableState == EnableState.Remote;
@@ -276,6 +276,9 @@ namespace Orange
 		{
 			if (enableState == EnableState.Both && ftpClient.IsConnected) {
 				try {
+					if (ExistsRemote(hashString)) {
+						return true;
+					}
 					bool successful = ftpClient.UploadFile(GetLocalPath(hashString), GetRemotePath(hashString),
 						FtpExists.Overwrite, true);
 					if (!successful) {
@@ -317,6 +320,9 @@ namespace Orange
 		{
 			if (RemoteEnabled && ftpClient.IsConnected) {
 				try {
+					if (ExistsLocal(hashString)) {
+						return true;
+					}
 					bool successful = ftpClient.DownloadFile(GetLocalPath(hashString), GetRemotePath(hashString));
 					if (!successful) {
 						ftpClient.Disconnect();
