@@ -120,7 +120,9 @@ namespace Tangerine.Panels
 		{
 			scrollView.SetFocus();
 			var index = (scrollView.Content.LocalMousePosition().Y / rowHeight).Floor();
-			SelectAnimation(index);
+			if (index < GetAnimations().Count) {
+				SelectAnimation(index);
+			}
 		}
 
 		private void ShowContextMenu()
