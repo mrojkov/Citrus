@@ -63,9 +63,6 @@ namespace Tangerine
 						BindingFlags.SetProperty |
 						BindingFlags.Instance;
 					foreach (var category in typeof(ColorTheme).GetProperties(flags)) {
-						if (category.Name == "Basic") {
-							continue;
-						}
 						var categoryValue = category.GetValue(AppUserPreferences.Instance.ColorTheme);
 						if (categoryValue == null) {
 							if (theme == null) {
