@@ -150,6 +150,7 @@ namespace Tangerine.Panels
 						Core.Operations.InsertIntoList<AnimationTrackList, AnimationTrack>.Perform(animation.Tracks, 0, track);
 					}
 				});
+				// Schedule animation rename on the next update, since the widgets are not built yet
 				panelWidget.Tasks.Add(DelayedRenameAnimation());
 			}
 
