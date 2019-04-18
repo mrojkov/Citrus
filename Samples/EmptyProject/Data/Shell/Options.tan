@@ -3,6 +3,7 @@
 	"Anchors":15,
 	"Animations":[
 		{
+			"IsLegacy":true,
 			"Markers":[
 				{
 					"Id":"Show"
@@ -31,46 +32,21 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[16777215]
-						},
-						{
-							"Frame":6,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":22,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":30,
-							"Value":[16777215]
-						}
+						[0,0,[16777215]],
+						[6,0,[4294967295]],
+						[22,0,[4294967295]],
+						[30,0,[16777215]]
 					],
 					"TargetProperty":"Color"
 				},
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[0.04586,1]
-						},
-						{
-							"Frame":6,
-							"Value":[1,1.13575]
-						},
-						{
-							"Frame":10,
-							"Value":[1,1]
-						},
-						{
-							"Frame":22,
-							"Value":[1,1]
-						},
-						{
-							"Frame":30,
-							"Value":[1,0.04586]
-						}
+						[0,0,[0.04586,1]],
+						[6,0,[1,1.13575]],
+						[10,0,[1,1]],
+						[22,0,[1,1]],
+						[30,0,[1,0.04586]]
 					],
 					"TargetProperty":"Scale"
 				}
@@ -81,9 +57,8 @@
 				{
 					"class":"Lime.Button, Lime",
 					"Color":[4294967295],
-					"ContentsPath":"/Shell/Buttons/BtnOk",
+					"ContentsPath":"Buttons/BtnOk",
 					"Id":"@BtnOk",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[555,531],
 					"Scale":[0.5,0.5],
@@ -98,7 +73,6 @@
 					"FontHeight":66,
 					"HAlignment":1,
 					"Id":"Title",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[388,167],
 					"Size":[462,60],
@@ -111,28 +85,26 @@
 					"class":"Lime.Image, Lime",
 					"Color":[3114114461],
 					"Id":"Line01",
-					"Nodes":[					],
 					"Pivot":[0.5,1],
 					"Position":[390,206],
 					"Scale":[0.59184,0.59184],
 					"Size":[794.5608,8],
 					"Texture":{
 						"class":"Lime.SerializableTexture, Lime",
-						"SerializationPath":"/Shell/Windows/Line02"
+						"SerializationPath":"Windows/Line02"
 					}
 				},
 				{
 					"class":"Lime.Image, Lime",
 					"Color":[4283427256],
 					"Id":"BarSm",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[389,169],
 					"Scale":[0.96947,1],
 					"Size":[485.21146,60],
 					"Texture":{
 						"class":"Lime.SerializableTexture, Lime",
-						"SerializationPath":"/Shell/Windows/BarSm"
+						"SerializationPath":"Windows/BarSm"
 					}
 				},
 				{
@@ -144,6 +116,7 @@
 							"class":"Lime.Frame, Lime",
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Id":"Check"
@@ -174,72 +147,37 @@
 										{
 											"class":"Lime.Color4Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[16777215]
-												},
-												{
-													"Frame":6,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":10,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":40,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":46,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":50,
-													"Value":[16777215]
-												}
+												[0,0,[16777215]],
+												[6,0,[4294967295]],
+												[10,0,[4294967295]],
+												[40,0,[4294967295]],
+												[46,0,[4294967295]],
+												[50,0,[16777215]]
 											],
 											"TargetProperty":"Color"
 										},
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[0.3753,0.3753]
-												},
-												{
-													"Frame":6,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":10,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":40,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":46,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":50,
-													"Value":[0.3753,0.3753]
-												}
+												[0,0,[0.3753,0.3753]],
+												[6,0,[1.01449,1.01449]],
+												[10,0,[0.78261,0.78261]],
+												[40,0,[0.78261,0.78261]],
+												[46,0,[1.01449,1.01449]],
+												[50,0,[0.3753,0.3753]]
 											],
 											"TargetProperty":"Scale"
 										}
 									],
 									"Color":[16777215],
 									"Id":"BulletCheck",
-									"Nodes":[									],
 									"Pivot":[0.40171,0.66091],
 									"Position":[25,23],
 									"Scale":[0.3753,0.3753],
 									"Size":[104,90],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletCheck"
+										"SerializationPath":"Buttons/BulletCheck"
 									}
 								}
 							],
@@ -256,7 +194,6 @@
 							},
 							"FontHeight":41,
 							"Id":"Text",
-							"Nodes":[							],
 							"Pivot":[0,0.5],
 							"Position":[66,29],
 							"Size":[197.33325,55],
@@ -269,6 +206,7 @@
 							"Anchors":15,
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Action":1,
@@ -323,22 +261,10 @@
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Frame":38,
-													"Value":[1.12371,1.12371]
-												},
-												{
-													"Frame":40,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":42,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":46,
-													"Value":[1.12371,1.12371]
-												}
+												[38,0,[1.12371,1.12371]],
+												[40,0,[0.98909,0.82834]],
+												[42,0,[0.98909,0.82834]],
+												[46,0,[1.12371,1.12371]]
 											],
 											"TargetProperty":"Scale"
 										}
@@ -347,7 +273,6 @@
 									"Color":[4280586817],
 									"Id":"NineGrid2",
 									"LeftOffset":0.4,
-									"Nodes":[									],
 									"Pivot":[0.5,0.5],
 									"Position":[29.21646,29.21646],
 									"RightOffset":0.4,
@@ -355,7 +280,7 @@
 									"Size":[52,52],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletMicroFrame"
+										"SerializationPath":"Buttons/BulletMicroFrame"
 									},
 									"TopOffset":0.4
 								}
@@ -378,6 +303,7 @@
 							"class":"Lime.Frame, Lime",
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Id":"Check"
@@ -408,72 +334,37 @@
 										{
 											"class":"Lime.Color4Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[16777215]
-												},
-												{
-													"Frame":6,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":10,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":40,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":46,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":50,
-													"Value":[16777215]
-												}
+												[0,0,[16777215]],
+												[6,0,[4294967295]],
+												[10,0,[4294967295]],
+												[40,0,[4294967295]],
+												[46,0,[4294967295]],
+												[50,0,[16777215]]
 											],
 											"TargetProperty":"Color"
 										},
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[0.3753,0.3753]
-												},
-												{
-													"Frame":6,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":10,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":40,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":46,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":50,
-													"Value":[0.3753,0.3753]
-												}
+												[0,0,[0.3753,0.3753]],
+												[6,0,[1.01449,1.01449]],
+												[10,0,[0.78261,0.78261]],
+												[40,0,[0.78261,0.78261]],
+												[46,0,[1.01449,1.01449]],
+												[50,0,[0.3753,0.3753]]
 											],
 											"TargetProperty":"Scale"
 										}
 									],
 									"Color":[16777215],
 									"Id":"BulletCheck",
-									"Nodes":[									],
 									"Pivot":[0.40171,0.66091],
 									"Position":[25,23],
 									"Scale":[0.3753,0.3753],
 									"Size":[104,90],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletCheck"
+										"SerializationPath":"Buttons/BulletCheck"
 									}
 								}
 							],
@@ -490,7 +381,6 @@
 							},
 							"FontHeight":41,
 							"Id":"Text",
-							"Nodes":[							],
 							"Pivot":[0,0.5],
 							"Position":[66,29],
 							"Size":[197.33325,55],
@@ -503,6 +393,7 @@
 							"Anchors":15,
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Action":1,
@@ -557,22 +448,10 @@
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Frame":38,
-													"Value":[1.12371,1.12371]
-												},
-												{
-													"Frame":40,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":42,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":46,
-													"Value":[1.12371,1.12371]
-												}
+												[38,0,[1.12371,1.12371]],
+												[40,0,[0.98909,0.82834]],
+												[42,0,[0.98909,0.82834]],
+												[46,0,[1.12371,1.12371]]
 											],
 											"TargetProperty":"Scale"
 										}
@@ -581,7 +460,6 @@
 									"Color":[4280586817],
 									"Id":"NineGrid2",
 									"LeftOffset":0.4,
-									"Nodes":[									],
 									"Pivot":[0.5,0.5],
 									"Position":[29.21646,29.21646],
 									"RightOffset":0.4,
@@ -589,7 +467,7 @@
 									"Size":[52,52],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletMicroFrame"
+										"SerializationPath":"Buttons/BulletMicroFrame"
 									},
 									"TopOffset":0.4
 								}
@@ -612,6 +490,7 @@
 							"class":"Lime.Frame, Lime",
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Id":"Check"
@@ -642,72 +521,37 @@
 										{
 											"class":"Lime.Color4Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[16777215]
-												},
-												{
-													"Frame":6,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":10,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":40,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":46,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":50,
-													"Value":[16777215]
-												}
+												[0,0,[16777215]],
+												[6,0,[4294967295]],
+												[10,0,[4294967295]],
+												[40,0,[4294967295]],
+												[46,0,[4294967295]],
+												[50,0,[16777215]]
 											],
 											"TargetProperty":"Color"
 										},
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[0.3753,0.3753]
-												},
-												{
-													"Frame":6,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":10,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":40,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":46,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":50,
-													"Value":[0.3753,0.3753]
-												}
+												[0,0,[0.3753,0.3753]],
+												[6,0,[1.01449,1.01449]],
+												[10,0,[0.78261,0.78261]],
+												[40,0,[0.78261,0.78261]],
+												[46,0,[1.01449,1.01449]],
+												[50,0,[0.3753,0.3753]]
 											],
 											"TargetProperty":"Scale"
 										}
 									],
 									"Color":[16777215],
 									"Id":"BulletCheck",
-									"Nodes":[									],
 									"Pivot":[0.40171,0.66091],
 									"Position":[25,23],
 									"Scale":[0.3753,0.3753],
 									"Size":[104,90],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletCheck"
+										"SerializationPath":"Buttons/BulletCheck"
 									}
 								}
 							],
@@ -724,7 +568,6 @@
 							},
 							"FontHeight":41,
 							"Id":"Text",
-							"Nodes":[							],
 							"Pivot":[0,0.5],
 							"Position":[66,29],
 							"Size":[197.33325,55],
@@ -737,6 +580,7 @@
 							"Anchors":15,
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Action":1,
@@ -791,22 +635,10 @@
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Frame":38,
-													"Value":[1.12371,1.12371]
-												},
-												{
-													"Frame":40,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":42,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":46,
-													"Value":[1.12371,1.12371]
-												}
+												[38,0,[1.12371,1.12371]],
+												[40,0,[0.98909,0.82834]],
+												[42,0,[0.98909,0.82834]],
+												[46,0,[1.12371,1.12371]]
 											],
 											"TargetProperty":"Scale"
 										}
@@ -815,7 +647,6 @@
 									"Color":[4280586817],
 									"Id":"NineGrid2",
 									"LeftOffset":0.4,
-									"Nodes":[									],
 									"Pivot":[0.5,0.5],
 									"Position":[29.21646,29.21646],
 									"RightOffset":0.4,
@@ -823,7 +654,7 @@
 									"Size":[52,52],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletMicroFrame"
+										"SerializationPath":"Buttons/BulletMicroFrame"
 									},
 									"TopOffset":0.4
 								}
@@ -846,6 +677,7 @@
 							"class":"Lime.Frame, Lime",
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Id":"Check"
@@ -876,72 +708,37 @@
 										{
 											"class":"Lime.Color4Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[16777215]
-												},
-												{
-													"Frame":6,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":10,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":40,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":46,
-													"Value":[4294967295]
-												},
-												{
-													"Frame":50,
-													"Value":[16777215]
-												}
+												[0,0,[16777215]],
+												[6,0,[4294967295]],
+												[10,0,[4294967295]],
+												[40,0,[4294967295]],
+												[46,0,[4294967295]],
+												[50,0,[16777215]]
 											],
 											"TargetProperty":"Color"
 										},
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Value":[0.3753,0.3753]
-												},
-												{
-													"Frame":6,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":10,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":40,
-													"Value":[0.78261,0.78261]
-												},
-												{
-													"Frame":46,
-													"Value":[1.01449,1.01449]
-												},
-												{
-													"Frame":50,
-													"Value":[0.3753,0.3753]
-												}
+												[0,0,[0.3753,0.3753]],
+												[6,0,[1.01449,1.01449]],
+												[10,0,[0.78261,0.78261]],
+												[40,0,[0.78261,0.78261]],
+												[46,0,[1.01449,1.01449]],
+												[50,0,[0.3753,0.3753]]
 											],
 											"TargetProperty":"Scale"
 										}
 									],
 									"Color":[16777215],
 									"Id":"BulletCheck",
-									"Nodes":[									],
 									"Pivot":[0.40171,0.66091],
 									"Position":[25,23],
 									"Scale":[0.3753,0.3753],
 									"Size":[104,90],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletCheck"
+										"SerializationPath":"Buttons/BulletCheck"
 									}
 								}
 							],
@@ -958,7 +755,6 @@
 							},
 							"FontHeight":41,
 							"Id":"Text",
-							"Nodes":[							],
 							"Pivot":[0,0.5],
 							"Position":[66,29],
 							"Size":[197.33325,55],
@@ -971,6 +767,7 @@
 							"Anchors":15,
 							"Animations":[
 								{
+									"IsLegacy":true,
 									"Markers":[
 										{
 											"Action":1,
@@ -1025,22 +822,10 @@
 										{
 											"class":"Lime.Vector2Animator, Lime",
 											"ReadonlyKeys":[
-												{
-													"Frame":38,
-													"Value":[1.12371,1.12371]
-												},
-												{
-													"Frame":40,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":42,
-													"Value":[0.98909,0.82834]
-												},
-												{
-													"Frame":46,
-													"Value":[1.12371,1.12371]
-												}
+												[38,0,[1.12371,1.12371]],
+												[40,0,[0.98909,0.82834]],
+												[42,0,[0.98909,0.82834]],
+												[46,0,[1.12371,1.12371]]
 											],
 											"TargetProperty":"Scale"
 										}
@@ -1049,7 +834,6 @@
 									"Color":[4280586817],
 									"Id":"NineGrid2",
 									"LeftOffset":0.4,
-									"Nodes":[									],
 									"Pivot":[0.5,0.5],
 									"Position":[29.21646,29.21646],
 									"RightOffset":0.4,
@@ -1057,7 +841,7 @@
 									"Size":[52,52],
 									"Texture":{
 										"class":"Lime.SerializableTexture, Lime",
-										"SerializationPath":"/Shell/Buttons/BulletMicroFrame"
+										"SerializationPath":"Buttons/BulletMicroFrame"
 									},
 									"TopOffset":0.4
 								}
@@ -1075,13 +859,12 @@
 					"class":"Lime.Image, Lime",
 					"Color":[4294967295],
 					"Id":"WinSmall",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[389,371],
 					"Size":[512,512],
 					"Texture":{
 						"class":"Lime.SerializableTexture, Lime",
-						"SerializationPath":"/Shell/Windows/WinSmall"
+						"SerializationPath":"Windows/WinSmall"
 					}
 				}
 			],
@@ -1097,21 +880,10 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[13409074]
-						},
-						{
-							"Frame":6,
-							"Value":[3368852274]
-						},
-						{
-							"Frame":22,
-							"Value":[3368852274]
-						},
-						{
-							"Frame":30,
-							"Value":[13409074]
-						}
+						[0,0,[13409074]],
+						[6,0,[3368852274]],
+						[22,0,[3368852274]],
+						[30,0,[13409074]]
 					],
 					"TargetProperty":"Color"
 				}
@@ -1119,7 +891,6 @@
 			"Blending":2,
 			"Color":[13409074],
 			"Id":"Shade",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Shader":3,

@@ -2,6 +2,7 @@
 	"class":"Lime.Frame, Lime",
 	"Animations":[
 		{
+			"IsLegacy":true,
 			"Markers":[
 				{
 					"Id":"Normal"
@@ -43,7 +44,6 @@
 		}
 	],
 	"Color":[4294967295],
-	"Components":[],
 	"Id":"@",
 	"Nodes":[
 		{
@@ -52,15 +52,12 @@
 				{
 					"class":"Lime.Animator`1[[Lime.AudioAction, Lime]], Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24
-						}
+						[24,0,0]
 					],
 					"TargetProperty":"Action"
 				}
 			],
 			"Id":"ButtonClick",
-			"Nodes":[],
 			"Sample":{
 				"SerializationPath":"/Audio/Sounds/ButtonClick"
 			},
@@ -72,71 +69,31 @@
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24,
-							"Value":[1,1]
-						},
-						{
-							"Frame":26,
-							"Value":[0.713,0.713]
-						},
-						{
-							"Frame":28,
-							"Value":[0.713,0.713]
-						},
-						{
-							"Frame":34,
-							"Value":[1.09425,1.09425]
-						},
-						{
-							"Frame":40,
-							"Value":[1,1]
-						},
-						{
-							"Frame":48,
-							"Value":[1,1]
-						},
-						{
-							"Frame":50,
-							"Value":[0.91515,0.91515]
-						}
+						[24,0,[1,1]],
+						[26,0,[0.713,0.713]],
+						[28,0,[0.713,0.713]],
+						[34,0,[1.09425,1.09425]],
+						[40,0,[1,1]],
+						[48,0,[1,1]],
+						[50,0,[0.91515,0.91515]]
 					],
 					"TargetProperty":"Scale"
 				},
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":26,
-							"Value":[2527109280]
-						},
-						{
-							"Frame":28,
-							"Value":[2527109280]
-						},
-						{
-							"Frame":40,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":48,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":50,
-							"Value":[2583691264]
-						}
+						[24,0,[4294967295]],
+						[26,0,[2527109280]],
+						[28,0,[2527109280]],
+						[40,0,[4294967295]],
+						[48,0,[4294967295]],
+						[50,0,[2583691264]]
 					],
 					"TargetProperty":"Color"
 				}
 			],
 			"Color":[4294967295],
 			"Id":"Ico",
-			"Nodes":[],
 			"Pivot":[0.51875,0.51875],
 			"Position":[122,134],
 			"Size":[160,160],
@@ -151,75 +108,49 @@
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24,
-							"Value":[1,1]
-						},
-						{
-							"Frame":26,
-							"Value":[0.99118,0.7255]
-						},
-						{
-							"Frame":28,
-							"Value":[0.99118,0.7255]
-						},
-						{
-							"Frame":34,
-							"Value":[0.92406,1.09949]
-						},
-						{
-							"Frame":40,
-							"Value":[1,1]
-						}
+						[24,0,[1,1]],
+						[26,0,[0.99118,0.7255]],
+						[28,0,[0.99118,0.7255]],
+						[34,0,[0.92406,1.09949]],
+						[40,0,[1,1]]
 					],
 					"TargetProperty":"Scale"
 				},
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":26,
-							"Value":[3617759906]
-						},
-						{
-							"Frame":28,
-							"Value":[3617759906]
-						},
-						{
-							"Frame":34,
-							"Value":[4294967295]
-						}
+						[24,0,[4294967295]],
+						[26,0,[3617759906]],
+						[28,0,[3617759906]],
+						[34,0,[4294967295]]
 					],
 					"TargetProperty":"Color"
 				},
 				{
 					"class":"Lime.Animator`1[[Lime.ITexture, Lime]], Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":48,
-							"Value":{
+						[
+							48,
+							0,
+							{
 								"class":"Lime.SerializableTexture, Lime",
 								"SerializationPath":"/Shell/Buttons/RoundGreen"
 							}
-						},
-						{
-							"Frame":50,
-							"Value":{
+						],
+						[
+							50,
+							0,
+							{
 								"class":"Lime.SerializableTexture, Lime",
 								"SerializationPath":"/Shell/Buttons/RoundDisable"
 							}
-						}
+						]
 					],
 					"TargetProperty":"Texture"
 				}
 			],
 			"Color":[4294967295],
 			"Id":"BigRound",
-			"Nodes":[],
 			"Pivot":[0.46947,0.4771],
 			"Position":[126,122],
 			"Size":[262,262],
@@ -234,29 +165,16 @@
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Frame":24,
-							"Value":[1,1]
-						},
-						{
-							"Frame":26,
-							"Value":[1.03883,1.03883]
-						},
-						{
-							"Frame":28,
-							"Value":[1.03883,1.03883]
-						},
-						{
-							"Frame":40,
-							"Value":[1,1]
-						}
+						[24,0,[1,1]],
+						[26,0,[1.03883,1.03883]],
+						[28,0,[1.03883,1.03883]],
+						[40,0,[1,1]]
 					],
 					"TargetProperty":"Scale"
 				}
 			],
 			"Color":[4294967295],
 			"Id":"RoundFrame",
-			"Nodes":[],
 			"Pivot":[0.5,0.5],
 			"Position":[131,137],
 			"Size":[304,304],

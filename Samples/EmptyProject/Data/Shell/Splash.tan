@@ -3,6 +3,7 @@
 	"Anchors":15,
 	"Animations":[
 		{
+			"IsLegacy":true,
 			"Markers":[
 				{
 					"Id":"Start"
@@ -25,34 +26,22 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[4278190080]
-						},
-						{
-							"Frame":8,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":36,
-							"Value":[4294967295]
-						},
-						{
-							"Frame":44,
-							"Value":[4278190080]
-						}
+						[0,0,[4278190080]],
+						[8,0,[4294967295]],
+						[36,0,[4294967295]],
+						[44,0,[4278190080]]
 					],
 					"TargetProperty":"Color"
 				}
 			],
 			"Color":[4278190080],
 			"Id":"GameForest",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Size":[1366,1366],
 			"Texture":{
 				"class":"Lime.SerializableTexture, Lime",
-				"SerializationPath":"/Shell/Splash/GameForest"
+				"SerializationPath":"Splash/GameForest"
 			}
 		}
 	],
