@@ -72,7 +72,7 @@ namespace Lime
 
 		public Marker this[string id] => Find(id);
 
-		internal static MarkerList DeepClone(MarkerList source, Animation owner)
+		internal static MarkerList Clone(MarkerList source, Animation owner)
 		{
 			var result = new MarkerList(owner, source.Count);
 			foreach (var marker in source) {

@@ -176,7 +176,7 @@ namespace Lime
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
 			clone.Next = null;
-			clone.Markers = MarkerList.DeepClone(Markers, clone);
+			clone.Markers = MarkerList.Clone(Markers, clone);
 			clone.Tracks = Tracks.Clone(clone);
 			clone.EffectiveAnimators = null;
 			clone.EffectiveTriggerableAnimators = null;
