@@ -3,6 +3,7 @@
 	"Anchors":15,
 	"Animations":[
 		{
+			"IsLegacy":true,
 			"Markers":[
 				{
 					"Id":"Hide"
@@ -31,42 +32,20 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[4294967295]
-						},
-						{
-							"Frame":10,
-							"Value":[16777215]
-						},
-						{
-							"Frame":20,
-							"Value":[16777215]
-						},
-						{
-							"Frame":30,
-							"Value":[4294967295]
-						}
+						[0,0,[4294967295]],
+						[10,0,[16777215]],
+						[20,0,[16777215]],
+						[30,0,[4294967295]]
 					],
 					"TargetProperty":"Color"
 				},
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[1,1]
-						},
-						{
-							"Frame":10,
-							"Value":[1.15,1.15]
-						},
-						{
-							"Frame":20,
-							"Value":[1.15,1.15]
-						},
-						{
-							"Frame":30,
-							"Value":[1,1]
-						}
+						[0,0,[1,1]],
+						[10,0,[1.15,1.15]],
+						[20,0,[1.15,1.15]],
+						[30,0,[1,1]]
 					],
 					"TargetProperty":"Scale"
 				}
@@ -77,9 +56,8 @@
 				{
 					"class":"Lime.Button, Lime",
 					"Color":[4294967295],
-					"ContentsPath":"/Shell/Buttons/BtnOptions",
+					"ContentsPath":"Buttons/BtnOptions",
 					"Id":"@BtnOptions",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[689,471],
 					"Scale":[0.8,0.8],
@@ -94,7 +72,6 @@
 					"FontHeight":60,
 					"HAlignment":1,
 					"Id":"Text1",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[515.0001,194.33331],
 					"Size":[640,63],
@@ -104,9 +81,8 @@
 				{
 					"class":"Lime.Button, Lime",
 					"Color":[4294967295],
-					"ContentsPath":"/Shell/Buttons/BtnPlay",
+					"ContentsPath":"Buttons/BtnPlay",
 					"Id":"@BtnPlay",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[373,383],
 					"Size":[256,256]
@@ -115,13 +91,12 @@
 					"class":"Lime.Image, Lime",
 					"Color":[4294967295],
 					"Id":"MiddGreen",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[512,384],
 					"Size":[714,512],
 					"Texture":{
 						"class":"Lime.SerializableTexture, Lime",
-						"SerializationPath":"/Shell/Windows/MiddGreen"
+						"SerializationPath":"Windows/MiddGreen"
 					}
 				}
 			],
@@ -136,34 +111,22 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[4294967295]
-						},
-						{
-							"Frame":10,
-							"Value":[16777215]
-						},
-						{
-							"Frame":20,
-							"Value":[16777215]
-						},
-						{
-							"Frame":30,
-							"Value":[4294967295]
-						}
+						[0,0,[4294967295]],
+						[10,0,[16777215]],
+						[20,0,[16777215]],
+						[30,0,[4294967295]]
 					],
 					"TargetProperty":"Color"
 				}
 			],
 			"Color":[4294967295],
 			"Id":"Shade",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Size":[1366,1366],
 			"Texture":{
 				"class":"Lime.SerializableTexture, Lime",
-				"SerializationPath":"/Shell/Windows/PatternedBG"
+				"SerializationPath":"Windows/PatternedBG"
 			}
 		}
 	],

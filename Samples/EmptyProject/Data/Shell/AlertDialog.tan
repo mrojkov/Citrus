@@ -3,6 +3,7 @@
 	"Anchors":15,
 	"Animations":[
 		{
+			"IsLegacy":true,
 			"Markers":[
 				{
 					"Id":"Hide"
@@ -31,42 +32,20 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[4294967295]
-						},
-						{
-							"Frame":10,
-							"Value":[16777215]
-						},
-						{
-							"Frame":20,
-							"Value":[16777215]
-						},
-						{
-							"Frame":30,
-							"Value":[4294967295]
-						}
+						[0,0,[4294967295]],
+						[10,0,[16777215]],
+						[20,0,[16777215]],
+						[30,0,[4294967295]]
 					],
 					"TargetProperty":"Color"
 				},
 				{
 					"class":"Lime.Vector2Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[1,1]
-						},
-						{
-							"Frame":10,
-							"Value":[1.15,1.15]
-						},
-						{
-							"Frame":20,
-							"Value":[1.15,1.15]
-						},
-						{
-							"Frame":30,
-							"Value":[1,1]
-						}
+						[0,0,[1,1]],
+						[10,0,[1.15,1.15]],
+						[20,0,[1.15,1.15]],
+						[30,0,[1,1]]
 					],
 					"TargetProperty":"Scale"
 				}
@@ -86,7 +65,6 @@
 								"Name":"Default"
 							},
 							"Id":"Default",
-							"Nodes":[							],
 							"Size":54,
 							"SpaceAfter":-12,
 							"TextColor":[4278205774]
@@ -101,9 +79,8 @@
 				{
 					"class":"Lime.Button, Lime",
 					"Color":[4294967295],
-					"ContentsPath":"/Shell/Buttons/BtnOk",
+					"ContentsPath":"Buttons/BtnOk",
 					"Id":"@BtnOk",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[456,325],
 					"Scale":[0.6,0.6],
@@ -113,14 +90,13 @@
 					"class":"Lime.Image, Lime",
 					"Color":[4294967295],
 					"Id":"WinSmall",
-					"Nodes":[					],
 					"Pivot":[0.5,0.5],
 					"Position":[278,192],
 					"Scale":[1,1.16902],
 					"Size":[580.5,343],
 					"Texture":{
 						"class":"Lime.SerializableTexture, Lime",
-						"SerializationPath":"/Shell/Windows/WinSmall"
+						"SerializationPath":"Windows/WinSmall"
 					}
 				}
 			],
@@ -135,21 +111,10 @@
 				{
 					"class":"Lime.Color4Animator, Lime",
 					"ReadonlyKeys":[
-						{
-							"Value":[3368852274]
-						},
-						{
-							"Frame":10,
-							"Value":[13409074]
-						},
-						{
-							"Frame":20,
-							"Value":[13409074]
-						},
-						{
-							"Frame":30,
-							"Value":[3368852274]
-						}
+						[0,0,[3368852274]],
+						[10,0,[13409074]],
+						[20,0,[13409074]],
+						[30,0,[3368852274]]
 					],
 					"TargetProperty":"Color"
 				}
@@ -157,7 +122,6 @@
 			"Blending":2,
 			"Color":[3368852274],
 			"Id":"Shade",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Shader":3,

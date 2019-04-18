@@ -7,7 +7,6 @@
 			"class":"Lime.Frame, Lime",
 			"Color":[4294967295],
 			"Id":"Scene1",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Size":[1024,768]
@@ -22,7 +21,6 @@
 			"FontHeight":45,
 			"HAlignment":1,
 			"Id":"Text1",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,65.50003],
 			"Size":[378,50],
@@ -33,9 +31,8 @@
 			"class":"Lime.Button, Lime",
 			"Anchors":6,
 			"Color":[4294967295],
-			"ContentsPath":"/Shell/Buttons/BtnXRed",
+			"ContentsPath":"Buttons/BtnXRed",
 			"Id":"@BtnExit",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[946,80],
 			"Scale":[0.5,0.5],
@@ -46,13 +43,12 @@
 			"Anchors":48,
 			"Color":[4294967295],
 			"Id":"bg",
-			"Nodes":[			],
 			"Pivot":[0.5,0.5],
 			"Position":[512,384],
 			"Size":[1366,1366],
 			"Texture":{
 				"class":"Lime.SerializableTexture, Lime",
-				"SerializationPath":"/Shell/Windows/PatternedBG"
+				"SerializationPath":"Windows/PatternedBG"
 			}
 		}
 	],
