@@ -13,6 +13,7 @@ namespace Kumquat
 		public string FieldName;
 		public string ScenePath;
 		public string BaseClassName;
+		public bool IsInExternalScene;
 		public readonly List<ParsedFramesTree> InnerClasses = new List<ParsedFramesTree>();
 		public readonly List<ParsedNode> ParsedNodes = new List<ParsedNode>();
 
@@ -24,6 +25,7 @@ namespace Kumquat
 			FieldName = parsedFramesTree.FieldName;
 			ScenePath = parsedFramesTree.ScenePath;
 			BaseClassName = parsedFramesTree.BaseClassName;
+			IsInExternalScene = parsedFramesTree.IsInExternalScene;
 		}
 
 		public ParsedFramesTree() { }
