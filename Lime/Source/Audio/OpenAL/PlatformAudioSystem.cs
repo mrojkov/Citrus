@@ -70,7 +70,18 @@ namespace Lime
 #elif ANDROID
 			// LoadLibrary() ivokes JNI_OnLoad()
 			Java.Lang.JavaSystem.LoadLibrary(Lib);
-			context = new AudioContext();
+
+			// Some devices can throw AudioContextException : The audio context could not be created with the specified parameters
+			// while AudioContext initializing. Try initialize context multiple times to avoid it.
+			for (int i = 0; i < 3; i++) {
+				try {
+					context = new AudioContext();
+					Logger.Write($"AudioContext initialized successfully");
+					break;
+				} catch (AudioContextException e) {
+					Logger.Write($"Initialize AudioContext error: {e.Message}");
+				}
+			}
 #else
 			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
 			if (isDeviceAvailable && !CommandLineArgs.NoAudio) {
