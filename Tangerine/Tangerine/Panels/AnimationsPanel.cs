@@ -83,7 +83,7 @@ namespace Tangerine.Panels
 					error = "Invalid animation name";
 				} else if (TangerineDefaultCharsetAttribute.IsValid(newId, out var message) != ValidationResult.Ok) {
 					error = message;
-				} else if (GetAnimations().Any(a => a.Id == newId)) {
+				} else if (animation.Owner.Animations.Any(a => a.Id == newId)) {
 					error = $"An animation '{newId}' already exists";
 				}
 				if (error != null) {
@@ -93,23 +93,32 @@ namespace Tangerine.Panels
 				Document.Current.History.DoTransaction(() => {
 					var oldId = animation.Id;
 					Core.Operations.SetProperty.Perform(animation, nameof(Animation.Id), newId);
-					foreach (var node in animation.Owner.Descendants) {
-						if (node.ContentsPath != null) {
-							continue;
-						}
-						foreach (var a in node.Animations) {
-							foreach (var track in a.Tracks) {
-								foreach (var animator in track.Animators) {
-									if (animator.AnimationId == oldId) {
-										Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.AnimationId), newId);
-									}
+					foreach (var a in animation.Owner.Animations) {
+						foreach (var track in a.Tracks) {
+							foreach (var animator in track.Animators) {
+								if (animator.AnimationId == oldId) {
+									Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.AnimationId), newId);
 								}
 							}
 						}
-						foreach (var animator in node.Animators) {
-							if (animator.AnimationId == oldId) {
-								Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.AnimationId), newId);
+					}
+					ChangeAnimatorsAnimationId(animation.Owner);
+
+					void ChangeAnimatorsAnimationId(Node node)
+					{
+						foreach (var child in node.Nodes) {
+							foreach (var animator in child.Animators) {
+								if (animator.AnimationId == oldId) {
+									Core.Operations.SetProperty.Perform(animator, nameof(IAnimator.AnimationId), newId);
+								}
 							}
+							if (child.ContentsPath != null) {
+								continue;
+							}
+							if (child.Animations.Any(i => i.Id == oldId)) {
+								continue;
+							}
+							ChangeAnimatorsAnimationId(child);
 						}
 					}
 				});
