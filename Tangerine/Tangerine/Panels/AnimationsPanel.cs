@@ -8,7 +8,7 @@ namespace Tangerine.Panels
 {
 	public class AnimationsPanel : IDocumentView
 	{
-		private const string legacyAnimationId = "<Legacy>";
+		private const string legacyAnimationId = "[Legacy]";
 		private readonly Widget panelWidget;
 		private readonly Frame rootWidget;
 		private readonly ThemedScrollView scrollView;
@@ -287,7 +287,10 @@ namespace Tangerine.Panels
 				ColumnDefaults = new List<DefaultLayoutCell> { new DefaultLayoutCell { StretchY = 0 } }
 			};
 			foreach (var a in animations) {
-				var label = a.IsLegacy ? legacyAnimationId : (a.IsCompound ? a.Id + " (Compound)" : a.Id);
+				var label = a.IsLegacy ? legacyAnimationId : a.Id;
+				if (a.IsCompound) {
+					label += " [Compound]";
+				}
 				var path = GetNodePath(a.Owner);
 				if (!a.IsLegacy && !string.IsNullOrEmpty(path)) {
 					label += " (" + path + ')';
