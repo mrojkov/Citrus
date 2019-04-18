@@ -100,7 +100,11 @@ namespace Lime.Graphics.Platform.Vulkan
 			boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
 			CreateCommandPool();
 			CreatePipelineCache();
-			MemoryAllocator = new MemoryAllocator(this, preferPersistentMapping: true);
+			var preferPersistentMapping = true;
+#if iOS || MAC
+			preferPersistentMapping = false;
+#endif
+			MemoryAllocator = new MemoryAllocator(this, preferPersistentMapping);
 			scheduler = new Scheduler(this);
 			uploadBufferSuballocator = new UploadBufferAllocator(this, 4 * 1024 * 1024);
 			descriptorAllocator = new DescriptorAllocator(this, new DescriptorPoolLimits {
