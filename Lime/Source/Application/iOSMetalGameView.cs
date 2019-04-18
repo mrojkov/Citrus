@@ -42,7 +42,7 @@ namespace Lime
 
 		public static bool IsMetalSupported()
 		{
-			return MTLDevice.SystemDefault != null;
+			return UIDevice.CurrentDevice.CheckSystemVersion(10, 0) && MTLDevice.SystemDefault != null;
 		}
 
 		public MetalGameView(CGRect frame) : base(frame, MTLDevice.SystemDefault)
