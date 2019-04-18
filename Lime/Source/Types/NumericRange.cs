@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -58,6 +58,16 @@ namespace Lime
 		public override string ToString()
 		{
 			return string.Format("{0}, {1}", Median, Dispersion);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				var hashCode = -1547769350;
+				hashCode = hashCode * -1521134295 + Median.GetHashCode();
+				hashCode = hashCode * -1521134295 + Dispersion.GetHashCode();
+				return hashCode;
+			}
 		}
 	}
 }

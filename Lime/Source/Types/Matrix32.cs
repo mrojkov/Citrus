@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Yuzu;
 
@@ -297,6 +298,17 @@ namespace Lime
 		public override string ToString()
 		{
 			return string.Format("U: {0}; V: {1}; T: {2}", U, V, T);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				var hashCode = 1568519108;
+				hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(U);
+				hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(V);
+				hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(T);
+				return hashCode;
+			}
 		}
 	}
 }

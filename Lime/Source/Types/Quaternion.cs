@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -569,7 +569,13 @@ namespace Lime
 		/// <returns>Hash code of this <see cref="Quaternion"/>.</returns>
 		public override int GetHashCode()
 		{
-			return X.GetHashCode() + Y.GetHashCode() + Z.GetHashCode() + W.GetHashCode();
+			unchecked {
+				var hashCode = X.GetHashCode();
+				hashCode = (hashCode * 397) ^ Y.GetHashCode();
+				hashCode = (hashCode * 397) ^ Z.GetHashCode();
+				hashCode = (hashCode * 397) ^ W.GetHashCode();
+				return hashCode;
+			}
 		}
 
 		/// <summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -59,7 +59,9 @@ namespace Lime
 
 		public override int GetHashCode()
 		{
-			return Width.GetHashCode() ^ Height.GetHashCode();
+			unchecked {
+				return (Width * 397) ^ Height;
+			}
 		}
 
 		/// <summary>

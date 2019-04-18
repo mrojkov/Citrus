@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -34,7 +34,9 @@ namespace Lime
 
 		public override int GetHashCode()
 		{
-			return Position.GetHashCode() ^ Direction.GetHashCode();
+			unchecked {
+				return (Direction.GetHashCode() * 397) ^ Position.GetHashCode();
+			}
 		}
 
 		/// <summary>

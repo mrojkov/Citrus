@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Yuzu;
 
 namespace Lime
@@ -80,7 +80,9 @@ namespace Lime
 
 		public override int GetHashCode()
 		{
-			return X.GetHashCode() ^ Y.GetHashCode();
+			unchecked {
+				return (X * 397) ^ Y;
+			}
 		}
 
 		public static bool operator ==(IntVector2 lhs, IntVector2 rhs)
