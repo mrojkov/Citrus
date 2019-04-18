@@ -481,7 +481,7 @@ void ReflectUniformBlock(
 }
 
 void ReflectSamplers(
-	const spirv_cross::Compiler& reflector, const std::vector<spirv_cross::Resource>& resources,
+	const spirv_cross::Compiler& reflector, const spirv_cross::SmallVector<spirv_cross::Resource>& resources,
 	ShaderStage stage, ProgramReflection& reflection)
 {
 	for (auto& sampler : resources) {
@@ -497,7 +497,7 @@ void ReflectSamplers(
 	}
 }
 
-void ReflectAttribs(const spirv_cross::Compiler& reflector, const std::vector<spirv_cross::Resource>& resources, ProgramReflection& reflection)
+void ReflectAttribs(const spirv_cross::Compiler& reflector, const spirv_cross::SmallVector<spirv_cross::Resource>& resources, ProgramReflection& reflection)
 {
 	for (auto& attrib : resources) {
 		auto& type = reflector.get_type(attrib.base_type_id);
@@ -563,7 +563,7 @@ void PatchDecorations(
 	std::vector<unsigned int>& spirv,
 	spv::Decoration decoration,
 	const spirv_cross::Compiler& reflector,
-	const std::vector<spirv_cross::Resource>& resources)
+    const spirv_cross::SmallVector<spirv_cross::Resource>& resources)
 {
 	for (auto& resource : resources) {
 		uint32_t wordOffset;
