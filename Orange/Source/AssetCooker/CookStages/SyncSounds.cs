@@ -5,15 +5,15 @@ using Lime;
 
 namespace Orange
 {
-	class SyncSounds : CookStage
+	class SyncSounds : ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return oggExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return soundExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return oggExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return soundExtension; } }
 
 		private readonly string oggExtension = ".ogg";
 		private readonly string soundExtension = ".sound";
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(oggExtension, soundExtension, AssetBundle.Current, Converter);
 		}

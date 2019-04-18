@@ -4,14 +4,14 @@ using Lime;
 
 namespace Orange
 {
-	class SyncScenes : CookStage
+	class SyncScenes : ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return sceneExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return sceneExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return sceneExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return sceneExtension; } }
 
 		private readonly string sceneExtension = ".tan";
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(sceneExtension, sceneExtension, AssetBundle.Current, Converter);
 		}

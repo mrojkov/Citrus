@@ -4,15 +4,15 @@ using Lime;
 
 namespace Orange
 {
-	class SyncTextures: CookStage
+	class SyncTextures: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return platformTextureExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return platformTextureExtension; } }
 
 		private readonly string originalTextureExtension = ".png";
 		private readonly string platformTextureExtension = AssetCooker.GetPlatformTextureExtension();
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(originalTextureExtension, platformTextureExtension, AssetBundle.Current, Converter);
 		}

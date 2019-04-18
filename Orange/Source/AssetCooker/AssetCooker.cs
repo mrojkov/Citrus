@@ -17,9 +17,9 @@ namespace Orange
 	public static class AssetCooker
 	{
 		private static readonly CookingProfile[] defaultCookingProfiles = { CookingProfile.Total, CookingProfile.Partial };
-		private static readonly Dictionary<CookStage, CookingProfile[]> cookStages = new Dictionary<CookStage, CookingProfile[]>();
+		private static readonly Dictionary<ICookStage, CookingProfile[]> cookStages = new Dictionary<ICookStage, CookingProfile[]>();
 		private static CookingProfile cookingProfile = CookingProfile.Total;
-		public static IEnumerable<CookStage> CookStages => cookStages.Keys;
+		public static IEnumerable<ICookStage> CookStages => cookStages.Keys;
 
 		private delegate bool Converter(string srcPath, string dstPath);
 
@@ -49,12 +49,12 @@ namespace Orange
 			}
 		}
 
-		public static void AddStage(CookStage stage, params CookingProfile[] cookingProfiles)
+		public static void AddStage(ICookStage stage, params CookingProfile[] cookingProfiles)
 		{
 			cookStages.Add(stage, cookingProfiles.Length == 0 ? defaultCookingProfiles : cookingProfiles);
 		}
 
-		public static void RemoveStage(CookStage stage)
+		public static void RemoveStage(ICookStage stage)
 		{
 			cookStages.Remove(stage);
 		}

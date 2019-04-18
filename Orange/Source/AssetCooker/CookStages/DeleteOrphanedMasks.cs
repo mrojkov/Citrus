@@ -6,14 +6,14 @@ using System.IO;
 
 namespace Orange
 {
-	class DeleteOrphanedMasks: CookStage
+	class DeleteOrphanedMasks: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return maskExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public IEnumerable<string> BundleExtensions { get { yield return maskExtension; } }
 
 		private readonly string maskExtension = ".mask";
 
-		public override void Action()
+		public void Action()
 		{
 			foreach (var maskPath in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
 				if (maskPath.EndsWith(maskExtension, StringComparison.OrdinalIgnoreCase)) {

@@ -104,7 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\AssetCooker\CookStage.cs" />
+    <Compile Include="Source\AssetCooker\ICookStage.cs" />
     <Compile Include="Source\AssetCooker\CookStages\DeleteOrphanedMasks.cs" />
     <Compile Include="Source\AssetCooker\CookStages\DeleteOrphanedTextureParams.cs" />
     <Compile Include="Source\AssetCooker\CookStages\RemoveDeprecatedModels.cs" />

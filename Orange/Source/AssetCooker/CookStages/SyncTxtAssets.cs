@@ -4,15 +4,15 @@ using Lime;
 
 namespace Orange
 {
-	class SyncTxtAssets: CookStage
+	class SyncTxtAssets: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return txtExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return txtExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return txtExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return txtExtension; } }
 
 		private readonly string txtExtension = ".txt";
 		private readonly string t3dExtension = ".t3d";
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(txtExtension, txtExtension, AssetBundle.Current, Converter);
 		}

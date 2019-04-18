@@ -4,14 +4,14 @@ using Lime;
 
 namespace Orange
 {
-	class SyncFonts: CookStage
+	class SyncFonts: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return fontExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return fontExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return fontExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return fontExtension; } }
 
 		private readonly string fontExtension = ".tft";
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(fontExtension, fontExtension, AssetBundle.Current, Converter);
 		}

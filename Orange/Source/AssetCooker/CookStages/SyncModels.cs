@@ -6,15 +6,15 @@ using Orange.FbxImporter;
 
 namespace Orange
 {
-	class SyncModels : CookStage
+	class SyncModels : ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return fbxExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return t3dExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return fbxExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return t3dExtension; } }
 
 		private readonly string fbxExtension = ".fbx";
 		private readonly string t3dExtension = ".t3d";
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 		}

@@ -4,10 +4,10 @@ using Lime;
 
 namespace Orange
 {
-	class SyncRawAssets: CookStage
+	class SyncRawAssets: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return extension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return extension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return extension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return extension; } }
 
 		private readonly string extension;
 		private readonly AssetAttributes attributes;
@@ -18,7 +18,7 @@ namespace Orange
 			this.attributes = attributes;
 		}
 
-		public override void Action()
+		public void Action()
 		{
 			SyncUpdated.Sync(extension, extension, AssetBundle.Current, Converter);
 		}

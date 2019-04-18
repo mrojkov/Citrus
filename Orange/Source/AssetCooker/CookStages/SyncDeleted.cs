@@ -6,10 +6,10 @@ using Lime;
 
 namespace Orange
 {
-	class SyncDeleted: CookStage
+	class SyncDeleted: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
-		public override IEnumerable<string> BundleExtensions
+		public IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public IEnumerable<string> BundleExtensions
 		{
 			get
 			{
@@ -23,7 +23,7 @@ namespace Orange
 		private readonly string[] toDeleteExtensions = { ".atlasPart", ".mask", ".texture", ".ant" };
 		private readonly string modelTanExtension = ".t3d";
 
-		public override void Action()
+		public void Action()
 		{
 			var assetFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {

@@ -5,14 +5,14 @@ using System.IO;
 
 namespace Orange
 {
-	class DeleteOrphanedTextureParams: CookStage
+	class DeleteOrphanedTextureParams: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return textureParamsExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public IEnumerable<string> BundleExtensions { get { yield return textureParamsExtension; } }
 
 		private readonly string textureParamsExtension = ".texture";
 
-		public override void Action()
+		public void Action()
 		{
 			foreach (var path in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(textureParamsExtension, StringComparison.OrdinalIgnoreCase)) {

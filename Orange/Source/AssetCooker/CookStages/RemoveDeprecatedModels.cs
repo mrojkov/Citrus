@@ -5,14 +5,14 @@ using Lime;
 
 namespace Orange
 {
-	class RemoveDeprecatedModels: CookStage
+	class RemoveDeprecatedModels: ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield break; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return modelExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public IEnumerable<string> BundleExtensions { get { yield return modelExtension; } }
 
 		private readonly string modelExtension = ".model";
 
-		public override void Action()
+		public void Action()
 		{
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(modelExtension)) {
 				var path = fileInfo.Path;

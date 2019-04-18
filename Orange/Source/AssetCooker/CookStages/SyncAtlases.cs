@@ -6,15 +6,15 @@ using Lime;
 
 namespace Orange
 {
-	class SyncAtlases : CookStage
+	class SyncAtlases : ICookStage
 	{
-		public override IEnumerable<string> ImportedExtensions { get { yield return textureExtension; } }
-		public override IEnumerable<string> BundleExtensions { get { yield return atlasPartExtension; } }
+		public IEnumerable<string> ImportedExtensions { get { yield return textureExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return atlasPartExtension; } }
 
 		private readonly string textureExtension = ".png";
 		private readonly string atlasPartExtension = ".atlasPart";
 
-		public override void Action()
+		public void Action()
 		{
 			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(textureExtension)) {
