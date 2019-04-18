@@ -288,7 +288,14 @@ namespace Lime
 							}
 						}
 					}
-					if (animation.Id != null) {
+					var stopRecursion = animation.Id == null;
+					foreach (var a in child.Animations) {
+						if (a.IdComparisonCode == animation.IdComparisonCode) {
+							stopRecursion = true;
+							break;
+						}
+					}
+					if (!stopRecursion) {
 						AddEffectiveAnimatorsRecursively(child);
 					}
 				}

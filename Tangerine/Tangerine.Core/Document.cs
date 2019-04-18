@@ -204,14 +204,7 @@ namespace Tangerine.Core
 			var ancestor = Container;
 			while (true) {
 				foreach (var a in ancestor.Animations) {
-					var found = false;
-					foreach (var other in animations) {
-						found = other.Id == a.Id;
-						if (found) {
-							break;
-						}
-					}
-					if (!found && !a.IsLegacy) {
+					if (!a.IsLegacy) {
 						animations.Add(a);
 					}
 				}
