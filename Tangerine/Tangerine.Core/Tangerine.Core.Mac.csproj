@@ -61,10 +61,12 @@
     <Folder Include="Operations\" />
     <Compile Include="Operations\RemoveKeyframeRange.cs" />
     <Compile Include="SyncPresenters.cs" />
-    <Compile Include="Operations\RemoveAnimationProcessor.cs" />
     <Compile Include="Operations\RenameAnimationProcessor.cs" />
     <Compile Include="PropertyValidator.cs" />
     <Compile Include="SceneCache.cs" />
+    <Compile Include="AnimationTrackEditorState.cs" />
+    <Compile Include="GridSelection.cs" />
+    <Compile Include="GridSpanList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />

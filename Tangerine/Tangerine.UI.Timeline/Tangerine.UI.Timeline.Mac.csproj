@@ -93,7 +93,6 @@
     <Compile Include="Components\GridPropertyView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
-    <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Components\RollBoneView.cs" />
     <Compile Include="Operations\MoveNodes.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
@@ -127,12 +126,23 @@
     <Compile Include="Processors\BoneLinkIndicationProcessor.cs" />
     <Compile Include="LinkIndicatorButton.cs" />
     <Compile Include="Operations\ToggleKeyframes.cs" />
-    <Compile Include="Utils\GridSelection.cs" />
     <Compile Include="Operations\CenterTimelineOnCurrentColumn.cs" />
     <Compile Include="Operations\DragKeyframes.cs" />
     <Compile Include="Operations\NumericMoveDialog.cs" />
     <Compile Include="Operations\NumericScaleDialog.cs" />
     <Compile Include="Processors\SlowMotionProcessor.cs" />
+    <Compile Include="Components\GridAnimationTrackView.cs" />
+    <Compile Include="Components\GridKeyframesRenderer.cs" />
+    <Compile Include="Components\RollAnimationTrackView.cs" />
+    <Compile Include="Operations\CompoundAnimations\AddAnimationClip.cs" />
+    <Compile Include="Operations\CompoundAnimations\AnimationClipToolbox.cs" />
+    <Compile Include="Operations\CompoundAnimations\DeleteSelectedAnimationClips.cs" />
+    <Compile Include="Operations\CompoundAnimations\DragAnimationClips.cs" />
+    <Compile Include="Operations\CompoundAnimations\SplitAnimationClip.cs" />
+    <Compile Include="Processors\GridPane\GridContextMenuProcessor.cs" />
+    <Compile Include="Processors\GridPane\CompoundAnimations\CreateAnimationTrackWeightRampProcessor.cs" />
+    <Compile Include="Processors\GridPane\CompoundAnimations\GridContextMenuProcessor.cs" />
+    <Compile Include="Processors\GridPane\CompoundAnimations\SelectAndDragAnimationClipsProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">

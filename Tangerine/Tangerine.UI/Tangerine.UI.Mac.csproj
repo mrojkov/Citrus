@@ -74,6 +74,7 @@
     <Compile Include="UIProcessors.cs" />
     <Compile Include="PropertyEditors\FolderPropertyEditor.cs" />
     <Compile Include="Dialogs\TriggerSelectionDialog.cs" />
+    <Compile Include="PropertyEditors\BezierEasingPropertyEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documentation\Documentation.cs" />

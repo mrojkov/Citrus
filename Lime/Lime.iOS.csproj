@@ -452,11 +452,16 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\FormatConverter.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\MemoryAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Murmur3.cs" />
-    <Compile Include="Source\Widgets\Animation\Easing.cs" />
     <Compile Include="Source\Widgets\Text\SignedDistanceField\Materials\SDFMaterialProviderPool.cs" />
     <Compile Include="Source\Widgets\IPropertyLocker.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationClip.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationTrack.cs" />
+    <Compile Include="Source\Mathf.Easings.cs" />
+    <Compile Include="Source\Widgets\Animation\BezierEasing.cs" />
+    <Compile Include="Source\Widgets\Animation\BlendedAnimator.cs" />
+    <Compile Include="Source\Widgets\Animation\ChainedAnimator.cs" />
+    <Compile Include="Source\Widgets\Animation\CubicBezier.cs" />
+    <Compile Include="Source\Widgets\Animation\EasedAnimator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

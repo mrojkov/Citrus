@@ -1599,6 +1599,16 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static object Make_Lime__BezierEasing(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.BezierEasing();
+			result.P1X = d.Reader.ReadSingle();
+			result.P1Y = d.Reader.ReadSingle();
+			result.P2X = d.Reader.ReadSingle();
+			result.P2Y = d.Reader.ReadSingle();
+			return result;
+		}
+
 		private static object Make_Lime__BitSet32(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.BitSet32();
@@ -2607,16 +2617,6 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.DistortionMeshPoint();
 			Read_Lime__DistortionMeshPoint(d, def, result);
-			return result;
-		}
-
-		private static object Make_Lime__EasingParams(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.BezierEasing();
-			result.P1X = d.Reader.ReadSingle();
-			result.P1Y = d.Reader.ReadSingle();
-			result.P2X = d.Reader.ReadSingle();
-			result.P2Y = d.Reader.ReadSingle();
 			return result;
 		}
 
@@ -10344,6 +10344,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Animator<global::System.Single>)] = Make_Lime__Animator_Single;
 			makeCache[typeof(global::Lime.Animator<global::System.String>)] = Make_Lime__Animator_String;
 			makeCache[typeof(global::Lime.Audio)] = Make_Lime__Audio;
+			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__BezierEasing;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
 			makeCache[typeof(global::Lime.BlendingOption)] = Make_Lime__BlendingOption;
 			makeCache[typeof(global::Lime.Bone)] = Make_Lime__Bone;
@@ -10359,7 +10360,6 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
-			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__EasingParams;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;
 			makeCache[typeof(global::Lime.Font)] = Make_Lime__Font;
 			makeCache[typeof(global::Lime.FontChar)] = Make_Lime__FontChar;
