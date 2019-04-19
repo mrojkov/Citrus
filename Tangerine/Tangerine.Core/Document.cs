@@ -559,6 +559,13 @@ namespace Tangerine.Core
 			}
 		}
 
+		public void OnLocalizationChanged()
+		{
+			foreach (var text in RootNode.Descendants.OfType<IText>()) {
+				text.Invalidate();
+			}
+		}
+
 		public class NodeDecoratorList : List<Action<Node>>
 		{
 			public void AddFor<T>(Action<Node> action) where T: Node

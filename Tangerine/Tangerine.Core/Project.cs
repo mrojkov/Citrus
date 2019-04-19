@@ -12,6 +12,7 @@ namespace Tangerine.Core
 	public class Project
 	{
 		readonly VersionedCollection<Document> documents = new VersionedCollection<Document>();
+		private ProjectLocalization localization;
 		public IReadOnlyVersionedCollection<Document> Documents => documents;
 
 		public SceneCache SceneCache = new SceneCache();
@@ -29,6 +30,16 @@ namespace Tangerine.Core
 		public readonly string CitprojPath;
 		public readonly string UserprefsPath;
 		public readonly string AssetsDirectory;
+
+		public ProjectLocalization Localization
+		{
+			get => localization;
+			set {
+				localization = value;
+				localization.Apply();
+				InvalidateDisplayedText();
+			}
+		}
 
 		public delegate bool DocumentReloadConfirmationDelegate(Document document);
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
@@ -526,6 +537,16 @@ namespace Tangerine.Core
 				return false;
 			}
 			return GetFullPath(AssetPath.CorrectSlashes(path), out var fullPath) && File.Exists(fullPath);
+		}
+
+		private void InvalidateDisplayedText()
+		{
+			foreach (var document in Documents) {
+				if (!document.Loaded) {
+					continue;
+				}
+				document.OnLocalizationChanged();
+			}
 		}
 	}
 }

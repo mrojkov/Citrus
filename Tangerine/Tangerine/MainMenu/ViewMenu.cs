@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 using Tangerine.UI;
 using Tangerine.UI.Docking;
 using Tangerine.UI.SceneView;
@@ -82,66 +83,33 @@ namespace Tangerine
 		}
 	}
 
-	public class ProjectLocalization : CommandHandler
+	public class SetLocalization : CommandHandler
 	{
-		private readonly Locale locale;
+		private readonly ProjectLocalization localization;
 
-		public static Locale Current { get; private set; }
-
-		public ProjectLocalization(Locale locale)
+		public SetLocalization(ProjectLocalization localization)
 		{
-			this.locale = locale;
+			this.localization = localization;
 		}
 
 		public override void Execute()
 		{
-			Drop(invalidateDisplayedText: false);
-			try {
-				using (var stream = new FileStream(locale.DictionaryPath, FileMode.Open)) {
-					Localization.Dictionary.ReadFromStream(stream);
-				}
-				Current = locale;
-				System.Console.WriteLine($"Localization was successfully loaded from \"{locale.DictionaryPath}\"");
-			} catch (System.Exception exception) {
-				System.Console.WriteLine($"Can not read localization from \"{locale.DictionaryPath}\": {exception.Message}");
-			}
-			InvalidateDisplayedText();
+			Project.Current.Localization = localization;
 		}
 
 		public override void RefreshCommand(ICommand command)
 		{
-			command.Checked = Current != null && Current.Code == locale.Code;
+			command.Checked = Project.Current.Localization != null && Project.Current.Localization.Code == localization.Code;
 		}
 
-		public static void Drop(bool invalidateDisplayedText = true)
-		{
-			Current = null;
-			Localization.Dictionary.Clear();
-			if (invalidateDisplayedText) {
-				InvalidateDisplayedText();
-			}
-		}
-
-		private static void InvalidateDisplayedText()
-		{
-			foreach (var document in Project.Current.Documents) {
-				if (!document.Loaded) {
-					continue;
-				}
-				foreach (var text in document.RootNode.Descendants.OfType<IText>()) {
-					text.Invalidate();
-				}
-			}
-		}
-
-		public static List<Locale> GetLocales()
+		public static List<ProjectLocalization> GetLocales()
 		{
 			var directory = Project.Current.AssetsDirectory;
 			if (string.IsNullOrEmpty(directory)) {
 				return null;
 			}
 
-			var locales = new List<Locale>();
+			var locales = new List<ProjectLocalization>();
 			const string LocalizationFilesPrefix = "Dictionary";
 			const string LocalizationFilesExtension = ".txt";
 			var localizationFilesPattern = $"{LocalizationFilesPrefix}*{LocalizationFilesExtension}";
@@ -153,21 +121,9 @@ namespace Tangerine
 				if (string.IsNullOrEmpty(locale)) {
 					locale = "Default";
 				}
-				locales.Add(new Locale(locale, file));
+				locales.Add(new ProjectLocalization(locale, file));
 			}
 			return locales;
-		}
-	}
-
-	public class Locale
-	{
-		public readonly string Code;
-		public readonly string DictionaryPath;
-
-		public Locale(string code, string dictionaryPath)
-		{
-			Code = code;
-			DictionaryPath = dictionaryPath;
 		}
 	}
 }
