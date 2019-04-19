@@ -222,7 +222,16 @@ namespace Lime
 		/// </summary>
 		public override string ToString() => $"{AX}, {AY}, {BX}, {BY}";
 
-		public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode();
+		public override int GetHashCode()
+		{
+			unchecked {
+				var hashCode = AX.GetHashCode();
+				hashCode = (hashCode * 397) ^ AY.GetHashCode();
+				hashCode = (hashCode * 397) ^ BX.GetHashCode();
+				hashCode = (hashCode * 397) ^ BY.GetHashCode();
+				return hashCode;
+			}
+		}
 
 		/// <summary>
 		/// Applies the transformation matrix to this <see cref="Rectangle"/>.

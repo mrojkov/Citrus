@@ -397,7 +397,7 @@
     <Compile Include="Source\Graphics\Etc2Decoder.cs" />
     <Compile Include="Source\Graphics\Format.cs" />
     <Compile Include="Source\Graphics\GraphicsUtility.cs" />
-    <Compile Include="Source\Graphics\Hasher.cs" />
+    <Compile Include="Source\Hasher.cs" />
     <Compile Include="Source\Graphics\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\PlatformRenderer.cs" />

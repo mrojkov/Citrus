@@ -259,7 +259,6 @@ namespace Tangerine.UI
 
 		[YuzuOptional]
 		public bool IsDark { get; set; }
-		public Theme.ColorTheme Basic { get; set; }
 		[YuzuOptional]
 		public ToolbarColors Toolbar { get; set; }
 		[YuzuOptional]
@@ -286,7 +285,6 @@ namespace Tangerine.UI
 		public ColorTheme Clone()
 		{
 			var clone = (ColorTheme)this.MemberwiseClone();
-			clone.Basic = Basic?.Clone();
 			return clone;
 		}
 
@@ -431,7 +429,6 @@ namespace Tangerine.UI
 			};
 			return new ColorTheme {
 				IsDark = true,
-				Basic = basic,
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,
@@ -579,7 +576,6 @@ namespace Tangerine.UI
 			};
 			return new ColorTheme {
 				IsDark = false,
-				Basic = basic,
 				Toolbar = toolbar,
 				SceneView = sceneView,
 				TimelineGrid = timelineGrid,

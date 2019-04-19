@@ -41,7 +41,7 @@ namespace Tangerine.UI.Inspector
 			}
 			var pixels = new Color4[width * height];
 			for (int i = 0; i < pixels.Length; i++) {
-				pixels[i] = Color4.Lerp(image[i], ColorTheme.Current.Basic.WhiteBackground, ColorTheme.Current.Basic.BlackText);
+				pixels[i] = Color4.Lerp(image[i], Theme.Colors.WhiteBackground, Theme.Colors.BlackText);
 			}
 			return pixels;
 		}

@@ -11,18 +11,21 @@ namespace Tangerine.UI.SceneView.Presenters
 		private List<Widget> widgets = new List<Widget>();
 		private int widgetsHashCode;
 		private readonly List<IPresenter> presenters = new List<IPresenter>();
-		private readonly Dictionary<Widget, (List<Quadrangle> Hulls, int HashCode)> cache = new Dictionary<Widget, (List<Quadrangle> Hulls, int HashCode)>();
+		private readonly Dictionary<Widget, (List<Quadrangle> Hulls, long HashCode)> cache =
+			new Dictionary<Widget, (List<Quadrangle> Hulls, long HashCode)>();
+		private Hasher hasher = new Hasher();
 
 		public void RenderWidgetsFrameProgression(Widget widget)
 		{
+			hasher.Begin();
 			sceneView.Frame.PrepareRendererState();
 			int savedAnimationFrame = Document.Current.AnimationFrame;
 			if (!(widget is IAnimationHost host)) {
 				return;
 			}
-			int max = 0, min = 0, hash = 0;
+			int max = 0, min = 0;
 			foreach (var animator in host.Animators) {
-				hash ^= animator.Version;
+				hasher.Write(animator.Version);
 				if (animator.AnimationId != Document.Current.AnimationId) {
 					continue;
 				}
@@ -34,14 +37,15 @@ namespace Tangerine.UI.SceneView.Presenters
 			if (max == min) {
 				return;
 			}
-			hash ^= widget.Position.GetHashCode();
-			hash ^= widget.Rotation.GetHashCode();
-			hash ^= widget.Scale.GetHashCode();
-			hash ^= widget.Pivot.GetHashCode();
-			hash ^= widget.Size.GetHashCode();
-			hash ^= (Document.Current.AnimationId ?? "").GetHashCode();
-			hash ^= SceneView.Instance.Scene.Scale.X.GetHashCode();
-			hash ^= SceneView.Instance.Scene.Position.GetHashCode();
+			hasher.Write(widget.Position);
+			hasher.Write(widget.Rotation);
+			hasher.Write(widget.Scale);
+			hasher.Write(widget.Pivot);
+			hasher.Write(widget.Size);
+			hasher.Write((Document.Current.AnimationId ?? "").GetHashCode());
+			hasher.Write(SceneView.Instance.Scene.Scale);
+			hasher.Write(SceneView.Instance.Scene.Position);
+			var hash = hasher.End();
 			if (cache.TryGetValue(widget, out var cacheEntry) && hash == cacheEntry.HashCode) {
 				DrawHulls(cacheEntry.Hulls, min, max);
 				return;
