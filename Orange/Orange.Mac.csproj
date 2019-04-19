@@ -79,6 +79,9 @@
     <Reference Include="Octokit">
       <HintPath>$(SolutionDir)packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
+    <Reference Include="FluentFTP, Version=23.1.0.0, Culture=neutral, PublicKeyToken=f4af092b1d8df44f, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\FluentFTP.23.1.0\lib\net45\FluentFTP.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
