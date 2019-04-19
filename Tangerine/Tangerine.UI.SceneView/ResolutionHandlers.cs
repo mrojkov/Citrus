@@ -185,6 +185,7 @@ namespace Tangerine.UI.SceneView
 				}
 				rootNode.Size = resolution;
 				ApplyResolutionMarkers(rootNode, resolutionPreview.Preset, resolutionPreview.IsPortrait);
+				ApplyLocalizationMarkers(rootNode);
 			}
 
 			private static void ApplyResolutionMarkers(Node rootNode, ResolutionPreset resolutionPreset, bool isPortrait)
@@ -205,6 +206,21 @@ namespace Tangerine.UI.SceneView
 				ApplyResolutionMarkerToNode(rootNode);
 				foreach (var descendant in rootNode.Descendants) {
 					ApplyResolutionMarkerToNode(descendant);
+				}
+			}
+
+			private static void ApplyLocalizationMarkers(Node rootNode)
+			{
+				var marker = $"@{Project.Current.Localization.Code}";
+				void Apply(Node node)
+				{
+					foreach (var animation in node.Animations) {
+						animation.TryRun(marker);
+					}
+				}
+				Apply(rootNode);
+				foreach (var descendant in rootNode.Descendants) {
+					Apply(descendant);
 				}
 			}
 		}

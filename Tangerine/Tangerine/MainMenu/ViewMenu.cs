@@ -95,6 +95,9 @@ namespace Tangerine
 		public override void Execute()
 		{
 			Project.Current.Localization = localization;
+			if (Document.Current?.ResolutionPreview.Enabled ?? false) {
+				ResolutionPreviewHandler.Execute(Document.Current, true);
+			}
 		}
 
 		public override void RefreshCommand(ICommand command)
