@@ -161,7 +161,7 @@
     <Compile Include="Source\Updater.cs" />
     <Compile Include="Source\Builder\BuildConfiguration.cs" />
     <Compile Include="Source\Actions\SynchronizeDocumentation.cs" />
-    <Compile Include="Source\AssetCooker\LocalCache.cs" />
+    <Compile Include="Source\AssetCooker\AssetCache.cs" />
     <Compile Include="Source\AssetCooker\ICookStage.cs" />
     <Compile Include="Source\AssetCooker\TextureTools.cs" />
     <Compile Include="Source\AssetCooker\CookStages\DeleteOrphanedMasks.cs" />
