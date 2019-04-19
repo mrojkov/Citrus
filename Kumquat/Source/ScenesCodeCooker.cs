@@ -573,9 +573,10 @@ namespace Kumquat
 						}
 						if (parsedNode != null && parsedNode.IsExternalScene) {
 							AddReferringSceneSafe(parsedNode.ContentsPath, currentCookingScene);
-						}
-						if (n.Nodes.Count > 0 && (parsedNode == null || !parsedNode.IsExternalScene)) {
-							nodesToParse.Add(n);
+						} else if (n.Nodes.Count > 0 && (parsedNode == null || !parsedNode.IsExternalScene)) {
+							nodesToParse.Add((
+								n, !string.IsNullOrEmpty(current.node.ContentsPath) || current.isInExternalScene
+							));
 						}
 					}
 				}
