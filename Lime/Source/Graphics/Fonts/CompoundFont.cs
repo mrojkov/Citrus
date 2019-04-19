@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -98,6 +99,43 @@ namespace Lime
 				}
 				fonts.Clear();
 			}
+		}
+	}
+
+	public class SerializableCompoundFont : IFont
+	{
+		[YuzuMember]
+		public List<string> FontNames { get; private set; } = new List<string>();
+
+		private CompoundFont font;
+
+		public string About => (font ?? (font = CreateFont())).About;
+
+		public IFontCharSource Chars => (font ?? (font = CreateFont())).Chars;
+
+		public bool RoundCoordinates => (font ?? (font = CreateFont())).RoundCoordinates;
+
+		private CompoundFont CreateFont()
+		{
+			var font = new CompoundFont();
+			foreach (var name in FontNames) {
+				var f = FontPool.Instance[name];
+				if (f != FontPool.Instance.Null && !font.Fonts.Contains(f)) {
+					font.Fonts.Add(f);
+				}
+			}
+			return font;
+		}
+
+		public void ClearCache()
+		{
+			Dispose();
+		}
+
+		public void Dispose()
+		{
+			font?.Dispose();
+			font = null;
 		}
 	}
 }

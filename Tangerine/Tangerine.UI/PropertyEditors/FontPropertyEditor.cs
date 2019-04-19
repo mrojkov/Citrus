@@ -17,7 +17,7 @@ namespace Tangerine.UI
 			EditorContainer.AddNode(selector);
 			var propType = editorParams.PropertyInfo.PropertyType;
 			var items = AssetBundle.Current.EnumerateFiles(defaultFontDirectory).
-				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft")).
+				Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft") || i.EndsWith(".cft")).
 				Select(i => new DropDownList.Item(FontPool.ExtractFontNameFromPath(i, defaultFontDirectory)));
 			foreach (var i in items) {
 				selector.Items.Add(i);
@@ -41,7 +41,7 @@ namespace Tangerine.UI
 
 		private static string GetFontName(SerializableFont i)
 		{
-			return string.IsNullOrEmpty(i?.Name) ? "Default" : (i.Name.EndsWith(".fnt") || i.Name.EndsWith(".tft")) ? UpdateFontName(i.Name) : i.Name;
+			return string.IsNullOrEmpty(i?.Name) ? "Default" : (i.Name.EndsWith(".fnt") || i.Name.EndsWith(".tft") || i.Name.EndsWith(".cft")) ? UpdateFontName(i.Name) : i.Name;
 		}
 
 		private static string GetFontNameWithoutExtension(SerializableFont i)
@@ -57,7 +57,7 @@ namespace Tangerine.UI
 		private static string UpdateFontName(string s)
 		{
 			return
-				FontPool.TryGetOrUpdateBundleFontPath(s, out var path) ?
+				FontPool.TryGetOrUpdateBundleFontPath(s, out var path, ".fnt", ".tft", ".cft") ?
 				FontPool.ExtractFontNameFromPath(path, defaultFontDirectory) :
 				"Default";
 		}

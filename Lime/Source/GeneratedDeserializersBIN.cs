@@ -7261,6 +7261,33 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__SerializableCompoundFont(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SerializableCompoundFont)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					while (--tmp1 >= 0) {
+						var tmp2 = d.Reader.ReadString();
+						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
+						result.FontNames.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__SerializableCompoundFont(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SerializableCompoundFont();
+			Read_Lime__SerializableCompoundFont(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__SerializableFont(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SerializableFont)obj;
@@ -10116,6 +10143,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.RenderOptimizer.ContentRectangle)] = Read_Lime_RenderOptimizer__ContentRectangle;
 			readCache[typeof(global::Lime.RenderOptimizer.ContentSizeComponent)] = Read_Lime_RenderOptimizer__ContentSizeComponent;
 			readCache[typeof(global::Lime.RichText)] = Read_Lime__RichText;
+			readCache[typeof(global::Lime.SerializableCompoundFont)] = Read_Lime__SerializableCompoundFont;
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.SerializableTexture)] = Read_Lime__SerializableTexture;
@@ -10294,6 +10322,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.RenderOptimizer.ContentRectangle)] = Make_Lime_RenderOptimizer__ContentRectangle;
 			makeCache[typeof(global::Lime.RenderOptimizer.ContentSizeComponent)] = Make_Lime_RenderOptimizer__ContentSizeComponent;
 			makeCache[typeof(global::Lime.RichText)] = Make_Lime__RichText;
+			makeCache[typeof(global::Lime.SerializableCompoundFont)] = Make_Lime__SerializableCompoundFont;
 			makeCache[typeof(global::Lime.SerializableFont)] = Make_Lime__SerializableFont;
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;
 			makeCache[typeof(global::Lime.SerializableTexture)] = Make_Lime__SerializableTexture;

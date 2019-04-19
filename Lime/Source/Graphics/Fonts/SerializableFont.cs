@@ -84,6 +84,7 @@ namespace Lime
 	{
 		public const string DefaultFontDirectory = "Fonts/";
 		public const string DefaultFontName = "Default";
+		private static readonly string[] defaultFontExtensions = new string[] { ".fnt", ".tft" };
 		public IFont Null = new Font();
 		private Dictionary<string, IFont> fonts = new Dictionary<string, IFont>();
 
@@ -110,10 +111,17 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				if (!AssetBundle.Initialized || !TryGetOrUpdateBundleFontPath(name, out var fontPath)) {
+				if (AssetBundle.Initialized) {
+					if (TryGetOrUpdateBundleFontPath(name, out var fontPath, defaultFontExtensions)) {
+						font = Serialization.ReadObject<Font>(fontPath);
+					} else if (TryGetOrUpdateBundleFontPath(name, out var compoundFontPath, ".cft")) {
+						font = Serialization.ReadObject<SerializableCompoundFont>(compoundFontPath);
+					} else {
+						return Null;
+					}
+				} else {
 					return Null;
 				}
-				font = Serialization.ReadObject<Font>(fontPath);
 				fonts[name] = font;
 				return font;
 			}
@@ -141,9 +149,10 @@ namespace Lime
 			}
 		}
 
-		public static bool TryGetOrUpdateBundleFontPath(string fontName, out string fontPath)
+		public static bool TryGetOrUpdateBundleFontPath(string fontName, out string fontPath, params string[] extensions)
 		{
-			var fontPaths = AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Where(i => i.EndsWith(".fnt") || i.EndsWith(".tft"));
+			var ext = extensions.Any() ? extensions : defaultFontExtensions;
+			var fontPaths = AssetBundle.Current.EnumerateFiles(DefaultFontDirectory).Where(i => ext.Any(e => i.EndsWith(e)));
 			if (fontPaths.Contains(fontName)) {
 				fontPath = fontName;
 				return true;
