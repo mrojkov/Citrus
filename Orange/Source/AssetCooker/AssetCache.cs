@@ -194,7 +194,7 @@ namespace Orange
 		/// <summary>
 		/// Uploads file to remote server if it doesn't exists there
 		/// </summary>
-		public string GetCachedFile(string hashString)
+		public string Load(string hashString)
 		{
 			if (ExistsLocal(hashString)) {
 				UploadFromLocal(hashString);

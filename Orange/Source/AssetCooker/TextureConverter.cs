@@ -17,7 +17,7 @@ namespace Orange
 			           " -effort " + (highQualityCompression ? "60" : "40") +
 			           (mipMaps ? " -mipmaps 4" : "") + " -output {2}";
 			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".etc", args);
-			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
+			var cachePath = AssetCache.Instance.Load(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
@@ -96,7 +96,7 @@ namespace Orange
 			}
 			args.AppendFormat(" -r {0},{1} -shh", width, height);
 			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".pvr", args.ToString());
-			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
+			var cachePath = AssetCache.Instance.Load(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
@@ -147,7 +147,7 @@ namespace Orange
 
 			string args = "{0} {1}".Format(mipsFlag, compressionMethod);
 			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".dds", args);
-			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
+			var cachePath = AssetCache.Instance.Load(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
@@ -225,6 +225,7 @@ namespace Orange
 			return toolPath;
 		}
 
+		private static readonly SHA256 sha256 = SHA256.Create();
 		private static string GetTextureHashString(Bitmap bitmap, string extension, string commandLineArgs)
 		{
 			using (var stream = new MemoryStream()) {
@@ -234,7 +235,7 @@ namespace Orange
 				var commandLineArgsBytes = Encoding.UTF8.GetBytes(commandLineArgs);
 				stream.Write(commandLineArgsBytes, 0, commandLineArgsBytes.Length);
 				stream.Position = 0;
-				return BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty).ToLower();
+				return BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty).ToLower();
 			}
 		}
 	}
