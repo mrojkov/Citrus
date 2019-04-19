@@ -149,6 +149,7 @@ namespace Tangerine
 			foreach (var file in localizationFiles) {
 				var fileName = Path.GetFileNameWithoutExtension(file);
 				var locale = fileName?.Substring(LocalizationFilesPrefix.Length) ?? string.Empty;
+				locale = locale.TrimStart('.');
 				if (string.IsNullOrEmpty(locale)) {
 					locale = "Default";
 				}
