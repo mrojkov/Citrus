@@ -295,6 +295,7 @@ namespace Orange
 			AddStage(new DeleteOrphanedTextureParams(), CookingProfile.Total);
 			AddStage(new SyncFonts());
 			AddStage(new SyncHotFonts());
+			AddStage(new SyncCompoundFonts());
 			AddStage(new SyncRawAssets(".ttf"));
 			AddStage(new SyncRawAssets(".otf"));
 			AddStage(new SyncRawAssets(".ogv"));
