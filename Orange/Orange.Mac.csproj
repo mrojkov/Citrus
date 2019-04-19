@@ -83,6 +83,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\AssetCooker\CookStages\SyncCompoundFonts.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
