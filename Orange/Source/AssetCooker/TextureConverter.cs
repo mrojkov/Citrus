@@ -13,26 +13,25 @@ namespace Orange
 		{
 			var hasAlpha = bitmap.HasAlpha;
 			var bledBitmap = hasAlpha ? TextureConverterUtils.BleedAlpha(bitmap) : null;
-			var args = "{0} -format " + (hasAlpha ? "RGBA8" : "RGB8") + " -jobs 8 " +
+			var args = "{0} -format " + (hasAlpha ? "RGBA8" : "RGB8") + " -jobs {1} " +
 			           " -effort " + (highQualityCompression ? "60" : "40") +
-			           (mipMaps ? " -mipmaps 4" : "") + " -output {1}";
-
-			var cachePath = AssetCache.Instance.GetTexture(bledBitmap ?? bitmap, ".etc", args);
+			           (mipMaps ? " -mipmaps 4" : "") + " -output {2}";
+			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".etc", args);
+			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
-		
 			var ktxPath = Toolbox.GetTempFilePathWithExtension(".ktx");
 			var pngPath = Path.ChangeExtension(ktxPath, ".png");
 			var etcTool = GetToolPath("EtcTool");
 			try {
 				(bledBitmap ?? bitmap).SaveTo(pngPath);
-				if (Process.Start(etcTool, args.Format(pngPath, ktxPath)) != 0) {
+				if (Process.Start(etcTool, args.Format(pngPath, 8, ktxPath)) != 0) {
 					throw new Lime.Exception($"ETCTool error\nCommand line: {etcTool} {args}\"");
 				}
 				bundle.ImportFile(ktxPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				AssetCache.Instance.Save(ktxPath);
+				AssetCache.Instance.Save(ktxPath, hashString);
 			} finally {
 				bledBitmap?.Dispose();
 				DeletePossibleLockedFile(pngPath);
@@ -46,7 +45,6 @@ namespace Orange
 			int width = bitmap.Width;
 			int height = bitmap.Height;
 			bool hasAlpha = bitmap.HasAlpha;
-
 			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 2048);
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 2048);
 			var args = new StringBuilder();
@@ -89,9 +87,6 @@ namespace Orange
 			if (highQualityCompression && (new[] { PVRFormat.PVRTC2, PVRFormat.PVRTC4, PVRFormat.PVRTC4_Forced }.Contains(pvrFormat))) {
 				args.Append(" -q pvrtcbest");
 			}
-			var pvrPath = Toolbox.GetTempFilePathWithExtension(".pvr");
-			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
-
 			Bitmap bledBitmap = null;
 			if (bitmap.HasAlpha) {
 				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
@@ -99,21 +94,20 @@ namespace Orange
 			if (mipMaps) {
 				args.Append(" -m");
 			}
-
-			args.AppendFormat("-r {0},{1} -shh", width, height);
-
-			var cachePath = AssetCache.Instance.GetTexture(bitmap, ".pvr", args.ToString());
+			args.AppendFormat(" -r {0},{1} -shh", width, height);
+			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".pvr", args.ToString());
+			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
-
+			var pvrPath = Toolbox.GetTempFilePathWithExtension(".pvr");
+			var tgaPath = Path.ChangeExtension(pvrPath, ".tga");
 			try {
 				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: true);
 				if (bledBitmap != null && bledBitmap != bitmap) {
 					bledBitmap.Dispose();
 				}
-
 				args.AppendFormat(" -i \"{0}\" -o \"{1}\"", tgaPath, pvrPath);
 #if MAC
 				var pvrTexTool = GetToolPath("PVRTexTool");
@@ -124,7 +118,7 @@ namespace Orange
 					throw new Lime.Exception($"PVRTextTool error\nCommand line: {pvrTexTool} {args}\"");
 				}
 				bundle.ImportFile(pvrPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				AssetCache.Instance.Save(pvrPath);
+				AssetCache.Instance.Save(pvrPath, hashString);
 			} finally {
 				DeletePossibleLockedFile(tgaPath);
 				DeletePossibleLockedFile(pvrPath);
@@ -138,9 +132,6 @@ namespace Orange
 			if (bitmap.HasAlpha) {
 				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
 			}
-			var ddsPath = Toolbox.GetTempFilePathWithExtension(".dds");
-			var tgaPath = Path.ChangeExtension(ddsPath, ".tga");
-
 			string mipsFlag = mipMaps ? string.Empty : "-nomips";
 			string compressionMethod;
 			if (compressed) {
@@ -153,29 +144,29 @@ namespace Orange
 #endif
 			}
 			var nvcompress = GetToolPath("nvcompress");
-			var srcPath = Path.Combine(Directory.GetCurrentDirectory(), tgaPath);
-			var dstPath = Path.Combine(Directory.GetCurrentDirectory(), ddsPath);
 
-			string args = "{0} {1} \"{2}\" \"{3}\"";
-
-			var cachePath = AssetCache.Instance.GetTexture(bledBitmap ?? bitmap, ".dds", args.Format(mipsFlag, compressionMethod, "", ""));
+			string args = "{0} {1}".Format(mipsFlag, compressionMethod);
+			var hashString = GetTextureHashString(bledBitmap ?? bitmap, ".dds", args);
+			var cachePath = AssetCache.Instance.GetCachedFile(hashString);
 			if (cachePath != null) {
 				bundle.ImportFile(cachePath, path, 0, "", attributes, time, CookingRulesSHA1);
 				return;
 			}
-
+			var ddsPath = Toolbox.GetTempFilePathWithExtension(".dds");
+			var tgaPath = Path.ChangeExtension(ddsPath, ".tga");
+			var srcPath = Path.Combine(Directory.GetCurrentDirectory(), tgaPath);
+			var dstPath = Path.Combine(Directory.GetCurrentDirectory(), ddsPath);
 			try {
 				TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tgaPath, swapRedAndBlue: compressed);
 				if (bledBitmap != null && bledBitmap != bitmap) {
 					bledBitmap.Dispose();
 				}
-
+				args += $" \"{srcPath}\" \"{dstPath}\"";
 				if (Process.Start(nvcompress, args.Format(mipsFlag, compressionMethod, srcPath, dstPath), options: Process.Options.RedirectErrors) != 0) {
 					throw new Lime.Exception($"NVCompress error\nCommand line: {nvcompress} {args}\"");
 				}
-
 				bundle.ImportFile(ddsPath, path, 0, "", attributes, time, CookingRulesSHA1);
-				AssetCache.Instance.Save(ddsPath);
+				AssetCache.Instance.Save(ddsPath, hashString);
 			} finally {
 				DeletePossibleLockedFile(ddsPath);
 				DeletePossibleLockedFile(tgaPath);
@@ -232,6 +223,19 @@ namespace Orange
 			Process.Start("chmod", $"+x {toolPath}");
 #endif
 			return toolPath;
+		}
+
+		private static string GetTextureHashString(Bitmap bitmap, string extension, string commandLineArgs)
+		{
+			using (var stream = new MemoryStream()) {
+				bitmap.SaveTo(stream);
+				var extensionBytes = Encoding.UTF8.GetBytes(extension);
+				stream.Write(extensionBytes, 0, extensionBytes.Length);
+				var commandLineArgsBytes = Encoding.UTF8.GetBytes(commandLineArgs);
+				stream.Write(commandLineArgsBytes, 0, commandLineArgsBytes.Length);
+				stream.Position = 0;
+				return BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty).ToLower();
+			}
 		}
 	}
 }

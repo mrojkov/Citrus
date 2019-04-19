@@ -37,7 +37,6 @@ namespace Orange
 
 		private bool RemoteEnabled => enableState == EnableState.Both || enableState == EnableState.Remote;
 		private bool LocalEnabled => enableState == EnableState.Both || enableState == EnableState.Local;
-		private string lastHandledHashString;
 
 		private AssetCache() { }
 
@@ -178,42 +177,25 @@ namespace Orange
 			Console.WriteLine($"[Cache] Disconnected from {serverUsername}@{serverAddress}");
 		}
 
-		public string GetTexture(Bitmap bitmap, string extension, string commandLineArgs)
-		{
-			using (var stream = new MemoryStream()) {
-				bitmap.SaveTo(stream);
-				var extensionBytes = Encoding.UTF8.GetBytes(extension);
-				stream.Write(extensionBytes, 0, extensionBytes.Length);
-				var commandLineArgsBytes = Encoding.UTF8.GetBytes(commandLineArgs);
-				stream.Write(commandLineArgsBytes, 0, commandLineArgsBytes.Length);
-				return GetCachedFile(GetHashString(stream));
-			}
-		}
-
-		/// <summary>
-		/// Won't work if GetCachedFile was not used just before
-		/// </summary>
-		/// <seealso cref="GetCachedFile"/>
-		public void Save(string srcPath)
+		public void Save(string srcPath, string hashString)
 		{
 			if (enableState == EnableState.None) {
 				return;
 			}
 			// Maybe we should not save files locally when local cache is disabled
-			var path = GetLocalPath(lastHandledHashString);
+			var path = GetLocalPath(hashString);
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 			File.Copy(srcPath, path);
 			if (RemoteEnabled) {
-				UploadFromLocal(lastHandledHashString);
+				UploadFromLocal(hashString);
 			}
 		}
 
 		/// <summary>
 		/// Uploads file to remote server if it doesn't exists there
 		/// </summary>
-		private string GetCachedFile(string hashString)
+		public string GetCachedFile(string hashString)
 		{
-			lastHandledHashString = hashString;
 			if (ExistsLocal(hashString)) {
 				UploadFromLocal(hashString);
 				return GetLocalPath(hashString);
@@ -225,12 +207,6 @@ namespace Orange
 				return GetLocalPath(hashString);
 			}
 			return null;
-		}
-
-		private string GetHashString(Stream stream)
-		{
-			stream.Position = 0;
-			return BitConverter.ToString(SHA256.Create().ComputeHash(stream)).Replace("-", string.Empty).ToLower();
 		}
 
 		private string GetLocalPath(string hashString)
