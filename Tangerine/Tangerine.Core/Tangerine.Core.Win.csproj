@@ -73,6 +73,7 @@
     <Compile Include="Operations\TimelineColumnRemove.cs" />
     <Compile Include="Operations\TimelineHorizontalShift.cs" />
     <Compile Include="Project.cs" />
+    <Compile Include="ProjectLocalization.cs" />
     <Compile Include="ProjectPreferences.cs" />
     <Compile Include="ProjectUserPreferences.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
