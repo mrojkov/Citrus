@@ -11,33 +11,40 @@ namespace Tangerine.UI.Inspector
 
 		public static readonly EasingIcons Instance = new EasingIcons();
 
-		private Dictionary<(EasingFunction, EasingType, int), Texture2D> textures = new Dictionary<(EasingFunction, EasingType, int), Texture2D>();
+		private Dictionary<(Mathf.EasingFunction, Mathf.EasingType), Texture2D> textures = new Dictionary<(Mathf.EasingFunction, Mathf.EasingType), Texture2D>();
 
-		public ITexture Get(EasingFunction function, EasingType type, int softness)
+		public ITexture Get(Mathf.EasingFunction function, Mathf.EasingType type)
 		{
 			Texture2D texture;
-			if (textures.TryGetValue((function, type, softness), out texture)) {
+			if (textures.TryGetValue((function, type), out texture)) {
 				return texture;
 			}
 			texture = new Texture2D();
-			var pixels = Render(Width, Height, function, type, softness);
+			var pixels = Render(Width, Height, function, type);
 			texture.LoadImage(pixels, Width, Height);
-			textures.Add((function, type, softness), texture);
+			textures.Add((function, type), texture);
 			return texture;
 		}
 
-		private static Color4[] Render(int width, int height, EasingFunction function, EasingType type, int softness)
+		private static Color4[] Render(int width, int height, Mathf.EasingFunction function, Mathf.EasingType type)
 		{
 			var image = new float[width * height];
+			float py = 0, px = 0;
 			for (float t = 0; t <= 1; t += 0.001f) {
-				var v = Easing.Interpolate(t, function, type);
-				if (softness != 0) {
-					var k = softness * 0.01f;
-					v = (1 - k) * v + k * t;
-				}
+				var v = Mathf.Easings.Interpolate(t, function, type);
 				var x = (t * 0.75f + 0.125f) * width;
 				var y = ((1 - v) * 0.5f + 0.25f) * height;
-				DrawPoint(x, y, image, width);
+				var ix = (int)x;
+				var iy = (int)y;
+				if (t > 0 && (y - py).Abs() > (x - px).Abs()) {
+					DrawPoint(ix + (x - ix > 0.5f ? 1 : -1), iy, x, y, false, image, width, height);
+					DrawPoint(ix, iy, x, y, false, image, width, height);
+				} else {
+					DrawPoint(ix, iy, x, y, true, image, width, height);
+					DrawPoint(ix, iy + (y - iy > 0.5f ? 1 : -1), x, y, true, image, width, height);
+				}
+				px = x;
+				py = y;
 			}
 			var pixels = new Color4[width * height];
 			for (int i = 0; i < pixels.Length; i++) {
@@ -46,15 +53,13 @@ namespace Tangerine.UI.Inspector
 			return pixels;
 		}
 
-		private static void DrawPoint(float x, float y, float[] image, int width)
+		private static void DrawPoint(int px, int py, float rx, float ry, bool majorXAxis, float[] image, int width, int height)
 		{
-			var px = (int)(x + 0.5f);
-			var py = (int)(y + 0.5f);
-			var dx = x - px;
-			var dy = y - py;
-			var t = Mathf.Sqrt(dx * dx + dy * dy);
-			var i = px + py * width;
-			image[i] = Mathf.Max(image[i], 1 - t);
+			if (py >= 0 && py < height) {
+				float t = majorXAxis ? (ry - (py + 0.5f)).Abs() : (rx - (px + 0.5f)).Abs();
+				var i = px + py * width;
+				image[i] = Mathf.Max(image[i], 1 - t);
+			}
 		}
 	}
 }

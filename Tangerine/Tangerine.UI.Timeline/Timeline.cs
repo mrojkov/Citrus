@@ -6,7 +6,6 @@ using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Components;
-using Tangerine.UI.Timeline.Processors;
 
 namespace Tangerine.UI.Timeline
 {
@@ -42,6 +41,20 @@ namespace Tangerine.UI.Timeline
 		public float OffsetY { get { return Offset.Y; } set { Offset = new Vector2(Offset.X, value); } }
 
 		public int CurrentColumn => Document.Current.AnimationFrame;
+
+		public float CurrentColumnEased
+		{
+			get {
+				if (Document.Current.PreviewAnimation) {
+					var time = Document.Current.Animation.Time;
+					time = Document.Current.Animation.BezierEasingCalculator.EaseTime(time);
+					return (float)(time * AnimationUtils.FramesPerSecond);
+				} else {
+					return Document.Current.AnimationFrame;
+				}
+			}
+		}
+
 		public int ColumnCount { get; set; }
 		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
@@ -156,12 +169,17 @@ namespace Tangerine.UI.Timeline
 				new MouseWheelProcessor(this),
 				new RollMouseScrollProcessor(),
 				new SelectAndDragKeyframesProcessor(),
+				new CompoundAnimations.CreateAnimationTrackWeightRampProcessor(),
+				new CompoundAnimations.SelectAndDragAnimationClipsProcessor(0),
+				new CompoundAnimations.SelectAndDragAnimationClipsProcessor(1),
 				new HasKeyframeRespondentProcessor(),
 				new DragKeyframesRespondentProcessor(),
 				new GridMouseScrollProcessor(),
 				new SelectAndDragRowsProcessor(),
 				new RulerbarMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
+				new GridContextMenuProcessor(),
+				new CompoundAnimations.GridContextMenuProcessor(),
 				PanelTitleUpdater()
 			);
 		}

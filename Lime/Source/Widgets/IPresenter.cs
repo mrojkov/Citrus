@@ -139,7 +139,7 @@ namespace Lime
 			public override void Render()
 			{
 				PrepareRenderState();
-				Renderer.DrawRectOutline(Position, Size, Color, Thickness);
+				Renderer.DrawRectOutline(Position, Position + Size, Color, Thickness);
 			}
 		}
 	}
@@ -186,7 +186,7 @@ namespace Lime
 			public override void Render()
 			{
 				PrepareRenderState();
-				Renderer.DrawRect(Position, Size, Color);
+				Renderer.DrawRect(Position, Position + Size, Color);
 			}
 		}
 	}

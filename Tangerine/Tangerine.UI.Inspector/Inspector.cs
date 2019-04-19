@@ -18,7 +18,6 @@ namespace Tangerine.UI.Inspector
 		private readonly ThemedScrollView contentWidget;
 
 		private HashSet<Type> prevTypes = new HashSet<Type>();
-		private float prevPosition;
 
 		public static Inspector Instance { get; private set; }
 
@@ -36,6 +35,20 @@ namespace Tangerine.UI.Inspector
 		public static void RegisterGlobalCommands()
 		{
 			CommandHandlerList.Global.Connect(InspectorCommands.InspectRootNodeCommand, () => Document.Current.InspectRootNode = !Document.Current.InspectRootNode);
+			CommandHandlerList.Global.Connect(InspectorCommands.InspectEasing, new InspectEasingCommandHandler());
+		}
+
+		class InspectEasingCommandHandler : CommandHandler
+		{
+			public override void RefreshCommand(ICommand command)
+			{
+				command.Checked = CoreUserPreferences.Instance.InspectEasing;
+			}
+
+			public override void Execute()
+			{
+				CoreUserPreferences.Instance.InspectEasing = !CoreUserPreferences.Instance.InspectEasing;
+			}
 		}
 
 		public void Attach()
@@ -83,7 +96,7 @@ namespace Tangerine.UI.Inspector
 								Index = 0,
 								Title = "Inspector Toolbar Panel",
 								Draggable = false,
-								CommandIds = { "InspectRootNodeCommand" }
+								CommandIds = { "InspectRootNodeCommand", "InspectEasing" }
 							}
 						}
 					}
@@ -117,7 +130,14 @@ namespace Tangerine.UI.Inspector
 		private static int CalcSelectedRowsHashcode()
 		{
 			var r = 0;
-			if (Document.Current.InspectRootNode) {
+			if (CoreUserPreferences.Instance.InspectEasing) {
+				r ^= FindMarkerBehind()?.GetHashCode() ?? 0;
+			}
+			if (Document.Current.Animation.IsCompound) {
+				foreach (var track in GetSelectedAnimationTracksAndClips()) {
+					r ^= track.GetHashCode();
+				}
+			} else if (Document.Current.InspectRootNode) {
 				var rootNode = Document.Current.RootNode;
 				r ^= rootNode.GetHashCode();
 				foreach (var component in rootNode.Components) {
@@ -130,6 +150,9 @@ namespace Tangerine.UI.Inspector
 						var node = row.Components.Get<NodeRow>()?.Node;
 						if (node != null) {
 							foreach (var component in node.Components) {
+								if (ClassAttributes<NodeComponentDontSerializeAttribute>.Get(component.GetType()) != null) {
+									continue;
+								}
 								r ^= component.GetHashCode();
 							}
 						}
@@ -139,13 +162,46 @@ namespace Tangerine.UI.Inspector
 			return r;
 		}
 
+		public static Marker FindMarkerBehind()
+		{
+			Marker marker = null;
+			foreach (var m in Document.Current.Animation.Markers) {
+				if (m.Frame > Document.Current.Animation.Frame) {
+					break;
+				}
+				marker = m;
+			}
+			return marker;
+		}
+
 		private void Rebuild()
 		{
-			content.BuildForObjects(Document.Current.InspectRootNode ? new[] { Document.Current.RootNode } : Document.Current.SelectedNodes().ToArray());
+			if (Document.Current.Animation.IsCompound) {
+				content.BuildForObjects(GetSelectedAnimationTracksAndClips().ToList());
+			} else if (Document.Current.InspectRootNode) {
+				content.BuildForObjects(new[] { Document.Current.RootNode });
+			} else {
+				content.BuildForObjects(Document.Current.SelectedNodes().ToList());
+			}
 			InspectorCommands.InspectRootNodeCommand.Icon = Document.Current.InspectRootNode ? inspectRootActivatedTexture : inspectRootDeactivatedTexture;
 			Toolbar.Rebuild();
 			// Delay UpdateScrollPosition, since contentWidget.MaxScrollPosition is not updated yet.
 			contentWidget.LateTasks.Add(UpdateScrollPositionOnNextUpdate);
+		}
+
+		private static IEnumerable<object> GetSelectedAnimationTracksAndClips()
+		{
+			foreach (var row in Document.Current.SelectedRows()) {
+				yield return row.Components.Get<AnimationTrackRow>().Track;
+			}
+			foreach (var row in Document.Current.Rows) {
+				var track = row.Components.Get<AnimationTrackRow>().Track;
+				foreach (var clip in track.Clips) {
+					if (clip.IsSelected) {
+						yield return clip;
+					}
+				}
+			}
 		}
 
 		private IEnumerator<object> UpdateScrollPositionOnNextUpdate()
@@ -153,7 +209,7 @@ namespace Tangerine.UI.Inspector
 			var nodes = Document.Current.InspectRootNode
 				? new[] { Document.Current.RootNode }
 				: Document.Current.SelectedNodes().ToArray();
-			
+
 			var types = new HashSet<Type>(InspectorContent.GetTypes(nodes));
 			var areEqual = types.SetEquals(prevTypes);
 			contentWidget.ScrollPosition = areEqual ?

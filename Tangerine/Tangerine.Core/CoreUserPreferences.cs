@@ -15,6 +15,9 @@ namespace Tangerine.Core
 		public bool ResetAnimationsTimes { get; set; }
 
 		[YuzuOptional]
+		public bool InspectEasing { get; set; }
+
+		[YuzuOptional]
 		public KeyFunction DefaultKeyFunction { get; set; }
 
 		[YuzuOptional]

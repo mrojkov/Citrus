@@ -49,7 +49,11 @@ namespace Tangerine.UI.Inspector
 				widget.SetFocus();
 			}
 			Clear();
-			BuildForObjectsHelper(objects).ToList();
+			if (CoreUserPreferences.Instance.InspectEasing) {
+				AddEasingEditor();
+			}
+			foreach (var _ in BuildForObjectsHelper(objects)) {
+			}
 			if (objects.Any() && objects.All(o => o is Node)) {
 				var nodes = objects.Cast<Node>().ToList();
 				foreach (var t in GetComponentsTypes(nodes)) {
@@ -69,6 +73,18 @@ namespace Tangerine.UI.Inspector
 
 			if (Footer != null) {
 				widget.AddNode(Footer);
+			}
+		}
+
+		private void AddEasingEditor()
+		{
+			var marker = Inspector.FindMarkerBehind();
+			if (marker != null) {
+				new BezierEasingPropertyEditor(new PropertyEditorParams(widget, marker, nameof(Marker.BezierEasing)) {
+					ShowLabel = false,
+					History = History,
+					PropertySetter = SetProperty
+				});
 			}
 		}
 
@@ -97,7 +113,7 @@ namespace Tangerine.UI.Inspector
 			}
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.All(_ => _ is IAnimable), widget, propertyPath)) {
+				foreach (var e in PopulateContentForType(t, o, rootObjects ?? o, !Document.Current.InspectRootNode && animableByPath && objects.Any(_ => _ is IAnimable), widget, propertyPath)) {
 					yield return e;
 				}
 			}
@@ -487,7 +503,6 @@ namespace Tangerine.UI.Inspector
 						Padding = new Thickness(12, 0),
 						VAlignment = VAlignment.Center,
 						ForceUncutText = false,
-						FontHeight = 14
 					}
 				}
 			};

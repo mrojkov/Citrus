@@ -250,12 +250,12 @@ namespace Lime
 
 		public override ValidationResult IsValid(object value, out string message)
 		{
-			return IsValidPath(value as string, out message);
+			return IsValid(value as string, out message);
 		}
 
-		public static ValidationResult IsValidPath(string path, out string message)
+		public static ValidationResult IsValid(string value, out string message)
 		{
-			message = path == null || path is string s && !regex.IsMatch(s) ? null : "Wrong charset";
+			message = value == null || value is string s && !regex.IsMatch(s) ? null : "Wrong charset";
 			return message == null ? ValidationResult.Ok : ValidationResult.Warning;
 		}
 	}
@@ -276,7 +276,7 @@ namespace Lime
 	public class TangerinePropertyDefaultValueAttribute : Attribute
 	{
 		private readonly Type Type;
-		private readonly string Method;	
+		private readonly string Method;
 
 		private Func<object> getDefaultValue;
 
@@ -287,12 +287,12 @@ namespace Lime
 		}
 
 		public object GetValue()
-		{ 
+		{
 			if (getDefaultValue == null) {
 				var fn = Type.GetMethod(Method);
 				if (fn == null) {
 					throw new System.Exception();
-				}	
+				}
 				getDefaultValue = () => fn.Invoke(Type,null);
 			}
 			return getDefaultValue();

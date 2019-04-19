@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -6,14 +7,23 @@ namespace Lime
 	{
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
-		public virtual void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0) { }
+		/// <summary>
+		/// 1. Refreshes animation.EffectiveAnimators;
+		/// 2. Applies each animator at currentTime;
+		/// 3. Executes triggers in given range.
+		/// The range is [previousTime, currentTime) or [previousTime, currentTime] depending on executeTriggersAtCurrentTime flag.
+		/// This method doesn't depend on animation.Time value.
+		/// </summary>
+		public virtual void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime) { }
+		public virtual bool AreEffectiveAnimatorsValid(Animation animation) => false;
+		public virtual void BuildEffectiveAnimators(Animation animation) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
 	{
 		public Func<Animation, string, double, bool> OnRunAnimation;
 		public Action<Animation, float> OnAdvanceAnimation;
-		public Action<Animation, bool, double> OnApplyAnimators;
+		public Action<Animation, double, double, bool> OnApplyEffectiveAnimatorsAndBuildTriggersList;
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
@@ -22,16 +32,12 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			if (OnAdvanceAnimation != null) {
-				OnAdvanceAnimation(animation, delta);
-			}
+			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)
 		{
-			if (OnApplyAnimators != null) {
-				OnApplyAnimators(animation, invokeTriggers, animationTimeCorrection);
-			}
+			OnApplyEffectiveAnimatorsAndBuildTriggersList?.Invoke(animation, previousTime, currentTime, executeTriggersAtCurrentTime);
 		}
 	}
 
@@ -49,6 +55,8 @@ namespace Lime
 				}
 				frame = marker.Frame;
 			}
+			// Easings may give huge animationTimeCorrection values, clamp it.
+			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame, 0);
 			animation.Time = AnimationUtils.FramesToSeconds(frame) + animationTimeCorrection;
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
@@ -57,56 +65,36 @@ namespace Lime
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var previousTime = animation.TimeInternal;
+			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;
-			if (!animation.NextMarkerOrTriggerTime.HasValue) {
-				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
-				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
-				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
-				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
-			}
-
-			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
-				ApplyAnimators(animation, invokeTriggers: false);
+			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, previousTime);
+			if (animation.MarkerAhead == null || currentTime < animation.MarkerAhead.Time) {
+				ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 			} else {
-				var frameTime = animation.NextMarkerOrTriggerTime.Value;
-				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
-				animation.NextMarkerOrTriggerTime = null;
-				var currentMarker = animation.Markers.GetByFrame(frameIndex);
-				if (currentMarker != null) {
-					ProcessMarker(animation, currentMarker);
-				}
-				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
-				if (!animation.IsRunning) {
+				var marker = animation.MarkerAhead;
+				animation.MarkerAhead = null;
+				ProcessMarker(animation, marker);
+				if (marker.Action == MarkerAction.Stop) {
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.RaiseStopped();
+				} else if (marker.Action == MarkerAction.Play) {
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 				}
 			}
 		}
 
-		protected static double? GetNextMarkerOrTriggerTime(Animation animation, int nextFrame)
+		protected static Marker FindMarkerAhead(Animation animation, double time)
 		{
-			int? nextMarkerOrTriggerFrame = null;
-			foreach (var marker in animation.Markers) {
-				if (marker.Frame >= nextFrame) {
-					nextMarkerOrTriggerFrame = marker.Frame;
-					break;
-				}
-			}
-			for (var child = animation.Owner.FirstChild; child != null; child = child.NextSibling) {
-				foreach (var animator in child.Animators) {
-					if (!animator.Enabled || !animator.IsTriggerable || animator.AnimationId != animation.Id) {
-						continue;
-					}
-
-					if (animator.TryGetNextKeyFrame(nextFrame, out var keyFrame)) {
-						if (!nextMarkerOrTriggerFrame.HasValue || keyFrame < nextMarkerOrTriggerFrame.Value) {
-							nextMarkerOrTriggerFrame = keyFrame;
-						}
+			if (animation.Markers.Count > 0) {
+				var frame = AnimationUtils.SecondsToFramesCeiling(time);
+				foreach (var marker in animation.Markers) {
+					if (marker.Frame >= frame) {
+						return marker;
 					}
 				}
 			}
-			return nextMarkerOrTriggerFrame * AnimationUtils.SecondsPerFrame;
+			return null;
 		}
 
 		protected virtual void ProcessMarker(Animation animation, Marker marker)
@@ -131,21 +119,185 @@ namespace Lime
 			marker.CustomAction?.Invoke();
 		}
 
-		public override void ApplyAnimators(Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)
 		{
-			ApplyAnimators(animation.Owner, animation, invokeTriggers, animationTimeCorrection);
+			if (!AreEffectiveAnimatorsValid(animation)) {
+				BuildEffectiveAnimators(animation);
+			}
+			foreach (var a in animation.EffectiveAnimators) {
+				a.Apply(currentTime);
+			}
+			foreach (var a in animation.EffectiveTriggerableAnimators) {
+				a.ExecuteTriggersInRange(previousTime, currentTime, executeTriggersAtCurrentTime);
+			}
+#if TANGERINE
+			foreach (var track in animation.Tracks) {
+				// To edit the track weight in the inspector, it must be animated
+				track.Animators.Apply(animation.Time, animation.Id);
+			}
+#endif
 		}
 
-		private static void ApplyAnimators(Node node, Animation animation, bool invokeTriggers, double animationTimeCorrection = 0)
+		public override bool AreEffectiveAnimatorsValid(Animation animation)
 		{
-			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-				var animators = child.Animators;
-				animators.Apply(animation.Time, animation.Id);
-				if (invokeTriggers) {
-					animators.InvokeTriggers(animation.Frame, animation.Id, animationTimeCorrection);
+			if (animation.IsCompound) {
+				if (animation.EffectiveAnimators == null) {
+					return false;
 				}
-				if (animation.Id != null) {
-					ApplyAnimators(child, animation, invokeTriggers);
+				foreach (var track in animation.Tracks) {
+					foreach (var clip in track.Clips) {
+						var clipAnimation = clip.CachedAnimation;
+						if (clipAnimation == null) {
+							if (clip.FindAnimation() != null) {
+								return false;
+							}
+						} else if (
+							(clipAnimation.IdComparisonCode != clip.AnimationIdComparisonCode) ||
+							(clipAnimation.Owner != animation.Owner) ||
+							(clipAnimation != null && !AreEffectiveAnimatorsValid(clipAnimation))
+						) {
+							return false;
+						}
+					}
+				}
+				return true;
+			} else {
+				return
+					animation.Owner.DescendantAnimatorsVersion == animation.EffectiveAnimatorsVersion &&
+					animation.EffectiveAnimators != null;
+			}
+		}
+
+		public override void BuildEffectiveAnimators(Animation animation)
+		{
+			if (animation.IsCompound) {
+				BuildEffectiveAnimatorsForCompoundAnimation(animation);
+			} else {
+				BuildEffectiveAnimatorsForSimpleAnimation(animation);
+			}
+		}
+
+		private static void BuildEffectiveAnimatorsForCompoundAnimation(Animation animation)
+		{
+			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
+			(animation.EffectiveTriggerableAnimators ?? (animation.EffectiveTriggerableAnimators = new List<IAbstractAnimator>())).Clear();
+			var animationBindings = new Dictionary<AnimatorBinding, (IAbstractAnimator Animator, AnimationTrack Track)>();
+			var trackBindings = new Dictionary<AnimatorBinding, IChainedAnimator>();
+			foreach (var track in animation.Tracks) {
+				trackBindings.Clear();
+				foreach (var clip in track.Clips) {
+					var clipAnimation = clip.FindAnimation();
+					clip.CachedAnimation = clipAnimation;
+					if (clipAnimation == null) {
+						continue;
+					}
+					if (!clipAnimation.AnimationEngine.AreEffectiveAnimatorsValid(clipAnimation)) {
+						clipAnimation.AnimationEngine.BuildEffectiveAnimators(clipAnimation);
+					}
+					foreach (var a in clipAnimation.EffectiveAnimators) {
+						if (trackBindings.TryGetValue(new AnimatorBinding(a), out var chained)) {
+							chained.Add(clip, a);
+						} else {
+							chained = AnimatorRegistry.Instance.CreateChainedAnimator(a.ValueType);
+							chained.Add(clip, a);
+							trackBindings.Add(new AnimatorBinding(a), chained);
+						}
+					}
+				}
+				foreach (var a in trackBindings.Values) {
+					if (animationBindings.TryGetValue(new AnimatorBinding(a), out var i)) {
+						if (i.Animator is IBlendedAnimator blended) {
+							blended.Add(track, a);
+						} else {
+							animationBindings.Remove(new AnimatorBinding(a));
+							blended = AnimatorRegistry.Instance.CreateBlendedAnimator(a.ValueType);
+							blended.Add(i.Track, i.Animator);
+							blended.Add(track, a);
+							animationBindings.Add(new AnimatorBinding(a), (blended, track));
+						}
+					} else {
+						animationBindings.Add(new AnimatorBinding(a), (a, track));
+					}
+				}
+			}
+			foreach (var b in animationBindings.Values) {
+				var a = b.Animator;
+				if (animation.HasEasings()) {
+					var a2 = AnimatorRegistry.Instance.CreateEasedAnimator(a.ValueType);
+					a2.Initialize(animation, a);
+					a = a2;
+				}
+				animation.EffectiveAnimators.Add(a);
+				if (a.IsTriggerable) {
+					animation.EffectiveTriggerableAnimators.Add(a);
+				}
+			}
+		}
+
+		private struct AnimatorBinding : IEquatable<AnimatorBinding>
+		{
+			public IAnimable Animable;
+			public int TargetPropertyPathComparisonCode;
+
+			public AnimatorBinding(IAbstractAnimator animator)
+			{
+				Animable = animator.Animable;
+				TargetPropertyPathComparisonCode = animator.TargetPropertyPathComparisonCode;
+			}
+
+			public bool Equals(AnimatorBinding other)
+			{
+				return Animable == other.Animable && TargetPropertyPathComparisonCode == other.TargetPropertyPathComparisonCode;
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked {
+					var r = -511344;
+					r = r * -1521134295 + Animable.GetHashCode();
+					r = r * -1521134295 + TargetPropertyPathComparisonCode;
+					return r;
+				}
+			}
+		}
+
+		private static void BuildEffectiveAnimatorsForSimpleAnimation(Animation animation)
+		{
+			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
+			(animation.EffectiveTriggerableAnimators ?? (animation.EffectiveTriggerableAnimators = new List<IAbstractAnimator>())).Clear();
+			animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
+			AddEffectiveAnimatorsRecursively(animation.Owner);
+
+			void AddEffectiveAnimatorsRecursively(Node node)
+			{
+				foreach (var child in node.Nodes) {
+					// Optimization: avoid calling Animators.GetEnumerator() for empty collection since it allocates memory
+					if (child.Animators.Count > 0) {
+						foreach (var a in child.Animators) {
+							if (a.AnimationId == animation.Id) {
+								var a2 = (IAbstractAnimator)a;
+								if (animation.HasEasings()) {
+									var a3 = AnimatorRegistry.Instance.CreateEasedAnimator(a.ValueType);
+									a3.Initialize(animation, a);
+									a2 = a3;
+								}
+								animation.EffectiveAnimators.Add(a2);
+								if (a2.IsTriggerable) {
+									animation.EffectiveTriggerableAnimators.Add(a2);
+								}
+							}
+						}
+					}
+					var stopRecursion = animation.Id == null;
+					foreach (var a in child.Animations) {
+						if (a.IdComparisonCode == animation.IdComparisonCode) {
+							stopRecursion = true;
+							break;
+						}
+					}
+					if (!stopRecursion) {
+						AddEffectiveAnimatorsRecursively(child);
+					}
 				}
 			}
 		}
@@ -155,29 +307,21 @@ namespace Lime
 	{
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{
-			var previousTime = animation.TimeInternal;
+			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
 			animation.TimeInternal = currentTime;
-			if (!animation.NextMarkerOrTriggerTime.HasValue) {
-				var frameIndex = AnimationUtils.SecondsToFrames(currentTime);
-				var frameTime = AnimationUtils.SecondsPerFrame * frameIndex;
-				var stepOverFrame = previousTime <= frameTime && frameTime <= currentTime;
-				animation.NextMarkerOrTriggerTime = GetNextMarkerOrTriggerTime(animation, frameIndex + (stepOverFrame ? 0 : 1));
-			}
-
-			if (!animation.NextMarkerOrTriggerTime.HasValue || currentTime <= animation.NextMarkerOrTriggerTime.Value) {
-				// do nothing
+			animation.MarkerAhead = animation.MarkerAhead ?? FindMarkerAhead(animation, previousTime);
+			if (animation.MarkerAhead == null || currentTime < animation.MarkerAhead.Time) {
+				// Do nothing
 			} else {
-				var frameTime = animation.NextMarkerOrTriggerTime.Value;
-				var frameIndex = AnimationUtils.SecondsToFrames(frameTime);
-				animation.NextMarkerOrTriggerTime = null;
-				var currentMarker = animation.Markers.GetByFrame(frameIndex);
-				if (currentMarker != null) {
-					ProcessMarker(animation, currentMarker);
-				}
-				ApplyAnimators(animation, invokeTriggers: true, animationTimeCorrection: previousTime - frameTime);
-				if (!animation.IsRunning) {
+				var marker = animation.MarkerAhead;
+				animation.MarkerAhead = null;
+				ProcessMarker(animation, marker);
+				if (marker.Action == MarkerAction.Stop) {
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.RaiseStopped();
+				} else if (marker.Action == MarkerAction.Play) {
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 				}
 			}
 		}

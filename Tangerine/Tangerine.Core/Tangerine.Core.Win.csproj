@@ -51,13 +51,15 @@
     <Compile Include="Document.Animation.cs" />
     <Compile Include="ExpressionParser\Tokenizer.cs" />
     <Compile Include="DocumentPreview.cs" />
+    <Compile Include="GridSelection.cs" />
+    <Compile Include="GridSpanList.cs" />
     <Compile Include="HotSerialization.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />
     <Compile Include="NodeEditorState.cs" />
+    <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="Operations\ClearRowSelection.cs" />
     <Compile Include="Operations\NodeTypeConvert.cs" />
-    <Compile Include="Operations\RemoveAnimationProcessor.cs" />
     <Compile Include="Operations\RemoveKeyframeRange.cs" />
     <Compile Include="Operations\RenameAnimationProcessor.cs" />
     <Compile Include="Operations\ReplaceContents.cs" />

@@ -11,10 +11,16 @@ namespace Lime
 	{
 		public const double FramesPerSecond = 30.0;
 		public const double SecondsPerFrame = 1 / FramesPerSecond;
+		public const double Threshold = 0.000001;
 
 		public static int SecondsToFrames(double seconds)
 		{
-			return (int)(seconds * FramesPerSecond + 0.000001);
+			return (int)(seconds * FramesPerSecond + Threshold);
+		}
+
+		public static int SecondsToFramesCeiling(double seconds)
+		{
+			return (int)(seconds * FramesPerSecond + (1 - Threshold));
 		}
 
 		public static double FramesToSeconds(int frame)
@@ -60,7 +66,7 @@ namespace Lime
 				var componentTypeName = propertyPath.Substring(prevIndex + 1, index - prevIndex - 1);
 				var type = global::Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, Serialization.YuzuCommonOptions)
 				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
-				o = host.Components.Get(type);
+				o = host.GetComponent(type);
 				if (o == null) {
 					return (result, null, -1);
 				}

@@ -405,6 +405,60 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public class InsertIntoList<TList, TElement> : Operation where TList : IList<TElement>
+	{
+		public readonly TList List;
+		public readonly int Index;
+		public readonly TElement Element;
+
+		public override bool IsChangingDocument => true;
+
+		protected InsertIntoList(TList list, int index, TElement element)
+		{
+			List = list;
+			Index = index;
+			Element = element;
+		}
+
+		public static void Perform(TList list, int index, TElement element) => DocumentHistory.Current.Perform(new InsertIntoList<TList, TElement>(list, index, element));
+
+		public class Processor : OperationProcessor<InsertIntoList<TList, TElement>>
+		{
+			protected override void InternalRedo(InsertIntoList<TList, TElement> op) => op.List.Insert(op.Index, op.Element);
+			protected override void InternalUndo(InsertIntoList<TList, TElement> op) => op.List.RemoveAt(op.Index);
+		}
+	}
+
+	public class RemoveFromList<TList, TElement> : Operation where TList : IList<TElement>
+	{
+		public readonly TList List;
+		public readonly int Index;
+		private TElement backup;
+
+		public override bool IsChangingDocument => true;
+
+		protected RemoveFromList(TList list, int index)
+		{
+			List = list;
+			Index = index;
+		}
+
+		public static void Perform(TList list, TElement item) => Perform(list, list.IndexOf(item));
+
+		public static void Perform(TList list, int index) => DocumentHistory.Current.Perform(new RemoveFromList<TList, TElement>(list, index));
+
+		public class Processor : OperationProcessor<RemoveFromList<TList, TElement>>
+		{
+			protected override void InternalRedo(RemoveFromList<TList, TElement> op)
+			{
+				op.backup = op.List[op.Index];
+				op.List.RemoveAt(op.Index);
+			}
+
+			protected override void InternalUndo(RemoveFromList<TList, TElement> op) => op.List.Insert(op.Index, op.backup);
+		}
+	}
+
 	public class AddIntoCollection<TCollection, TElement> : Operation where TCollection : ICollection<TElement>
 	{
 		public readonly TCollection Collection;

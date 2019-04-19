@@ -51,6 +51,14 @@ namespace Lime
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Write(string data)
+		{
+			fixed (char* ptr = data) {
+				WriteInternal((byte*)ptr, data.Length * sizeof(char));
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void WriteInternal(byte* data, int count)
 		{
 			unchecked {

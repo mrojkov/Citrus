@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.Timeline.Components;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
@@ -20,8 +20,8 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public class Processor : OperationProcessor<ClearGridSelection>
 		{
-			class Backup { public List<GridSpanList> Spans; }
-				
+			class Backup { public List<Core.Components.GridSpanList> Spans; }
+
 			protected override void InternalRedo(ClearGridSelection op)
 			{
 				op.Save(new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanListComponent>().Spans).ToList() });

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -36,7 +36,7 @@ namespace Tangerine.UI.Timeline
 
 		static List<Curve> CreateCurves(IAnimator animator)
 		{
-			var adapter = Curve.Adapters[animator.GetValueType()];
+			var adapter = Curve.Adapters[animator.ValueType];
 			var curves = new List<Curve>();
 			for (int i = 0; i < adapter.ComponentCount; i++) {
 				var color = ColorTheme.Current.TimelineCurveEditor.Curves[i];

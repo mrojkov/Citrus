@@ -1,13 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Linq;
-using System.IO;
+using System.Collections.Concurrent;
 
 namespace Lime
 {
 	public static class Toolbox
 	{
+		public static class StringUniqueCodeGenerator
+		{
+			private static int counter = 2;
+			private static readonly ConcurrentDictionary<string, int> map = new ConcurrentDictionary<string, int>();
+			private static readonly Func<string, int> uidFactory = _ => counter++;
+
+			public static int Generate(string s) => s == null ? 1 : map.GetOrAdd(s, uidFactory);
+		}
+
 		public static bool IsNullOrWhiteSpace(this string value)
 		{
 			return string.IsNullOrWhiteSpace(value);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lime;
 
@@ -85,6 +85,28 @@ namespace Tangerine.Core.Components
 		public BoneRow(Bone bone)
 		{
 			Bone = bone;
+		}
+	}
+
+	public sealed class AnimationTrackRow : Component
+	{
+		public AnimationTrack Track { get; private set; }
+
+		public AnimationTrackRow(AnimationTrack track)
+		{
+			Track = track;
+		}
+
+		public AnimationTrackVisibility Visibility
+		{
+			get { return Track.EditorState().Visibility; }
+			set { Track.EditorState().Visibility = value; }
+		}
+
+		public bool Locked
+		{
+			get { return Track.EditorState().Locked; }
+			set { Track.EditorState().Locked = value; }
 		}
 	}
 

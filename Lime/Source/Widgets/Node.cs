@@ -126,6 +126,17 @@ namespace Lime
 			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
 			set => contentsPath = Yuzu.Current?.ExpandPath(value) ?? value;
 		}
+#if TANGERINE
+		protected void OnContentsPathChange()
+		{
+			if (string.IsNullOrEmpty(ContentsPath)) {
+				Nodes.Clear();
+				Components.Clear();
+			}
+			LoadExternalScenes();
+		}
+#endif
+
 
 		internal static long NodeReferenceCacheValidationCode = 1;
 
@@ -151,9 +162,15 @@ namespace Lime
 			internal set
 			{
 				if (parent != value) {
+					for (var n = Parent; n != null; n = n.Parent) {
+						n.DescendantAnimatorsVersion++;
+					}
 					var oldParent = parent;
 					parent = value;
 					PropagateDirtyFlags();
+					for (var n = Parent; n != null; n = n.Parent) {
+						n.DescendantAnimatorsVersion++;
+					}
 					OnParentChanged(oldParent);
 				}
 			}
@@ -288,6 +305,8 @@ namespace Lime
 		[YuzuMember]
 		public NodeComponentCollection Components { get; private set; }
 
+		Component IAnimationHost.GetComponent(Type type) => Components.Get(type);
+
 		/// <summary>
 		/// Collections of Animators.
 		/// </summary>
@@ -388,199 +407,19 @@ namespace Lime
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
 		public AnimationCollection Animations { get; private set; }
+		internal int DescendantAnimatorsVersion { get; private set; }
 
-#if TANGERINE
-		public class TangerineAnimationCollection : IList<Animation>, IList
+		void IAnimationHost.OnAnimatorCollectionChanged()
 		{
-			private Node owner;
-
-			public Animation this[int index]
-			{
-				get => owner.Animations[ToInternalIndex(index)];
-				set {
-					value.Id = value.Id ?? "";
-					owner.Animations[ToInternalIndex(index)] = value;
-				}
-			}
-
-			public int Count
-			{
-				get {
-					var count = 0;
-					foreach (var a in owner.Animations) {
-						if (!a.IsLegacy) {
-							count++;
-						}
-					}
-					return count;
-				}
-			}
-
-			public bool IsReadOnly => false;
-
-			bool IList.IsReadOnly => false;
-
-			bool IList.IsFixedSize => false;
-
-			int ICollection.Count => Count;
-
-			object ICollection.SyncRoot => this;
-
-			bool ICollection.IsSynchronized => false;
-
-			object IList.this[int index]
-			{
-				get => this[index];
-				set => this[index] = (Animation)value;
-			}
-
-			internal TangerineAnimationCollection(Node owner)
-			{
-				this.owner = owner;
-			}
-
-			public void Add(Animation item)
-			{
-				if (item != null && item.IsLegacy) {
-					throw new ArgumentException(nameof(item));
-				}
-				item.Id = item.Id ?? "";
-				owner.Animations.Add(item);
-			}
-
-			public void Clear()
-			{
-				while (Count > 0) {
-					RemoveAt(Count - 1);
-				}
-			}
-
-			public bool Contains(Animation item)
-			{
-				return item != null && !item.IsLegacy && owner.Animations.Contains(item);
-			}
-
-			public void CopyTo(Animation[] array, int arrayIndex)
-			{
-				throw new NotImplementedException();
-			}
-
-			public int IndexOf(Animation item)
-			{
-				if (item != null && !item.IsLegacy) {
-					return FromInternalIndex(owner.Animations.IndexOf(item));
-				}
-				return -1;
-			}
-
-			public void Insert(int index, Animation item)
-			{
-				if (item != null && item.IsLegacy) {
-					throw new ArgumentException(nameof(item));
-				}
-				item.Id = item.Id ?? "";
-				owner.Animations.Insert(ToInternalIndex(index), item);
-			}
-
-			public bool Remove(Animation item)
-			{
-				return item != null && !item.IsLegacy && owner.Animations.Remove(item);
-			}
-
-			public void RemoveAt(int index)
-			{
-				owner.Animations.RemoveAt(ToInternalIndex(index));
-			}
-
-			public IEnumerator<Animation> GetEnumerator()
-			{
-				foreach (var a in owner.Animations) {
-					if (!a.IsLegacy) {
-						yield return a;
-					}
-				}
-			}
-
-			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-			private int FromInternalIndex(int index)
-			{
-				var j = 0;
-				for (var i = 0; i < index; i++) {
-					if (!owner.Animations[i].IsLegacy) {
-						j++;
-					}
-				}
-				return j;
-			}
-
-			private int ToInternalIndex(int index)
-			{
-				var i = 0;
-				while (true) {
-					if (i == owner.Animations.Count || !owner.Animations[i].IsLegacy) {
-						index--;
-						if (index < 0) {
-							return i;
-						}
-					}
-					i++;
-				}
-			}
-
-			int IList.Add(object value)
-			{
-				Add((Animation)value);
-				return Count - 1;
-			}
-
-			bool IList.Contains(object value)
-			{
-				return value is Animation a && Contains(a);
-			}
-
-			int IList.IndexOf(object value)
-			{
-				if (value is Animation a) {
-					return IndexOf(a);
-				}
-				return -1;
-			}
-
-			void IList.Insert(int index, object value)
-			{
-				Insert(index, (Animation)value);
-			}
-
-			void IList.Remove(object value)
-			{
-				if (value is Animation a) {
-					Remove(a);
-				}
-			}
-
-			void ICollection.CopyTo(Array array, int index)
-			{
-				CopyTo((Animation[])array, index);
+			for (var n = Parent; n != null; n = n.Parent) {
+				n.DescendantAnimatorsVersion++;
 			}
 		}
 
-		[TangerineInspect]
-		public TangerineAnimationCollection TangerineAnimations { get; private set;  }
-
+#if TANGERINE
 		protected bool ShouldInspectContentsPath() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 
 		protected bool ShouldInspectPosition() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
-
-		protected void OnContentsPathChange()
-		{
-			if (string.IsNullOrEmpty(ContentsPath)) {
-				Nodes.Clear();
-				Components.Clear();
-			}
-			LoadExternalScenes();
-		}
-
 #endif // TANGERINE
 
 		public bool NeedSerializeAnimations() =>
@@ -635,9 +474,6 @@ namespace Lime
 			Components = new NodeComponentCollection(this);
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationCollection(this);
-#if TANGERINE
-			TangerineAnimations = new TangerineAnimationCollection(this);
-#endif
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = this;
@@ -782,9 +618,7 @@ namespace Lime
 			clone.NextSibling = null;
 			clone.gestures = null;
 			clone.Animations = Animations.Clone(clone);
-#if TANGERINE
-			clone.TangerineAnimations = new TangerineAnimationCollection(clone);
-#endif
+			clone.DescendantAnimatorsVersion = 0;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
 			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;
@@ -933,27 +767,27 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		public virtual void OnTrigger(string property, double animationTimeCorrection = 0)
+		public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
 			if (property != "Trigger") {
 				return;
 			}
-			if (string.IsNullOrEmpty(Trigger)) {
+			if (string.IsNullOrEmpty(value as string)) {
 				DefaultAnimation.Time = animationTimeCorrection;
 				DefaultAnimation.IsRunning = true;
 			} else {
-				TriggerMultipleAnimations(animationTimeCorrection);
+				TriggerMultipleAnimations((string)value, animationTimeCorrection);
 			}
 		}
 
-		protected void TriggerMultipleAnimations(double animationTimeCorrection = 0)
+		protected void TriggerMultipleAnimations(string trigger, double animationTimeCorrection = 0)
 		{
-			if (Trigger.IndexOf(',') >= 0) {
-				foreach (var s in Trigger.Split(',')) {
+			if (trigger.IndexOf(',') >= 0) {
+				foreach (var s in trigger.Split(',')) {
 					TriggerAnimation(s.Trim(), animationTimeCorrection);
 				}
 			} else {
-				TriggerAnimation(Trigger, animationTimeCorrection);
+				TriggerAnimation(trigger, animationTimeCorrection);
 			}
 		}
 

@@ -71,17 +71,16 @@ namespace Tangerine.UI.Timeline
 
 		private void ScaleKeyframes()
 		{
-			var boundaries = GridSelection.GetSelectionBoundaries();
-			if (boundaries.HasValue || Scale < Mathf.ZeroTolerance) {
+			if (GridSelection.GetSelectionBoundaries(out var boundaries) && Scale < Mathf.ZeroTolerance) {
 				var saved = new List<IKeyframe>();
-				for (int i = boundaries.Value.Top; i <= boundaries.Value.Bottom; ++i) {
+				for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 					if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
 						continue;
 					}
 					foreach (var animator in animable.Animators.ToList()) {
 						saved.Clear();
 						IEnumerable<IKeyframe> keys = animator.ReadonlyKeys.Where(k =>
-							k.Frame >= boundaries.Value.Left && k.Frame < boundaries.Value.Right
+							k.Frame >= boundaries.Left && k.Frame < boundaries.Right
 						).ToList();
 						if (Scale < 1) {
 							keys = keys.Reverse().ToList();
@@ -93,10 +92,10 @@ namespace Tangerine.UI.Timeline
 						foreach (var key in saved) {
 							// The formula should behave similiar to stretching animation with mouse
 							int newFrame = (int)(
-								boundaries.Value.Left +
-								(key.Frame - boundaries.Value.Left) *
-								(1 + (boundaries.Value.Left - boundaries.Value.Right) * Scale) /
-								(1 + boundaries.Value.Left - boundaries.Value.Right)
+								boundaries.Left +
+								(key.Frame - boundaries.Left) *
+								(1 + (boundaries.Left - boundaries.Right) * Scale) /
+								(1 + boundaries.Left - boundaries.Right)
 							);
 							var newKey = key.Clone();
 							newKey.Frame = newFrame;
@@ -111,8 +110,8 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 				ClearGridSelection.Perform();
-				for (int i = boundaries.Value.Top; i <= boundaries.Value.Bottom; ++i) {
-					SelectGridSpan.Perform(i, boundaries.Value.Left, (int)(boundaries.Value.Left + (boundaries.Value.Right - boundaries.Value.Left) * Scale));
+				for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
+					SelectGridSpan.Perform(i, boundaries.Left, (int)(boundaries.Left + (boundaries.Right - boundaries.Left) * Scale));
 				}
 			} else {
 				Document.Current.History.RollbackTransaction();

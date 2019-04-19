@@ -50,6 +50,8 @@ namespace Lime
 			[YuzuOptional]
 			public Color4 SelectedBackground { get; set; }
 			[YuzuOptional]
+			public Color4 SelectedInactiveBackground { get; set; }
+			[YuzuOptional]
 			public Color4 HoveredBackground { get; set; }
 			[YuzuOptional]
 			public Color4 DisabledBackground { get; set; }
@@ -141,6 +143,7 @@ namespace Lime
 					WhiteBackground = Color4.Black.Lighten(0.25f),
 					GrayBackground = new Color4(45, 45, 48),
 					SelectedBackground = new Color4(86, 86, 86),
+					SelectedInactiveBackground = new Color4(107, 107, 107),
 					SelectedBorder = new Color4(153, 209, 255),
 					HoveredBackground = new Color4(86, 86, 86).Lighten(0.25f),
 					DisabledBackground = grayBackground.Darken(.1f),
@@ -194,6 +197,7 @@ namespace Lime
 					WhiteBackground = Color4.White,
 					GrayBackground = grayBackground,
 					SelectedBackground = new Color4(205, 232, 255),
+					SelectedInactiveBackground = new Color4(220, 220, 220),
 					SelectedBorder = new Color4(153, 209, 255),
 					HoveredBackground = new Color4(229, 243, 255),
 					DisabledBackground = grayBackground.Lighten(.1f),

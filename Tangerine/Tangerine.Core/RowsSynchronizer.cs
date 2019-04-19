@@ -14,9 +14,16 @@ namespace Tangerine.Core
 		{
 			var doc = Document.Current;
 			rows.Clear();
-			doc.RowTree = GetFolderRow(doc.Container.RootFolder());
-			doc.RowTree.Rows.Clear();
-			AddFolderContent(doc.RowTree);
+			if (Document.Current.Animation.IsCompound) {
+				doc.RowTree = new Row { CanHaveChildren = true };
+				foreach (var track in Document.Current.Animation.Tracks) {
+					AddRow(doc.RowTree, GetAnimationTrackRow(track));
+				}
+			} else {
+				doc.RowTree = GetFolderRow(doc.Container.RootFolder());
+				doc.RowTree.Rows.Clear();
+				AddFolderContent(doc.RowTree);
+			}
 			// Use temporary row list to avoid 'Collection was modified' exception during row batch processing.
 			if (!rows.SequenceEqual(Document.Current.Rows)) {
 				doc.Rows.Clear();
@@ -126,6 +133,15 @@ namespace Tangerine.Core
 			if (!row.Components.Contains<FolderRow>()) {
 				row.Components.Add(new FolderRow(folder));
 				row.CanHaveChildren = true;
+			}
+			return row;
+		}
+
+		Row GetAnimationTrackRow(AnimationTrack track)
+		{
+			var row = Document.Current.GetRowForObject(track);
+			if (!row.Components.Contains<AnimationTrackRow>()) {
+				row.Components.Add(new AnimationTrackRow(track));
 			}
 			return row;
 		}

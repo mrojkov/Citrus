@@ -91,6 +91,18 @@ namespace Lime
 			return false;
 		}
 
+		public bool TryFind(int idComparisonCode, out Animation animation)
+		{
+			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
+				if (a.IdComparisonCode == idComparisonCode) {
+					animation = a;
+					return true;
+				}
+			}
+			animation = null;
+			return false;
+		}
+
 		public bool TryRun(string animationId, string markerId = null, double animationTimeCorrection = 0)
 		{
 			Animation animation;

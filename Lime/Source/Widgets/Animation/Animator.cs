@@ -5,48 +5,43 @@ using Yuzu;
 
 namespace Lime
 {
-	public interface IAnimator : IDisposable
+	public interface IAbstractAnimator
+	{
+		IAnimable Animable { get; }
+		int TargetPropertyPathComparisonCode { get; }
+		int Duration { get; }
+		bool IsTriggerable { get; }
+		Type ValueType { get; }
+		void Apply(double time);
+		void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime);
+	}
+
+	internal interface IAbstractAnimator<T> : IAbstractAnimator
+	{
+		T CalcValue(double time);
+		IAbstractAnimatorSetter<T> Setter { get; }
+	}
+
+	internal interface IAbstractAnimatorSetter<T>
+	{
+		void SetValue(T value);
+	}
+
+	public interface IAnimator : IDisposable, IAbstractAnimator
 	{
 		IAnimationHost Owner { get; set; }
-#if TANGERINE
-		IAnimable Animable { get; }
-#endif // TANGERINE
-		IAnimator Next { get; set; }
-
 		IAnimator Clone();
-
-		bool IsTriggerable { get; set; }
-
 		string TargetPropertyPath { get; set; }
-
 		string AnimationId { get; set; }
-
 		bool Enabled { get; set; }
-
-		int Duration { get; }
-
-		void InvokeTrigger(int frame, double animationTimeCorrection = 0);
-
-		void Apply(double time);
-
-		void ResetCache();
-
 		IKeyframeList ReadonlyKeys { get; }
-
 		IKeyframeList Keys { get; }
-
 		object UserData { get; set; }
-
-		Type GetValueType();
-
-		object CalcValue(double time);
-
-		bool TryGetNextKeyFrame(int nextFrame, out int keyFrame);
-
 		void Unbind();
-
 		bool IsZombie { get; }
-
+		object CalcValue(double time);
+		void ExecuteTrigger(int frame, double animationTimeCorrection);
+		void ResetCache();
 #if TANGERINE
 		int Version { get; }
 #endif // TANGERINE
@@ -55,7 +50,6 @@ namespace Lime
 	public interface IKeyframeList : IList<IKeyframe>
 	{
 		IKeyframe CreateKeyframe();
-
 		IKeyframe GetByFrame(int frame);
 
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
@@ -66,10 +60,9 @@ namespace Lime
 #endif // TANGERINE
 	}
 
-	public class Animator<T> : IAnimator
+	public class Animator<T> : IAnimator, IAbstractAnimator<T>, IAbstractAnimatorSetter<T>
 	{
 		public IAnimationHost Owner { get; set; }
-#if TANGERINE
 		public IAnimable Animable
 		{
 			get
@@ -81,16 +74,22 @@ namespace Lime
 			}
 		}
 		private IAnimable animable;
-#endif // TANGERINE
-		public IAnimator Next { get; set; }
-
 		private double minTime;
 		private double maxTime;
 		private KeyframeParams @params;
 		private int keyIndex;
 		protected T Value1, Value2, Value3, Value4;
-
-		public bool IsTriggerable { get; set; }
+		private bool isTriggerable;
+		public bool IsTriggerable
+		{
+			get
+			{
+				if (animable == null && !IsZombie) {
+					Bind();
+				}
+				return isTriggerable;
+			}
+		}
 		public bool Enabled { get; set; } = true;
 		private delegate void SetterDelegate(T value);
 		private delegate void IndexedSetterDelegate(int index, T value);
@@ -113,10 +112,21 @@ namespace Lime
 		public int Version { get => version + ReadonlyKeys.Version; }
 #endif // TANGERINE
 
+		private string targetPropertyPath;
 		[YuzuMember("TargetProperty")]
-		public string TargetPropertyPath { get; set; }
+		public string TargetPropertyPath
+		{
+			get => targetPropertyPath;
+			set
+			{
+				targetPropertyPath = value;
+				TargetPropertyPathComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(value);
+			}
+		}
 
-		public Type GetValueType() { return typeof(T); }
+		public int TargetPropertyPathComparisonCode { get; private set; }
+
+		public Type ValueType => typeof(T);
 
 		[YuzuMember]
 		public TypedKeyframeList<T> ReadonlyKeys { get; private set; }
@@ -125,6 +135,8 @@ namespace Lime
 		public string AnimationId { get; set; }
 
 		public object UserData { get; set; }
+
+		IAbstractAnimatorSetter<T> IAbstractAnimator<T>.Setter => this;
 
 		public Animator()
 		{
@@ -185,7 +197,6 @@ namespace Lime
 #endif // TANGERINE
 			clone.IsZombie = false;
 			clone.Owner = null;
-			clone.Next = null;
 			clone.boxedKeys = null;
 			boxedKeys = null;
 			ReadonlyKeys.AddRef();
@@ -212,17 +223,40 @@ namespace Lime
 			Keys.Clear();
 		}
 
-		public void InvokeTrigger(int frame, double animationTimeCorrection = 0)
+		public void ExecuteTrigger(int frame, double animationTimeCorrection)
 		{
-			if (ReadonlyKeys.Count > 0 && Enabled) {
-				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				if (ReadonlyKeys[keyIndex].Frame == frame) {
-					Owner.OnTrigger(TargetPropertyPath, animationTimeCorrection);
+			if (!Enabled || IsZombie || !IsTriggerable) {
+				return;
+			}
+			foreach (var key in ReadonlyKeys) {
+				if (key.Frame == frame) {
+					Owner?.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: animationTimeCorrection);
+					break;
 				}
 			}
 		}
 
-		public void Apply(double time)
+		public void ExecuteTriggersInRange(double minTime, double maxTime, bool executeTriggerAtMaxTime)
+		{
+			if (!Enabled || IsZombie || !IsTriggerable || Owner == null) {
+				return;
+			}
+			int minFrame = AnimationUtils.SecondsToFramesCeiling(minTime);
+			int maxFrame = AnimationUtils.SecondsToFramesCeiling(maxTime) + (executeTriggerAtMaxTime ? 1 : 0);
+			if (minFrame >= maxFrame) {
+				return;
+			}
+			foreach (var key in ReadonlyKeys) {
+				if (key.Frame >= maxFrame) {
+					break;
+				} else if (key.Frame >= minFrame) {
+					var t = minTime - AnimationUtils.FramesToSeconds(key.Frame);
+					Owner.OnTrigger(TargetPropertyPath, key.Value, animationTimeCorrection: t);
+				}
+			}
+		}
+
+		public void SetValue(T value)
 		{
 			if (Enabled && !IsZombie && ReadonlyKeys.Count > 0) {
 				if (setter == null) {
@@ -231,8 +265,13 @@ namespace Lime
 						return;
 					}
 				}
-				setter(CalcValue(time));
+				setter(value);
 			}
+		}
+
+		public void Apply(double time)
+		{
+			SetValue(CalcValue(time));
 		}
 
 		private void Bind()
@@ -246,7 +285,7 @@ namespace Lime
 #if TANGERINE
 			animable = a;
 #endif // TANGERINE
-			IsTriggerable = p.Triggerable;
+			isTriggerable = p.Triggerable;
 			if (index == -1) {
 				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), a, mi);
 			} else {
@@ -260,6 +299,7 @@ namespace Lime
 		public void ResetCache()
 		{
 			minTime = maxTime = 0;
+			Owner?.OnAnimatorCollectionChanged();
 		}
 
 		public T CalcValue(double time)
@@ -271,13 +311,8 @@ namespace Lime
 				return Value2;
 			}
 			var t = (float)((time - minTime) / (maxTime - minTime));
-			if (@params.EasingFunction != EasingFunction.Linear) {
-				var origT = t;
-				t = Easing.Interpolate(t, @params.EasingFunction, @params.EasingType);
-				if (@params.EasingSoftness != 0) {
-					var k = (float)@params.EasingSoftness * 0.01f;
-					t = (1 - k) * t + k * origT;
-				}
+			if (@params.EasingFunction != Mathf.EasingFunction.Linear) {
+				t = Mathf.Easings.Interpolate(t, @params.EasingFunction, @params.EasingType);
 			}
 			if (@params.Function == KeyFunction.Linear) {
 				return InterpolateLinear(t);
@@ -288,23 +323,9 @@ namespace Lime
 
 		object IAnimator.CalcValue(double time) => CalcValue(time);
 
-		public bool TryGetNextKeyFrame(int nextFrame, out int keyFrame)
-		{
-			foreach (var key in ReadonlyKeys) {
-				if (key.Frame < nextFrame) {
-					continue;
-				}
-
-				keyFrame = key.Frame;
-				return true;
-			}
-			keyFrame = -1;
-			return false;
-		}
-
 		private static KeyframeParams defaultKeyframeParams = new KeyframeParams {
 			Function = KeyFunction.Steep,
-			EasingFunction = EasingFunction.Linear
+			EasingFunction = Mathf.EasingFunction.Linear
 		};
 
 		private void CacheInterpolationParameters(double time)
@@ -312,8 +333,8 @@ namespace Lime
 			int count = ReadonlyKeys.Count;
 			if (count == 0) {
 				Value2 = default(T);
-				minTime = -float.MaxValue;
-				maxTime = float.MaxValue;
+				minTime = -double.MaxValue;
+				maxTime = double.MaxValue;
 				@params = defaultKeyframeParams;
 				return;
 			}
@@ -330,23 +351,22 @@ namespace Lime
 				i--;
 			}
 			keyIndex = i;
-			int minFrame, maxFrame;
 			if (i < 0) {
 				keyIndex = 0;
-				maxFrame = ReadonlyKeys[0].Frame;
-				minFrame = int.MinValue;
+				maxTime = ReadonlyKeys[0].Frame * AnimationUtils.SecondsPerFrame;
+				minTime = double.MinValue;
 				Value2 = ReadonlyKeys[0].Value;
 				@params = defaultKeyframeParams;
 			} else if (i == count - 1) {
-				minFrame = ReadonlyKeys[i].Frame;
-				maxFrame = int.MaxValue;
+				minTime = ReadonlyKeys[i].Frame * AnimationUtils.SecondsPerFrame;
+				maxTime = double.MaxValue;
 				Value2 = ReadonlyKeys[i].Value;
 				@params = defaultKeyframeParams;
 			} else {
 				var key1 = ReadonlyKeys[i];
 				var key2 = ReadonlyKeys[i + 1];
-				minFrame = key1.Frame;
-				maxFrame = key2.Frame;
+				minTime = key1.Frame * AnimationUtils.SecondsPerFrame;
+				maxTime = key2.Frame * AnimationUtils.SecondsPerFrame;
 				Value2 = key1.Value;
 				Value3 = key2.Value;
 				@params = key1.Params;
@@ -358,8 +378,6 @@ namespace Lime
 					Value4 = ReadonlyKeys[i + 1 >= count - 1 ? 1 : i + 2].Value;
 				}
 			}
-			minTime = minFrame * AnimationUtils.SecondsPerFrame;
-			maxTime = maxFrame * AnimationUtils.SecondsPerFrame;
 		}
 	}
 

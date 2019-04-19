@@ -26,13 +26,12 @@ namespace Tangerine.UI.Timeline
 					yield return null;
 					continue;
 				}
-				var boundaries = GridSelection.GetSelectionBoundaries();
-				if (boundaries == null || boundaries.Value.Right - boundaries.Value.Left < 2) {
+				if (!GridSelection.GetSelectionBoundaries(out var boundaries) || boundaries.Right - boundaries.Left < 2) {
 					yield return null;
 					continue;
 				}
-				var topLeft = grid.CellToGridCoordinates(boundaries.Value.Top, boundaries.Value.Left);
-				var bottomRight = grid.CellToGridCoordinates(boundaries.Value.Bottom + 1, boundaries.Value.Right);
+				var topLeft = grid.CellToGridCoordinates(boundaries.Top, boundaries.Left);
+				var bottomRight = grid.CellToGridCoordinates(boundaries.Bottom + 1, boundaries.Right);
 				var mousePosition = grid.ContentWidget.LocalMousePosition();
 				if (mousePosition.Y < topLeft.Y || mousePosition.Y > bottomRight.Y) {
 					yield return null;
@@ -41,12 +40,12 @@ namespace Tangerine.UI.Timeline
 				if (mousePosition.X - topLeft.X < 0 && mousePosition.X - topLeft.X > -10) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
 					if (input.ConsumeKeyPress(Key.Mouse0)) {
-						yield return Drag(boundaries.Value, DragSide.Left);
+						yield return Drag(boundaries, DragSide.Left);
 					}
 				} else if (mousePosition.X - bottomRight.X > 0 && mousePosition.X - bottomRight.X < 10) {
 					Utils.ChangeCursorIfDefault(MouseCursor.SizeWE);
 					if (input.ConsumeKeyPress(Key.Mouse0)) {
-						yield return Drag(boundaries.Value, DragSide.Right);
+						yield return Drag(boundaries, DragSide.Right);
 					}
 				}
 				yield return null;
@@ -55,7 +54,7 @@ namespace Tangerine.UI.Timeline
 
 		private enum DragSide { Left, Right }
 
-		private IEnumerator<object> Drag(Boundaries boundaries, DragSide side)
+		private IEnumerator<object> Drag(IntRectangle boundaries, DragSide side)
 		{
 			IntVector2? last = null;
 			Save(boundaries);
@@ -94,7 +93,7 @@ namespace Tangerine.UI.Timeline
 			yield return null;
 		}
 
-		private void Stretch(Boundaries boundaries, DragSide side, int newPos, bool stretchMarkers)
+		private void Stretch(IntRectangle boundaries, DragSide side, int newPos, bool stretchMarkers)
 		{
 			int length;
 			if (side == DragSide.Left) {
@@ -157,7 +156,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private void Save(Boundaries boundaries)
+		private void Save(IntRectangle boundaries)
 		{
 			savedPositions.Clear();
 			savedKeyframes.Clear();

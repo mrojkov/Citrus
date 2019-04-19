@@ -64,8 +64,8 @@ namespace Tangerine.UI.Timeline
 			RenderCursor();
 			Timeline.Instance.GetVisibleColumnRange(out var minColumn, out var maxColumn);
 			for (int i = minColumn; i <= maxColumn; i++) {
-				var x = i * TimelineMetrics.ColWidth + 0.5f;
 				if (i % 10 == 0) {
+					var x = i * TimelineMetrics.ColWidth + 0.5f;
 					float textHeight = Theme.Metrics.TextHeight;
 					float y = (RootWidget.Height - textHeight) / 2;
 					Renderer.DrawTextLine(
@@ -73,7 +73,9 @@ namespace Tangerine.UI.Timeline
 						Theme.Metrics.TextHeight,
 						Theme.Colors.BlackText,
 						0.0f);
-					Renderer.DrawLine(x, 0, x, RootWidget.Height, ColorTheme.Current.TimelineRuler.Notchings);
+					if (!Document.Current.Animation.IsCompound) {
+						Renderer.DrawLine(x, 0, x, RootWidget.Height, ColorTheme.Current.TimelineRuler.Notchings);
+					}
 				}
 			}
 			bool metUpperMarker = false;
@@ -92,7 +94,7 @@ namespace Tangerine.UI.Timeline
 
 		void RenderCursor()
 		{
-			var r = GetRectangle(Timeline.Instance.CurrentColumn);
+			var r = GetRectangle(Timeline.Instance.CurrentColumnEased);
 			Renderer.DrawRect(
 				r.A, r.B,
 				Document.Current.PreviewAnimation ?
@@ -137,7 +139,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private Rectangle GetRectangle(int frame)
+		private Rectangle GetRectangle(float frame)
 		{
 			return new Rectangle {
 				A = new Vector2(frame * TimelineMetrics.ColWidth + 0.5f, 0),

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
-using Tangerine.UI.Timeline.Components;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {

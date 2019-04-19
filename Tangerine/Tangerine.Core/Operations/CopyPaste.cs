@@ -21,15 +21,28 @@ namespace Tangerine.Core.Operations
 
 		public static string CopyToString()
 		{
-			using (var frame = CreateInMemoryCopy()) {
-				var stream = new System.IO.MemoryStream();
-				TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
-				var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
-				return text;
+			var stream = new System.IO.MemoryStream();
+			if (Document.Current.Animation.IsCompound) {
+				CopyAnimationTracks(stream);
+			} else {
+				CopyNodes(stream);
 			}
+			var text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+			return text;
 		}
 
-		static Frame CreateInMemoryCopy()
+		private static void CopyAnimationTracks(System.IO.MemoryStream stream)
+		{
+			var animation = new Animation { IsCompound = true };
+			foreach (var row in Document.Current.TopLevelSelectedRows()) {
+				if (row.Components.Get<AnimationTrackRow>()?.Track is AnimationTrack track) {
+					animation.Tracks.Add(track.Clone());
+				}
+			}
+			TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, animation, Serialization.Format.JSON);
+		}
+
+		private static void CopyNodes(System.IO.MemoryStream stream)
 		{
 			var frame = new Frame();
 			foreach (var row in Document.Current.TopLevelSelectedRows()) {
@@ -64,7 +77,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			frame.SyncFolderDescriptorsAndNodes();
-			return frame;
+			TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
 		}
 
 		static Folder CloneFolder(Folder folder)
@@ -100,24 +113,46 @@ namespace Tangerine.Core.Operations
 				new RowLocation(row.Parent, row.Parent.Rows.IndexOf(row));
 			var data = Clipboard.Text;
 			if (!string.IsNullOrEmpty(data)) {
-				Perform(data, loc, pasteAtMouse);
+				if (Document.Current.Animation.IsCompound) {
+					PasteAnimationTracks(data, loc);
+				} else {
+					PasteNodes(data, loc, pasteAtMouse);
+				}
 			}
-
 			foreach (var node in Document.Current.SelectedNodes()) {
 				node.LoadExternalScenes();
 			}
 		}
 
-		public static bool CanPaste(string data, RowLocation location)
+		private static void PasteAnimationTracks(string data, RowLocation loc)
 		{
-			// We are support only paste into folders for now.
-			return location.ParentRow.Components.Contains<FolderRow>() ||
-				   location.ParentRow.Components.Contains<BoneRow>();
+			try {
+				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
+				var animation = TangerineYuzu.Instance.Value.ReadObject<Animation>(string.Empty, stream);
+				ClearRowSelection.Perform();
+				var tracks = animation.Tracks.ToList();
+				animation.Tracks.Clear();
+				int i = Document.Current.Animation.Tracks.Count == 0 ? 0 : loc.Index + 1;
+				foreach (var t in tracks) {
+					InsertIntoList<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, i++, t);
+					SelectRow.Perform(Document.Current.GetRowForObject(t));
+				}
+			} catch (System.Exception e) {
+				Debug.Write(e);
+				return;
+			}
 		}
 
-		public static bool Perform(string data, RowLocation location, bool pasteAtMouse = false)
+		public static bool PasteNodes(string data, RowLocation location, bool pasteAtMouse = false)
 		{
-			if (!CanPaste(data, location)) {
+			bool CanPaste()
+			{
+				// We are support only paste into folders for now.
+				return location.ParentRow.Components.Contains<FolderRow>() ||
+					   location.ParentRow.Components.Contains<BoneRow>();
+			}
+
+			if (!CanPaste()) {
 				return false;
 			}
 			Frame frame;
@@ -231,31 +266,32 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var row in Document.Current.TopLevelSelectedRows().ToList()) {
+			var doc = Document.Current;
+			foreach (var row in doc.TopLevelSelectedRows().ToList()) {
 				if (!row.IsCopyPasteAllowed()) {
 					continue;
 				}
 				if (row.Components.Get<PropertyRow>()?.Animator is IAnimator animator) {
-					Document.Current.History.DoTransaction(() => {
+					doc.History.DoTransaction(() => {
 						foreach (var keyframe in animator.Keys.ToList()) {
 							RemoveKeyframe.Perform(animator, keyframe.Frame);
 						}
 					});
-					continue;
-				}
-				var item = Row.GetFolderItem(row);
-				var currentBone = row.Components.Get<BoneRow>()?.Bone;
-				if (currentBone != null) {
-					var bones = Document.Current.Container.Nodes.OfType<Bone>().ToList();
+				} else if (row.Components.Get<AnimationTrackRow>()?.Track is AnimationTrack track) {
+					doc.History.DoTransaction(() => {
+						RemoveFromList<AnimationTrackList, AnimationTrack>.Perform(doc.Animation.Tracks, track);
+					});
+				} else if (row.Components.Get<BoneRow>()?.Bone is Bone currentBone) {
+					var bones = doc.Container.Nodes.OfType<Bone>().ToList();
 					var dependentBones = BoneUtils.FindBoneDescendats(currentBone, bones).ToList();
 					dependentBones.Insert(0, currentBone);
-					UntieWidgetsFromBones.Perform(dependentBones, Document.Current.Container.Nodes.OfType<Widget>());
+					UntieWidgetsFromBones.Perform(dependentBones, doc.Container.Nodes.OfType<Widget>());
 					foreach (var bone in dependentBones) {
-						UnlinkFolderItem.Perform(Document.Current.Container, bone);
-						Document.Current.Container.AsWidget.BoneArray[bone.Index] = default(BoneArray.Entry);
+						UnlinkFolderItem.Perform(doc.Container, bone);
+						doc.Container.AsWidget.BoneArray[bone.Index] = default;
 					}
-				} else if (item != null) {
-					UnlinkFolderItem.Perform(Document.Current.Container, item);
+				} else if (Row.GetFolderItem(row) is IFolderItem item) {
+					UnlinkFolderItem.Perform(doc.Container, item);
 				}
 			}
 		}

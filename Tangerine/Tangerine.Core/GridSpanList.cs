@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tangerine.Core;
 using Lime;
 
-namespace Tangerine.UI.Timeline.Components
+namespace Tangerine.Core.Components
 {
 	public struct GridSpan
 	{
@@ -67,7 +66,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			if (span.B - span.A != 1) {
 				throw new NotSupportedException("Deselection of areas, longer than 1, is not supported");
-			} 
+			}
 			var result = new GridSpanList();
 			foreach (var s in this) {
 				if (s.B < span.A || s.A >= span.B) {

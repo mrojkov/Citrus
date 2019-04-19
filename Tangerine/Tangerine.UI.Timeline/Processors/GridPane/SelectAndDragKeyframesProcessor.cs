@@ -20,10 +20,10 @@ namespace Tangerine.UI.Timeline
 			var lastSelectedCell = IntVector2.Zero;
 			Node lastSelectionContainer = null;
 			while (true) {
-				if (input.WasMousePressed()) {
+				if (input.WasMousePressed() && !Document.Current.Animation.IsCompound) {
 					using (Document.Current.History.BeginTransaction()) {
-						var initialCell = Grid.CellUnderMouse(ignoreBounds: false);
-						if (initialCell.Y >= 0 && initialCell.Y < Document.Current.Rows.Count) {
+						if (Grid.IsMouseOverRow()) {
+							var initialCell = Grid.CellUnderMouse();
 							if (IsCellSelected(initialCell)) {
 								yield return DragSelectionTask(initialCell);
 							} else {
@@ -36,7 +36,8 @@ namespace Tangerine.UI.Timeline
 								var isSelectingKeyframes = input.IsKeyPressed(Key.Alt);
 
 								if (isSelectRangeMode && lastSelectionContainer == Document.Current.Container) {
-									yield return SelectRangeTask(lastSelectedCell, initialCell, isSelectingKeyframes);
+									SelectRange(lastSelectedCell, initialCell, isSelectingKeyframes);
+									yield return null;
 								} else if (!r.Result || isInMultiselectMode) {
 									yield return SelectTask(initialCell, isSelectingKeyframes);
 									lastSelectedCell = initialCell;
@@ -55,7 +56,7 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		private static object SelectRangeTask(IntVector2 a, IntVector2 b, bool selectKeyframes)
+		private static void SelectRange(IntVector2 a, IntVector2 b, bool selectKeyframes)
 		{
 			Operations.ClearGridSelection.Perform();
 			Core.Operations.ClearRowSelection.Perform();
@@ -76,7 +77,6 @@ namespace Tangerine.UI.Timeline
 					Operations.SelectGridSpan.Perform(i, r.A.X, r.B.X + 1);
 				}
 			}
-			return null;
 		}
 
 		private static void SelectKeyframes(IntRectangle bounds)
@@ -132,11 +132,11 @@ namespace Tangerine.UI.Timeline
 					Operations.DeselectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
 				} else {
 					Operations.ClearGridSelection.Perform();
-					var currentCell = Grid.CellUnderMouse();
+					var cell = Grid.CellUnderMouse();
 					Operations.SelectGridSpan.Perform(
-						currentCell.Y,
-						currentCell.X,
-						currentCell.X + 1
+						cell.Y,
+						cell.X,
+						cell.X + 1
 					);
 				}
 			}

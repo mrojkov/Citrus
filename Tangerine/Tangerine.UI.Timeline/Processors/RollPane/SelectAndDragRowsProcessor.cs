@@ -15,6 +15,7 @@ namespace Tangerine.UI.Timeline
 			Probers.Add(new BoneRowProber());
 			Probers.Add(new FolderRowProber());
 			Probers.Add(new NodeRowProber());
+			Probers.Add(new AnimationTrackRowProber());
 		}
 
 		public IEnumerator<object> Task()
@@ -105,7 +106,7 @@ namespace Tangerine.UI.Timeline
 				.Select(row => new KeyValuePair<Row, int>(row, parentRowRows.IndexOf(row)));
 
 			var rows = enumeratedSelectedRows.ToList();
-			Document.Current.History.DoTransaction(() => {	
+			Document.Current.History.DoTransaction(() => {
 				foreach (var elem in rows) {
 					Probers.Any(p => p.Probe(elem.Key, dragLocation));
 					if (elem.Value >= dragLocation.Index) dragLocation.Index++;
@@ -293,7 +294,7 @@ namespace Tangerine.UI.Timeline
 
 			protected abstract bool ProbeInternal(T component, Row row, RowLocation location);
 
-			protected void MoveFolderItemTo(IFolderItem item, RowLocation newLocation)
+			protected static void MoveFolderItemTo(IFolderItem item, RowLocation newLocation)
 			{
 				FolderItemLocation targetLoc;
 				var folder = newLocation.ParentRow.Components.Get<FolderRow>().Folder;
@@ -318,6 +319,18 @@ namespace Tangerine.UI.Timeline
 					AlertDialog.Show(e.Message);
 					return false;
 				}
+				return true;
+			}
+		}
+
+		public class AnimationTrackRowProber : Prober<AnimationTrackRow>
+		{
+			protected override bool ProbeInternal(AnimationTrackRow component, Row row, RowLocation location)
+			{
+				var newIndex = location.Index > row.Index ? location.Index - 1 : location.Index;
+				var track = component.Track;
+				RemoveFromList<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, row.Index);
+				InsertIntoList<AnimationTrackList, AnimationTrack>.Perform(Document.Current.Animation.Tracks, newIndex, track);
 				return true;
 			}
 		}

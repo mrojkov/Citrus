@@ -54,7 +54,7 @@ namespace Tangerine.UI
 		public bool IsAnimableWithEasing {
 			get {
 				var t = PropertyInfo.PropertyType;
-				return t == typeof(Vector2) || t == typeof(Vector3) || t == typeof(Quaternion) || t == typeof(float);
+				return t == typeof(Vector2) || t == typeof(Vector3) || t == typeof(Quaternion) || t == typeof(float) || t == typeof(Color4);
 			}
 		}
 

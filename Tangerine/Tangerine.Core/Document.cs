@@ -55,7 +55,6 @@ namespace Tangerine.Core
 		public bool IsModified => History.IsDocumentModified;
 		public event Action<Document> Saving;
 
-
 		/// <summary>
 		/// The list of Tangerine node decorators.
 		/// </summary>
@@ -195,18 +194,17 @@ namespace Tangerine.Core
 
 		public void GetAnimations(List<Animation> animations)
 		{
+			GetAnimationsHelper(animations);
+			animations.Sort(AnimationsComparer.Instance);
+			animations.Insert(0, Container.DefaultAnimation);
+		}
+
+		private void GetAnimationsHelper(List<Animation> animations)
+		{
 			var ancestor = Container;
-			animations.Add(ancestor.DefaultAnimation);
 			while (true) {
-				foreach (var a in ancestor.TangerineAnimations) {
-					var found = false;
-					foreach (var other in animations) {
-						found = other.Id == a.Id;
-						if (found) {
-							break;
-						}
-					}
-					if (!found) {
+				foreach (var a in ancestor.Animations) {
+					if (!a.IsLegacy) {
 						animations.Add(a);
 					}
 				}
@@ -214,6 +212,16 @@ namespace Tangerine.Core
 					return;
 				}
 				ancestor = ancestor.Parent;
+			}
+		}
+
+		class AnimationsComparer : IComparer<Animation>
+		{
+			public static readonly AnimationsComparer Instance = new AnimationsComparer();
+
+			public int Compare(Animation x, Animation y)
+			{
+				return x.Id.CompareTo(y.Id);
 			}
 		}
 
@@ -479,6 +487,18 @@ namespace Tangerine.Core
 					if (pr != null && pr.Node != prevNode) {
 						yield return pr.Node;
 						prevNode = pr.Node;
+					}
+				}
+			}
+		}
+
+		public IEnumerable<AnimationTrack> SelectedAnimationTracks()
+		{
+			foreach (var row in Rows) {
+				if (row.Selected) {
+					var nr = row.Components.Get<AnimationTrackRow>();
+					if (nr != null) {
+						yield return nr.Track;
 					}
 				}
 			}

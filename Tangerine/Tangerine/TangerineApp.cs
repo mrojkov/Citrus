@@ -9,7 +9,6 @@ using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
-using Tangerine.UI.Timeline.Processors;
 using Tangerine.UI.Timeline;
 
 namespace Tangerine
@@ -102,6 +101,7 @@ namespace Tangerine
 			var timelinePanel = new Panel("Timeline");
 			var inspectorPanel = new Panel("Inspector");
 			var searchPanel = new Panel("Hierarchy");
+			var animationsPanel = new Panel("Animations");
 			var filesystemPanel = new Panel("Filesystem");
 			var consolePanel = new Panel("Console");
 			var backupHistoryPanel = new Panel("Backups");
@@ -118,6 +118,7 @@ namespace Tangerine
 			dockManager.AppendPanelTo(documentPanel, placement, 0.5f);
 			var commandHandlerList = CommandHandlerList.Global;
 			var commandsDictionary = new Dictionary<string, Command> {
+				{ animationsPanel.Id, new Command(animationsPanel.Title) },
 				{ timelinePanel.Id, new Command(timelinePanel.Title) },
 				{ inspectorPanel.Id, new Command(inspectorPanel.Title) },
 				{ searchPanel.Id, new Command(searchPanel.Title) },
@@ -134,6 +135,7 @@ namespace Tangerine
 			dockManager.AddPanel(inspectorPanel, placement, DockSite.Left);
 			var filesystemPlacement = dockManager.AddPanel(filesystemPanel, placement, DockSite.Right);
 			dockManager.AddPanel(searchPanel, filesystemPlacement, DockSite.Fill);
+			dockManager.AddPanel(animationsPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(backupHistoryPanel, filesystemPlacement, DockSite.Fill);
 			dockManager.AddPanel(consolePanel, filesystemPlacement, DockSite.Bottom, 0.3f);
 			dockManager.AddPanel(visualHintsPanel, placement, DockSite.Right, 0.3f).Hidden = true;
@@ -219,7 +221,10 @@ namespace Tangerine
 					(n as PointObject).SkinningWeights = new SkinningWeights();
 				}
 			});
-
+			Animation.EasingEnabledChecker = (animation) => {
+				var doc = Document.Current;
+				return doc == null || doc.PreviewAnimation || animation != doc.Animation;
+			};
 			if (SceneUserPreferences.Instance.VisualHintsRegistry != null) {
 				VisualHintsRegistry.Instance = SceneUserPreferences.Instance.VisualHintsRegistry;
 			}
@@ -268,11 +273,12 @@ namespace Tangerine
 				typeof(Core.Operations.RemoveKeyframe.Processor),
 				typeof(Core.Operations.SetKeyframe.Processor),
 				typeof(Core.Operations.InsertFolderItem.Processor),
-				typeof(Core.Operations.RemoveAnimationProcessor),
 				typeof(Core.Operations.AddIntoCollection<,>.Processor),
 				typeof(Core.Operations.RemoveFromCollection<,>.Processor),
 				typeof(Core.Operations.InsertIntoList.Processor),
 				typeof(Core.Operations.RemoveFromList.Processor),
+				typeof(Core.Operations.InsertIntoList<,>.Processor),
+				typeof(Core.Operations.RemoveFromList<,>.Processor),
 				typeof(Core.Operations.UnlinkFolderItem.Processor),
 				typeof(Core.Operations.MoveNodes.Processor),
 				typeof(Core.Operations.SetMarker.Processor),
@@ -310,6 +316,7 @@ namespace Tangerine
 						new UI.SceneView.SceneView(documentViewContainer),
 						new Panels.HierarchyPanel(searchPanel.ContentWidget),
 						new Panels.BackupHistoryPanel(backupHistoryPanel.ContentWidget),
+						new Panels.AnimationsPanel(animationsPanel.ContentWidget),
 						// Use VisualHintsPanel sigleton because we need preserve its state between documents.
 						VisualHintsPanel.Instance ?? VisualHintsPanel.Initialize(visualHintsPanel),
 						new AttachmentPanel(attachmentPanel),

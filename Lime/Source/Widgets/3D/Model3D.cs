@@ -42,7 +42,7 @@ namespace Lime
 						if (string.IsNullOrEmpty(attachment.EntryTrigger)) return;
 						var oldTrigger = Trigger;
 						Trigger = attachment.EntryTrigger;
-						TriggerMultipleAnimations();
+						TriggerMultipleAnimations(Trigger);
 						Update(0);
 						Trigger = oldTrigger;
 					}

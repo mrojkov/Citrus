@@ -38,8 +38,9 @@ namespace Lime
 	public interface IAnimationHost
 	{
 		AnimatorCollection Animators { get; }
-		void OnTrigger(string property, double animationTimeCorrection = 0);
-		NodeComponentCollection Components { get; }
+		void OnAnimatorCollectionChanged();
+		void OnTrigger(string property, object value, double animationTimeCorrection = 0);
+		Component GetComponent(Type type);
 	}
 
 	public static class IAnimableExtensions

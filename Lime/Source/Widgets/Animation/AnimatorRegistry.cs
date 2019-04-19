@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Lime;
 
 namespace Lime
 {
@@ -8,70 +7,186 @@ namespace Lime
 	{
 		public static AnimatorRegistry Instance { get; } = new AnimatorRegistry();
 
-		public void Add(Type propertyType, Type animatorType) => map.Add(propertyType, animatorType);
+		public void Add(Type propertyType, IAnimatorFactory factory) => map.Add(propertyType, factory);
 
 		public IAnimator CreateAnimator(Type propertyType)
 		{
-			if (!map.TryGetValue(propertyType, out var animatorType)) {
+			return GetFactory(propertyType).CreateAnimator();
+		}
+
+		public IEasedAnimator CreateEasedAnimator(Type propertyType)
+		{
+			return GetFactory(propertyType).CreateEasedAnimator();
+		}
+
+		public IChainedAnimator CreateChainedAnimator(Type propertyType)
+		{
+			return GetFactory(propertyType).CreateChainedAnimator();
+		}
+
+		public IBlendedAnimator CreateBlendedAnimator(Type propertyType)
+		{
+			return GetFactory(propertyType).CreateBlendedAnimator();
+		}
+
+		private IAnimatorFactory GetFactory(Type propertyType)
+		{
+			if (!map.TryGetValue(propertyType, out var factory)) {
 				if (propertyType.IsEnum) {
-					animatorType = typeof(Animator<>).MakeGenericType(propertyType);
-					Add(propertyType, animatorType);
+					factory = new EnumAnimatorFactory(propertyType);
+					Add(propertyType, factory);
 				} else {
-					throw new Lime.Exception("Can't find animator type for property of {0}", propertyType.Name);
+					throw new Exception("Can't find animator type for property of " + propertyType.Name);
 				}
 			}
-			var ctr = animatorType.GetConstructor(System.Type.EmptyTypes);
-			var animator = ctr.Invoke(new object[] {}) as IAnimator;
-			return animator;
+			return factory;
 		}
 
 		public AnimatorRegistry()
 		{
-			Add(typeof(Vector2), typeof(Vector2Animator));
-			Add(typeof(Vector3), typeof(Vector3Animator));
-			Add(typeof(Quaternion), typeof(QuaternionAnimator));
-			Add(typeof(Matrix44), typeof(Matrix44Animator));
-			Add(typeof(float), typeof(NumericAnimator));
-			Add(typeof(Color4), typeof(Color4Animator));
-			Add(typeof(string), typeof(Animator<string>));
-			Add(typeof(int), typeof(IntAnimator));
-			Add(typeof(bool), typeof(Animator<bool>));
-			Add(typeof(NumericRange), typeof(NumericRangeAnimator));
-			Add(typeof(Blending), typeof(Animator<Blending>));
-			Add(typeof(ShaderId), typeof(Animator<ShaderId>));
-			Add(typeof(ITexture), typeof(Animator<ITexture>));
-			Add(typeof(RenderTarget), typeof(Animator<RenderTarget>));
-			Add(typeof(ClipMethod), typeof(Animator<ClipMethod>));
-			Add(typeof(SerializableSample), typeof(Animator<SerializableSample>));
-			Add(typeof(SerializableFont), typeof(Animator<SerializableFont>));
-			Add(typeof(EmitterShape), typeof(Animator<EmitterShape>));
-			Add(typeof(AudioAction), typeof(Animator<AudioAction>));
-			Add(typeof(MovieAction), typeof(Animator<MovieAction>));
-			Add(typeof(Anchors), typeof(Animator<Anchors>));
-			Add(typeof(EmissionType), typeof(Animator<EmissionType>));
-			Add(typeof(ParticlesLinkage), typeof(Animator<ParticlesLinkage>));
-			Add(typeof(TextOverflowMode), typeof(Animator<TextOverflowMode>));
-			Add(typeof(NodeReference<Widget>), typeof(Animator<NodeReference<Widget>>));
-			Add(typeof(NodeReference<Spline>), typeof(Animator<NodeReference<Spline>>));
-			Add(typeof(NodeReference<Node3D>), typeof(Animator<NodeReference<Node3D>>));
-			Add(typeof(NodeReference<Spline3D>), typeof(Animator<NodeReference<Spline3D>>));
-			Add(typeof(NodeReference<Camera3D>), typeof(Animator<NodeReference<Camera3D>>));
-			Add(typeof(LayoutDirection), typeof(Animator<LayoutDirection>));
-			Add(typeof(Thickness), typeof(ThicknessAnimator));
-			Add(typeof(HAlignment), typeof(Animator<HAlignment>));
-			Add(typeof(VAlignment), typeof(Animator<VAlignment>));
-			Add(typeof(Alignment), typeof(Animator<Alignment>));
+			Add(typeof(Vector2), new Vector2AnimatorFactory());
+			Add(typeof(Vector3), new Vector2AnimatorFactory());
+			Add(typeof(Quaternion), new QuaternionAnimatorFactory());
+			Add(typeof(Matrix44), new Matrix44AnimatorFactory());
+			Add(typeof(float), new NumericAnimatorFactory());
+			Add(typeof(Color4), new Color4AnimatorFactory());
+			Add(typeof(string), new AnimatorFactory<string>());
+			Add(typeof(int), new IntAnimatorFactory());
+			Add(typeof(bool), new AnimatorFactory<bool>());
+			Add(typeof(NumericRange), new NumericRangeAnimatorFactory());
+			Add(typeof(Blending), new AnimatorFactory<Blending>());
+			Add(typeof(ShaderId), new AnimatorFactory<ShaderId>());
+			Add(typeof(ITexture), new AnimatorFactory<ITexture>());
+			Add(typeof(RenderTarget), new AnimatorFactory<RenderTarget>());
+			Add(typeof(ClipMethod), new AnimatorFactory<ClipMethod>());
+			Add(typeof(SerializableSample), new AnimatorFactory<SerializableSample>());
+			Add(typeof(SerializableFont), new AnimatorFactory<SerializableFont>());
+			Add(typeof(EmitterShape), new AnimatorFactory<EmitterShape>());
+			Add(typeof(AudioAction), new AnimatorFactory<AudioAction>());
+			Add(typeof(MovieAction), new AnimatorFactory<MovieAction>());
+			Add(typeof(Anchors), new AnimatorFactory<Anchors>());
+			Add(typeof(EmissionType), new AnimatorFactory<EmissionType>());
+			Add(typeof(ParticlesLinkage), new AnimatorFactory<ParticlesLinkage>());
+			Add(typeof(TextOverflowMode), new AnimatorFactory<TextOverflowMode>());
+			Add(typeof(NodeReference<Widget>), new AnimatorFactory<NodeReference<Widget>>());
+			Add(typeof(NodeReference<Spline>), new AnimatorFactory<NodeReference<Spline>>());
+			Add(typeof(NodeReference<Node3D>), new AnimatorFactory<NodeReference<Node3D>>());
+			Add(typeof(NodeReference<Spline3D>), new AnimatorFactory<NodeReference<Spline3D>>());
+			Add(typeof(NodeReference<Camera3D>), new AnimatorFactory<NodeReference<Camera3D>>());
+			Add(typeof(LayoutDirection), new AnimatorFactory<LayoutDirection>());
+			Add(typeof(Thickness), new ThicknessAnimatorFactory());
+			Add(typeof(HAlignment), new AnimatorFactory<HAlignment>());
+			Add(typeof(VAlignment), new AnimatorFactory<VAlignment>());
+			Add(typeof(Alignment), new AnimatorFactory<Alignment>());
 		}
 
 		public bool Contains(Type propertyType) => propertyType.IsEnum || map.ContainsKey(propertyType);
 
-		private Dictionary<Type, Type> map = new Dictionary<Type, Type>();
+		private Dictionary<Type, IAnimatorFactory> map = new Dictionary<Type, IAnimatorFactory>();
 
 		public IEnumerable<Type> EnumerateRegisteredTypes()
 		{
 			foreach (var kv in map) {
 				yield return kv.Key;
 			}
+		}
+
+		public interface IAnimatorFactory
+		{
+			IAnimator CreateAnimator();
+			IEasedAnimator CreateEasedAnimator();
+			IChainedAnimator CreateChainedAnimator();
+			IBlendedAnimator CreateBlendedAnimator();
+		}
+
+		public class AnimatorFactory<T> : IAnimatorFactory
+		{
+			public virtual IAnimator CreateAnimator() => new Animator<T>();
+			public virtual IEasedAnimator CreateEasedAnimator() => new EasedAnimator<T>();
+			public virtual IChainedAnimator CreateChainedAnimator() => new ChainedAnimator<T>();
+			public virtual IBlendedAnimator CreateBlendedAnimator() => new BlendedAnimator<T>();
+		}
+
+		private class Vector2AnimatorFactory : AnimatorFactory<Vector2>
+		{
+			public override IAnimator CreateAnimator() => new Vector2Animator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new Vector2BlendedAnimator();
+		}
+
+		private class Vector3AnimatorFactory : AnimatorFactory<Vector3>
+		{
+			public override IAnimator CreateAnimator() => new Vector3Animator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new Vector2BlendedAnimator();
+		}
+
+		private class QuaternionAnimatorFactory : AnimatorFactory<Quaternion>
+		{
+			public override IAnimator CreateAnimator() => new QuaternionAnimator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new QuaternionBlendedAnimator();
+		}
+
+		private class Matrix44AnimatorFactory : AnimatorFactory<Matrix44>
+		{
+			public override IAnimator CreateAnimator() => new Matrix44Animator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new Matrix44BlendedAnimator();
+		}
+
+		private class NumericAnimatorFactory : AnimatorFactory<float>
+		{
+			public override IAnimator CreateAnimator() => new NumericAnimator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new NumericBlendedAnimator();
+		}
+
+		private class Color4AnimatorFactory : AnimatorFactory<Color4>
+		{
+			public override IAnimator CreateAnimator() => new Color4Animator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new Color4BlendedAnimator();
+		}
+
+		private class IntAnimatorFactory : AnimatorFactory<Color4>
+		{
+			public override IAnimator CreateAnimator() => new IntAnimator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new IntBlendedAnimator();
+		}
+
+		private class NumericRangeAnimatorFactory : AnimatorFactory<NumericRangeAnimator>
+		{
+			public override IAnimator CreateAnimator() => new NumericRangeAnimator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new NumericRangeBlendedAnimator();
+		}
+
+		private class ThicknessAnimatorFactory : AnimatorFactory<ThicknessAnimator>
+		{
+			public override IAnimator CreateAnimator() => new ThicknessAnimator();
+			public override IBlendedAnimator CreateBlendedAnimator() => new ThicknessBlendedAnimator();
+		}
+
+		public class EnumAnimatorFactory : IAnimatorFactory
+		{
+			private readonly Func<IAbstractAnimator> animatorFactory;
+			private readonly Func<IAbstractAnimator> easedAnimatorFactory;
+			private readonly Func<IAbstractAnimator> chainedAnimatorFactory;
+			private readonly Func<IAbstractAnimator> blendedAnimatorFactory;
+
+			public EnumAnimatorFactory(Type enumType)
+			{
+				animatorFactory = CreateDelegate(typeof(Animator<>), enumType);
+				easedAnimatorFactory = CreateDelegate(typeof(EasedAnimator<>), enumType);
+				chainedAnimatorFactory = CreateDelegate(typeof(ChainedAnimator<>), enumType);
+				blendedAnimatorFactory = CreateDelegate(typeof(BlendedAnimator<>), enumType);
+			}
+
+			private Func<IAbstractAnimator> CreateDelegate(Type animatorType, Type enumType)
+			{
+				var t = animatorType.MakeGenericType(enumType);
+				var ctr = t.GetConstructor(Type.EmptyTypes);
+				return () => ctr.Invoke(new object[] { }) as IAbstractAnimator;
+			}
+
+			public IAnimator CreateAnimator() => (IAnimator)animatorFactory();
+			public IEasedAnimator CreateEasedAnimator() => (IEasedAnimator)easedAnimatorFactory();
+			public IChainedAnimator CreateChainedAnimator() => (IChainedAnimator)chainedAnimatorFactory();
+			public IBlendedAnimator CreateBlendedAnimator() => (IBlendedAnimator)blendedAnimatorFactory();
 		}
 	}
 }

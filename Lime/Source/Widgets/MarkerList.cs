@@ -24,7 +24,15 @@ namespace Lime
 			markers = new List<Marker>(capacity);
 		}
 
-		public void Clear() => markers.Clear();
+		public void Clear()
+		{
+			foreach (var m in markers) {
+				m.Owner = null;
+			}
+			markers.Clear();
+			owner?.InvalidateCache();
+		}
+
 		public bool Contains(Marker item) => markers.Contains(item);
 		public void CopyTo(Marker[] array, int arrayIndex) => markers.CopyTo(array, arrayIndex);
 		public List<Marker>.Enumerator GetEnumerator() => markers.GetEnumerator();
@@ -45,20 +53,26 @@ namespace Lime
 			if (index < 0) {
 				return false;
 			}
-			markers.RemoveAt(index);
+			RemoveAt(index);
 			return true;
 		}
 
-		public void RemoveAt(int index) => markers.RemoveAt(index);
+		public void RemoveAt(int index)
+		{
+			markers[index].Owner = null;
+			markers.RemoveAt(index);
+			owner?.InvalidateCache();
+		}
 
 		public Marker this[int index]
 		{
 			get { return markers[index]; }
 			set { throw new NotSupportedException(); }
 		}
+
 		public Marker this[string id] => Find(id);
 
-		internal static MarkerList DeepClone(MarkerList source, Animation owner)
+		internal static MarkerList Clone(MarkerList source, Animation owner)
 		{
 			var result = new MarkerList(owner, source.Count);
 			foreach (var marker in source) {
@@ -127,12 +141,19 @@ namespace Lime
 
 		public void Add(Marker marker)
 		{
+			if (marker.Owner != null) {
+				throw new InvalidOperationException();
+			}
+			marker.Owner = owner;
 			markers.Add(marker);
-			owner.NextMarkerOrTriggerTime = null;
+			owner?.InvalidateCache();
 		}
 
 		public void AddOrdered(Marker marker)
 		{
+			if (marker.Owner != null) {
+				throw new InvalidOperationException();
+			}
 			if (Count == 0 || marker.Frame > this[Count - 1].Frame) {
 				markers.Add(marker);
 			} else {
@@ -146,7 +167,8 @@ namespace Lime
 					markers.Insert(i, marker);
 				}
 			}
-			owner.NextMarkerOrTriggerTime = null;
+			marker.Owner = owner;
+			owner?.InvalidateCache();
 		}
 	}
 }

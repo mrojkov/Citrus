@@ -1,4 +1,4 @@
-﻿using Tangerine.UI.Timeline;
+using Tangerine.UI.Timeline;
 
 namespace Tangerine.UI
 {
@@ -12,6 +12,5 @@ namespace Tangerine.UI
 		}
 		public const float DefaultRowHeight = 25;
 		public const float RowSpacing = 1;
-		public const float ToolbarMinWidth = 50;
 	}
 }
