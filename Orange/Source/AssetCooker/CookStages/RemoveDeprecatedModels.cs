@@ -1,0 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Lime;
+
+namespace Orange
+{
+	class RemoveDeprecatedModels: ICookStage
+	{
+		public IEnumerable<string> ImportedExtensions { get { yield break; } }
+		public IEnumerable<string> BundleExtensions { get { yield return modelExtension; } }
+
+		private readonly string modelExtension = ".model";
+
+		public void Action()
+		{
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(modelExtension)) {
+				var path = fileInfo.Path;
+				if (AssetCooker.CookingRulesMap.ContainsKey(path)) {
+					AssetCooker.CookingRulesMap.Remove(path);
+				}
+				Logger.Write($"Removing deprecated .model file: {path}");
+				File.Delete(path);
+			}
+		}
+	}
+}

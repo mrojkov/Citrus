@@ -44,7 +44,7 @@ namespace Orange
 		public Func<string[]> GetRequiredAssemblies;
 
 		[ImportMany(nameof(AtlasPackers), AllowRecomposition = true)]
-		public IEnumerable<Lazy<Func<string, List<AssetCooker.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
+		public IEnumerable<Lazy<Func<string, List<TextureTools.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
 
 		[ImportMany(nameof(AfterAssetUpdated), AllowRecomposition = true)]
 		public IEnumerable<Action<Lime.AssetBundle, CookingRules, string>> AfterAssetUpdated { get; set; }
