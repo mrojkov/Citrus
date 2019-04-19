@@ -34,10 +34,13 @@ namespace Tangerine.Core
 		public ProjectLocalization Localization
 		{
 			get => localization;
-			set {
+			set
+			{
 				localization = value;
-				localization.Apply();
-				InvalidateDisplayedText();
+				localization.LoadDictionary();
+				foreach (var document in Documents) {
+					document.OnLocalizationChanged();
+				}
 			}
 		}
 
@@ -90,6 +93,9 @@ namespace Tangerine.Core
 			if (File.Exists(UserprefsPath)) {
 				try {
 					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
+					if (UserPreferences?.Localization != null) {
+						Localization = UserPreferences.Localization;
+					}
 					foreach (var path in UserPreferences.Documents) {
 						try {
 							if (GetFullPath(path, out string fullPath)) {
@@ -181,6 +187,7 @@ namespace Tangerine.Core
 					return false;
 				}
 			}
+			UserPreferences.Localization = localization;
 			try {
 				TangerineYuzu.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
 			} catch (System.Exception) { }
@@ -537,16 +544,6 @@ namespace Tangerine.Core
 				return false;
 			}
 			return GetFullPath(AssetPath.CorrectSlashes(path), out var fullPath) && File.Exists(fullPath);
-		}
-
-		private void InvalidateDisplayedText()
-		{
-			foreach (var document in Documents) {
-				if (!document.Loaded) {
-					continue;
-				}
-				document.OnLocalizationChanged();
-			}
 		}
 	}
 }

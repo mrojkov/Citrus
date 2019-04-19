@@ -33,6 +33,9 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public readonly List<string> RecentDocuments = new List<string>();
 
+		[YuzuOptional]
+		public ProjectLocalization Localization { get; set; }
+
 		public const int MaxRecentDocuments = 5;
 
 		public static ProjectUserPreferences Instance => Project.Current.UserPreferences;

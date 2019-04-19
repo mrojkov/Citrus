@@ -1,11 +1,16 @@
 using System.IO;
+using Yuzu;
 
 namespace Tangerine.Core
 {
 	public class ProjectLocalization
 	{
-		public readonly string Code;
-		public readonly string DictionaryPath;
+		[YuzuRequired]
+		public string Code { get; set; }
+		[YuzuRequired]
+		public string DictionaryPath { get; set; }
+
+		public ProjectLocalization() { }
 
 		public ProjectLocalization(string code, string dictionaryPath)
 		{
@@ -13,7 +18,7 @@ namespace Tangerine.Core
 			DictionaryPath = dictionaryPath;
 		}
 
-		public void Apply()
+		public void LoadDictionary()
 		{
 			Lime.Localization.Dictionary.Clear();
 			try {

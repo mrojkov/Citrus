@@ -354,17 +354,22 @@ namespace Tangerine
 				CommandHandlerList.Global.Disconnect(item);
 			}
 			localizationMenu.Clear();
-			Localization.Dictionary.Clear();
 			foreach (var locale in SetLocalization.GetLocales()) {
 				var command = new Command(locale.Code);
 				var commandHandler = new SetLocalization(locale);
 				CommandHandlerList.Global.Connect(command, commandHandler);
 				localizationMenu.Add(command);
-				if (Project.Current.Localization == null || locale.Code == "Default") {
+				if (
+					(Project.Current.Localization == null || locale.Code == "Default")
+					&& Project.Current.UserPreferences.Localization == null
+				) {
 					commandHandler.Execute();
 				}
 			}
 			localizationCommand.Enabled = localizationMenu.Count > 0;
+			if (!localizationCommand.Enabled) {
+				Localization.Dictionary.Clear();
+			}
 		}
 
 		public static void RebuildRecentDocumentsMenu()
