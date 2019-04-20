@@ -137,6 +137,8 @@ namespace Tangerine.UI
 			public Color4 AnimationClip { get; set; }
 			[YuzuOptional]
 			public Color4 AnimationClipBorder { get; set; }
+			[YuzuOptional]
+			public Color4 AnimationClipLabel { get; set; }
 		}
 
 		public class TimelineCurveEditorColors : Theme.DefaultColors
@@ -231,6 +233,10 @@ namespace Tangerine.UI
 			public Color4 StripeBackground1 { get; set; }
 			[YuzuOptional]
 			public Color4 StripeBackground2 { get; set; }
+			[YuzuOptional]
+			public Color4 EasingSpline { get; set; }
+			[YuzuOptional]
+			public Color4 EasingControls { get; set; }
 		}
 
 		public class KeyboardColors : Theme.DefaultColors
@@ -374,6 +380,7 @@ namespace Tangerine.UI
 				AnimationTrackWeightCurve = new Color4(20, 200, 200, 100),
 				AnimationClip = new Color4(50, 50, 255, 80),
 				AnimationClipBorder = new Color4(50, 50, 255),
+				AnimationClipLabel = basic.BlackText,
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
@@ -422,6 +429,8 @@ namespace Tangerine.UI
 				ComponentHeaderLabelBackground = Color4.Black.Lighten(0.375f),
 				StripeBackground1 = basic.GrayBackground,
 				StripeBackground2 = basic.GrayBackground.Lighten(0.05f),
+				EasingSpline = basic.SelectedBorder,
+				EasingControls = basic.GrayText,
 			};
 			var keyboard = new KeyboardColors {
 				BlackText = Color4.White,
@@ -526,6 +535,7 @@ namespace Tangerine.UI
 				AnimationTrackWeightCurve = new Color4(20, 200, 200, 100),
 				AnimationClip = new Color4(50, 50, 255, 60),
 				AnimationClipBorder = new Color4(50, 50, 255),
+				AnimationClipLabel = basic.BlackText,
 			};
 			var timelineCurveEditor = new TimelineCurveEditorColors {
 				Curves = new[] { Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow },
@@ -573,6 +583,8 @@ namespace Tangerine.UI
 				ComponentHeaderLabelBackground = Color4.White.Darken(0.275f),
 				StripeBackground1 = basic.GrayBackground,
 				StripeBackground2 = basic.GrayBackground.Darken(0.05f),
+				EasingSpline = basic.SelectedBorder,
+				EasingControls = basic.GrayText,
 			};
 			var keyboard = new KeyboardColors {
 				BlackText = Color4.Black,

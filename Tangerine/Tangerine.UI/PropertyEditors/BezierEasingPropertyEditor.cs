@@ -55,7 +55,7 @@ namespace Tangerine.UI
 				var p0 = Vector2.Zero;
 				for (var t = 0f; t < 1; t += 0.01f) {
 					var p1 = new Vector2((float)bezier.SampleCurveX(t), (float)bezier.SampleCurveY(t));
-					Renderer.DrawLine(Project(canvas, p0), Project(canvas, p1), ColorTheme.Current.Basic.SelectedBorder, 2);
+					Renderer.DrawLine(Project(canvas, p0), Project(canvas, p1), ColorTheme.Current.Inspector.EasingSpline, 2);
 					p0 = p1;
 				}
 			}
@@ -147,7 +147,7 @@ namespace Tangerine.UI
 				private void Render(Widget widget)
 				{
 					widget.PrepareRendererState();
-					var controlsColor = ColorTheme.Current.Basic.GrayText;
+					var controlsColor = ColorTheme.Current.Inspector.EasingControls;
 					var origin = index == 0 ? Vector2.Zero : Vector2.One;
 					Renderer.DrawLine(Project(canvas, origin), Project(canvas, GetPosition()), controlsColor, 2);
 					Renderer.DrawRound(Project(canvas, origin), 2, 15, controlsColor);

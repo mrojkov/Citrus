@@ -74,7 +74,7 @@ namespace Tangerine.UI.Timeline.Components
 					Padding = new Thickness(4),
 					VAlignment = VAlignment.Center,
 					OverflowMode = TextOverflowMode.Ellipsis,
-					Color = ColorTheme.Current.Basic.BlackText
+					Color = ColorTheme.Current.TimelineGrid.AnimationClipLabel
 				});
 			}
 		}
