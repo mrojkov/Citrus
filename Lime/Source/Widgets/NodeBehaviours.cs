@@ -35,7 +35,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	internal class UpdateBehaviour : NodeBehavior
+	public class UpdateBehaviour : NodeBehavior
 	{
 		public UpdateHandler Updating;
 
@@ -51,7 +51,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	internal class UpdatedBehaviour : NodeBehavior
+	public class UpdatedBehaviour : NodeBehavior
 	{
 		public UpdateHandler Updated;
 
@@ -67,7 +67,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	internal class TasksBehaviour : NodeBehavior
+	public class TasksBehaviour : NodeBehavior
 	{
 		public TaskList Tasks { get; private set; }
 
@@ -94,7 +94,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	internal class LateTasksBehaviour : NodeBehavior
+	public class LateTasksBehaviour : NodeBehavior
 	{
 		public TaskList Tasks { get; private set; }
 
