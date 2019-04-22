@@ -7,14 +7,14 @@ namespace Orange
 	class SyncTextures: ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
-		public IEnumerable<string> BundleExtensions { get { yield return platformTextureExtension; } }
+		public IEnumerable<string> BundleExtensions { get { yield return PlatformTextureExtension; } }
 
 		private readonly string originalTextureExtension = ".png";
-		private readonly string platformTextureExtension = AssetCooker.GetPlatformTextureExtension();
+		private string PlatformTextureExtension => AssetCooker.GetPlatformTextureExtension();
 
 		public void Action()
 		{
-			SyncUpdated.Sync(originalTextureExtension, platformTextureExtension, AssetBundle.Current, Converter);
+			SyncUpdated.Sync(originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
 		}
 
 		private bool Converter(string srcPath, string dstPath)
