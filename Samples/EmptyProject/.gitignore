@@ -263,3 +263,5 @@ bfg_emptyproject_android_client/
 
 *.model
 .idea
+
+cache.log

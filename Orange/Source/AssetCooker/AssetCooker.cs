@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using Lime;
 using Orange.FbxImporter;
+using Debug = System.Diagnostics.Debug;
 
 namespace Orange
 {
@@ -94,7 +96,42 @@ namespace Orange
 			AssetCache.Instance.Initialize();
 			AssetCooker.Platform = platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+#if DEBUG
+			string line = "";
+			switch (AssetCache.Instance.EnableState) {
+				case AssetCache.EnableStates.None:
+					line = "None";
+					break;
+				case AssetCache.EnableStates.Local:
+					line = "Local";
+					break;
+				case AssetCache.EnableStates.Remote:
+					line = "Remote";
+					break;
+				case AssetCache.EnableStates.Both:
+					line = "Both";
+					break;
+			}
+			string text = $"Asset cooking. Enabled cache: {line}";
+			Console.WriteLine(text);
+			using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+				w.WriteLine(text);
+				w.WriteLine(DateTime.Now);
+			}
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
+#endif
 			CookBundles(bundles: bundles);
+#if DEBUG
+			timer.Stop();
+			text = $"All bundles cooked: {timer.ElapsedMilliseconds} ms";
+			Debug.WriteLine(text);
+			using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+				w.WriteLine(text);
+				w.WriteLine();
+				w.WriteLine();
+			}
+#endif
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
@@ -145,11 +182,35 @@ namespace Orange
 				}
 				
 				UserInterface.Instance.SetupProgressBar(s);
-				BeginCookBundles?.Invoke();			
+				BeginCookBundles?.Invoke();
 
+#if DEBUG
+				Stopwatch timer = new Stopwatch();
+				timer.Start();
+#endif
 				CookBundle(CookingRulesBuilder.MainBundleName);
+#if DEBUG
+				timer.Stop();
+				string text = $"Main bundle cooked: {timer.ElapsedMilliseconds} ms";
+				Debug.WriteLine(text);
+				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+					w.WriteLine(text);
+				}
+#endif
 				foreach (var extraBundle in extraBundles) {
+#if DEBUG
+					Stopwatch extraTimer = new Stopwatch();
+					extraTimer.Start();
+#endif
 					CookBundle(extraBundle);
+#if DEBUG
+					extraTimer.Stop();
+					string extraText = $"{extraBundle} cooked: {extraTimer.ElapsedMilliseconds} ms";
+					Debug.WriteLine(extraText);
+					using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+						w.WriteLine(extraText);
+					}
+#endif
 				}
 				extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
@@ -201,7 +262,7 @@ namespace Orange
 			try {
 				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
 			} catch (System.Exception) {
-				Debug.Write("Failed to create directory: {0} {1}", Path.GetDirectoryName(bundlePath));
+				Lime.Debug.Write("Failed to create directory: {0} {1}", Path.GetDirectoryName(bundlePath));
 				throw;
 			}
 
