@@ -1031,8 +1031,8 @@ namespace Lime
 				TargetPropertyPath = "Color"
 			};
 			animator.ReadonlyKeys.Add(0, new Color4(255, 255, 255, 0));
-			animator.ReadonlyKeys.Add(1, new Color4(255, 255, 255, 255));
-			animator.ReadonlyKeys.Add(2, new Color4(255, 255, 255, 0));
+			animator.ReadonlyKeys.Add(30, new Color4(255, 255, 255, 255));
+			animator.ReadonlyKeys.Add(60, new Color4(255, 255, 255, 0));
 			defaultModifier.Animators.Add(animator);
 			Nodes.Add(defaultModifier);
 		}
