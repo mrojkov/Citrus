@@ -149,7 +149,7 @@ namespace Lime
 			public override IBlendedAnimator CreateBlendedAnimator() => new IntBlendedAnimator();
 		}
 
-		private class NumericRangeAnimatorFactory : AnimatorFactory<NumericRangeAnimator>
+		private class NumericRangeAnimatorFactory : AnimatorFactory<NumericRange>
 		{
 			public override IAnimator CreateAnimator() => new NumericRangeAnimator();
 			public override IBlendedAnimator CreateBlendedAnimator() => new NumericRangeBlendedAnimator();
