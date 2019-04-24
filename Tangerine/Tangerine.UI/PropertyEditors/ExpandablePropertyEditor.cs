@@ -5,7 +5,9 @@ namespace Tangerine.UI
 {
 	// Used to unify generic descendants of ExpandableProperty for type checking
 	public interface IExpandablePropertyEditor
-	{ }
+	{
+		bool Expanded { get; set; }
+	}
 
 	public class ExpandablePropertyEditor<T> : CommonPropertyEditor<T>, IExpandablePropertyEditor
 	{

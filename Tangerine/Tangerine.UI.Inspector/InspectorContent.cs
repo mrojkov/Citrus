@@ -14,6 +14,7 @@ namespace Tangerine.UI.Inspector
 	public class InspectorContent
 	{
 		private readonly List<IPropertyEditor> editors;
+		private readonly Dictionary<string, bool> expandedPropertyEditors = new Dictionary<string, bool>();
 		private readonly Widget widget;
 		private int row = 1;
 		private int totalObjectCount;
@@ -44,6 +45,7 @@ namespace Tangerine.UI.Inspector
 
 		public void BuildForObjects(IEnumerable<object> objects)
 		{
+			SaveExpandedStates();
 			totalObjectCount = objects.Count();
 			if (Widget.Focused != null && Widget.Focused.DescendantOf(widget)) {
 				widget.SetFocus();
@@ -74,6 +76,7 @@ namespace Tangerine.UI.Inspector
 			if (Footer != null) {
 				widget.AddNode(Footer);
 			}
+			LoadExpandedStates();
 		}
 
 		private void AddEasingEditor()
@@ -571,6 +574,26 @@ namespace Tangerine.UI.Inspector
 					OnComponentRemove?.Invoke(c);
 				}
 				Document.Current.History.CommitTransaction();
+			}
+		}
+
+		private void SaveExpandedStates()
+		{
+			foreach (var editor in editors) {
+				if (editor is IExpandablePropertyEditor expandable) {
+					expandedPropertyEditors[((IPropertyEditor)expandable).EditorParams.PropertyPath] = expandable.Expanded;
+				}
+			}
+		}
+
+		private void LoadExpandedStates()
+		{
+			foreach (var editor in editors) {
+				if (editor is IExpandablePropertyEditor expandable) {
+					expandable.Expanded =
+						expandedPropertyEditors.TryGetValue(
+							((IPropertyEditor) expandable).EditorParams.PropertyPath, out var expanded) && expanded;
+				}
 			}
 		}
 
