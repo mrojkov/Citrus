@@ -2,6 +2,12 @@
 
 namespace Lime
 {
+	public enum SoftKeyboardType
+	{
+		Default,
+		Numeric
+	}
+	
 	/// <summary>
 	/// Програмная клавиатура (для мобильных устройств)
 	/// </summary>
@@ -36,7 +42,7 @@ namespace Lime
 		/// Показывает или прячет клавиатуру
 		/// </summary>
 		/// <param name="show">true, чтобы показать; false, чтобы спрятать</param>
-		void Show(bool show);
+		void Show(bool show, SoftKeyboardType type);
 	}
 
 	internal class DummySoftKeyboard : ISoftKeyboard
@@ -45,7 +51,7 @@ namespace Lime
 		public float Height { get { return 0; } }
 		public event Action Shown;
 		public event Action Hidden;
-		public void Show(bool show)
+		public void Show(bool show, SoftKeyboardType type)
 		{
 			if (show)
 				Shown?.Invoke();

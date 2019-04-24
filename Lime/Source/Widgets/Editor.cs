@@ -48,7 +48,9 @@ namespace Lime
 			Text = (IText)displayWidget;
 			Text.TrimWhitespaces = false;
 			Text.Localizable = false;
-
+			if (editorParams is EditorParams ep) {
+				displayWidget.Components.Add(ep);
+			}
 			EditorParams = editorParams;
 			History.MaxDepth = EditorParams.MaxUndoDepth;
 
