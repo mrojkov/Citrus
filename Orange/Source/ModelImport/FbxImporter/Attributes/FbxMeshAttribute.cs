@@ -154,7 +154,10 @@ namespace Orange.FbxImporter
 			var sm = new List<FbxSubmesh>();
 			sm.AddRange(meshAttribute1.Submeshes);
 			sm.AddRange(meshAttribute2.Submeshes);
+			var skinningMode = meshAttribute1.SkinningMode == meshAttribute2.SkinningMode ?
+				meshAttribute1.SkinningMode : SkinningMode.DualQuaternion;
 			return new FbxMeshAttribute {
+				SkinningMode = skinningMode,
 				Submeshes = sm
 			};
 		}
