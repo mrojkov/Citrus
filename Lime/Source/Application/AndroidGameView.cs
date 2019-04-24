@@ -101,6 +101,7 @@ namespace Lime
 
 		public System.Drawing.Size Size { get; private set; }
 		public event Action<object, EventArgs> Resize;
+		public SoftKeyboardType SoftKeyboardType { get; set; }
 
 		public event Action SurfaceCreating;
 		public event Action SurfaceDestroing;
@@ -139,7 +140,9 @@ namespace Lime
 			// http://stackoverflow.com/questions/14560344/android-backspace-in-webview-baseinputconnection
 			var baseInputConnection = new FixDelKeyInputConnection(this, false);
 			outAttrs.ActionLabel = null;
-			outAttrs.InputType = InputTypes.TextVariationVisiblePassword | InputTypes.TextFlagNoSuggestions;
+			outAttrs.InputType = SoftKeyboardType == SoftKeyboardType.Default ?
+				InputTypes.TextVariationVisiblePassword | InputTypes.TextFlagNoSuggestions :
+				InputTypes.ClassNumber;
 			outAttrs.ImeOptions = ImeFlags.NoExtractUi | (ImeFlags)ImeAction.None;
 			return baseInputConnection;
 		}
@@ -158,7 +161,7 @@ namespace Lime
 		{
 			// we override this function to hide keyboard when app is stopped.
 			base.ClearFocus();
-			androidSoftKeyboard.Show(false);
+			androidSoftKeyboard.Show(false, SoftKeyboardType.Default);
 		}
 
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)

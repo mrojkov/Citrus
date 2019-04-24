@@ -873,10 +873,11 @@ namespace Lime
 		{
 			// Grisha: invoke on main thread to make it possible to focus widgets not from main thread
 			Application.InvokeOnMainThread(() => {
-				if (value != null && value is IText) {
-					Application.SoftKeyboard.Show(true);
+				var p = value?.Components.Get<EditorParams>();
+				if (p != null) {
+					Application.SoftKeyboard.Show(true, p.SoftKeyboardType);
 				} else {
-					Application.SoftKeyboard.Show(false);
+					Application.SoftKeyboard.Show(false, SoftKeyboardType.Default);
 				}
 			});
 

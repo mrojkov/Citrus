@@ -40,8 +40,9 @@ namespace Lime
 		public event Action Shown;
 		public event Action Hidden;
 
-		public void Show(bool show)
+		public void Show(bool show, SoftKeyboardType type)
 		{
+			gameView.SoftKeyboardType = type;
 			if (show) {
 				gameView.Focusable = true;
 				gameView.FocusableInTouchMode = true;

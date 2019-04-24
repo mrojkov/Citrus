@@ -86,10 +86,11 @@ namespace Lime
 			View.AddGestureRecognizer(gestureRecognizer);
 		}
 
-		public void ShowSoftKeyboard(bool show)
+		public void ShowSoftKeyboard(bool show, SoftKeyboardType type)
 		{
 			if (show != textView.IsFirstResponder) {
 				if (show) {
+					textView.KeyboardType = type == SoftKeyboardType.Default ? UIKeyboardType.Default : UIKeyboardType.NumberPad;
 					textView.BecomeFirstResponder();
 				} else {
 					textView.ResignFirstResponder();
@@ -420,9 +421,9 @@ namespace Lime
 				}
 			}
 
-			public void Show(bool show)
+			public void Show(bool show, SoftKeyboardType type)
 			{
-				controller.ShowSoftKeyboard(show);
+				controller.ShowSoftKeyboard(show, type);
 			}
 
 			public bool Visible { get; internal set; }

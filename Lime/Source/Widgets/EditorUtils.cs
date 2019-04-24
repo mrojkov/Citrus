@@ -288,6 +288,7 @@ namespace Lime
 		int MaxLines { get; set; }
 		float MaxHeight { get; set; }
 		int MaxUndoDepth { get; set; }
+		SoftKeyboardType SoftKeyboardType { get; set; }
 		bool UseSecureString { get; set; }
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
@@ -302,13 +303,14 @@ namespace Lime
 		bool IsAcceptableHeight(float height);
 	}
 
-	public class EditorParams : IEditorParams
+	public class EditorParams : NodeComponent, IEditorParams
 	{
 		public bool SelectAllOnFocus { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
 		public int MaxUndoDepth { get; set; } = 100;
+		public SoftKeyboardType SoftKeyboardType { get; set; }
 		public bool UseSecureString { get; set; }
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; } =
@@ -337,8 +339,7 @@ namespace Lime
 			return s == "-" || Double.TryParse(s, numberStyle, CultureInfo.InvariantCulture, out temp);
 		}
 	}
-
-
+	
 	public static class WordUtils
 	{
 		private enum CharClass

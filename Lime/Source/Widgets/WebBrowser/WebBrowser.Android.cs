@@ -76,7 +76,7 @@ namespace Lime
 			// Browser may request keyboard and we should hide it on our own when closing browser.
 			// TODO: Check browser behaviour due to new Input logic
 			if (/*KeyboardFocus.Instance.Focused == null &&*/Application.SoftKeyboard.Visible) {
-				Application.SoftKeyboard.Show(false);
+				Application.SoftKeyboard.Show(false, SoftKeyboardType.Default);
 			}
 			GC.SuppressFinalize(this);
 		}
