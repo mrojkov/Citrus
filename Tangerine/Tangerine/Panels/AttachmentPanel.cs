@@ -316,7 +316,7 @@ namespace Tangerine
 								meshOption.HitTestTarget == default &&
 								meshOption.CullMode == CullMode.Front &&
 								meshOption.DisableMerging == default &&
-								meshOption.SkinningMode == SkinningMode.Linear
+								meshOption.SkinningMode == SkinningMode.Default
 							) {
 								continue;
 							}
