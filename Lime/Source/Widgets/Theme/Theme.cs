@@ -262,7 +262,7 @@ namespace Lime
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;
-				if (Widget.Focused == node && !widget.IsMouseOverThisOrDescendant()) {
+				if (Widget.Focused == node && widget.GloballyEnabled && !widget.IsMouseOverThisOrDescendant()) {
 					var ro = RenderObjectPool<RenderObject>.Acquire();
 					ro.CaptureRenderState(widget);
 					ro.Size = widget.Size;
@@ -296,7 +296,7 @@ namespace Lime
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;
-				if (widget.IsMouseOverThisOrDescendant()) {
+				if (widget.GloballyEnabled && widget.IsMouseOverThisOrDescendant()) {
 					var ro = RenderObjectPool<RenderObject>.Acquire();
 					ro.CaptureRenderState(widget);
 					ro.Size = widget.Size;
