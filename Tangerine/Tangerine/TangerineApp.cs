@@ -27,6 +27,7 @@ namespace Tangerine
 		private TangerineApp(string[] args)
 		{
 			Orange.UserInterface.Instance = new OrangeInterface();
+			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			TangerineYuzu.Instance.Value.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
