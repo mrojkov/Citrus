@@ -358,12 +358,14 @@ namespace Tangerine
 				InitialDirectory = Path.GetDirectoryName(Document.Current.FullPath),
 			};
 			if (dlg.RunModal()) {
-				string assetPath;
-				if (!Project.Current.TryGetAssetPath(dlg.FileName, out assetPath)) {
+				if (!Project.Current.TryGetAssetPath(dlg.FileName, out var assetPath)) {
 					AlertDialog.Show("Can't save the document outside the project directory");
 				} else {
 					try {
-						Document.WriteNodeToFile(assetPath, DocumentFormat.Tan, node);
+						var clone = node.Clone().AsWidget;
+						clone.Position = Vector2.Zero;
+						clone.Visible = true;
+						Document.WriteNodeToFile(assetPath, DocumentFormat.Tan, clone);
 					} catch (System.Exception e) {
 						AlertDialog.Show(e.Message);
 					}
