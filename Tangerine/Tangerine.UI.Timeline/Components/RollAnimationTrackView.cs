@@ -49,7 +49,6 @@ namespace Tangerine.UI.Timeline.Components
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
-				HitTestTarget = true,
 				Nodes = {
 					(spacer = new Widget()),
 					Spacer.HSpacer(6),
