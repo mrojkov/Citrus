@@ -77,7 +77,7 @@ namespace Tangerine.Core
 
 		private readonly Dictionary<string, CacheEntry> contentPathToCacheEntry = new Dictionary<string, CacheEntry>();
 
-		private bool SceneCache_SceneLoading(string path, ref Node instance, bool external)
+		private bool SceneCache_SceneLoading(string path, ref Node instance, bool external, bool ignoreExternals)
 		{
 			Console.WriteLine($"Loading: {path}, external: {external}");
 			if (!external) {
@@ -86,7 +86,8 @@ namespace Tangerine.Core
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
 				contentPathToCacheEntry.Add(path, new CacheEntry());
 				return false;
-			} else if (t.Node == null) {
+			}
+			if (t.Node == null) {
 				return false;
 			}
 			instance = t.Node.Clone();
