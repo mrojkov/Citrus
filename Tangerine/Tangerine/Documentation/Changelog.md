@@ -1,3 +1,29 @@
+##### Changelog 20.04.2009 - 25.04.2019
+
+* Ключи анимации альфа-канала в ParticleModifier были изменены на 0 30 60 [CIT-1044](https://jira.game-forest.com:2000/browse/CIT-1044)
+* Добавлена возможность копировать компоненты [CIT-1140](https://jira.game-forest.com:2000/browse/CIT-1140)
+* Добавлена возможность сбрасывать анимации на начальное положение при использовании Animation Mode [CIT-1143](https://jira.game-forest.com:2000/browse/CIT-1143)
+* Переделан механизм загрузки .dll OrangePlugin [CIT-1150](https://jira.game-forest.com:2000/browse/CIT-1150)
+* Теперь кости игнорируются при перетаскивании виджетов на таймлайне [CIT-1157](https://jira.game-forest.com:2000/browse/CIT-1157)
+* Реализован интеллектуальный автоскролл в Orange [CIT-1164](https://jira.game-forest.com:2000/browse/CIT-1164)
+* Отрефакторен AssetCoocker [CIT-1165](https://jira.game-forest.com:2000/browse/CIT-1165)
+* Реализован сетевой кэш для сборки билдов в Orange [CIT-1166](https://jira.game-forest.com:2000/browse/CIT-1166)
+* Реализован dual quaternion skinning для 3D моделей [CIT-1170](https://jira.game-forest.com:2000/browse/CIT-1170)
+* При экспорте фрейма во внешнюю сцену его значения больше не экспортируются [CIT-1180](https://jira.game-forest.com:2000/browse/CIT-1180)
+* Реализованы маркеры для локалей [CIT-1192](https://jira.game-forest.com:2000/browse/CIT-1192)
+* Реализованы составные анимации (CompoundAnimations)
+
+Багфиксы:
+
+* Исправлена проблема со "съезжающими" панелями в редакторе [CIT-922](https://jira.game-forest.com:2000/browse/CIT-922)
+* Исправлена проблема, при которой использоватся по-умолчанию первый словарь в списке [CIT-1007](https://jira.game-forest.com:2000/browse/CIT-1007)
+* Исправлены неработающие ограничения для значений, введенных с помощью мыши [CIT-1061](https://jira.game-forest.com:2000/browse/CIT-1061)
+* Исправлена ошибка, не позволяющая назначить DefaultLayout в Layouts [CIT-1071](https://jira.game-forest.com:2000/browse/CIT-1071)
+* Исправлена проблема, когда при запуске нового проекта возникал черный экран [CIT-1138](https://jira.game-forest.com:2000/browse/CIT-1138)
+* Исправлена ошибка, когда Frame Progression не отрисовывается поверх всех виджетов [CIT-1167](https://jira.game-forest.com:2000/browse/CIT-1167)
+* Исправлена ошибка ObjectDisposedException "Texture2D" [CIT-1174](https://jira.game-forest.com:2000/browse/CIT-1174)
+* Исправлена ошибка, при которой BounceZoneThickness в ScrollView ни на что не влиял [CIT-1186](https://jira.game-forest.com:2000/browse/CIT-1186)
+
 ##### Changelog 19.03.2019
 
 * Реализован автоскролл в Orange [CIT-1152](https://jira.game-forest.com:2000/browse/CIT-1152)
