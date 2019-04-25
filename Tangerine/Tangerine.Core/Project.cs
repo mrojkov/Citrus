@@ -12,7 +12,6 @@ namespace Tangerine.Core
 	public class Project
 	{
 		readonly VersionedCollection<Document> documents = new VersionedCollection<Document>();
-		private ProjectLocalization localization;
 		public IReadOnlyVersionedCollection<Document> Documents => documents;
 
 		public SceneCache SceneCache = new SceneCache();
@@ -26,20 +25,11 @@ namespace Tangerine.Core
 
 		public static readonly Project Null = new Project();
 		public static Project Current { get; private set; } = Null;
+		public static string Locale => ProjectUserPreferences.Instance.Locale;
 
 		public readonly string CitprojPath;
 		public readonly string UserprefsPath;
 		public readonly string AssetsDirectory;
-
-		public ProjectLocalization Localization
-		{
-			get => localization;
-			set {
-				localization = value;
-				localization.Apply();
-				InvalidateDisplayedText();
-			}
-		}
 
 		public delegate bool DocumentReloadConfirmationDelegate(Document document);
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
@@ -112,6 +102,7 @@ namespace Tangerine.Core
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}
 			}
+			SetLocale(Locale);
 			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			fsWatcher.Changed += (path) => HandleFileSystemWatcherEvent(path);
 			fsWatcher.Created += (path) => HandleFileSystemWatcherEvent(path);
@@ -187,6 +178,29 @@ namespace Tangerine.Core
 			AssetBundle.Current = null;
 			Current = Null;
 			return true;
+		}
+
+		public void SetLocale(string locale)
+		{
+			ProjectUserPreferences.Instance.Locale = locale;
+			LoadDictionary();
+			foreach (var document in Documents) {
+				document.OnLocaleChanged();
+			}
+
+			void LoadDictionary()
+			{
+				var dictionaryPath = Path.Combine(AssetsDirectory, $"Dictionary{(locale != ProjectUserPreferences.DefaultLocale ? '.' + locale : "")}.txt");
+				Lime.Localization.Dictionary.Clear();
+				try {
+					using (var stream = new FileStream(dictionaryPath, FileMode.Open)) {
+						Lime.Localization.Dictionary.ReadFromStream(stream);
+					}
+					Console.WriteLine($"Dictionary was successfully loaded from \"{dictionaryPath}\"");
+				} catch (System.Exception exception) {
+					Console.WriteLine($"Can not read dictionary from \"{dictionaryPath}\": {exception.Message}");
+				}
+			}
 		}
 
 		public bool TryGetAssetPath(string systemPath, out string assetPath)
@@ -537,16 +551,6 @@ namespace Tangerine.Core
 				return false;
 			}
 			return GetFullPath(AssetPath.CorrectSlashes(path), out var fullPath) && File.Exists(fullPath);
-		}
-
-		private void InvalidateDisplayedText()
-		{
-			foreach (var document in Documents) {
-				if (!document.Loaded) {
-					continue;
-				}
-				document.OnLocalizationChanged();
-			}
 		}
 	}
 }

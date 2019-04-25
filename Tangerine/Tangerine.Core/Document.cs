@@ -256,6 +256,7 @@ namespace Tangerine.Core
 				throw new System.InvalidOperationException($"Can't open '{Path}': {e.Message}");
 			}
 			Loaded = true;
+			OnLocaleChanged();
 		}
 
 		private void Document_Changed() => Project.Current.SceneCache.InvalidateEntryFromOpenedDocumentChanged(Path, IsModified ? (Func<Node>)(() => RootNodeUnwrapped) : null);
@@ -559,8 +560,11 @@ namespace Tangerine.Core
 			}
 		}
 
-		public void OnLocalizationChanged()
+		public void OnLocaleChanged()
 		{
+			if (!Loaded) {
+				return;
+			}
 			foreach (var text in RootNode.Descendants.OfType<IText>()) {
 				text.Invalidate();
 			}

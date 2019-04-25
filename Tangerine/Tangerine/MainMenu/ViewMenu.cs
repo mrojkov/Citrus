@@ -83,50 +83,56 @@ namespace Tangerine
 		}
 	}
 
-	public class SetLocalization : CommandHandler
+	public class LocalizationMenuFactory
 	{
-		private readonly ProjectLocalization localization;
-
-		public SetLocalization(ProjectLocalization localization)
+		public static void Rebuild(Menu menu)
 		{
-			this.localization = localization;
-		}
-
-		public override void Execute()
-		{
-			Project.Current.Localization = localization;
-			if (Document.Current?.ResolutionPreview.Enabled ?? false) {
-				ResolutionPreviewHandler.Execute(Document.Current, true);
+			foreach (var item in menu) {
+				CommandHandlerList.Global.Disconnect(item);
+			}
+			menu.Clear();
+			foreach (var locale in GetAvailableLocales()) {
+				var command = new Command(locale);
+				CommandHandlerList.Global.Connect(command, new SetLocaleCommandHandler(locale));
+				menu.Add(command);
 			}
 		}
 
-		public override void RefreshCommand(ICommand command)
+		private class SetLocaleCommandHandler : CommandHandler
 		{
-			command.Checked = Project.Current.Localization != null && Project.Current.Localization.Code == localization.Code;
-		}
+			private readonly string locale;
 
-		public static List<ProjectLocalization> GetLocales()
-		{
-			var directory = Project.Current.AssetsDirectory;
-			if (string.IsNullOrEmpty(directory)) {
-				return null;
+			public SetLocaleCommandHandler(string locale)
+			{
+				this.locale = locale;
 			}
 
-			var locales = new List<ProjectLocalization>();
-			const string LocalizationFilesPrefix = "Dictionary";
-			const string LocalizationFilesExtension = ".txt";
-			var localizationFilesPattern = $"{LocalizationFilesPrefix}*{LocalizationFilesExtension}";
-			var localizationFiles = Directory.EnumerateFiles(directory, localizationFilesPattern, SearchOption.TopDirectoryOnly);
-			foreach (var file in localizationFiles) {
-				var fileName = Path.GetFileNameWithoutExtension(file);
-				var locale = fileName?.Substring(LocalizationFilesPrefix.Length) ?? string.Empty;
-				locale = locale.TrimStart('.');
-				if (string.IsNullOrEmpty(locale)) {
-					locale = "Default";
+			public override void Execute()
+			{
+				Project.Current.SetLocale(locale);
+				// Resolution preview applies localization markers either.
+				if (Document.Current?.ResolutionPreview.Enabled ?? false) {
+					ResolutionPreviewHandler.Execute(Document.Current, true);
 				}
-				locales.Add(new ProjectLocalization(locale, file));
 			}
-			return locales;
+
+			public override void RefreshCommand(ICommand command)
+			{
+				command.Checked = Project.Locale == locale;
+			}
+		}
+
+		private static IEnumerable<string> GetAvailableLocales()
+		{
+			if (Project.Current == Project.Null) {
+				yield break;
+			}
+			var files = Directory.EnumerateFiles(
+				Project.Current.AssetsDirectory, $"Dictionary*.txt", SearchOption.TopDirectoryOnly);
+			foreach (var file in files.Select(i => Path.GetFileNameWithoutExtension(i))) {
+				var locale = Path.GetExtension(file);
+				yield return string.IsNullOrEmpty(locale) ? ProjectUserPreferences.DefaultLocale : locale.Substring(1);
+			}
 		}
 	}
 }

@@ -259,7 +259,6 @@ namespace Tangerine
 			}
 
 			SyncSources(meta, attachment);
-			var isFirstInvoke = true;
 			var content = new ThemedTabbedWidget();
 			content.AddTab("General", CreateGeneralPane(attachment), true);
 			content.AddTab("Materials Remap", CreateMaterialsRemapPane(attachment));

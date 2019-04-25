@@ -78,7 +78,6 @@
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="ITaskProvider.cs" />
-    <Compile Include="ProjectLocalization.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="VersionedCollection.cs" />

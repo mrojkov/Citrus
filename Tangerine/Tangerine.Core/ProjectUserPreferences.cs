@@ -33,6 +33,11 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public readonly List<string> RecentDocuments = new List<string>();
 
+		public const string DefaultLocale = "EN";
+
+		[YuzuOptional]
+		public string Locale { get; set; } = DefaultLocale;
+
 		public const int MaxRecentDocuments = 5;
 
 		public static ProjectUserPreferences Instance => Project.Current.UserPreferences;
