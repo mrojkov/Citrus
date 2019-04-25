@@ -403,10 +403,11 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, letterSpacing, spriteList, caret.Sync, -1);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length, letterSpacing, spriteList, caret.Sync, -1,
+						ignoreLetterSpacingForFirstChar: true);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
-				if (lastLine) {
+					if (lastLine) {
 					// There is no end-of-text character, so simulate it.
 					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
 				}

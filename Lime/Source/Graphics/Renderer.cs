@@ -376,7 +376,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
-			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, bool skipFirstLetter = true)
+			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, bool ignoreLetterSpacingForFirstChar = true)
 		{
 			int j = 0;
 			if (list != null) {
@@ -407,20 +407,19 @@ namespace Lime
 					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					continue;
 				}
-				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				var xDelta = scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + ((!skipFirstLetter || i != 0) ? letterSpacing : 0.0f));
-				position.X += xDelta;
-				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
-				Vector2 roundPos;
-				if (font.RoundCoordinates) {
-					roundPos = new Vector2(position.X.Round(), position.Y.Round() + fontChar.VerticalOffset);
-					onDrawChar?.Invoke(i, new Vector2((position.X - xDelta).Round(), position.Y.Round()), size);
-				} else {
-					roundPos = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
-					onDrawChar?.Invoke(i, new Vector2(position.X - xDelta, position.Y), size);
+				var scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
+				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
+				if (!ignoreLetterSpacingForFirstChar || i > 0) {
+					position.X += scale * letterSpacing;
 				}
+				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
+				var charPosition = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
+				if (font.RoundCoordinates) {
+					charPosition = new Vector2(charPosition.X.Round(), charPosition.Y.Round());
+				}
+				onDrawChar?.Invoke(i, charPosition, size);
 				chars[j].FontChar = fontChar;
-				chars[j].Position = roundPos;
+				chars[j].Position = charPosition;
 				++j;
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
@@ -978,7 +977,8 @@ namespace Lime
 
 		private static readonly Matrix44 vulkanClipspaceMatrix = Matrix44.CreateScale(1, -1, 0.5f) * Matrix44.CreateTranslation(0, 0, 0.5f);
 		private static readonly Matrix44 openglRenderTextureClipspaceMatrix = Matrix44.CreateScale(1, -1, 1);
-		
+
+
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
 			if (Application.RenderingBackend == RenderingBackend.Vulkan) {

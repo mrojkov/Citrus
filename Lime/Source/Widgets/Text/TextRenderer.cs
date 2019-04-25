@@ -200,7 +200,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, skipFirstLetter: word.X == 0 || (word.IsTagBegin && IsBullet(word)));
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, ignoreLetterSpacingForFirstChar: word.X == 0 || (word.IsTagBegin && IsBullet(word)));
 					}
 					c += wordLength;
 				}
