@@ -38,6 +38,8 @@ namespace Lime
 			}
 		}
 
+		public bool Enabled { get; set; } = true;
+
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			if (oldOwner != null) {
@@ -54,6 +56,9 @@ namespace Lime
 
 		public void Attach(Animation animation, string markerId, string sourceMarkerId = null)
 		{
+			if (!Enabled) {
+				return;
+			}
 			blendings.Remove(animation.Id ?? "");
 
 			BlendingOption blendingOption = null;

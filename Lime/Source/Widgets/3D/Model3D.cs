@@ -39,12 +39,23 @@ namespace Lime
 				if (AssetBundle.Current.FileExists(attachmentPath)) {
 					using (var stream = AssetBundle.Current.OpenFileLocalized(attachmentPath)) {
 						var attachment = yuzu.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
-						if (string.IsNullOrEmpty(attachment.EntryTrigger)) return;
+						if (string.IsNullOrEmpty(attachment.EntryTrigger)) {
+							return;
+						}
+						var blender = Components.Get<AnimationBlender>();
+						var enabledBlending = false;
+						if (blender != null) {
+							enabledBlending = blender.Enabled;
+							blender.Enabled = false;
+						}
 						var oldTrigger = Trigger;
 						Trigger = attachment.EntryTrigger;
 						TriggerMultipleAnimations(Trigger);
 						Update(0);
 						Trigger = oldTrigger;
+						if (blender != null) {
+							blender.Enabled = enabledBlending;
+						}
 					}
 				}
 			}
