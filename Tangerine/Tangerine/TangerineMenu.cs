@@ -20,7 +20,6 @@ namespace Tangerine
 		private static ICommand customNodes;
 		private static IMenu create;
 		private static Menu localizationMenu;
-		private static Command localizationCommand;
 		private static Menu layoutMenu;
 		private static Menu orangeMenu;
 		private static ICommand orangeCommand;
@@ -185,9 +184,7 @@ namespace Tangerine
 					SceneViewCommands.ResolutionReverceChanger,
 					SceneViewCommands.ResolutionOrientation,
 					TimelineCommands.CenterTimelineOnCurrentColumn,
-					(localizationCommand = new Command("Localization", localizationMenu = new Menu()) {
-						Enabled = false
-					})
+					new Command("Locale", localizationMenu = new Menu()),
 				})),
 				new Command("Window", new Menu {
 					GenericCommands.NextDocument,
@@ -266,6 +263,7 @@ namespace Tangerine
 			}
 			overlaysMenu.Clear();
 			RebuildOrangeMenu(proj.CitprojPath);
+			LocalizationMenuFactory.Rebuild(localizationMenu);
 			if (proj == Project.Null)
 				return;
 			proj.UserPreferences.Rulers.CollectionChanged += OnRulersCollectionChanged;
@@ -273,7 +271,6 @@ namespace Tangerine
 			AddRulersCommands(proj.UserPreferences.Rulers);
 			RebuildRulerMenu();
 			AddOverlaysCommands(proj.Overlays);
-			RebuildLocalizationMenu();
 		}
 
 		private static void RebuildRulerMenu()
@@ -345,30 +342,6 @@ namespace Tangerine
 				});
 				overlaysMenu.Add(command);
 				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler(overlayPair.Key));
-			}
-		}
-
-		private static void RebuildLocalizationMenu()
-		{
-			foreach (var item in localizationMenu) {
-				CommandHandlerList.Global.Disconnect(item);
-			}
-			localizationMenu.Clear();
-			foreach (var locale in SetLocalization.GetLocales()) {
-				var command = new Command(locale.Code);
-				var commandHandler = new SetLocalization(locale);
-				CommandHandlerList.Global.Connect(command, commandHandler);
-				localizationMenu.Add(command);
-				if (
-					(Project.Current.Localization == null || locale.Code == "Default")
-					&& Project.Current.UserPreferences.Localization == null
-				) {
-					commandHandler.Execute();
-				}
-			}
-			localizationCommand.Enabled = localizationMenu.Count > 0;
-			if (!localizationCommand.Enabled) {
-				Localization.Dictionary.Clear();
 			}
 		}
 

@@ -211,7 +211,7 @@ namespace Tangerine.UI.SceneView
 
 			private static void ApplyLocalizationMarkers(Node rootNode)
 			{
-				var marker = $"@{Project.Current.Localization.Code}";
+				var marker = Project.Locale;
 				void Apply(Node node)
 				{
 					foreach (var animation in node.Animations) {
