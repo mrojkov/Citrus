@@ -96,42 +96,27 @@ namespace Orange
 			AssetCache.Instance.Initialize();
 			AssetCooker.Platform = platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-#if DEBUG
-			string line = "";
-			switch (AssetCache.Instance.EnableState) {
-				case AssetCache.EnableStates.None:
-					line = "None";
-					break;
-				case AssetCache.EnableStates.Local:
-					line = "Local";
-					break;
-				case AssetCache.EnableStates.Remote:
-					line = "Remote";
-					break;
-				case AssetCache.EnableStates.Both:
-					line = "Both";
-					break;
+			if (The.Workspace.BenchmarkEnabled) {
+				string text = $"Asset cooking. Enabled cache: {AssetCache.Instance.EnableState}. Active platform: {The.Workspace.ActivePlatform}";
+				Debug.WriteLine(text);
+				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+					w.WriteLine(text);
+					w.WriteLine(DateTime.Now);
+				}
+				Stopwatch timer = new Stopwatch();
+				timer.Start();
+				CookBundles(bundles: bundles);
+				timer.Stop();
+				text = $"All bundles cooked: {timer.ElapsedMilliseconds} ms";
+				Debug.WriteLine(text);
+				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+					w.WriteLine(text);
+					w.WriteLine();
+					w.WriteLine();
+				}
+			} else {
+				CookBundles(bundles: bundles);
 			}
-			string text = $"Asset cooking. Enabled cache: {line}";
-			Console.WriteLine(text);
-			using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-				w.WriteLine(text);
-				w.WriteLine(DateTime.Now);
-			}
-			Stopwatch timer = new Stopwatch();
-			timer.Start();
-#endif
-			CookBundles(bundles: bundles);
-#if DEBUG
-			timer.Stop();
-			text = $"All bundles cooked: {timer.ElapsedMilliseconds} ms";
-			Debug.WriteLine(text);
-			using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-				w.WriteLine(text);
-				w.WriteLine();
-				w.WriteLine();
-			}
-#endif
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
@@ -184,33 +169,34 @@ namespace Orange
 				UserInterface.Instance.SetupProgressBar(s);
 				BeginCookBundles?.Invoke();
 
-#if DEBUG
-				Stopwatch timer = new Stopwatch();
-				timer.Start();
-#endif
-				CookBundle(CookingRulesBuilder.MainBundleName);
-#if DEBUG
-				timer.Stop();
-				string text = $"Main bundle cooked: {timer.ElapsedMilliseconds} ms";
-				Debug.WriteLine(text);
-				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-					w.WriteLine(text);
-				}
-#endif
-				foreach (var extraBundle in extraBundles) {
-#if DEBUG
-					Stopwatch extraTimer = new Stopwatch();
-					extraTimer.Start();
-#endif
-					CookBundle(extraBundle);
-#if DEBUG
-					extraTimer.Stop();
-					string extraText = $"{extraBundle} cooked: {extraTimer.ElapsedMilliseconds} ms";
-					Debug.WriteLine(extraText);
+				if (The.Workspace.BenchmarkEnabled) {
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
+					CookBundle(CookingRulesBuilder.MainBundleName);
+					timer.Stop();
+					string text = $"Main bundle cooked: {timer.ElapsedMilliseconds} ms";
+					Debug.WriteLine(text);
 					using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-						w.WriteLine(extraText);
+						w.WriteLine(text);
 					}
-#endif
+				} else {
+					CookBundle(CookingRulesBuilder.MainBundleName);
+				}
+
+				foreach (var extraBundle in extraBundles) {
+					if (The.Workspace.BenchmarkEnabled) {
+						Stopwatch extraTimer = new Stopwatch();
+						extraTimer.Start();
+						CookBundle(extraBundle);
+						extraTimer.Stop();
+						string extraText = $"{extraBundle} cooked: {extraTimer.ElapsedMilliseconds} ms";
+						Debug.WriteLine(extraText);
+						using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+							w.WriteLine(extraText);
+						}
+					} else {
+						CookBundle(extraBundle);
+					}
 				}
 				extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
