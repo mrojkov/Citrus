@@ -45,7 +45,7 @@ namespace Lime
 		public AnimatorRegistry()
 		{
 			Add(typeof(Vector2), new Vector2AnimatorFactory());
-			Add(typeof(Vector3), new Vector2AnimatorFactory());
+			Add(typeof(Vector3), new Vector3AnimatorFactory());
 			Add(typeof(Quaternion), new QuaternionAnimatorFactory());
 			Add(typeof(Matrix44), new Matrix44AnimatorFactory());
 			Add(typeof(float), new NumericAnimatorFactory());
