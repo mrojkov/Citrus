@@ -42,7 +42,10 @@ namespace Orange
 
 		private void GetSettings()
 		{
-			var data = The.Workspace.ProjectJson.AsDynamic.AssetCache;
+			dynamic data = null;
+			try {
+				data = The.Workspace.ProjectJson.AsDynamic.AssetCache;
+			} catch { }
 			if (data == null) {
 				enableState = EnableState.None;
 				Console.WriteLine($"[Cache] Warning: 'AssetCache' field not found in {The.Workspace.ProjectFile}. Caching disabled");
