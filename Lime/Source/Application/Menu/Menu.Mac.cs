@@ -141,9 +141,11 @@ namespace Lime
 				if (commandVersion == Command.Version) {
 					return;
 				}
+				var title = Command.Text != null ? Command.Text.Replace("&", string.Empty) : string.Empty;
 				commandVersion = Command.Version;
 				NativeMenuItem.Hidden = !Command.Visible;
-				NativeMenuItem.Title = Command.Text ?? "";
+				NativeMenuItem.Enabled = Command.Enabled;
+				NativeMenuItem.Title = title;
 				NativeMenuItem.State = Command.Checked ? NSCellStateValue.On : NSCellStateValue.Off;
 				if (Command.Shortcut.Main != Key.Unknown) {
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
@@ -154,7 +156,7 @@ namespace Lime
 				}
 				if (Command.Menu != null) {
 					var nativeSubmenu = ((Menu)Command.Menu).NativeMenu;
-					nativeSubmenu.Title = Command.Text;
+					nativeSubmenu.Title = title;
 					NativeMenuItem.Submenu = nativeSubmenu;
 				} else {
 					NativeMenuItem.Submenu = null;

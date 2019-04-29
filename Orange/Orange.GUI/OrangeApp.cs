@@ -19,10 +19,10 @@ namespace Orange
 			LoadFont();
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();
-			CreateMenuItems();
+			CreateActionMenuItems();
 		}
 
-		private static void CreateMenuItems()
+		private static void CreateActionMenuItems()
 		{
 			The.MenuController.CreateAssemblyMenuItems();
 		}

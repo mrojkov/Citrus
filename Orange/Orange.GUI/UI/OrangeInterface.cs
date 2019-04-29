@@ -22,8 +22,8 @@ namespace Orange
 		private Button goButton;
 		private Button abortButton;
 		private Widget footerSection;
-
 		private ProgressBarField progressBarField;
+		private ICommand actionsCommand;
 
 		public OrangeInterface()
 		{
@@ -57,6 +57,13 @@ namespace Orange
 			mainVBox.AddNode(progressBarField);
 			mainVBox.AddNode(CreateFooterSection());
 			windowWidget.AddNode(mainVBox);
+
+			Application.MainMenu = new Menu {
+				new Command("&File", new Menu {
+					new Command("&Quit", () => { Application.Exit(); })
+				}),
+				(actionsCommand = new Command("&Actions", new Menu { }))
+			};
 		}
 
 		private Widget CreateHeaderSection()
@@ -236,8 +243,42 @@ namespace Orange
 		public override void RefreshMenu()
 		{
 			actionPicker.Items.Clear();
+			actionsCommand.Menu.Clear();
+			var letterUsedCount = new Dictionary<char, int>();
 			foreach (var menuItem in The.MenuController.GetVisibleAndSortedItems()) {
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
+				// Arrange win-specific hotkey ampersands, minimizing conflicts
+				var label = menuItem.Label.ToLower();
+				bool wordStart = true;
+				var insertionPoints = new List<KeyValuePair<char, int>>();
+				for (int i = 0; i < label.Length; i++) {
+					if (label[i] == ' ') {
+						continue;
+					}
+					if (wordStart) {
+						var key = label[i];
+						if (!letterUsedCount.ContainsKey(key)) {
+							letterUsedCount.Add(key, 0);
+						}
+						insertionPoints.Add(new KeyValuePair<char, int>(key, i));
+					}
+					wordStart = false;
+					if (i < label.Length - 1 && label[i + 1] == ' ') {
+						wordStart = true;
+					}
+				}
+				insertionPoints.Sort((a, b) => {
+					if (!letterUsedCount.ContainsKey(a.Key)) {
+						letterUsedCount.Add(a.Key, 0);
+					}
+					if (!letterUsedCount.ContainsKey(b.Key)) {
+						letterUsedCount.Add(b.Key, 0);
+					}
+					return letterUsedCount[a.Key] - letterUsedCount[b.Key];
+				});
+				var labelWithAmpersand = menuItem.Label.Insert(insertionPoints[0].Value, "&");
+				letterUsedCount[insertionPoints[0].Key]++;
+				actionsCommand.Menu.Add(new Command(labelWithAmpersand, () => { Execute(menuItem.Action); }));
 			}
 		}
 
