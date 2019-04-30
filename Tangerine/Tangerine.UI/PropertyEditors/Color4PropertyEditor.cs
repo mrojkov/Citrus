@@ -10,7 +10,7 @@ namespace Tangerine.UI
 	public class Color4PropertyEditor : ExpandablePropertyEditor<Color4>
 	{
 		private EditBox editor;
-		private Color4 lastColor;
+		private Color4 previousColor;
 		private ToolbarButton pipetteButton;
 		private readonly ColorPickerPanel panel;
 
@@ -20,7 +20,11 @@ namespace Tangerine.UI
 		{
 			ColorBoxButton colorBox;
 			panel = new ColorPickerPanel();
-			var currentColor = CoalescedPropertyValue(Color4.White).DistinctUntilChanged();
+			var objects = (EditorParams.IsAnimable ? EditorParams.RootObjects : EditorParams.Objects).ToList();
+			var first = PropertyValue(objects.First()).GetValue();
+			var @default = objects.All(o =>
+				PropertyValue(o).GetValue().A == first.A) ? new Color4(255, 255, 255, first.A) : Color4.White;
+			var currentColor = CoalescedPropertyValue(@default).DistinctUntilChanged();
 			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
@@ -41,14 +45,21 @@ namespace Tangerine.UI
 			}));
 			panel.Changed += () => {
 				EditorParams.History?.RollbackTransaction();
-				SetProperty(panel.Color);
+				if ((panel.Color.ABGR & 0xFFFFFF) == (previousColor.ABGR & 0xFFFFFF) && panel.Color.A != previousColor.A) {
+					SetProperty<Color4>(c => {
+						c.A = panel.Color.A;
+						return c;
+					});
+				} else {
+					SetProperty(panel.Color);
+				}
 			};
 			panel.DragStarted += () => {
 				EditorParams.History?.BeginTransaction();
-				lastColor = panel.Color;
+				previousColor = panel.Color;
 			};
 			panel.DragEnded += () => {
-				if (panel.Color != lastColor || (editorParams.Objects.Skip(1).Any() && SameValues())) {
+				if (panel.Color != previousColor || (editorParams.Objects.Skip(1).Any() && SameValues())) {
 					EditorParams.History?.CommitTransaction();
 				}
 				EditorParams.History?.EndTransaction();
