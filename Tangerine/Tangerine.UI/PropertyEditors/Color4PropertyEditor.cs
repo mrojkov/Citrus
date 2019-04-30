@@ -20,7 +20,7 @@ namespace Tangerine.UI
 		{
 			ColorBoxButton colorBox;
 			panel = new ColorPickerPanel();
-			var objects = (EditorParams.IsAnimable ? EditorParams.RootObjects : EditorParams.Objects).ToList();
+			var objects = (EditorParams.IsAnimable ? EditorParams.Objects : EditorParams.Objects).ToList();
 			var first = PropertyValue(objects.First()).GetValue();
 			var @default = objects.All(o =>
 				PropertyValue(o).GetValue().A == first.A) ? new Color4(255, 255, 255, first.A) : Color4.White;
