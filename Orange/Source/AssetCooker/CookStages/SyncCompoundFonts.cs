@@ -11,10 +11,9 @@ namespace Orange
 
 		private readonly string fontExtension = ".cft";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(fontExtension, fontExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fontExtension);
+
+		public void Action() => SyncUpdated.Sync(fontExtension, fontExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

@@ -18,10 +18,9 @@ namespace Orange
 			this.attributes = attributes;
 		}
 
-		public void Action()
-		{
-			SyncUpdated.Sync(extension, extension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(extension);
+
+		public void Action() => SyncUpdated.Sync(extension, extension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

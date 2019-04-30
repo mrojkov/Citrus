@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Lime;
 
 namespace Orange
@@ -12,6 +13,8 @@ namespace Orange
 
 		private readonly string modelExtension = ".model";
 
+		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(modelExtension).Count();
+
 		public void Action()
 		{
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(modelExtension)) {
@@ -21,6 +24,7 @@ namespace Orange
 				}
 				Logger.Write($"Removing deprecated .model file: {path}");
 				File.Delete(path);
+				UserInterface.Instance.IncreaseProgressBar();
 			}
 		}
 	}

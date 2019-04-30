@@ -11,10 +11,9 @@ namespace Orange
 
 		private readonly string hotFontExtension = ".fnt";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotFontExtension);
+
+		public void Action() => SyncUpdated.Sync(hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

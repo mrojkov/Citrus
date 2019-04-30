@@ -142,18 +142,7 @@ namespace Orange
 			}
 
 			try {
-				int s = 0;
-				// Drop cooking rules, they shouldn't be counting as assets, but The.Workspace.AssetFiles includes them
-				foreach (var asset in The.Workspace.AssetFiles.Enumerate()) {
-					if (string.Equals(Path.GetExtension(asset.Path), ".txt", StringComparison.OrdinalIgnoreCase)) {
-						if (string.Equals(Path.GetFileName(asset.Path), "#CookingRules.txt", StringComparison.OrdinalIgnoreCase) ||
-							!string.Equals(Path.GetExtension(Path.GetFileNameWithoutExtension(asset.Path)), string.Empty, StringComparison.OrdinalIgnoreCase))
-							continue;
-					}
-					s++;
-				}
-
-				UserInterface.Instance.SetupProgressBar(s);
+				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(extraBundles));
 				BeginCookBundles?.Invoke();
 
 				// TODO Update this when AssetCooker.CookBundles will only cook bundles that was passed to it
@@ -184,6 +173,30 @@ namespace Orange
 				EndCookBundles?.Invoke();
 				UserInterface.Instance.StopProgressBar();
 			}
+		}
+
+		private static int CalculateAssetCount(HashSet<string> extraBundles)
+		{
+			var assetCount = 0;
+			var allBundles = new HashSet<string>();
+			allBundles.Add(CookingRulesBuilder.MainBundleName);
+			allBundles.UnionWith(extraBundles);
+			var savedWorkspaceAssetFiles = The.Workspace.AssetFiles;
+			foreach (var bundleName in allBundles) {
+				var bundle = CreateBundle(bundleName);
+				AssetBundle.SetCurrent(bundle, false);
+				The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
+				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+					var profileCookStages = cookStages
+						.Where(kv => kv.Value.Contains(cookingProfile))
+						.Select(kv => kv.Key);
+					foreach (var stage in profileCookStages) {
+						assetCount += stage.GetOperationsCount();
+					}
+				}
+			}
+			The.Workspace.AssetFiles = savedWorkspaceAssetFiles;
+			return assetCount;
 		}
 
 		private static void CookBundle(string bundleName)
@@ -251,21 +264,25 @@ namespace Orange
 			}
 		}
 
+		private static bool AssetIsInBundlePredicate(FileInfo info, string bundleName)
+		{
+			CookingRules rules;
+			if (CookingRulesMap.TryGetValue(info.Path, out rules)) {
+				if (rules.Ignore) {
+					return false;
+				}
+				return Array.IndexOf(rules.Bundles, bundleName) != -1;
+			} else {
+				// There are no cooking rules for text files, consider them as part of the main bundle.
+				return bundleName == CookingRulesBuilder.MainBundleName;
+			}
+		}
+
 		private static void CookBundleHelper(string bundleName)
 		{
 			Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 			var assetFilesEnumerator = The.Workspace.AssetFiles;
-			The.Workspace.AssetFiles = new FilteredFileEnumerator(assetFilesEnumerator, (info) => {
-				CookingRules rules;
-				if (CookingRulesMap.TryGetValue(info.Path, out rules)) {
-					if (rules.Ignore)
-						return false;
-					return Array.IndexOf(rules.Bundles, bundleName) != -1;
-				} else {
-					// There are no cooking rules for text files, consider them as part of the main bundle.
-					return bundleName == CookingRulesBuilder.MainBundleName;
-				}
-			});
+			The.Workspace.AssetFiles = new FilteredFileEnumerator(assetFilesEnumerator, (info) => AssetIsInBundlePredicate(info, bundleName));
 			// Every asset bundle must have its own atlases folder, so they aren't conflict with each other
 			atlasesPostfix = bundleName != CookingRulesBuilder.MainBundleName ? bundleName : "";
 			try {

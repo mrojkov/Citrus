@@ -12,6 +12,8 @@ namespace Orange
 
 		private readonly string textureParamsExtension = ".texture";
 
+		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureParamsExtension).Count();
+
 		public void Action()
 		{
 			foreach (var path in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
@@ -20,6 +22,7 @@ namespace Orange
 					if (!AssetCooker.AssetBundle.FileExists(origImageFile)) {
 						AssetCooker.DeleteFileFromBundle(path);
 					}
+					UserInterface.Instance.IncreaseProgressBar();
 				}
 			}
 		}

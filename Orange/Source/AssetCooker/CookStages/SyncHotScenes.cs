@@ -11,10 +11,9 @@ namespace Orange
 
 		private readonly string hotSceneExtension = ".scene";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotSceneExtension);
+
+		public void Action() => SyncUpdated.Sync(hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

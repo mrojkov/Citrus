@@ -13,6 +13,8 @@ namespace Orange
 
 		private readonly string maskExtension = ".mask";
 
+		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(maskExtension).Count();
+
 		public void Action()
 		{
 			foreach (var maskPath in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
@@ -21,6 +23,7 @@ namespace Orange
 					if (!AssetCooker.AssetBundle.FileExists(origImageFile)) {
 						AssetCooker.DeleteFileFromBundle(maskPath);
 					}
+					UserInterface.Instance.IncreaseProgressBar();
 				}
 			}
 		}

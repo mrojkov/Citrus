@@ -12,10 +12,9 @@ namespace Orange
 		private readonly string txtExtension = ".txt";
 		private readonly string t3dExtension = ".t3d";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(txtExtension, txtExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(txtExtension);
+
+		public void Action() => SyncUpdated.Sync(txtExtension, txtExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{
