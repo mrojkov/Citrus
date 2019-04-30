@@ -132,14 +132,11 @@ namespace Lime.Graphics.Platform.Vulkan
 				backbufferFormat = surfaceFormats[0].Format;
 			}
 			context.PhysicalDevice.GetSurfaceCapabilities(surface, out var surfaceCapabilities);
-			//if (width < surfaceCapabilities.MinImageExtent.Width || height < surfaceCapabilities.MinImageExtent.Height ||
-			//	width > surfaceCapabilities.MaxImageExtent.Width || height > surfaceCapabilities.MaxImageExtent.Height
-			//) {
-			//	throw new InvalidOperationException();
-			//}			
-			// XXX
-			width = (int)surfaceCapabilities.CurrentExtent.Width;
-			height = (int)surfaceCapabilities.CurrentExtent.Height;
+			if (width < surfaceCapabilities.MinImageExtent.Width || height < surfaceCapabilities.MinImageExtent.Height ||
+				width > surfaceCapabilities.MaxImageExtent.Width || height > surfaceCapabilities.MaxImageExtent.Height
+			) {
+				throw new InvalidOperationException();
+			}			
 			var desiredBufferCount = 3U;
 			if (desiredBufferCount < surfaceCapabilities.MinImageCount) {
 				desiredBufferCount = surfaceCapabilities.MinImageCount;

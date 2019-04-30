@@ -44,13 +44,13 @@ namespace Lime
 		{
 			return UIDevice.CurrentDevice.CheckSystemVersion(10, 0) && MTLDevice.SystemDefault != null;
 		}
-
+		
 		public MetalGameView(CGRect frame) : base(frame, MTLDevice.SystemDefault)
 		{
 			stopwatch = new System.Diagnostics.Stopwatch();
 			Delegate = this;
 		}
-		
+ 				
 		public void Draw(MTKView view)
 		{
 			EnsureInitialized();
@@ -74,19 +74,15 @@ namespace Lime
 				PlatformRenderer.Initialize(vkContext);
 			}
 			if (vkSwapChain == null) {
-				var size = metalLayer.Frame.Size;
+				var size = metalLayer.DrawableSize;
+				GetDrawableSize(out var drawableWidth, out var drawableHeight);
 				vkSwapChain = new Graphics.Platform.Vulkan.Swapchain(
-					vkContext, this.Handle,
-					(int)(size.Width * PixelScale), (int)(size.Height * PixelScale));
+					vkContext, this.Handle, drawableWidth, drawableHeight);
 			}
 		}
 
-		public void DrawableSizeWillChange(MTKView view, CGSize size)
-		{
-			EnsureInitialized();
-			vkSwapChain.Resize((int)size.Width, (int)size.Height);
-		}
-		
+		void IMTKViewDelegate.DrawableSizeWillChange(MTKView view, CGSize size) { }
+ 		
 		void SetupMetal()
 		{
 			metalLayer = (CAMetalLayer)Layer;
@@ -117,13 +113,23 @@ namespace Lime
 			base.Dispose(disposing);
 			disposed = true;
 		}
+		
 
 		public override void LayoutSubviews()
 		{
 			var bounds = Bounds;
 		    ClientSize = new Vector2((float)Layer.Bounds.Size.Width, (float)Layer.Bounds.Size.Height);
+		    EnsureInitialized();
+		    GetDrawableSize(out var drawableWidth, out var drawableHeight);
+		    vkSwapChain.Resize(drawableWidth, drawableHeight);
 		}
-
+		
+		private void GetDrawableSize(out int width, out int height)
+		{
+			width = (int)(Layer.Bounds.Width * Layer.ContentsScale);
+		    height = (int)(Layer.Bounds.Height * Layer.ContentsScale);
+		}
+		
 		public void MakeCurrent()
 		{
 			vkContext.Begin(vkSwapChain);
