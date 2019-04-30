@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.UI.Timeline.Components
 {
@@ -93,7 +94,6 @@ namespace Tangerine.UI.Timeline.Components
 				Padding = new Thickness { Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
-				HitTestTarget = true,
 				Nodes = {
 					expandButtonContainer,
 					(indentSpacer = new Widget()),
@@ -106,7 +106,7 @@ namespace Tangerine.UI.Timeline.Components
 					lockAnimationButton,
 					eyeButton,
 					lockButton,
-				}
+				},
 			};
 			widget.Components.Add(new AwakeBehavior());
 			label.AddChangeWatcher(() => nodeData.Node.Id, s => RefreshLabel());
@@ -181,8 +181,23 @@ namespace Tangerine.UI.Timeline.Components
 				button.Texture = IconPool.GetTexture(texture);
 			});
 			button.AddTransactionClickHandler(
-				() => Core.Operations.SetProperty.Perform(nodeData, nameof(NodeRow.Visibility), (NodeVisibility)(((int)nodeData.Visibility + 1) % 3))
+				() => {
+					var selectedRows = Document.Current.SelectedRows().Select(r => r.Components.Get<NodeRow>())
+						.Where(nr => nr != null).ToList();
+					if (selectedRows.Contains(nodeData)) {
+						selectedRows.ForEach(nr => {
+							if (nr != nodeData) {
+								SetProperty.Perform(nr, nameof(NodeRow.Visibility), NextVisibility(nodeData.Visibility));
+							}
+						});
+					}
+					SetProperty.Perform(nodeData, nameof(NodeRow.Visibility), NextVisibility(nodeData.Visibility));
+					Application.Input.ConsumeKey(Key.Mouse0);
+				}
 			);
+
+			NodeVisibility NextVisibility(NodeVisibility v) => (NodeVisibility)(((int)v + 1) % 3);
+
 			return button;
 		}
 

@@ -10,91 +10,12 @@ namespace Tangerine.UI.Timeline
 {
 	public class SelectAndDragRowsProcessor : ITaskProvider
 	{
-		public SelectAndDragRowsProcessor()
-		{
-			Probers.Add(new BoneRowProber());
-			Probers.Add(new FolderRowProber());
-			Probers.Add(new NodeRowProber());
-			Probers.Add(new AnimationTrackRowProber());
-		}
+		private RowLocation? dragLocation;
 
-		public IEnumerator<object> Task()
+		void OnRollRenderOverlay(Widget _)
 		{
-			var roll = Timeline.Instance.Roll;
-			var input = roll.RootWidget.Input;
-			input.AcceptMouseThroughDescendants = true;
-			while (true) {
-				yield return null;
-				if (!input.WasMousePressed() || input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					continue;
-				}
-				var initialMousePosition = input.MousePosition;
-				var row = RowUnderMouse(initialMousePosition);
-				if (row == null) {
-					continue;
-				}
-				if (input.IsKeyPressed(Key.Shift)) {
-					if (Document.Current.SelectedRows().Any()) {
-						var firstRow = Document.Current.SelectedRows().FirstOrDefault();
-						Document.Current.History.DoTransaction(() => {
-							ClearRowSelection.Perform();
-							SelectRowRange.Perform(firstRow, row);
-						});
-					} else {
-						Document.Current.History.DoTransaction(() => {
-							ClearRowSelection.Perform();
-							SelectRow.Perform(row);
-						});
-					}
-				} else if (input.IsKeyPressed(Key.Control)) {
-					Document.Current.History.DoTransaction(() => {
-						SelectRow.Perform(row, !row.Selected);
-					});
-				} else {
-					if (!row.Selected) {
-						Document.Current.History.DoTransaction(() => {
-							ClearRowSelection.Perform();
-							SelectRow.Perform(row);
-						});
-					}
-					while (
-						input.IsMousePressed() &&
-						Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < TimelineMetrics.DefaultRowHeight / 4
-					) {
-						yield return null;
-					}
-					if (input.IsMousePressed()) {
-						yield return DragTask();
-					} else {
-						Document.Current.History.DoTransaction(() => {
-							ClearRowSelection.Perform();
-							SelectRow.Perform(row);
-						});
-					}
-				}
-			}
-		}
-
-		static IEnumerator<object> DragTask()
-		{
-			var roll = Timeline.Instance.Roll;
-			RowLocation? dragLocation = new RowLocation(Document.Current.RowTree, 0);
-			Action<Widget> a = _ => {
-				if (dragLocation != null) {
-					RenderDragCursor(dragLocation.Value);
-				}
-			};
-			roll.OnRenderOverlay += a;
-			var input = roll.RootWidget.Input;
-			while (input.IsMousePressed()) {
-				dragLocation = MouseToRowLocation(input.MousePosition);
-				CommonWindow.Current.Invalidate();
-				yield return null;
-			}
-			roll.OnRenderOverlay -= a;
-			CommonWindow.Current.Invalidate();
 			if (dragLocation != null) {
-				DragRows(dragLocation.Value);
+				RenderDragCursor(dragLocation.Value);
 			}
 		}
 
@@ -130,7 +51,7 @@ namespace Tangerine.UI.Timeline
 			if (ShouldSkipDragCursorRendering(y, CalcIndentation(pr))) {
 				return;
 			}
-			
+
 			Timeline.Instance.Roll.ContentWidget.PrepareRendererState();
 			Renderer.DrawRect(
 				new Vector2(TimelineMetrics.RollIndentation * CalcIndentation(pr), y - 1),
@@ -415,6 +336,74 @@ namespace Tangerine.UI.Timeline
 				}
 				return false;
 			}
+		}
+
+		public IEnumerator<object> Task()
+		{
+			Probers.Add(new BoneRowProber());
+			Probers.Add(new FolderRowProber());
+			Probers.Add(new NodeRowProber());
+			Probers.Add(new AnimationTrackRowProber());
+			var roll = Timeline.Instance.Roll;
+			var input = roll.RootWidget.Input;
+			roll.RootWidget.HitTestTarget = true;
+			roll.RootWidget.Gestures.Add(new ClickGesture(0, () => {
+				var row = RowUnderMouse(input.MousePosition);
+				if (row == null) {
+					return;
+				}
+				if (input.IsKeyPressed(Key.Shift)) {
+					if (Document.Current.SelectedRows().Any()) {
+						var firstRow = Document.Current.SelectedRows().FirstOrDefault();
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRowRange.Perform(firstRow, row);
+						});
+					} else {
+						Document.Current.History.DoTransaction(() => {
+							ClearRowSelection.Perform();
+							SelectRow.Perform(row);
+						});
+					}
+				} else if (input.IsKeyPressed(Key.Control)) {
+					Document.Current.History.DoTransaction(() => {
+						SelectRow.Perform(row, !row.Selected);
+					});
+				} else {
+					Document.Current.History.DoTransaction(() => {
+						ClearRowSelection.Perform();
+						SelectRow.Perform(row);
+					});
+					input.ConsumeKey(Key.Mouse0);
+				}
+			}));
+			var dg = new DragGesture(0);
+			dg.Recognized += () => {
+				var row = RowUnderMouse(input.MousePosition);
+				if (!row?.Selected ?? false) {
+					Document.Current.History.DoTransaction(() => {
+						ClearRowSelection.Perform();
+						SelectRow.Perform(row);
+					});
+				}
+				roll.OnRenderOverlay += OnRollRenderOverlay;
+				dragLocation = new RowLocation(Document.Current.RowTree, 0);
+			};
+			dg.Changed += () => {
+				dragLocation = MouseToRowLocation(input.MousePosition);
+				CommonWindow.Current.Invalidate();
+			};
+			dg.Ended += () => {
+				if (!dg.IsRecognizing()) {
+					roll.OnRenderOverlay -= OnRollRenderOverlay;
+					CommonWindow.Current.Invalidate();
+					if (dragLocation != null) {
+						DragRows(dragLocation.Value);
+					}
+				}
+			};
+			roll.RootWidget.Gestures.Add(dg);
+			yield break;
 		}
 	}
 }
