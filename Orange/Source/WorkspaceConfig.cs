@@ -23,6 +23,10 @@ namespace Orange
 		public Vector2 ClientPosition;
 
 		[YuzuOptional]
+		public AssetCacheMode AssetCacheEnabled = AssetCacheMode.Local;
+
+		[YuzuOptional]
+		public string AssetCacheLocalPath = ".orange/Cache";
 		public bool BenchmarkEnabled;
 
 		public static string GetDataPath()

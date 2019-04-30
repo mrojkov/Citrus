@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Lime;
+using Orange;
 using Tangerine.Core;
 using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline;
+using EmbeddedResource = Tangerine.UI.EmbeddedResource;
 
 namespace Tangerine
 {
@@ -97,6 +99,7 @@ namespace Tangerine
 				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
 				SceneUserPreferences.Instance.VisualHintsRegistry = VisualHintsRegistry.Instance;
 				Core.UserPreferences.Instance.Save();
+				The.Workspace.Save();
 			};
 
 			var timelinePanel = new Panel("Timeline");

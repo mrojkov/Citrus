@@ -25,6 +25,11 @@ namespace Orange
 		private ProgressBarField progressBarField;
 		private ICommand actionsCommand;
 
+		private Command CacheBoth;
+		private Command CacheRemote;
+		private Command CacheLocal;
+		private Command CacheNone;
+
 		public OrangeInterface()
 		{
 			var windowSize = new Vector2(500, 400);
@@ -58,12 +63,49 @@ namespace Orange
 			mainVBox.AddNode(CreateFooterSection());
 			windowWidget.AddNode(mainVBox);
 
+			CacheBoth = new Command("&Both", () => CacheCommandsHandler(AssetCache.EnableState.Both));
+			CacheRemote = new Command("&Remote", () => CacheCommandsHandler(AssetCache.EnableState.Remote));
+			CacheLocal = new Command("&Local", () => CacheCommandsHandler(AssetCache.EnableState.Local));
+			CacheNone = new Command("&None", () => CacheCommandsHandler(AssetCache.EnableState.None));
+
 			Application.MainMenu = new Menu {
 				new Command("&File", new Menu {
 					new Command("&Quit", () => { Application.Exit(); })
 				}),
-				(actionsCommand = new Command("&Actions", new Menu { }))
+				(actionsCommand = new Command("&Actions", new Menu { })),
+				new Command("&Cache", new Menu {
+					new Command("&Enabled", new Menu {
+						CacheBoth,
+						CacheRemote,
+						CacheLocal,
+						CacheNone
+					})
+				})
 			};
+		}
+
+		private void CacheCommandsHandler(AssetCache.EnableState state)
+		{
+			CacheBoth.Checked = false;
+			CacheRemote.Checked = false;
+			CacheLocal.Checked = false;
+			CacheNone.Checked = false;
+			switch (state) {
+				case AssetCache.EnableState.Both:
+					CacheBoth.Checked = true;
+					break;
+				case AssetCache.EnableState.Remote:
+					CacheRemote.Checked = true;
+					break;
+				case AssetCache.EnableState.Local:
+					CacheLocal.Checked = true;
+					break;
+				case AssetCache.EnableState.None:
+					CacheNone.Checked = true;
+					break;
+			}
+
+			The.Workspace.AssetCacheEnabled = state;
 		}
 
 		private Widget CreateHeaderSection()
@@ -368,6 +410,7 @@ namespace Orange
 			if (config.ClientSize != Vector2.Zero) {
 				window.ClientSize = config.ClientSize;
 			}
+			CacheCommandsHandler(config.AssetCacheEnabled);
 		}
 
 		private class TextViewWriter : TextWriter

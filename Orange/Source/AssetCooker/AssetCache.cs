@@ -34,6 +34,7 @@ namespace Orange
 		private string serverPath;
 		private string localPath = Path.Combine(".orange", "Cache");
 		public AssetCacheMode Mode { get; private set; }
+		private EnableState enableState;
 
 		private bool RemoteEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Remote;
 		private bool LocalEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Local;
@@ -51,28 +52,23 @@ namespace Orange
 				Console.WriteLine($"[Cache] Warning: 'AssetCache' field not found in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
-			string temp = (string) data.Enabled;
-			switch (temp) {
-				case "None":
+			switch (The.Workspace.AssetCacheEnabled) {
+				case AssetCacheMode.None:
 					Mode = AssetCacheMode.None;
-					Console.WriteLine($"[Cache] Caching disabled via {The.Workspace.ProjectFile}");
+					Console.WriteLine($"[Cache] Caching disabled via WorkspaceConfig");
 					return;
-				case "Local":
+				case AssetCacheMode.Local:
 					Mode = AssetCacheMode.Local;
 					break;
-				case "Remote":
+				case AssetCacheMode.Remote:
 					Mode = AssetCacheMode.Remote;
 					break;
-				case "Both":
+				case AssetCacheMode.Both:
 					Mode = AssetCacheMode.Both;
 					break;
-				case null:
-					Mode = AssetCacheMode.None;
-					Console.WriteLine($"[Cache] Error: 'Enabled' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
-					return;
 				default:
 					Mode = AssetCacheMode.None;
-					throw new ArgumentException($"[Cache] Error: '{temp}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
+					throw new ArgumentException($"[Cache] Error: '{The.Workspace.AssetCacheEnabled}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
 			}
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
@@ -214,7 +210,7 @@ namespace Orange
 
 		private string GetLocalPath(string hashString)
 		{
-			return Path.Combine(The.Workspace.ProjectDirectory, localPath,
+			return Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.AssetCacheLocalPath,
 				hashString.Substring(0, 2), hashString.Substring(2, 2), hashString);
 		}
 

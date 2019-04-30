@@ -10,6 +10,11 @@ namespace Tangerine
 {
 	public class OrangeInterface : Orange.UserInterface
 	{
+		public Command CacheBoth;
+		public Command CacheRemote;
+		public Command CacheLocal;
+		public Command CacheNone;
+
 		public OrangePluginUIBuilder PluginUIBuilder;
 
 		public readonly PlatformPicker PlatformPicker = new PlatformPicker();
@@ -61,6 +66,35 @@ namespace Tangerine
 		public override void SetupProgressBar(int maxPosition) { }
 		public override void StopProgressBar() { }
 		public override void IncreaseProgressBar(int amount = 1) { }
+
+		public void CacheCommandsHandler(AssetCache.EnableState state)
+		{
+			CacheBoth.Checked = false;
+			CacheRemote.Checked = false;
+			CacheLocal.Checked = false;
+			CacheNone.Checked = false;
+			switch (state) {
+				case AssetCache.EnableState.Both:
+					CacheBoth.Checked = true;
+					break;
+				case AssetCache.EnableState.Remote:
+					CacheRemote.Checked = true;
+					break;
+				case AssetCache.EnableState.Local:
+					CacheLocal.Checked = true;
+					break;
+				case AssetCache.EnableState.None:
+					CacheNone.Checked = true;
+					break;
+			}
+
+			The.Workspace.AssetCacheEnabled = state;
+		}
+
+		public override void LoadFromWorkspaceConfig(WorkspaceConfig config)
+		{
+			CacheCommandsHandler(config.AssetCacheEnabled);
+		}
 	}
 
 	public class PlatformPicker : ThemedDropDownList
