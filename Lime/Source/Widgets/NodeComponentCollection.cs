@@ -153,10 +153,10 @@ namespace Lime
 			owner.Behaviours = owner.LateBehaviours = EmptyBehaviors;
 		}
 
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourUpdateChecker =>
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourUpdateChecker =
 			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
 
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =>
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =
 			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
 
 		private class OverridenBehaviourMethodChecker
