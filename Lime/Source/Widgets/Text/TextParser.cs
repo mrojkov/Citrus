@@ -7,7 +7,7 @@ namespace Lime.Text
 {
 	class TextParser
 	{
-		private const char Nbsp = ' ';
+		private const char Nbsp = 'ï¿½';
 		public struct Fragment
 		{
 			public int Style;
@@ -85,7 +85,7 @@ namespace Lime.Text
 					if (isClosedTag) {
 						string tag = text.Substring(p, pos - p - 1);
 						ProcessOpeningTag(tag);
-						ProcessTextBlock(" ");
+						ProcessTextBlock("");
 						ProcessClosingTag(tag);
 					} else if (isOpeningTag) {
 						string tag = text.Substring(p, pos - p);
@@ -95,7 +95,10 @@ namespace Lime.Text
 						}
 					} else {
 						string tag = text.Substring(p, pos - p);
-						if (!ProcessClosingTag(tag)) {
+						if (p - 3 > 0 && text[p - 3] == '>') {
+							ProcessTextBlock("");
+							ProcessClosingTag(tag);
+						} else if (!ProcessClosingTag(tag)) {
 							pos = text.Length;
 							return;
 						}

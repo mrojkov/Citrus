@@ -29,6 +29,7 @@ namespace Lime.Text
 			public float Width;
 			public bool LineBreak; // Effective line break after the text formatting.
 			public bool IsNbsp;
+			public bool IsSingularTag;
 			public Word Clone() { return (Word)MemberwiseClone(); }
 		};
 
@@ -62,6 +63,9 @@ namespace Lime.Text
 			};
 			int length = word.Length;
 			if (length == 0) {
+				if (style > 0) {
+					word.IsSingularTag = true;
+				}
 				words.Add(word);
 				return;
 			}
@@ -148,7 +152,7 @@ namespace Lime.Text
 					if (word.IsTagBegin) {
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
-					var ch = texts[word.TextIndex][word.Start];
+					var ch = texts[word.TextIndex].Length > 0 ? texts[word.TextIndex][word.Start] : 0;
 					if (!(j == count - 1 && (ch == ' ' || ch == '\n') && !(IsBullet(word) || style.ImageUsage == TextStyle.ImageUsageEnum.Overlay))) {
 						totalWidth += word.Width;
 					}
@@ -340,7 +344,7 @@ namespace Lime.Text
 					lastWordInLastLine > firstWordInLastLineIndex
 					&& (
 						word.X + font.MeasureTextLine(
-							t.Substring(word.Start, 1), ScaleSize(style.Size), style.LetterSpacing).X + dotsWidth > maxWidth
+							word.Length > 0 ? t.Substring(word.Start, 1) : string.Empty, ScaleSize(style.Size), style.LetterSpacing).X + dotsWidth > maxWidth
 						|| (word.Length == 1 && t[word.Start] == ' ')
 					)
 				) {
@@ -366,7 +370,7 @@ namespace Lime.Text
 				if (word.LineBreak) {
 					x = 0;
 				}
-				var skipFirstLetter = x == 0 || (word.IsTagBegin && IsBullet(word));
+				var skipFirstLetter = x == 0 || IsBullet(word);
 				word.Width = CalcWordWidth(word, skipFirstLetter);
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
@@ -376,7 +380,7 @@ namespace Lime.Text
 					word.Start == 0 &&
 					t.Length > 0 &&
 					t[word.Start] > ' ' &&
-					(GetLastChar(texts[fittedWords[i - 1].TextIndex]) > ' ' || IsBullet(fittedWords[i - 1]));
+					(GetLastChar(texts[fittedWords[i - 1].TextIndex]) > ' ' || (IsBullet(fittedWords[i - 1]) && !fittedWords[i - 1].IsSingularTag));
 				if (isLongerThanWidth && isTextOrBullet && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
@@ -385,6 +389,7 @@ namespace Lime.Text
 						if (wordEnd > word.Start)
 							fittedCharsCount = wordEnd - word.Start;
 						var newWord = word.Clone();
+						newWord.IsTagBegin = false;
 						newWord.Start = word.Start + fittedCharsCount;
 						newWord.Length = word.Length - fittedCharsCount;
 						newWord.Width = CalcWordWidth(newWord, true);
@@ -392,13 +397,20 @@ namespace Lime.Text
 						word.Length = fittedCharsCount;
 						word.Width = CalcWordWidth(word, skipFirstLetter);
 						word.X = x;
-						x += word.Width;
 						fittedWords.Insert(i + 1, newWord);
 						goto skip_default_placement;
 					}
 				}
 
-				if (isLongerThanWidth && isTextOrBullet && x > 0 && !isWordContinue && !fittedWords[i - 1].IsNbsp && t[word.Start] != ' ') {
+				if (isLongerThanWidth && isTextOrBullet && x > 0 && !fittedWords[i - 1].IsNbsp) {
+					if (isWordContinue) {
+						var prev = fittedWords[i - 1];
+						prev.X = 0;
+						prev.LineBreak = true;
+						word.X = prev.Width;
+						x = word.X + word.Width;
+						goto skip_default_placement;
+					}
 					word.X = 0;
 					word.LineBreak = true;
 					word.Width = CalcWordWidth(word, true);
@@ -432,7 +444,7 @@ namespace Lime.Text
 			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
-				var w = font.MeasureTextLine(t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing).X;
+				var w = font.MeasureTextLine(t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing).X + (IsBullet(word) ? style.ImageSize.X : 0);
 				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
