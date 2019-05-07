@@ -21,8 +21,8 @@ namespace Lime
 		public string RunningMarkerId { get; set; }
 		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
-		internal List<IAbstractAnimator> EffectiveAnimators;
-		internal List<IAbstractAnimator> EffectiveTriggerableAnimators;
+		public List<IAbstractAnimator> EffectiveAnimators;
+		public List<IAbstractAnimator> EffectiveTriggerableAnimators;
 		internal int EffectiveAnimatorsVersion;
 
 		[YuzuMember]
