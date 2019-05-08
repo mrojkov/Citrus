@@ -22,10 +22,7 @@ namespace Orange
 			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
-				var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
-				foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
-					UnpackBundle(fileInfo.FullName);
-				}
+				UnpackBundle(bundlePath);
 			}
 			The.UI.StopProgressBar();
 		}
@@ -105,13 +102,9 @@ namespace Orange
 			var assetCount = 0;
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
-				var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
-				foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath),
-					SearchOption.TopDirectoryOnly)) {
-					using (var bundle = new PackedAssetBundle(fileInfo.FullName, AssetBundleFlags.None)) {
+				using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 						AssetBundle.SetCurrent(bundle, false);
 						assetCount += AssetBundle.Current.EnumerateFiles().Count();
-					}
 				}
 			}
 			return assetCount;
