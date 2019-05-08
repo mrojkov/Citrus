@@ -19,13 +19,12 @@ namespace Orange
 				}
 			}
 
+			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
-				var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
-				foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
-					UnpackBundle(fileInfo.FullName);
-				}
+				UnpackBundle(bundlePath);
 			}
+			The.UI.StopProgressBar();
 		}
 
 		private static void UnpackBundle(string bundlePath)
@@ -55,6 +54,7 @@ namespace Orange
 								}
 							}
 						}
+						The.UI.IncreaseProgressBar();
 					}
 				}
 			}
@@ -95,6 +95,19 @@ namespace Orange
 					}
 				}
 			}
+		}
+
+		private static int GetAssetsToRevealCount(HashSet<string> bundles)
+		{
+			var assetCount = 0;
+			foreach (var bundleName in bundles) {
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
+						AssetBundle.SetCurrent(bundle, false);
+						assetCount += AssetBundle.Current.EnumerateFiles().Count();
+				}
+			}
+			return assetCount;
 		}
 	}
 }
