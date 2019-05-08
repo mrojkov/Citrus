@@ -73,13 +73,17 @@ namespace Lime
 		public static void StartListening(Input input)
 		{
 			if (listener == null && isActive) {
-				listener = new AccelerometerListener { input = input };
-				var activity = ActivityDelegate.Instance.Activity;
-				var sensorManager = (SensorManager)activity.GetSystemService(AndroidContext.SensorService);
-				sensorManager.RegisterListener(
-					listener,
-					sensorManager.GetDefaultSensor(SensorType.Accelerometer),
-					SensorDelay.Ui);
+				try {
+					listener = new AccelerometerListener { input = input };
+					var activity = ActivityDelegate.Instance.Activity;
+					var sensorManager = (SensorManager)activity.GetSystemService(AndroidContext.SensorService);
+					sensorManager.RegisterListener(
+						listener,
+						sensorManager.GetDefaultSensor(SensorType.Accelerometer),
+						SensorDelay.Ui);
+				} catch {
+					listener = null;
+				}
 			}
 		}
 
