@@ -50,7 +50,7 @@ namespace Lime
 
 		public static Vector2 Sign(Vector2 x) => new Vector2(Sign(x.X), Sign(x.Y));
 
-#if ANDROID || iOS || MAC
+#if ANDROID || iOS
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Cos(float radians) => MathF.Cos(radians);
 
