@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Lime
 {
@@ -98,6 +99,18 @@ namespace Lime
 		public static float Log(float x) => (float)Math.Log(x);
 
 		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static unsafe float FastInverseSqrt(float x)
+		{
+			var half = x * 0.5F;
+			var i = *(long*)&x;
+			i = 0x5f3759df - (i >> 1);
+			x = *(float*)&i;
+			// Duplicate this line to increase result accuracy
+			x = x * (1.5f - (half * x * x));
+			return x;
+		}
 
 		public static float Lerp(float amount, float value1, float value2) => value1 + (value2 - value1) * amount;
 

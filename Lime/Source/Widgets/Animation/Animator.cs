@@ -451,7 +451,19 @@ namespace Lime
 	{
 		protected override Quaternion InterpolateLinear(float t)
 		{
-			return Quaternion.Slerp(Value2, Value3, t);
+			var a = 1.0f - t;
+			var b = Quaternion.Dot(Value2, Value3) > 0.0f ? t : -t;
+			Quaternion q;
+			q.X = a * Value2.X + b * Value3.X;
+			q.Y = a * Value2.Y + b * Value3.Y;
+			q.Z = a * Value2.Z + b * Value3.Z;
+			q.W = a * Value2.W + b * Value3.W;
+			var invl = Mathf.FastInverseSqrt(q.LengthSquared());
+			q.X *= invl;
+			q.Y *= invl;
+			q.Z *= invl;
+			q.W *= invl;
+			return q;
 		}
 	}
 
