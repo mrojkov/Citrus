@@ -312,7 +312,7 @@ namespace Lime
 
 			public static float ElasticEaseIn(float p)
 			{
-				return (float)(Math.Sin(13 * Mathf.HalfPi * p) * Math.Pow(2, 10 * (p - 1)));
+				return Mathf.Sin(13 * Mathf.HalfPi * p) * Mathf.Pow(2, 10 * (p - 1));
 			}
 
 			public static float ElasticEaseOut(float p)

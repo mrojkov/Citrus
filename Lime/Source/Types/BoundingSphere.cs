@@ -119,7 +119,7 @@ namespace Lime
 				var diff = (pt - center);
 				float sqDist = diff.SqrLength;
 				if (sqDist > sqRadius) {
-					float distance = (float)Math.Sqrt(sqDist);
+					float distance = Mathf.Sqrt(sqDist);
 					var direction = diff / distance;
 					var G = center - radius * direction;
 					center = (G + pt) / 2;

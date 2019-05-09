@@ -212,7 +212,7 @@ namespace Lime
 
 		public float Length
 		{
-			get { return (float)Math.Sqrt(X * X + Y * Y + Z * Z); }
+			get { return Mathf.Sqrt(X * X + Y * Y + Z * Z); }
 		}
 
 		public float SqrLength

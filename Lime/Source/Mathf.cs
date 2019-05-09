@@ -17,8 +17,10 @@ namespace Lime
 		public const float DegToRad = Pi / 180;
 		public const float RadToDeg = 180 / Pi;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Max(float x, float y) => (x > y) ? x : y;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Min(float x, float y) => (x < y) ? x : y;
 
 		/// <summary>
@@ -26,6 +28,7 @@ namespace Lime
 		/// </summary>
 		/// <param name="v"></param>
 		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Abs(float v) => Math.Abs(v);
 
 		/// <summary>
@@ -42,21 +45,66 @@ namespace Lime
 		/// <returns></returns>
 		public static Vector3 Abs(Vector3 v) => new Vector3(Abs(v.X), Abs(v.Y), Abs(v.Z));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Sign(float x) => Math.Sign(x);
 
 		public static Vector2 Sign(Vector2 x) => new Vector2(Sign(x.X), Sign(x.Y));
 
+#if ANDROID || iOS || MAC
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Cos(float radians) => MathF.Cos(radians);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Sin(float radians) => MathF.Sin(radians);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Atan2(Vector2 v) => MathF.Atan2(v.Y, v.X);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Atan2(float y, float x) => MathF.Atan2(y, x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Asin(float v) => MathF.Asin(v);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Acos(float v) => MathF.Acos(v);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Sqrt(float x) => MathF.Sqrt(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Log(float x) => MathF.Log(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Pow(float x, float y) => MathF.Pow(x, y);
+#else
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Cos(float radians) => (float)Math.Cos(radians);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Sin(float radians) => (float)Math.Sin(radians);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Atan2(Vector2 v) => (float)Math.Atan2(v.Y, v.X);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Atan2(float y, float x) => (float)Math.Atan2(y, x);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Asin(float v) => (float)Math.Asin(v);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Acos(float v) => (float)Math.Acos(v);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Sqrt(float x) => (float)Math.Sqrt(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Log(float x) => (float)Math.Log(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
+#endif
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
@@ -90,15 +138,8 @@ namespace Lime
 			return angle - 180;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Sqr(float x) => x * x;
-
-		public static float Sqrt(float x) => (float)Math.Sqrt(x);
-
-		public static float Dist2(Vector2 a, Vector2 b) => Sqr(a.X - b.X) + Sqr(a.Y - b.Y);
-
-		public static float Log(float x) => (float)Math.Log(x);
-
-		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static unsafe float FastInverseSqrt(float x)
@@ -112,6 +153,7 @@ namespace Lime
 			return x;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Lerp(float amount, float value1, float value2) => value1 + (value2 - value1) * amount;
 
 		public static Vector2 Lerp(float amount, Vector2 value1, Vector2 value2) => value1 + (value2 - value1) * amount;
@@ -255,12 +297,16 @@ namespace Lime
 
 		public static float UniformRandom(float median, float dispersion) => RandomGenerator.UniformRandom(median, dispersion);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool InRange(float x, float upper, float lower) => lower <= x && x <= upper;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Clamp(float value, float min, float max) => (value < min) ? min : (value > max ? max : value);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Clamp(int value, int min, int max) => (value < min) ? min : (value > max ? max : value);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static double Clamp(double value, double min, double max) => (value < min) ? min : (value > max ? max : value);
 
 		public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max) => new Vector2(

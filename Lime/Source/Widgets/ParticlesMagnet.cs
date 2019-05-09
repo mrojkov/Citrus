@@ -134,12 +134,12 @@ namespace Lime
 
 			float magnetStrength = magnet.Strength;
 			if (magnet.Attenuation > 0.0001f) {
-				magnetStrength /= (float)Math.Pow(squaredDistance, magnet.Attenuation * 0.5f);
+				magnetStrength /= Mathf.Pow(squaredDistance, magnet.Attenuation * 0.5f);
 			}
 
 			float t = magnetStrength * p.MagnetAmountCurrent * delta;
 			if (t * t > squaredDistance) {
-				t = (float)Math.Sqrt(squaredDistance);
+				t = Mathf.Sqrt(squaredDistance);
 			}
 			p.RegularPosition += direction * t;
 		}

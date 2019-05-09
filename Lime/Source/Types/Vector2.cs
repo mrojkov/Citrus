@@ -152,7 +152,7 @@ namespace Lime
 		{
 			var sin = value1.X * value2.Y - value2.X * value1.Y;
 			var cos = value1.X * value2.X + value1.Y * value2.Y;
-			return (float)Math.Atan2(sin, cos);
+			return Mathf.Atan2(sin, cos);
 		}
 
 		/// <summary>
@@ -376,7 +376,7 @@ namespace Lime
 		/// </summary>
 		public float Atan2Rad
 		{
-			get { return (float)Math.Atan2(Y, X); }
+			get { return Mathf.Atan2(Y, X); }
 		}
 
 		/// <summary>
@@ -384,12 +384,12 @@ namespace Lime
 		/// </summary>
 		public float Atan2Deg
 		{
-			get { return (float)Math.Atan2(Y, X) * Mathf.RadToDeg; }
+			get { return Mathf.Atan2(Y, X) * Mathf.RadToDeg; }
 		}
 
 		public float Length
 		{
-			get { return (float)Math.Sqrt(X * X + Y * Y); }
+			get { return Mathf.Sqrt(X * X + Y * Y); }
 		}
 
 		/// <summary>

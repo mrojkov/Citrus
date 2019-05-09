@@ -645,7 +645,7 @@ namespace Lime
 			float crossProduct = Vector2.CrossProduct(transform.U, transform.V);
 			if (crossProduct < 0.0f)
 				emitterScale.Y = -emitterScale.Y;
-			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
+			emitterScaleAmount = Mathf.Sqrt(Math.Abs(crossProduct));
 			float emitterAngle = transform.U.Atan2Deg;
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber(Rng);
