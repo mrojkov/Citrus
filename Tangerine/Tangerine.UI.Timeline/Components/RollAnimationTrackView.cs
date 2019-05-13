@@ -61,21 +61,20 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			trackIdEditor = new RollNodeView.ObjectIdInplaceEditor(row, Track, label, editBoxContainer);
-			Widget.Gestures.Add(new DoubleClickGesture(() => {
-				Document.Current.History.DoTransaction(() => {
-					var labelExtent = label.MeasureUncutText();
-					if (label.LocalMousePosition().X < labelExtent.X) {
-						trackIdEditor.Rename();
-					}
-				});
-			}));
 			label.AddChangeWatcher(() => Track.Id, s => label.Text = s);
 			Widget.Components.Add(new AwakeBehavior());
 			Widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			Widget.Gestures.Add(new ClickGesture(1, ShowTrackContextMenu));
 		}
 
-		public void Rename() => trackIdEditor.Rename();
+		public void Rename()
+		{
+			Document.Current.History.DoTransaction(() => {
+				var labelExtent = label.MeasureUncutText();
+				if (label.LocalMousePosition().X < labelExtent.X) {
+					trackIdEditor.Rename();
+				}
+			});
+		}
 
 		ToolbarButton CreateEyeButton()
 		{
@@ -106,7 +105,7 @@ namespace Tangerine.UI.Timeline.Components
 			return button;
 		}
 
-		private void ShowTrackContextMenu()
+		public void ShowContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {

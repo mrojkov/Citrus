@@ -33,7 +33,6 @@ namespace Tangerine.UI.Timeline.Components
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
-				HitTestTarget = true,
 				Nodes = {
 					(spacer = new Widget()),
 					Spacer.HSpacer(6),
@@ -47,10 +46,9 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget.Components.Add(new AwakeBehavior());
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
 		}
 
-		void ShowPropertyContextMenu()
+		public void ShowContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {

@@ -14,6 +14,7 @@ namespace Tangerine.UI.Timeline.Components
 		AwakeBehavior AwakeBehavior { get; }
 		float Indentation { set; }
 		void Rename();
+		void ShowContextMenu();
 	}
 
 	public interface IGridRowView

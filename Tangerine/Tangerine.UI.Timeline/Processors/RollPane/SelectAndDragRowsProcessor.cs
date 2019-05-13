@@ -5,6 +5,7 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.Core.Components;
+using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
@@ -346,7 +347,6 @@ namespace Tangerine.UI.Timeline
 			Probers.Add(new AnimationTrackRowProber());
 			var roll = Timeline.Instance.Roll;
 			var input = roll.RootWidget.Input;
-			roll.RootWidget.HitTestTarget = true;
 			roll.RootWidget.Gestures.Add(new ClickGesture(0, () => {
 				var row = RowUnderMouse(input.MousePosition);
 				if (row == null) {
@@ -377,6 +377,15 @@ namespace Tangerine.UI.Timeline
 					input.ConsumeKey(Key.Mouse0);
 				}
 			}));
+			roll.RootWidget.Gestures.Add(new DoubleClickGesture(() => {
+				Document.Current.History.DoTransaction(() => {
+					var row = RowUnderMouse(input.MousePosition);
+					var rowView = row.Components.Get<RowView>();
+					rowView?.RollRow.Rename();
+				});
+			}));
+			roll.RootWidget.Gestures.Add(new ClickGesture(1, () =>
+				RowUnderMouse(input.MousePosition).Components.Get<RowView>()?.RollRow.ShowContextMenu()));
 			var dg = new DragGesture(0);
 			dg.Recognized += () => {
 				var row = RowUnderMouse(input.MousePosition);
