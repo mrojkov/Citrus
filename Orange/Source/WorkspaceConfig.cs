@@ -22,6 +22,9 @@ namespace Orange
 		[YuzuMember]
 		public Vector2 ClientPosition;
 
+		[YuzuOptional]
+		public bool BenchmarkEnabled;
+
 		public static string GetDataPath()
 		{
 			var name = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;

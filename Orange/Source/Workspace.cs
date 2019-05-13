@@ -23,6 +23,8 @@ namespace Orange
 		// citrus location is a location of Citrus used by currently loaded project, not *this* Citrus
 		private string citrusLocation;
 
+		public bool BenchmarkEnabled;
+
 		public Workspace()
 		{
 			Targets = new List<Target>();
@@ -103,6 +105,7 @@ namespace Orange
 			if (citrusVersion.IsStandalone) {
 				Console.WriteLine($"Welcome to Citrus. Version {citrusVersion.Version}, build number: {citrusVersion.BuildNumber}");
 			}
+			BenchmarkEnabled = config.BenchmarkEnabled;
 #pragma warning disable CS4014
 			Orange.Updater.CheckForUpdates();
 #pragma warning restore CS4014
