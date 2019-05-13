@@ -34,7 +34,6 @@ namespace Orange
 		private string serverPath;
 		private string localPath = Path.Combine(".orange", "Cache");
 		public AssetCacheMode Mode { get; private set; }
-		private EnableState enableState;
 
 		private bool RemoteEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Remote;
 		private bool LocalEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Local;
@@ -52,7 +51,7 @@ namespace Orange
 				Console.WriteLine($"[Cache] Warning: 'AssetCache' field not found in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
-			switch (The.Workspace.AssetCacheEnabled) {
+			switch (The.Workspace.AssetCacheMode) {
 				case AssetCacheMode.None:
 					Mode = AssetCacheMode.None;
 					Console.WriteLine($"[Cache] Caching disabled via WorkspaceConfig");
@@ -68,7 +67,7 @@ namespace Orange
 					break;
 				default:
 					Mode = AssetCacheMode.None;
-					throw new ArgumentException($"[Cache] Error: '{The.Workspace.AssetCacheEnabled}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
+					throw new ArgumentException($"[Cache] Error: '{The.Workspace.AssetCacheMode}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
 			}
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");

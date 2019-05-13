@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
-using Orange;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
@@ -255,23 +254,24 @@ namespace Tangerine
 					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
 				}));
 			}
-			(UserInterface.Instance as OrangeInterface).CacheBoth = new Command("&Both",
-				() => (UserInterface.Instance as OrangeInterface).CacheCommandsHandler(Orange.AssetCache.EnableState.Both));
-			(UserInterface.Instance as OrangeInterface).CacheRemote = new Command("&Remote",
-				() => (UserInterface.Instance as OrangeInterface).CacheCommandsHandler(Orange.AssetCache.EnableState.Remote));
-			(UserInterface.Instance as OrangeInterface).CacheLocal = new Command("&Local",
-				() => (UserInterface.Instance as OrangeInterface).CacheCommandsHandler(Orange.AssetCache.EnableState.Local));
-			(UserInterface.Instance as OrangeInterface).CacheNone = new Command("&None",
-				() => (UserInterface.Instance as OrangeInterface).CacheCommandsHandler(Orange.AssetCache.EnableState.None));
+			// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
+			(Orange.UserInterface.Instance as OrangeInterface).CacheBoth = new Command("&Both",
+				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Both));
+			(Orange.UserInterface.Instance as OrangeInterface).CacheRemote = new Command("&Remote",
+				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Remote));
+			(Orange.UserInterface.Instance as OrangeInterface).CacheLocal = new Command("&Local",
+				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Local));
+			(Orange.UserInterface.Instance as OrangeInterface).CacheNone = new Command("&None",
+				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.None));
 			orangeMenu.Add(new Command("Cache", new Menu {
-				new Command("Enabled", new Menu{
-					(UserInterface.Instance as OrangeInterface).CacheBoth,
-					(UserInterface.Instance as OrangeInterface).CacheRemote,
-					(UserInterface.Instance as OrangeInterface).CacheLocal,
-					(UserInterface.Instance as OrangeInterface).CacheNone,
+				new Command("Mode", new Menu{
+					(Orange.UserInterface.Instance as OrangeInterface).CacheBoth,
+					(Orange.UserInterface.Instance as OrangeInterface).CacheRemote,
+					(Orange.UserInterface.Instance as OrangeInterface).CacheLocal,
+					(Orange.UserInterface.Instance as OrangeInterface).CacheNone,
 				})
 			}));
-			The.UI.LoadFromWorkspaceConfig(WorkspaceConfig.Load());
+			Orange.The.UI.LoadFromWorkspaceConfig(Orange.WorkspaceConfig.Load());
 		}
 
 		public static void OnProjectChanged(Project proj)

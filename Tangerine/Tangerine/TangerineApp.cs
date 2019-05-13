@@ -4,14 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Lime;
-using Orange;
 using Tangerine.Core;
 using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline;
-using EmbeddedResource = Tangerine.UI.EmbeddedResource;
 
 namespace Tangerine
 {
@@ -99,7 +97,7 @@ namespace Tangerine
 				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
 				SceneUserPreferences.Instance.VisualHintsRegistry = VisualHintsRegistry.Instance;
 				Core.UserPreferences.Instance.Save();
-				The.Workspace.Save();
+				Orange.The.Workspace.Save();
 			};
 
 			var timelinePanel = new Panel("Timeline");
@@ -607,7 +605,7 @@ namespace Tangerine
 			};
 			foreach (var resource in fontResourcePaths) {
 				try {
-					defaultFonts.Add(new DynamicFont(new EmbeddedResource(resource, "Tangerine").GetResourceBytes()));
+					defaultFonts.Add(new DynamicFont(new Tangerine.UI.EmbeddedResource(resource, "Tangerine").GetResourceBytes()));
 				} catch (SystemException e) {
 					System.Console.WriteLine($"Couldn't load font {resource}: {e}");
 				}

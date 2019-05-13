@@ -23,7 +23,7 @@ namespace Orange
 		// citrus location is a location of Citrus used by currently loaded project, not *this* Citrus
 		private string citrusLocation;
 
-		public AssetCacheMode AssetCacheEnabled;
+		public AssetCacheMode AssetCacheMode;
 		public string AssetCacheLocalPath;
 		public bool BenchmarkEnabled;
 
@@ -111,10 +111,12 @@ namespace Orange
 #pragma warning disable CS4014
 			Orange.Updater.CheckForUpdates();
 #pragma warning restore CS4014
-			AssetCacheEnabled = config.AssetCacheEnabled;
-			AssetCacheLocalPath = config.AssetCacheLocalPath;
-			if (!Path.IsPathRooted(AssetCacheLocalPath)) {
-				AssetCacheLocalPath = Path.Combine(ProjectDirectory, AssetCacheLocalPath);
+			if (ProjectFile != string.Empty) {
+				AssetCacheMode = config.AssetCacheMode;
+				AssetCacheLocalPath = config.AssetCacheLocalPath;
+				if (!Path.IsPathRooted(AssetCacheLocalPath)) {
+					AssetCacheLocalPath = Path.Combine(ProjectDirectory, AssetCacheLocalPath);
+				}
 			}
 		}
 
@@ -122,7 +124,7 @@ namespace Orange
 		{
 			var config = WorkspaceConfig.Load();
 			config.CitrusProject = ProjectFile;
-			config.AssetCacheEnabled = AssetCacheEnabled;
+			config.AssetCacheMode = AssetCacheMode;
 			The.UI.SaveToWorkspaceConfig(ref config);
 			WorkspaceConfig.Save(config);
 		}

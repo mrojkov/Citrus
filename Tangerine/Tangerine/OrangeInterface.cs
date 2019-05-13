@@ -67,34 +67,17 @@ namespace Tangerine
 		public override void StopProgressBar() { }
 		public override void IncreaseProgressBar(int amount = 1) { }
 
-		public void CacheCommandsHandler(AssetCache.EnableState state)
+		// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
+		public void UpdateCacheModeCheckboxes(AssetCacheMode state)
 		{
-			CacheBoth.Checked = false;
-			CacheRemote.Checked = false;
-			CacheLocal.Checked = false;
-			CacheNone.Checked = false;
-			switch (state) {
-				case AssetCache.EnableState.Both:
-					CacheBoth.Checked = true;
-					break;
-				case AssetCache.EnableState.Remote:
-					CacheRemote.Checked = true;
-					break;
-				case AssetCache.EnableState.Local:
-					CacheLocal.Checked = true;
-					break;
-				case AssetCache.EnableState.None:
-					CacheNone.Checked = true;
-					break;
-			}
-
-			The.Workspace.AssetCacheEnabled = state;
+			CacheBoth.Checked = state == AssetCacheMode.Both;
+			CacheRemote.Checked = state == AssetCacheMode.Remote;
+			CacheLocal.Checked = state == AssetCacheMode.Local;
+			CacheNone.Checked = state == AssetCacheMode.None;
+			The.Workspace.AssetCacheMode = state;
 		}
 
-		public override void LoadFromWorkspaceConfig(WorkspaceConfig config)
-		{
-			CacheCommandsHandler(config.AssetCacheEnabled);
-		}
+		public override void LoadFromWorkspaceConfig(WorkspaceConfig config) => UpdateCacheModeCheckboxes(config.AssetCacheMode);
 	}
 
 	public class PlatformPicker : ThemedDropDownList
