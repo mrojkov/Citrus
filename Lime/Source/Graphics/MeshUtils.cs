@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -125,6 +126,33 @@ namespace Lime
 		public static Mesh<VertexPositionColor> CreateCylinder(float height, float radius, int tesselation, Color4 color)
 		{
 			return CreateFrustum(height, radius, radius, tesselation, color);
+		}
+
+		public static void RemoveDuplicates<TVertex>(Mesh<TVertex> mesh) where TVertex : unmanaged
+		{
+			RemoveDuplicates(mesh, EqualityComparer<TVertex>.Default);
+		}
+
+		public static void RemoveDuplicates<TVertex>(Mesh<TVertex> mesh, IEqualityComparer<TVertex> comparer) where TVertex : unmanaged
+		{
+			var indexByVertexMap = new Dictionary<TVertex, ushort>(comparer);
+			var vertices = new List<TVertex>();
+			var indices = new List<ushort>();
+			foreach (var i in mesh.Indices) {
+				var v = mesh.Vertices[i];
+				if (indexByVertexMap.TryGetValue(v, out var index)) {
+					indices.Add(index);
+				} else {
+					index = checked((ushort)vertices.Count);
+					vertices.Add(v);
+					indices.Add(index);
+					indexByVertexMap.Add(v, index);
+				}
+			}
+			mesh.Vertices = vertices.ToArray();
+			mesh.Indices = indices.ToArray();
+			mesh.DirtyFlags |= MeshDirtyFlags.Vertices;
+			mesh.DirtyFlags |= MeshDirtyFlags.Indices;
 		}
 	}
 

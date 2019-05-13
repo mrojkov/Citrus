@@ -121,7 +121,7 @@ namespace Orange.FbxImporter
 					? GetOrCreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex])
 					: FbxMaterial.Default
 			};
-
+			MeshUtils.RemoveDuplicates(sm.Mesh);
 			if (meshAttribute.Bones.Length > 0) {
 				foreach (var bone in meshAttribute.Bones) {
 					sm.BoneNames.Add(bone.Name);

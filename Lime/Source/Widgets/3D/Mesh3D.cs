@@ -11,7 +11,7 @@ namespace Lime
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Size = 16)]
-		public struct BlendIndices
+		public struct BlendIndices : IEquatable<BlendIndices>
 		{
 			private float index0;
 			private float index1;
@@ -29,11 +29,30 @@ namespace Lime
 
 			[YuzuMember("3")]
 			public byte Index3 { get => (byte)index3; set => index3 = value; }
+
+			public bool Equals(BlendIndices other)
+			{
+				return index0 == other.index0 &&
+					index1 == other.index1 &&
+					index2 == other.index2 &&
+					index3 == other.index3;
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked {
+					var hashCode = index0.GetHashCode();
+					hashCode = (hashCode * 397) ^ index1.GetHashCode();
+					hashCode = (hashCode * 397) ^ index2.GetHashCode();
+					hashCode = (hashCode * 397) ^ index3.GetHashCode();
+					return hashCode;
+				}
+			}
 		}
 
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
-		public struct BlendWeights
+		public struct BlendWeights : IEquatable<BlendWeights>
 		{
 			[YuzuMember("0")]
 			public float Weight0;
@@ -46,10 +65,29 @@ namespace Lime
 
 			[YuzuMember("3")]
 			public float Weight3;
+
+			public bool Equals(BlendWeights other)
+			{
+				return Weight0 == other.Weight0 &&
+					Weight1 == other.Weight1 &&
+					Weight2 == other.Weight2 &&
+					Weight3 == other.Weight3;
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked {
+					var hashCode = Weight0.GetHashCode();
+					hashCode = (hashCode * 397) ^ Weight1.GetHashCode();
+					hashCode = (hashCode * 397) ^ Weight2.GetHashCode();
+					hashCode = (hashCode * 397) ^ Weight3.GetHashCode();
+					return hashCode;
+				}
+			}
 		}
 
 		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48)]
-		public struct Vertex
+		public struct Vertex : IEquatable<Vertex>
 		{
 			[YuzuMember("0")]
 			public Vector3 Pos;
@@ -68,6 +106,29 @@ namespace Lime
 
 			[YuzuMember("5")]
 			public Vector3 Normal;
+
+			public bool Equals(Vertex other)
+			{
+				return Pos == other.Pos &&
+					Color == other.Color &&
+					UV1 == other.UV1 &&
+					BlendIndices.Equals(other.BlendIndices) &&
+					BlendWeights.Equals(other.BlendWeights) &&
+					Normal == other.Normal;
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked {
+					var hashCode = Pos.GetHashCode();
+					hashCode = (hashCode * 397) ^ Color.GetHashCode();
+					hashCode = (hashCode * 397) ^ UV1.GetHashCode();
+					hashCode = (hashCode * 397) ^ BlendIndices.GetHashCode();
+					hashCode = (hashCode * 397) ^ BlendWeights.GetHashCode();
+					hashCode = (hashCode * 397) ^ Normal.GetHashCode();
+					return hashCode;
+				}
+			}
 		}
 
 		[TangerineIgnore]
