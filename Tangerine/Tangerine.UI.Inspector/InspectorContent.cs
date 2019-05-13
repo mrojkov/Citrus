@@ -14,7 +14,6 @@ namespace Tangerine.UI.Inspector
 	public class InspectorContent
 	{
 		private readonly List<IPropertyEditor> editors;
-		private readonly Dictionary<string, bool> expandedPropertyEditors = new Dictionary<string, bool>();
 		private readonly Widget widget;
 		private int row = 1;
 		private int totalObjectCount;
@@ -577,21 +576,22 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
-		private void SaveExpandedStates()
+		public void SaveExpandedStates()
 		{
 			foreach (var editor in editors) {
 				if (editor is IExpandablePropertyEditor expandable) {
-					expandedPropertyEditors[((IPropertyEditor)expandable).EditorParams.PropertyPath] = expandable.Expanded;
+					CoreUserPreferences.Instance.InspectorExpandableEditorsState[
+						((IPropertyEditor)expandable).EditorParams.PropertyPath] = expandable.Expanded;
 				}
 			}
 		}
 
-		private void LoadExpandedStates()
+		public void LoadExpandedStates()
 		{
 			foreach (var editor in editors) {
 				if (editor is IExpandablePropertyEditor expandable) {
 					expandable.Expanded =
-						expandedPropertyEditors.TryGetValue(
+						CoreUserPreferences.Instance.InspectorExpandableEditorsState.TryGetValue(
 							((IPropertyEditor) expandable).EditorParams.PropertyPath, out var expanded) && expanded;
 				}
 			}

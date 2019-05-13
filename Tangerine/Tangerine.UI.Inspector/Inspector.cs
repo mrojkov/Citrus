@@ -56,11 +56,13 @@ namespace Tangerine.UI.Inspector
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			Docking.DockManager.Instance.FilesDropped += OnFilesDropped;
+			content.LoadExpandedStates();
 		}
 
 		public void Detach()
 		{
 			Instance = null;
+			content.SaveExpandedStates();
 			Docking.DockManager.Instance.FilesDropped -= OnFilesDropped;
 			RootWidget.Unlink();
 		}
