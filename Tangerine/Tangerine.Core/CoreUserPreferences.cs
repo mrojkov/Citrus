@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Lime;
 using Yuzu;
 
@@ -41,6 +42,9 @@ namespace Tangerine.Core
 		[YuzuOptional]
 		public bool LockTimelineCursor { get; set; }
 
+		[YuzuOptional]
+		public Dictionary<string, bool> InspectorExpandableEditorsState { get; set; }
+
 		public CoreUserPreferences()
 		{
 			ResetToDefaults();
@@ -52,6 +56,7 @@ namespace Tangerine.Core
 			AnimationMode = false;
 			DefaultKeyFunction = KeyFunction.Linear;
 			StopAnimationOnCurrentFrame = false;
+			InspectorExpandableEditorsState = new Dictionary<string, bool>();
 		}
 
 		public static CoreUserPreferences Instance => UserPreferences.Instance.Get<CoreUserPreferences>();

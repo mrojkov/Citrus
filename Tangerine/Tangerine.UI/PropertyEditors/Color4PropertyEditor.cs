@@ -25,6 +25,7 @@ namespace Tangerine.UI
 			var @default = objects.All(o =>
 				PropertyValue(o).GetValue().A == first.A) ? new Color4(255, 255, 255, first.A) : Color4.White;
 			var currentColor = CoalescedPropertyValue(@default).DistinctUntilChanged();
+			panel.Color = currentColor.GetValue().Value;
 			EditorContainer.AddNode(new Widget {
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
