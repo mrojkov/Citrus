@@ -19,6 +19,16 @@ namespace Orange
 				}
 			}
 
+			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles.ToList()));
+			foreach (var bundleName in bundles) {
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				UnpackBundle(bundlePath);
+			}
+			The.UI.StopProgressBar();
+		}
+
+		public static void Unpack(TargetPlatform platfotm, List<string> bundles)
+		{
 			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
@@ -29,6 +39,10 @@ namespace Orange
 
 		private static void UnpackBundle(string bundlePath)
 		{
+			if (!File.Exists(bundlePath)) {
+				Console.WriteLine($"WARNING: {bundlePath} do not exists! Skipping...");
+				return;
+			}
 			string outputDirectory = bundlePath + ".Unpacked";
 			using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 				AssetBundle.SetCurrent(bundle, false);
@@ -97,11 +111,14 @@ namespace Orange
 			}
 		}
 
-		private static int GetAssetsToRevealCount(HashSet<string> bundles)
+		private static int GetAssetsToRevealCount(List<string> bundles)
 		{
 			var assetCount = 0;
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				if (!File.Exists(bundlePath)) {
+					continue;
+				}
 				using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 						AssetBundle.SetCurrent(bundle, false);
 						assetCount += AssetBundle.Current.EnumerateFiles().Count();
