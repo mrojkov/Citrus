@@ -33,10 +33,10 @@ namespace Orange
 		private string serverUsername;
 		private string serverPath;
 		private string localPath = Path.Combine(".orange", "Cache");
-		public EnableStates EnableState { get; private set; }
+		public AssetCacheMode Mode { get; private set; }
 
-		private bool RemoteEnabled => EnableState == EnableStates.Both || EnableState == EnableStates.Remote;
-		private bool LocalEnabled => EnableState == EnableStates.Both || EnableState == EnableStates.Local;
+		private bool RemoteEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Remote;
+		private bool LocalEnabled => Mode == AssetCacheMode.Both || Mode == AssetCacheMode.Local;
 
 		private AssetCache() { }
 
@@ -47,78 +47,78 @@ namespace Orange
 				data = The.Workspace.ProjectJson.AsDynamic.AssetCache;
 			} catch { }
 			if (data == null) {
-				EnableState = EnableStates.None;
+				Mode = AssetCacheMode.None;
 				Console.WriteLine($"[Cache] Warning: 'AssetCache' field not found in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
 			string temp = (string) data.Enabled;
 			switch (temp) {
 				case "None":
-					EnableState = EnableStates.None;
+					Mode = AssetCacheMode.None;
 					Console.WriteLine($"[Cache] Caching disabled via {The.Workspace.ProjectFile}");
 					return;
 				case "Local":
-					EnableState = EnableStates.Local;
+					Mode = AssetCacheMode.Local;
 					break;
 				case "Remote":
-					EnableState = EnableStates.Remote;
+					Mode = AssetCacheMode.Remote;
 					break;
 				case "Both":
-					EnableState = EnableStates.Both;
+					Mode = AssetCacheMode.Both;
 					break;
 				case null:
-					EnableState = EnableStates.None;
+					Mode = AssetCacheMode.None;
 					Console.WriteLine($"[Cache] Error: 'Enabled' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
 					return;
 				default:
-					EnableState = EnableStates.None;
+					Mode = AssetCacheMode.None;
 					throw new ArgumentException($"[Cache] Error: '{temp}' is not a valid state for 'Enabled' field in AssetCache in {The.Workspace.ProjectFile}. Caching disabled");
 			}
-			if (EnableState == EnableStates.Local) {
+			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
 			}
 			serverAddress = (string)data.ServerAddress;
 			if (serverAddress == null) {
-				if (EnableState == EnableStates.Both) {
-					EnableState = EnableStates.Local;
+				if (Mode == AssetCacheMode.Both) {
+					Mode = AssetCacheMode.Local;
 					Console.WriteLine($"[Cache] Warning: 'ServerAddress' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
 					return;
 				}
-				EnableState = EnableStates.None;
+				Mode = AssetCacheMode.None;
 				Console.WriteLine($"[Cache] Error: 'ServerAddress' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
 
 			serverUsername = (string)data.ServerUsername;
 			if (serverUsername == null) {
-				if (EnableState == EnableStates.Both) {
-					EnableState = EnableStates.Local;
+				if (Mode == AssetCacheMode.Both) {
+					Mode = AssetCacheMode.Local;
 					Console.WriteLine($"[Cache] Error: 'ServerUsername' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
 					return;
 				}
-				EnableState = EnableStates.None;
+				Mode = AssetCacheMode.None;
 				Console.WriteLine($"[Cache] Error: 'ServerUsername' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
 
 			serverPath = (string)data.ServerPath;
 			if (serverPath == null) {
-				if (EnableState == EnableStates.Both) {
-					EnableState = EnableStates.Local;
+				if (Mode == AssetCacheMode.Both) {
+					Mode = AssetCacheMode.Local;
 					Console.WriteLine($"[Cache] Error: 'ServerPath' field not found in AssetCache settings in {The.Workspace.ProjectFile}. LOCAL cache will be used");
 					return;
 				}
-				EnableState = EnableStates.None;
+				Mode = AssetCacheMode.None;
 				Console.WriteLine($"[Cache] Error: 'ServerPath' field not found in AssetCache settings in {The.Workspace.ProjectFile}. Caching disabled");
 				return;
 			}
 
-			if (EnableState == EnableStates.Remote) {
+			if (Mode == AssetCacheMode.Remote) {
 				Console.WriteLine("[Cache] Using REMOTE cache");
 			}
 
-			if (EnableState == EnableStates.Both) {
+			if (Mode == AssetCacheMode.Both) {
 				Console.WriteLine("[Cache] Using LOCAL and REMOTE cache");
 			}
 		}
@@ -148,11 +148,11 @@ namespace Orange
 				catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					string ending;
-					if (EnableState == EnableStates.Both) {
-						EnableState = EnableStates.Local;
+					if (Mode == AssetCacheMode.Both) {
+						Mode = AssetCacheMode.Local;
 						ending = "LOCAL cache will be used";
 					} else {
-						EnableState = EnableStates.None;
+						Mode = AssetCacheMode.None;
 						ending = "Caching disabled";
 					}
 					Console.WriteLine($"[Cache] Error: Can't connect to {serverUsername}@{serverAddress}. {ending}");
@@ -172,17 +172,17 @@ namespace Orange
 			if (ftpClient.IsConnected) {
 				ftpClient.Disconnect();
 			}
-			if (EnableState == EnableStates.Both) {
-				EnableState = EnableStates.Local;
+			if (Mode == AssetCacheMode.Both) {
+				Mode = AssetCacheMode.Local;
 			} else {
-				EnableState = EnableStates.None;
+				Mode = AssetCacheMode.None;
 			}
 			Console.WriteLine($"[Cache] Disconnected from {serverUsername}@{serverAddress}");
 		}
 
 		public void Save(string srcPath, string hashString)
 		{
-			if (EnableState == EnableStates.None) {
+			if (Mode == AssetCacheMode.None) {
 				return;
 			}
 			// Maybe we should not save files locally when local cache is disabled
@@ -237,11 +237,11 @@ namespace Orange
 				catch(System.Exception e) {
 					Console.WriteLine(e.Message);
 					string ending;
-					if (EnableState == EnableStates.Both) {
-						EnableState = EnableStates.Local;
+					if (Mode == AssetCacheMode.Both) {
+						Mode = AssetCacheMode.Local;
 						ending = "LOCAL cache will be used";
 					} else {
-						EnableState = EnableStates.None;
+						Mode = AssetCacheMode.None;
 						ending = "Caching disabled";
 					}
 					Console.WriteLine($"[Cache] Error: Can't check existance of file {hashString} at {serverUsername}@{serverAddress}. {ending}");
@@ -253,7 +253,7 @@ namespace Orange
 
 		private bool UploadFromLocal(string hashString)
 		{
-			if (EnableState == EnableStates.Both && ftpClient.IsConnected) {
+			if (Mode == AssetCacheMode.Both && ftpClient.IsConnected) {
 				try {
 					if (ExistsRemote(hashString)) {
 						return true;
@@ -263,11 +263,11 @@ namespace Orange
 					if (!successful) {
 						ftpClient.Disconnect();
 						string ending;
-						if (EnableState == EnableStates.Both) {
-							EnableState = EnableStates.Local;
+						if (Mode == AssetCacheMode.Both) {
+							Mode = AssetCacheMode.Local;
 							ending = "LOCAL cache will be used";
 						} else {
-							EnableState = EnableStates.None;
+							Mode = AssetCacheMode.None;
 							ending = "Caching disabled";
 						}
 						Console.WriteLine($"[Cache] Failed to upload {hashString} to {serverUsername}@{serverAddress}. Disconnected. {ending}");
@@ -277,11 +277,11 @@ namespace Orange
 				catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					string ending;
-					if (EnableState == EnableStates.Both) {
-						EnableState = EnableStates.Local;
+					if (Mode == AssetCacheMode.Both) {
+						Mode = AssetCacheMode.Local;
 						ending = "LOCAL cache will be used";
 					} else {
-						EnableState = EnableStates.None;
+						Mode = AssetCacheMode.None;
 						ending = "Caching disabled";
 					}
 					Console.WriteLine($"[Cache] Error: Failed to upload {hashString} to {serverUsername}@{serverAddress}. {ending}");
@@ -306,11 +306,11 @@ namespace Orange
 					if (!successful) {
 						ftpClient.Disconnect();
 						string ending;
-						if (EnableState == EnableStates.Both) {
-							EnableState = EnableStates.Local;
+						if (Mode == AssetCacheMode.Both) {
+							Mode = AssetCacheMode.Local;
 							ending = "LOCAL cache will be used";
 						} else {
-							EnableState = EnableStates.None;
+							Mode = AssetCacheMode.None;
 							ending = "Caching disabled";
 						}
 						Console.WriteLine(
@@ -321,11 +321,11 @@ namespace Orange
 				catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					string ending;
-					if (EnableState == EnableStates.Both) {
-						EnableState = EnableStates.Local;
+					if (Mode == AssetCacheMode.Both) {
+						Mode = AssetCacheMode.Local;
 						ending = "LOCAL cache will be used";
 					} else {
-						EnableState = EnableStates.None;
+						Mode = AssetCacheMode.None;
 						ending = "Caching disabled";
 					}
 					Console.WriteLine($"[Cache] Error: Failed to download {hashString} from {serverUsername}@{serverAddress}. {ending}");
@@ -339,14 +339,13 @@ namespace Orange
 			}
 			return false;
 		}
+	}
 
-		public enum EnableStates
-		{
-			None,
-			Local,
-			Remote,
-			Both
-		}
-
+	public enum AssetCacheMode
+	{
+		None,
+		Local,
+		Remote,
+		Both
 	}
 }

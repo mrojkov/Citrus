@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using Lime;
 using Orange.FbxImporter;
-using Debug = System.Diagnostics.Debug;
 
 namespace Orange
 {
@@ -96,27 +95,7 @@ namespace Orange
 			AssetCache.Instance.Initialize();
 			AssetCooker.Platform = platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			if (The.Workspace.BenchmarkEnabled) {
-				string text = $"Asset cooking. Enabled cache: {AssetCache.Instance.EnableState}. Active platform: {The.Workspace.ActivePlatform}";
-				Debug.WriteLine(text);
-				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-					w.WriteLine(text);
-					w.WriteLine(DateTime.Now);
-				}
-				Stopwatch timer = new Stopwatch();
-				timer.Start();
-				CookBundles(bundles: bundles);
-				timer.Stop();
-				text = $"All bundles cooked: {timer.ElapsedMilliseconds} ms";
-				Debug.WriteLine(text);
-				using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-					w.WriteLine(text);
-					w.WriteLine();
-					w.WriteLine();
-				}
-			} else {
-				CookBundles(bundles: bundles);
-			}
+			CookBundles(bundles: bundles);
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
@@ -140,6 +119,14 @@ namespace Orange
 
 		private static void CookBundles(bool requiredCookCode = true, List<string> bundles = null)
 		{
+			LogText = "";
+			var allTimer = StartBenchmark(
+				$"Asset cooking. Asset cache mode: {AssetCache.Instance.Mode}. Active platform: {The.Workspace.ActivePlatform}" +
+				System.Environment.NewLine +
+				DateTime.Now +
+				System.Environment.NewLine
+			);
+
 			bool skipCodeCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipCodeCooking");
 			if (skipCodeCooking) {
 				requiredCookCode = false;
@@ -154,7 +141,7 @@ namespace Orange
 				}
 			}
 
-			try {			
+			try {
 				int s = 0;
 				// Drop cooking rules, they shouldn't be counting as assets, but The.Workspace.AssetFiles includes them
 				foreach (var asset in The.Workspace.AssetFiles.Enumerate()) {
@@ -165,38 +152,19 @@ namespace Orange
 					}
 					s++;
 				}
-				
+
 				UserInterface.Instance.SetupProgressBar(s);
 				BeginCookBundles?.Invoke();
 
-				if (The.Workspace.BenchmarkEnabled) {
-					Stopwatch timer = new Stopwatch();
-					timer.Start();
-					CookBundle(CookingRulesBuilder.MainBundleName);
-					timer.Stop();
-					string text = $"Main bundle cooked: {timer.ElapsedMilliseconds} ms";
-					Debug.WriteLine(text);
-					using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-						w.WriteLine(text);
-					}
-				} else {
-					CookBundle(CookingRulesBuilder.MainBundleName);
-				}
+				// TODO Update this when AssetCooker.CookBundles will only cook bundles that was passed to it
+				var timer = StartBenchmark();
+				CookBundle(CookingRulesBuilder.MainBundleName);
+				StopBenchmark(timer, "Main bundle cooked: ");
 
 				foreach (var extraBundle in extraBundles) {
-					if (The.Workspace.BenchmarkEnabled) {
-						Stopwatch extraTimer = new Stopwatch();
-						extraTimer.Start();
-						CookBundle(extraBundle);
-						extraTimer.Stop();
-						string extraText = $"{extraBundle} cooked: {extraTimer.ElapsedMilliseconds} ms";
-						Debug.WriteLine(extraText);
-						using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
-							w.WriteLine(extraText);
-						}
-					} else {
-						CookBundle(extraBundle);
-					}
+					var extraTimer = StartBenchmark();
+					CookBundle(extraBundle);
+					StopBenchmark(extraTimer, $"{extraBundle} cooked: ");
 				}
 				extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
@@ -205,6 +173,8 @@ namespace Orange
 				if (requiredCookCode) {
 					CodeCooker.Cook(CookingRulesMap, extraBundlesList);
 				}
+				StopBenchmark(allTimer, "All bundles cooked: ");
+				PrintBenchmark();
 			} catch (OperationCanceledException e) {
 				Console.WriteLine(e.Message);
 				RestoreBackups();
@@ -277,7 +247,7 @@ namespace Orange
 
 			public void Rescan()
 			{
-				
+
 			}
 		}
 
@@ -531,6 +501,39 @@ namespace Orange
 		{
 			foreach (var backupPath in bundleBackupFiles) {
 				TryRestoreBackup(backupPath);
+			}
+		}
+
+		private static string LogText;
+		private static Stopwatch StartBenchmark(string text="")
+		{
+			if (!The.Workspace.BenchmarkEnabled) {
+				return null;
+			}
+			LogText += text;
+			var timer = new Stopwatch();
+			timer.Start();
+			return timer;
+		}
+
+		private static void StopBenchmark(Stopwatch timer, string text)
+		{
+			if (!The.Workspace.BenchmarkEnabled) {
+				return;
+			}
+			timer.Stop();
+			LogText += text + $"{timer.ElapsedMilliseconds} ms" + System.Environment.NewLine;
+		}
+
+		private static void PrintBenchmark()
+		{
+			if (!The.Workspace.BenchmarkEnabled) {
+				return;
+			}
+			using (var w = File.AppendText(Path.Combine(The.Workspace.ProjectDirectory, "cache.log"))) {
+				w.WriteLine(LogText);
+				w.WriteLine();
+				w.WriteLine();
 			}
 		}
 	}
