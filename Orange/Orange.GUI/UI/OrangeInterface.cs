@@ -25,6 +25,11 @@ namespace Orange
 		private ProgressBarField progressBarField;
 		private ICommand actionsCommand;
 
+		private Command CacheBoth;
+		private Command CacheRemote;
+		private Command CacheLocal;
+		private Command CacheNone;
+
 		public OrangeInterface()
 		{
 			var windowSize = new Vector2(500, 400);
@@ -58,12 +63,36 @@ namespace Orange
 			mainVBox.AddNode(CreateFooterSection());
 			windowWidget.AddNode(mainVBox);
 
+			// TODO Duplicates code from Tangerine.TangerineMenu.cs. Both should be presented at one file
+			CacheBoth = new Command("&Both", () => UpdateCacheModeCheckboxes(AssetCacheMode.Both));
+			CacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
+			CacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
+			CacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
+
 			Application.MainMenu = new Menu {
 				new Command("&File", new Menu {
 					new Command("&Quit", () => { Application.Exit(); })
 				}),
-				(actionsCommand = new Command("&Actions", new Menu { }))
+				(actionsCommand = new Command("&Actions", new Menu { })),
+				new Command("&Cache", new Menu {
+					new Command("&Mode", new Menu {
+						CacheBoth,
+						CacheRemote,
+						CacheLocal,
+						CacheNone
+					})
+				})
 			};
+		}
+
+		// TODO Duplicates code from Tangerine.OrangeInterface.cs. Both should be presented at one file
+		private void UpdateCacheModeCheckboxes(AssetCacheMode state)
+		{
+			CacheBoth.Checked = state == AssetCacheMode.Both;
+			CacheRemote.Checked = state == AssetCacheMode.Remote;
+			CacheLocal.Checked = state == AssetCacheMode.Local;
+			CacheNone.Checked = state == AssetCacheMode.None;
+			The.Workspace.AssetCacheMode = state;
 		}
 
 		private Widget CreateHeaderSection()
@@ -368,6 +397,7 @@ namespace Orange
 			if (config.ClientSize != Vector2.Zero) {
 				window.ClientSize = config.ClientSize;
 			}
+			UpdateCacheModeCheckboxes(config.AssetCacheMode);
 		}
 
 		private class TextViewWriter : TextWriter
