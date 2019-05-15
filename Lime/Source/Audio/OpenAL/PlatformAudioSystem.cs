@@ -78,7 +78,7 @@ namespace Lime
 					context = new AudioContext();
 					Logger.Write($"AudioContext initialized successfully");
 					break;
-				} catch (AudioContextException e) {
+				} catch (System.Exception e) {
 					Logger.Write($"Initialize AudioContext error: {e.Message}");
 				}
 			}
