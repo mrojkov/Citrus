@@ -21,6 +21,7 @@ namespace Orange
 		public override void Initialize()
 		{
 			base.Initialize();
+			The.Workspace.LoadCacheSettings();
 #if MAC
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #else
