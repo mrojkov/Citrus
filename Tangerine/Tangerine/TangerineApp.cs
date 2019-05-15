@@ -111,6 +111,7 @@ namespace Tangerine
 			documentPanel.PanelWidget = documentPanel.ContentWidget;
 			var visualHintsPanel = new Panel("Visual Hints");
 			var attachmentPanel = new Panel("Model3D Attachment");
+			var remoteScriptingPanel = new Panel("Remote Scripting");
 			var dockManager = DockManager.Instance;
 			new UI.Console(consolePanel);
 			var root = dockManager.Model.WindowPlacements.First();
@@ -129,6 +130,7 @@ namespace Tangerine
 				{ backupHistoryPanel.Id, new Command(backupHistoryPanel.Title) },
 				{ visualHintsPanel.Id, new Command(visualHintsPanel.Title) },
 				{ attachmentPanel.Id, new Command(attachmentPanel.Title) },
+				{ remoteScriptingPanel.Id, new Command(remoteScriptingPanel.Title) },
 			};
 			foreach (var pair in commandsDictionary) {
 				commandHandlerList.Connect(pair.Value, new PanelCommandHandler(pair.Key));
@@ -142,6 +144,7 @@ namespace Tangerine
 			dockManager.AddPanel(consolePanel, filesystemPlacement, DockSite.Bottom, 0.3f);
 			dockManager.AddPanel(visualHintsPanel, placement, DockSite.Right, 0.3f).Hidden = true;
 			dockManager.AddPanel(attachmentPanel, placement, DockSite.Bottom, 0.3f).Hidden = true;
+			dockManager.AddPanel(remoteScriptingPanel, placement, DockSite.Right, 0.3f).Hidden = true;
 			DockManagerInitialState = dockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(dockManager);
 			documentPanel.ContentWidget.Nodes.Add(dockManager.DocumentArea);
@@ -344,6 +347,7 @@ namespace Tangerine
 				null : AppUserPreferences.Instance.RecentProjects[0], document => TangerineMenu.RebuildRecentProjectsMenu());
 
 			new UI.FilesystemView.FilesystemPane(filesystemPanel);
+			new UI.RemoteScripting.RemoteScriptingPane(remoteScriptingPanel);
 			RegisterGlobalCommands();
 
 			Documentation.Init();
