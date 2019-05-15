@@ -65,36 +65,41 @@ namespace Orange.Source
 
 		private static bool TryGetMSBuildPath(out string path)
 		{
-			return TryGetPureMSBuild15Path(out path) || TryGetVsMSBuild15Path(out path);
-		}
-
-		private static bool TryGetPureMSBuild15Path(out string path)
-		{
-			var msBuildPath = Path.Combine(
+			var msBuild16Path = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-				@"Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe");
-
-			if (File.Exists(msBuildPath)) {
-				path = msBuildPath;
+				@"Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\", "MSBuild.exe");
+			if (File.Exists(msBuild16Path)) {
+				path = msBuild16Path;
 				return true;
 			}
-			path = null;
-			return false;
-		}
 
-		private static bool TryGetVsMSBuild15Path(out string path)
-		{
-			path = null;
 			var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
-			if (visualStudioRegistryPath == null) {
-				return false;
+			if (visualStudioRegistryPath != null) {
+				var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
+				var vsBuild15Path = Path.Combine(vsPath, "MSBuild", "15.0", "Bin", "MSBuild.exe");
+				if (File.Exists(vsBuild15Path)) {
+					path = vsBuild15Path;
+					return true;
+				}
 			}
-			var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
-			var msBuild15Path = Path.Combine(vsPath, "MSBuild", "15.0", "Bin", "MSBuild.exe");
+
+			var msBuild15Path = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+				@"Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\", "MSBuild.exe");
 			if (File.Exists(msBuild15Path)) {
 				path = msBuild15Path;
 				return true;
 			}
+
+			var msBuild14Path = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+				@"MSBuild\14.0\Bin\", "MSBuild.exe");
+			if (File.Exists(msBuild14Path)) {
+				path = msBuild14Path;
+				return true;
+			}
+
+			path = null;
 			return false;
 		}
 	}
