@@ -10,6 +10,8 @@ namespace Orange
 {
 	public class DictionaryExtractor
 	{
+		public static Func<DictionaryExtractor> Factory = () => new DictionaryExtractor();
+
 		private static readonly Regex tanTextMatcher = new Regex(
 			@"^(\s*""Text""\s*:)\s*""(?<string>[^""\\]*(?:\\.[^""\\]*)*)"",?\s?$",
 			RegexOptions.Compiled | RegexOptions.Multiline);
@@ -124,7 +126,7 @@ namespace Orange
 			}
 		}
 
-		private void ExtractTexts()
+		protected virtual void ExtractTexts()
 		{
 			bool ScanFilter(DirectoryInfo directoryInfo)
 			{
@@ -221,7 +223,7 @@ namespace Orange
 			}
 		}
 
-		private static string GetContext(string file)
+		protected static string GetContext(string file)
 		{
 			return file;
 		}
@@ -231,7 +233,7 @@ namespace Orange
 			return taggedStringMatcher.Match(str).Success;
 		}
 
-		private void AddToDictionary(string key, string context)
+		protected void AddToDictionary(string key, string context)
 		{
 			var match = taggedStringMatcher.Match(key);
 			if (match.Success) {
@@ -248,7 +250,7 @@ namespace Orange
 			}
 		}
 
-		private static bool HasAlphabeticCharacters(string text)
+		protected static bool HasAlphabeticCharacters(string text)
 		{
 			return text.Any(c => char.IsLetter(c));
 		}

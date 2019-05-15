@@ -11,8 +11,7 @@ namespace Orange
 			if (!The.UI.AskConfirmation("Are you sure you want to update the dictionary?")) {
 				return "Action canceled";
 			}
-			DictionaryExtractor extractor = new DictionaryExtractor();
-			extractor.ExtractDictionary();
+			DictionaryExtractor.Factory().ExtractDictionary();
 			return null;
 		}
 	}
