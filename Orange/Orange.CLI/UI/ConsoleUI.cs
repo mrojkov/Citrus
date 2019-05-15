@@ -21,7 +21,6 @@ namespace Orange
 		public override void Initialize()
 		{
 			base.Initialize();
-			The.Workspace.LoadCacheSettings();
 #if MAC
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #else
@@ -45,6 +44,7 @@ namespace Orange
 				throw new FileNotFoundException("Project file '{0}' does not exist", projectFile);
 			}
 			The.Workspace.Open(projectFile);
+			The.Workspace.LoadCacheSettings();
 		}
 
 		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
