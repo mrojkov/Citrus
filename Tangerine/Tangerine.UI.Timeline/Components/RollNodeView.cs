@@ -113,17 +113,6 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			widget.Gestures.Add(new ClickGesture(1, ShowPropertyContextMenu));
-			widget.Gestures.Add(new DoubleClickGesture(() => {
-				Document.Current.History.DoTransaction(() => {
-					var labelExtent = label.MeasureUncutText();
-					if (label.LocalMousePosition().X < labelExtent.X) {
-						Rename();
-					} else {
-						Core.Operations.EnterNode.Perform(nodeData.Node);
-					}
-				});
-			}));
 			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
 				Document.Current.History.DoTransaction(() => {
 					Core.Operations.ClearRowSelection.Perform();
@@ -292,10 +281,15 @@ namespace Tangerine.UI.Timeline.Components
 			if (NodeData.Node.EditorState().Locked) {
 				return;
 			}
-			nodeIdEditor.Rename();
+			var labelExtent = label.MeasureUncutText();
+			if (label.LocalMousePosition().X < labelExtent.X) {
+				nodeIdEditor.Rename();
+			} else {
+				Core.Operations.EnterNode.Perform(nodeData.Node);
+			}
 		}
 
-		void ShowPropertyContextMenu()
+		public void ShowContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {

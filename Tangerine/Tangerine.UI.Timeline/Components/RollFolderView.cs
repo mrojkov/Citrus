@@ -168,6 +168,10 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Tasks.Add(EditFolderIdTask());
 		}
 
+		public void ShowContextMenu()
+		{
+		}
+
 		IEnumerator<object> EditFolderIdTask()
 		{
 			var initialText = editBox.Text;
