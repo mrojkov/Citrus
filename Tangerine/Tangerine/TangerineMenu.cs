@@ -272,6 +272,7 @@ namespace Tangerine
 				})
 			}));
 			Orange.The.UI.LoadFromWorkspaceConfig(Orange.WorkspaceConfig.Load());
+			Orange.The.Workspace.LoadCacheSettings();
 		}
 
 		public static void OnProjectChanged(Project proj)

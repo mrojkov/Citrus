@@ -111,6 +111,12 @@ namespace Orange
 #pragma warning disable CS4014
 			Orange.Updater.CheckForUpdates();
 #pragma warning restore CS4014
+			LoadCacheSettings();
+		}
+
+		public void LoadCacheSettings()
+		{
+			var config = WorkspaceConfig.Load();
 			if (ProjectFile != string.Empty) {
 				AssetCacheMode = config.AssetCacheMode;
 				AssetCacheLocalPath = config.AssetCacheLocalPath;
