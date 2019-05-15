@@ -9,6 +9,8 @@ namespace Orange
 	{
 		public delegate bool Converter(string srcPath, string dstPath);
 
+		public static int GetOperationsCount(string fileExtension) => The.Workspace.AssetFiles.Enumerate(fileExtension).Count();
+
 		public static void Sync(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
 		{
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {

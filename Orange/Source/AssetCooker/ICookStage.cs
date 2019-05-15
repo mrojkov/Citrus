@@ -8,5 +8,6 @@ namespace Orange
 		void Action();
 		IEnumerable<string> ImportedExtensions { get; }
 		IEnumerable<string> BundleExtensions { get; }
+		int GetOperationsCount();
 	}
 }

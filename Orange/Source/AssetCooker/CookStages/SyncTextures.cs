@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Lime;
@@ -12,17 +13,14 @@ namespace Orange
 		private readonly string originalTextureExtension = ".png";
 		private string PlatformTextureExtension => AssetCooker.GetPlatformTextureExtension();
 
-		public void Action()
-		{
-			SyncUpdated.Sync(originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(originalTextureExtension);
+
+		public void Action() => SyncUpdated.Sync(originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{
 			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, originalTextureExtension)];
 			if (rules.TextureAtlas != null) {
-				// Reverse double counting
-				UserInterface.Instance.IncreaseProgressBar(-1);
 				// No need to cache this texture since it is a part of texture atlas.
 				return false;
 			}

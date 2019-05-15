@@ -454,7 +454,7 @@ namespace Orange
 				var rect = new Widget();
 				rect.CompoundPresenter.Add(new WidgetFlatFillPresenter(Lime.Theme.Colors.SelectedBorder));
 				rect.Tasks.AddLoop(() => {
-					rect.Size = new Vector2(bar.Width * (float)CurrentPosition / MaxPosition, bar.ContentHeight);
+					rect.Size = new Vector2(bar.Width * Mathf.Clamp((float)CurrentPosition / MaxPosition, 0, 1), bar.ContentHeight);
 				});
 				bar.AddNode(rect);
 
@@ -477,7 +477,6 @@ namespace Orange
 			public void Progress(int amount = 1)
 			{
 				CurrentPosition += amount;
-				Mathf.Clamp(CurrentPosition, 0, MaxPosition);
 				Application.InvokeOnMainThread(() => {
 					textFieldA.Text = (int)((float)CurrentPosition / MaxPosition * 100) + "%";
 					textFieldB.Text = CurrentPosition + " / " + MaxPosition;

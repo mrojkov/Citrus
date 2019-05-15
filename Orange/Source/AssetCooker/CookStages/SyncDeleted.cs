@@ -23,6 +23,23 @@ namespace Orange
 		private readonly string[] toDeleteExtensions = { ".atlasPart", ".mask", ".texture", ".ant" };
 		private readonly string modelTanExtension = ".t3d";
 
+		public int GetOperationsCount()
+		{
+			var result = 0;
+			var assetFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {
+				assetFiles.Add(fileInfo.Path);
+			}
+			foreach (var path in AssetCooker.AssetBundle.EnumerateFiles()) {
+				if (!path.StartsWith("Atlases") &&
+				    !toDeleteExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase) &&
+				    !assetFiles.Contains(Path.ChangeExtension(path, AssetCooker.GetOriginalAssetExtension(path)))) {
+					result++;
+				}
+			}
+			return result;
+		}
+
 		public void Action()
 		{
 			var assetFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -49,6 +66,7 @@ namespace Orange
 						AssetCooker.ModelsToRebuild.Add(path.Remove(modelAttachmentExtIndex) + modelTanExtension);
 					}
 					AssetCooker.DeleteFileFromBundle(path);
+					UserInterface.Instance.IncreaseProgressBar();
 				}
 			}
 		}

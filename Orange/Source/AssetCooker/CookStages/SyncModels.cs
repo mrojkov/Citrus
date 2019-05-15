@@ -14,10 +14,9 @@ namespace Orange
 		private readonly string fbxExtension = ".fbx";
 		private readonly string t3dExtension = ".t3d";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fbxExtension);
+
+		public void Action() => SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 
 		private bool Converter(string srcPath, string dstPath)
 		{

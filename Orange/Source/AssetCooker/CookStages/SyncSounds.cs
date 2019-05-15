@@ -13,10 +13,9 @@ namespace Orange
 		private readonly string oggExtension = ".ogg";
 		private readonly string soundExtension = ".sound";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(oggExtension, soundExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(oggExtension);
+
+		public void Action() => SyncUpdated.Sync(oggExtension, soundExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

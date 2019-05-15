@@ -11,10 +11,9 @@ namespace Orange
 
 		private readonly string sceneExtension = ".tan";
 
-		public void Action()
-		{
-			SyncUpdated.Sync(sceneExtension, sceneExtension, AssetBundle.Current, Converter);
-		}
+		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(sceneExtension);
+
+		public void Action() => SyncUpdated.Sync(sceneExtension, sceneExtension, AssetBundle.Current, Converter);
 
 		private bool Converter(string srcPath, string dstPath)
 		{

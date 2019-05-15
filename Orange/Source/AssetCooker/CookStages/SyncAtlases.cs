@@ -14,6 +14,8 @@ namespace Orange
 		private readonly string textureExtension = ".png";
 		private readonly string atlasPartExtension = ".atlasPart";
 
+		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureExtension).Count();
+
 		public void Action()
 		{
 			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
