@@ -178,8 +178,8 @@ namespace Launcher
 			if (builderPath != null) {
 				return true;
 			}
-			Process.Start(@"https://visualstudio.microsoft.com/ru/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15");
-			SetFailedBuildStatus("Please install Microsoft Build Tools 2017");
+			Process.Start(@"https://visualstudio.microsoft.com/ru/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16");
+			SetFailedBuildStatus("Please install Microsoft Build Tools 2019");
 			return false;
 #else
 			return true;
@@ -214,6 +214,11 @@ namespace Launcher
 		private string builderPath
 		{
 			get {
+				var msBuild16Path = Path.Combine(@"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\", "MSBuild.exe");
+				if (File.Exists(msBuild16Path)) {
+					return msBuild16Path;
+				}
+
 				var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
 				if (visualStudioRegistryPath != null) {
 					var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
