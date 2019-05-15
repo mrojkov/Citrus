@@ -317,6 +317,7 @@ namespace Orange
 			AddStage(new SyncAtlases(), CookingProfile.Total);
 			AddStage(new SyncDeleted(), CookingProfile.Total);
 			AddStage(new SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
+			AddStage(new SyncRawAssets(".cfg", AssetAttributes.ZippedDeflate));
 			AddStage(new SyncTxtAssets());
 			AddStage(new SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
 			var rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
