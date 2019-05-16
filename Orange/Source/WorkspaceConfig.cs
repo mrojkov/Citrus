@@ -26,7 +26,7 @@ namespace Orange
 		public AssetCacheMode AssetCacheMode = AssetCacheMode.Local | AssetCacheMode.Remote;
 
 		[YuzuOptional]
-		public string AssetCacheLocalPath = ".orange/Cache";
+		public string AssetCacheLocalPath = Path.Combine(".orange", "Cache");
 
 		[YuzuOptional]
 		public bool BenchmarkEnabled;

@@ -24,7 +24,7 @@ namespace Orange
 		private string serverAddress;
 		private string serverUsername;
 		private string serverPath;
-		private string localPath = Path.Combine(".orange", "Cache");
+		private string tempFilePath;
 		public AssetCacheMode Mode { get; private set; }
 
 		private bool IsLocalEnabled => (Mode & AssetCacheMode.Local) != 0;
@@ -45,6 +45,7 @@ namespace Orange
 				Console.WriteLine("[Cache] Cache disabled via WorkspaceConfig");
 				return;
 			}
+			tempFilePath = Path.Combine(The.Workspace.AssetCacheLocalPath, "cache.tmp");
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
@@ -215,16 +216,26 @@ namespace Orange
 					if (ExistsLocal(hashString)) {
 						return true;
 					}
-					bool successful = ftpClient.DownloadFile(GetLocalPath(hashString), GetRemotePath(hashString));
+					bool successful = ftpClient.DownloadFile(tempFilePath, GetRemotePath(hashString));
 					if (!successful) {
 						ftpClient.Disconnect();
 						HandleRemoteCacheFailure(hashString, "Download failed");
+						if (File.Exists(tempFilePath)) {
+							File.Delete(tempFilePath);
+						}
 						return false;
 					}
+					var fullLocalPath = GetLocalPath(hashString);
+					Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
+					File.Copy(tempFilePath, fullLocalPath, true);
+					File.Delete(tempFilePath);
 				}
 				catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Download failed");
+					if (File.Exists(tempFilePath)) {
+							File.Delete(tempFilePath);
+					}
 					return false;
 				}
 
