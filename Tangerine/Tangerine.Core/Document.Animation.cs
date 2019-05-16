@@ -227,7 +227,7 @@ namespace Tangerine.Core
 							if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
 								SetTimeRecursive(node, 0);
 							} else {
-								SetTime(node, 0, animation.Id);
+								SetTime(node, animation.Id, 0);
 							}
 							animation.IsRunning = true;
 							FastForwardToFrame(animation, frameIndex);
@@ -238,7 +238,7 @@ namespace Tangerine.Core
 							if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
 								SetTimeRecursive(node, 0);
 							} else {
-								SetTime(node, 0, animation.Id);
+								SetTime(node, animation.Id, 0);
 							}
 						} else {
 							// Terekhov Dmitry: In case we've created a new container that doesn't have a
@@ -253,7 +253,7 @@ namespace Tangerine.Core
 							frameIndex > cacheFrame.Value + OptimalRollbackForCacheAnimationsStates * 2)) {
 							AnimationsStatesComponent.Remove(node);
 							if (movingBack) {
-								SetTimeRecursive(node, 0);
+								SetTime(node, animation.Id, 0);
 								StopAnimationRecursive(node);
 								animation.IsRunning = true;
 								FastForwardToFrame(animation, (frameIndex - OptimalRollbackForCacheAnimationsStates).Clamp(0, frameIndex));
@@ -303,27 +303,35 @@ namespace Tangerine.Core
 				return (float) forwardDelta;
 			}
 
-			private static void SetTimeRecursiveDownstream(Node node, double time)
-			{
-				foreach (var animation in node.Animations) {
-					animation.Time = time;
-				}
-				foreach (var child in node.Nodes) {
-					SetTimeRecursiveDownstream(child, time);
-				}
-			}
-
 			internal static void SetTimeRecursive(Node node, double time)
 			{
-				foreach (var animation in node.Animations) {
-					animation.Time = time;
+				void SetTime(Node n, double t)
+				{
+					foreach (var animation in n.Animations) {
+						animation.Time = t;
+					}
 				}
-				foreach (var child in node.Nodes) {
-					SetTimeRecursiveDownstream(child, time);
+				SetTime(node, time);
+				foreach (var descendant in node.Descendants) {
+					SetTime(descendant, time);
 				}
 			}
 
-			internal static void SetTime(Node node, double time, string animationId)
+			internal static void SetTimeRecursive(Node node, string animationId, double time)
+			{
+				void SetTime(Node n, string id, double t)
+				{
+					if (n.Animations.TryFind(id, out var animation)) {
+						animation.Time = t;
+					}
+				}
+				SetTime(node, animationId, time);
+				foreach (var descendant in node.Descendants) {
+					SetTime(descendant, animationId, time);
+				}
+			}
+
+			internal static void SetTime(Node node, string animationId, double time)
 			{
 				if (node.Animations.TryFind(animationId, out var animation)) {
 					animation.Time = time;
@@ -332,18 +340,22 @@ namespace Tangerine.Core
 
 			internal static void StopAnimationRecursive(Node node)
 			{
-				foreach (var animation in node.Animations) {
-					animation.IsRunning = false;
+				void StopAnimation(Node n)
+				{
+					foreach (var animation in n.Animations) {
+						animation.IsRunning = false;
+					}
 				}
-				foreach (var child in node.Nodes) {
-					StopAnimationRecursive(child);
+				StopAnimation(node);
+				foreach (var descendant in node.Descendants) {
+					StopAnimation(descendant);
 				}
 			}
 
 			static void ClearParticlesRecursive(Node node)
 			{
 				if (node is ParticleEmitter) {
-					var e = (ParticleEmitter) node;
+					var e = (ParticleEmitter)node;
 					e.ClearParticles();
 				}
 				foreach (var child in node.Nodes) {
