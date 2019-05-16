@@ -95,5 +95,6 @@ namespace Lime
 		TextOverflowMode OverflowMode { get; set; }
 		bool WordSplitAllowed { get; set; }
 		bool TrimWhitespaces { get; set; }
+		bool GetCharPair(Vector2 point, out Tuple<SpriteList.CharDef, SpriteList.CharDef> pair);
 	}
 }

@@ -530,5 +530,11 @@ namespace Lime
 			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}
+
+		public bool GetCharPair(Vector2 point, out Tuple<SpriteList.CharDef, SpriteList.CharDef> pair)
+		{
+			PrepareSpriteListAndExtent();
+			return spriteList.GetCharPair(point, out pair);
+		}
 	}
 }

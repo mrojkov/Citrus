@@ -239,6 +239,21 @@ namespace Lime
 				tag = -1;
 				return false;
 			}
+
+			public bool GetCharIndex(Vector2 point, out int index)
+			{
+				index = -1;
+				for (int i = 0; i < CharDefs.Length; i++) {
+					var cd = CharDefs[i];
+					var a = cd.Position;
+					var b = cd.Position + cd.Size(FontHeight);
+					if (point.X >= a.X && point.Y >= a.Y && point.X < b.X && point.Y < b.Y) {
+						index = i;
+						return true;
+					}
+				}
+				return false;
+			}
 		}
 
 		public void Add(
@@ -300,6 +315,28 @@ namespace Lime
 				}
 			}
 			tag = -1;
+			return false;
+		}
+
+		public bool GetCharPair(Vector2 point, out Tuple<CharDef, CharDef> pair)
+		{
+			pair = null;
+			for (int i = 0; i < items.Count; i++) {
+				var s = items[i];
+				if (s.HitTest(point, out var tag) && s is TextSprite textSprite) {
+					if (textSprite.GetCharIndex(point, out var pos)) {
+						if (pos < textSprite.CharDefs.Length - 1) {
+							pair = new Tuple<CharDef, CharDef>(textSprite.CharDefs[pos], textSprite.CharDefs[pos + 1]);
+							return true;
+						} else if (pos > 0) {
+							pair = new Tuple<CharDef, CharDef>(textSprite.CharDefs[pos - 1], textSprite.CharDefs[pos]);
+							return true;
+						} else {
+							return false;
+						}
+					}
+				}
+			}
 			return false;
 		}
 	}

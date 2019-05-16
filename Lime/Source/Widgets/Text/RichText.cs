@@ -364,6 +364,18 @@ namespace Lime
 			return PrepareRenderer().CalcNumCharacters(Size);
 		}
 
+		public bool GetCharPair(Vector2 point, out Tuple<SpriteList.CharDef, SpriteList.CharDef> pair)
+		{
+			EnsureSpriteLists();
+			foreach (var sl in spriteLists) {
+				if (sl.GetCharPair(point, out pair)) {
+					return true;
+				}
+			}
+			pair = null;
+			return false;
+		}
+
 		public int MaxDisplayCharacters {
 			get {
 				return maxDisplayCharacters;
