@@ -179,7 +179,8 @@ namespace Orange
 			return false;
 		}
 
-		private bool UploadFromLocal(string hashString)
+		/// <summary>Returns 'true' if uploading was successful. Returns 'false' if something went wrong.</summary>
+		public bool UploadFromLocal(string hashString)
 		{
 			if (Mode == (AssetCacheMode.Local | AssetCacheMode.Remote) && ftpClient.IsConnected) {
 				try {
