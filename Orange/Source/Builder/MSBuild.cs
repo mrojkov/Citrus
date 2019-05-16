@@ -73,6 +73,14 @@ namespace Orange.Source
 				return true;
 			}
 
+			msBuild16Path = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+				@"Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\", "MSBuild.exe");
+			if (File.Exists(msBuild16Path)) {
+				path = msBuild16Path;
+				return true;
+			}
+
 			var visualStudioRegistryPath = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7");
 			if (visualStudioRegistryPath != null) {
 				var vsPath = visualStudioRegistryPath.GetValue("15.0", string.Empty) as string;
