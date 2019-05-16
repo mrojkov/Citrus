@@ -11,13 +11,7 @@ namespace Orange
 	{
 		public static void Unpack(TargetPlatform platform)
 		{
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			var bundles = new HashSet<string>();
-			foreach (var dictionaryItem in cookingRulesMap) {
-				foreach (var bundle in dictionaryItem.Value.Bundles) {
-					bundles.Add(bundle);
-				}
-			}
+			var bundles = AssetCooker.GetListOfAllBundles();
 
 			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles.ToList()));
 			foreach (var bundleName in bundles) {
