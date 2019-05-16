@@ -727,7 +727,7 @@ namespace Lime
 
 		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
 
-		protected void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
+		public void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
 			if (layer == 0) {
 				if (PostPresenter != null) {

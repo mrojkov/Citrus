@@ -16,7 +16,7 @@ namespace Lime
 		private bool? hasEasings;
 		internal Animation Next;
 		internal double TimeInternal;
-		internal Marker MarkerAhead;
+		public Marker MarkerAhead;
 		public event Action Stopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
