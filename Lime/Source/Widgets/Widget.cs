@@ -964,40 +964,36 @@ namespace Lime
 		/// </summary>
 		public override void Update(float delta)
 		{
-			if (delta > Application.MaxDelta) {
-				SafeUpdate(delta);
-			} else {
 #if PROFILE
-				var watch = System.Diagnostics.Stopwatch.StartNew();
+			var watch = System.Diagnostics.Stopwatch.StartNew();
 #endif
-				foreach (var b in Behaviours) {
-					b.Update(delta);
-				}
-				if (GloballyVisible) {
-					AdvanceAnimation(delta);
-#if PROFILE
-					watch.Stop();
-#endif
-					for (var node = FirstChild; node != null;) {
-						var next = node.NextSibling;
-						node.Update(node.AnimationSpeed * delta);
-						node = next;
-					}
-#if PROFILE
-					watch.Start();
-#endif
-				}
-				foreach (var b in LateBehaviours) {
-					b.LateUpdate(delta);
-				}
-				if (EnableViewCulling && CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
-					ExpandParentBoundingRect();
-				}
+			foreach (var b in Behaviours) {
+				b.Update(delta);
+			}
+			if (GloballyVisible) {
+				AdvanceAnimation(delta);
 #if PROFILE
 				watch.Stop();
-				NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
+				for (var node = FirstChild; node != null;) {
+					var next = node.NextSibling;
+					node.Update(node.AnimationSpeed * delta);
+					node = next;
+				}
+#if PROFILE
+				watch.Start();
 #endif
 			}
+			foreach (var b in LateBehaviours) {
+				b.LateUpdate(delta);
+			}
+			if (EnableViewCulling && CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+				ExpandParentBoundingRect();
+			}
+#if PROFILE
+			watch.Stop();
+			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
+#endif
 		}
 
 		/// <summary>

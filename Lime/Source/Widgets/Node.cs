@@ -688,32 +688,18 @@ namespace Lime
 		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
-			if (delta > Application.MaxDelta) {
-				SafeUpdate(delta);
-			} else {
-				foreach (var b in Behaviours) {
-					b.Update(delta);
-				}
-				AdvanceAnimation(delta);
-				for (var node = FirstChild; node != null;) {
-					var next = node.NextSibling;
-					node.Update(node.AnimationSpeed * delta);
-					node = next;
-				}
-				foreach (var b in LateBehaviours) {
-					b.LateUpdate(delta);
-				}
+			foreach (var b in Behaviours) {
+				b.Update(delta);
 			}
-		}
-
-		protected void SafeUpdate(float delta)
-		{
-			var remainDelta = delta;
-			do {
-				delta = Mathf.Min(remainDelta, Application.MaxDelta);
-				Update(delta);
-				remainDelta -= delta;
-			} while (remainDelta > 0f);
+			AdvanceAnimation(delta);
+			for (var node = FirstChild; node != null;) {
+				var next = node.NextSibling;
+				node.Update(node.AnimationSpeed * delta);
+				node = next;
+			}
+			foreach (var b in LateBehaviours) {
+				b.LateUpdate(delta);
+			}
 		}
 
 		protected internal virtual RenderObject GetRenderObject() => null;
