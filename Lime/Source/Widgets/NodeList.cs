@@ -105,18 +105,7 @@ namespace Lime
 		/// </summary>
 		public void Add(Node node)
 		{
-			RuntimeChecksBeforeInsertion(node);
-			CreateListIfNeeded();
-			node.Parent = owner;
-			if (Count > 0) {
-				list[Count - 1].NextSibling = node;
-			}
-			list.Add(node);
-			RefreshFirstChild();
-			node.PropagateDirtyFlags();
-#if TANGERINE
-			Version++;
-#endif // TANGERINE
+			Insert(Count, node);
 		}
 
 		private void CreateListIfNeeded()
@@ -155,6 +144,7 @@ namespace Lime
 			RefreshFirstChild();
 			node.PropagateDirtyFlags();
 			Node.InvalidateNodeReferenceCache();
+			owner.Manager?.RegisterNode(node);
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -162,8 +152,14 @@ namespace Lime
 
 		private void RuntimeChecksBeforeInsertion(Node node)
 		{
+			if (node == null) {
+				throw new ArgumentNullException(nameof(node));
+			}
+			if (node.Manager != null) {
+				throw new ArgumentException(nameof(node));
+			}
 			if (node.Parent != null) {
-				throw new Lime.Exception("Can't adopt a node twice. Call node.Unlink() first");
+				throw new ArgumentException("Can't adopt a node twice. Call node.Unlink() first");
 			}
 		}
 
@@ -232,6 +228,7 @@ namespace Lime
 			node.Parent = null;
 			node.NextSibling = null;
 			node.PropagateDirtyFlags();
+			owner.Manager?.UnregisterNode(node);
 		}
 
 		public void RemoveRange(int index, int count)
@@ -291,6 +288,7 @@ namespace Lime
 				oldNode.Parent = null;
 				oldNode.NextSibling = null;
 				oldNode.PropagateDirtyFlags();
+				owner.Manager?.UnregisterNode(oldNode);
 				list[index] = value;
 				if (index > 0) {
 					list[index - 1].NextSibling = value;
@@ -300,7 +298,9 @@ namespace Lime
 				}
 				RefreshFirstChild();
 				value.PropagateDirtyFlags();
+				value.Manager = owner.Manager;
 				Node.InvalidateNodeReferenceCache();
+				owner.Manager?.RegisterNode(value);
 #if TANGERINE
 				Version++;
 #endif // TANGERINE

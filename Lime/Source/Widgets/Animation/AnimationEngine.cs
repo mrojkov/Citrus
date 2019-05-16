@@ -99,7 +99,7 @@ namespace Lime
 
 		protected virtual void ProcessMarker(Animation animation, Marker marker)
 		{
-			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+			if ((animation.OwnerNode.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
 				return;
 			}
 			switch (marker.Action) {
@@ -163,7 +163,7 @@ namespace Lime
 				return true;
 			} else {
 				return
-					animation.Owner.DescendantAnimatorsVersion == animation.EffectiveAnimatorsVersion &&
+					animation.OwnerNode.DescendantAnimatorsVersion == animation.EffectiveAnimatorsVersion &&
 					animation.EffectiveAnimators != null;
 			}
 		}
@@ -265,8 +265,8 @@ namespace Lime
 		{
 			(animation.EffectiveAnimators ?? (animation.EffectiveAnimators = new List<IAbstractAnimator>())).Clear();
 			(animation.EffectiveTriggerableAnimators ?? (animation.EffectiveTriggerableAnimators = new List<IAbstractAnimator>())).Clear();
-			animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
-			AddEffectiveAnimatorsRecursively(animation.Owner);
+			animation.EffectiveAnimatorsVersion = animation.OwnerNode.DescendantAnimatorsVersion;
+			AddEffectiveAnimatorsRecursively(animation.OwnerNode);
 
 			if (!animation.IsLegacy && animation.ApplyZeroPose) {
 				var animatorBindings = new HashSet<AnimatorBinding>();

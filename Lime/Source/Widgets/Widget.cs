@@ -75,7 +75,7 @@ namespace Lime
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
 		public static bool RenderTransparentWidgets;
-		public static bool EnableViewCulling = true;
+		public static bool EnableViewCulling = false;
 
 		#region Layout properties
 		private LayoutManager layoutManager;
@@ -957,43 +957,6 @@ namespace Lime
 					w?.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		public override void Update(float delta)
-		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
-			foreach (var b in Behaviours) {
-				b.Update(delta);
-			}
-			if (GloballyVisible) {
-				AdvanceAnimation(delta);
-#if PROFILE
-				watch.Stop();
-#endif
-				for (var node = FirstChild; node != null;) {
-					var next = node.NextSibling;
-					node.Update(node.AnimationSpeed * delta);
-					node = next;
-				}
-#if PROFILE
-				watch.Start();
-#endif
-			}
-			foreach (var b in LateBehaviours) {
-				b.LateUpdate(delta);
-			}
-			if (EnableViewCulling && CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
-				ExpandParentBoundingRect();
-			}
-#if PROFILE
-			watch.Stop();
-			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 		}
 
 		/// <summary>

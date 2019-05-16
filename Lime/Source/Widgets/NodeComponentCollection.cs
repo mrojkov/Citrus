@@ -55,18 +55,68 @@ namespace Lime
 		public virtual void Dispose() { }
 	}
 
-	public class NodeBehavior : NodeComponent
+	//public class NodeBehavior : NodeComponent
+	//{
+	//	public virtual int Order => 0;
+
+	//	public virtual void Update(float delta) { }
+	//	public virtual void LateUpdate(float delta) { }
+	//}
+
+	public class NodeBehavior : BehaviourComponent
 	{
+		private UpdateSubBehaviour ub;
+		private LateUpdateSubBehaviour lub;
+
 		public virtual int Order => 0;
 
-		public virtual void Update(float delta) { }
-		public virtual void LateUpdate(float delta) { }
+		protected internal override void Start()
+		{
+			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Add(this);
+			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Add(this);
+		}
+
+		protected internal override void Stop()
+		{
+			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Remove(this);
+			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Remove(this);
+		}
+
+		public new virtual void Update(float delta)
+		{
+		}
+
+		public virtual void LateUpdate(float delta)
+		{
+		}
+
+		private class UpdateSubBehaviour : BehaviourComponent
+		{
+			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
+
+			protected internal override void Update(float delta)
+			{
+				foreach (var b in Behaviors) {
+					b.Update(delta);
+				}
+			}
+		}
+
+		private class LateUpdateSubBehaviour : BehaviourComponent
+		{
+			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
+
+			protected internal override void Update(float delta)
+			{
+				foreach (var b in Behaviors) {
+					b.LateUpdate(delta);
+				}
+			}
+		}
 	}
 
 	public class NodeComponentCollection : ComponentCollection<NodeComponent>
 	{
-		internal static readonly NodeBehavior[] EmptyBehaviors = new NodeBehavior[0];
-
 		private readonly Node owner;
 
 		public NodeComponentCollection(Node owner)
@@ -80,66 +130,18 @@ namespace Lime
 				throw new InvalidOperationException("The component is already in a collection.");
 			}
 			base.Add(component);
-			var behaviour = component as NodeBehavior;
-			if (behaviour != null) {
-				var type = behaviour.GetType();
-				if (behaviourUpdateChecker.Value.IsMethodOverriden(type)) {
-					owner.Behaviours = InsertBehaviour(owner.Behaviours, behaviour);
-				}
-				if (behaviourLateUpdateChecker.Value.IsMethodOverriden(type)) {
-					owner.LateBehaviours = InsertBehaviour(owner.LateBehaviours, behaviour);
-				}
-			}
 			component.Owner = owner;
-		}
-
-		private static NodeBehavior[] InsertBehaviour(NodeBehavior[] list, NodeBehavior behaviour)
-		{
-			var newList = new NodeBehavior[list.Length + 1];
-			var i = 0;
-			int? insertIndex = null;
-			foreach (var b in list) {
-				if (!insertIndex.HasValue && b.Order > behaviour.Order) {
-					insertIndex = i++;
-				}
-				newList[i++] = b;
-			}
-			newList[insertIndex ?? list.Length] = behaviour;
-			return newList;
+			owner?.Manager?.RegisterComponent(component);
 		}
 
 		public override bool Remove(NodeComponent component)
 		{
 			if (base.Remove(component)) {
 				component.Owner = null;
-				var behaviour = component as NodeBehavior;
-				if (behaviour != null) {
-					var behaviorType = behaviour.GetType();
-					if (behaviourUpdateChecker.Value.IsMethodOverriden(behaviorType)) {
-						owner.Behaviours = RemoveBehaviour(owner.Behaviours, behaviour);
-					}
-					if (behaviourLateUpdateChecker.Value.IsMethodOverriden(behaviorType)) {
-						owner.LateBehaviours = RemoveBehaviour(owner.LateBehaviours, behaviour);
-					}
-				}
+				owner?.Manager?.UnregisterComponent(component);
 				return true;
 			}
 			return false;
-		}
-
-		private static NodeBehavior[] RemoveBehaviour(NodeBehavior[] list, NodeBehavior behaviour)
-		{
-			if (list.Length == 1) {
-				return EmptyBehaviors;
-			}
-			var newList = new NodeBehavior[list.Length - 1];
-			var i = 0;
-			foreach (var b in list) {
-				if (b != behaviour) {
-					newList[i++] = b;
-				}
-			}
-			return newList;
 		}
 
 		public override void Clear()
@@ -150,34 +152,6 @@ namespace Lime
 				}
 			}
 			base.Clear();
-			owner.Behaviours = owner.LateBehaviours = EmptyBehaviors;
-		}
-
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourUpdateChecker =
-			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
-
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =
-			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
-
-		private class OverridenBehaviourMethodChecker
-		{
-			private readonly string methodName;
-			private readonly Dictionary<Type, bool> checkedTypes = new Dictionary<Type, bool>();
-
-			public OverridenBehaviourMethodChecker(string methodName)
-			{
-				this.methodName = methodName;
-			}
-
-			public bool IsMethodOverriden(Type type)
-			{
-				bool result;
-				if (!checkedTypes.TryGetValue(type, out result)) {
-					result = type.GetMethod(methodName).DeclaringType != typeof(NodeBehavior);
-					checkedTypes.Add(type, result);
-				}
-				return result;
-			}
 		}
 
 		[global::Yuzu.YuzuSerializeItemIf]

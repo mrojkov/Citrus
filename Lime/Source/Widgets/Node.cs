@@ -77,6 +77,10 @@ namespace Lime
 			All = ~None
 		}
 
+		private NodeManager manager;
+
+		public NodeManager Manager { get; internal set; }
+
 		/// <summary>
 		/// Is invoked after default animation has been stopped (e.g. hit "Stop" marker).
 		/// Note: DefaultAnimation.Stopped will be set to null after invocation or after RunAnimation call.
@@ -232,11 +236,6 @@ namespace Lime
 		internal int RunningAnimationCount;
 
 		/// <summary>
-		/// Gets the cached reference to the first animation in the animation collection.
-		/// </summary>
-		public Animation FirstAnimation { get; internal set; }
-
-		/// <summary>
 		/// Gets the cached reference to the first children node.
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
 		/// </summary>
@@ -253,9 +252,6 @@ namespace Lime
 			add => Components.GetOrAdd<AwakeBehavior>().Action += value;
 			remove => Components.GetOrAdd<AwakeBehavior>().Action -= value;
 		}
-
-		internal NodeBehavior[] Behaviours = NodeComponentCollection.EmptyBehaviors;
-		internal NodeBehavior[] LateBehaviours = NodeComponentCollection.EmptyBehaviors;
 
 		/// <summary>
 		/// Called before Update.
@@ -368,20 +364,7 @@ namespace Lime
 		/// Returns the first animation in the animation collection
 		/// or creates an animation if the collection is empty.
 		/// </summary>
-		public Animation DefaultAnimation
-		{
-			get {
-				Animation a;
-				for (a = FirstAnimation; a != null; a = a.Next) {
-					if (a.IsLegacy) {
-						return a;
-					}
-				}
-				a = new Animation() { IsLegacy = true };
-				Animations.Add(a);
-				return a;
-			}
-		}
+		public Animation DefaultAnimation => Components.GetOrAdd<AnimationBehaviour>().DefaultAnimation;
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -406,7 +389,8 @@ namespace Lime
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
-		public AnimationCollection Animations { get; private set; }
+		public AnimationCollection Animations => Components.GetOrAdd<AnimationBehaviour>().Animations;
+
 		internal int DescendantAnimatorsVersion { get; private set; }
 
 		void IAnimationHost.OnAnimatorCollectionChanged()
@@ -422,8 +406,11 @@ namespace Lime
 		protected bool ShouldInspectPosition() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 #endif // TANGERINE
 
-		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (!FirstAnimation.IsLegacy || FirstAnimation.Markers.Count > 0));
+		public bool NeedSerializeAnimations()
+		{
+			var c = Components.Get<AnimationBehaviour>();
+			return c != null && (c.Animations.Count > 1 || (c.Animations.Count == 1 && (!c.Animations[0].IsLegacy || c.Animations[0].Markers.Count > 0)));
+		}
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -473,10 +460,10 @@ namespace Lime
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
 			Animators = new AnimatorCollection(this);
-			Animations = new AnimationCollection(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = this;
+			Components.Add(new NodeUpdateBehaviour());
 			++CreatedCount;
 		}
 
@@ -501,16 +488,6 @@ namespace Lime
 			}
 			Nodes.Clear();
 			Animators.Dispose();
-		}
-
-		internal void RefreshRunningAnimationCount()
-		{
-			RunningAnimationCount = 0;
-			for (var a = FirstAnimation; a != null; a = a.Next) {
-				if (a.IsRunning) {
-					RunningAnimationCount++;
-				}
-			}
 		}
 
 		/// <summary>
@@ -612,17 +589,14 @@ namespace Lime
 			// it's important to initialize AsWidget and AsNode3D as sooon as possible since following clone process may access them
 			clone.AsWidget = clone as Widget;
 			clone.AsNode3D = clone as Node3D;
+			clone.Manager = null;
 			clone.Parent = null;
-			clone.FirstAnimation = null;
 			clone.FirstChild = null;
 			clone.NextSibling = null;
 			clone.gestures = null;
-			clone.Animations = Animations.Clone(clone);
 			clone.DescendantAnimatorsVersion = 0;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
-			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;
-			clone.LateBehaviours = NodeComponentCollection.EmptyBehaviors;
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
@@ -679,27 +653,6 @@ namespace Lime
 		{
 			Unlink();
 			Dispose();
-		}
-
-		/// <summary>
-		/// Advances animations of this node and calls Update of all its children.
-		/// Usually called once a frame.
-		/// </summary>
-		/// <param name="delta">Time delta since last Update.</param>
-		public virtual void Update(float delta)
-		{
-			foreach (var b in Behaviours) {
-				b.Update(delta);
-			}
-			AdvanceAnimation(delta);
-			for (var node = FirstChild; node != null;) {
-				var next = node.NextSibling;
-				node.Update(node.AnimationSpeed * delta);
-				node = next;
-			}
-			foreach (var b in LateBehaviours) {
-				b.LateUpdate(delta);
-			}
 		}
 
 		protected internal virtual RenderObject GetRenderObject() => null;
@@ -1034,19 +987,6 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Advances all running animations by provided delta.
-		/// </summary>
-		/// <param name="delta">Time delta (in seconds).</param>
-		public void AdvanceAnimation(float delta)
-		{
-			if (RunningAnimationCount > 0) {
-				for (var a = FirstAnimation; a != null; a = a.Next) {
-					a.Advance(delta);
-				}
-			}
-		}
-
-		/// <summary>
 		/// Loads all textures, fonts and animators for this node and for all its descendants.
 		/// Forces reloading of textures if they are null.
 		/// </summary>
@@ -1304,6 +1244,16 @@ namespace Lime
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;
+		}
+
+		public virtual void Update(float delta) { }
+
+		class NodeUpdateBehaviour : BehaviourComponent
+		{
+			protected internal override void Update(float delta)
+			{
+				Owner.Update(delta);
+			}
 		}
 
 		private class DescendantsEnumerable : IEnumerable<Node>

@@ -14,7 +14,7 @@ namespace Lime
 	{
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
-
+		
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -24,6 +24,8 @@ namespace Lime
 
 		public WindowWidget(IWindow window)
 		{
+			var manager = new NodeManager();
+			manager.AddNode(this);
 			WidgetContext = new WidgetContext(this);
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, WidgetContext);
@@ -51,8 +53,14 @@ namespace Lime
 			renderChain.GetRenderObjects(renderObjectList1);
 		}
 
+		private int level;
+
 		public override void Update(float delta)
 		{
+			if (level > 0) {
+				return;
+			}
+			level++;
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
@@ -77,7 +85,7 @@ namespace Lime
 
 			// Update the widget hierarchy.
 			context.MouseCursor = MouseCursor.Default;
-			base.Update(delta);
+			Manager.Update(delta);
 			Window.Cursor = context.MouseCursor;
 
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
@@ -93,6 +101,7 @@ namespace Lime
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
+			level--;
 		}
 
 		public void RenderAll()
