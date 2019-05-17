@@ -216,7 +216,11 @@ namespace Lime
 
 		public void CopyTo(TComponent[] array, int arrayIndex)
 		{
-			throw new NotImplementedException();
+			for (var i = 0; i < buckets.Length; i++) {
+				if (buckets[i].Key > 0) {
+					array[arrayIndex++] = buckets[i].Component;
+				}
+			}
 		}
 
 		private static class ComponentKeyResolver<T> where T : TComponent
