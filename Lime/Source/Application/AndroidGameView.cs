@@ -331,12 +331,9 @@ namespace Lime
 		{
 			if (EglTryMakeCurrent()) return;
 			var error = egl.EglGetError();
-			if (error == EGL11.EglContextLost) {
+			if (error == EGL11.EglBadSurface || error == EGL11.EglContextLost) {
 				OnEglContextLost();
-				if (EglTryMakeCurrent()) return;
-				error = egl.EglGetError();
 			}
-			throw new System.Exception($"Could not make current EGL context, error {GetEglErrorString(error)}");
 		}
 
 		private bool EglTryMakeCurrent()
@@ -366,7 +363,7 @@ namespace Lime
 		{
 			if (!egl.EglSwapBuffers(eglDisplay, eglSurface)) {
 				var error = egl.EglGetError();
-				if (error == EGL11.EglContextLost) {
+				if (error == EGL11.EglBadSurface || error == EGL11.EglContextLost) {
 					OnEglContextLost();
 				} else {
 					throw new System.Exception($"Could not swap buffers, error {GetEglErrorString(error)}");
@@ -376,8 +373,13 @@ namespace Lime
 
 		private void OnEglContextLost()
 		{
-			eglContext = null;
 			Logger.Write("EGL context lost");
+			DestroyEglContext();
+			CreateEglContext();
+			if (!EglTryMakeCurrent()) {
+				throw new System.Exception($"Could not make current EGL context, error {GetEglErrorString(egl.EglGetError())}");
+			}
+			PlatformRenderer.RaiseContextLost();
 		}
 
 		private void EnsureEglDisplayCreated()

@@ -278,6 +278,10 @@ namespace Lime
 		public static bool OffscreenRendering => CurrentRenderTarget != null;
 		public static event Action RenderTargetChanged;
 
+		public static event Action ContextLost;
+
+		internal static void RaiseContextLost() => ContextLost?.Invoke();
+
 		internal static void Initialize(IPlatformRenderContext context)
 		{
 			Context = context;
