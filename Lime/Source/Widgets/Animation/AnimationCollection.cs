@@ -93,15 +93,15 @@ namespace Lime
 		public void Run(string animationId, string markerId = null)
 		{
 			if (!TryRun(animationId, markerId)) {
-				//if (animationId != null && markerId != null) {
-				//	throw new Lime.Exception(string.Format("Unknown animation ({0}) or marker ({1})", animationId, markerId));
-				//} else if (animationId != null && markerId == null) {
-				//	throw new Lime.Exception(string.Format("Unknown animation ({0})", animationId));
-				//} else if (animationId == null && markerId != null) {
-				//	throw new Lime.Exception(string.Format("Unknown marker ({0})", markerId));
-				//} else {
-				//	throw new Lime.Exception("Unknown animation or marker");
-				//}
+				if (animationId != null && markerId != null) {
+					throw new Lime.Exception(string.Format("Unknown animation ({0}) or marker ({1})", animationId, markerId));
+				} else if (animationId != null && markerId == null) {
+					throw new Lime.Exception(string.Format("Unknown animation ({0})", animationId));
+				} else if (animationId == null && markerId != null) {
+					throw new Lime.Exception(string.Format("Unknown marker ({0})", markerId));
+				} else {
+					throw new Lime.Exception("Unknown animation or marker");
+				}
 			}
 		}
 

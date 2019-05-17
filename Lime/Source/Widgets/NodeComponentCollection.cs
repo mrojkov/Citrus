@@ -73,13 +73,13 @@ namespace Lime
 		protected internal override void Start()
 		{
 			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Add(this);
-			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Add(this);
+			Owner.Components.GetOrAdd<LateUpdateSubBehaviour>().Behaviors.Add(this);
 		}
 
 		protected internal override void Stop()
 		{
 			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Remove(this);
-			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Remove(this);
+			Owner.Components.GetOrAdd<LateUpdateSubBehaviour>().Behaviors.Remove(this);
 		}
 
 		public new virtual void Update(float delta)
@@ -90,6 +90,8 @@ namespace Lime
 		{
 		}
 
+		[UpdateAfterBehaviour(typeof(UpdateBehaviour))]
+		[UpdateBeforeBehaviour(typeof(TasksBehaviour))]
 		private class UpdateSubBehaviour : BehaviourComponent
 		{
 			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
@@ -102,6 +104,8 @@ namespace Lime
 			}
 		}
 
+		[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
+		[UpdateBeforeBehaviour(typeof(LateTasksBehaviour))]
 		private class LateUpdateSubBehaviour : BehaviourComponent
 		{
 			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
@@ -149,6 +153,7 @@ namespace Lime
 			for (int i = 0; i < buckets.Length; i++) {
 				if (buckets[i].Key > 0) {
 					buckets[i].Component.Owner = null;
+					owner?.Manager?.UnregisterComponent(buckets[i].Component);
 				}
 			}
 			base.Clear();

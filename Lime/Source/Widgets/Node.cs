@@ -1155,10 +1155,6 @@ namespace Lime
 				}
 			}
 
-			Animations.Clear();
-			var animations = content.Animations.ToList();
-			content.Animations.Clear();
-			Animations.AddRange(animations);
 			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
 				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
 				var node = content.Nodes[0];
@@ -1182,6 +1178,11 @@ namespace Lime
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
 						Components.Add(assetBundlePathComponent.Clone());
+					}
+					Components.Remove(typeof(AnimationBehaviour));
+					var animationBehaviour = content.Components.Get<AnimationBehaviour>();
+					if (animationBehaviour != null) {
+						Components.Add(animationBehaviour.Clone());
 					}
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
