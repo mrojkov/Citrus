@@ -68,6 +68,7 @@ namespace Lime
 			"ヽヾーァィゥェォッャュョヮヵヶぁぃぅぇぉっゃゅょゎゕゖㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ々〻";
 		const string NotAllowedAtTheEnd =
 			"$(*,£¥·‘“〈《「『【〔〖〝﹗﹙﹛＄（．［｛￡￥([｛〔〘｟«";
+		const string NotAllowedToSplit = "0123456789-";
 
 		internal static void AdjustLineBreakPosition(string text, ref int position)
 		{
@@ -75,6 +76,14 @@ namespace Lime
 				position -= 1;
 			} else if (position > 2 && NotAllowedAtTheEnd.IndexOf(text[position - 1]) >= 0) {
 				position -= 2;
+			}
+
+			while (
+				position > 1 &&
+				NotAllowedToSplit.IndexOf(text[position]) >= 0 &&
+				NotAllowedToSplit.IndexOf(text[position - 1]) >= 0
+			) {
+				position--;
 			}
 		}
 
