@@ -983,6 +983,7 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
+			return true;
 			if (!EnableViewCulling) {
 				return true;
 			}
