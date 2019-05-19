@@ -112,28 +112,84 @@ namespace Lime
 			Application.WindowUnderMouse = this;
 
 			var ccb = new ChoreographerCallback();
-			long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
-			ccb.OnFrame += frameTimeNanos => {
-				var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
-				var gw = ActivityDelegate.Instance.GameView;
-				prevFrameTime = frameTimeNanos;
-				if (Active && gw.IsSurfaceCreated) {
-					fpsCounter.Refresh();
-					gw.ProcessTextInput();
-					Update(delta);
-					if (AsyncRendering) {
-						renderCompleted.WaitOne();
-						renderCompleted.Reset();
-						RaiseSync();
-						gw.UnbindContext();
-						renderReady.Set();
-					} else {
-						RaiseSync();
-						Render();
-					}
-				}
-			};
+			ccb.OnFrame += OnFrame;
 			Choreographer.Instance.PostFrameCallback(ccb);
+		}
+		
+		UpdateState updateState;
+		
+		void OnFrame(long frameTimeNanos)
+		{
+			var _continue = true;
+			while (_continue) {
+				switch (updateState) {
+					case UpdateState.Update:
+						_continue = HandleUpdateState_Update(frameTimeNanos);
+						break;
+					case UpdateState.WaitForRender:
+						_continue = HandleUpdateState_WaitForRender();
+						break;
+					case UpdateState.RenderAsync:
+						_continue = HandleUpdateState_RenderAsync();
+						break;
+					case UpdateState.RenderSync:
+						_continue = HandleUpdateState_RenderSync();
+						break;
+				}
+			}
+		}
+		
+		long prevFrameTime = Java.Lang.JavaSystem.NanoTime();
+		
+		bool HandleUpdateState_Update(long frameTimeNanos)
+		{
+			var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
+			var gw = ActivityDelegate.Instance.GameView;
+			prevFrameTime = frameTimeNanos;
+			if (Active && gw.IsSurfaceCreated) {
+				fpsCounter.Refresh();
+				gw.ProcessTextInput();
+				Update(delta);
+				updateState = AsyncRendering ? UpdateState.WaitForRender : UpdateState.RenderSync;
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		bool HandleUpdateState_WaitForRender()
+		{
+			if (renderCompleted.WaitOne(100) && Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+				renderCompleted.Reset();
+				updateState = UpdateState.RenderAsync;
+				return true;
+			}
+			return false;
+		}
+		
+		bool HandleUpdateState_RenderAsync()
+		{
+			RaiseSync();
+			ActivityDelegate.Instance.GameView.UnbindContext();
+			renderReady.Set();
+			updateState = UpdateState.Update;
+			return false;
+		}
+		
+		bool HandleUpdateState_RenderSync()
+		{
+			RaiseSync();
+			Render();
+			updateState = UpdateState.Update;
+			return false;
+		}
+		
+		enum UpdateState
+		{
+			Update,
+			WaitForRender,
+			RenderAsync,
+			RenderSync
 		}
 
 		class ChoreographerCallback : Java.Lang.Object, Choreographer.IFrameCallback
