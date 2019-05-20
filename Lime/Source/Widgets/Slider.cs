@@ -6,7 +6,7 @@ namespace Lime
 	[TangerineRegisterNode(Order = 18)]
 	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
-	public class Slider : Widget
+	public class Slider : Widget, IUpdatableNode
 	{
 		[YuzuMember]
 		[TangerineKeyframeColor(7)]
@@ -49,6 +49,7 @@ namespace Lime
 			Value = 0;
 			Step = 0;
 			Awoke += Awake;
+			Components.Add(new UpdatableNodeBehaviour());
 		}
 
 		private static void Awake(Node owner)
@@ -83,9 +84,8 @@ namespace Lime
 			get { return Nodes.TryFind("Rail") as Spline; }
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (GloballyVisible && !GetTangerineFlag(TangerineFlags.SceneNode)) {
 				Advance();
 			}

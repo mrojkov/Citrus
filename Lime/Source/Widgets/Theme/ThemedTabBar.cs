@@ -181,9 +181,9 @@ namespace Lime
 			CompoundPresenter.Add(fill);
 		}
 
-		public override void Update(float delta)
+		public override void OnUpdate(float delta)
 		{
-			base.Update(delta);
+			base.OnUpdate(delta);
 			if (IsMouseOver()) {
 				fill.Color = Theme.Colors.CloseButtonFocusBorderHovered;
 			} else {

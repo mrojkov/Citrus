@@ -463,7 +463,6 @@ namespace Lime
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = this;
-			Components.Add(new NodeUpdateBehaviour());
 			++CreatedCount;
 		}
 
@@ -1247,16 +1246,6 @@ namespace Lime
 			return false;
 		}
 
-		public virtual void Update(float delta) { }
-
-		class NodeUpdateBehaviour : BehaviourComponent
-		{
-			protected internal override void Update(float delta)
-			{
-				Owner.Update(delta);
-			}
-		}
-
 		private class DescendantsEnumerable : IEnumerable<Node>
 		{
 			private readonly Node root;
@@ -1332,6 +1321,35 @@ namespace Lime
 					current = null;
 				}
 			}
+		}
+	}
+
+	public interface IUpdatableNode
+	{
+		void OnUpdate(float delta);
+	}
+
+	public static class NodeCompatibilityExtensions
+	{
+		public static void Update(this Node node, float delta)
+		{
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	[UpdateAfterBehaviour(typeof(UpdatedBehaviour))]
+	public class UpdatableNodeBehaviour : BehaviourComponent
+	{
+		private IUpdatableNode node;
+
+		protected internal override void Start()
+		{
+			node = (IUpdatableNode)Owner;
+		}
+
+		protected internal override void Update(float delta)
+		{
+			node.OnUpdate(delta);
 		}
 	}
 }

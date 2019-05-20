@@ -51,7 +51,7 @@ namespace Lime
 						var oldTrigger = Trigger;
 						Trigger = attachment.EntryTrigger;
 						TriggerMultipleAnimations(Trigger);
-						Update(0);
+						this.Update(0);
 						Trigger = oldTrigger;
 						if (blender != null) {
 							blender.Enabled = enabledBlending;

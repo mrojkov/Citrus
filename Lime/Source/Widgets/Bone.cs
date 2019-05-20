@@ -71,7 +71,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 5)]
 	[TangerineVisualHintGroup("/All/Nodes/Bones")]
-	public class Bone : Node
+	public class Bone : Node, IUpdatableNode
 	{
 		[YuzuMember]
 		[TangerineKeyframeColor(10)]
@@ -136,11 +136,11 @@ namespace Lime
 			EffectiveRadius = 100;
 			FadeoutZone = 50;
 			IKStopper = true;
+			Components.Add(new UpdatableNodeBehaviour());
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;
 				e.Joint = Position;

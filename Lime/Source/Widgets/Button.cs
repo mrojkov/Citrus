@@ -9,7 +9,7 @@ namespace Lime
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[TangerineAllowedChildrenTypes(typeof(Node))]
 	[TangerineVisualHintGroup("/All/Nodes/Containers")]
-	public class Button : Widget
+	public class Button : Widget, IUpdatableNode
 	{
 		private TextPresentersFeeder textPresentersFeeder;
 		private IEnumerator<int> stateHandler;
@@ -43,6 +43,7 @@ namespace Lime
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
 			Awoke += Awake;
+			Components.Add(new UpdatableNodeBehaviour());
 		}
 
 		private void SetState(IEnumerator<int> newState)
@@ -185,9 +186,8 @@ namespace Lime
 			SetState(NormalState());
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (GloballyVisible) {
 				stateHandler.MoveNext();
 				textPresentersFeeder.Update();

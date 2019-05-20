@@ -11,7 +11,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 4)]
 	[TangerineVisualHintGroup("/All/Nodes/Media")]
-	public sealed class Movie : Widget, IImageCombinerArg
+	public sealed class Movie : Widget, IImageCombinerArg, IUpdatableNode
 	{
 		bool skipRender;
 		bool textureInitialized;
@@ -38,6 +38,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			movieTexture = new MovieTexture();
+			Components.Add(new UpdatableNodeBehaviour());
 		}
 
 		public override Vector2 CalcContentSize()
@@ -71,9 +72,8 @@ namespace Lime
 			skipRender = false;
 		}
 
-		public override void Update(float delta)
+		public void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			movieTexture.Looped = Looped;
 			movieTexture.Update(delta);
 		}

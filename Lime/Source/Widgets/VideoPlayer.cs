@@ -15,7 +15,7 @@ namespace Lime
 		Finished,
 	}
 
-	public class VideoPlayer : Image
+	public class VideoPlayer : Image, IUpdatableNode
 	{
 		public bool Looped
 		{
@@ -50,6 +50,7 @@ namespace Lime
 		public VideoPlayer()
 		{
 			Anchors = Anchors.LeftRightTopBottom;
+			Components.Add(new UpdatableNodeBehaviour());
 		}
 
 		public VideoPlayer(Widget parentWidget)
@@ -59,9 +60,8 @@ namespace Lime
 			Anchors = Anchors.LeftRightTopBottom;
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (decoder != null) {
 				decoder.Update(delta);
 				Texture = decoder.Texture;

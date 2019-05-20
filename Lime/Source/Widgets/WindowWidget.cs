@@ -53,14 +53,8 @@ namespace Lime
 			renderChain.GetRenderObjects(renderObjectList1);
 		}
 
-		private int level;
-
-		public override void Update(float delta)
+		public virtual void Update(float delta)
 		{
-			if (level > 0) {
-				return;
-			}
-			level++;
 			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
@@ -101,7 +95,6 @@ namespace Lime
 			renderChain.Clear();
 			renderChain.ClipRegion = new Rectangle(Vector2.Zero, Size);
 			RenderChainBuilder?.AddToRenderChain(renderChain);
-			level--;
 		}
 
 		public void RenderAll()
