@@ -279,6 +279,16 @@ namespace Tangerine.Core
 				}
 			}
 
+			private static void SafeUpdate(Animation animation, float delta)
+			{
+				var remainDelta = delta;
+				do {
+					delta = Mathf.Min(remainDelta, Application.MaxDelta);
+					animation.Owner.Update(delta);
+					remainDelta -= delta;
+				} while (remainDelta > 0f);
+			}
+
 			internal static void FastForwardToFrame(Animation animation, int frame)
 			{
 				// Try to decrease error in node.AnimationTime by call node.Update several times
@@ -287,7 +297,7 @@ namespace Tangerine.Core
 				do {
 					forwardDelta = CalcDeltaToFrame(animation, frame);
 					var delta = Mathf.Min(forwardDelta, OptimalDelta);
-					animation.Owner.Update(delta);
+					SafeUpdate(animation, delta);
 				} while (forwardDelta > OptimalDelta);
 			}
 
