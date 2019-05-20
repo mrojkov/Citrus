@@ -99,6 +99,7 @@ namespace Lime
 		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>();
 		private List<BehaviourFamily> behaviourFamilyQueue = new List<BehaviourFamily>();
 		private bool behaviourFamilyQueueDirty = false;
+		private Stack<int> deadIndices = new Stack<int>();
 
 		public void Update(float delta)
 		{
@@ -120,9 +121,21 @@ namespace Lime
 				behaviourFamilyQueueDirty = false;
 			}
 			foreach (var bf in behaviourFamilyQueue) {
-				ProcessRemovals(bf);
 				for (var i = 0; i < bf.Behaviours.Count; i++) {
-					bf.Behaviours[i]?.Update(delta);
+					var b = bf.Behaviours[i];
+					if (b != null) {
+						b.Update(delta);
+					} else {
+						deadIndices.Push(i);
+					}
+				}
+				while (deadIndices.Count > 0) {
+					var index = deadIndices.Pop();
+					bf.Behaviours[index] = bf.Behaviours[bf.Behaviours.Count - 1];
+					if (bf.Behaviours[index] != null) {
+						bf.Behaviours[index].IndexInFamily = index;
+					}
+					bf.Behaviours.RemoveAt(bf.Behaviours.Count - 1);
 				}
 			}
 		}
@@ -171,33 +184,11 @@ namespace Lime
 		public void Remove(BehaviourComponent behaviour)
 		{
 			if (!pendingBehaviours.Remove(behaviour)) {
-				var family = behaviour.Family;
-				family.Behaviours[behaviour.IndexInFamily] = null;
-				family.Removals.Add(behaviour.IndexInFamily);
+				behaviour.Family.Behaviours[behaviour.IndexInFamily] = null;
 				behaviour.Family = null;
 				behaviour.IndexInFamily = -1;
 				behaviour.Stop();
 			}
-		}
-
-		private void ProcessRemovals(BehaviourFamily family)
-		{
-			//foreach (var i in family.Removals) {
-			//	var lastIndex = family.Behaviours.Count - 1;
-			//	while (lastIndex >= 0 && family.Behaviours[lastIndex] == null) {
-			//		family.Behaviours.RemoveAt(lastIndex);
-			//		lastIndex--;
-			//	}
-			//	if (lastIndex < 0) {
-			//		break;
-			//	}
-			//	if (i > lastIndex) {
-			//		continue;
-			//	}
-			//	family.Behaviours[i] = family.Behaviours[lastIndex];
-			//	family.Behaviours[i].IndexInFamily = i;
-			//	family.Behaviours.RemoveAt(lastIndex);
-			//}
 		}
 
 		private int GetBehaviourFamilyIndex(Type behaviourType)
@@ -246,7 +237,6 @@ namespace Lime
 	{
 		public readonly Type BehaviourType;
 		public readonly List<BehaviourComponent> Behaviours = new List<BehaviourComponent>();
-		public readonly List<int> Removals = new List<int>();
 
 		public BehaviourFamily(Type behaviourType)
 		{
