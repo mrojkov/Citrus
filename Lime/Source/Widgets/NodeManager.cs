@@ -72,9 +72,19 @@ namespace Lime
 			}
 		}
 
+		private bool updating = false;
+
 		public void Update(float delta)
 		{
-			behaviourSystem.Update(delta);
+			if (updating) {
+				throw new InvalidOperationException();
+			}
+			try {
+				updating = true;
+				behaviourSystem.Update(delta);
+			} finally {
+				updating = false;
+			}
 		}
 	}
 
