@@ -159,10 +159,15 @@ namespace Lime
 		
 		bool HandleUpdateState_WaitForRender()
 		{
-			if (renderCompleted.WaitOne(100) && Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
-				renderCompleted.Reset();
-				updateState = UpdateState.RenderAsync;
-				return true;
+			if (renderCompleted.WaitOne(100)) {
+				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+					renderCompleted.Reset();
+					updateState = UpdateState.RenderAsync;
+					return true;
+				} else {
+					updateState = UpdateState.Update;
+					return false;
+				}
 			}
 			return false;
 		}
