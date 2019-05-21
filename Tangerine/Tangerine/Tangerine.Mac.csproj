@@ -97,6 +97,7 @@
     <Compile Include="MainMenu\ToolsMenu.cs" />
     <Compile Include="MainMenu\SystemMenu.cs" />
     <Compile Include="Panels\AnimationsPanel.cs" />
+    <Compile Include="MainMenu\OrangeMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

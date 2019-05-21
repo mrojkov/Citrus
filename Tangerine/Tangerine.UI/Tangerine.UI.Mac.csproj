@@ -104,7 +104,6 @@
     <Compile Include="Docking\DockHierarchy.cs" />
     <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="Utils\DropSceneContextMenu.cs" />
-    <Compile Include="OrangeCommandHandler.cs" />
     <Compile Include="PropertyEditors\AnchorsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AudioSamplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\BlendingPropertyEditor.cs" />

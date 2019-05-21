@@ -57,6 +57,7 @@
     <Compile Include="CommandHandlers.cs" />
     <Compile Include="Dialogs\RenderToPngSequenceDialog.cs" />
     <Compile Include="MainMenu\GitMenu.cs" />
+    <Compile Include="MainMenu\OrangeMenu.cs" />
     <Compile Include="MainMenu\ToolsMenu.cs" />
     <Compile Include="MainMenu\SystemMenu.cs" />
     <Compile Include="Panels\AnimationsPanel.cs" />
