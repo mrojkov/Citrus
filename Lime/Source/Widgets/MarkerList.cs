@@ -162,10 +162,9 @@ namespace Lime
 					i++;
 				}
 				if (markers[i].Frame == marker.Frame) {
-					markers[i] = marker;
-				} else {
-					markers.Insert(i, marker);
+					throw new InvalidOperationException("There's already a marker on that position");
 				}
+				markers.Insert(i, marker);
 			}
 			marker.Owner = owner;
 			owner?.InvalidateCache();
