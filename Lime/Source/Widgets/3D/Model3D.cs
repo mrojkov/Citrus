@@ -48,11 +48,21 @@ namespace Lime
 							enabledBlending = blender.Enabled;
 							blender.Enabled = false;
 						}
+
+						// TODO: Move this to Orange.FbxModelImporter
 						var oldTrigger = Trigger;
 						Trigger = attachment.EntryTrigger;
 						TriggerMultipleAnimations(Trigger);
-						this.Update(0);
+						var animationBehaviour = Components.Get<AnimationBehaviour>();
+						if (animationBehaviour != null) {
+							foreach (var a in animationBehaviour.Animations) {
+								if (a.IsRunning) {
+									a.Advance(0);
+								}
+							}
+						}
 						Trigger = oldTrigger;
+
 						if (blender != null) {
 							blender.Enabled = enabledBlending;
 						}
