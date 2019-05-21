@@ -703,7 +703,9 @@ namespace Tangerine.Core.Operations
 				var backup = new Backup {
 					Marker = Document.Current.Animation.Markers.GetByFrame(op.marker.Frame)
 				};
-
+				if (backup.Marker != null) {
+					Document.Current.Animation.Markers.Remove(backup.Marker);
+				}
 				op.Save(backup);
 				Document.Current.Animation.Markers.AddOrdered(op.marker);
 
