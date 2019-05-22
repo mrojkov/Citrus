@@ -228,6 +228,7 @@ namespace Tangerine
 				CommandHandlerList.Global.Disconnect(command);
 			}
 			orangeCommands.Clear();
+			OrangeBuildCommand.Instance = null;
 			orangeMenuCommand.Enabled = citprojPath != null;
 			if (!orangeMenuCommand.Enabled) {
 				return;
@@ -247,7 +248,7 @@ namespace Tangerine
 			var build = orangeMenuItems.First(item => item.Label == BuildLabel);
 			var cookGameAssets = orangeMenuItems.First(item => item.Label == CookGameAssetsLabel);
 			AddOrangeCommand(OrangeCommands.Run, new OrangeCommand(() => buildAndRun.Action()));
-			AddOrangeCommand(OrangeCommands.Build, new OrangeCommand(() => build.Action()));
+			AddOrangeCommand(OrangeCommands.Build, OrangeBuildCommand.Instance = new OrangeBuildCommand(build.Action));
 			AddOrangeCommand(OrangeCommands.RunConfig, new OrangePluginOptionsCommand());
 			AddOrangeCommand(OrangeCommands.CookGameAssets, new OrangeCommand(() => cookGameAssets.Action()));
 			foreach (var menuItem in orangeMenuItems) {
