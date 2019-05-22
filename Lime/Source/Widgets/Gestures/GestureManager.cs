@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Lime
@@ -49,21 +46,26 @@ namespace Lime
 
 		protected virtual IEnumerable<Gesture> EnumerateGestures(Node node)
 		{
-			var noClickGesturesAnymore = false;
-			while (node != null) {
+			var noMoreClicks = new bool[3];
+			var noMoreDoubleClicks = new bool[3];
+			for (; node != null; node = node.Parent) {
 				if (node.HasGestures()) {
-					var anyClickGesture = false;
-					foreach (var r in node.Gestures) {
-						bool isWrongGesture = r is ClickGesture || r is DoubleClickGesture;
-						if (isWrongGesture && noClickGesturesAnymore) {
-							continue;
+					foreach (var g in node.Gestures) {
+						if (g is ClickGesture cg) {
+							if (noMoreClicks[cg.ButtonIndex]) {
+								continue;
+							}
+							noMoreClicks[cg.ButtonIndex] = true;
 						}
-						anyClickGesture |= isWrongGesture;
-						yield return r;
+						if (g is DoubleClickGesture dcg) {
+							if (noMoreDoubleClicks[dcg.ButtonIndex]) {
+								continue;
+							}
+							noMoreDoubleClicks[dcg.ButtonIndex] = true;
+						}
+						yield return g;
 					}
-					noClickGesturesAnymore |= anyClickGesture;
 				}
-				node = node.Parent;
 			}
 		}
 	}
