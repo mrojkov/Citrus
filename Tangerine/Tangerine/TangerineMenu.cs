@@ -240,11 +240,14 @@ namespace Tangerine
 			}
 			var orangeMenuItems = Orange.MenuController.Instance.GetVisibleAndSortedItems();
 			const string BuildAndRunLabel = "Build and Run";
+			const string BuildLabel = "Build";
 			const string CookGameAssetsLabel = "Cook Game Assets";
-			var blacklist = new HashSet<string> { "Run Tangerine", BuildAndRunLabel, CookGameAssetsLabel };
+			var blacklist = new HashSet<string> { "Run Tangerine", BuildAndRunLabel, BuildLabel, CookGameAssetsLabel };
 			var buildAndRun = orangeMenuItems.First(item => item.Label == BuildAndRunLabel);
+			var build = orangeMenuItems.First(item => item.Label == BuildLabel);
 			var cookGameAssets = orangeMenuItems.First(item => item.Label == CookGameAssetsLabel);
 			AddOrangeCommand(OrangeCommands.Run, new OrangeCommand(() => buildAndRun.Action()));
+			AddOrangeCommand(OrangeCommands.Build, new OrangeCommand(() => build.Action()));
 			AddOrangeCommand(OrangeCommands.RunConfig, new OrangePluginOptionsCommand());
 			AddOrangeCommand(OrangeCommands.CookGameAssets, new OrangeCommand(() => cookGameAssets.Action()));
 			foreach (var menuItem in orangeMenuItems) {
