@@ -193,7 +193,7 @@ namespace Lime
 
 		public void Remove(BehaviourComponent behaviour)
 		{
-			if (!pendingBehaviours.Remove(behaviour)) {
+			if (!pendingBehaviours.Remove(behaviour) && behaviour.Family != null) {
 				behaviour.Family.Behaviours[behaviour.IndexInFamily] = null;
 				behaviour.Family = null;
 				behaviour.IndexInFamily = -1;

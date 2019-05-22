@@ -77,8 +77,6 @@ namespace Lime
 			All = ~None
 		}
 
-		private NodeManager manager;
-
 		public NodeManager Manager { get; internal set; }
 
 		/// <summary>
@@ -1331,25 +1329,108 @@ namespace Lime
 
 	public static class NodeCompatibilityExtensions
 	{
+		private static void RegisterLegacyBehaviours(Node node)
+		{
+			foreach (var component in node.Components) {
+				if (component is NodeBehavior legacyBehaviour) {
+					legacyBehaviour.Register();
+				}
+			}
+		}
+
 		public static void Update(this Node node, float delta)
 		{
+			RegisterLegacyBehaviours(node);
+			var legacyBehaviourContainer = node.Components.Get<LegacyBehaviourContainer>();
+			if (legacyBehaviourContainer != null) {
+				legacyBehaviourContainer.Update(delta);
+			}
+			var animationBehaviour = node.Components.Get<AnimationBehaviour>();
+			if (animationBehaviour != null) {
+				animationBehaviour.Update(delta);
+			}
+			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+				Update(child, delta);
+			}
+			RegisterLegacyBehaviours(node);
+			var legacyLateBehaviourContainer = node.Components.Get<LegacyLateBehaviourContainer>();
+			if (legacyLateBehaviourContainer != null) {
+				legacyLateBehaviourContainer.Update(delta);
+			}
+			var updatableNodeBehaviour = node.Components.Get<UpdatableNodeBehaviour>();
+			if (updatableNodeBehaviour != null) {
+				updatableNodeBehaviour.CheckOwner();
+				updatableNodeBehaviour.Update(delta);
+			}
 		}
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateAfterBehaviour(typeof(UpdatedBehaviour))]
+	[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
 	public class UpdatableNodeBehaviour : BehaviourComponent
 	{
 		private IUpdatableNode node;
 
-		protected internal override void Start()
+		internal void CheckOwner()
 		{
 			node = (IUpdatableNode)Owner;
+		}
+
+		protected internal override void Start()
+		{
+			CheckOwner();
 		}
 
 		protected internal override void Update(float delta)
 		{
 			node.OnUpdate(delta);
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	public class AnimationBehaviour : BehaviourComponent
+	{
+		internal int RunningAnimationCount;
+
+		public AnimationCollection Animations { get; private set; }
+
+		public Animation DefaultAnimation
+		{
+			get {
+				foreach (var a in Animations) {
+					if (a.IsLegacy) {
+						return a;
+					}
+				}
+				var newAnimation = new Animation() { IsLegacy = true };
+				Animations.Add(newAnimation);
+				return newAnimation;
+			}
+		}
+
+		public AnimationBehaviour()
+		{
+			Animations = new AnimationCollection(this);
+		}
+
+		protected internal override void Update(float delta)
+		{
+			if (RunningAnimationCount > 0) {
+				foreach (var a in Animations) {
+					a.Advance(delta);
+				}
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (AnimationBehaviour)base.Clone();
+			clone.RunningAnimationCount = 0;
+			clone.Animations = new AnimationCollection(clone);
+			foreach (var a in Animations) {
+				clone.Animations.Add(a.Clone());
+			}
+			return clone;
 		}
 	}
 }

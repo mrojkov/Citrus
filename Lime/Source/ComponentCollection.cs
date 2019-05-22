@@ -49,7 +49,7 @@ namespace Lime
 
 		public bool IsReadOnly => false;
 
-		public bool Contains(TComponent component) => ContainsKey(component.GetKey());
+		public virtual bool Contains(TComponent component) => ContainsKey(component.GetKey());
 		public bool Contains<T>() where T : TComponent => ContainsKey(ComponentKeyResolver<T>.Key);
 		public bool Contains(Type type) => ContainsKey(Component.GetKeyForType(type));
 

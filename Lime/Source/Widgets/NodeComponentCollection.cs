@@ -55,31 +55,60 @@ namespace Lime
 		public virtual void Dispose() { }
 	}
 
-	//public class NodeBehavior : NodeComponent
-	//{
-	//	public virtual int Order => 0;
-
-	//	public virtual void Update(float delta) { }
-	//	public virtual void LateUpdate(float delta) { }
-	//}
-
 	public class NodeBehavior : BehaviourComponent
 	{
-		private UpdateSubBehaviour ub;
-		private LateUpdateSubBehaviour lub;
+		private bool registered;
+		private LegacyBehaviourContainer behaviourContainer;
+		private LegacyLateBehaviourContainer lateBehaviourContainer;
 
 		public virtual int Order => 0;
 
+		public void Register()
+		{
+			if (!registered) {
+				if (behaviourUpdateChecker.Value.IsMethodOverriden(GetType())) {
+					behaviourContainer = Owner.Components.GetOrAdd<LegacyBehaviourContainer>();
+					behaviourContainer.Add(this);
+				}
+				if (behaviourLateUpdateChecker.Value.IsMethodOverriden(GetType())) {
+					lateBehaviourContainer = Owner.Components.GetOrAdd<LegacyLateBehaviourContainer>();
+					lateBehaviourContainer.Add(this);
+				}
+				registered = true;
+			}
+		}
+
 		protected internal override void Start()
 		{
-			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Add(this);
-			Owner.Components.GetOrAdd<LateUpdateSubBehaviour>().Behaviors.Add(this);
+			Register();
 		}
 
 		protected internal override void Stop()
 		{
-			Owner.Components.GetOrAdd<UpdateSubBehaviour>().Behaviors.Remove(this);
-			Owner.Components.GetOrAdd<LateUpdateSubBehaviour>().Behaviors.Remove(this);
+			RemoveFromContainer(behaviourContainer);
+			RemoveFromContainer(lateBehaviourContainer);
+			behaviourContainer = null;
+			lateBehaviourContainer = null;
+			registered = false;
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (NodeBehavior)base.Clone();
+			clone.behaviourContainer = null;
+			clone.lateBehaviourContainer = null;
+			clone.registered = false;
+			return clone;
+		}
+
+		private void RemoveFromContainer(LegacyBehaviourContainerBase container)
+		{
+			if (container != null) {
+				container.Remove(this);
+				if (container.IsEmpty) {
+					container.Owner?.Components.Remove(container);
+				}
+			}
 		}
 
 		public new virtual void Update(float delta)
@@ -90,32 +119,85 @@ namespace Lime
 		{
 		}
 
-		[UpdateAfterBehaviour(typeof(UpdateBehaviour))]
-		[UpdateBeforeBehaviour(typeof(TasksBehaviour))]
-		private class UpdateSubBehaviour : BehaviourComponent
-		{
-			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourUpdateChecker =
+			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
 
-			protected internal override void Update(float delta)
+		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =
+			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
+
+		private class OverridenBehaviourMethodChecker
+		{
+			private readonly string methodName;
+			private readonly Dictionary<Type, bool> checkedTypes = new Dictionary<Type, bool>();
+
+			public OverridenBehaviourMethodChecker(string methodName)
 			{
-				foreach (var b in Behaviors) {
-					b.Update(delta);
+				this.methodName = methodName;
+			}
+
+			public bool IsMethodOverriden(Type type)
+			{
+				bool result;
+				if (!checkedTypes.TryGetValue(type, out result)) {
+					result = type.GetMethod(methodName).DeclaringType != typeof(NodeBehavior);
+					checkedTypes.Add(type, result);
 				}
+				return result;
 			}
 		}
+	}
 
-		[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
-		[UpdateBeforeBehaviour(typeof(LateTasksBehaviour))]
-		private class LateUpdateSubBehaviour : BehaviourComponent
+	[NodeComponentDontSerialize]
+	[UpdateBeforeBehaviour(typeof(AnimationBehaviour))]
+	public class LegacyBehaviourContainer : LegacyBehaviourContainerBase
+	{
+		protected internal override void Update(float delta)
 		{
-			public List<NodeBehavior> Behaviors = new List<NodeBehavior>();
-
-			protected internal override void Update(float delta)
-			{
-				foreach (var b in Behaviors) {
-					b.LateUpdate(delta);
-				}
+			foreach (var b in behaviours) {
+				b.Update(delta);
 			}
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
+	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
+	public class LegacyLateBehaviourContainer : LegacyBehaviourContainerBase
+	{
+		protected internal override void Update(float delta)
+		{
+			foreach (var b in behaviours) {
+				b.LateUpdate(delta);
+			}
+		}
+	}
+
+	public class LegacyBehaviourContainerBase : BehaviourComponent
+	{
+		protected readonly List<NodeBehavior> behaviours = new List<NodeBehavior>();
+
+		public bool IsEmpty => behaviours.Count == 0;
+
+		internal void Add(NodeBehavior b)
+		{
+			var index = 0;
+			while (index < behaviours.Count && behaviours[index].Order < b.Order) {
+				index++;
+			}
+			behaviours.Insert(index, b);
+		}
+
+		internal void Remove(NodeBehavior b)
+		{
+			behaviours.Remove(b);
+		}
+
+		public override NodeComponent Clone()
+		{
+			// TODO: This component shold not be cloned
+			var clone = (LegacyBehaviourContainerBase)base.Clone();
+			clone.behaviours.Clear();
+			return clone;
 		}
 	}
 
@@ -140,7 +222,8 @@ namespace Lime
 
 		public override bool Remove(NodeComponent component)
 		{
-			if (base.Remove(component)) {
+			if (component != null && component.Owner == owner) {
+				base.Remove(component);
 				component.Owner = null;
 				owner?.Manager?.UnregisterComponent(component);
 				return true;
@@ -157,6 +240,11 @@ namespace Lime
 				}
 			}
 			base.Clear();
+		}
+
+		public override bool Contains(NodeComponent component)
+		{
+			return component != null && component.Owner == owner;
 		}
 
 		[global::Yuzu.YuzuSerializeItemIf]
