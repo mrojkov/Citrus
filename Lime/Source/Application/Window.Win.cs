@@ -310,6 +310,9 @@ namespace Lime
 			private static Graphics.Platform.Vulkan.PlatformRenderContext platformRenderContext;
 
 			private Graphics.Platform.Vulkan.Swapchain swapchain;
+			private bool canRender;
+
+			public override bool CanRender => canRender;
 
 			protected override void OnHandleCreated(EventArgs e)
 			{
@@ -330,8 +333,10 @@ namespace Lime
 			protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
 			{
 				base.SetBoundsCore(x, y, width, height, specified);
+				canRender = false;
 				if (width != 0 && height != 0) {
 					swapchain.Resize(ClientSize.Width, ClientSize.Height);
+					canRender = true;
 				}
 			}
 
@@ -353,6 +358,8 @@ namespace Lime
 		private abstract class RenderControl : UserControl
 		{
 			public bool VSync { get; set; }
+
+			public virtual bool CanRender => true;
 
 			public event Action BeforeBoundsChanged;
 
@@ -798,7 +805,7 @@ namespace Lime
 			switch (renderingState) {
 				case RenderingState.Updated:
 					PixelScale = CalcPixelScale(e.Graphics.DpiX);
-					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed) {
+					if (!AsyncRendering && renderControl.IsHandleCreated && form.Visible && !renderControl.IsDisposed && renderControl.CanRender) {
 						renderControl.Begin();
 						RaiseRendering();
 						renderControl.SwapBuffers();
@@ -841,14 +848,16 @@ namespace Lime
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
 				renderControl.Invalidate();
 			}
-			renderingState = RenderingState.Updated;
-			if (AsyncRendering) {
-				renderCompleted.WaitOne();
-				renderCompleted.Reset();
-			}
-			RaiseSync();
-			if (AsyncRendering) {
-				renderReady.Set();
+			renderingState = renderControl.CanRender ? RenderingState.Updated : RenderingState.Rendered;
+			if (renderControl.CanRender) {
+				if (AsyncRendering) {
+					renderCompleted.WaitOne();
+					renderCompleted.Reset();
+				}
+				RaiseSync();
+				if (AsyncRendering) {
+					renderReady.Set();
+				}
 			}
 		}
 
