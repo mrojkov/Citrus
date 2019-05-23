@@ -19,6 +19,7 @@ namespace Tangerine.UI.Timeline
 				Layout = new StackLayout { VerticallySizeable = true },
 				ClipChildren = ClipMethod.ScissorTest,
 				HitTestTarget = true,
+				Input = { AcceptMouseThroughDescendants = true },
 			};
 			ContentWidget = new Widget {
 				Padding = new Thickness { Top = 1, Bottom = 1 },
