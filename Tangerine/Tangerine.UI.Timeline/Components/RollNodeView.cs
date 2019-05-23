@@ -91,6 +91,7 @@ namespace Tangerine.UI.Timeline.Components
 			lockButton = CreateLockButton();
 			lockAnimationButton = CreateLockAnimationButton();
 			widget = new Widget {
+				HitTestTarget = true,
 				Padding = new Thickness { Right = 2 },
 				MinHeight = TimelineMetrics.DefaultRowHeight,
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
@@ -113,14 +114,22 @@ namespace Tangerine.UI.Timeline.Components
 			label.AddChangeWatcher(() => IsGrayedLabel(nodeData.Node), s => RefreshLabel());
 			label.AddChangeWatcher(() => nodeData.Node.ContentsPath, s => RefreshLabel());
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
-			nodeIcon.Gestures.Add(new DoubleClickGesture(() => {
+			nodeIdEditor = new ObjectIdInplaceEditor(row, nodeData.Node, label, editBoxContainer);
+			label.HitTestTarget = true;
+			label.Gestures.Add(new DoubleClickGesture(() => {
 				Document.Current.History.DoTransaction(() => {
-					Core.Operations.ClearRowSelection.Perform();
-					Core.Operations.SelectRow.Perform(row);
-					Rename();
+					if (NodeData.Node.EditorState().Locked) {
+						return;
+					}
+					var labelExtent = label.MeasureUncutText();
+					if (label.LocalMousePosition().X < labelExtent.X) {
+						nodeIdEditor.Rename();
+					} else {
+						EnterNode.Perform(nodeData.Node);
+					}
 				});
 			}));
-			nodeIdEditor = new ObjectIdInplaceEditor(row, nodeData.Node, label, editBoxContainer);
+			widget.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 		}
 
 		public Widget Widget => widget;
@@ -278,18 +287,10 @@ namespace Tangerine.UI.Timeline.Components
 
 		public void Rename()
 		{
-			if (NodeData.Node.EditorState().Locked) {
-				return;
-			}
-			var labelExtent = label.MeasureUncutText();
-			if (label.LocalMousePosition().X < labelExtent.X) {
-				nodeIdEditor.Rename();
-			} else {
-				Core.Operations.EnterNode.Perform(nodeData.Node);
-			}
+			nodeIdEditor.Rename();
 		}
 
-		public void ShowContextMenu()
+		private void ShowContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {
@@ -306,13 +307,7 @@ namespace Tangerine.UI.Timeline.Components
 				Command.Paste,
 				Command.Delete,
 				Command.MenuSeparator,
-				new Command("Rename", () => {
-					Document.Current.History.DoTransaction(() => {
-						Core.Operations.ClearRowSelection.Perform();
-						Core.Operations.SelectRow.Perform(row);
-						Rename();
-					});
-				}),
+				new Command("Rename", Rename),
 				new Command("Color mark",
 					(submenu = new Menu {
 						CreateSetColorMarkCommand("No Color", 0),
@@ -387,13 +382,13 @@ namespace Tangerine.UI.Timeline.Components
 				editBoxContainer.Visible = true;
 				// refresh edit box text, since dataflows for coalesced property value wont refresh it when editBox is invisible
 				editBox.Text = (string)propEditor.EditorParams.PropertyInfo.GetValue(obj);
-				editBox.SetFocus();
 				((WindowWidget)editBoxContainer.GetRoot()).Window.Activate();
 				editBoxContainer.Tasks.Add(EditObjectIdTask());
 			}
 
 			IEnumerator<object> EditObjectIdTask()
 			{
+				editBox.SetFocus();
 				while (editBox.IsFocused()) {
 					yield return null;
 					if (!row.Selected) {

@@ -62,18 +62,26 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			trackIdEditor = new RollNodeView.ObjectIdInplaceEditor(row, Track, label, editBoxContainer);
 			label.AddChangeWatcher(() => Track.Id, s => label.Text = s);
+			label.HitTestTarget = true;
+			label.Gestures.Add(new DoubleClickGesture(() => {
+				Document.Current.History.DoTransaction(() => {
+					if (trackRow.Locked) {
+						return;
+					}
+					var labelExtent = label.MeasureUncutText();
+					if (label.LocalMousePosition().X < labelExtent.X) {
+						Rename();
+					}
+				});
+			}));
+			Widget.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 			Widget.Components.Add(new AwakeBehavior());
 			Widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
 		}
 
 		public void Rename()
 		{
-			Document.Current.History.DoTransaction(() => {
-				var labelExtent = label.MeasureUncutText();
-				if (label.LocalMousePosition().X < labelExtent.X) {
-					trackIdEditor.Rename();
-				}
-			});
+			trackIdEditor.Rename();
 		}
 
 		ToolbarButton CreateEyeButton()
@@ -105,7 +113,7 @@ namespace Tangerine.UI.Timeline.Components
 			return button;
 		}
 
-		public void ShowContextMenu()
+		private void ShowContextMenu()
 		{
 			Document.Current.History.DoTransaction(() => {
 				if (!row.Selected) {
@@ -119,7 +127,9 @@ namespace Tangerine.UI.Timeline.Components
 				Command.Cut,
 				Command.Copy,
 				Command.Paste,
-				Command.Delete
+				Command.Delete,
+				Command.MenuSeparator,
+				new Command("Rename", Rename),
 			};
 			menu.Popup();
 		}

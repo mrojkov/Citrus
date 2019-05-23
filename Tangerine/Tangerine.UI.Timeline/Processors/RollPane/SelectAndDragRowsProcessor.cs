@@ -377,15 +377,6 @@ namespace Tangerine.UI.Timeline
 					input.ConsumeKey(Key.Mouse0);
 				}
 			}));
-			roll.RootWidget.Gestures.Add(new DoubleClickGesture(() => {
-				Document.Current.History.DoTransaction(() => {
-					var row = RowUnderMouse(input.MousePosition);
-					var rowView = row.Components.Get<RowView>();
-					rowView?.RollRow.Rename();
-				});
-			}));
-			roll.RootWidget.Gestures.Add(new ClickGesture(1, () =>
-				RowUnderMouse(input.MousePosition).Components.Get<RowView>()?.RollRow.ShowContextMenu()));
 			var dg = new DragGesture(0);
 			dg.Recognized += () => {
 				var row = RowUnderMouse(input.MousePosition);

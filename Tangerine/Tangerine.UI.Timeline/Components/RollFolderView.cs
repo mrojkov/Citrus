@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
+using System;
 
 namespace Tangerine.UI.Timeline.Components
 {
@@ -61,10 +62,21 @@ namespace Tangerine.UI.Timeline.Components
 				},
 			};
 			widget.Components.Add(new AwakeBehavior());
+			label.HitTestTarget = true;
 			label.AddChangeWatcher(() => folder.Id, s => label.Text = folder.Id);
+			label.Gestures.Add(new DoubleClickGesture(() => {
+				Document.Current.History.DoTransaction(() => {
+					var labelExtent = label.MeasureUncutText();
+					if (label.LocalMousePosition().X < labelExtent.X) {
+						Rename();
+					} else {
+						Document.Current.History.DoTransaction(ExpandOrCollapse);
+					}
+				});
+			}));
+			widget.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 			widget.CompoundPresenter.Push(new SyncDelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.Tasks.Add(HandleDobleClickTask());
 		}
 
 		public Widget Widget => widget;
@@ -127,13 +139,18 @@ namespace Tangerine.UI.Timeline.Components
 				() => folder.Items.Count != 0,
 				i => button.Visible = folder.Items.Count != 0
 			);
-			button.AddTransactionClickHandler(() => {
+			button.AddTransactionClickHandler(ExpandOrCollapse);
+			return button;
+		}
+
+		private void ExpandOrCollapse()
+		{
+			if (folder.Items.Count > 0) {
 				Core.Operations.SetProperty.Perform(folder, nameof(Folder.Expanded), !folder.Expanded);
 				if (folder.Expanded) {
 					Timeline.Instance.EnsureRowChildsVisible(row);
 				}
-			});
-			return button;
+			}
 		}
 
 		void RenderBackground(Widget widget)
@@ -142,20 +159,6 @@ namespace Tangerine.UI.Timeline.Components
 			Renderer.DrawRect(
 				Vector2.Zero, widget.Size,
 				row.Selected ? Theme.Colors.SelectedBackground : Theme.Colors.WhiteBackground);
-		}
-
-		IEnumerator<object> HandleDobleClickTask()
-		{
-			while (true) {
-				if (nodeIcon.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Document.Current.History.DoTransaction(() => {
-						Core.Operations.ClearRowSelection.Perform();
-						Core.Operations.SelectRow.Perform(row);
-					});
-					Rename();
-				}
-				yield return null;
-			}
 		}
 
 		public void Rename()
@@ -168,8 +171,22 @@ namespace Tangerine.UI.Timeline.Components
 			editBox.Tasks.Add(EditFolderIdTask());
 		}
 
-		public void ShowContextMenu()
+		private void ShowContextMenu()
 		{
+			Document.Current.History.DoTransaction(() => {
+				if (!row.Selected) {
+					Core.Operations.ClearRowSelection.Perform();
+					Core.Operations.SelectRow.Perform(row);
+				}
+			});
+			new Menu {
+				Command.Cut,
+				Command.Copy,
+				Command.Paste,
+				Command.Delete,
+				Command.MenuSeparator,
+				new Command("Rename", Rename),
+			}.Popup();
 		}
 
 		IEnumerator<object> EditFolderIdTask()

@@ -22,25 +22,29 @@ namespace Tangerine.UI
 
 		protected override IEnumerable<Gesture> EnumerateGestures(Node node)
 		{
-			bool helpModeOn = Documentation.IsHelpModeOn;
-			var noClickGesturesAnymore = false;
-			while (node != null) {
+			var noMoreClicks = new bool[3];
+			var noMoreDoubleClicks = new bool[3];
+			for (; node != null; node = node.Parent) {
 				if (node.HasGestures()) {
-					var anyClickGesture = false;
-					foreach (var r in node.Gestures) {
-						if ((!helpModeOn && (r is HelpGesture)) || (helpModeOn && !(r is HelpGesture))) {
+					foreach (var g in node.Gestures) {
+						if (Documentation.IsHelpModeOn != (g is HelpGesture)) {
 							continue;
 						}
-						bool isWrongGesture = r is ClickGesture || r is DoubleClickGesture;
-						if (isWrongGesture && noClickGesturesAnymore) {
-							continue;
+						if (g is ClickGesture cg) {
+							if (noMoreClicks[cg.ButtonIndex]) {
+								continue;
+							}
+							noMoreClicks[cg.ButtonIndex] = true;
 						}
-						anyClickGesture |= isWrongGesture;
-						yield return r;
+						if (g is DoubleClickGesture dcg) {
+							if (noMoreDoubleClicks[dcg.ButtonIndex]) {
+								continue;
+							}
+							noMoreDoubleClicks[dcg.ButtonIndex] = true;
+						}
+						yield return g;
 					}
-					noClickGesturesAnymore |= anyClickGesture;
 				}
-				node = node.Parent;
 			}
 		}
 
