@@ -48,6 +48,9 @@ namespace Orange
 		[ImportMany(nameof(AtlasPackers), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Func<string, List<TextureTools.AtlasItem>, int, int>, IAtlasPackerMetadata>> AtlasPackers { get; set; }
 
+		[ImportMany(nameof(BeforeBundlesCooking), AllowRecomposition = true)]
+		public IEnumerable<Action> BeforeBundlesCooking { get; set; }
+
 		[ImportMany(nameof(AfterAssetUpdated), AllowRecomposition = true)]
 		public IEnumerable<Action<Lime.AssetBundle, CookingRules, string>> AfterAssetUpdated { get; set; }
 
@@ -241,6 +244,13 @@ namespace Orange
 			}
 			resolvedAssemblies[assembly.GetName().Name] = assembly;
 			return assembly;
+		}
+
+		public static void BeforeBundlesCooking()
+		{
+			foreach (var action in CurrentPlugin.BeforeBundlesCooking) {
+				action();
+			}
 		}
 
 		public static void AfterAssetUpdated(Lime.AssetBundle bundle, CookingRules cookingRules, string path)
