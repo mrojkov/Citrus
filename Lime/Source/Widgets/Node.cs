@@ -1281,8 +1281,7 @@ namespace Lime
 				Nodes.Clear();
 				Nodes.AddRange(nodes);
 			}
-
-			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
+			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType) && !nodeType.IsSubclassOf(contentType)) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
 					Components.Remove(typeof(AssetBundlePathComponent));
