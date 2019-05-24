@@ -1,3 +1,5 @@
+using System;
+
 namespace Lime
 {
 	internal class CommonMaterialProgram : ShaderProgram
@@ -95,19 +97,23 @@ namespace Lime
 			#ifdef DIFFUSE_TEXTURE_ENABLED
 				color.rgba *= texture2D(u_DiffuseTexture, v_UV).rgba;
 			#endif
-			#ifdef FOG_ENABLED
-				float d = abs(v_ViewPos.z);
-			#if defined(FOG_LINEAR)
-				float fogFactor = (d - u_FogStart) / (u_FogEnd - u_FogStart);
-			#elif defined(FOG_EXP)
-				float fogFactor = 1.0 - 1.0 / exp(d * u_FogDensity);
-			#elif defined(FOG_EXP_SQUARED)
-				float fogFactor = 1.0 - 1.0 / exp((d * u_FogDensity) * (d * u_FogDensity));
-			#endif
-				fogFactor = clamp(fogFactor, 0.0, 1.0);
-				color.rgb = mix(color.rgb, u_FogColor.rgb, fogFactor);
-			#endif
+			#ifdef SHADOWS_RENDERING_MODE
+				gl_FragColor = vec4(1.0, 0.0, 0.0, color.a);
+			#else
+				#ifdef FOG_ENABLED
+					float d = abs(v_ViewPos.z);
+				#if defined(FOG_LINEAR)
+					float fogFactor = (d - u_FogStart) / (u_FogEnd - u_FogStart);
+				#elif defined(FOG_EXP)
+					float fogFactor = 1.0 - 1.0 / exp(d * u_FogDensity);
+				#elif defined(FOG_EXP_SQUARED)
+					float fogFactor = 1.0 - 1.0 / exp((d * u_FogDensity) * (d * u_FogDensity));
+				#endif
+					fogFactor = clamp(fogFactor, 0.0, 1.0);
+					color.rgb = mix(color.rgb, u_FogColor.rgb, fogFactor);
+				#endif
 				gl_FragColor = color;
+			#endif // SHADOWS_RENDERING_MODE
 			}
 		";
 
@@ -129,6 +135,9 @@ namespace Lime
 		private static string BuildPreamble(CommonMaterialProgramSpec spec)
 		{
 			var preamble = "";
+			if (spec.ShadowRenderingMode) {
+				preamble += "#define SHADOWS_RENDERING_MODE\n";
+			}
 			if (spec.SkinEnabled) {
 				preamble += "#define SKIN_ENABLED\n";
 			}
@@ -175,12 +184,35 @@ namespace Lime
 		}
 	}
 
-	internal struct CommonMaterialProgramSpec
+	internal struct CommonMaterialProgramSpec : IEquatable<CommonMaterialProgramSpec>
 	{
 		public bool SkinEnabled;
 		public bool DiffuseTextureEnabled;
 		public FogMode FogMode;
 		public SkinningMode SkinningMode;
+		public bool ShadowRenderingMode;
 
+		public bool Equals(CommonMaterialProgramSpec other)
+		{
+			return other is CommonMaterialProgramSpec spec &&
+				   SkinEnabled == spec.SkinEnabled &&
+				   DiffuseTextureEnabled == spec.DiffuseTextureEnabled &&
+				   FogMode == spec.FogMode &&
+				   SkinningMode == spec.SkinningMode &&
+				   ShadowRenderingMode == spec.ShadowRenderingMode;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				var hashCode = 785726275;
+				hashCode = hashCode * -1521134295 + SkinEnabled.GetHashCode();
+				hashCode = hashCode * -1521134295 + DiffuseTextureEnabled.GetHashCode();
+				hashCode = hashCode * -1521134295 + FogMode.GetHashCode();
+				hashCode = hashCode * -1521134295 + SkinningMode.GetHashCode();
+				hashCode = hashCode * -1521134295 + ShadowRenderingMode.GetHashCode();
+				return hashCode;
+			}
+		}
 	}
 }
