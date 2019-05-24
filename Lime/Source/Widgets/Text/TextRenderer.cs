@@ -107,7 +107,21 @@ namespace Lime.Text
 
 		private bool IsBullet(Word word)
 		{
-			return word.IsTagBegin && Styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet;
+			return
+				word.IsTagBegin &&
+				Styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet &&
+				Styles[word.Style].ImageTexture != null &&
+				Styles[word.Style].ImageSize.X != 0 &&
+				Styles[word.Style].ImageSize.Y != 0;
+		}
+
+		private bool IsOverlay(Word word)
+		{
+			return
+				Styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Overlay &&
+				Styles[word.Style].ImageTexture != null &&
+				Styles[word.Style].ImageSize.X != 0 &&
+				Styles[word.Style].ImageSize.Y != 0;
 		}
 
 		private char GetLastChar(string s)
@@ -153,7 +167,7 @@ namespace Lime.Text
 						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
 					var ch = texts[word.TextIndex].Length > 0 ? texts[word.TextIndex][word.Start] : 0;
-					if (!(j == count - 1 && (ch == ' ' || ch == '\n') && !(IsBullet(word) || style.ImageUsage == TextStyle.ImageUsageEnum.Overlay))) {
+					if (!(j == count - 1 && (ch == ' ' || ch == '\n') && !IsBullet(word))) {
 						totalWidth += word.Width;
 					}
 				}
@@ -174,7 +188,7 @@ namespace Lime.Text
 					var t = texts[word.TextIndex];
 					TextStyle style = Styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
-					if (IsBullet(word) && style.ImageTexture != null) {
+					if (IsBullet(word)) {
 						if (maxCharacters >= 0 && c >= maxCharacters) {
 							break;
 						}
@@ -191,7 +205,9 @@ namespace Lime.Text
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
 								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, ScaleSize(style.Size),
-								word.Start, word.Length, style.LetterSpacing, spriteLists[word.Style], tag: word.Style);
+								word.Start, word.Length, style.LetterSpacing, spriteLists[word.Style], tag: word.Style,
+								ignoreLetterSpacingForFirstChar: word.X == 0 || IsBullet(word) || (b + j - 1 > 0 && fittedWords[b + j - 1].IsSingularTag)
+							);
 						}
 					}
 					int wordLength = word.Length;
@@ -204,7 +220,9 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style, ignoreLetterSpacingForFirstChar: word.X == 0 || (word.IsTagBegin && IsBullet(word)));
+							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style,
+							ignoreLetterSpacingForFirstChar: word.X == 0 || IsBullet(word) || (b + j - 1 > 0 && fittedWords[b + j - 1].IsSingularTag)
+						);
 					}
 					c += wordLength;
 				}
@@ -212,14 +230,21 @@ namespace Lime.Text
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
 					TextStyle style = Styles[word.Style];
-					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay && style.ImageTexture != null) {
+					if (IsOverlay(word)) {
 						int k = j + 1;
 						for (; k < count; k++) {
 							if (fittedWords[b + k].IsTagBegin)
 								break;
 						}
 						k -= 1;
-						Vector2 lt = new Vector2(fittedWords[b + j].X, y) + offset;
+						var font = Styles[word.Style].Font;
+						var fontHeight = Styles[word.Style].Size;
+						var fontChar = font.Chars.Get(texts[word.TextIndex][word.Start], fontHeight);
+						if (fontChar == FontChar.Null) {
+							continue;
+						}
+						float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
+						Vector2 lt = new Vector2(word.X + (word.X > 0 ? scale * Styles[word.Style].LetterSpacing : 0.0f), y) + offset;
 						Vector2 rb = new Vector2(fittedWords[b + k].X + fittedWords[b + k].Width, y) + offset;
 						float yOffset = (maxHeight - ScaleSize(style.ImageSize.Y)) * 0.5f;
 						spriteLists[word.Style].Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
@@ -370,7 +395,7 @@ namespace Lime.Text
 				if (word.LineBreak) {
 					x = 0;
 				}
-				var skipFirstLetter = x == 0 || IsBullet(word);
+				var skipFirstLetter = x == 0 || IsBullet(word) || (i > 0 && fittedWords[i - 1].IsSingularTag);
 				word.Width = CalcWordWidth(word, skipFirstLetter);
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
