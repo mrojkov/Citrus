@@ -12,6 +12,7 @@ namespace Lime
 		private static Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram> programCache =
 			new Dictionary<CommonMaterialProgramSpec, CommonMaterialProgram>();
 
+		private CommonMaterialProgram shadowsProgram;
 		private CommonMaterialProgram program;
 		private ITexture diffuseTexture;
 		private Matrix44[] boneTransforms;
@@ -48,7 +49,7 @@ namespace Lime
 			{
 				if (skinningMode != value) {
 					skinningMode = value;
-					program = null;
+					Invalidate();
 				}
 			}
 		}
@@ -61,7 +62,7 @@ namespace Lime
 			{
 				if (diffuseTexture != value) {
 					diffuseTexture = value;
-					program = null;
+					Invalidate();
 				}
 			}
 		}
@@ -74,7 +75,7 @@ namespace Lime
 			{
 				if (skinEnabled != value) {
 					skinEnabled = value;
-					program = null;
+					Invalidate();
 				}
 			}
 		}
@@ -87,10 +88,12 @@ namespace Lime
 			{
 				if (fogMode != value) {
 					fogMode = value;
-					program = null;
+					Invalidate();
 				}
 			}
 		}
+
+		public static bool ShadowsRenderingMode { get; set; }
 
 		public CommonMaterial()
 		{
@@ -127,7 +130,6 @@ namespace Lime
 
 		public void Apply(int pass)
 		{
-			PrepareShaderProgram();
 			shaderParams.Set(shaderParamKeys.World, Renderer.FixupWVP(Renderer.World));
 			shaderParams.Set(shaderParamKeys.WorldView, Renderer.FixupWVP(Renderer.WorldView));
 			shaderParams.Set(shaderParamKeys.WorldViewProj, Renderer.FixupWVP(Renderer.WorldViewProjection));
@@ -147,31 +149,39 @@ namespace Lime
 			}
 			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetTextureLegacy(CommonMaterialProgram.DiffuseTextureStage, diffuseTexture);
-			PlatformRenderer.SetShaderProgram(program);
+			PlatformRenderer.SetShaderProgram(GetEffectiveShaderProgram());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
-		private void PrepareShaderProgram()
+		private CommonMaterialProgram GetEffectiveShaderProgram()
 		{
-			if (program != null) {
-				return;
+			if (ShadowsRenderingMode) {
+				return shadowsProgram ?? (shadowsProgram = GetShaderProgram());
+			} else {
+				return program ?? (program = GetShaderProgram());
 			}
+		}
+
+		private CommonMaterialProgram GetShaderProgram()
+		{
+			CommonMaterialProgram program;
 			var spec = new CommonMaterialProgramSpec {
 				SkinEnabled = skinEnabled,
 				DiffuseTextureEnabled = diffuseTexture != null,
 				FogMode = FogMode,
-				SkinningMode = SkinningMode
+				SkinningMode = SkinningMode,
+				ShadowRenderingMode = ShadowsRenderingMode,
 			};
-			if (programCache.TryGetValue(spec, out program)) {
-				return;
+			if (!programCache.TryGetValue(spec, out program)) {
+				program = new CommonMaterialProgram(spec);
+				programCache.Add(spec, program);
 			}
-			program = new CommonMaterialProgram(spec);
-			programCache[spec] = program;
+			return program;
 		}
 
 		public void Invalidate()
 		{
-			program = null;
+			shadowsProgram = program = null;
 		}
 
 		public IMaterial Clone()
