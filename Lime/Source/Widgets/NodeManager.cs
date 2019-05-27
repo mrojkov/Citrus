@@ -109,7 +109,6 @@ namespace Lime
 		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>();
 		private List<BehaviourFamily> behaviourFamilyQueue = new List<BehaviourFamily>();
 		private bool behaviourFamilyQueueDirty = false;
-		private Stack<int> deadIndices = new Stack<int>();
 
 		public void Update(float delta)
 		{
@@ -131,21 +130,18 @@ namespace Lime
 				behaviourFamilyQueueDirty = false;
 			}
 			foreach (var bf in behaviourFamilyQueue) {
-				for (var i = 0; i < bf.Behaviours.Count; i++) {
+				for (var i = bf.Behaviours.Count - 1; i >= 0; i--) {
 					var b = bf.Behaviours[i];
 					if (b != null) {
 						b.Update(delta);
 					} else {
-						deadIndices.Push(i);
+						b = bf.Behaviours[bf.Behaviours.Count - 1];
+						if (b != null) {
+							b.IndexInFamily = i;
+						}
+						bf.Behaviours[i] = b;
+						bf.Behaviours.RemoveAt(bf.Behaviours.Count - 1);
 					}
-				}
-				while (deadIndices.Count > 0) {
-					var index = deadIndices.Pop();
-					bf.Behaviours[index] = bf.Behaviours[bf.Behaviours.Count - 1];
-					if (bf.Behaviours[index] != null) {
-						bf.Behaviours[index].IndexInFamily = index;
-					}
-					bf.Behaviours.RemoveAt(bf.Behaviours.Count - 1);
 				}
 			}
 		}
