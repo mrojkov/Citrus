@@ -27,7 +27,7 @@ namespace Lime
 		public void DiscardTexturesUnderPressure()
 		{
 			lock (textures) {
-				foreach (WeakReference r in textures.Values) {
+				foreach (WeakReference r in textures.Values.ToList()) {
 					var texture = r.Target as ITexture;
 					if (texture != null && !texture.IsDisposed) {
 						texture.MaybeDiscardUnderPressure();
@@ -39,7 +39,7 @@ namespace Lime
 		public void DiscardAllTextures()
 		{
 			lock (textures) {
-				foreach (WeakReference r in textures.Values) {
+				foreach (WeakReference r in textures.Values.ToList()) {
 					var texture = r.Target as ITexture;
 					if (texture != null && !texture.IsDisposed) {
 						texture.Dispose();
@@ -51,7 +51,7 @@ namespace Lime
 		public void DiscardAllStubTextures()
 		{
 			lock (textures) {
-				foreach (WeakReference r in textures.Values) {
+				foreach (WeakReference r in textures.Values.ToList()) {
 					var target = r.Target as ITexture;
 					if (target != null && target.IsStubTexture && !target.IsDisposed) {
 						target.Dispose();
