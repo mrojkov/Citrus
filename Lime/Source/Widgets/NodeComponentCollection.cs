@@ -153,8 +153,13 @@ namespace Lime
 	{
 		protected internal override void Update(float delta)
 		{
-			foreach (var b in behaviours) {
-				b.Update(delta);
+			for (var i = behaviours.Count - 1; i >= 0; i--) {
+				var b = behaviours[i];
+				if (b != null) {
+					b.Update(delta);
+				} else {
+					behaviours.RemoveAt(i);
+				}
 			}
 		}
 	}
@@ -166,8 +171,13 @@ namespace Lime
 	{
 		protected internal override void Update(float delta)
 		{
-			foreach (var b in behaviours) {
-				b.LateUpdate(delta);
+			for (var i = behaviours.Count - 1; i >= 0; i--) {
+				var b = behaviours[i];
+				if (b != null) {
+					b.LateUpdate(delta);
+				} else {
+					behaviours.RemoveAt(i);
+				}
 			}
 		}
 	}
@@ -181,7 +191,7 @@ namespace Lime
 		internal void Add(NodeBehavior b)
 		{
 			var index = 0;
-			while (index < behaviours.Count && behaviours[index].Order < b.Order) {
+			while (index < behaviours.Count && (behaviours[index] == null || behaviours[index].Order < b.Order)) {
 				index++;
 			}
 			behaviours.Insert(index, b);
@@ -189,7 +199,10 @@ namespace Lime
 
 		internal void Remove(NodeBehavior b)
 		{
-			behaviours.Remove(b);
+			var index = behaviours.IndexOf(b);
+			if (index >= 0) {
+				behaviours[index] = null;
+			}
 		}
 
 		public override NodeComponent Clone()
