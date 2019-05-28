@@ -480,5 +480,7 @@ namespace Lime
 		{
 			return Context.SetPipelineCacheData(data);
 		}
+
+		public static FormatFeatures GetFormatFeatures(Format format) => Context.GetFormatFeatures(format);
 	}
 }
