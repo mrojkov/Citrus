@@ -35,17 +35,27 @@ namespace Lime.Graphics.Platform.OpenGL
 			const All CompressedRgb8Etc2 = (All)37492;
 			const All CompressedRgb8PunchthroughAlpha1Etc2 = (All)37494;
 			const All CompressedRgba8Etc2Eac = (All)37496;
+			const All R8 = (All)33321;
+			const All RG8 = (All)33323;
 			glInternalFormat = 0;
 			glFormat = 0;
 			glType = 0;
 			switch (format) {
 				case Format.R8_UNorm:
-					glInternalFormat = All.Red;
+					if (ctx.ESProfile && ctx.GLMajorVersion >= 3) {
+						glInternalFormat = R8;
+					} else {
+						glInternalFormat = All.Red;
+					}
 					glFormat = All.Red;
 					glType = All.UnsignedByte;
 					break;
 				case Format.R8G8_UNorm:
-					glInternalFormat = All.RgExt;
+					if (ctx.ESProfile && ctx.GLMajorVersion >= 3) {
+						glInternalFormat = RG8;
+					} else {
+						glInternalFormat = All.RgExt;
+					}
 					glFormat = All.RgExt;
 					glType = All.UnsignedByte;
 					break;
