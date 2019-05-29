@@ -190,7 +190,12 @@ namespace Tangerine.Core
 
 			void LoadDictionary()
 			{
-				var dictionaryPath = Path.Combine(AssetsDirectory, $"Dictionary{(locale != ProjectUserPreferences.DefaultLocale ? '.' + locale : "")}.txt");
+				var legacyDictionaryPath = Path.Combine(AssetsDirectory, $"Dictionary{(locale != ProjectUserPreferences.DefaultLocale ? '.' + locale : "")}.txt");
+				var dictionaryPath = Path.Combine(AssetsDirectory, Localization.DictionariesPath, $"Dictionary{(locale != ProjectUserPreferences.DefaultLocale ? '.' + locale : "")}.txt");
+				if (!File.Exists(dictionaryPath)) {
+					Console.WriteLine($"Using legacy dictionary path: \"{legacyDictionaryPath}\". Consider moving dictionary to \"{dictionaryPath}\".");
+					dictionaryPath = legacyDictionaryPath;
+				}
 				Lime.Localization.Dictionary.Clear();
 				try {
 					using (var stream = new FileStream(dictionaryPath, FileMode.Open)) {

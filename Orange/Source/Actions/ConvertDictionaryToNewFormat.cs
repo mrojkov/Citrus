@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -23,6 +23,10 @@ namespace Orange.Source.Actions
 		private static void SaveDictionary(string dictionary)
 		{
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+				var dictionaryPath = dictionary;
+				if (Directory.Exists(Localization.DictionariesPath)) {
+					dictionaryPath = Path.Combine(Localization.DictionariesPath, dictionary);
+				}
 				using (var stream = new FileStream(dictionary, FileMode.Create)) {
 					Localization.Dictionary.WriteToStream(stream);
 				}
@@ -33,6 +37,11 @@ namespace Orange.Source.Actions
 		{
 			Localization.Dictionary.Clear();
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+				var dictionaryPath = Path.Combine(Localization.DictionariesPath, dictionary);
+				if (!File.Exists(dictionaryPath)) {
+					// using legacy dictionary path
+					dictionaryPath = dictionary;
+				}
 				if (File.Exists(dictionary)) {
 					using (var stream = new FileStream(dictionary, FileMode.Open)) {
 						Localization.Dictionary.ReadFromStream(stream);

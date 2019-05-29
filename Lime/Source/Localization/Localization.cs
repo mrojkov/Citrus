@@ -10,6 +10,9 @@ namespace Lime
 	/// </summary>
 	public static class Localization
 	{
+		/// <summary>Default dictionaries path relative to project assets directory.</summary>
+		public const string DictionariesPath = "Localization";
+
 		private static bool useNumericKeys;
 
 		/// <summary>

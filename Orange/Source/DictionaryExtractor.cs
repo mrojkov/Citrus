@@ -32,7 +32,7 @@ namespace Orange
 			dictionary = new LocalizationDictionary();
 			ExtractTexts();
 			foreach (var name in GetFileNames()) {
-				CleanupAndSaveDictionary(name);
+				CleanupAndSaveDictionary(Path.Combine(GetDictionariesDirectory(), name));
 			}
 		}
 
@@ -41,10 +41,19 @@ namespace Orange
 			return Path.ChangeExtension("Dictionary.txt", CreateSerializer().GetFileExtension());
 		}
 
+		private static string GetDictionariesDirectory()
+		{
+			var dictionariesDirectory = Path.Combine(The.Workspace.AssetsDirectory, Localization.DictionariesPath);
+			if (Directory.Exists(dictionariesDirectory)) {
+				return Localization.DictionariesPath;
+			}
+			return string.Empty;
+		}
+
 		private static IEnumerable<string> GetFileNames()
 		{
 			var files = Directory.GetFiles(
-				The.Workspace.AssetsDirectory,
+				Path.Combine(The.Workspace.AssetsDirectory, GetDictionariesDirectory()),
 				"*" + CreateSerializer().GetFileExtension(),
 				SearchOption.TopDirectoryOnly);
 			return files
@@ -56,14 +65,17 @@ namespace Orange
 		{
 			var result = new LocalizationDictionary();
 			LoadDictionary(result, path);
-			var addContext = ShouldAddContextToLocalizedDictionary() || path == GetDefaultFileName();
+			var addContext = ShouldAddContextToLocalizedDictionary() ||
+			                 path.EndsWith(GetDefaultFileName(), StringComparison.OrdinalIgnoreCase);
 			MergeDictionaries(result, dictionary, addContext);
 			SaveDictionary(result, path);
 		}
 
 		private static void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified, bool addContext)
 		{
-			int added = 0, deleted = 0, updated = 0;
+			int added = 0;
+			int deleted = 0;
+			int updated = 0;
 			foreach (var key in modified.Keys.ToList()) {
 				if (!current.ContainsKey(key)) {
 					Logger.Write("+ " + key);
@@ -165,15 +177,11 @@ namespace Orange
 			}
 		}
 
-		private static bool ShouldLocalizeOnlyTaggedSceneTexts()
-		{
-			return The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
-		}
+		private static bool ShouldLocalizeOnlyTaggedSceneTexts() =>
+			The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 
-		private static bool ShouldAddContextToLocalizedDictionary()
-		{
-			return The.Workspace.ProjectJson.GetValue("AddContextToLocalizedDictionary", true);
-		}
+		private static bool ShouldAddContextToLocalizedDictionary() =>
+			The.Workspace.ProjectJson.GetValue("AddContextToLocalizedDictionary", true);
 
 		private void ProcessSourceFile(string file)
 		{
@@ -223,15 +231,9 @@ namespace Orange
 			}
 		}
 
-		protected static string GetContext(string file)
-		{
-			return file;
-		}
+		protected static string GetContext(string file) => file;
 
-		private static bool IsCorrectTaggedString(string str)
-		{
-			return taggedStringMatcher.Match(str).Success;
-		}
+		private static bool IsCorrectTaggedString(string str) => taggedStringMatcher.Match(str).Success;
 
 		protected void AddToDictionary(string key, string context)
 		{
@@ -250,10 +252,7 @@ namespace Orange
 			}
 		}
 
-		protected static bool HasAlphabeticCharacters(string text)
-		{
-			return text.Any(c => char.IsLetter(c));
-		}
+		protected static bool HasAlphabeticCharacters(string text) => text.Any(c => char.IsLetter(c));
 
 		private void AddToDictionaryHelper(string key, string value, string context)
 		{
@@ -269,9 +268,9 @@ namespace Orange
 			e.Context = string.Join("\n", ctx);
 		}
 
-		private static string Unescape(string text)
-		{
-			return text.Replace("\\n", "\n").Replace("\\\"", "\"").Replace("\\'", "'");
-		}
+		private static string Unescape(string text) =>
+			text.Replace("\\n", "\n")
+				.Replace("\\\"", "\"")
+				.Replace("\\'", "'");
 	}
 }

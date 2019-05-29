@@ -127,8 +127,16 @@ namespace Tangerine
 			if (Project.Current == Project.Null) {
 				yield break;
 			}
-			var files = Directory.EnumerateFiles(
-				Project.Current.AssetsDirectory, $"Dictionary*.txt", SearchOption.TopDirectoryOnly);
+			// enumerate dictionaries in legacy location (./Data/Dictionary.*.txt) as well as new location (./Data/Localization.*.txt)
+			var files = Directory.EnumerateFiles(Project.Current.AssetsDirectory, $"Dictionary*.txt", SearchOption.TopDirectoryOnly)
+				.Select(i => Path.GetFileName(i));
+			var absoluteDictionariesPath = Path.Combine(Project.Current.AssetsDirectory, Localization.DictionariesPath);
+			if (Directory.Exists(absoluteDictionariesPath)) {
+				files = files.Union(
+					Directory.EnumerateFiles(absoluteDictionariesPath, $"Dictionary*.txt", SearchOption.TopDirectoryOnly)
+					.Select(i => Path.GetFileName(i))
+				);
+			}
 			foreach (var file in files.Select(i => Path.GetFileNameWithoutExtension(i))) {
 				var locale = Path.GetExtension(file);
 				yield return string.IsNullOrEmpty(locale) ? ProjectUserPreferences.DefaultLocale : locale.Substring(1);
