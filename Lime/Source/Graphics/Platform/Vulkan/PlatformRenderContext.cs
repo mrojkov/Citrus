@@ -116,7 +116,6 @@ namespace Lime.Graphics.Platform.Vulkan
 			samplerCache = new SamplerCache(this);
 			placeholderTexture = new PlatformTexture2D(this, Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
 			placeholderTexture.SetData(0, new[] { Color4.Black });
-			CreateClearPipeline();
 			ResetState();
 		}
 
@@ -778,21 +777,23 @@ namespace Lime.Graphics.Platform.Vulkan
 						Layout = shaderProgram.PipelineLayout,
 						Subpass = 0
 					};
-					return device.CreateGraphicsPipelines(PipelineCache.VKPipelineCache, 1, &createInfo);
+					return device.CreateGraphicsPipelines(PipelineCache.NativePipelineCache, 1, &createInfo);
 				}
 			} finally {
 				Marshal.FreeHGlobal(shaderEntryPointNamePtr);
 			}
 		}
 
-		public void SerializePipelineCache(BinaryWriter writer)
+		public bool PipelineCacheSupported => true;
+
+		public byte[] GetPipelineCacheData()
 		{
-			PipelineCache.Serialize(writer);
+			return PipelineCache.GetData();
 		}
 
-		public void DeserializePipelineCache(BinaryReader reader)
+		public bool SetPipelineCacheData(byte[] data)
 		{
-			PipelineCache.Deserialize(reader);
+			return PipelineCache.SetData(data);
 		}
 
 		//public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
@@ -901,6 +902,9 @@ namespace Lime.Graphics.Platform.Vulkan
 			var oldVertexInputLayout = vertexInputLayout;
 			var oldCullMode = cullMode;
 			try {
+				if (clearProgram == null) {
+					CreateClearPipeline();
+				}
 				clearVertices[0] = new Vector4(-1, 1, depth, 1);
 				clearVertices[1] = new Vector4(-1, -1, depth, 1);
 				clearVertices[2] = new Vector4(1, 1, depth, 1);

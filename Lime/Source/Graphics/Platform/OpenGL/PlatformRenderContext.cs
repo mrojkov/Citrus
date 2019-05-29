@@ -876,12 +876,10 @@ namespace Lime.Graphics.Platform.OpenGL
 			return features;
 		}
 
-		public void SerializePipelineCache(BinaryWriter writer)
-		{
-		}
+		public bool PipelineCacheSupported => false;
 
-		public void DeserializePipelineCache(BinaryReader reader)
-		{
-		}
+		public byte[] GetPipelineCacheData() => throw new NotSupportedException();
+
+		public bool SetPipelineCacheData(byte[] data) => throw new NotSupportedException();
 	}
 }

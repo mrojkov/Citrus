@@ -4,23 +4,35 @@ using System.IO;
 
 namespace Lime.Graphics.Platform.Vulkan
 {
-	internal unsafe class PipelineCache
+	internal unsafe class PipelineCache : IDisposable
 	{
-		public const int Version = 1;
-
 		private Dictionary<long, byte[]> shaderSpvCache = new Dictionary<long, byte[]>();
 
-		internal SharpVulkan.PipelineCache VKPipelineCache;
+		internal SharpVulkan.PipelineCache NativePipelineCache;
 
 		public PlatformRenderContext Context { get; }
 
 		public PipelineCache(PlatformRenderContext context)
 		{
 			Context = context;
-			VKPipelineCache = CreateVKPipelineCache(new byte[0]);
+			NativePipelineCache = CreateNativePipelineCache(Array.Empty<byte>());
 		}
 
-		private SharpVulkan.PipelineCache CreateVKPipelineCache(byte[] initialData)
+		public void Dispose()
+		{
+			Discard();
+		}
+
+		private void Discard()
+		{
+			if (NativePipelineCache != SharpVulkan.PipelineCache.Null) {
+				Context.Device.DestroyPipelineCache(NativePipelineCache);
+				NativePipelineCache = SharpVulkan.PipelineCache.Null;
+			}
+			shaderSpvCache = null;
+		}
+
+		private SharpVulkan.PipelineCache CreateNativePipelineCache(byte[] initialData)
 		{
 			fixed (byte* initialDataPtr = initialData) {
 				var createInfo = new SharpVulkan.PipelineCacheCreateInfo {
@@ -30,15 +42,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				};
 				return Context.Device.CreatePipelineCache(ref createInfo);
 			}
-		}
-
-		private void SetVKPipelineCache(SharpVulkan.PipelineCache newCache)
-		{
-			if (VKPipelineCache == newCache) {
-				return;
-			}
-			Context.Device.DestroyPipelineCache(VKPipelineCache);
-			VKPipelineCache = newCache;
 		}
 
 		public byte[] GetShaderSpv(long hash)
@@ -51,39 +54,57 @@ namespace Lime.Graphics.Platform.Vulkan
 			shaderSpvCache.Add(hash, spv);
 		}
 
-		public void Serialize(BinaryWriter writer)
+		private const int FormatMagicNumber = ((int)'P' << 16) | ((int)'L' << 8) | (int)'C';
+		private const int FormatVersion = 100;
+
+		public byte[] GetData()
 		{
-			var vkPipelineCacheData = Context.Device.GetPipelineCacheData(VKPipelineCache);
-			writer.Write(Version);
-			writer.Write(vkPipelineCacheData.Length);
-			writer.Write(vkPipelineCacheData);
-			writer.Write(shaderSpvCache.Count);
-			foreach (var i in shaderSpvCache) {
-				writer.Write(i.Key);
-				writer.Write(i.Value.Length);
-				writer.Write(i.Value);
+			var stream = new MemoryStream();
+			using (var writer = new BinaryWriter(stream)) {
+				writer.Write(FormatMagicNumber);
+				writer.Write(FormatVersion);
+				var nativeData = Context.Device.GetPipelineCacheData(NativePipelineCache);
+				writer.Write(nativeData.Length);
+				writer.Write(nativeData);
+				writer.Write(shaderSpvCache.Count);
+				foreach (var (shaderHash, shaderSpv) in shaderSpvCache) {
+					writer.Write(shaderHash);
+					writer.Write(shaderSpv.Length);
+					writer.Write(shaderSpv);
+				}
+				writer.Flush();
+				return stream.ToArray();
 			}
 		}
 
-		public bool Deserialize(BinaryReader reader)
+		public bool SetData(byte[] data)
 		{
-			var version = reader.ReadInt32();
-			if (version != Version) {
+			try {
+				using (var reader = new BinaryReader(new MemoryStream(data))) {
+					if (reader.ReadInt32() != FormatMagicNumber) {
+						return false;
+					}
+					if (reader.ReadInt32() != FormatVersion) {
+						return false;
+					}
+					var nativeDataSize = reader.ReadInt32();
+					var nativeData = reader.ReadBytes(nativeDataSize);
+					var shaderSpvCount = reader.ReadInt32();
+					var shaderSpvMap = new Dictionary<long, byte[]>(shaderSpvCount);
+					for (var i = 0; i < shaderSpvCount; i++) {
+						var shaderHash = reader.ReadInt64();
+						var shaderSpvSize = reader.ReadInt32();
+						var shaderSpv = reader.ReadBytes(shaderSpvSize);
+						shaderSpvMap.Add(shaderHash, shaderSpv);
+					}
+					Discard();
+					NativePipelineCache = CreateNativePipelineCache(nativeData);
+					shaderSpvCache = shaderSpvMap;
+					return true;
+				}
+			} catch (EndOfStreamException) {
 				return false;
 			}
-			var vkPipelineCacheDataSize = reader.ReadInt32();
-			var vkPipelineCacheData = reader.ReadBytes(vkPipelineCacheDataSize);
-			var vkPipelineCache = CreateVKPipelineCache(vkPipelineCacheData);
-			SetVKPipelineCache(vkPipelineCache);
-			shaderSpvCache.Clear();
-			var entryCount = reader.ReadInt32();
-			for (var i = 0; i < entryCount; i++) {
-				var hash = reader.ReadInt64();
-				var size = reader.ReadInt32();
-				var spv = reader.ReadBytes(size);
-				shaderSpvCache.Add(hash, spv);
-			}
-			return true;
 		}
 	}
 }

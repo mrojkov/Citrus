@@ -283,6 +283,8 @@ namespace Lime
 
 		internal static void RaiseContextLost() => ContextLost?.Invoke();
 
+		public static bool PipelineCacheSupported => Context.PipelineCacheSupported;
+
 		internal static void Initialize(IPlatformRenderContext context)
 		{
 			Context = context;
@@ -469,14 +471,14 @@ namespace Lime
 			DrawCount++;
 		}
 
-		public static void SerializePipelineCache(BinaryWriter writer)
+		public static byte[] GetPipelineCacheData()
 		{
-			Context.SerializePipelineCache(writer);
+			return Context.GetPipelineCacheData();
 		}
 
-		public static void DeserializePipelineCache(BinaryReader reader)
+		public static bool SetPipelineCacheData(byte[] data)
 		{
-			Context.DeserializePipelineCache(reader);
+			return Context.SetPipelineCacheData(data);
 		}
 	}
 }
