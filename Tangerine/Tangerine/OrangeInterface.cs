@@ -10,7 +10,7 @@ namespace Tangerine
 {
 	public class OrangeInterface : Orange.UserInterface
 	{
-		public Command CacheBoth;
+		public Command CacheLocalAndRemote;
 		public Command CacheRemote;
 		public Command CacheLocal;
 		public Command CacheNone;
@@ -70,7 +70,7 @@ namespace Tangerine
 		// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
 		public void UpdateCacheModeCheckboxes(AssetCacheMode state)
 		{
-			CacheBoth.Checked = state == AssetCacheMode.Both;
+			CacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
 			CacheRemote.Checked = state == AssetCacheMode.Remote;
 			CacheLocal.Checked = state == AssetCacheMode.Local;
 			CacheNone.Checked = state == AssetCacheMode.None;

@@ -25,7 +25,7 @@ namespace Orange
 		private ProgressBarField progressBarField;
 		private ICommand actionsCommand;
 
-		private Command CacheBoth;
+		private Command CacheLocalAndRemote;
 		private Command CacheRemote;
 		private Command CacheLocal;
 		private Command CacheNone;
@@ -64,7 +64,7 @@ namespace Orange
 			windowWidget.AddNode(mainVBox);
 
 			// TODO Duplicates code from Tangerine.TangerineMenu.cs. Both should be presented at one file
-			CacheBoth = new Command("&Both", () => UpdateCacheModeCheckboxes(AssetCacheMode.Both));
+			CacheLocalAndRemote = new Command("Local &and remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local | AssetCacheMode.Remote));
 			CacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
 			CacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
 			CacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
@@ -76,7 +76,7 @@ namespace Orange
 				(actionsCommand = new Command("&Actions", new Menu { })),
 				new Command("&Cache", new Menu {
 					new Command("&Mode", new Menu {
-						CacheBoth,
+						CacheLocalAndRemote,
 						CacheRemote,
 						CacheLocal,
 						CacheNone
@@ -88,7 +88,7 @@ namespace Orange
 		// TODO Duplicates code from Tangerine.OrangeInterface.cs. Both should be presented at one file
 		private void UpdateCacheModeCheckboxes(AssetCacheMode state)
 		{
-			CacheBoth.Checked = state == AssetCacheMode.Both;
+			CacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
 			CacheRemote.Checked = state == AssetCacheMode.Remote;
 			CacheLocal.Checked = state == AssetCacheMode.Local;
 			CacheNone.Checked = state == AssetCacheMode.None;
