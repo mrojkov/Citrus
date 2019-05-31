@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Lime;
 
 namespace Tangerine.Core
 {
@@ -12,9 +14,16 @@ namespace Tangerine.Core
 		public ResolutionPreset DefaultResolution { get; private set; }
 		public bool IsLandscapeDefault { get; private set; }
 
+		private readonly List<string> scriptReferences = new List<string>();
+		public string ScriptsPath { get; private set; }
+		public string ScriptsAssemblyName { get; private set; }
+		public IReadOnlyList<string> ScriptsReferences => scriptReferences;
+		public string EntryPointsClass { get; private set; }
+
 		public void Initialize()
 		{
 			InitializeResolutions();
+			InitializeRemoteScriptingPreferences();
 		}
 
 		private void InitializeResolutions()
@@ -65,6 +74,32 @@ namespace Tangerine.Core
 			});
 			IsLandscapeDefault = true;
 			Console.WriteLine("Default resolution presets was loaded.");
+		}
+
+		private void InitializeRemoteScriptingPreferences()
+		{
+			try {
+				var projectJson = Orange.The.Workspace.ProjectJson.AsDynamic;
+				var projectDirectory = Orange.The.Workspace.ProjectDirectory;
+				ScriptsPath = AssetPath.CorrectSlashes(Path.Combine(projectDirectory, (string)projectJson.RemoteScripting.ScriptsPath));
+				ScriptsAssemblyName = (string)projectJson.RemoteScripting.ScriptsAssemblyName;
+				var scriptsReferencesPath = Path.Combine(projectDirectory, (string)projectJson.RemoteScripting.ReferencesPath);
+				foreach (string reference in projectJson.RemoteScripting.References) {
+					scriptReferences.Add(AssetPath.CorrectSlashes(Path.Combine(scriptsReferencesPath, reference)));
+				}
+				EntryPointsClass = (string)projectJson.RemoteScripting.EntryPointsClass;
+				Console.WriteLine("Remote scripting preferences was successfully loaded.");
+			} catch {
+				InitializeDefaultRemoteScriptingPreferences();
+			}
+		}
+
+		private void InitializeDefaultRemoteScriptingPreferences()
+		{
+			ScriptsPath = null;
+			ScriptsAssemblyName = null;
+			scriptReferences.Clear();
+			EntryPointsClass = null;
 		}
 	}
 }
