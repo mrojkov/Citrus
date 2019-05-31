@@ -106,8 +106,10 @@ namespace Lime
 					if (isRunning) {
 						Load();
 					}
-					if (Owner != null) {
-						Owner.RunningAnimationCount += isRunning ? 1 : -1;
+					if (isRunning) {
+						Owner?.IncrementRunningAnimationCount();
+					} else {
+						Owner?.DecrementRunningAnimationCount();
 					}
 				}
 			}

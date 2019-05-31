@@ -7,7 +7,8 @@ namespace Lime
 	public class NodeManager
 	{
 		private List<Node> nodes = new List<Node>();
-		private BehaviourSystem behaviourSystem = new BehaviourSystem();
+
+		internal readonly BehaviourSystem BehaviourSystem = new BehaviourSystem();
 
 		public void AddNode(Node node)
 		{
@@ -58,7 +59,7 @@ namespace Lime
 		{
 			switch (component) {
 				case BehaviourComponent behaviour:
-					behaviourSystem.Add(behaviour);
+					BehaviourSystem.Add(behaviour);
 					break;
 			}
 		}
@@ -67,7 +68,7 @@ namespace Lime
 		{
 			switch (component) {
 				case BehaviourComponent behaviour:
-					behaviourSystem.Remove(behaviour);
+					BehaviourSystem.Remove(behaviour);
 					break;
 			}
 		}
@@ -81,7 +82,7 @@ namespace Lime
 			}
 			try {
 				updating = true;
-				behaviourSystem.Update(delta);
+				BehaviourSystem.Update(delta);
 			} finally {
 				updating = false;
 			}
@@ -90,14 +91,73 @@ namespace Lime
 
 	public class BehaviourComponent : NodeComponent
 	{
+		private int freezeCounter;
+
 		internal BehaviourFamily Family;
 		internal int IndexInFamily = -1;
+
+		internal BehaviourSystem BehaviourSystem => Owner?.Manager?.BehaviourSystem;
+
+		public bool Frozen => freezeCounter > 0;
+
+		public BehaviourFreezeHandle Freeze() => new BehaviourFreezeHandle(this);
+
+		internal void IncrementFreezeCounter()
+		{
+			freezeCounter++;
+			if (freezeCounter == 1) {
+				BehaviourSystem?.Freeze(this);
+			}
+		}
+
+		internal void DecrementFreezeCounter()
+		{
+			if (freezeCounter == 0) {
+				throw new InvalidOperationException();
+			}
+			freezeCounter--;
+			if (freezeCounter == 0) {
+				BehaviourSystem?.Unfreeze(this);
+			}
+		}
 
 		protected internal virtual void Start() { }
 
 		protected internal virtual void Stop() { }
 
 		protected internal virtual void Update(float delta) { }
+
+		public override NodeComponent Clone()
+		{
+			var clone = (BehaviourComponent)base.Clone();
+			clone.Family = null;
+			clone.IndexInFamily = -1;
+			clone.freezeCounter = 0;
+			return clone;
+		}
+	}
+
+	public struct BehaviourFreezeHandle
+	{
+		private BehaviourComponent b;
+
+		public bool IsActive => b != null;
+
+		public static readonly BehaviourFreezeHandle None = new BehaviourFreezeHandle();
+
+		internal BehaviourFreezeHandle(BehaviourComponent behaviour)
+		{
+			b = behaviour;
+			b.IncrementFreezeCounter();
+		}
+
+		public void Dispose()
+		{
+			if (b != null) {
+				b.DecrementFreezeCounter();
+				b = null;
+			}
+		}
 	}
 
 	internal class BehaviourSystem
@@ -105,10 +165,26 @@ namespace Lime
 		private List<List<int>> behaviourFamilyGraph = new List<List<int>>();
 		private List<BehaviourFamily> behaviourFamilies = new List<BehaviourFamily>();
 		private Dictionary<Type, int> behaviourFamilyIndexMap = new Dictionary<Type, int>();
-		private HashSet<BehaviourComponent> pendingBehaviours = new HashSet<BehaviourComponent>();
-		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>();
+		private HashSet<BehaviourComponent> pendingBehaviours = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
+		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
 		private List<BehaviourFamily> behaviourFamilyQueue = new List<BehaviourFamily>();
 		private bool behaviourFamilyQueueDirty = false;
+
+		public void Freeze(BehaviourComponent behaviour)
+		{
+			if (behaviour.Family != null) {
+				behaviour.Family.Behaviours[behaviour.IndexInFamily] = null;
+				behaviour.IndexInFamily = -1;
+			}
+		}
+
+		public void Unfreeze(BehaviourComponent behaviour)
+		{
+			if (behaviour.Family != null) {
+				behaviour.IndexInFamily = behaviour.Family.Behaviours.Count;
+				behaviour.Family.Behaviours.Add(behaviour);
+			}
+		}
 
 		public void Update(float delta)
 		{
@@ -119,8 +195,10 @@ namespace Lime
 				foreach (var b in pendingBehaviours2) {
 					var bf = behaviourFamilies[GetBehaviourFamilyIndex(b.GetType())];
 					b.Family = bf;
-					b.IndexInFamily = bf.Behaviours.Count;
-					bf.Behaviours.Add(b);
+					if (!b.Frozen) {
+						b.IndexInFamily = bf.Behaviours.Count;
+						bf.Behaviours.Add(b);
+					}
 					b.Start();
 				}
 				pendingBehaviours2.Clear();
@@ -190,9 +268,11 @@ namespace Lime
 		public void Remove(BehaviourComponent behaviour)
 		{
 			if (!pendingBehaviours.Remove(behaviour) && behaviour.Family != null) {
-				behaviour.Family.Behaviours[behaviour.IndexInFamily] = null;
+				if (behaviour.IndexInFamily >= 0) {
+					behaviour.Family.Behaviours[behaviour.IndexInFamily] = null;
+					behaviour.IndexInFamily = -1;
+				}
 				behaviour.Family = null;
-				behaviour.IndexInFamily = -1;
 				behaviour.Stop();
 			}
 		}

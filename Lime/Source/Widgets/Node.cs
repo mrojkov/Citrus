@@ -1390,7 +1390,8 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class AnimationBehaviour : BehaviourComponent
 	{
-		internal int RunningAnimationCount;
+		private BehaviourFreezeHandle freezeHandle;
+		private int runningAnimationCount;
 
 		public AnimationCollection Animations { get; private set; }
 
@@ -1408,24 +1409,39 @@ namespace Lime
 			}
 		}
 
+		internal void IncrementRunningAnimationCount()
+		{
+			runningAnimationCount++;
+			if (runningAnimationCount == 1) {
+				freezeHandle.Dispose();
+			}
+		}
+
+		internal void DecrementRunningAnimationCount()
+		{
+			runningAnimationCount--;
+			if (runningAnimationCount == 0) {
+				freezeHandle = Freeze();
+			}
+		}
+
 		public AnimationBehaviour()
 		{
 			Animations = new AnimationCollection(this);
+			freezeHandle = Freeze();
 		}
 
 		protected internal override void Update(float delta)
 		{
-			if (RunningAnimationCount > 0) {
-				foreach (var a in Animations) {
-					a.Advance(delta);
-				}
+			foreach (var a in Animations) {
+				a.Advance(delta);
 			}
 		}
 
 		public override NodeComponent Clone()
 		{
 			var clone = (AnimationBehaviour)base.Clone();
-			clone.RunningAnimationCount = 0;
+			clone.freezeHandle = clone.Freeze();
 			clone.Animations = new AnimationCollection(clone);
 			foreach (var a in Animations) {
 				clone.Animations.Add(a.Clone());
