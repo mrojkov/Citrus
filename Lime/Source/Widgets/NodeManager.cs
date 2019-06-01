@@ -8,6 +8,7 @@ namespace Lime
 	{
 		private List<Node> nodes = new List<Node>();
 
+		internal readonly AnimationSystem AnimationSystem = new AnimationSystem();
 		internal readonly BehaviourSystem BehaviourSystem = new BehaviourSystem();
 
 		public void AddNode(Node node)
@@ -58,6 +59,9 @@ namespace Lime
 		internal void RegisterComponent(NodeComponent component)
 		{
 			switch (component) {
+				case AnimationComponent animation:
+					AnimationSystem.Add(animation);
+					break;
 				case BehaviourComponent behaviour:
 					BehaviourSystem.Add(behaviour);
 					break;
@@ -67,6 +71,9 @@ namespace Lime
 		internal void UnregisterComponent(NodeComponent component)
 		{
 			switch (component) {
+				case AnimationComponent animation:
+					AnimationSystem.Remove(animation);
+					break;
 				case BehaviourComponent behaviour:
 					BehaviourSystem.Remove(behaviour);
 					break;
@@ -82,6 +89,7 @@ namespace Lime
 			}
 			try {
 				updating = true;
+				AnimationSystem.Update(delta);
 				BehaviourSystem.Update(delta);
 			} finally {
 				updating = false;
@@ -282,6 +290,9 @@ namespace Lime
 			if (behaviourFamilyIndexMap.TryGetValue(behaviourType, out var index)) {
 				return index;
 			}
+			//if (!typeof(BehaviourComponent).IsAssignableFrom(behaviourType)) {
+			//	throw new InvalidOperationException();
+			//}
 			index = behaviourFamilies.Count;
 			behaviourFamilies.Add(new BehaviourFamily(behaviourType));
 			behaviourFamilyGraph.Add(new List<int>());
@@ -327,6 +338,85 @@ namespace Lime
 		public BehaviourFamily(Type behaviourType)
 		{
 			BehaviourType = behaviourType;
+		}
+	}
+
+	internal class AnimationSystem
+	{
+		private List<List<Animation>> runningAnimationsByDepth = new List<List<Animation>>();
+
+		public void Add(AnimationComponent component)
+		{
+			foreach (var a in component.Animations) {
+				if (a.IsRunning) {
+					AddRunningAnimation(a);
+				}
+			}
+		}
+
+		public void Remove(AnimationComponent component)
+		{
+			foreach (var a in component.Animations) {
+				RemoveRunningAnimation(a);
+			}
+		}
+
+		internal void AddRunningAnimation(Animation animation)
+		{
+			var depth = GetDepth(animation.OwnerNode);
+			var list = GetRunningAnimationList(depth);
+			animation.Depth = depth;
+			animation.Index = list.Count;
+			list.Add(animation);
+		}
+
+		internal void RemoveRunningAnimation(Animation animation)
+		{
+			if (animation.Depth >= 0) {
+				var list = GetRunningAnimationList(animation.Depth);
+				list[animation.Index] = null;
+				animation.Depth = -1;
+				animation.Index = -1;
+			}
+		}
+
+		private List<Animation> GetRunningAnimationList(int depth)
+		{
+			while (depth >= runningAnimationsByDepth.Count) {
+				runningAnimationsByDepth.Add(new List<Animation>());
+			}
+			return runningAnimationsByDepth[depth];
+		}
+
+		public void Update(float delta)
+		{
+			for (var i = 0; i < runningAnimationsByDepth.Count; i++) {
+				var runningAnimations = runningAnimationsByDepth[i];
+				for (var j = runningAnimations.Count - 1; j >= 0; j--) {
+					var a = runningAnimations[j];
+					if (a != null) {
+						a.Advance(delta);
+					} else {
+						a = runningAnimations[runningAnimations.Count - 1];
+						if (a != null) {
+							a.Index = j;
+						}
+						runningAnimations[j] = a;
+						runningAnimations.RemoveAt(runningAnimations.Count - 1);
+					}
+				}
+			}
+		}
+
+		private int GetDepth(Node node)
+		{
+			var depth = 0;
+			var p = node.Parent;
+			while (p != null) {
+				depth++;
+				p = p.Parent;
+			}
+			return depth;
 		}
 	}
 }

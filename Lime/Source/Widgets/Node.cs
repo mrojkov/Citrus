@@ -362,7 +362,7 @@ namespace Lime
 		/// Returns the first animation in the animation collection
 		/// or creates an animation if the collection is empty.
 		/// </summary>
-		public Animation DefaultAnimation => Components.GetOrAdd<AnimationBehaviour>().DefaultAnimation;
+		public Animation DefaultAnimation => Components.GetOrAdd<AnimationComponent>().DefaultAnimation;
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -387,7 +387,7 @@ namespace Lime
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
-		public AnimationCollection Animations => Components.GetOrAdd<AnimationBehaviour>().Animations;
+		public AnimationCollection Animations => Components.GetOrAdd<AnimationComponent>().Animations;
 
 		internal int DescendantAnimatorsVersion { get; private set; }
 
@@ -406,7 +406,7 @@ namespace Lime
 
 		public bool NeedSerializeAnimations()
 		{
-			var c = Components.Get<AnimationBehaviour>();
+			var c = Components.Get<AnimationComponent>();
 			return c != null && (c.Animations.Count > 1 || (c.Animations.Count == 1 && (!c.Animations[0].IsLegacy || c.Animations[0].Markers.Count > 0)));
 		}
 
@@ -1176,8 +1176,8 @@ namespace Lime
 					if (assetBundlePathComponent != null) {
 						Components.Add(assetBundlePathComponent.Clone());
 					}
-					Components.Remove(typeof(AnimationBehaviour));
-					var animationBehaviour = content.Components.Get<AnimationBehaviour>();
+					Components.Remove(typeof(AnimationComponent));
+					var animationBehaviour = content.Components.Get<AnimationComponent>();
 					if (animationBehaviour != null) {
 						Components.Add(animationBehaviour.Clone());
 					}
@@ -1345,9 +1345,13 @@ namespace Lime
 			if (legacyBehaviourContainer != null) {
 				legacyBehaviourContainer.Update(delta);
 			}
-			var animationBehaviour = node.Components.Get<AnimationBehaviour>();
-			if (animationBehaviour != null) {
-				animationBehaviour.Update(delta);
+			var animationComponent = node.Components.Get<AnimationComponent>();
+			if (animationComponent != null) {
+				foreach (var a in animationComponent.Animations) {
+					if (a.IsRunning) {
+						a.Advance(delta);
+					}
+				}
 			}
 			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
 				Update(child, delta);
@@ -1366,7 +1370,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
+	[UpdateAfterBehaviour(typeof(AnimationComponent))]
 	public class UpdatableNodeBehaviour : BehaviourComponent
 	{
 		private IUpdatableNode node;
@@ -1388,10 +1392,9 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	public class AnimationBehaviour : BehaviourComponent
+	public class AnimationComponent : NodeComponent
 	{
-		private BehaviourFreezeHandle freezeHandle;
-		private int runningAnimationCount;
+		private AnimationSystem AnimationSystem => Owner?.Manager?.AnimationSystem;
 
 		public AnimationCollection Animations { get; private set; }
 
@@ -1409,39 +1412,24 @@ namespace Lime
 			}
 		}
 
-		internal void IncrementRunningAnimationCount()
+		internal void AddRunningAnimation(Animation animation)
 		{
-			runningAnimationCount++;
-			if (runningAnimationCount == 1) {
-				freezeHandle.Dispose();
-			}
+			AnimationSystem?.AddRunningAnimation(animation);
 		}
 
-		internal void DecrementRunningAnimationCount()
+		internal void RemoveRunningAnimation(Animation animation)
 		{
-			runningAnimationCount--;
-			if (runningAnimationCount == 0) {
-				freezeHandle = Freeze();
-			}
+			AnimationSystem?.RemoveRunningAnimation(animation);
 		}
 
-		public AnimationBehaviour()
+		public AnimationComponent()
 		{
 			Animations = new AnimationCollection(this);
-			freezeHandle = Freeze();
-		}
-
-		protected internal override void Update(float delta)
-		{
-			foreach (var a in Animations) {
-				a.Advance(delta);
-			}
 		}
 
 		public override NodeComponent Clone()
 		{
-			var clone = (AnimationBehaviour)base.Clone();
-			clone.freezeHandle = clone.Freeze();
+			var clone = (AnimationComponent)base.Clone();
 			clone.Animations = new AnimationCollection(clone);
 			foreach (var a in Animations) {
 				clone.Animations.Add(a.Clone());

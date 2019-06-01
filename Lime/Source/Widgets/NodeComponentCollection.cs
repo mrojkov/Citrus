@@ -148,7 +148,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateBeforeBehaviour(typeof(AnimationBehaviour))]
+	[UpdateBeforeBehaviour(typeof(AnimationComponent))]
 	public class LegacyBehaviourContainer : LegacyBehaviourContainerBase
 	{
 		protected internal override void Update(float delta)
@@ -165,7 +165,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateAfterBehaviour(typeof(AnimationBehaviour))]
+	[UpdateAfterBehaviour(typeof(AnimationComponent))]
 	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
 	public class LegacyLateBehaviourContainer : LegacyBehaviourContainerBase
 	{

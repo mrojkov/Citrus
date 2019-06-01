@@ -18,6 +18,8 @@ namespace Lime
 		private bool? hasEasings;
 		private bool applyZeroPose = true;
 		internal Animation Next;
+		internal int Depth = -1;
+		internal int Index = -1;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
 		public event Action Stopped;
@@ -92,7 +94,7 @@ namespace Lime
 			set { Time = AnimationUtils.FramesToSeconds(value); }
 		}
 
-		public AnimationBehaviour Owner { get; internal set; }
+		public AnimationComponent Owner { get; internal set; }
 
 		public Node OwnerNode => Owner?.Owner;
 
@@ -107,9 +109,9 @@ namespace Lime
 						Load();
 					}
 					if (isRunning) {
-						Owner?.IncrementRunningAnimationCount();
+						Owner?.AddRunningAnimation(this);
 					} else {
-						Owner?.DecrementRunningAnimationCount();
+						Owner?.RemoveRunningAnimation(this);
 					}
 				}
 			}

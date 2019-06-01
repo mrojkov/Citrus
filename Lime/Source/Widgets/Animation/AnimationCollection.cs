@@ -6,7 +6,7 @@ namespace Lime
 {
 	public sealed class AnimationCollection : IList<Animation>, IList
 	{
-		private AnimationBehaviour owner;
+		private AnimationComponent owner;
 		private List<Animation> items = new List<Animation>();
 
 		public int Count => items.Count;
@@ -46,7 +46,7 @@ namespace Lime
 			}
 		}
 
-		public AnimationCollection(AnimationBehaviour owner)
+		public AnimationCollection(AnimationComponent owner)
 		{
 			this.owner = owner;
 		}
@@ -162,7 +162,7 @@ namespace Lime
 			items.Insert(index, item);
 			item.Owner = owner;
 			if (item.IsRunning) {
-				owner.IncrementRunningAnimationCount();
+				owner.AddRunningAnimation(item);
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace Lime
 			items.RemoveAt(index);
 			item.Owner = null;
 			if (item.IsRunning) {
-				owner.DecrementRunningAnimationCount();
+				owner.RemoveRunningAnimation(item);
 			}
 		}
 

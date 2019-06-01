@@ -112,11 +112,11 @@ namespace Lime
 			} else if (result is WaitPredicate) {
 				waitPredicate = (WaitPredicate)result;
 			} else if (result is Node3D node3D) {
-				var ac = node3D.Components.Get<AnimationBehaviour>();
+				var ac = node3D.Components.Get<AnimationComponent>();
 				var firstAnimation = ac != null && ac.Animations.Count > 0 ? ac.Animations[0] : null;
 				waitPredicate = firstAnimation != null ? WaitForAnimation(firstAnimation) : null;
 			} else if (result is Node node) {
-				var defaultAnimation = node.Components.Get<AnimationBehaviour>()?.DefaultAnimation;
+				var defaultAnimation = node.Components.Get<AnimationComponent>()?.DefaultAnimation;
 				waitPredicate = defaultAnimation != null ? WaitForAnimation(defaultAnimation) : null;
 			} else if (result is IEnumerable<object>) {
 				throw new InvalidOperationException("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
