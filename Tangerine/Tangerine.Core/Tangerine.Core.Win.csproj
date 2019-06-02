@@ -42,6 +42,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\OrangeCommands.cs" />
     <Compile Include="ExpressionParser\ExpressionParser.cs" />
     <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="BackupManager.cs" />

@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Lime;
 using Orange;
 using Tangerine.Core;
+using Tangerine.Core.Commands;
 using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
@@ -239,6 +239,10 @@ namespace Tangerine
 				orangeMenu.Add(command);
 				CommandHandlerList.Global.Connect(command, handler);
 			}
+			void OnOrangeCommandExecuting()
+			{
+				UI.Console.Instance.Show();
+			}
 			var orangeMenuItems = Orange.MenuController.Instance.GetVisibleAndSortedItems();
 			const string BuildAndRunLabel = "Build and Run";
 			const string BuildLabel = "Build";
@@ -247,15 +251,15 @@ namespace Tangerine
 			var buildAndRun = orangeMenuItems.First(item => item.Label == BuildAndRunLabel);
 			var build = orangeMenuItems.First(item => item.Label == BuildLabel);
 			var cookGameAssets = orangeMenuItems.First(item => item.Label == CookGameAssetsLabel);
-			AddOrangeCommand(OrangeCommands.Run, new OrangeCommand(() => buildAndRun.Action()));
-			AddOrangeCommand(OrangeCommands.Build, OrangeBuildCommand.Instance = new OrangeBuildCommand(build.Action));
+			AddOrangeCommand(OrangeCommands.Run, new OrangeCommand(() => buildAndRun.Action()) { Executing = OnOrangeCommandExecuting });
+			AddOrangeCommand(OrangeCommands.Build, OrangeBuildCommand.Instance = new OrangeBuildCommand(build.Action) { Executing = OnOrangeCommandExecuting });
 			AddOrangeCommand(OrangeCommands.RunConfig, new OrangePluginOptionsCommand());
-			AddOrangeCommand(OrangeCommands.CookGameAssets, new OrangeCommand(() => cookGameAssets.Action()));
+			AddOrangeCommand(OrangeCommands.CookGameAssets, new OrangeCommand(() => cookGameAssets.Action()) { Executing = OnOrangeCommandExecuting });
 			foreach (var menuItem in orangeMenuItems) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
 				}
-				AddOrangeCommand(new Command(menuItem.Label), new OrangeCommand(() => menuItem.Action()));
+				AddOrangeCommand(new Command(menuItem.Label), new OrangeCommand(() => menuItem.Action()) { Executing = OnOrangeCommandExecuting });
 			}
 
 			// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
