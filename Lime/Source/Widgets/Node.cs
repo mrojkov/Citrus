@@ -231,8 +231,6 @@ namespace Lime
 		public CompoundPresenter CompoundPostPresenter =>
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
-		internal int RunningAnimationCount;
-
 		/// <summary>
 		/// Gets the cached reference to the first children node.
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
