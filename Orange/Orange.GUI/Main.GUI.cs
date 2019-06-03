@@ -1,4 +1,4 @@
-﻿#if WIN
+#if WIN
 using System;
 #elif MAC
 using AppKit;

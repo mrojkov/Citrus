@@ -46,6 +46,7 @@ namespace Lime
 		private IEnumerator<object> Loop()
 		{
 			var button = TryFind<Widget>("Button");
+			button.Clicked += () => Clicked?.Invoke();
 			while (true) {
 				if (!GloballyEnabled) {
 					yield return null;

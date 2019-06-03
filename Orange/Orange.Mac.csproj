@@ -183,6 +183,7 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncTextures.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncTxtAssets.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
+    <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

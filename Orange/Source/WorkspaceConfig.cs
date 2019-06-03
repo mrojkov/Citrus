@@ -27,6 +27,8 @@ namespace Orange
 
 		[YuzuOptional]
 		public string AssetCacheLocalPath = ".orange/Cache";
+
+		[YuzuOptional]
 		public bool BenchmarkEnabled;
 
 		public static string GetDataPath()

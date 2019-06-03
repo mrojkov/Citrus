@@ -43,7 +43,7 @@ namespace Orange
 		{
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
 			if (!skipCooking) {
-				Cook(The.Workspace.ActivePlatform);
+				Cook(The.Workspace.ActivePlatform, GetListOfAllBundles());
 			}
 			else {
 				Console.WriteLine("-------------  Skip Assets Cooking -------------");
@@ -79,6 +79,18 @@ namespace Orange
 			}
 		}
 
+		public static List<string> GetListOfAllBundles()
+		{
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			var bundles = new HashSet<string>();
+			foreach (var dictionaryItem in cookingRulesMap) {
+				foreach (var bundle in dictionaryItem.Value.Bundles) {
+					bundles.Add(bundle);
+				}
+			}
+			return bundles.ToList();
+		}
+
 		public static string GetPlatformTextureExtension()
 		{
 			switch (Platform) {
@@ -90,12 +102,12 @@ namespace Orange
 			}
 		}
 
-		public static void Cook(TargetPlatform platform, List<string> bundles = null)
+		public static void Cook(TargetPlatform platform, List<string> bundles)
 		{
 			AssetCache.Instance.Initialize();
 			AssetCooker.Platform = platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			CookBundles(bundles: bundles);
+			CookBundles(bundles);
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
@@ -112,12 +124,12 @@ namespace Orange
 			var defaultCookingProfile = AssetCooker.cookingProfile;
 			AssetCooker.cookingProfile = CookingProfile.Partial;
 
-			CookBundles(requiredCookCode: false);
+			CookBundles(GetListOfAllBundles(), false);
 			The.Workspace.AssetFiles = defaultAssetsEnumerator;
 			AssetCooker.cookingProfile = defaultCookingProfile;
 		}
 
-		private static void CookBundles(bool requiredCookCode = true, List<string> bundles = null)
+		private static void CookBundles(List<string> bundles, bool requiredCookCode = true)
 		{
 			LogText = "";
 			var allTimer = StartBenchmark(
@@ -132,35 +144,22 @@ namespace Orange
 				requiredCookCode = false;
 			}
 
-			var extraBundles = new HashSet<string>();
-			foreach (var dictionaryItem in CookingRulesMap) {
-				foreach (var bundle in dictionaryItem.Value.Bundles) {
-					if (bundle != CookingRulesBuilder.MainBundleName && (bundles == null || bundles.Contains(bundle))) {
-						extraBundles.Add(bundle);
-					}
-				}
-			}
-
 			try {
-				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(extraBundles));
+				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(bundles));
 				BeginCookBundles?.Invoke();
 
-				// TODO Update this when AssetCooker.CookBundles will only cook bundles that was passed to it
-				var timer = StartBenchmark();
-				CookBundle(CookingRulesBuilder.MainBundleName);
-				StopBenchmark(timer, "Main bundle cooked: ");
-
-				foreach (var extraBundle in extraBundles) {
+				foreach (var bundle in bundles) {
 					var extraTimer = StartBenchmark();
-					CookBundle(extraBundle);
-					StopBenchmark(extraTimer, $"{extraBundle} cooked: ");
+					CookBundle(bundle);
+					StopBenchmark(extraTimer, $"{bundle} cooked: ");
 				}
-				extraBundles.Add(CookingRulesBuilder.MainBundleName);
 
-				var extraBundlesList = extraBundles.Reverse().ToList();
-				PluginLoader.AfterBundlesCooked(extraBundlesList);
+				var extraBundles = bundles.ToList();
+				extraBundles.Remove(CookingRulesBuilder.MainBundleName);
+				extraBundles.Reverse();
+				PluginLoader.AfterBundlesCooked(extraBundles);
 				if (requiredCookCode) {
-					CodeCooker.Cook(CookingRulesMap, extraBundlesList);
+					CodeCooker.Cook(CookingRulesMap, extraBundles);
 				}
 				StopBenchmark(allTimer, "All bundles cooked: ");
 				PrintBenchmark();
@@ -175,14 +174,11 @@ namespace Orange
 			}
 		}
 
-		private static int CalculateAssetCount(HashSet<string> extraBundles)
+		private static int CalculateAssetCount(List<string> bundles)
 		{
 			var assetCount = 0;
-			var allBundles = new HashSet<string>();
-			allBundles.Add(CookingRulesBuilder.MainBundleName);
-			allBundles.UnionWith(extraBundles);
 			var savedWorkspaceAssetFiles = The.Workspace.AssetFiles;
-			foreach (var bundleName in allBundles) {
+			foreach (var bundleName in bundles) {
 				var bundle = CreateBundle(bundleName);
 				AssetBundle.SetCurrent(bundle, false);
 				The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
