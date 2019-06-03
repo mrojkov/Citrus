@@ -91,6 +91,11 @@ namespace Lime
 				updating = true;
 				AnimationSystem.Update(delta);
 				BehaviourSystem.Update(delta);
+				if (Widget.EnableViewCulling) {
+					foreach (var n in nodes) {
+						n.UpdateBoundingRect();
+					}
+				}
 			} finally {
 				updating = false;
 			}

@@ -75,7 +75,7 @@ namespace Lime
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
 		public static bool RenderTransparentWidgets;
-		public static bool EnableViewCulling = false;
+		public static bool EnableViewCulling = true;
 
 		#region Layout properties
 		private LayoutManager layoutManager;
@@ -983,7 +983,6 @@ namespace Lime
 
 		public bool ClipRegionTest(Rectangle clipRegion)
 		{
-			return true;
 			if (!EnableViewCulling) {
 				return true;
 			}
@@ -1411,6 +1410,18 @@ namespace Lime
 			Anchors = Anchors.None;
 			Size = ParentWidget.Size;
 			Anchors = Anchors.LeftRightTopBottom;
+		}
+
+		public override void UpdateBoundingRect()
+		{
+			if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+				ExpandParentBoundingRect();
+			}
+			if (GloballyVisible) {
+				for (var n = FirstChild; n != null; n = n.NextSibling) {
+					n.UpdateBoundingRect();
+				}
+			}
 		}
 	}
 }

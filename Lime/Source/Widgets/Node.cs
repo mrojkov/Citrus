@@ -1320,6 +1320,13 @@ namespace Lime
 				}
 			}
 		}
+
+		public virtual void UpdateBoundingRect()
+		{
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
+				n.UpdateBoundingRect();
+			}
+		}
 	}
 
 	public interface IUpdatableNode
