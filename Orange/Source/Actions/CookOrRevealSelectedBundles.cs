@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -13,9 +14,11 @@ namespace Orange
 		private static WindowWidget windowWidget;
 		private static Widget mainVBox;
 		private static ThemedScrollView scrollView;
+		private static ThemedButton selectButton;
 		private static Dictionary<string, ThemedCheckBox> bundleMap;
 		private static Action action;
 		private static bool windowClosed;
+
 
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Cook/Reveal Selected Bundles")]
@@ -26,6 +29,9 @@ namespace Orange
 			action = null;
 			bundleMap = new Dictionary<string, ThemedCheckBox>();
 			Application.InvokeOnMainThread(CreateSelectionWindow);
+			// Selection window can be created only on main thread
+			// We should wait for that window to close, or user will
+			// be able to run multiple actions at the same time, leading to crash
 			while (!windowClosed);
 			action?.Invoke();
 		}
@@ -61,6 +67,12 @@ namespace Orange
 			scrollView.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.White));
 
 			windowWidget.AddNode(mainVBox);
+
+			selectButton = new ThemedButton {
+				Text = "Select all",
+				Clicked = SelectButtonClickHandler
+			};
+
 			mainVBox.AddNode(scrollView);
 			foreach (var bundle in GetBundles()) {
 				bundleMap[bundle] = new ThemedCheckBox();
@@ -77,22 +89,7 @@ namespace Orange
 					}
 				});
 			}
-			var foldButton = new ThemedButton {
-				Clicked = FoldButtonClickHandler
-			};
-			foldButton.LateTasks.AddLoop(() => {
-				var allChecked = true;
-				foreach (var bundle in bundleMap.Keys) {
-					if (!bundleMap[bundle].Checked) {
-						allChecked = false;
-					}
-				}
-				if (allChecked) {
-					foldButton.Text = "Deselect all";
-				} else {
-					foldButton.Text = "Select all";
-				}
-			});
+
 			var cookButton = new ThemedButton {
 				Clicked = CookButtonClickHandler,
 				Text = "Cook"
@@ -107,7 +104,8 @@ namespace Orange
 				}
 			};
 			mainVBox.AddNode(buttonLine);
-			buttonLine.AddNode(foldButton);
+			buttonLine.AddNode(selectButton);
+			selectButton.Tasks.Add(UpdateTextOfSelectButton());
 			buttonLine.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = float.MaxValue }, MaxHeight = 0 });
 			buttonLine.AddNode(cookButton);
 			buttonLine.AddNode(revealButton);
@@ -127,7 +125,7 @@ namespace Orange
 			return bundles.ToList();
 		}
 
-		private static void FoldButtonClickHandler()
+		private static void SelectButtonClickHandler()
 		{
 			var unfold = true;
 			foreach (var bundle in bundleMap.Keys) {
@@ -138,6 +136,25 @@ namespace Orange
 
 			foreach (var bundle in bundleMap.Keys) {
 				bundleMap[bundle].Checked = !unfold;
+			}
+
+		}
+
+		private static IEnumerator<object> UpdateTextOfSelectButton()
+		{
+			while (true) {
+				var allChecked = true;
+				foreach (var bundle in bundleMap.Keys) {
+					if (!bundleMap[bundle].Checked) {
+						allChecked = false;
+					}
+				}
+				if (allChecked) {
+					selectButton.Text = "Deselect all";
+				} else {
+					selectButton.Text = "Select all";
+				}
+				yield return null;
 			}
 		}
 
