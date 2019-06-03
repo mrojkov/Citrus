@@ -482,7 +482,7 @@ namespace Lime
 				newAnimators.Clear();
 			}
 
-			foreach (var animation in model.Animations.Except(newAnimations)) {
+			foreach (var animation in model.Animations.Except(newAnimations).ToList()) {
 				var srcAnimators = new List<IAnimator>();
 				animation.FindAnimators(srcAnimators);
 				if (animationsToReduce.Keys.Contains(animation.Id)) {
