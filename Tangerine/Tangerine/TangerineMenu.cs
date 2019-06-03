@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lime;
+using Orange;
 using Tangerine.Core;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
@@ -255,20 +256,18 @@ namespace Tangerine
 				}));
 			}
 			// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
-			(Orange.UserInterface.Instance as OrangeInterface).CacheBoth = new Command("&Both",
-				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Both));
-			(Orange.UserInterface.Instance as OrangeInterface).CacheRemote = new Command("&Remote",
-				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Remote));
-			(Orange.UserInterface.Instance as OrangeInterface).CacheLocal = new Command("&Local",
-				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.Local));
-			(Orange.UserInterface.Instance as OrangeInterface).CacheNone = new Command("&None",
-				() => (Orange.UserInterface.Instance as OrangeInterface).UpdateCacheModeCheckboxes(Orange.AssetCacheMode.None));
+			var orangeInterfaceInstance = (OrangeInterface) Orange.UserInterface.Instance;
+			var updateAction = new Action<AssetCacheMode>(mode => orangeInterfaceInstance.UpdateCacheModeCheckboxes(mode));
+			orangeInterfaceInstance.CacheLocalAndRemote = new Command("Local &and remote", () => updateAction(Orange.AssetCacheMode.Local | Orange.AssetCacheMode.Remote));
+			orangeInterfaceInstance.CacheRemote = new Command("&Remote", () => updateAction(Orange.AssetCacheMode.Remote));
+			orangeInterfaceInstance.CacheLocal = new Command("&Local", () => updateAction(Orange.AssetCacheMode.Local));
+			orangeInterfaceInstance.CacheNone = new Command("&None", () => updateAction(Orange.AssetCacheMode.None));
 			orangeMenu.Add(new Command("Cache", new Menu {
 				new Command("Mode", new Menu{
-					(Orange.UserInterface.Instance as OrangeInterface).CacheBoth,
-					(Orange.UserInterface.Instance as OrangeInterface).CacheRemote,
-					(Orange.UserInterface.Instance as OrangeInterface).CacheLocal,
-					(Orange.UserInterface.Instance as OrangeInterface).CacheNone,
+					orangeInterfaceInstance.CacheLocalAndRemote,
+					orangeInterfaceInstance.CacheRemote,
+					orangeInterfaceInstance.CacheLocal,
+					orangeInterfaceInstance.CacheNone,
 				})
 			}));
 			Orange.The.UI.LoadFromWorkspaceConfig(Orange.WorkspaceConfig.Load());
