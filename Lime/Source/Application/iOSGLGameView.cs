@@ -84,7 +84,8 @@ namespace Lime
 			
 			var eaglLayer = (CAEAGLLayer)Layer;
 			if (!mgleaglContext.RenderBufferStorage((uint)RenderbufferTarget.Renderbuffer, eaglLayer)) {
-				throw new InvalidOperationException("EAGLContext.RenderBufferStorage() failed");
+				Logger.Write("Failed to bind render buffer with error: {0}", GL.GetErrorCode());
+				//throw new InvalidOperationException("EAGLContext.RenderBufferStorage() failed");
 			}
 			
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.ColorAttachment0, RenderbufferTarget.Renderbuffer, colorRenderbuffer);
