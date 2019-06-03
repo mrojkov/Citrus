@@ -179,15 +179,16 @@ namespace Orange
 			var assetCount = 0;
 			var savedWorkspaceAssetFiles = The.Workspace.AssetFiles;
 			foreach (var bundleName in bundles) {
-				var bundle = CreateBundle(bundleName);
-				AssetBundle.SetCurrent(bundle, false);
-				The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
-				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-					var profileCookStages = cookStages
-						.Where(kv => kv.Value.Contains(cookingProfile))
-						.Select(kv => kv.Key);
-					foreach (var stage in profileCookStages) {
-						assetCount += stage.GetOperationsCount();
+				using (var bundle = CreateBundle(bundleName)) {
+					AssetBundle.SetCurrent(bundle, false);
+					The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
+					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+						var profileCookStages = cookStages
+							.Where(kv => kv.Value.Contains(cookingProfile))
+							.Select(kv => kv.Key);
+						foreach (var stage in profileCookStages) {
+							assetCount += stage.GetOperationsCount();
+						}
 					}
 				}
 			}
