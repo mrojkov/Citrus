@@ -150,7 +150,7 @@ namespace Lime
 		}
 	}
 
-	public struct BehaviourFreezeHandle
+	public struct BehaviourFreezeHandle : IDisposable
 	{
 		private BehaviourComponent b;
 
