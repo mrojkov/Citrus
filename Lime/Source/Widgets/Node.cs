@@ -1332,8 +1332,42 @@ namespace Lime
 		void OnUpdate(float delta);
 	}
 
+	public class NodeFreezeHandle
+	{
+		internal readonly List<BehaviourFreezeHandle> BehaviourFreezeHandles = new List<BehaviourFreezeHandle>();
+
+		public bool IsActive => BehaviourFreezeHandles.Count > 0;
+
+		public void Unfreeze()
+		{
+			foreach (var fh in BehaviourFreezeHandles) {
+				fh.Dispose();
+			}
+			BehaviourFreezeHandles.Clear();
+		}
+	}
+
 	public static class NodeCompatibilityExtensions
 	{
+		public static void FreezeChildrenBehaviours(this Node node, NodeFreezeHandle freezeHandle)
+		{
+			foreach (var child in node.Nodes) {
+				FreezeNodeBehaviours(child, freezeHandle);
+			}
+		}
+
+		public static void FreezeNodeBehaviours(this Node node, NodeFreezeHandle freezeHandle)
+		{
+			foreach (var c in node.Components) {
+				if (c is BehaviourComponent b) {
+					freezeHandle.BehaviourFreezeHandles.Add(b.Freeze());
+				}
+			}
+			foreach (var child in node.Nodes) {
+				FreezeNodeBehaviours(child, freezeHandle);
+			}
+		}
+
 		private static void RegisterLegacyBehaviours(Node node)
 		{
 			foreach (var component in node.Components) {
