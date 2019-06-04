@@ -10,7 +10,7 @@ namespace Tangerine.UI.RemoteScripting
 
 		private readonly Panel panel;
 		private Widget rootWidget;
-		private RemoteScriptingTabbedWidget tabbedWidget;
+		private RemoteScriptingWidgets.TabbedWidget tabbedWidget;
 		private RemoteScriptingStatusBar statusBar;
 
 		public RemoteScriptingPane(Panel panel)
@@ -34,7 +34,12 @@ namespace Tangerine.UI.RemoteScripting
 			rootWidget = new Widget {
 				Layout = new VBoxLayout(),
 				Nodes = {
-					(tabbedWidget = new RemoteScriptingTabbedWidget(statusBar)),
+					(tabbedWidget = new RemoteScriptingWidgets.TabbedWidget(
+						new RemoteScriptingWidgets.TabbedWidgetPage[] {
+							new RemoteScriptingAssemblyPage(statusBar),
+							new RemoteScriptingDevicesPage(),
+						}
+					)),
 					statusBar,
 				}
 			};
@@ -43,10 +48,10 @@ namespace Tangerine.UI.RemoteScripting
 
 		private void CleanUp()
 		{
-			tabbedWidget?.UnlinkAndDispose();
-			tabbedWidget = null;
 			statusBar?.UnlinkAndDispose();
 			statusBar = null;
+			tabbedWidget?.UnlinkAndDispose();
+			tabbedWidget = null;
 			rootWidget?.UnlinkAndDispose();
 			rootWidget = null;
 		}

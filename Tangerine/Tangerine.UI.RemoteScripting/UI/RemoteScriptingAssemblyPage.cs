@@ -1,15 +1,17 @@
 using System.IO;
 using System.Linq;
 using Lime;
+using RemoteScripting;
 using Tangerine.Core;
 using Tangerine.Core.Commands;
+using Exception = Lime.Exception;
 
 namespace Tangerine.UI.RemoteScripting
 {
-	internal class RemoteScriptingAssemblyPage : RemoteScriptingTabbedWidget.Page
+	internal class RemoteScriptingAssemblyPage : RemoteScriptingWidgets.TabbedWidgetPage
 	{
 		private readonly RemoteScriptingStatusBar statusBar;
-		private ThemedTextView assemblyBuilderLog;
+		private RemoteScriptingWidgets.TextView assemblyBuilderLog;
 		private ToolbarButton buildGameAndAssemblyButton;
 		private ToolbarButton buildAssemblyButton;
 
@@ -21,12 +23,12 @@ namespace Tangerine.UI.RemoteScripting
 		public override void Initialize()
 		{
 			Tab = new ThemedTab { Text = "Assembly" };
-			RemoteScriptingTabbedWidget.Toolbar toolbar;
+			RemoteScriptingWidgets.Toolbar toolbar;
 			Content = new Widget {
 				Layout = new VBoxLayout(),
 				Nodes = {
-					(toolbar = new RemoteScriptingTabbedWidget.Toolbar()),
-					(assemblyBuilderLog = new RemoteScriptingTabbedWidget.TextView())
+					(toolbar = new RemoteScriptingWidgets.Toolbar()),
+					(assemblyBuilderLog = new RemoteScriptingWidgets.TextView())
 				}
 			};
 			toolbar.Content.Nodes.AddRange(
@@ -68,10 +70,29 @@ namespace Tangerine.UI.RemoteScripting
 					foreach (var diagnostic in result.Diagnostics) {
 						Log(diagnostic.ToString());
 					}
-					SetStatusAndLog(result.Success ? "Assembly was build." : "Assembly wasn't build due to errors in the code.");
+					var success = false;
 					if (result.Success) {
 						Log($"Assembly length in bytes: {result.AssemblyRawBytes.Length}");
+						try {
+							var portableAssembly = new PortableAssembly(result.AssemblyRawBytes, preferences.EntryPointsClass);
+							var compiledAssembly = new CompiledAssembly {
+								RawBytes = result.AssemblyRawBytes,
+								PortableAssembly = portableAssembly
+							};
+							CompiledAssembly.Instance = compiledAssembly;
+							success = true;
+						} catch (System.Reflection.ReflectionTypeLoadException exception) {
+							Log(exception.ToString());
+							Log("Can't load assembly due to type load exceptions:");
+							foreach (var loaderException in exception.LoaderExceptions) {
+								Log(loaderException.ToString());
+							}
+						} catch (Exception exception) {
+							Log("Can't load assembly due to unknown exception:");
+							Log(exception.ToString());
+						}
 					}
+					SetStatusAndLog(success ? "Assembly was build." : "Assembly wasn't build due to errors in the code.");
 					Log(string.Empty);
 				} catch (System.Exception e) {
 					System.Console.WriteLine(e);
@@ -84,7 +105,7 @@ namespace Tangerine.UI.RemoteScripting
 			BuildAssemblyAsync();
 		}
 
-		private void Log(string message) => assemblyBuilderLog.Append($"{message}\n");
+		public void Log(string text) => assemblyBuilderLog.AppendLine(text);
 
 		private void SetStatusAndLog(string message)
 		{
