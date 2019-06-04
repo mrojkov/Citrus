@@ -198,9 +198,7 @@ namespace Lime
 			}
 			Node.InvalidateNodeReferenceCache();
 			foreach (var node in list) {
-				node.Parent = null;
-				node.NextSibling = null;
-				node.PropagateDirtyFlags();
+				CleanupNode(node);
 			}
 			list = null;
 			RefreshFirstChild();
@@ -283,13 +281,9 @@ namespace Lime
 			{
 				RuntimeChecksBeforeInsertion(value);
 				CreateListIfNeeded();
-				value.Parent = owner;
-				var oldNode = list[index];
-				oldNode.Parent = null;
-				oldNode.NextSibling = null;
-				oldNode.PropagateDirtyFlags();
-				owner.Manager?.UnregisterNode(oldNode);
+				CleanupNode(list[index]);
 				list[index] = value;
+				value.Parent = owner;
 				if (index > 0) {
 					list[index - 1].NextSibling = value;
 				}
