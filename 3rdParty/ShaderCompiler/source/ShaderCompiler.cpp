@@ -670,6 +670,21 @@ const char* GetShaderInfoLog(ShaderHandle shaderHandle)
 	return static_cast<Shader*>(shaderHandle)->infoLog.c_str();
 }
 
+unsigned int GetShaderSpvSize(ShaderHandle shaderHandle)
+{
+	return static_cast<Shader*>(shaderHandle)->spirv.size() * sizeof(unsigned int);
+}
+
+const void* GetShaderSpv(ShaderHandle shaderHandle)
+{
+	return static_cast<Shader*>(shaderHandle)->spirv.data();
+}
+
+void SetShaderSpv(ShaderHandle shaderHandle, const void* spv, unsigned int size)
+{
+	static_cast<Shader*>(shaderHandle)->spirv.assign((unsigned int*)spv, (unsigned int*)((char*)spv + size));
+}
+
 void DestroyShader(ShaderHandle shaderHandle)
 {
 	delete static_cast<Shader*>(shaderHandle);
@@ -717,15 +732,15 @@ unsigned int GetSpvSize(ProgramHandle programHandle, ShaderStage stage)
 	auto program = static_cast<Program*>(programHandle);
 	switch (stage) {
 		case SHADER_STAGE_VERTEX:
-			return program->vsSpirv.size() * sizeof(uint32_t);
+			return program->vsSpirv.size() * sizeof(unsigned int);
 		case SHADER_STAGE_FRAGMENT:
-			return program->fsSpirv.size() * sizeof(uint32_t);
+			return program->fsSpirv.size() * sizeof(unsigned int);
 		default:
 			return 0;
 	}
 }
 
-const unsigned int* GetSpv(ProgramHandle programHandle, ShaderStage stage)
+const void* GetSpv(ProgramHandle programHandle, ShaderStage stage)
 {
 	auto program = static_cast<Program*>(programHandle);
 	switch (stage) {

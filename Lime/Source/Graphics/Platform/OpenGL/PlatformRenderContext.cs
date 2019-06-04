@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 #if iOS || MAC || ANDROID
 using GLStencilOp = Lime.Graphics.Platform.OpenGL.StencilOp;
@@ -874,5 +875,11 @@ namespace Lime.Graphics.Platform.OpenGL
 			}
 			return features;
 		}
+
+		public bool PipelineCacheSupported => false;
+
+		public byte[] GetPipelineCacheData() => throw new NotSupportedException();
+
+		public bool SetPipelineCacheData(byte[] data) => throw new NotSupportedException();
 	}
 }

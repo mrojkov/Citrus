@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
 
 using static SharpVulkan.ResultExtensions;
 
@@ -45,7 +46,6 @@ namespace Lime.Graphics.Platform.Vulkan
 		private PrimitiveTopology primitiveTopology;
 		private PlatformVertexInputLayout vertexInputLayout;
 		private LruCache<Hash128, SharpVulkan.Pipeline> pipelineLruCache = new LruCache<Hash128, SharpVulkan.Pipeline>();
-		private SharpVulkan.PipelineCache pipelineCache;
 		private UploadBufferAllocator uploadBufferSuballocator;
 		private DescriptorAllocator descriptorAllocator;
 		private PlatformBuffer[] vertexBuffers;
@@ -66,6 +66,7 @@ namespace Lime.Graphics.Platform.Vulkan
 		private BoundVertexBuffer[] boundVertexBuffers;
 		private BoundIndexBuffer boundIndexBuffer;
 
+		internal PipelineCache PipelineCache;
 		internal SharpVulkan.Ext.VulkanExt VKExt = new SharpVulkan.Ext.VulkanExt();
 		internal bool SupportsDedicatedAllocation;
 		internal SharpVulkan.Instance Instance => instance;
@@ -99,7 +100,7 @@ namespace Lime.Graphics.Platform.Vulkan
 			vertexOffsets = new int[MaxVertexBufferSlots];
 			boundVertexBuffers = new BoundVertexBuffer[MaxVertexBufferSlots];
 			CreateCommandPool();
-			CreatePipelineCache();
+			PipelineCache = new PipelineCache(this);
 			var preferPersistentMapping = true;
 #if iOS || MAC
 			preferPersistentMapping = false;
@@ -115,7 +116,6 @@ namespace Lime.Graphics.Platform.Vulkan
 			samplerCache = new SamplerCache(this);
 			placeholderTexture = new PlatformTexture2D(this, Format.R8G8B8A8_UNorm, 1, 1, false, TextureParams.Default);
 			placeholderTexture.SetData(0, new[] { Color4.Black });
-			CreateClearPipeline();
 			ResetState();
 		}
 
@@ -257,14 +257,6 @@ namespace Lime.Graphics.Platform.Vulkan
 				QueueFamilyIndex = queueFamilyIndex
 			};
 			commandPool = device.CreateCommandPool(ref createInfo);
-		}
-
-		private void CreatePipelineCache()
-		{
-			var createInfo = new SharpVulkan.PipelineCacheCreateInfo {
-				StructureType = SharpVulkan.StructureType.PipelineCacheCreateInfo,
-			};
-			pipelineCache = device.CreatePipelineCache(ref createInfo);
 		}
 
 		internal void EnsureReadbackBuffer(ulong size)
@@ -785,11 +777,23 @@ namespace Lime.Graphics.Platform.Vulkan
 						Layout = shaderProgram.PipelineLayout,
 						Subpass = 0
 					};
-					return device.CreateGraphicsPipelines(pipelineCache, 1, &createInfo);
+					return device.CreateGraphicsPipelines(PipelineCache.NativePipelineCache, 1, &createInfo);
 				}
 			} finally {
 				Marshal.FreeHGlobal(shaderEntryPointNamePtr);
 			}
+		}
+
+		public bool PipelineCacheSupported => true;
+
+		public byte[] GetPipelineCacheData()
+		{
+			return PipelineCache.GetData();
+		}
+
+		public bool SetPipelineCacheData(byte[] data)
+		{
+			return PipelineCache.SetData(data);
 		}
 
 		//public void Clear(ClearOptions options, float r, float g, float b, float a, float depth, byte stencil)
@@ -898,6 +902,9 @@ namespace Lime.Graphics.Platform.Vulkan
 			var oldVertexInputLayout = vertexInputLayout;
 			var oldCullMode = cullMode;
 			try {
+				if (clearProgram == null) {
+					CreateClearPipeline();
+				}
 				clearVertices[0] = new Vector4(-1, 1, depth, 1);
 				clearVertices[1] = new Vector4(-1, -1, depth, 1);
 				clearVertices[2] = new Vector4(1, 1, depth, 1);

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Lime.Graphics.Platform
 {
@@ -7,6 +8,8 @@ namespace Lime.Graphics.Platform
 		int MaxTextureSlots { get; }
 		int MaxVertexBufferSlots { get; }
 		int MaxVertexAttributes { get; }
+
+		bool PipelineCacheSupported { get; }
 
 		IPlatformBuffer CreateBuffer(BufferType bufferType, int size, bool dynamic);
 		IPlatformTexture2D CreateTexture2D(Format format, int width, int height, bool mipmaps, TextureParams textureParams);
@@ -43,5 +46,7 @@ namespace Lime.Graphics.Platform
 		void SetIndexBuffer(IPlatformBuffer buffer, int offset, IndexFormat format);
 		void Draw(int startVertex, int vertexCount);
 		void DrawIndexed(int startIndex, int indexCount, int baseVertex);
+		byte[] GetPipelineCacheData();
+		bool SetPipelineCacheData(byte[] data);
 	}
 }

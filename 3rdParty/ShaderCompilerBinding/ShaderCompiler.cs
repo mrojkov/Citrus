@@ -63,6 +63,15 @@ namespace Lime.Graphics.Platform.Vulkan
 			return Marshal.PtrToStringAnsi(GetShaderInfoLogInternal(shaderHandle));
 		}
 
+		[DllImport(LibraryName, EntryPoint = "GetShaderSpvSize", CallingConvention = CallingConvention.Cdecl)]
+		public static extern uint GetShaderSpvSize(IntPtr shaderHandle);
+
+		[DllImport(LibraryName, EntryPoint = "GetShaderSpv", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr GetShaderSpv(IntPtr shaderHandle);
+
+		[DllImport(LibraryName, EntryPoint = "SetShaderSpv", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr SetShaderSpv(IntPtr shaderHandle, IntPtr spv, uint size);
+
 		[DllImport(LibraryName, EntryPoint = "DestroyShader", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void DestroyShader(IntPtr shaderHandle);
 

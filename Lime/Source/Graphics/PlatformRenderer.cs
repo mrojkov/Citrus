@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Lime.Graphics.Platform;
 
 namespace Lime
@@ -282,6 +283,8 @@ namespace Lime
 
 		internal static void RaiseContextLost() => ContextLost?.Invoke();
 
+		public static bool PipelineCacheSupported => Context.PipelineCacheSupported;
+
 		internal static void Initialize(IPlatformRenderContext context)
 		{
 			Context = context;
@@ -466,6 +469,16 @@ namespace Lime
 			PreDraw(topology);
 			Context.DrawIndexed(startIndex, indexCount, baseVertex);
 			DrawCount++;
+		}
+
+		public static byte[] GetPipelineCacheData()
+		{
+			return Context.GetPipelineCacheData();
+		}
+
+		public static bool SetPipelineCacheData(byte[] data)
+		{
+			return Context.SetPipelineCacheData(data);
 		}
 	}
 }

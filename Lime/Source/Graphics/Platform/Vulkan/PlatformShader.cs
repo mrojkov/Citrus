@@ -1,8 +1,9 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Lime.Graphics.Platform.Vulkan
 {
-	internal class PlatformShader : IPlatformShader
+	internal unsafe class PlatformShader : IPlatformShader
 	{
 		private PlatformRenderContext context;
 		private IntPtr shader;
@@ -32,11 +33,32 @@ namespace Lime.Graphics.Platform.Vulkan
 				? ShaderCompiler.Stage.Vertex
 				: ShaderCompiler.Stage.Fragment;
 			shader = ShaderCompiler.CreateShader();
-			if (!ShaderCompiler.CompileShader(shader, compilerStage, source)) {
-				var infoLog = ShaderCompiler.GetShaderInfoLog(shader);
-				ShaderCompiler.DestroyShader(shader);
-				throw new InvalidOperationException($"Shader compilation failed:\n{infoLog}");
+			var hash = ComputeHash(Stage, source);
+			var spv = context.PipelineCache.GetShaderSpv(hash);
+			if (spv != null) {
+				fixed (byte* spvPtr = spv) {
+					ShaderCompiler.SetShaderSpv(shader, new IntPtr(spvPtr), (uint)spv.Length);
+				}
+			} else {
+				if (!ShaderCompiler.CompileShader(shader, compilerStage, source)) {
+					var infoLog = ShaderCompiler.GetShaderInfoLog(shader);
+					ShaderCompiler.DestroyShader(shader);
+					throw new InvalidOperationException($"Shader compilation failed:\n{infoLog}");
+				}
+				spv = new byte[ShaderCompiler.GetShaderSpvSize(shader)];
+				Marshal.Copy(ShaderCompiler.GetShaderSpv(shader), spv, 0, spv.Length);
+				context.PipelineCache.AddShaderSpv(hash, spv);
 			}
+		}
+
+		private static long ComputeHash(ShaderStageMask stage, string source)
+		{
+			var hasher = new Hasher();
+			hasher.Begin();
+			hasher.Write(stage);
+			hasher.Write(source.Length);
+			hasher.Write(source);
+			return hasher.End();
 		}
 	}
 }
