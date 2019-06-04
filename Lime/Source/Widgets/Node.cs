@@ -1375,7 +1375,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateAfterBehaviour(typeof(AnimationComponent))]
+	[LateBehaviour]
 	public class UpdatableNodeBehaviour : BehaviourComponent
 	{
 		private IUpdatableNode node;

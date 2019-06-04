@@ -323,9 +323,9 @@ namespace Lime
 			if (behaviourFamilyIndexMap.TryGetValue(behaviourType, out var index)) {
 				return index;
 			}
-			//if (!typeof(BehaviourComponent).IsAssignableFrom(behaviourType)) {
-			//	throw new InvalidOperationException();
-			//}
+			if (!typeof(BehaviourComponent).IsAssignableFrom(behaviourType)) {
+				throw new InvalidOperationException();
+			}
 			var late = behaviourType.GetCustomAttribute<LateBehaviourAttribute>() != null;
 			index = behaviourFamilies.Count;
 			behaviourFamilies.Add(new BehaviourFamily(behaviourType, late));
