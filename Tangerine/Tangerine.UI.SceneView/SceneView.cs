@@ -290,12 +290,23 @@ namespace Tangerine.UI.SceneView
 			DuplicateNodes();
 		}
 
-		public class SceneWidget : Widget
+		public class SceneWidget : Widget, IUpdatableNode
 		{
-			public override void Update(float delta)
+			private NodeFreezeHandle freezeHandle = new NodeFreezeHandle();
+
+			public SceneWidget()
 			{
-				if (Document.Current.PreviewAnimation) {
-					base.Update(delta);
+				Components.Add(new UpdatableNodeBehaviour());
+			}
+
+			public virtual void OnUpdate(float delta)
+			{
+				if (Document.Current.PreviewAnimation != freezeHandle.IsActive) {
+					if (Document.Current.PreviewAnimation) {
+						this.FreezeChildrenBehaviours(freezeHandle);
+					} else {
+						freezeHandle.Unfreeze();
+					}
 				}
 			}
 		}

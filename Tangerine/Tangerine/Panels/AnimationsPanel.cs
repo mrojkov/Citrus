@@ -121,7 +121,7 @@ namespace Tangerine.Panels
 							}
 						}
 					}
-					ChangeAnimatorsAnimationId(animation.Owner);
+					ChangeAnimatorsAnimationId(animation.OwnerNode);
 
 					void ChangeAnimatorsAnimationId(Node node)
 					{
@@ -378,7 +378,7 @@ namespace Tangerine.Panels
 				if (a.IsCompound) {
 					label += " [Compound]";
 				}
-				var path = GetNodePath(a.Owner);
+				var path = GetNodePath(a.OwnerNode);
 				if (!a.IsLegacy && !string.IsNullOrEmpty(path)) {
 					label += " (" + path + ')';
 				}

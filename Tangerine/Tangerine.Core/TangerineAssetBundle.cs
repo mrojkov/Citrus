@@ -168,7 +168,8 @@ namespace Tangerine.Core
 						if (attachment.Animations != null) {
 							foreach (var animation in attachment.Animations) {
 								if (animation.SourceAnimationId == null) {
-									animation.SourceAnimationId = model.FirstAnimation?.Id;
+									var ac = model.Components.Get<AnimationComponent>();
+									animation.SourceAnimationId = ac != null && ac.Animations.Count > 0 ? ac.Animations[0].Id : null;
 								}
 							}
 						}

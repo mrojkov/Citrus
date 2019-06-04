@@ -38,7 +38,7 @@ namespace Tangerine.UI.Timeline
 				var rollRow = row.Components.Get<Components.RowView>().RollRow;
 				var widget = rollRow.Widget;
 				if (!rollRow.AwakeBehavior.IsAwoken) {
-					widget.Update(0);
+					rollRow.AwakeBehavior.Update(0);
 				}
 				content.AddNode(widget);
 			}

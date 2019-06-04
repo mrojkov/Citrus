@@ -347,16 +347,20 @@ namespace Tangerine.UI
 		}
 	}
 
-	public class GradientControlPointWidget : Widget
+	public class GradientControlPointWidget : Widget, IUpdatableNode
 	{
 		private readonly Vertex[] vertices = { new Vertex(), new Vertex(), new Vertex() };
 		public GradientControlPoint ControlPoint { get; set; }
 		private readonly ITexture chessTexture;
 		public const float tipBodyRatio = 1f / 3f;
 
-		public override void Update(float delta)
+		public GradientControlPointWidget()
 		{
-			base.Update(delta);
+			Components.Add(new UpdatableNodeBehaviour());
+		}
+
+		public virtual void OnUpdate(float delta)
+		{
 			Position = new Vector2(ParentWidget.Size.X * ControlPoint.Position, ParentWidget.Size.Y);
 		}
 
