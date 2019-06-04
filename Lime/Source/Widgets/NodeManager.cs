@@ -275,6 +275,7 @@ namespace Lime
 		private void BuildBehaviourFamilyQueue()
 		{
 			earlyBehaviourFamilyQueue.Clear();
+			lateBehaviourFamilyQueue.Clear();
 			behaviourFamilyGraphNodeColors.Clear();
 			for (var i = 0; i < behaviourFamilyGraph.Count; i++) {
 				behaviourFamilyGraphNodeColors.Add(BehaviourFamilyGraphNodeColor.White);
