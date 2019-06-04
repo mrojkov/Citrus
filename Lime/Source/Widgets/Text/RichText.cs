@@ -153,18 +153,6 @@ namespace Lime
 			Invalidate();
 		}
 
-		private bool InvertStylesPalleteIndex()
-		{
-			bool dirty = false;
-			foreach (var s in renderer.Styles) {
-				if (s.GradientMapIndex != -1) {
-					dirty = true;
-					s.gradientMapIndex = ShaderPrograms.ColorfulTextShaderProgram.GradientMapTextureSize - s.GradientMapIndex - 1;
-				}
-			}
-			return dirty;
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
