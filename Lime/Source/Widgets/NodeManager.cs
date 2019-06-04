@@ -88,16 +88,27 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			try {
-				updating = true;
-				AnimationSystem.Update(delta);
-				BehaviourSystem.Update(delta);
-				if (Widget.EnableViewCulling) {
-					foreach (var n in nodes) {
-						n.UpdateBoundingRect();
-					}
-				}
+				UpdateCore(delta);
 			} finally {
 				updating = false;
+			}
+		}
+
+		private void UpdateCore(float delta)
+		{
+			BehaviourSystem.StartPendingBehaviours();
+			BehaviourSystem.EarlyUpdate(delta);
+			AnimationSystem.Update(delta);
+			BehaviourSystem.LateUpdate(delta);
+			UpdateBoundingRects();
+		}
+
+		private void UpdateBoundingRects()
+		{
+			if (Widget.EnableViewCulling) {
+				foreach (var n in nodes) {
+					n.UpdateBoundingRect();
+				}
 			}
 		}
 	}
@@ -180,7 +191,8 @@ namespace Lime
 		private Dictionary<Type, int> behaviourFamilyIndexMap = new Dictionary<Type, int>();
 		private HashSet<BehaviourComponent> pendingBehaviours = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
 		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
-		private List<BehaviourFamily> behaviourFamilyQueue = new List<BehaviourFamily>();
+		private List<BehaviourFamily> earlyBehaviourFamilyQueue = new List<BehaviourFamily>();
+		private List<BehaviourFamily> lateBehaviourFamilyQueue = new List<BehaviourFamily>();
 		private bool behaviourFamilyQueueDirty = false;
 
 		public void Freeze(BehaviourComponent behaviour)
@@ -199,7 +211,7 @@ namespace Lime
 			}
 		}
 
-		public void Update(float delta)
+		public void StartPendingBehaviours()
 		{
 			while (pendingBehaviours.Count > 0) {
 				var t = pendingBehaviours;
@@ -220,6 +232,20 @@ namespace Lime
 				BuildBehaviourFamilyQueue();
 				behaviourFamilyQueueDirty = false;
 			}
+		}
+
+		public void EarlyUpdate(float delta)
+		{
+			UpdateBehaviours(earlyBehaviourFamilyQueue, delta);
+		}
+
+		public void LateUpdate(float delta)
+		{
+			UpdateBehaviours(lateBehaviourFamilyQueue, delta);
+		}
+
+		private void UpdateBehaviours(List<BehaviourFamily> behaviourFamilyQueue, float delta)
+		{
 			foreach (var bf in behaviourFamilyQueue) {
 				for (var i = bf.Behaviours.Count - 1; i >= 0; i--) {
 					var b = bf.Behaviours[i];
@@ -248,7 +274,7 @@ namespace Lime
 
 		private void BuildBehaviourFamilyQueue()
 		{
-			behaviourFamilyQueue.Clear();
+			earlyBehaviourFamilyQueue.Clear();
 			behaviourFamilyGraphNodeColors.Clear();
 			for (var i = 0; i < behaviourFamilyGraph.Count; i++) {
 				behaviourFamilyGraphNodeColors.Add(BehaviourFamilyGraphNodeColor.White);
@@ -269,7 +295,9 @@ namespace Lime
 					BuildBehaviourFamilyQueue(i);
 				}
 				behaviourFamilyGraphNodeColors[nodeIndex] = BehaviourFamilyGraphNodeColor.Black;
-				behaviourFamilyQueue.Add(behaviourFamilies[nodeIndex]);
+				var behaviourFamily = behaviourFamilies[nodeIndex];
+				var queue = behaviourFamily.Late ? lateBehaviourFamilyQueue : earlyBehaviourFamilyQueue;
+				queue.Add(behaviourFamilies[nodeIndex]);
 			}
 		}
 
@@ -298,15 +326,24 @@ namespace Lime
 			//if (!typeof(BehaviourComponent).IsAssignableFrom(behaviourType)) {
 			//	throw new InvalidOperationException();
 			//}
+			var late = behaviourType.GetCustomAttribute<LateBehaviourAttribute>() != null;
 			index = behaviourFamilies.Count;
-			behaviourFamilies.Add(new BehaviourFamily(behaviourType));
+			behaviourFamilies.Add(new BehaviourFamily(behaviourType, late));
 			behaviourFamilyGraph.Add(new List<int>());
 			behaviourFamilyIndexMap.Add(behaviourType, index);
 			foreach (var i in behaviourType.GetCustomAttributes<UpdateAfterBehaviourAttribute>(true)) {
-				behaviourFamilyGraph[index].Add(GetBehaviourFamilyIndex(i.BehaviourType));
+				var predecessorFamilyIndex = GetBehaviourFamilyIndex(i.BehaviourType);
+				if (behaviourFamilies[predecessorFamilyIndex].Late != late) {
+					throw new InvalidOperationException();
+				}
+				behaviourFamilyGraph[index].Add(predecessorFamilyIndex);
 			}
 			foreach (var i in behaviourType.GetCustomAttributes<UpdateBeforeBehaviourAttribute>(true)) {
-				behaviourFamilyGraph[GetBehaviourFamilyIndex(i.BehaviourType)].Add(index);
+				var successorFamilyIndex = GetBehaviourFamilyIndex(i.BehaviourType);
+				if (behaviourFamilies[successorFamilyIndex].Late != late) {
+					throw new InvalidOperationException();
+				}
+				behaviourFamilyGraph[successorFamilyIndex].Add(index);
 			}
 			behaviourFamilyQueueDirty = true;
 			return index;
@@ -335,14 +372,21 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Class)]
+	public class LateBehaviourAttribute : Attribute
+	{
+	}
+
 	internal class BehaviourFamily
 	{
+		public readonly bool Late;
 		public readonly Type BehaviourType;
 		public readonly List<BehaviourComponent> Behaviours = new List<BehaviourComponent>();
 
-		public BehaviourFamily(Type behaviourType)
+		public BehaviourFamily(Type behaviourType, bool late)
 		{
 			BehaviourType = behaviourType;
+			Late = late;
 		}
 	}
 
