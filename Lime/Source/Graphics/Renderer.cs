@@ -376,7 +376,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, float letterSpacing,
-			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1, bool ignoreLetterSpacingForFirstChar = true)
+			SpriteList list, Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			int j = 0;
 			if (list != null) {
@@ -390,6 +390,7 @@ namespace Lime
 			var chars = new SpriteList.CharDef[j];
 			j = 0;
 			FontChar prevChar = null;
+			var halfLetterSpacing = letterSpacing * .5f;
 			float savedX = position.X;
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
@@ -408,10 +409,7 @@ namespace Lime
 					continue;
 				}
 				var scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
-				if (!ignoreLetterSpacingForFirstChar || i > 0) {
-					position.X += scale * letterSpacing;
-				}
+				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing);
 				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
 				var charPosition = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
 				if (font.RoundCoordinates) {
@@ -421,7 +419,7 @@ namespace Lime
 				chars[j].FontChar = fontChar;
 				chars[j].Position = charPosition;
 				++j;
-				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
+				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + halfLetterSpacing);
 				prevChar = fontChar;
 			}
 			list.Add(font, color, fontHeight, chars, tag);
