@@ -201,6 +201,7 @@ namespace Lime
 				}
 			}
 		}
+
 		protected abstract void UpdateBehaviour(NodeBehavior b, float delta);
 
 		public override NodeComponent Clone()
