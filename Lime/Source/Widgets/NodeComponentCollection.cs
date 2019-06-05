@@ -150,16 +150,9 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class LegacyBehaviourContainer : LegacyBehaviourContainerBase
 	{
-		protected internal override void Update(float delta)
+		protected override void UpdateBehaviour(NodeBehavior b, float delta)
 		{
-			for (var i = behaviours.Count - 1; i >= 0; i--) {
-				var b = behaviours[i];
-				if (b != null) {
-					b.Update(delta);
-				} else {
-					behaviours.RemoveAt(i);
-				}
-			}
+			b.Update(delta);
 		}
 	}
 
@@ -168,29 +161,22 @@ namespace Lime
 	[LateBehaviour]
 	public class LegacyLateBehaviourContainer : LegacyBehaviourContainerBase
 	{
-		protected internal override void Update(float delta)
+		protected override void UpdateBehaviour(NodeBehavior b, float delta)
 		{
-			for (var i = behaviours.Count - 1; i >= 0; i--) {
-				var b = behaviours[i];
-				if (b != null) {
-					b.LateUpdate(delta);
-				} else {
-					behaviours.RemoveAt(i);
-				}
-			}
+			b.LateUpdate(delta);
 		}
 	}
 
-	public class LegacyBehaviourContainerBase : BehaviourComponent
+	public abstract class LegacyBehaviourContainerBase : BehaviourComponent
 	{
-		protected readonly List<NodeBehavior> behaviours = new List<NodeBehavior>();
+		private readonly List<NodeBehavior> behaviours = new List<NodeBehavior>();
 
 		public bool IsEmpty => behaviours.Count == 0;
 
 		internal void Add(NodeBehavior b)
 		{
 			var index = 0;
-			while (index < behaviours.Count && (behaviours[index] == null || behaviours[index].Order < b.Order)) {
+			while (index < behaviours.Count && (behaviours[index] == null || behaviours[index].Order > b.Order)) {
 				index++;
 			}
 			behaviours.Insert(index, b);
@@ -204,9 +190,22 @@ namespace Lime
 			}
 		}
 
+		protected internal override void Update(float delta)
+		{
+			for (var i = behaviours.Count - 1; i >= 0; i--) {
+				var b = behaviours[i];
+				if (b != null) {
+					UpdateBehaviour(b, delta * Owner.EffectiveAnimationSpeed);
+				} else {
+					behaviours.RemoveAt(i);
+				}
+			}
+		}
+		protected abstract void UpdateBehaviour(NodeBehavior b, float delta);
+
 		public override NodeComponent Clone()
 		{
-			// TODO: This component shold not be cloned
+			// TODO: This component should not be cloned
 			var clone = (LegacyBehaviourContainerBase)base.Clone();
 			clone.behaviours.Clear();
 			return clone;

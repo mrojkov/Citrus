@@ -445,7 +445,7 @@ namespace Lime
 				for (var j = runningAnimations.Count - 1; j >= 0; j--) {
 					var a = runningAnimations[j];
 					if (a != null) {
-						a.Advance(delta);
+						a.Advance(delta * a.OwnerNode.EffectiveAnimationSpeed);
 					} else {
 						a = runningAnimations[runningAnimations.Count - 1];
 						if (a != null) {

@@ -74,6 +74,7 @@ namespace Lime
 			GlobalTransformInverse = 1 << 7,
 			ParentBoundingRect = 1 << 8,
 			Enabled = 1 << 9,
+			EffectiveAnimationSpeed = 1 << 10,
 			All = ~None
 		}
 
@@ -277,10 +278,42 @@ namespace Lime
 		/// </summary>
 		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehaviour>().Tasks;
 
+		private float animationSpeed;
+
 		/// <summary>
 		/// Animation speed multiplier.
 		/// </summary>
-		public float AnimationSpeed { get; set; }
+		public float AnimationSpeed
+		{
+			get => animationSpeed;
+			set
+			{
+				if (animationSpeed != value) {
+					animationSpeed = value;
+					PropagateDirtyFlags(DirtyFlags.EffectiveAnimationSpeed);
+				}
+			}
+		}
+
+		private float effectiveAnimationSpeed;
+
+		public float EffectiveAnimationSpeed
+		{
+			get {
+				if (CleanDirtyFlags(DirtyFlags.EffectiveAnimationSpeed)) {
+					RecalcEffectiveAnimationSpeed();
+				}
+				return effectiveAnimationSpeed;
+			}
+		}
+
+		private void RecalcEffectiveAnimationSpeed()
+		{
+			effectiveAnimationSpeed = AnimationSpeed;
+			if (Parent != null) {
+				effectiveAnimationSpeed *= Parent.EffectiveAnimationSpeed;
+			}
+		}
 
 		public IRenderChainBuilder RenderChainBuilder { get; set; }
 
