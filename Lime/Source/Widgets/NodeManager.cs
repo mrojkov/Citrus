@@ -250,7 +250,7 @@ namespace Lime
 				for (var i = bf.Behaviours.Count - 1; i >= 0; i--) {
 					var b = bf.Behaviours[i];
 					if (b != null) {
-						b.Update(delta);
+						b.Update(delta * b.Owner.EffectiveAnimationSpeed);
 					} else {
 						b = bf.Behaviours[bf.Behaviours.Count - 1];
 						if (b != null) {

@@ -195,7 +195,7 @@ namespace Lime
 			for (var i = behaviours.Count - 1; i >= 0; i--) {
 				var b = behaviours[i];
 				if (b != null) {
-					UpdateBehaviour(b, delta * Owner.EffectiveAnimationSpeed);
+					UpdateBehaviour(b, delta);
 				} else {
 					behaviours.RemoveAt(i);
 				}
