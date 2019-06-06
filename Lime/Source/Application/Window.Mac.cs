@@ -462,10 +462,10 @@ namespace Lime
 			if (invalidated) {
 				fpsCounter.Refresh();
 				// Workaround macOS 10.14 issue: UpdateGLContext should be called on render frame, not on DidResize.
-				//if (needUpdateGLContext) {
-				//	needUpdateGLContext = false;
-				//	View.UpdateGLContext();
-				//}
+				if (needUpdateGLContext) {
+					needUpdateGLContext = false;
+					View.UpdateGLContext();
+				}
 				View.MakeCurrent();
 				RaiseRendering();
 				View.SwapBuffers();
