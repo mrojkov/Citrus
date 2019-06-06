@@ -38,11 +38,12 @@ namespace Lime
 				TouchPressDistance = Vector2.Distance(Touch0, Touch1);
 				TouchDistance = TouchPressDistance;
 			} else if (IsChanging()) {
-				var previousTouchDistance = TouchDistance;
+				float previousTouchDistance = TouchDistance;
 				TouchDistance = Vector2.Distance(Touch0, Touch1);
 				LastPinchScale = TouchDistance / previousTouchDistance;
-				if (!WasChanged() && TouchDistance != previousTouchDistance) {
+				if (!LastPinchScale.Equals(1)) {
 					RaiseChanged();
+					LastPinchScale = 1;
 				}
 			}
 		}
@@ -72,7 +73,9 @@ namespace Lime
 
 		protected override bool CanStartDrag()
 		{
-			return (MousePosition - MousePressPosition).SqrLength > DragThresholdSqr;
+			return
+				(MousePosition - MousePressPosition).SqrLength > DragThresholdSqr ||
+				!TouchDistance.Equals(Vector2.Distance(Touch0, Touch1));
 		}
 	}
 }
