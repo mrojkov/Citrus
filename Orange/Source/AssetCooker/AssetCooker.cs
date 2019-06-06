@@ -43,7 +43,7 @@ namespace Orange
 		{
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
 			if (!skipCooking) {
-				Cook(The.Workspace.ActivePlatform, GetListOfAllBundles());
+				Cook(The.Workspace.ActiveTarget, GetListOfAllBundles());
 			}
 			else {
 				Console.WriteLine("-------------  Skip Assets Cooking -------------");
@@ -102,12 +102,18 @@ namespace Orange
 			}
 		}
 
-		public static void Cook(TargetPlatform platform, List<string> bundles)
+		public static void Cook(Target target, List<string> bundles)
 		{
 			AssetCache.Instance.Initialize();
-			AssetCooker.Platform = platform;
-			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			AssetCooker.Platform = target.Platform;
+			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
 			CookBundles(bundles);
+		}
+
+		public static void Cook(TargetPlatform platform, List<string> bundles)
+		{
+			var firstPlatformTarget = The.Workspace.Targets.FirstOrDefault(t => t.Platform == platform);
+			Cook(firstPlatformTarget, bundles);
 		}
 
 		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)

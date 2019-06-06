@@ -166,7 +166,7 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetCooker.Cook(The.Workspace.ActivePlatform, bundles);
+			action = () => AssetCooker.Cook(The.Workspace.ActiveTarget, bundles);
 			window.Close();
 		}
 

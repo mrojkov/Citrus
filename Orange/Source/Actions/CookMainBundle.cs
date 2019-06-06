@@ -10,7 +10,7 @@ namespace Orange
 		public static void CookMainBundleAction()
 		{
 			AssetCooker.Cook(
-				The.Workspace.ActivePlatform,
+				The.Workspace.ActiveTarget,
 				new System.Collections.Generic.List<string>() { CookingRulesBuilder.MainBundleName }
 			);
 		}
