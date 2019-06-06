@@ -88,6 +88,7 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			try {
+				updating = true;
 				UpdateCore(delta);
 			} finally {
 				updating = false;
