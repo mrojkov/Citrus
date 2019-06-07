@@ -1426,9 +1426,9 @@ namespace Lime
 		public static void Update(this Node node, float delta)
 		{
 			RegisterLegacyBehaviours(node);
-			var legacyBehaviourContainer = node.Components.Get<LegacyBehaviourContainer>();
-			if (legacyBehaviourContainer != null) {
-				legacyBehaviourContainer.Update(delta);
+			var legacyEarlyBehaviourContainer = node.Components.Get<LegacyEarlyBehaviourContainer>();
+			if (legacyEarlyBehaviourContainer != null) {
+				legacyEarlyBehaviourContainer.Update(delta);
 			}
 			var animationComponent = node.Components.Get<AnimationComponent>();
 			if (animationComponent != null) {
