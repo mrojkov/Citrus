@@ -124,8 +124,8 @@ namespace Lime
 			var isColorSpaceRGB = cgImage.ColorSpace.Model == CGColorSpaceModel.RGB;
 			var isMonochrome = cgImage.ColorSpace.Model == CGColorSpaceModel.Monochrome;
 			var bpp = cgImage.BitsPerPixel;
-			if (!((isColorSpaceRGB && (bpp == 32 || bpp == 64)) || (isMonochrome && bpp == 8))) {
-				throw new FormatException("Can not return array of pixels: bitmap should be either 32/64 bpp RGBA or 8 bpp monochrome");
+			if (!((isColorSpaceRGB && (bpp == 32 || bpp == 64)) || (isMonochrome && (bpp == 8 || bpp == 16)))) {
+				throw new FormatException("Can not return array of pixels: bitmap should be either 32/64 bpp RGBA or 8/16 bpp monochrome");
 			}
 
 			var doSwap = cgImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
@@ -155,11 +155,10 @@ namespace Lime
 									}
 									pixels[index++] = doSwap ? new Color4(b, g, r, a) : new Color4(r, g, b, a);
 								}
-
 								// Sometimes Width can be smaller then length of a row due to byte alignment.
 								// It's just an empty bytes at the end of each row, so we can skip them here.
-								for (int k = 0; k < rowLength - width; k++) {
-									pBytes += 4;
+								if (rowLength > width) {
+									pBytes += 4 * (rowLength - width);
 								}
 							}
 						}
@@ -176,45 +175,64 @@ namespace Lime
 									g = (ushort)(*pBytes++);
 									b = (ushort)(*pBytes++);
 									a = (ushort)(*pBytes++);
-									if (isPremultiplied && a != 65536 && a != 0) {
-										r = (ushort)(65536 * r / a);
-										g = (ushort)(65536 * g / a);
-										b = (ushort)(65536 * b / a);
+									if (isPremultiplied && a != 65535 && a != 0) {
+										r = (ushort)(65535 * r / a);
+										g = (ushort)(65535 * g / a);
+										b = (ushort)(65535 * b / a);
 									}
 									pixels[index++] = doSwap ? new Color4((byte)(b / 255), (byte)(g / 255), (byte)(r / 255), (byte)(a / 255))
 										: new Color4((byte)(r / 255), (byte)(g / 255), (byte)(b / 255), (byte)(a / 255));
 								}
-
 								// Sometimes Width can be smaller then length of a row due to byte alignment.
 								// It's just an empty bytes at the end of each row, so we can skip them here.
-								for (int k = 0; k < rowLength - width; k++) {
-									pBytes += bpp / 8;
+								if (rowLength > width) {
+									pBytes += 8 * (rowLength - width);
 								}
 							}
 						}
 					}
 				}
 			} else if (isMonochrome) {
-				using (var data = cgImage.DataProvider.CopyData()) {
-					unsafe {
-						byte* pBytes = (byte*)data.Bytes;
-						byte v;
-						int index = 0;
-						for (int i = 0; i < height; i++) {
-							for (int j = 0; j < width; j++) {
-								v = (*pBytes++);
-								pixels[index++] = new Color4(v, v, v, 255);
+				if (bpp == 8) {
+					using (var data = cgImage.DataProvider.CopyData()) {
+						unsafe {
+							byte* pBytes = (byte*)data.Bytes;
+							byte v;
+							int index = 0;
+							for (int i = 0; i < height; i++) {
+								for (int j = 0; j < width; j++) {
+									v = (*pBytes++);
+									pixels[index++] = new Color4(v, v, v, 255);
+								}	
+								// Sometimes Width can be smaller then length of a row due to byte alignment.
+								// It's just an empty bytes at the end of each row, so we can skip them here.
+								if (rowLength > width) {
+									pBytes += rowLength - width;
+								}
 							}
-
-							// Sometimes Width can be smaller then length of a row due to byte alignment.
-							// It's just an empty bytes at the end of each row, so we can skip them here.
-							for (int k = 0; k < rowLength - width; k++) {
-								pBytes += bpp / 8;
+						}
+					}
+				} else if (bpp == 16) {
+					using (var data = cgImage.DataProvider.CopyData()) {
+						unsafe {
+							byte* pBytes = (byte*)data.Bytes;
+							byte v, a;
+							int index = 0;
+							for (int i = 0; i < height; i++) {
+								for (int j = 0; j < width; j++) {
+									v = (*pBytes++);
+									a = (*pBytes++);
+									pixels[index++] = new Color4(v, v, v, a);
+								}
+								// Sometimes Width can be smaller then length of a row due to byte alignment.
+								// It's just an empty bytes at the end of each row, so we can skip them here.
+								if (rowLength > width) {
+									pBytes += 2 * (rowLength - width);
+								}
 							}
 						}
 					}
 				}
-
 			}
 			return pixels;
 		}
