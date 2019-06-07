@@ -1382,6 +1382,19 @@ namespace Lime
 
 	public static class NodeCompatibilityExtensions
 	{
+		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		{
+			var c = node.Components.Get<AnimationComponent>();
+			if (c != null) {
+				foreach (var a in c.Animations) {
+					a.Advance(delta);
+				}
+			}
+			foreach (var child in node.Nodes) {
+				AdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
+			}
+		}
+
 		public static void FreezeChildrenBehaviours(this Node node, NodeFreezeHandle freezeHandle)
 		{
 			foreach (var child in node.Nodes) {
