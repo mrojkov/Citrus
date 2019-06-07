@@ -31,7 +31,7 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <XamMacArch>x86_64</XamMacArch>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
-    <LinkMode>SdkOnly</LinkMode>
+    <LinkMode>None</LinkMode>
     <TlsProvider>Default</TlsProvider>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <CodeSignEntitlements>
