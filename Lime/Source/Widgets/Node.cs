@@ -1433,13 +1433,11 @@ namespace Lime
 			var animationComponent = node.Components.Get<AnimationComponent>();
 			if (animationComponent != null) {
 				foreach (var a in animationComponent.Animations) {
-					if (a.IsRunning) {
-						a.Advance(delta);
-					}
+					a.Advance(delta);
 				}
 			}
 			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-				Update(child, delta);
+				Update(child, delta * child.AnimationSpeed);
 			}
 			RegisterLegacyBehaviours(node);
 			var legacyLateBehaviourContainer = node.Components.Get<LegacyLateBehaviourContainer>();
