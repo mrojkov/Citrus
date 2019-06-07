@@ -334,21 +334,21 @@ namespace Lime
 			behaviourFamilyGraph.Add(new List<int>());
 			behaviourFamilyIndexMap.Add(behaviourType, index);
 			foreach (var i in behaviourType.GetCustomAttributes<UpdateAfterBehaviourAttribute>(true)) {
-				var predecessorFamilyIndex = GetBehaviourFamilyIndex(i.BehaviourType);
-				if (behaviourFamilies[predecessorFamilyIndex].Late != late) {
-					throw new InvalidOperationException();
-				}
-				behaviourFamilyGraph[index].Add(predecessorFamilyIndex);
+				InsertDependency(index, GetBehaviourFamilyIndex(i.BehaviourType));
 			}
 			foreach (var i in behaviourType.GetCustomAttributes<UpdateBeforeBehaviourAttribute>(true)) {
-				var successorFamilyIndex = GetBehaviourFamilyIndex(i.BehaviourType);
-				if (behaviourFamilies[successorFamilyIndex].Late != late) {
-					throw new InvalidOperationException();
-				}
-				behaviourFamilyGraph[successorFamilyIndex].Add(index);
+				InsertDependency(GetBehaviourFamilyIndex(i.BehaviourType), index);
 			}
 			behaviourFamilyQueueDirty = true;
 			return index;
+		}
+
+		private void InsertDependency(int successorFamilyIndex, int predecessorFamilyIndex)
+		{
+			if (behaviourFamilies[successorFamilyIndex].Late != behaviourFamilies[predecessorFamilyIndex].Late) {
+				throw new InvalidOperationException();
+			}
+			behaviourFamilyGraph[successorFamilyIndex].Add(predecessorFamilyIndex);
 		}
 	}
 
