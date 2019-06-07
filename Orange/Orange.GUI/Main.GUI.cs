@@ -19,7 +19,7 @@ namespace Orange
 			var thisExe = System.Reflection.Assembly.GetExecutingAssembly();
 			var resources = thisExe.GetManifestResourceNames();
 			Application.Initialize(new ApplicationOptions {
-				RenderingBackend = RenderingBackend.OpenGL
+				RenderingBackend = RenderingBackend.Vulkan
 			});
 			OrangeApp.Initialize();
 			Application.Run();
