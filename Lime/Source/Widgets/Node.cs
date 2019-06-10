@@ -1560,5 +1560,13 @@ namespace Lime
 				b.OnUpdate(delta);
 			}
 		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (BoneArrayUpdaterBehaviour)base.Clone();
+			clone.bones = new List<Bone>();
+			clone.needResort = false;
+			return clone;
+		}
 	}
 }
