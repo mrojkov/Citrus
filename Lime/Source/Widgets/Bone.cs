@@ -295,6 +295,7 @@ namespace Lime
 		}
 	}
 
+	[NodeComponentDontSerialize]
 	internal class BoneBehaviour : BehaviourComponent
 	{
 		private Bone bone;

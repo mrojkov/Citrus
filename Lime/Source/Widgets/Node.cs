@@ -1530,6 +1530,7 @@ namespace Lime
 		}
 	}
 
+	[NodeComponentDontSerialize]
 	[LateBehaviour]
 	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
 	public class BoneArrayUpdaterBehaviour : BehaviourComponent
