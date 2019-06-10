@@ -1425,6 +1425,10 @@ namespace Lime
 
 		public static void Update(this Node node, float delta)
 		{
+			var boneBehaviour = node.Components.Get<BoneBehaviour>();
+			if (boneBehaviour != null) {
+				boneBehaviour.Register();
+			}
 			RegisterLegacyBehaviours(node);
 			var legacyEarlyBehaviourContainer = node.Components.Get<LegacyEarlyBehaviourContainer>();
 			if (legacyEarlyBehaviourContainer != null) {
@@ -1444,6 +1448,10 @@ namespace Lime
 			if (legacyLateBehaviourContainer != null) {
 				legacyLateBehaviourContainer.Update(delta);
 			}
+			var boneArrayUpdaterBehaviour = node.Components.Get<BoneArrayUpdaterBehaviour>();
+			if (boneArrayUpdaterBehaviour != null) {
+				boneArrayUpdaterBehaviour.Update(delta);
+			}
 			var updatableNodeBehaviour = node.Components.Get<UpdatableNodeBehaviour>();
 			if (updatableNodeBehaviour != null) {
 				updatableNodeBehaviour.CheckOwner();
@@ -1452,6 +1460,7 @@ namespace Lime
 		}
 	}
 
+	[MutuallyExclusiveDerivedComponents]
 	[NodeComponentDontSerialize]
 	[LateBehaviour]
 	public class UpdatableNodeBehaviour : BehaviourComponent
@@ -1518,6 +1527,37 @@ namespace Lime
 				clone.Animations.Add(a.Clone());
 			}
 			return clone;
+		}
+	}
+
+	[LateBehaviour]
+	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
+	public class BoneArrayUpdaterBehaviour : BehaviourComponent
+	{
+		private List<Bone> bones = new List<Bone>();
+		private bool needResort = false;
+
+		public void AddBone(Bone bone)
+		{
+			bones.Add(bone);
+			needResort = true;
+		}
+
+		public void RemoveBone(Bone bone)
+		{
+			bones.Remove(bone);
+			needResort = true;
+		}
+
+		protected internal override void Update(float delta)
+		{
+			if (needResort) {
+				bones.Sort((x, y) => x.Index.CompareTo(y.Index));
+				needResort = false;
+			}
+			foreach (var b in bones) {
+				b.OnUpdate(delta);
+			}
 		}
 	}
 }

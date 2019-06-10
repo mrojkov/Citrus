@@ -71,7 +71,7 @@ namespace Lime
 
 	[TangerineRegisterNode(Order = 5)]
 	[TangerineVisualHintGroup("/All/Nodes/Bones")]
-	public class Bone : Node, IUpdatableNode
+	public class Bone : Node
 	{
 		[YuzuMember]
 		[TangerineKeyframeColor(10)]
@@ -136,7 +136,7 @@ namespace Lime
 			EffectiveRadius = 100;
 			FadeoutZone = 50;
 			IKStopper = true;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new BoneBehaviour());
 		}
 
 		public virtual void OnUpdate(float delta)
@@ -292,6 +292,31 @@ namespace Lime
 				bone = root;
 			}
 			return bone;
+		}
+	}
+
+	internal class BoneBehaviour : BehaviourComponent
+	{
+		private Bone bone;
+		private BoneArrayUpdaterBehaviour boneArrayUpdater;
+
+		protected internal override void Start()
+		{
+			Register();
+		}
+
+		public void Register()
+		{
+			if (bone == null) {
+				bone = (Bone)Owner;
+				boneArrayUpdater = Owner.Parent.Components.GetOrAdd<BoneArrayUpdaterBehaviour>();
+				boneArrayUpdater.AddBone(bone);
+			}
+		}
+
+		protected internal override void Stop()
+		{
+			boneArrayUpdater.RemoveBone(bone);
 		}
 	}
 }
