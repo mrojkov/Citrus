@@ -18,6 +18,7 @@ namespace Lime
 		public override bool IsNotDecorated() => false;
 
 		public bool SquashDuplicateLines { get; set; } = false;
+		public bool TrimWhitespaces { get; set; } = true;
 
 		public ThemedTextView()
 		{
@@ -52,7 +53,7 @@ namespace Lime
 					}
 					lastLine = null;
 				} else {
-					var line = new ThemedSimpleText(l);
+					var line = new ThemedSimpleText(l) { TrimWhitespaces = TrimWhitespaces };
 					line.TextProcessor += ProcessTextLine;
 					line.Components.Add(new TextLineMultiplicity());
 					lines.Add(line);
