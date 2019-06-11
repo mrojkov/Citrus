@@ -412,6 +412,7 @@
     <Compile Include="Source\Widgets\Animation\CubicBezier.cs" />
     <Compile Include="Source\Widgets\Animation\EasedAnimator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\PipelineCache.cs" />
+    <Compile Include="Source\Localization\Pluralizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

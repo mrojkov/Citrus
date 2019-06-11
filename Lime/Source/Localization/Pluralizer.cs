@@ -14,6 +14,8 @@ namespace Lime
 				return GetPlural(Math.Abs(i));
 			} else if (obj is float f) {
 				return GetPlural(Math.Abs((int)f));
+			} else if (obj is string s && int.TryParse(s, out var number)) {
+				return GetPlural(Math.Abs(number));
 			}
 			return 0;
 		}

@@ -270,6 +270,7 @@
     <Compile Include="Source\Graphics\VertexInputLayout.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\Localization\Pluralizer.cs" />
     <Compile Include="Source\Mathf.Easings.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
