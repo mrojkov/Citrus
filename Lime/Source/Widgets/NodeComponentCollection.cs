@@ -148,6 +148,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
+	[UpdateStage(typeof(EarlyUpdateStage))]
 	public class LegacyEarlyBehaviourContainer : LegacyBehaviourContainer
 	{
 		protected override void UpdateBehaviour(NodeBehavior b, float delta)
@@ -158,7 +159,7 @@ namespace Lime
 
 	[NodeComponentDontSerialize]
 	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
-	[LateBehaviour]
+	[UpdateStage(typeof(LateUpdateStage))]
 	public class LegacyLateBehaviourContainer : LegacyBehaviourContainer
 	{
 		protected override void UpdateBehaviour(NodeBehavior b, float delta)
@@ -167,7 +168,7 @@ namespace Lime
 		}
 	}
 
-	public abstract class LegacyBehaviourContainer : BehaviourComponent
+	public abstract class LegacyBehaviourContainer : UpdatableBehaviourComponent
 	{
 		private readonly List<NodeBehavior> behaviours = new List<NodeBehavior>();
 

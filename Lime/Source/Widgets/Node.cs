@@ -1405,7 +1405,7 @@ namespace Lime
 		public static void FreezeNodeBehaviours(this Node node, NodeFreezeHandle freezeHandle)
 		{
 			foreach (var c in node.Components) {
-				if (c is BehaviourComponent b) {
+				if (c is UpdatableBehaviourComponent b) {
 					freezeHandle.BehaviourFreezeHandles.Add(b.Freeze());
 				}
 			}
@@ -1462,8 +1462,8 @@ namespace Lime
 
 	[MutuallyExclusiveDerivedComponents]
 	[NodeComponentDontSerialize]
-	[LateBehaviour]
-	public class UpdatableNodeBehaviour : BehaviourComponent
+	[UpdateStage(typeof(LateUpdateStage))]
+	public class UpdatableNodeBehaviour : UpdatableBehaviourComponent
 	{
 		private IUpdatableNode node;
 
@@ -1531,9 +1531,9 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	[LateBehaviour]
+	[UpdateStage(typeof(LateUpdateStage))]
 	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
-	public class BoneArrayUpdaterBehaviour : BehaviourComponent
+	public class BoneArrayUpdaterBehaviour : UpdatableBehaviourComponent
 	{
 		private List<Bone> bones = new List<Bone>();
 		private bool needResort = false;
