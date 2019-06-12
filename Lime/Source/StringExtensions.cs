@@ -20,7 +20,7 @@ namespace Lime
 		/// </summary>
 		public static string Localize(this string text)
 		{
-			return Localization.GetString(text);
+			return Pluralizer.Pluralize(Localization.GetString(text));
 		}
 
 		/// <summary>
