@@ -320,6 +320,8 @@ namespace Lime
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static double Clamp(double value, double min, double max) => (value < min) ? min : (value > max ? max : value);
 
+		public static int LoopInRange(int value, int min, int max) => (value - min) % (max - min + 1) + min;
+
 		public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max) => new Vector2(
 			Clamp(value.X, min.X, max.X),
 			Clamp(value.Y, min.Y, max.Y)
