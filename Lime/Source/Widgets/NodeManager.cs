@@ -371,6 +371,7 @@ namespace Lime
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
 			behaviourFamily = updateStage.CreateBehaviourFamily(behaviourType);
+			behaviourFamilies.Add(behaviourType, behaviourFamily);
 			foreach (var i in behaviourType.GetCustomAttributes<UpdateAfterBehaviourAttribute>()) {
 				updateStage.AddDependency(behaviourFamily, GetUpdatableBehaviourFamily(i.BehaviourType));
 			}
