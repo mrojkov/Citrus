@@ -13,7 +13,7 @@ namespace Tangerine
 			var thisExe = System.Reflection.Assembly.GetExecutingAssembly();
 			string [] resources = thisExe.GetManifestResourceNames();
 			Lime.Application.Initialize(new ApplicationOptions {
-				RenderingBackend = RenderingBackend.OpenGL
+				RenderingBackend = RenderingBackend.Vulkan
 			});
 			TangerineApp.Initialize(args);
 			Lime.Application.Run();
