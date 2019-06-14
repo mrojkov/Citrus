@@ -849,13 +849,11 @@ namespace Lime
 				renderControl.Invalidate();
 			}
 			renderingState = renderControl.CanRender ? RenderingState.Updated : RenderingState.Rendered;
+			WaitForRendering();
 			if (renderControl.CanRender) {
-				if (AsyncRendering) {
-					renderCompleted.WaitOne();
-					renderCompleted.Reset();
-				}
 				RaiseSync();
 				if (AsyncRendering) {
+					renderCompleted.Reset();
 					renderReady.Set();
 				}
 			}
