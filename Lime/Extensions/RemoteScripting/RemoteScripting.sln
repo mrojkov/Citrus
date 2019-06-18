@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteScripting", "RemoteScripting.csproj", "{7B9B8D59-7B31-401B-B28A-011E9C6635C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\..\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\..\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Win", "..\..\Yuzu\Yuzu.Win.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Win", "..\..\..\Yuzu\Yuzu.Win.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

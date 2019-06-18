@@ -50,13 +50,13 @@
     <Compile Include="Source\PortableAssembly.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
-      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
-      <Name>Lime.Win</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Yuzu\Yuzu.Win.csproj">
+    <ProjectReference Include="..\..\..\Yuzu\Yuzu.Win.csproj">
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
