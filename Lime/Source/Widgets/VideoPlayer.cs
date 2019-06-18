@@ -50,7 +50,7 @@ namespace Lime
 		public VideoPlayer()
 		{
 			Anchors = Anchors.LeftRightTopBottom;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public VideoPlayer(Widget parentWidget)

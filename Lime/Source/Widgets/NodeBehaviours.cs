@@ -35,7 +35,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	public class UpdateBehaviour : NodeBehavior
+	public class UpdateBehavior : NodeBehavior
 	{
 		public UpdateHandler Updating;
 
@@ -44,14 +44,14 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (UpdateBehaviour)base.Clone();
+			var clone = (UpdateBehavior)base.Clone();
 			clone.Updating = null;
 			return clone;
 		}
 	}
 
 	[NodeComponentDontSerialize]
-	public class UpdatedBehaviour : NodeBehavior
+	public class UpdatedBehavior : NodeBehavior
 	{
 		public UpdateHandler Updated;
 
@@ -60,14 +60,14 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (UpdatedBehaviour)base.Clone();
+			var clone = (UpdatedBehavior)base.Clone();
 			clone.Updated = null;
 			return clone;
 		}
 	}
 
 	[NodeComponentDontSerialize]
-	public class TasksBehaviour : NodeBehavior
+	public class TasksBehavior : NodeBehavior
 	{
 		public TaskList Tasks { get; private set; }
 
@@ -82,7 +82,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (TasksBehaviour)base.Clone();
+			var clone = (TasksBehavior)base.Clone();
 			clone.Tasks = null;
 			return clone;
 		}
@@ -94,7 +94,7 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	public class LateTasksBehaviour : NodeBehavior
+	public class LateTasksBehavior : NodeBehavior
 	{
 		public TaskList Tasks { get; private set; }
 
@@ -109,7 +109,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (LateTasksBehaviour)base.Clone();
+			var clone = (LateTasksBehavior)base.Clone();
 			clone.Tasks = null;
 			return clone;
 		}

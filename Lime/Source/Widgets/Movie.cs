@@ -38,7 +38,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			movieTexture = new MovieTexture();
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public override Vector2 CalcContentSize()

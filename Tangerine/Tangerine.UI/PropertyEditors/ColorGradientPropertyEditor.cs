@@ -356,7 +356,7 @@ namespace Tangerine.UI
 
 		public GradientControlPointWidget()
 		{
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public virtual void OnUpdate(float delta)

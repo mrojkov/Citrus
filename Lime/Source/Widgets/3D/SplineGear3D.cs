@@ -25,7 +25,7 @@ namespace Lime
 		public SplineGear3D()
 		{
 			RenderChainBuilder = null;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		protected override Node CloneInternal()

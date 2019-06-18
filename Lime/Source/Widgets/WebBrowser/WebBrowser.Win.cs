@@ -19,7 +19,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			implementation = BrowserFactory(this);
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public WebBrowser(Widget parentWidget)

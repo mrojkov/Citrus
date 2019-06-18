@@ -43,7 +43,7 @@ namespace Lime
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
 			Awoke += Awake;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		private void SetState(IEnumerator<int> newState)

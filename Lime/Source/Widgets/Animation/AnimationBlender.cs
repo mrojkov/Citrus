@@ -6,7 +6,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterComponent]
-	public class AnimationBlender : BehaviourComponent
+	public class AnimationBlender : BehaviorComponent
 	{
 		private Dictionary<string, BlendingProcess> blendings = new Dictionary<string, BlendingProcess>();
 

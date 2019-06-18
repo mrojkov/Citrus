@@ -300,7 +300,7 @@ namespace Lime
 			AlongPathOrientation = false;
 			TimeShift = 0;
 			ImmortalParticles = false;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		protected override Node CloneInternal()

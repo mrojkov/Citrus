@@ -55,24 +55,24 @@ namespace Lime
 		public virtual void Dispose() { }
 	}
 
-	public class NodeBehavior : BehaviourComponent
+	public class NodeBehavior : BehaviorComponent
 	{
 		private bool registered;
-		private LegacyEarlyBehaviourContainer earlyBehaviourContainer;
-		private LegacyLateBehaviourContainer lateBehaviourContainer;
+		private LegacyEarlyBehaviorContainer earlyBehaviorContainer;
+		private LegacyLateBehaviorContainer lateBehaviorContainer;
 
 		public virtual int Order => 0;
 
 		public void Register()
 		{
 			if (!registered) {
-				if (behaviourEarlyUpdateChecker.Value.IsMethodOverriden(GetType())) {
-					earlyBehaviourContainer = Owner.Components.GetOrAdd<LegacyEarlyBehaviourContainer>();
-					earlyBehaviourContainer.Add(this);
+				if (behaviorEarlyUpdateChecker.Value.IsMethodOverriden(GetType())) {
+					earlyBehaviorContainer = Owner.Components.GetOrAdd<LegacyEarlyBehaviorContainer>();
+					earlyBehaviorContainer.Add(this);
 				}
-				if (behaviourLateUpdateChecker.Value.IsMethodOverriden(GetType())) {
-					lateBehaviourContainer = Owner.Components.GetOrAdd<LegacyLateBehaviourContainer>();
-					lateBehaviourContainer.Add(this);
+				if (behaviorLateUpdateChecker.Value.IsMethodOverriden(GetType())) {
+					lateBehaviorContainer = Owner.Components.GetOrAdd<LegacyLateBehaviorContainer>();
+					lateBehaviorContainer.Add(this);
 				}
 				registered = true;
 			}
@@ -85,23 +85,23 @@ namespace Lime
 
 		protected internal override void Stop()
 		{
-			RemoveFromContainer(earlyBehaviourContainer);
-			RemoveFromContainer(lateBehaviourContainer);
-			earlyBehaviourContainer = null;
-			lateBehaviourContainer = null;
+			RemoveFromContainer(earlyBehaviorContainer);
+			RemoveFromContainer(lateBehaviorContainer);
+			earlyBehaviorContainer = null;
+			lateBehaviorContainer = null;
 			registered = false;
 		}
 
 		public override NodeComponent Clone()
 		{
 			var clone = (NodeBehavior)base.Clone();
-			clone.earlyBehaviourContainer = null;
-			clone.lateBehaviourContainer = null;
+			clone.earlyBehaviorContainer = null;
+			clone.lateBehaviorContainer = null;
 			clone.registered = false;
 			return clone;
 		}
 
-		private void RemoveFromContainer(LegacyBehaviourContainer container)
+		private void RemoveFromContainer(LegacyBehaviorContainer container)
 		{
 			if (container != null) {
 				container.Remove(this);
@@ -119,18 +119,18 @@ namespace Lime
 		{
 		}
 
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourEarlyUpdateChecker =
-			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.Update)));
+		private static ThreadLocal<OverridenBehaviorMethodChecker> behaviorEarlyUpdateChecker =
+			new ThreadLocal<OverridenBehaviorMethodChecker>(() => new OverridenBehaviorMethodChecker(nameof(NodeBehavior.Update)));
 
-		private static ThreadLocal<OverridenBehaviourMethodChecker> behaviourLateUpdateChecker =
-			new ThreadLocal<OverridenBehaviourMethodChecker>(() => new OverridenBehaviourMethodChecker(nameof(NodeBehavior.LateUpdate)));
+		private static ThreadLocal<OverridenBehaviorMethodChecker> behaviorLateUpdateChecker =
+			new ThreadLocal<OverridenBehaviorMethodChecker>(() => new OverridenBehaviorMethodChecker(nameof(NodeBehavior.LateUpdate)));
 
-		private class OverridenBehaviourMethodChecker
+		private class OverridenBehaviorMethodChecker
 		{
 			private readonly string methodName;
 			private readonly Dictionary<Type, bool> checkedTypes = new Dictionary<Type, bool>();
 
-			public OverridenBehaviourMethodChecker(string methodName)
+			public OverridenBehaviorMethodChecker(string methodName)
 			{
 				this.methodName = methodName;
 			}
@@ -149,67 +149,67 @@ namespace Lime
 
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(EarlyUpdateStage))]
-	public class LegacyEarlyBehaviourContainer : LegacyBehaviourContainer
+	public class LegacyEarlyBehaviorContainer : LegacyBehaviorContainer
 	{
-		protected override void UpdateBehaviour(NodeBehavior b, float delta)
+		protected override void UpdateBehavior(NodeBehavior b, float delta)
 		{
 			b.Update(delta);
 		}
 	}
 
 	[NodeComponentDontSerialize]
-	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
+	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
 	[UpdateStage(typeof(LateUpdateStage))]
-	public class LegacyLateBehaviourContainer : LegacyBehaviourContainer
+	public class LegacyLateBehaviorContainer : LegacyBehaviorContainer
 	{
-		protected override void UpdateBehaviour(NodeBehavior b, float delta)
+		protected override void UpdateBehavior(NodeBehavior b, float delta)
 		{
 			b.LateUpdate(delta);
 		}
 	}
 
-	public abstract class LegacyBehaviourContainer : UpdatableBehaviourComponent
+	public abstract class LegacyBehaviorContainer : UpdatableBehaviorComponent
 	{
-		private readonly List<NodeBehavior> behaviours = new List<NodeBehavior>();
+		private readonly List<NodeBehavior> behaviors = new List<NodeBehavior>();
 
-		public bool IsEmpty => behaviours.Count == 0;
+		public bool IsEmpty => behaviors.Count == 0;
 
 		internal void Add(NodeBehavior b)
 		{
 			var index = 0;
-			while (index < behaviours.Count && (behaviours[index] == null || behaviours[index].Order > b.Order)) {
+			while (index < behaviors.Count && (behaviors[index] == null || behaviors[index].Order > b.Order)) {
 				index++;
 			}
-			behaviours.Insert(index, b);
+			behaviors.Insert(index, b);
 		}
 
 		internal void Remove(NodeBehavior b)
 		{
-			var index = behaviours.IndexOf(b);
+			var index = behaviors.IndexOf(b);
 			if (index >= 0) {
-				behaviours[index] = null;
+				behaviors[index] = null;
 			}
 		}
 
 		protected internal override void Update(float delta)
 		{
-			for (var i = behaviours.Count - 1; i >= 0; i--) {
-				var b = behaviours[i];
+			for (var i = behaviors.Count - 1; i >= 0; i--) {
+				var b = behaviors[i];
 				if (b != null) {
-					UpdateBehaviour(b, delta);
+					UpdateBehavior(b, delta);
 				} else {
-					behaviours.RemoveAt(i);
+					behaviors.RemoveAt(i);
 				}
 			}
 		}
 
-		protected abstract void UpdateBehaviour(NodeBehavior b, float delta);
+		protected abstract void UpdateBehavior(NodeBehavior b, float delta);
 
 		public override NodeComponent Clone()
 		{
 			// TODO: This component should not be cloned
-			var clone = (LegacyBehaviourContainer)base.Clone();
-			clone.behaviours.Clear();
+			var clone = (LegacyBehaviorContainer)base.Clone();
+			clone.behaviors.Clear();
 			return clone;
 		}
 	}

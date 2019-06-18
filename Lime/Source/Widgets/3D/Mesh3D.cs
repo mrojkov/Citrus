@@ -180,7 +180,7 @@ namespace Lime
 			Presenter = DefaultPresenter.Instance;
 			Submeshes = new Submesh3DCollection(this);
 			CullMode = CullMode.Front;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		internal protected override bool PartialHitTest (ref HitTestArgs args)

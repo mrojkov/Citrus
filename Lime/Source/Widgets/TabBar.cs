@@ -22,7 +22,7 @@ namespace Lime
 			HitTestTarget = true;
 			Gestures.Add(new ClickGesture(2, () => Closing?.Invoke()));
 			Awoke += Awake;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public bool Active

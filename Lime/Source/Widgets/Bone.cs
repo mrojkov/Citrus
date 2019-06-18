@@ -136,7 +136,7 @@ namespace Lime
 			EffectiveRadius = 100;
 			FadeoutZone = 50;
 			IKStopper = true;
-			Components.Add(new BoneBehaviour());
+			Components.Add(new BoneBehavior());
 		}
 
 		public virtual void OnUpdate(float delta)
@@ -296,10 +296,10 @@ namespace Lime
 	}
 
 	[NodeComponentDontSerialize]
-	internal class BoneBehaviour : BehaviourComponent
+	internal class BoneBehavior : BehaviorComponent
 	{
 		private Bone bone;
-		private BoneArrayUpdaterBehaviour boneArrayUpdater;
+		private BoneArrayUpdaterBehavior boneArrayUpdater;
 
 		protected internal override void Start()
 		{
@@ -310,7 +310,7 @@ namespace Lime
 		{
 			if (bone == null) {
 				bone = (Bone)Owner;
-				boneArrayUpdater = Owner.Parent.Components.GetOrAdd<BoneArrayUpdaterBehaviour>();
+				boneArrayUpdater = Owner.Parent.Components.GetOrAdd<BoneArrayUpdaterBehavior>();
 				boneArrayUpdater.AddBone(bone);
 			}
 		}
@@ -322,7 +322,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (BoneBehaviour)base.Clone();
+			var clone = (BoneBehavior)base.Clone();
 			clone.bone = null;
 			clone.boneArrayUpdater = null;
 			return clone;

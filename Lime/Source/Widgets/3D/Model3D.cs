@@ -53,9 +53,9 @@ namespace Lime
 						var oldTrigger = Trigger;
 						Trigger = attachment.EntryTrigger;
 						TriggerMultipleAnimations(Trigger);
-						var animationBehaviour = Components.Get<AnimationComponent>();
-						if (animationBehaviour != null) {
-							foreach (var a in animationBehaviour.Animations) {
+						var animationBehavior = Components.Get<AnimationComponent>();
+						if (animationBehavior != null) {
+							foreach (var a in animationBehavior.Animations) {
 								if (a.IsRunning) {
 									a.Advance(0);
 								}

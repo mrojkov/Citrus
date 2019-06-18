@@ -255,8 +255,8 @@ namespace Lime
 		/// </summary>
 		public UpdateHandler Updating
 		{
-			get => Components.GetOrAdd<UpdateBehaviour>().Updating;
-			set => Components.GetOrAdd<UpdateBehaviour>().Updating = value;
+			get => Components.GetOrAdd<UpdateBehavior>().Updating;
+			set => Components.GetOrAdd<UpdateBehavior>().Updating = value;
 		}
 
 		/// <summary>
@@ -264,19 +264,19 @@ namespace Lime
 		/// </summary>
 		public UpdateHandler Updated
 		{
-			get => Components.GetOrAdd<UpdatedBehaviour>().Updated;
-			set => Components.GetOrAdd<UpdatedBehaviour>().Updated = value;
+			get => Components.GetOrAdd<UpdatedBehavior>().Updated;
+			set => Components.GetOrAdd<UpdatedBehavior>().Updated = value;
 		}
 
 		/// <summary>
 		/// Tasks that are called before Update.
 		/// </summary>
-		public TaskList Tasks => Components.GetOrAdd<TasksBehaviour>().Tasks;
+		public TaskList Tasks => Components.GetOrAdd<TasksBehavior>().Tasks;
 
 		/// <summary>
 		/// Tasks that are called after Update.
 		/// </summary>
-		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehaviour>().Tasks;
+		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehavior>().Tasks;
 
 		private float animationSpeed;
 
@@ -1208,9 +1208,9 @@ namespace Lime
 						Components.Add(assetBundlePathComponent.Clone());
 					}
 					Components.Remove(typeof(AnimationComponent));
-					var animationBehaviour = content.Components.Get<AnimationComponent>();
-					if (animationBehaviour != null) {
-						Components.Add(animationBehaviour.Clone());
+					var animationBehavior = content.Components.Get<AnimationComponent>();
+					if (animationBehavior != null) {
+						Components.Add(animationBehavior.Clone());
 					}
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
@@ -1367,16 +1367,16 @@ namespace Lime
 
 	public class NodeFreezeHandle
 	{
-		internal readonly List<BehaviourFreezeHandle> BehaviourFreezeHandles = new List<BehaviourFreezeHandle>();
+		internal readonly List<BehaviorFreezeHandle> BehaviorFreezeHandles = new List<BehaviorFreezeHandle>();
 
-		public bool IsActive => BehaviourFreezeHandles.Count > 0;
+		public bool IsActive => BehaviorFreezeHandles.Count > 0;
 
 		public void Unfreeze()
 		{
-			foreach (var fh in BehaviourFreezeHandles) {
+			foreach (var fh in BehaviorFreezeHandles) {
 				fh.Dispose();
 			}
-			BehaviourFreezeHandles.Clear();
+			BehaviorFreezeHandles.Clear();
 		}
 	}
 
@@ -1395,44 +1395,44 @@ namespace Lime
 			}
 		}
 
-		public static void FreezeChildrenBehaviours(this Node node, NodeFreezeHandle freezeHandle)
+		public static void FreezeChildrenBehaviors(this Node node, NodeFreezeHandle freezeHandle)
 		{
 			foreach (var child in node.Nodes) {
-				FreezeNodeBehaviours(child, freezeHandle);
+				FreezeNodeBehaviors(child, freezeHandle);
 			}
 		}
 
-		public static void FreezeNodeBehaviours(this Node node, NodeFreezeHandle freezeHandle)
+		public static void FreezeNodeBehaviors(this Node node, NodeFreezeHandle freezeHandle)
 		{
 			foreach (var c in node.Components) {
-				if (c is UpdatableBehaviourComponent b) {
-					freezeHandle.BehaviourFreezeHandles.Add(b.Freeze());
+				if (c is UpdatableBehaviorComponent b) {
+					freezeHandle.BehaviorFreezeHandles.Add(b.Freeze());
 				}
 			}
 			foreach (var child in node.Nodes) {
-				FreezeNodeBehaviours(child, freezeHandle);
+				FreezeNodeBehaviors(child, freezeHandle);
 			}
 		}
 
-		private static void RegisterLegacyBehaviours(Node node)
+		private static void RegisterLegacyBehaviors(Node node)
 		{
 			foreach (var component in node.Components) {
-				if (component is NodeBehavior legacyBehaviour) {
-					legacyBehaviour.Register();
+				if (component is NodeBehavior legacyBehavior) {
+					legacyBehavior.Register();
 				}
 			}
 		}
 
 		public static void Update(this Node node, float delta)
 		{
-			var boneBehaviour = node.Components.Get<BoneBehaviour>();
-			if (boneBehaviour != null) {
-				boneBehaviour.Register();
+			var boneBehavior = node.Components.Get<BoneBehavior>();
+			if (boneBehavior != null) {
+				boneBehavior.Register();
 			}
-			RegisterLegacyBehaviours(node);
-			var legacyEarlyBehaviourContainer = node.Components.Get<LegacyEarlyBehaviourContainer>();
-			if (legacyEarlyBehaviourContainer != null) {
-				legacyEarlyBehaviourContainer.Update(delta);
+			RegisterLegacyBehaviors(node);
+			var legacyEarlyBehaviorContainer = node.Components.Get<LegacyEarlyBehaviorContainer>();
+			if (legacyEarlyBehaviorContainer != null) {
+				legacyEarlyBehaviorContainer.Update(delta);
 			}
 			var animationComponent = node.Components.Get<AnimationComponent>();
 			if (animationComponent != null) {
@@ -1443,19 +1443,19 @@ namespace Lime
 			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
 				Update(child, delta * child.AnimationSpeed);
 			}
-			RegisterLegacyBehaviours(node);
-			var legacyLateBehaviourContainer = node.Components.Get<LegacyLateBehaviourContainer>();
-			if (legacyLateBehaviourContainer != null) {
-				legacyLateBehaviourContainer.Update(delta);
+			RegisterLegacyBehaviors(node);
+			var legacyLateBehaviorContainer = node.Components.Get<LegacyLateBehaviorContainer>();
+			if (legacyLateBehaviorContainer != null) {
+				legacyLateBehaviorContainer.Update(delta);
 			}
-			var boneArrayUpdaterBehaviour = node.Components.Get<BoneArrayUpdaterBehaviour>();
-			if (boneArrayUpdaterBehaviour != null) {
-				boneArrayUpdaterBehaviour.Update(delta);
+			var boneArrayUpdaterBehavior = node.Components.Get<BoneArrayUpdaterBehavior>();
+			if (boneArrayUpdaterBehavior != null) {
+				boneArrayUpdaterBehavior.Update(delta);
 			}
-			var updatableNodeBehaviour = node.Components.Get<UpdatableNodeBehaviour>();
-			if (updatableNodeBehaviour != null) {
-				updatableNodeBehaviour.CheckOwner();
-				updatableNodeBehaviour.Update(delta);
+			var updatableNodeBehavior = node.Components.Get<UpdatableNodeBehavior>();
+			if (updatableNodeBehavior != null) {
+				updatableNodeBehavior.CheckOwner();
+				updatableNodeBehavior.Update(delta);
 			}
 		}
 	}
@@ -1463,7 +1463,7 @@ namespace Lime
 	[MutuallyExclusiveDerivedComponents]
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(LateUpdateStage))]
-	public class UpdatableNodeBehaviour : UpdatableBehaviourComponent
+	public class UpdatableNodeBehavior : UpdatableBehaviorComponent
 	{
 		private IUpdatableNode node;
 
@@ -1532,8 +1532,8 @@ namespace Lime
 
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(LateUpdateStage))]
-	[UpdateBeforeBehaviour(typeof(UpdatableNodeBehaviour))]
-	public class BoneArrayUpdaterBehaviour : UpdatableBehaviourComponent
+	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
+	public class BoneArrayUpdaterBehavior : UpdatableBehaviorComponent
 	{
 		private List<Bone> bones = new List<Bone>();
 		private bool needResort = false;
@@ -1563,7 +1563,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (BoneArrayUpdaterBehaviour)base.Clone();
+			var clone = (BoneArrayUpdaterBehavior)base.Clone();
 			clone.bones = new List<Bone>();
 			clone.needResort = false;
 			return clone;

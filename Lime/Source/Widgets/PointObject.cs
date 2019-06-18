@@ -10,7 +10,7 @@ namespace Lime
 
 		public PointObject()
 		{
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 #if !TANGERINE
 			RenderChainBuilder = null;
 #endif // !TANGERINE

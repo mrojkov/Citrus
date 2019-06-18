@@ -49,7 +49,7 @@ namespace Lime
 			Value = 0;
 			Step = 0;
 			Awoke += Awake;
-			Components.Add(new UpdatableNodeBehaviour());
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		private static void Awake(Node owner)

@@ -7,16 +7,16 @@ namespace Lime
 	public class NodeManager
 	{
 		private List<Node> nodes = new List<Node>();
-		private BehaviourUpdateStage behaviourEarlyUpdateStage;
-		private BehaviourUpdateStage behaviourLateUpdateStage;
+		private BehaviorUpdateStage behaviorEarlyUpdateStage;
+		private BehaviorUpdateStage behaviorLateUpdateStage;
 
 		internal readonly AnimationSystem AnimationSystem = new AnimationSystem();
-		internal readonly BehaviourSystem BehaviourSystem = new BehaviourSystem();
+		internal readonly BehaviorSystem BehaviorSystem = new BehaviorSystem();
 
 		public NodeManager()
 		{
-			behaviourEarlyUpdateStage = BehaviourSystem.GetUpdateStage(typeof(EarlyUpdateStage));
-			behaviourLateUpdateStage = BehaviourSystem.GetUpdateStage(typeof(LateUpdateStage));
+			behaviorEarlyUpdateStage = BehaviorSystem.GetUpdateStage(typeof(EarlyUpdateStage));
+			behaviorLateUpdateStage = BehaviorSystem.GetUpdateStage(typeof(LateUpdateStage));
 		}
 
 		public void AddNode(Node node)
@@ -70,8 +70,8 @@ namespace Lime
 				case AnimationComponent animation:
 					AnimationSystem.Add(animation);
 					break;
-				case BehaviourComponent behaviour:
-					BehaviourSystem.Add(behaviour);
+				case BehaviorComponent behavior:
+					BehaviorSystem.Add(behavior);
 					break;
 			}
 		}
@@ -82,8 +82,8 @@ namespace Lime
 				case AnimationComponent animation:
 					AnimationSystem.Remove(animation);
 					break;
-				case BehaviourComponent behaviour:
-					BehaviourSystem.Remove(behaviour);
+				case BehaviorComponent behavior:
+					BehaviorSystem.Remove(behavior);
 					break;
 			}
 		}
@@ -105,10 +105,10 @@ namespace Lime
 
 		private void UpdateCore(float delta)
 		{
-			BehaviourSystem.StartPendingBehaviours();
-			behaviourEarlyUpdateStage.Update(delta);
+			BehaviorSystem.StartPendingBehaviors();
+			behaviorEarlyUpdateStage.Update(delta);
 			AnimationSystem.Update(delta);
-			behaviourLateUpdateStage.Update(delta);
+			behaviorLateUpdateStage.Update(delta);
 			UpdateBoundingRects();
 		}
 
@@ -122,31 +122,31 @@ namespace Lime
 		}
 	}
 
-	public class BehaviourComponent : NodeComponent
+	public class BehaviorComponent : NodeComponent
 	{
 		protected internal virtual void Start() { }
 
 		protected internal virtual void Stop() { }
 	}
 
-	public abstract class UpdatableBehaviourComponent : BehaviourComponent
+	public abstract class UpdatableBehaviorComponent : BehaviorComponent
 	{
 		private int freezeCounter;
 
-		internal UpdatableBehaviourFamily Family;
+		internal UpdatableBehaviorFamily Family;
 		internal int IndexInFamily = -1;
 
-		internal BehaviourSystem BehaviourSystem => Owner?.Manager?.BehaviourSystem;
+		internal BehaviorSystem BehaviorSystem => Owner?.Manager?.BehaviorSystem;
 
 		public bool Frozen => freezeCounter > 0;
 
-		public BehaviourFreezeHandle Freeze() => new BehaviourFreezeHandle(this);
+		public BehaviorFreezeHandle Freeze() => new BehaviorFreezeHandle(this);
 
 		internal void IncrementFreezeCounter()
 		{
 			freezeCounter++;
 			if (freezeCounter == 1) {
-				BehaviourSystem?.Freeze(this);
+				BehaviorSystem?.Freeze(this);
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace Lime
 			}
 			freezeCounter--;
 			if (freezeCounter == 0) {
-				BehaviourSystem?.Unfreeze(this);
+				BehaviorSystem?.Unfreeze(this);
 			}
 		}
 
@@ -165,7 +165,7 @@ namespace Lime
 
 		public override NodeComponent Clone()
 		{
-			var clone = (UpdatableBehaviourComponent)base.Clone();
+			var clone = (UpdatableBehaviorComponent)base.Clone();
 			clone.Family = null;
 			clone.IndexInFamily = -1;
 			clone.freezeCounter = 0;
@@ -173,17 +173,17 @@ namespace Lime
 		}
 	}
 
-	public struct BehaviourFreezeHandle : IDisposable
+	public struct BehaviorFreezeHandle : IDisposable
 	{
-		private UpdatableBehaviourComponent b;
+		private UpdatableBehaviorComponent b;
 
 		public bool IsActive => b != null;
 
-		public static readonly BehaviourFreezeHandle None = new BehaviourFreezeHandle();
+		public static readonly BehaviorFreezeHandle None = new BehaviorFreezeHandle();
 
-		internal BehaviourFreezeHandle(UpdatableBehaviourComponent behaviour)
+		internal BehaviorFreezeHandle(UpdatableBehaviorComponent behavior)
 		{
-			b = behaviour;
+			b = behavior;
 			b.IncrementFreezeCounter();
 		}
 
@@ -199,44 +199,44 @@ namespace Lime
 	public class EarlyUpdateStage { }
 	public class LateUpdateStage { }
 
-	internal class BehaviourUpdateStage
+	internal class BehaviorUpdateStage
 	{
-		private DependencyGraph<UpdatableBehaviourFamily> behaviourFamilyGraph = new DependencyGraph<UpdatableBehaviourFamily>();
-		private List<UpdatableBehaviourFamily> behaviourFamilyQueue = new List<UpdatableBehaviourFamily>();
-		private bool behaviourFamilyQueueDirty;
+		private DependencyGraph<UpdatableBehaviorFamily> behaviorFamilyGraph = new DependencyGraph<UpdatableBehaviorFamily>();
+		private List<UpdatableBehaviorFamily> behaviorFamilyQueue = new List<UpdatableBehaviorFamily>();
+		private bool behaviorFamilyQueueDirty;
 
 		public readonly Type StageType;
 
-		public BehaviourUpdateStage(Type stageType)
+		public BehaviorUpdateStage(Type stageType)
 		{
 			StageType = stageType;
 		}
 
-		internal UpdatableBehaviourFamily CreateBehaviourFamily(Type behaviourType)
+		internal UpdatableBehaviorFamily CreateBehaviorFamily(Type behaviorType)
 		{
-			var bf = new UpdatableBehaviourFamily(this, behaviourFamilyGraph.Count, behaviourType);
-			behaviourFamilyGraph.Add(bf);
-			behaviourFamilyQueueDirty = true;
+			var bf = new UpdatableBehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType);
+			behaviorFamilyGraph.Add(bf);
+			behaviorFamilyQueueDirty = true;
 			return bf;
 		}
 
-		internal void AddDependency(UpdatableBehaviourFamily successor, UpdatableBehaviourFamily predecessor)
+		internal void AddDependency(UpdatableBehaviorFamily successor, UpdatableBehaviorFamily predecessor)
 		{
 			if (successor.UpdateStage != this || predecessor.UpdateStage != this) {
 				throw new InvalidOperationException();
 			}
-			behaviourFamilyGraph.AddDependency(successor.Index, predecessor.Index);
-			behaviourFamilyQueueDirty = true;
+			behaviorFamilyGraph.AddDependency(successor.Index, predecessor.Index);
+			behaviorFamilyQueueDirty = true;
 		}
 
 		public void Update(float delta)
 		{
-			if (behaviourFamilyQueueDirty) {
-				behaviourFamilyQueue.Clear();
-				behaviourFamilyGraph.Walk(behaviourFamilyQueue);
-				behaviourFamilyQueueDirty = false;
+			if (behaviorFamilyQueueDirty) {
+				behaviorFamilyQueue.Clear();
+				behaviorFamilyGraph.Walk(behaviorFamilyQueue);
+				behaviorFamilyQueueDirty = false;
 			}
-			foreach (var bf in behaviourFamilyQueue) {
+			foreach (var bf in behaviorFamilyQueue) {
 				bf.Update(delta);
 			}
 		}
@@ -296,89 +296,89 @@ namespace Lime
 		}
 	}
 
-	internal class BehaviourSystem
+	internal class BehaviorSystem
 	{
-		private Dictionary<Type, BehaviourUpdateStage> updateStages = new Dictionary<Type, BehaviourUpdateStage>();
-		private Dictionary<Type, UpdatableBehaviourFamily> behaviourFamilies = new Dictionary<Type, UpdatableBehaviourFamily>();
-		private HashSet<BehaviourComponent> pendingBehaviours = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
-		private HashSet<BehaviourComponent> pendingBehaviours2 = new HashSet<BehaviourComponent>(ReferenceEqualityComparer.Instance);
+		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
+		private Dictionary<Type, UpdatableBehaviorFamily> behaviorFamilies = new Dictionary<Type, UpdatableBehaviorFamily>();
+		private HashSet<BehaviorComponent> pendingBehaviors = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
+		private HashSet<BehaviorComponent> pendingBehaviors2 = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
 
-		public BehaviourUpdateStage GetUpdateStage(Type stageType)
+		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
 			if (!updateStages.TryGetValue(stageType, out var stage)) {
-				stage = new BehaviourUpdateStage(stageType);
+				stage = new BehaviorUpdateStage(stageType);
 				updateStages.Add(stageType, stage);
 			}
 			return stage;
 		}
 
-		public void Freeze(UpdatableBehaviourComponent behaviour)
+		public void Freeze(UpdatableBehaviorComponent behavior)
 		{
-			behaviour.Family?.DisableBehaviour(behaviour);
+			behavior.Family?.DisableBehavior(behavior);
 		}
 
-		public void Unfreeze(UpdatableBehaviourComponent behaviour)
+		public void Unfreeze(UpdatableBehaviorComponent behavior)
 		{
-			behaviour.Family?.EnableBehaviour(behaviour);
+			behavior.Family?.EnableBehavior(behavior);
 		}
 
-		public void StartPendingBehaviours()
+		public void StartPendingBehaviors()
 		{
-			while (pendingBehaviours.Count > 0) {
-				var t = pendingBehaviours;
-				pendingBehaviours = pendingBehaviours2;
-				pendingBehaviours2 = t;
-				foreach (var b in pendingBehaviours2) {
-					if (b is UpdatableBehaviourComponent ub) {
-						var bf = GetUpdatableBehaviourFamily(ub.GetType());
-						bf.AddBehaviour(ub);
+			while (pendingBehaviors.Count > 0) {
+				var t = pendingBehaviors;
+				pendingBehaviors = pendingBehaviors2;
+				pendingBehaviors2 = t;
+				foreach (var b in pendingBehaviors2) {
+					if (b is UpdatableBehaviorComponent ub) {
+						var bf = GetUpdatableBehaviorFamily(ub.GetType());
+						bf.AddBehavior(ub);
 					}
 					b.Start();
 				}
-				pendingBehaviours2.Clear();
+				pendingBehaviors2.Clear();
 			}
 		}
 
-		public void Add(BehaviourComponent behaviour)
+		public void Add(BehaviorComponent behavior)
 		{
-			pendingBehaviours.Add(behaviour);
+			pendingBehaviors.Add(behavior);
 		}
 
-		public void Remove(BehaviourComponent behaviour)
+		public void Remove(BehaviorComponent behavior)
 		{
-			if (!pendingBehaviours.Remove(behaviour)) {
-				if (behaviour is UpdatableBehaviourComponent ub) {
+			if (!pendingBehaviors.Remove(behavior)) {
+				if (behavior is UpdatableBehaviorComponent ub) {
 					var bf = ub.Family;
 					if (bf != null) {
-						bf.RemoveBehaviour(ub);
+						bf.RemoveBehavior(ub);
 					}
 				}
-				behaviour.Stop();
+				behavior.Stop();
 			}
 		}
 
-		private UpdatableBehaviourFamily GetUpdatableBehaviourFamily(Type behaviourType)
+		private UpdatableBehaviorFamily GetUpdatableBehaviorFamily(Type behaviorType)
 		{
-			if (behaviourFamilies.TryGetValue(behaviourType, out var behaviourFamily)) {
-				return behaviourFamily;
+			if (behaviorFamilies.TryGetValue(behaviorType, out var behaviorFamily)) {
+				return behaviorFamily;
 			}
-			if (!typeof(UpdatableBehaviourComponent).IsAssignableFrom(behaviourType)) {
+			if (!typeof(UpdatableBehaviorComponent).IsAssignableFrom(behaviorType)) {
 				throw new InvalidOperationException();
 			}
-			var updateStageAttr = behaviourType.GetCustomAttribute<UpdateStageAttribute>();
+			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
 			if (updateStageAttr == null) {
 				throw new InvalidOperationException();
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
-			behaviourFamily = updateStage.CreateBehaviourFamily(behaviourType);
-			behaviourFamilies.Add(behaviourType, behaviourFamily);
-			foreach (var i in behaviourType.GetCustomAttributes<UpdateAfterBehaviourAttribute>()) {
-				updateStage.AddDependency(behaviourFamily, GetUpdatableBehaviourFamily(i.BehaviourType));
+			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType);
+			behaviorFamilies.Add(behaviorType, behaviorFamily);
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
+				updateStage.AddDependency(behaviorFamily, GetUpdatableBehaviorFamily(i.BehaviorType));
 			}
-			foreach (var i in behaviourType.GetCustomAttributes<UpdateBeforeBehaviourAttribute>()) {
-				updateStage.AddDependency(GetUpdatableBehaviourFamily(i.BehaviourType), behaviourFamily);
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>()) {
+				updateStage.AddDependency(GetUpdatableBehaviorFamily(i.BehaviorType), behaviorFamily);
 			}
-			return behaviourFamily;
+			return behaviorFamily;
 		}
 	}
 
@@ -394,83 +394,83 @@ namespace Lime
 	}
 
 	[AttributeUsage(AttributeTargets.Class)]
-	public class UpdateAfterBehaviourAttribute : Attribute
+	public class UpdateAfterBehaviorAttribute : Attribute
 	{
-		public Type BehaviourType { get; }
+		public Type BehaviorType { get; }
 
-		public UpdateAfterBehaviourAttribute(Type behaviourType)
+		public UpdateAfterBehaviorAttribute(Type behaviorType)
 		{
-			BehaviourType = behaviourType;
+			BehaviorType = behaviorType;
 		}
 	}
 
 	[AttributeUsage(AttributeTargets.Class)]
-	public class UpdateBeforeBehaviourAttribute : Attribute
+	public class UpdateBeforeBehaviorAttribute : Attribute
 	{
-		public Type BehaviourType { get; }
+		public Type BehaviorType { get; }
 
-		public UpdateBeforeBehaviourAttribute(Type behaviourType)
+		public UpdateBeforeBehaviorAttribute(Type behaviorType)
 		{
-			BehaviourType = behaviourType;
+			BehaviorType = behaviorType;
 		}
 	}
 
-	internal class UpdatableBehaviourFamily
+	internal class UpdatableBehaviorFamily
 	{
-		private List<UpdatableBehaviourComponent> behaviours = new List<UpdatableBehaviourComponent>();
+		private List<UpdatableBehaviorComponent> behaviors = new List<UpdatableBehaviorComponent>();
 
-		public readonly BehaviourUpdateStage UpdateStage;
+		public readonly BehaviorUpdateStage UpdateStage;
 		public readonly int Index;
-		public readonly Type BehaviourType;
+		public readonly Type BehaviorType;
 
-		public UpdatableBehaviourFamily(BehaviourUpdateStage updateStage, int index, Type behaviourType)
+		public UpdatableBehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType)
 		{
 			UpdateStage = updateStage;
 			Index = index;
-			BehaviourType = behaviourType;
+			BehaviorType = behaviorType;
 		}
 
-		public void AddBehaviour(UpdatableBehaviourComponent b)
+		public void AddBehavior(UpdatableBehaviorComponent b)
 		{
 			b.Family = this;
 			if (!b.Frozen) {
-				EnableBehaviour(b);
+				EnableBehavior(b);
 			}
 		}
 
-		public void RemoveBehaviour(UpdatableBehaviourComponent b)
+		public void RemoveBehavior(UpdatableBehaviorComponent b)
 		{
-			DisableBehaviour(b);
+			DisableBehavior(b);
 			b.Family = null;
 		}
 
-		public void EnableBehaviour(UpdatableBehaviourComponent b)
+		public void EnableBehavior(UpdatableBehaviorComponent b)
 		{
-			b.IndexInFamily = behaviours.Count;
-			behaviours.Add(b);
+			b.IndexInFamily = behaviors.Count;
+			behaviors.Add(b);
 		}
 
-		public void DisableBehaviour(UpdatableBehaviourComponent b)
+		public void DisableBehavior(UpdatableBehaviorComponent b)
 		{
 			if (b.IndexInFamily >= 0) {
-				behaviours[b.IndexInFamily] = null;
+				behaviors[b.IndexInFamily] = null;
 				b.IndexInFamily = -1;
 			}
 		}
 
 		public void Update(float delta)
 		{
-			for (var i = behaviours.Count - 1; i >= 0; i--) {
-				var b = behaviours[i];
+			for (var i = behaviors.Count - 1; i >= 0; i--) {
+				var b = behaviors[i];
 				if (b != null) {
 					b.Update(delta * b.Owner.EffectiveAnimationSpeed);
 				} else {
-					b = behaviours[behaviours.Count - 1];
+					b = behaviors[behaviors.Count - 1];
 					if (b != null) {
 						b.IndexInFamily = i;
 					}
-					behaviours[i] = b;
-					behaviours.RemoveAt(behaviours.Count - 1);
+					behaviors[i] = b;
+					behaviors.RemoveAt(behaviors.Count - 1);
 				}
 			}
 		}
