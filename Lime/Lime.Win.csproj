@@ -276,6 +276,8 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
     <Compile Include="Source\ReferenceEqualityComparer.cs" />
+    <Compile Include="Source\ServiceProviderExtensions.cs" />
+    <Compile Include="Source\ServiceRegistry.cs" />
     <Compile Include="Source\TangerineAttributes.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -353,9 +355,16 @@
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
+    <Compile Include="Source\Widgets\NodeManagerProcessorCollection.cs" />
+    <Compile Include="Source\Widgets\NodeProcessor.cs" />
     <Compile Include="Source\Widgets\NodeManager.cs" />
+    <Compile Include="Source\Widgets\NodeManagerRootCollection.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
+    <Compile Include="Source\Widgets\Processors\AnimationProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorUpdateProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BoundingRectProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
     <Compile Include="Source\Widgets\RenderObject.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

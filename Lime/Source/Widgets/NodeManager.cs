@@ -6,40 +6,75 @@ namespace Lime
 {
 	public class NodeManager
 	{
-		private List<Node> nodes = new List<Node>();
-		private BehaviorUpdateStage behaviorEarlyUpdateStage;
-		private BehaviorUpdateStage behaviorLateUpdateStage;
+		private Dictionary<Type, List<NodeComponentProcessor>> processorsByComponentType = new Dictionary<Type, List<NodeComponentProcessor>>();
 
-		internal readonly AnimationSystem AnimationSystem = new AnimationSystem();
-		internal readonly BehaviorSystem BehaviorSystem = new BehaviorSystem();
+		public NodeManagerRootNodeCollection RootNodes { get; }
 
-		public NodeManager()
+		public NodeManagerProcessorCollection Processors { get; }
+
+		public IServiceProvider ServiceProvider { get; }
+
+		public NodeManager(IServiceProvider serviceProvider)
 		{
-			behaviorEarlyUpdateStage = BehaviorSystem.GetUpdateStage(typeof(EarlyUpdateStage));
-			behaviorLateUpdateStage = BehaviorSystem.GetUpdateStage(typeof(LateUpdateStage));
+			ServiceProvider = serviceProvider;
+			RootNodes = new NodeManagerRootNodeCollection(this);
+			Processors = new NodeManagerProcessorCollection(this);
 		}
 
-		public void AddNode(Node node)
+		internal void RegisterNodeProcessor(NodeProcessor processor)
 		{
-			if (node == null) {
-				throw new ArgumentNullException(nameof(node));
+			processor.Manager = this;
+			processor.Start();
+			if (processor is NodeComponentProcessor componentProcessor) {
+				foreach (var (componentType, componentProcessors) in processorsByComponentType) {
+					if (componentProcessor.TargetComponentType.IsAssignableFrom(componentType)) {
+						componentProcessors.Add(componentProcessor);
+					}
+				}
+				foreach (var node in RootNodes) {
+					AddComponentsToProcessor(node, componentProcessor);
+				}
 			}
-			if (node.Manager != null) {
-				throw new ArgumentException(nameof(node));
-			}
-			if (node.Parent != null) {
-				throw new ArgumentException(nameof(node));
-			}
-			nodes.Add(node);
-			RegisterNode(node);
 		}
 
-		public void RemoveNode(Node node)
+		private void AddComponentsToProcessor(Node node, NodeComponentProcessor processor)
 		{
-			if (node != null && node.Manager == this && node.Parent == null) {
-				nodes.Remove(node);
-				UnregisterNode(node);
+			foreach (var component in node.Components) {
+				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
+					processor.Add(component);
+				}
 			}
+			foreach (var child in node.Nodes) {
+				AddComponentsToProcessor(child, processor);
+			}
+		}
+
+		internal void UnregisterNodeProcessor(NodeProcessor processor)
+		{
+			if (processor is NodeComponentProcessor componentProcessor) {
+				foreach (var (componentType, componentProcessors) in processorsByComponentType) {
+					if (componentProcessor.TargetComponentType.IsAssignableFrom(componentType)) {
+						componentProcessors.Remove(componentProcessor);
+					}
+				}
+			}
+			processor.Manager = null;
+			processor.Stop();
+		}
+
+		private List<NodeComponentProcessor> GetProcessorsForComponentType(Type type)
+		{
+			if (processorsByComponentType.TryGetValue(type, out var targetProcessors)) {
+				return targetProcessors;
+			}
+			targetProcessors = new List<NodeComponentProcessor>();
+			foreach (var p in Processors) {
+				if (p is NodeComponentProcessor cp && cp.TargetComponentType.IsAssignableFrom(type)) {
+					targetProcessors.Add(cp);
+				}
+			}
+			processorsByComponentType.Add(type, targetProcessors);
+			return targetProcessors;
 		}
 
 		internal void RegisterNode(Node node)
@@ -66,25 +101,15 @@ namespace Lime
 
 		internal void RegisterComponent(NodeComponent component)
 		{
-			switch (component) {
-				case AnimationComponent animation:
-					AnimationSystem.Add(animation);
-					break;
-				case BehaviorComponent behavior:
-					BehaviorSystem.Add(behavior);
-					break;
+			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
+				p.Add(component);
 			}
 		}
 
 		internal void UnregisterComponent(NodeComponent component)
 		{
-			switch (component) {
-				case AnimationComponent animation:
-					AnimationSystem.Remove(animation);
-					break;
-				case BehaviorComponent behavior:
-					BehaviorSystem.Remove(behavior);
-					break;
+			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
+				p.Remove(component);
 			}
 		}
 
@@ -97,27 +122,11 @@ namespace Lime
 			}
 			try {
 				updating = true;
-				UpdateCore(delta);
+				foreach (var p in Processors) {
+					p.Update(delta);
+				}
 			} finally {
 				updating = false;
-			}
-		}
-
-		private void UpdateCore(float delta)
-		{
-			BehaviorSystem.StartPendingBehaviors();
-			behaviorEarlyUpdateStage.Update(delta);
-			AnimationSystem.Update(delta);
-			behaviorLateUpdateStage.Update(delta);
-			UpdateBoundingRects();
-		}
-
-		private void UpdateBoundingRects()
-		{
-			if (Widget.EnableViewCulling) {
-				foreach (var n in nodes) {
-					n.UpdateBoundingRect();
-				}
 			}
 		}
 	}
@@ -131,35 +140,8 @@ namespace Lime
 
 	public abstract class UpdatableBehaviorComponent : BehaviorComponent
 	{
-		private int freezeCounter;
-
 		internal UpdatableBehaviorFamily Family;
 		internal int IndexInFamily = -1;
-
-		internal BehaviorSystem BehaviorSystem => Owner?.Manager?.BehaviorSystem;
-
-		public bool Frozen => freezeCounter > 0;
-
-		public BehaviorFreezeHandle Freeze() => new BehaviorFreezeHandle(this);
-
-		internal void IncrementFreezeCounter()
-		{
-			freezeCounter++;
-			if (freezeCounter == 1) {
-				BehaviorSystem?.Freeze(this);
-			}
-		}
-
-		internal void DecrementFreezeCounter()
-		{
-			if (freezeCounter == 0) {
-				throw new InvalidOperationException();
-			}
-			freezeCounter--;
-			if (freezeCounter == 0) {
-				BehaviorSystem?.Unfreeze(this);
-			}
-		}
 
 		protected internal abstract void Update(float delta);
 
@@ -168,31 +150,7 @@ namespace Lime
 			var clone = (UpdatableBehaviorComponent)base.Clone();
 			clone.Family = null;
 			clone.IndexInFamily = -1;
-			clone.freezeCounter = 0;
 			return clone;
-		}
-	}
-
-	public struct BehaviorFreezeHandle : IDisposable
-	{
-		private UpdatableBehaviorComponent b;
-
-		public bool IsActive => b != null;
-
-		public static readonly BehaviorFreezeHandle None = new BehaviorFreezeHandle();
-
-		internal BehaviorFreezeHandle(UpdatableBehaviorComponent behavior)
-		{
-			b = behavior;
-			b.IncrementFreezeCounter();
-		}
-
-		public void Dispose()
-		{
-			if (b != null) {
-				b.DecrementFreezeCounter();
-				b = null;
-			}
 		}
 	}
 
@@ -312,16 +270,6 @@ namespace Lime
 			return stage;
 		}
 
-		public void Freeze(UpdatableBehaviorComponent behavior)
-		{
-			behavior.Family?.DisableBehavior(behavior);
-		}
-
-		public void Unfreeze(UpdatableBehaviorComponent behavior)
-		{
-			behavior.Family?.EnableBehavior(behavior);
-		}
-
 		public void StartPendingBehaviors()
 		{
 			while (pendingBehaviors.Count > 0) {
@@ -433,29 +381,15 @@ namespace Lime
 		public void AddBehavior(UpdatableBehaviorComponent b)
 		{
 			b.Family = this;
-			if (!b.Frozen) {
-				EnableBehavior(b);
-			}
-		}
-
-		public void RemoveBehavior(UpdatableBehaviorComponent b)
-		{
-			DisableBehavior(b);
-			b.Family = null;
-		}
-
-		public void EnableBehavior(UpdatableBehaviorComponent b)
-		{
 			b.IndexInFamily = behaviors.Count;
 			behaviors.Add(b);
 		}
 
-		public void DisableBehavior(UpdatableBehaviorComponent b)
+		public void RemoveBehavior(UpdatableBehaviorComponent b)
 		{
-			if (b.IndexInFamily >= 0) {
-				behaviors[b.IndexInFamily] = null;
-				b.IndexInFamily = -1;
-			}
+			behaviors[b.IndexInFamily] = null;
+			b.IndexInFamily = -1;
+			b.Family = null;
 		}
 
 		public void Update(float delta)
@@ -473,85 +407,6 @@ namespace Lime
 					behaviors.RemoveAt(behaviors.Count - 1);
 				}
 			}
-		}
-	}
-
-	internal class AnimationSystem
-	{
-		private List<List<Animation>> runningAnimationsByDepth = new List<List<Animation>>();
-
-		public void Add(AnimationComponent component)
-		{
-			foreach (var a in component.Animations) {
-				if (a.IsRunning) {
-					AddRunningAnimation(a);
-				}
-			}
-		}
-
-		public void Remove(AnimationComponent component)
-		{
-			foreach (var a in component.Animations) {
-				RemoveRunningAnimation(a);
-			}
-		}
-
-		internal void AddRunningAnimation(Animation animation)
-		{
-			var depth = GetDepth(animation.OwnerNode);
-			var list = GetRunningAnimationList(depth);
-			animation.Depth = depth;
-			animation.Index = list.Count;
-			list.Add(animation);
-		}
-
-		internal void RemoveRunningAnimation(Animation animation)
-		{
-			if (animation.Depth >= 0) {
-				var list = GetRunningAnimationList(animation.Depth);
-				list[animation.Index] = null;
-				animation.Depth = -1;
-				animation.Index = -1;
-			}
-		}
-
-		private List<Animation> GetRunningAnimationList(int depth)
-		{
-			while (depth >= runningAnimationsByDepth.Count) {
-				runningAnimationsByDepth.Add(new List<Animation>());
-			}
-			return runningAnimationsByDepth[depth];
-		}
-
-		public void Update(float delta)
-		{
-			for (var i = 0; i < runningAnimationsByDepth.Count; i++) {
-				var runningAnimations = runningAnimationsByDepth[i];
-				for (var j = runningAnimations.Count - 1; j >= 0; j--) {
-					var a = runningAnimations[j];
-					if (a != null) {
-						a.Advance(delta * a.OwnerNode.EffectiveAnimationSpeed);
-					} else {
-						a = runningAnimations[runningAnimations.Count - 1];
-						if (a != null) {
-							a.Index = j;
-						}
-						runningAnimations[j] = a;
-						runningAnimations.RemoveAt(runningAnimations.Count - 1);
-					}
-				}
-			}
-		}
-
-		private int GetDepth(Node node)
-		{
-			var depth = 0;
-			var p = node.Parent;
-			while (p != null) {
-				depth++;
-				p = p.Parent;
-			}
-			return depth;
 		}
 	}
 }

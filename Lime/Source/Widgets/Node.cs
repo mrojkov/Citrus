@@ -1365,21 +1365,6 @@ namespace Lime
 		void OnUpdate(float delta);
 	}
 
-	public class NodeFreezeHandle
-	{
-		internal readonly List<BehaviorFreezeHandle> BehaviorFreezeHandles = new List<BehaviorFreezeHandle>();
-
-		public bool IsActive => BehaviorFreezeHandles.Count > 0;
-
-		public void Unfreeze()
-		{
-			foreach (var fh in BehaviorFreezeHandles) {
-				fh.Dispose();
-			}
-			BehaviorFreezeHandles.Clear();
-		}
-	}
-
 	public static class NodeCompatibilityExtensions
 	{
 		public static void AdvanceAnimationsRecursive(this Node node, float delta)
@@ -1392,25 +1377,6 @@ namespace Lime
 			}
 			foreach (var child in node.Nodes) {
 				AdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
-			}
-		}
-
-		public static void FreezeChildrenBehaviors(this Node node, NodeFreezeHandle freezeHandle)
-		{
-			foreach (var child in node.Nodes) {
-				FreezeNodeBehaviors(child, freezeHandle);
-			}
-		}
-
-		public static void FreezeNodeBehaviors(this Node node, NodeFreezeHandle freezeHandle)
-		{
-			foreach (var c in node.Components) {
-				if (c is UpdatableBehaviorComponent b) {
-					freezeHandle.BehaviorFreezeHandles.Add(b.Freeze());
-				}
-			}
-			foreach (var child in node.Nodes) {
-				FreezeNodeBehaviors(child, freezeHandle);
 			}
 		}
 
@@ -1486,8 +1452,6 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class AnimationComponent : NodeComponent
 	{
-		private AnimationSystem AnimationSystem => Owner?.Manager?.AnimationSystem;
-
 		public AnimationCollection Animations { get; private set; }
 
 		public Animation DefaultAnimation
@@ -1504,14 +1468,17 @@ namespace Lime
 			}
 		}
 
-		internal void AddRunningAnimation(Animation animation)
+		public event Action<AnimationComponent, Animation> AnimationRun;
+		public event Action<AnimationComponent, Animation> AnimationStopped;
+
+		internal void OnAnimationRun(Animation animation)
 		{
-			AnimationSystem?.AddRunningAnimation(animation);
+			AnimationRun?.Invoke(this, animation);
 		}
 
-		internal void RemoveRunningAnimation(Animation animation)
+		internal void OnAnimationStopped(Animation animation)
 		{
-			AnimationSystem?.RemoveRunningAnimation(animation);
+			AnimationStopped?.Invoke(this, animation);
 		}
 
 		public AnimationComponent()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;
@@ -109,6 +110,11 @@ namespace Lime
 		{
 			key = tuple.Key;
 			value = tuple.Value;
+		}
+
+		public static void ResetEnumerator<T>(ref T enumerator) where T : IEnumerator
+		{
+			enumerator.Reset();
 		}
 	}
 

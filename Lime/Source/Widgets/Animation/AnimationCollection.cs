@@ -162,7 +162,7 @@ namespace Lime
 			items.Insert(index, item);
 			item.Owner = owner;
 			if (item.IsRunning) {
-				owner.AddRunningAnimation(item);
+				owner.OnAnimationRun(item);
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace Lime
 			items.RemoveAt(index);
 			item.Owner = null;
 			if (item.IsRunning) {
-				owner.RemoveRunningAnimation(item);
+				owner.OnAnimationStopped(item);
 			}
 		}
 

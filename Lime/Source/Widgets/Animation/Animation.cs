@@ -109,9 +109,9 @@ namespace Lime
 						Load();
 					}
 					if (isRunning) {
-						Owner?.AddRunningAnimation(this);
+						Owner?.OnAnimationRun(this);
 					} else {
-						Owner?.RemoveRunningAnimation(this);
+						Owner?.OnAnimationStopped(this);
 					}
 				}
 			}

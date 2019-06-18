@@ -24,8 +24,7 @@ namespace Lime
 
 		public WindowWidget(IWindow window)
 		{
-			var manager = new NodeManager();
-			manager.AddNode(this);
+			CreateManager().RootNodes.Add(this);
 			WidgetContext = new WidgetContext(this);
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, WidgetContext);
@@ -34,6 +33,19 @@ namespace Lime
 			window.Activated += () => windowActivated = true;
 			window.Sync += Sync;
 			LayoutManager = new LayoutManager();
+		}
+
+		private NodeManager CreateManager()
+		{
+			var services = new ServiceRegistry();
+			services.Add(new BehaviorSystem());
+			var manager = new NodeManager(services);
+			manager.Processors.Add(new BehaviorSetupProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
+			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
+			manager.Processors.Add(new BoundingRectProcessor());
+			return manager;
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
