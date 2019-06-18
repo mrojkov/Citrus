@@ -260,7 +260,7 @@ namespace Tangerine.UI.RemoteScripting
 		{
 			public readonly HostClient Client;
 			public readonly RemoteScriptingWidgets.TabbedWidget TabbedWidget;
-			public readonly LogPage Log;
+			public readonly ApplicationOutputPage ApplicationOutput;
 
 			public Action Updated;
 
@@ -274,7 +274,7 @@ namespace Tangerine.UI.RemoteScripting
 
 				TabbedWidget = new RemoteScriptingWidgets.TabbedWidget(
 					new RemoteScriptingWidgets.TabbedWidgetPage[] {
-						Log = new LogPage()
+						ApplicationOutput = new ApplicationOutputPage()
 					}
 				);
 			}
@@ -303,7 +303,7 @@ namespace Tangerine.UI.RemoteScripting
 							SetName((NetworkDeviceName)message);
 							break;
 						case NetworkMessageType.Text:
-							AppendLog((NetworkText)message);
+							AppendApplicationOutput((NetworkText)message);
 							break;
 						default:
 							throw new NotSupportedException($"Unknown message type: {message.MessageType}");
@@ -317,18 +317,18 @@ namespace Tangerine.UI.RemoteScripting
 				Updated?.Invoke();
 			}
 
-			private void AppendLog(NetworkText message)
+			private void AppendApplicationOutput(NetworkText message)
 			{
-				Log.Append(message.Text);
+				ApplicationOutput.Append(message.Text);
 			}
 
-			public class LogPage : RemoteScriptingWidgets.TabbedWidgetPage
+			public class ApplicationOutputPage : RemoteScriptingWidgets.TabbedWidgetPage
 			{
 				private RemoteScriptingWidgets.TextView textView;
 
 				public override void Initialize()
 				{
-					Tab = new ThemedTab { Text = "Log" };
+					Tab = new ThemedTab { Text = "Application Output" };
 					Content = new Widget {
 						Layout = new VBoxLayout(),
 						Nodes = {
