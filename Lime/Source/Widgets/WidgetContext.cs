@@ -33,7 +33,7 @@ namespace Lime
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
 
-		public GestureManager GestureManager { get; set; }
+		public GestureManager GestureManager { get; }
 
 		public WidgetContext(Widget root) : base(Property.Create(() => Current, (v) => Current = v))
 		{
@@ -41,6 +41,7 @@ namespace Lime
 			if (Current == null) {
 				Current = this;
 			}
+			GestureManager = new GestureManager(this);
 		}
 	}
 }
