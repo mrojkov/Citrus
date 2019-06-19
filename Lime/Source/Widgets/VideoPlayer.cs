@@ -58,6 +58,7 @@ namespace Lime
 			parentWidget.Nodes.Add(this);
 			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRightTopBottom;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public virtual void OnUpdate(float delta)
