@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoltenVK", "..\3rdParty\Mol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderCompilerBinding.Mac", "..\3rdParty\ShaderCompilerBinding\ShaderCompilerBinding.Mac.csproj", "{94911E6A-53F9-4B86-9ADE-E3B510C810B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.RemoteScripting.Mac", "Tangerine.UI.RemoteScripting\Tangerine.UI.RemoteScripting.Mac.csproj", "{F93DA48E-2A86-4DC4-A392-102B1E567B3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,14 @@ Global
 		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{94911E6A-53F9-4B86-9ADE-E3B510C810B9}.Release|x86.Build.0 = Release|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Debug|x86.Build.0 = Debug|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|x86.ActiveCfg = Release|Any CPU
+		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

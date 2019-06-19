@@ -184,6 +184,7 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncTxtAssets.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
     <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
+    <Compile Include="Source\Actions\BuildGame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

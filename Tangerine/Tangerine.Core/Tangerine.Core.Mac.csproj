@@ -67,6 +67,7 @@
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="GridSelection.cs" />
     <Compile Include="GridSpanList.cs" />
+    <Compile Include="Commands\OrangeCommands.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />

@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Lime;
 using Orange;
 using Tangerine.Core;
+using Tangerine.Core.Commands;
+using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 
@@ -23,7 +24,8 @@ namespace Tangerine
 		private static Menu localizationMenu;
 		private static Menu layoutMenu;
 		private static Menu orangeMenu;
-		private static ICommand orangeCommand;
+		private static List<ICommand> orangeCommands = new List<ICommand>();
+		private static ICommand orangeMenuCommand;
 
 		static TangerineMenu()
 		{
@@ -36,7 +38,7 @@ namespace Tangerine
 			overlaysMenu = new Menu();
 			rulerMenu = new Menu();
 			orangeMenu = new Menu();
-			orangeCommand = new Command("Orange", orangeMenu);
+			orangeMenuCommand = new Command("Orange", orangeMenu);
 			RebuildOrangeMenu(null);
 			CreateMainMenu();
 			CreateResolutionMenu();
@@ -191,7 +193,7 @@ namespace Tangerine
 					GenericCommands.NextDocument,
 					GenericCommands.PreviousDocument
 				}),
-				orangeCommand,
+				orangeMenuCommand,
 				new Command("Git", new Menu {
 					GitCommands.ForceUpdate,
 					GitCommands.Update,
@@ -221,40 +223,45 @@ namespace Tangerine
 
 		private static void RebuildOrangeMenu(string citprojPath)
 		{
-			var blacklist = new HashSet<string> { "Run Tangerine", "Build and Run", "Cook Game Assets" };
 			orangeMenu.Clear();
-			if (!(orangeCommand.Enabled = citprojPath != null)) {
-				CommandHandlerList.Global.Disconnect(OrangeCommands.Run);
-				CommandHandlerList.Global.Disconnect(OrangeCommands.CookGameAssets);
+			foreach (var command in orangeCommands) {
+				CommandHandlerList.Global.Disconnect(command);
+			}
+			orangeCommands.Clear();
+			OrangeBuildCommand.Instance = null;
+			orangeMenuCommand.Enabled = citprojPath != null;
+			if (!orangeMenuCommand.Enabled) {
 				return;
 			}
-			var items = Orange.MenuController.Instance.GetVisibleAndSortedItems();
-			var buildAndRun = items.First((i) => i.Label == "Build and Run");
-			var context = WidgetContext.Current;
-			CommandHandlerList.Global.Connect(OrangeCommands.Run, () => {
-				context.Root.Tasks.Add(OrangeTask(
-					() => {
-						buildAndRun.Action();
-					})
-				);
-			});
-			var cookGameAssets = items.First((i) => i.Label == "Cook Game Assets");
-			CommandHandlerList.Global.Connect(OrangeCommands.CookGameAssets, () => {
-				context.Root.Tasks.Add(
-					OrangeTask(() => cookGameAssets.Action())
-				);
-			});
-			orangeMenu.Add(OrangeCommands.Run);
-			orangeMenu.Add(OrangeCommands.RunConfig);
-			orangeMenu.Add(OrangeCommands.CookGameAssets);
-			foreach (var menuItem in items) {
+
+			void AddOrangeCommand(ICommand command, CommandHandler handler)
+			{
+				orangeMenu.Add(command);
+				CommandHandlerList.Global.Connect(command, handler);
+			}
+			void OnOrangeCommandExecuting()
+			{
+				UI.Console.Instance.Show();
+			}
+			var orangeMenuItems = Orange.MenuController.Instance.GetVisibleAndSortedItems();
+			const string BuildAndRunLabel = "Build and Run";
+			const string BuildLabel = "Build";
+			const string CookGameAssetsLabel = "Cook Game Assets";
+			var blacklist = new HashSet<string> { "Run Tangerine", BuildAndRunLabel, BuildLabel, CookGameAssetsLabel };
+			var buildAndRun = orangeMenuItems.First(item => item.Label == BuildAndRunLabel);
+			var build = orangeMenuItems.First(item => item.Label == BuildLabel);
+			var cookGameAssets = orangeMenuItems.First(item => item.Label == CookGameAssetsLabel);
+			AddOrangeCommand(OrangeCommands.Run, new OrangeCommand(() => buildAndRun.Action()) { Executing = OnOrangeCommandExecuting });
+			AddOrangeCommand(OrangeCommands.Build, OrangeBuildCommand.Instance = new OrangeBuildCommand(build.Action) { Executing = OnOrangeCommandExecuting });
+			AddOrangeCommand(OrangeCommands.RunConfig, new OrangePluginOptionsCommand());
+			AddOrangeCommand(OrangeCommands.CookGameAssets, new OrangeCommand(() => cookGameAssets.Action()) { Executing = OnOrangeCommandExecuting });
+			foreach (var menuItem in orangeMenuItems) {
 				if (blacklist.Contains(menuItem.Label)) {
 					continue;
 				}
-				orangeMenu.Add(new Command(menuItem.Label, () => {
-					context.Root.Tasks.Add(OrangeTask(() => menuItem.Action()));
-				}));
+				AddOrangeCommand(new Command(menuItem.Label), new OrangeCommand(() => menuItem.Action()) { Executing = OnOrangeCommandExecuting });
 			}
+
 			// TODO Duplicates code from Orange.GUI.OrangeInterface.cs. Both should be presented at one file
 			var orangeInterfaceInstance = (OrangeInterface) Orange.UserInterface.Instance;
 			var updateAction = new Action<AssetCacheMode>(mode => orangeInterfaceInstance.UpdateCacheModeCheckboxes(mode));

@@ -57,6 +57,7 @@
     <Compile Include="CommandHandlers.cs" />
     <Compile Include="Dialogs\RenderToPngSequenceDialog.cs" />
     <Compile Include="MainMenu\GitMenu.cs" />
+    <Compile Include="MainMenu\OrangeMenu.cs" />
     <Compile Include="MainMenu\ToolsMenu.cs" />
     <Compile Include="MainMenu\SystemMenu.cs" />
     <Compile Include="Panels\AnimationsPanel.cs" />
@@ -121,6 +122,10 @@
     <ProjectReference Include="..\Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
       <Project>{d6b543cb-0223-4210-bb0f-7d8250760895}</Project>
       <Name>Tangerine.UI.Inspector.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.UI.RemoteScripting\Tangerine.UI.RemoteScripting.Win.csproj">
+      <Project>{a60e48a9-2220-4e9d-9b22-3fb1c3ddbf43}</Project>
+      <Name>Tangerine.UI.RemoteScripting.Win</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj">
       <Project>{80486551-a659-42b0-aada-165c54e9b0af}</Project>

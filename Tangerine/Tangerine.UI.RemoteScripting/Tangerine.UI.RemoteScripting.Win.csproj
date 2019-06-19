@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tangerine.UI.RemoteScripting</RootNamespace>
+    <AssemblyName>Tangerine.UI.RemoteScripting</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="RemoteScripting, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lime\Extensions\RemoteScripting\RemoteScripting.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CompiledAssembly.cs" />
+    <Compile Include="CSharpCodeCompiler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\RemoteScriptingDevicesPage.cs" />
+    <Compile Include="UI\RemoteScriptingAssemblyPage.cs" />
+    <Compile Include="UI\RemoteScriptingPane.cs" />
+    <Compile Include="UI\RemoteScriptingStatusBar.cs" />
+    <Compile Include="UI\RemoteScriptingWidgets.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Win.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
+      <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
+      <Name>Tangerine.Core.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Win.csproj">
+      <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
+      <Name>Tangerine.UI.Win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
+      <Version>2.6.2</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
+      <Version>3.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
