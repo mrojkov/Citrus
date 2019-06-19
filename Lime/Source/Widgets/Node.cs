@@ -1490,6 +1490,8 @@ namespace Lime
 		{
 			var clone = (AnimationComponent)base.Clone();
 			clone.Animations = new AnimationCollection(clone);
+			clone.AnimationRun = null;
+			clone.AnimationStopped = null;
 			foreach (var a in Animations) {
 				clone.Animations.Add(a.Clone());
 			}
