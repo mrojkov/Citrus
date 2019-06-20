@@ -73,7 +73,7 @@ namespace Lime
 		protected bool globallyVisible;
 
 		public static Widget Focused { get; private set; }
-		public static Vector2 DefaultWidgetSize = new Vector2(100);
+		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
 		public static bool RenderTransparentWidgets;
 		public static bool EnableViewCulling = true;
 

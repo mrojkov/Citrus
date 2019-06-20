@@ -15,7 +15,6 @@ namespace Orange
 		private OrangeApp()
 		{
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
-			Widget.DefaultWidgetSize = Vector2.Zero;
 			LoadFont();
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();

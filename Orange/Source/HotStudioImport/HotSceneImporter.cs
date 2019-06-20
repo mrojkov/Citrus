@@ -49,13 +49,9 @@ namespace Orange
 			using (TextReader reader = new StreamReader(stream)) {
 				string text = reader.ReadToEnd();
 				lexer = new HotLexer(sourcePath, text, isTangerine);
-				var savedDefaultWidgetSize = Widget.DefaultWidgetSize;
-				try {
-					Widget.DefaultWidgetSize = new Vector2(100, 100);
-					node = ParseNode(node);
-				} finally {
-					Widget.DefaultWidgetSize = savedDefaultWidgetSize;
-				}
+				// if there are any default values in *.scene different from default values
+				// of corresponding properties in Citrus, they should be cared of here
+				node = ParseNode(node);
 				lexer.ReadLine();
 				thumbnailProvider?.SetThumbnail(node, ReadThumbnail(lexer));
 				if (isTangerine) {
