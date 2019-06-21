@@ -28,11 +28,19 @@ namespace Lime
             if (cgImage == null) {
                 cgImage = CGImage.FromJPEG(new CGDataProvider(data), null, false, CGColorRenderingIntent.Default);
             }
+			if (cgImage == null) {
+				throw new FailedToCreateCGImageFromGivenStreamException();
+			} 
 			var alphaInfo = cgImage.AlphaInfo;
 			HasAlpha =
 				alphaInfo != CGImageAlphaInfo.None &&
 				alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
 				alphaInfo != CGImageAlphaInfo.NoneSkipLast;
+		}
+
+		public class FailedToCreateCGImageFromGivenStreamException : Lime.Exception
+		{
+
 		}
 
 		public BitmapImplementation(Color4[] pixels, int width, int height)
