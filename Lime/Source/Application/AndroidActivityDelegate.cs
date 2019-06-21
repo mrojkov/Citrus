@@ -136,7 +136,9 @@ namespace Lime
 		public void OnLowMemory()
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
-			TexturePool.Instance.DiscardTexturesUnderPressure();
+			Window.Current.InvokeOnRendering(() => {
+				TexturePool.Instance.DiscardTexturesUnderPressure();
+			});
 			System.GC.Collect();
 			if (LowMemory != null) {
 				LowMemory();
