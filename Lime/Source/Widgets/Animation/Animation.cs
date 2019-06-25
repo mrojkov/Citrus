@@ -205,6 +205,8 @@ namespace Lime
 			clone.EffectiveTriggerableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
 			clone.BezierEasingCalculator = new AnimationBezierEasingCalculator(clone.Markers, clone);
+			clone.Index = -1;
+			clone.Depth = -1;
 			return clone;
 		}
 

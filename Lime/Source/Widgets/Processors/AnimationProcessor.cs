@@ -30,11 +30,13 @@ namespace Lime
 
 		internal void OnAnimationRun(AnimationComponent component, Animation animation)
 		{
-			var depth = GetDepth(animation.OwnerNode);
-			var list = GetRunningAnimationList(depth);
-			animation.Depth = depth;
-			animation.Index = list.Count;
-			list.Add(animation);
+			if (animation.Depth < 0) {
+				var depth = GetDepth(animation.OwnerNode);
+				var list = GetRunningAnimationList(depth);
+				animation.Depth = depth;
+				animation.Index = list.Count;
+				list.Add(animation);
+			}
 		}
 
 		internal void OnAnimationStopped(AnimationComponent component, Animation animation)
