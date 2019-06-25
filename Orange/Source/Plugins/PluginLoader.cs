@@ -121,33 +121,59 @@ namespace Orange
 			CurrentPlugin = new OrangePlugin();
 			ResetPlugins();
 			try {
-				if (Directory.Exists(CurrentPluginDirectory)) {
-					var orangePluginAssemblies = The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies");
-					if (orangePluginAssemblies == null) {
-						var msg = "Warning: Field 'OrangePluginAssemblies' not found in " + citrusProjectFile;
-						The.UI.ShowError(msg);
-						Console.WriteLine(msg);
-					} else if (orangePluginAssemblies.Length == 0) {
-						Console.WriteLine("Warning: Field 'OrangePluginAssemblies' in " + citrusProjectFile + " is empty");
-					} else {
-						foreach (var path in The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies")) {
-							if (!path.Contains("$CONFIGURATION")) {
-								Console.WriteLine(
-									"Warning: Using '$CONFIGURATION' instead of 'Debug' or 'Release' in dll path" +
-									$" is strictly recommended ($CONFIGURATION line not found in {path}");
-							}
-							var absPath = Path.Combine(The.Workspace.ProjectDirectory,
-								path.Replace("$CONFIGURATION", pluginConfiguration));
-							if (!File.Exists(absPath)) {
-								var msg = "File not found on attempt to import OrangePluginAssemblies: " + absPath;
-								The.UI.ShowError(msg);
-								throw new FileNotFoundException(msg);
-							}
-							catalog.Catalogs.Add(new AssemblyCatalog(Assembly.LoadFrom(absPath)));
+				var orangePluginAssemblies = The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies");
+				if (orangePluginAssemblies == null) {
+					var msg = "Warning: Field 'OrangePluginAssemblies' not found in " + citrusProjectFile;
+					The.UI.ShowError(msg);
+					Console.WriteLine(msg);
+				} else if (orangePluginAssemblies.Length == 0) {
+					Console.WriteLine("Warning: Field 'OrangePluginAssemblies' in " + citrusProjectFile + " is empty");
+				} else {
+					foreach (var path in The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies")) {
+						if (!path.Contains("$CONFIGURATION")) {
+							Console.WriteLine(
+								"Warning: Using '$CONFIGURATION' instead of 'Debug' or 'Release' in dll path" +
+								$" is strictly recommended ($CONFIGURATION line not found in {path}");
 						}
+						var assemblyPath = path.Replace("$CONFIGURATION", pluginConfiguration);
+#if TANGERINE
+						assemblyPath = assemblyPath.Replace("$HOST_APPLICATION", "Tangerine");
+#else
+						assemblyPath = assemblyPath.Replace("$HOST_APPLICATION", "Orange");
+#endif
+						var absPath = Path.Combine(The.Workspace.ProjectDirectory, assemblyPath);
+						if (!File.Exists(absPath)) {
+							var msg = "File not found on attempt to import OrangePluginAssemblies: " + absPath;
+							The.UI.ShowError(msg);
+							throw new FileNotFoundException(msg);
+						}
+
+						var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+						if (!TryFindDomainAssembliesByPath(domainAssemblies, absPath, out var assembly)) {
+							var assemblyName = AssemblyName.GetAssemblyName(absPath);
+							TryFindDomainAssembliesByName(domainAssemblies, assemblyName.Name, out assembly);
+						}
+						try {
+							if (assembly == null) {
+								assembly = LoadAssembly(absPath);
+							}
+							catalog.Catalogs.Add(new AssemblyCatalog(assembly));
+						} catch (ReflectionTypeLoadException e) {
+							var msg = "Failed to import OrangePluginAssemblies: " + absPath;
+							foreach (var loaderException in e.LoaderExceptions) {
+								msg += $"\n{loaderException}";
+							}
+							The.UI.ShowError(msg);
+							throw new Exception(msg);
+						} catch (Exception e) {
+							var msg = $"Unhandled exception while importing OrangePluginAssemblies: {absPath}\n{e}";
+							The.UI.ShowError(msg);
+							throw new Exception(msg);
+						}
+						resolvedAssemblies[assembly.GetName().Name] = assembly;
 					}
-					ValidateComposition();
 				}
+				ValidateComposition();
 			} catch (BadImageFormatException e) {
 				Console.WriteLine(e.Message);
 			} catch (System.Exception e) {
@@ -241,17 +267,14 @@ namespace Orange
 		public static IEnumerable<Type> EnumerateTangerineExportedTypes()
 		{
 			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies;
-			if (requiredAssemblies == null) {
-				yield break;
-			}
-
-			foreach (string name in requiredAssemblies()) {
-				AssemblyResolve(null, new ResolveEventArgs(name, null));
+			if (requiredAssemblies != null) {
+				foreach (var name in requiredAssemblies()) {
+					AssemblyResolve(null, new ResolveEventArgs(name, null));
+				}
 			}
 
 			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-				string assemblyName = assembly.GetName().Name;
-
+				var assemblyName = assembly.GetName().Name;
 				if (ignoredAssemblies.IsMatch(assemblyName)) {
 					continue;
 				}
@@ -262,15 +285,13 @@ namespace Orange
 				} catch (Exception) {
 					exportedTypes = null;
 				}
-
-				if (exportedTypes == null) {
-					continue;
-				}
-
-				foreach (var t in exportedTypes) {
-					if (t.GetCustomAttributes(false).Any(i =>
-						i is TangerineRegisterNodeAttribute || i is TangerineRegisterComponentAttribute)) {
-						yield return t;
+				if (exportedTypes != null) {
+					foreach (var t in exportedTypes) {
+						if (t.GetCustomAttributes(false).Any(i =>
+							i is TangerineRegisterNodeAttribute || i is TangerineRegisterComponentAttribute)
+						) {
+							yield return t;
+						}
 					}
 				}
 			}
@@ -284,67 +305,68 @@ namespace Orange
 				return null;
 			}
 
-			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies?.Invoke();
-			string foundPath = requiredAssemblies?.FirstOrDefault(assemblyPath =>
-				assemblyPath == name || Path.GetFileName(assemblyPath).Equals(name, StringComparison.InvariantCultureIgnoreCase)
-			);
-
-			if (foundPath == null) {
-				return null;
-			}
-
-			Assembly assembly;
-
-			if (!resolvedAssemblies.TryGetValue(name, out assembly)) {
-				string dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+			if (!resolvedAssemblies.TryGetValue(name, out var assembly)) {
+				var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies?.Invoke();
+				var foundPath = requiredAssemblies?.FirstOrDefault(assemblyPath =>
+					assemblyPath == name || Path.GetFileName(assemblyPath).Equals(name, StringComparison.InvariantCultureIgnoreCase)
+				);
+				if (foundPath == null) {
+					return null;
+				}
 
 				var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-				var existedAssemblyByPath = domainAssemblies.Where(i => {
-					try {
-						return string.Equals(
-							Path.GetFullPath(i.Location),
-							Path.GetFullPath(dllPath),
-							StringComparison.CurrentCultureIgnoreCase);
-					} catch {
-						return false;
-					}
-				});
-
-				if (existedAssemblyByPath.Any()) {
-					assembly = existedAssemblyByPath.First();
+				var dllPath = Path.Combine(CurrentPluginDirectory, foundPath) + ".dll";
+				if (TryFindDomainAssembliesByPath(domainAssemblies, dllPath, out assembly)) {
 					resolvedAssemblies.Add(name, assembly);
-
 					return assembly;
 				}
-
-				var existedAssemblyByName = domainAssemblies.Where(i => {
-					try {
-						return string.Equals(i.GetName().Name, name, StringComparison.CurrentCultureIgnoreCase);
-					} catch {
-						return false;
-					}
-				});
-
-				if (existedAssemblyByName.Any()) {
-					assembly = existedAssemblyByName.First();
+				if (TryFindDomainAssembliesByName(domainAssemblies, name, out assembly)) {
 					throw new InvalidOperationException(
 						$"WARNING: Assembly {name} with path {assembly.Location} has already loaded in domain." +
-						$"\nAssembly {name} with path {dllPath} leads to exception.");
+						$"\nAssembly {name} with path {dllPath} leads to exception."
+					);
 				}
-
-				var readAllDllBytes = File.ReadAllBytes(dllPath);
-				byte[] readAllPdbBytes = null;
-#if DEBUG
-				var pdbPath = Path.Combine(CurrentPluginDirectory, name) + ".pdb";
-				if (File.Exists(pdbPath)) {
-					readAllPdbBytes = File.ReadAllBytes(pdbPath);
-				}
-#endif
-				assembly = Assembly.Load(readAllDllBytes, readAllPdbBytes);
+				assembly = LoadAssembly(dllPath);
 				resolvedAssemblies.Add(name, assembly);
 			}
 			return assembly;
+		}
+
+		private static bool TryFindDomainAssembliesByPath(Assembly[] domainAssemblies, string path, out Assembly assembly)
+		{
+			assembly = domainAssemblies.FirstOrDefault(i => {
+				try {
+					return string.Equals(Path.GetFullPath(i.Location), Path.GetFullPath(path), StringComparison.CurrentCultureIgnoreCase);
+				} catch {
+					return false;
+				}
+			});
+			return assembly != null;
+		}
+
+		private static bool TryFindDomainAssembliesByName(Assembly[] domainAssemblies, string name, out Assembly assembly)
+		{
+			assembly = domainAssemblies.FirstOrDefault(i => {
+				try {
+					return string.Equals(i.GetName().Name, name, StringComparison.CurrentCultureIgnoreCase);
+				} catch {
+					return false;
+				}
+			});
+			return assembly != null;
+		}
+
+		private static Assembly LoadAssembly(string path)
+		{
+			var readAllDllBytes = File.ReadAllBytes(path);
+			byte[] readAllPdbBytes = null;
+#if DEBUG
+			var pdbPath = Path.ChangeExtension(path, ".pdb");
+			if (File.Exists(pdbPath)) {
+				readAllPdbBytes = File.ReadAllBytes(pdbPath);
+			}
+#endif
+			return Assembly.Load(readAllDllBytes, readAllPdbBytes);
 		}
 	}
 }
