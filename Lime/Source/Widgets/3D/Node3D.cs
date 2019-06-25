@@ -46,7 +46,8 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
+					Manager?.OnFilterChanged(this);
 				}
 			}
 		}
@@ -208,6 +209,11 @@ namespace Lime
 					globalColor *= Parent.AsNode3D.GlobalColor;
 				}
 			}
+		}
+
+		protected override bool CheckForGloballyFrozen()
+		{
+			return base.CheckForGloballyFrozen() || !GloballyVisible;
 		}
 
 		public Node3D()

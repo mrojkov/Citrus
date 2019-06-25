@@ -463,8 +463,14 @@ namespace Lime
 			set
 			{
 				if (color.ABGR != value.ABGR) {
-					PropagateDirtyFlags((color.A == 0) != (value.A == 0) ? DirtyFlags.Color | DirtyFlags.Visible : DirtyFlags.Color);
+					var visibilityChanged = (color.A == 0) != (value.A == 0);
 					color = value;
+					if (visibilityChanged) {
+						PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible | DirtyFlags.Frozen);
+						Manager?.OnFilterChanged(this);
+					} else {
+						PropagateDirtyFlags(DirtyFlags.Color);
+					}
 				}
 			}
 		}
@@ -477,11 +483,9 @@ namespace Lime
 			get { return color.A * (1 / 255f); }
 			set
 			{
-				var a = (byte)(value * 255f);
-				if (color.A != a) {
-					color.A = a;
-					PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible);
-				}
+				var newColor = Color;
+				newColor.A = (byte)(value * 255f);
+				Color = newColor;
 			}
 		}
 
@@ -538,8 +542,9 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
 					InvalidateParentConstraintsAndArrangement();
+					Manager?.OnFilterChanged(this);
 				}
 			}
 		}
@@ -1422,6 +1427,11 @@ namespace Lime
 					n.UpdateBoundingRect();
 				}
 			}
+		}
+
+		protected override bool CheckForGloballyFrozen()
+		{
+			return base.CheckForGloballyFrozen() || !GloballyVisible;
 		}
 	}
 }

@@ -99,6 +99,23 @@ namespace Lime
 			node.Manager = null;
 		}
 
+		internal void OnFilterChanged(Node node)
+		{
+			var frozen = node.GloballyFrozen;
+			foreach (var component in node.Components) {
+				foreach (var p in GetProcessorsForComponentType(component.GetType())) {
+					if (frozen) {
+						p.Freeze(component);
+					} else {
+						p.Unfreeze(component);
+					}
+				}
+			}
+			foreach (var child in node.Nodes) {
+				OnFilterChanged(child);
+			}
+		}
+
 		internal void RegisterComponent(NodeComponent component)
 		{
 			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
@@ -115,6 +132,8 @@ namespace Lime
 
 		private bool updating = false;
 
+		public int Frame;
+
 		public void Update(float delta)
 		{
 			if (updating) {
@@ -127,6 +146,7 @@ namespace Lime
 				}
 			} finally {
 				updating = false;
+				Frame++;
 			}
 		}
 	}
@@ -278,8 +298,8 @@ namespace Lime
 				pendingBehaviors2 = t;
 				foreach (var b in pendingBehaviors2) {
 					if (b is UpdatableBehaviorComponent ub) {
-						var bf = GetUpdatableBehaviorFamily(ub.GetType());
-						bf.AddBehavior(ub);
+						ub.Family = GetUpdatableBehaviorFamily(ub.GetType());
+						EnqueueDequeueBehavior(ub);
 					}
 					b.Start();
 				}
@@ -296,12 +316,32 @@ namespace Lime
 		{
 			if (!pendingBehaviors.Remove(behavior)) {
 				if (behavior is UpdatableBehaviorComponent ub) {
-					var bf = ub.Family;
-					if (bf != null) {
-						bf.RemoveBehavior(ub);
+					if (ub.Family != null) {
+						ub.Family.Dequeue(ub);
+						ub.Family = null;
 					}
 				}
 				behavior.Stop();
+			}
+		}
+
+		public void OnFilterChanged(UpdatableBehaviorComponent behavior)
+		{
+			if (!pendingBehaviors.Contains(behavior)) {
+				EnqueueDequeueBehavior(behavior);
+			}
+		}
+
+		private void EnqueueDequeueBehavior(UpdatableBehaviorComponent behavior)
+		{
+			var enabled = !behavior.Owner.GloballyFrozen;
+			var bf = behavior.Family;
+			if (bf != null) {
+				if (enabled) {
+					bf.Enqueue(behavior);
+				} else {
+					bf.Dequeue(behavior);
+				}
 			}
 		}
 
@@ -378,18 +418,24 @@ namespace Lime
 			BehaviorType = behaviorType;
 		}
 
-		public void AddBehavior(UpdatableBehaviorComponent b)
+		public bool Enqueue(UpdatableBehaviorComponent b)
 		{
-			b.Family = this;
-			b.IndexInFamily = behaviors.Count;
-			behaviors.Add(b);
+			if (b.IndexInFamily < 0) {
+				b.IndexInFamily = behaviors.Count;
+				behaviors.Add(b);
+				return true;
+			}
+			return false;
 		}
 
-		public void RemoveBehavior(UpdatableBehaviorComponent b)
+		public bool Dequeue(UpdatableBehaviorComponent b)
 		{
-			behaviors[b.IndexInFamily] = null;
-			b.IndexInFamily = -1;
-			b.Family = null;
+			if (b.IndexInFamily >= 0) {
+				behaviors[b.IndexInFamily] = null;
+				b.IndexInFamily = -1;
+				return true;
+			}
+			return false;
 		}
 
 		public void Update(float delta)

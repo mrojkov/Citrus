@@ -26,6 +26,23 @@ namespace Lime
 			behaviorSystem.Remove(component);
 		}
 
+		protected override void Freeze(BehaviorComponent component)
+		{
+			OnFilterChanged(component);
+		}
+
+		protected override void Unfreeze(BehaviorComponent component)
+		{
+			OnFilterChanged(component);
+		}
+
+		private void OnFilterChanged(BehaviorComponent component)
+		{
+			if (component is UpdatableBehaviorComponent ub) {
+				behaviorSystem.OnFilterChanged(ub);
+			}
+		}
+
 		protected internal override void Update(float delta)
 		{
 			behaviorSystem.StartPendingBehaviors();

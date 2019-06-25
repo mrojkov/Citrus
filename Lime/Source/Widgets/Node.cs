@@ -75,6 +75,7 @@ namespace Lime
 			ParentBoundingRect = 1 << 8,
 			Enabled = 1 << 9,
 			EffectiveAnimationSpeed = 1 << 10,
+			Frozen = 1 << 11,
 			All = ~None
 		}
 
@@ -190,7 +191,8 @@ namespace Lime
 			{
 				if (tangerineFlags != value) {
 					tangerineFlags = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
+					Manager?.OnFilterChanged(this);
 				}
 			}
 		}
@@ -1357,6 +1359,41 @@ namespace Lime
 			for (var n = FirstChild; n != null; n = n.NextSibling) {
 				n.UpdateBoundingRect();
 			}
+		}
+
+		private bool frozen;
+
+		public bool Frozen
+		{
+			get => frozen;
+			set {
+				if (frozen != value) {
+					frozen = value;
+					PropagateDirtyFlags(DirtyFlags.Frozen);
+					Manager?.OnFilterChanged(this);
+				}
+			}
+		}
+
+		private bool globallyFrozen;
+
+		public bool GloballyFrozen
+		{
+			get {
+				if (CleanDirtyFlags(DirtyFlags.Frozen)) {
+					globallyFrozen = CheckForGloballyFrozen();
+				}
+				return globallyFrozen;
+			}
+		}
+
+		protected virtual bool CheckForGloballyFrozen()
+		{
+			var result = frozen;
+			if (Parent != null) {
+				result |= Parent.GloballyFrozen;
+			}
+			return result;
 		}
 	}
 

@@ -188,6 +188,9 @@ namespace Lime
 
 		public virtual void OnUpdate(float delta)
 		{
+			if (stateHandler == null) {
+				return;
+			}
 			if (GloballyVisible) {
 				stateHandler.MoveNext();
 				textPresentersFeeder.Update();
