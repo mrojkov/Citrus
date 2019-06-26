@@ -51,6 +51,16 @@ namespace Lime
 		/// </summary>
 		private const string commentKeyPrefix = "_COMMENT";
 
+		public Dictionary<string, LocalizationEntry>.KeyCollection Keys => dictionary.Keys;
+
+		public Dictionary<string, LocalizationEntry>.ValueCollection Values => dictionary.Values;
+
+		public LocalizationEntry this[string key]
+		{
+			get => dictionary[key.Trim()];
+			set => dictionary[key.Trim()] = value;
+		}
+
 		/// <summary>
 		/// Получить значение по ключу
 		/// </summary>
@@ -78,6 +88,16 @@ namespace Lime
 			var e = GetEntry(key);
 			e.Text = text;
 			e.Context = context;
+		}
+
+		public void Clear()
+		{
+			dictionary.Clear();
+		}
+
+		public bool Remove(string key)
+		{
+			return key != null && dictionary.Remove(key.Trim());
 		}
 
 		/// <summary>
@@ -116,6 +136,17 @@ namespace Lime
 				value = e.Text;
 			}
 			return value != null;
+		}
+
+		public bool TryGetValue(string key, out LocalizationEntry value)
+		{
+			value = null;
+			return key != null && dictionary.TryGetValue(key.Trim(), out value);
+		}
+
+		public void Add(string key, LocalizationEntry value)
+		{
+			dictionary.Add(key.Trim(), value);
 		}
 
 		public bool ContainsKey(string key) => dictionary.ContainsKey(key.Trim());
