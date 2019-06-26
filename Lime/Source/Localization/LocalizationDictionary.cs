@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,23 +8,23 @@ using System.Text;
 namespace Lime
 {
 	/// <summary>
-	/// Запись словаря локализации
+	/// Р—Р°РїРёСЃСЊ СЃР»РѕРІР°СЂСЏ Р»РѕРєР°Р»РёР·Р°С†РёРё
 	/// </summary>
 	public class LocalizationEntry
 	{
 		/// <summary>
-		/// Текст перевода
+		/// РўРµРєСЃС‚ РїРµСЂРµРІРѕРґР°
 		/// </summary>
 		public string Text;
 
 		/// <summary>
-		/// Контекст. Аналог комментария для переводчика
+		/// РљРѕРЅС‚РµРєСЃС‚. РђРЅР°Р»РѕРі РєРѕРјРјРµРЅС‚Р°СЂРёСЏ РґР»СЏ РїРµСЂРµРІРѕРґС‡РёРєР°
 		/// </summary>
 		public string Context;
 	}
 
 	/// <summary>
-	/// Интерфейс сериалайзера, предоставляющего функции чтения и записи словаря в файл
+	/// РРЅС‚РµСЂС„РµР№СЃ СЃРµСЂРёР°Р»Р°Р№Р·РµСЂР°, РїСЂРµРґРѕСЃС‚Р°РІР»СЏСЋС‰РµРіРѕ С„СѓРЅРєС†РёРё С‡С‚РµРЅРёСЏ Рё Р·Р°РїРёСЃРё СЃР»РѕРІР°СЂСЏ РІ С„Р°Р№Р»
 	/// </summary>
 	public interface ILocalizationDictionarySerializer
 	{
@@ -33,43 +34,45 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// Словарь локализации. Используется для перевода текста на другой язык.
-	/// Содержит пары ключ-значение. Строка, заданная в HotStudio является ключом,
-	/// если начинается с квадратных скобок []. Словарь подменяет ее на фразу для конкретного языка
+	/// РЎР»РѕРІР°СЂСЊ Р»РѕРєР°Р»РёР·Р°С†РёРё. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРµСЂРµРІРѕРґР° С‚РµРєСЃС‚Р° РЅР° РґСЂСѓРіРѕР№ СЏР·С‹Рє.
+	/// РЎРѕРґРµСЂР¶РёС‚ РїР°СЂС‹ РєР»СЋС‡-Р·РЅР°С‡РµРЅРёРµ. РЎС‚СЂРѕРєР°, Р·Р°РґР°РЅРЅР°СЏ РІ HotStudio СЏРІР»СЏРµС‚СЃСЏ РєР»СЋС‡РѕРј,
+	/// РµСЃР»Рё РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ РєРІР°РґСЂР°С‚РЅС‹С… СЃРєРѕР±РѕРє []. РЎР»РѕРІР°СЂСЊ РїРѕРґРјРµРЅСЏРµС‚ РµРµ РЅР° С„СЂР°Р·Сѓ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ СЏР·С‹РєР°
 	/// </summary>
-	public class LocalizationDictionary : Dictionary<string, LocalizationEntry>
+	public class LocalizationDictionary : IEnumerable<KeyValuePair<string, LocalizationEntry>>
 	{
 		/// <summary>
-		/// Счётчик добавленных комментариев. Нужен чтобы заносить в словарь каждый комментарий с уникальным айди
+		/// РЎС‡С‘С‚С‡РёРє РґРѕР±Р°РІР»РµРЅРЅС‹С… РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ. РќСѓР¶РµРЅ С‡С‚РѕР±С‹ Р·Р°РЅРѕСЃРёС‚СЊ РІ СЃР»РѕРІР°СЂСЊ РєР°Р¶РґС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ СЃ СѓРЅРёРєР°Р»СЊРЅС‹Рј Р°Р№РґРё
 		/// </summary>
 		private int commentsCounter;
+		private Dictionary<string, LocalizationEntry> dictionary = new Dictionary<string, LocalizationEntry>();
 
 		/// <summary>
-		/// Префикс ключа для комментариев
+		/// РџСЂРµС„РёРєСЃ РєР»СЋС‡Р° РґР»СЏ РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ
 		/// </summary>
 		private const string commentKeyPrefix = "_COMMENT";
 
 		/// <summary>
-		/// Получить значение по ключу
+		/// РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ РїРѕ РєР»СЋС‡Сѓ
 		/// </summary>
 		public LocalizationEntry GetEntry(string key)
 		{
+			key = key.Trim();
 			LocalizationEntry e;
-			if (TryGetValue(key, out e)) {
+			if (dictionary.TryGetValue(key, out e)) {
 				return e;
 			} else {
 				e = new LocalizationEntry();
-				Add(key, e);
+				dictionary.Add(key, e);
 				return e;
 			}
 		}
 
 		/// <summary>
-		/// Добавляет новую запись в словарь. Если запись с таким ключом уже есть, заменяет ее
+		/// Р”РѕР±Р°РІР»СЏРµС‚ РЅРѕРІСѓСЋ Р·Р°РїРёСЃСЊ РІ СЃР»РѕРІР°СЂСЊ. Р•СЃР»Рё Р·Р°РїРёСЃСЊ СЃ С‚Р°РєРёРј РєР»СЋС‡РѕРј СѓР¶Рµ РµСЃС‚СЊ, Р·Р°РјРµРЅСЏРµС‚ РµРµ
 		/// </summary>
-		/// <param name="key">Ключ, по которому можно будет получить запись</param>
-		/// <param name="text">Текст</param>
-		/// <param name="context">Контекст. Аналог комментария для переводчика</param>
+		/// <param name="key">РљР»СЋС‡, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РјРѕР¶РЅРѕ Р±СѓРґРµС‚ РїРѕР»СѓС‡РёС‚СЊ Р·Р°РїРёСЃСЊ</param>
+		/// <param name="text">РўРµРєСЃС‚</param>
+		/// <param name="context">РљРѕРЅС‚РµРєСЃС‚. РђРЅР°Р»РѕРі РєРѕРјРјРµРЅС‚Р°СЂРёСЏ РґР»СЏ РїРµСЂРµРІРѕРґС‡РёРєР°</param>
 		public void Add(string key, string text, string context)
 		{
 			var e = GetEntry(key);
@@ -78,7 +81,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Проверяет не является ли ключ специальным ключом для комментариев
+		/// РџСЂРѕРІРµСЂСЏРµС‚ РЅРµ СЏРІР»СЏРµС‚СЃСЏ Р»Рё РєР»СЋС‡ СЃРїРµС†РёР°Р»СЊРЅС‹Рј РєР»СЋС‡РѕРј РґР»СЏ РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
@@ -88,9 +91,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет в словарь запись комментария
+		/// Р”РѕР±Р°РІР»СЏРµС‚ РІ СЃР»РѕРІР°СЂСЊ Р·Р°РїРёСЃСЊ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 		/// </summary>
-		/// <param name="comment">Текст комментария</param>
+		/// <param name="comment">РўРµРєСЃС‚ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ</param>
 		public void AddComment(string comment)
 		{
 			var e = GetEntry(commentKeyPrefix + commentsCounter.ToString());
@@ -100,22 +103,25 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Получает текст перевода по ключу. Возвращает true в случае успешной операции
+		/// РџРѕР»СѓС‡Р°РµС‚ С‚РµРєСЃС‚ РїРµСЂРµРІРѕРґР° РїРѕ РєР»СЋС‡Сѓ. Р’РѕР·РІСЂР°С‰Р°РµС‚ true РІ СЃР»СѓС‡Р°Рµ СѓСЃРїРµС€РЅРѕР№ РѕРїРµСЂР°С†РёРё
 		/// </summary>
-		/// <param name="key">Ключ</param>
-		/// <param name="value">Переменная, в которую будет записан результат</param>
+		/// <param name="key">РљР»СЋС‡</param>
+		/// <param name="value">РџРµСЂРµРјРµРЅРЅР°СЏ, РІ РєРѕС‚РѕСЂСѓСЋ Р±СѓРґРµС‚ Р·Р°РїРёСЃР°РЅ СЂРµР·СѓР»СЊС‚Р°С‚</param>
 		public bool TryGetText(string key, out string value)
 		{
+			key = key.Trim();
 			value = null;
 			LocalizationEntry e;
-			if (TryGetValue(key, out e)) {
+			if (dictionary.TryGetValue(key, out e)) {
 				value = e.Text;
 			}
 			return value != null;
 		}
 
+		public bool ContainsKey(string key) => dictionary.ContainsKey(key.Trim());
+
 		/// <summary>
-		/// Загружает словарь из потока
+		/// Р—Р°РіСЂСѓР¶Р°РµС‚ СЃР»РѕРІР°СЂСЊ РёР· РїРѕС‚РѕРєР°
 		/// </summary>
 		public void ReadFromStream(Stream stream)
 		{
@@ -123,7 +129,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Записывает словарь в поток
+		/// Р—Р°РїРёСЃС‹РІР°РµС‚ СЃР»РѕРІР°СЂСЊ РІ РїРѕС‚РѕРє
 		/// </summary>
 		public void WriteToStream(Stream stream)
 		{
@@ -131,21 +137,27 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Загружает словарь из потока
+		/// Р—Р°РіСЂСѓР¶Р°РµС‚ СЃР»РѕРІР°СЂСЊ РёР· РїРѕС‚РѕРєР°
 		/// </summary>
-		/// <param name="serializer">Сериалайзер, предоставляющий функции чтения и записи словаря в файл</param>
+		/// <param name="serializer">РЎРµСЂРёР°Р»Р°Р№Р·РµСЂ, РїСЂРµРґРѕСЃС‚Р°РІР»СЏСЋС‰РёР№ С„СѓРЅРєС†РёРё С‡С‚РµРЅРёСЏ Рё Р·Р°РїРёСЃРё СЃР»РѕРІР°СЂСЏ РІ С„Р°Р№Р»</param>
 		public void ReadFromStream(ILocalizationDictionarySerializer serializer, Stream stream)
 		{
 			serializer.Read(this, stream);
 		}
 
 		/// <summary>
-		/// Записывает словарь в поток
+		/// Р—Р°РїРёСЃС‹РІР°РµС‚ СЃР»РѕРІР°СЂСЊ РІ РїРѕС‚РѕРє
 		/// </summary>
-		/// <param name="serializer">Сериалайзер, предоставляющий функции чтения и записи словаря в файл</param>
+		/// <param name="serializer">РЎРµСЂРёР°Р»Р°Р№Р·РµСЂ, РїСЂРµРґРѕСЃС‚Р°РІР»СЏСЋС‰РёР№ С„СѓРЅРєС†РёРё С‡С‚РµРЅРёСЏ Рё Р·Р°РїРёСЃРё СЃР»РѕРІР°СЂСЏ РІ С„Р°Р№Р»</param>
 		public void WriteToStream(ILocalizationDictionarySerializer serializer, Stream stream)
 		{
 			serializer.Write(this, stream);
 		}
+
+		public Dictionary<string, LocalizationEntry>.Enumerator GetEnumerator() => dictionary.GetEnumerator();
+
+		IEnumerator<KeyValuePair<string, LocalizationEntry>> IEnumerable<KeyValuePair<string, LocalizationEntry>>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }
