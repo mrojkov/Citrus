@@ -61,6 +61,8 @@ namespace Lime
 			set => dictionary[key.Trim()] = value;
 		}
 
+		public int Count => dictionary.Count;
+
 		/// <summary>
 		/// Получить значение по ключу
 		/// </summary>
