@@ -37,6 +37,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			unchecked {
 				var r = -511344;
+				r = r * -1521134295 + (int)(TimelineMetrics.ColWidth * 10);
 				foreach (var clip in track.Clips) {
 					r = r * -1521134295 + clip.AnimationIdComparisonCode;
 					r = r * -1521134295 + clip.BeginFrame;
