@@ -85,7 +85,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 				RefreshMarkers();
 				cancelButton.Clicked += () => window.Close();
 				okButton.Clicked += () => {
-					var animation = Document.Current.Container.Animations.Find(animationSelector.Text);
+					var animation = Document.Current.Animation.Owner.Animations.Find(animationSelector.Text);
 					if (!animation.AnimationEngine.AreEffectiveAnimatorsValid(animation)) {
 						// Refreshes animation duration either
 						animation.AnimationEngine.BuildEffectiveAnimators(animation);
