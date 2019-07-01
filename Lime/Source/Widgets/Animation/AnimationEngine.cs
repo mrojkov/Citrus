@@ -268,6 +268,14 @@ namespace Lime
 			animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
 			AddEffectiveAnimatorsRecursively(animation.Owner);
 
+			if (!animation.IsLegacy) {
+				var animatorBindings = new HashSet<AnimatorBinding>();
+				foreach (var a in animation.EffectiveAnimators) {
+					animatorBindings.Add(new AnimatorBinding(a));
+				}
+				AddZeroPoseAnimatorsRecursively(animatorBindings, animation.Owner);
+			}
+
 			void AddEffectiveAnimatorsRecursively(Node node)
 			{
 				foreach (var child in node.Nodes) {
@@ -288,7 +296,7 @@ namespace Lime
 							}
 						}
 					}
-					var stopRecursion = animation.Id == null;
+					var stopRecursion = animation.IsLegacy;
 					foreach (var a in child.Animations) {
 						if (a.IdComparisonCode == animation.IdComparisonCode) {
 							stopRecursion = true;
@@ -297,6 +305,32 @@ namespace Lime
 					}
 					if (!stopRecursion) {
 						AddEffectiveAnimatorsRecursively(child);
+					}
+				}
+			}
+
+			void AddZeroPoseAnimatorsRecursively(HashSet<AnimatorBinding> animatorBindings, Node node)
+			{
+				foreach (var child in node.Nodes) {
+					// Optimization: avoid calling Animators.GetEnumerator() for empty collection since it allocates memory
+					if (child.Animators.Count > 0) {
+						foreach (var a in child.Animators) {
+							if (a.AnimationId == Animation.ZeroPoseId) {
+								if (!animatorBindings.Contains(new AnimatorBinding(a))) {
+									animation.EffectiveAnimators.Add(a);
+								}
+							}
+						}
+					}
+					var stopRecursion = false;
+					foreach (var a in child.Animations) {
+						if (a.IdComparisonCode == Animation.ZeroPoseIdComparisonCode) {
+							stopRecursion = true;
+							break;
+						}
+					}
+					if (!stopRecursion) {
+						AddZeroPoseAnimatorsRecursively(animatorBindings, child);
 					}
 				}
 			}
