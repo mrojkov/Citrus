@@ -21,7 +21,7 @@ namespace Lime
 		internal static void Decorate(SimpleText text)
 		{
 			text.ForceUncutText = true;
-			text.Localizable = true;
+			text.Localizable = false;
 			text.TextColor = Color4.White;
 			text.Color = Theme.Colors.BlackText;
 			text.Font = new SerializableFont();
