@@ -127,6 +127,65 @@ namespace Tangerine.Panels
 			}
 		}
 
+		private void DuplicateAnimation()
+		{
+			var index = GetSelectedAnimationIndex();
+			var sourceAnimation = GetAnimations()[index];
+			var owner = sourceAnimation.Owner;
+
+			Document.Current.History.DoTransaction(() => {
+				var animation = sourceAnimation.Clone();
+				animation.Id = GenerateAnimationId(sourceAnimation.Id + "Copy");
+				foreach (var track in animation.Tracks) {
+					foreach (var animator in track.Animators) {
+						animator.AnimationId = animation.Id;
+					}
+				}
+				Core.Operations.InsertIntoList.Perform(owner.Animations, owner.Animations.Count, animation);
+				SelectAnimation(GetAnimations().IndexOf(animation));
+				DuplicateAnimators(animation.Owner);
+
+				void DuplicateAnimators(Node node)
+				{
+					foreach (var child in node.Nodes) {
+						foreach (var animator in child.Animators.ToList()) {
+							if (animator.AnimationId == sourceAnimation.Id) {
+								var clone = animator.Clone();
+								clone.AnimationId = animation.Id;
+								Core.Operations.AddIntoCollection<AnimatorCollection, IAnimator>.Perform(child.Animators, clone);
+							}
+						}
+						if (child.ContentsPath != null) {
+							continue;
+						}
+						if (child.Animations.Any(i => i.Id == sourceAnimation.Id)) {
+							continue;
+						}
+						DuplicateAnimators(child);
+					}
+				}
+			});
+			// Schedule animation rename on the next update, since the widgets are not built yet
+			panelWidget.Tasks.Add(DelayedRenameAnimation());
+
+			IEnumerator<object> DelayedRenameAnimation()
+			{
+				yield return null;
+				RenameAnimation();
+			}
+		}
+
+		private string GenerateAnimationId(string prefix)
+		{
+			for (int i = 1; ; i++) {
+				var id = prefix + (i > 1 ? i.ToString() : "");
+				if (!GetAnimations().Any(a => a.Id == id)) {
+					return id;
+				}
+			}
+			throw new System.Exception();
+		}
+
 		private void SelectAnimationBasedOnMousePosition()
 		{
 			scrollView.SetFocus();
@@ -149,13 +208,14 @@ namespace Tangerine.Panels
 			}
 			menu.Add(Command.MenuSeparator);
 			menu.Add(new Command("Rename", RenameAnimation));
+			menu.Add(new Command("Duplicate", DuplicateAnimation));
 			menu.Add(Command.Delete);
 			menu.Popup();
 
 			void AddAnimation(Node node, bool compound)
 			{
 				Document.Current.History.DoTransaction(() => {
-					var animation = new Animation { Id = GenerateAnimationId(), IsCompound = compound };
+					var animation = new Animation { Id = GenerateAnimationId("NewAnimation"), IsCompound = compound };
 					Core.Operations.InsertIntoList.Perform(node.Animations, node.Animations.Count, animation);
 					SelectAnimation(GetAnimations().IndexOf(animation));
 					if (compound) {
@@ -172,17 +232,6 @@ namespace Tangerine.Panels
 				yield return null;
 				RenameAnimation();
 			}
-
-			string GenerateAnimationId()
-			{
-				for (int i = 1; ; i++) {
-					var id = "NewAnimation" + (i > 1 ? i.ToString() : "");
-					if (!GetAnimations().Any(a => a.Id == id)) {
-						return id;
-					}
-				}
-				throw new System.Exception();
-			}
 		}
 
 		private void Delete()
@@ -191,11 +240,30 @@ namespace Tangerine.Panels
 				var index = GetSelectedAnimationIndex();
 				if (index > 0) {
 					SelectAnimation(index - 1);
-				} else {
+				} else if (index + 1 < GetAnimations().Count) {
 					SelectAnimation(index + 1);
 				}
 				var animation = GetAnimations()[index];
+				DeleteAnimators(animation.Owner);
 				Core.Operations.RemoveFromList.Perform(animation.Owner.Animations, animation.Owner.Animations.IndexOf(animation));
+
+				void DeleteAnimators(Node node)
+				{
+					foreach (var child in node.Nodes) {
+						foreach (var animator in child.Animators.ToList()) {
+							if (animator.AnimationId == animation.Id) {
+								Core.Operations.RemoveFromCollection<AnimatorCollection, IAnimator>.Perform(child.Animators, animator);
+							}
+						}
+						if (child.ContentsPath != null) {
+							continue;
+						}
+						if (child.Animations.Any(i => i.Id == animation.Id)) {
+							continue;
+						}
+						DeleteAnimators(child);
+					}
+				}
 			});
 		}
 
@@ -247,7 +315,7 @@ namespace Tangerine.Panels
 					SelectAnimation(GetSelectedAnimationIndex() - 1);
 				}
 				if (!Commands.Delete.IsConsumed()) {
-					Command.Delete.Enabled = !Document.Current.Animation.IsLegacy;
+					Command.Delete.Enabled = !Document.Current.Animation.IsLegacy && Document.Current.Animation.Id != Animation.ZeroPoseId;
 					if (Commands.Delete.Consume()) {
 						Delete();
 					}
