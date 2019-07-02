@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class Animation : ICloneable
 	{
-		public const string ZeroPoseId = "#ZeroPose";
+		public const string ZeroPoseId = "ZeroPose";
 		public readonly static int ZeroPoseIdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(ZeroPoseId);
 #if TANGERINE
 		public static Func<Animation, bool> EasingEnabledChecker;
