@@ -79,8 +79,10 @@ namespace Tangerine.Panels
 				string error = null;
 				if (animation.IsLegacy) {
 					error = "Can't rename legacy animation";
-				} else if (newId.IsNullOrWhiteSpace()) {
-					error = "Invalid animation name";
+				} else if (animation.Id == Animation.ZeroPoseId) {
+					error = "Can't rename zero pose animation";
+				} else if (newId.IsNullOrWhiteSpace() || newId == Animation.ZeroPoseId) {
+					error = "Invalid animation id";
 				} else if (TangerineDefaultCharsetAttribute.IsValid(newId, out var message) != ValidationResult.Ok) {
 					error = message;
 				} else if (animation.Owner.Animations.Any(a => a.Id == newId)) {
