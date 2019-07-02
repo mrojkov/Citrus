@@ -63,7 +63,7 @@ namespace Tangerine.UI.Timeline
 							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCurrentColumn;
 							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
-								Document.ForceAnimationUpdate();
+								Document.Current.ForceAnimationUpdate();
 							}
 							previousColumn = newColumn;
 							Window.Current.Invalidate();

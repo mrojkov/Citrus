@@ -343,7 +343,7 @@ namespace Tangerine.Core
 				if (doc != null) {
 					ProjectUserPreferences.Instance.CurrentDocument = doc.Path;
 				}
-				ForceAnimationUpdate();
+				Current?.ForceAnimationUpdate();
 			}
 		}
 
