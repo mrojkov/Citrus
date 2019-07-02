@@ -68,12 +68,11 @@ namespace Tangerine.UI.Timeline.Operations
 
 			void SetColumn(int value, Animation animation)
 			{
-				Document.SetCurrentFrameToNode(value, animation, CoreUserPreferences.Instance.AnimationMode);
+				Document.SetCurrentFrameToNode(animation, value);
 				if (!isScrollingFrozen) {
 					Timeline.Instance.EnsureColumnVisible(value);
 				}
 			}
-
 		}
 	}
 }

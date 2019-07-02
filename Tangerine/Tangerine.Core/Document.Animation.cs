@@ -18,9 +18,9 @@ namespace Tangerine.Core
 			set => CurrentFrameSetter.CacheAnimationsStates = value;
 		}
 
-		public static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
+		public static void SetCurrentFrameToNode(Animation animation, int frameIndex)
 		{
-			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, animation, animationMode);
+			CurrentFrameSetter.SetCurrentFrameToNode(animation, frameIndex, CoreUserPreferences.Instance.AnimationMode);
 		}
 
 		private static void FastForwardToFrame(Animation animation, int frameIndex)
@@ -44,7 +44,7 @@ namespace Tangerine.Core
 					foreach ((var animation, var time) in savedAnimationsTimes) {
 						animation.Time = CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
 					}
-					SetCurrentFrameToNode(PreviewAnimationBegin, Animation, CoreUserPreferences.Instance.AnimationMode);
+					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
 				}
 				AudioSystem.StopAll();
 				CurrentFrameSetter.CacheAnimationsStates = true;
@@ -61,7 +61,7 @@ namespace Tangerine.Core
 				PreviewAnimation = true;
 				CurrentFrameSetter.CacheAnimationsStates = true;
 				if (triggerMarkersBeforeCurrentFrame) {
-					SetCurrentFrameToNode(0, Animation, true);
+					CurrentFrameSetter.SetCurrentFrameToNode(Animation, 0, animationMode: true);
 				}
 				Animation.IsRunning = PreviewAnimation;
 				if (triggerMarkersBeforeCurrentFrame) {
@@ -77,10 +77,7 @@ namespace Tangerine.Core
 
 		public void ForceAnimationUpdate()
 		{
-			SetCurrentFrameToNode(
-				Current.AnimationFrame,
-				Current.Animation,
-				CoreUserPreferences.Instance.AnimationMode);
+			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
 		}
 
 		private void SaveAnimationsTimes()
@@ -201,7 +198,7 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
+			internal static void SetCurrentFrameToNode(Animation animation, int frameIndex, bool animationMode)
 			{
 				Audio.GloballyEnable = false;
 				try {
