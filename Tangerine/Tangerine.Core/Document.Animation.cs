@@ -34,7 +34,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		public void TogglePreviewAnimation(bool animationMode, bool triggerMarkersBeforeCurrentFrame)
+		public void TogglePreviewAnimation(bool triggerMarkersBeforeCurrentFrame = false)
 		{
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
@@ -42,9 +42,9 @@ namespace Tangerine.Core
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
 					foreach ((var animation, var time) in savedAnimationsTimes) {
-						animation.Time = animationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
+						animation.Time = CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
 					}
-					SetCurrentFrameToNode(PreviewAnimationBegin, Animation, animationMode);
+					SetCurrentFrameToNode(PreviewAnimationBegin, Animation, CoreUserPreferences.Instance.AnimationMode);
 				}
 				AudioSystem.StopAll();
 				CurrentFrameSetter.CacheAnimationsStates = true;

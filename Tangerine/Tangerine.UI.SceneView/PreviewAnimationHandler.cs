@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
@@ -14,7 +14,7 @@ namespace Tangerine.UI.SceneView
 
 		public override void ExecuteTransaction()
 		{
-			Document.Current.TogglePreviewAnimation(CoreUserPreferences.Instance.AnimationMode, triggerMarkersBeforeCurrentFrame);
+			Document.Current.TogglePreviewAnimation(triggerMarkersBeforeCurrentFrame);
 		}
 	}
 }

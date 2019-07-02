@@ -264,7 +264,7 @@ namespace Tangerine.Core
 		private void Document_PerformingOperation(IOperation operation)
 		{
 			if (PreviewAnimation) {
-				TogglePreviewAnimation(!PreviewAnimation, triggerMarkersBeforeCurrentFrame: true);
+				TogglePreviewAnimation();
 			}
 		}
 
