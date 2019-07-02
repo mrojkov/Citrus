@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
-			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
+			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
 			return button;
 		}
 
@@ -203,6 +203,7 @@ namespace Tangerine.UI.Timeline
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tip = "Reset Animations Times" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ResetAnimationsTimes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ResetAnimationsTimes = !CoreUserPreferences.ResetAnimationsTimes;
+			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
 			return button;
 		}
 
