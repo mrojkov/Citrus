@@ -22,7 +22,9 @@ namespace Lime
 #elif ANDROID
 			var uri = Android.Net.Uri.Parse(url);
 			var intent = new Intent(Intent.ActionView, uri);
-			ActivityDelegate.Instance.Activity.StartActivity(intent);
+			if (intent.ResolveActivity(ActivityDelegate.Instance.ContentView.Context.PackageManager) != null) {
+				ActivityDelegate.Instance.Activity.StartActivity(intent);
+			}
 #else
 			System.Diagnostics.Process.Start(url);
 #endif
