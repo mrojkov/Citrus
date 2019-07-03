@@ -103,7 +103,7 @@ namespace Lime
 				Sync?.Invoke();
 			}
 		}
-		
+
 		private void RaiseUpdatingHelper(float delta)
 		{
 			if (Current.Active) {
