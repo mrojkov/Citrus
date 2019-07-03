@@ -311,7 +311,6 @@ namespace Lime
 			Shadows = new ShadowCollection(this, ShadowParams.Type.Base);
 			InnerShadows = new ShadowCollection(this, ShadowParams.Type.Inner);
 			Overlays = new ShadowCollection(this, ShadowParams.Type.Base);
-			Invalidate();
 		}
 
 		private void Invalidate()
