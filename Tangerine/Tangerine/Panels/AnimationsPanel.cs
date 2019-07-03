@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Lime;
 using Tangerine.Core;
 
@@ -42,8 +43,24 @@ namespace Tangerine.Panels
 					w.Width, rowHeight * (selectedIndex + 1),
 					scrollView.IsFocused() ? Theme.Colors.SelectedBackground : Theme.Colors.SelectedInactiveBackground);
 			}));
+			var dragGesture = new DragGesture(0);
+			dragGesture.Recognized += () => {
+				var index = (scrollView.Content.LocalMousePosition().Y / rowHeight).Floor();
+				if (index >= 0 && index < GetAnimations().Count) {
+					var animation = GetAnimations()[index];
+					if (!animation.IsLegacy && animation != Document.Current.Animation) {
+						// Dirty hack: using a file drag&drop mechanics for dropping animation clips on the timeline grid.
+						var encodedAnimationId = Convert.ToBase64String(Encoding.UTF8.GetBytes(animation.Id));
+						// DragFiles in Winforms blocks execution, call it on the next update
+						Application.InvokeOnNextUpdate(() => {
+							Window.Current.DragFiles(new[] { encodedAnimationId });
+						});
+					}
+				}
+			};
 			var mouseDownGesture = new ClickGesture(0);
-			mouseDownGesture.Began += SelectAnimationBasedOnMousePosition;
+			mouseDownGesture.Recognized += SelectAnimationBasedOnMousePosition;
+			scrollView.Gestures.Add(dragGesture);
 			scrollView.Gestures.Add(new ClickGesture(1, ShowContextMenu));
 			scrollView.Gestures.Add(mouseDownGesture);
 			scrollView.Gestures.Add(new DoubleClickGesture(0, RenameAnimation));
