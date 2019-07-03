@@ -296,8 +296,9 @@ namespace Lime
 		{
 			lock (scheduledActionsSync) {
 				if (scheduledActions != null) {
-					scheduledActions();
+					var tmp = scheduledActions;
 					scheduledActions = null;
+					tmp();
 				}
 			}
 		}
