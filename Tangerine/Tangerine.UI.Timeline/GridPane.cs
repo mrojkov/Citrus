@@ -325,7 +325,8 @@ namespace Tangerine.UI.Timeline
 		public IntVector2 CellUnderMouse()
 		{
 			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
-			var x = (int)(mousePos.X / TimelineMetrics.ColWidth);
+			var offset = Document.Current.Animation.IsCompound ? -0.5f : 0;
+			var x = (int)(mousePos.X / TimelineMetrics.ColWidth + offset);
 			if (mousePos.Y <= 0) {
 				return new IntVector2(x, Document.Current.Rows.Count > 0 ? 0 : -1);
 			}
