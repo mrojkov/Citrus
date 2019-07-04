@@ -48,6 +48,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 			var newClip = clip.Clone();
 			newClip.BeginFrame = frame;
 			newClip.EndFrame = clip.EndFrame;
+			newClip.InFrame = frame - clip.BeginFrame + clip.InFrame;
 			Core.Operations.SetProperty.Perform(clip, nameof(AnimationClip.EndFrame), frame);
 			Core.Operations.InsertIntoList<AnimationClipList, AnimationClip>.Perform(track.Clips, index + 1, newClip);
 		}
