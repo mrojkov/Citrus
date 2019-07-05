@@ -123,21 +123,19 @@ namespace Tangerine.Core.Operations
 
 	public class SetAnimableProperty
 	{
-
 		public static void Perform(object @object, string propertyPath, object value, bool createAnimatorIfNeeded = false, bool createInitialKeyframeForNewAnimator = true, int atFrame = -1)
 		{
-			IAnimator animator;
 			var animationHost = @object as IAnimationHost;
+			IAnimator animator;
 			object owner = @object;
 			int index = -1;
 			AnimationUtils.PropertyData propertyData = AnimationUtils.PropertyData.Empty;
 			if (animationHost != null) {
 				(propertyData, owner, index) = AnimationUtils.GetPropertyByPath(animationHost, propertyPath);
 			}
-			if (index == -1) {
-				SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyPath, value);
-			} else {
-				SetIndexedProperty.Perform(owner, propertyData.Info?.Name ?? propertyPath, index, value);
+			if (animationHost is Node && animationHost.Animators.TryFind(propertyPath, out var zeroPoseAnimator, Animation.ZeroPoseId)) {
+				// Force create a property animator if there is a zero pose animator
+				createAnimatorIfNeeded = true;
 			}
 			if (animationHost != null && (animationHost.Animators.TryFind(propertyPath, out animator, Document.Current.AnimationId) || createAnimatorIfNeeded)) {
 				if (animator == null && createInitialKeyframeForNewAnimator) {
@@ -165,6 +163,12 @@ namespace Tangerine.Core.Operations
 						Document.Current.AnimationFrame = savedFrame;
 					}
 				}
+			}
+			// Set property after setting a keyframe, since SetKeyframe may store the current value as a zero pose value
+			if (index == -1) {
+				SetProperty.Perform(owner, propertyData.Info?.Name ?? propertyPath, value);
+			} else {
+				SetIndexedProperty.Perform(owner, propertyData.Info?.Name ?? propertyPath, index, value);
 			}
 		}
 	}
@@ -239,7 +243,7 @@ namespace Tangerine.Core.Operations
 					op.Animator.ResetCache();
 				}
 				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
+					Document.Current?.ForceAnimationUpdate();
 				}
 			}
 
@@ -251,7 +255,7 @@ namespace Tangerine.Core.Operations
 				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
 				op.Animator.ResetCache();
 				if (op.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
+					Document.Current?.ForceAnimationUpdate();
 				}
 			}
 		}
@@ -266,9 +270,23 @@ namespace Tangerine.Core.Operations
 
 		public override bool IsChangingDocument => true;
 
-		public static void Perform(IAnimationHost animationHost, string propertyName, string animationId, IKeyframe keyframe)
+		public static void Perform(IAnimationHost animationHost, string propertyPath, string animationId, IKeyframe keyframe)
 		{
-			DocumentHistory.Current.Perform(new SetKeyframe(animationHost, propertyName, animationId, keyframe));
+			if (animationHost is Node && animationId != Animation.ZeroPoseId && !Document.Current.Animation.IsLegacy) {
+				// If there is no zero pose keyframe -- create one
+				var animations = Document.Current.Animation.Owner.Animations;
+				if (!animations.TryFind(Animation.ZeroPoseId, out _)) {
+					InsertIntoList.Perform(animations, animations.Count, new Animation { Id = Animation.ZeroPoseId });
+				}
+				if (!animationHost.Animators.TryFind(propertyPath, out _, Animation.ZeroPoseId)) {
+					var (propertyData, animable, index) = AnimationUtils.GetPropertyByPath(animationHost, propertyPath);
+					var zeroPoseKey = Lime.Keyframe.CreateForType(propertyData.Info.PropertyType);
+					zeroPoseKey.Value = index == -1 ? propertyData.Info.GetValue(animable) : propertyData.Info.GetValue(animable, new object [] { index });
+					zeroPoseKey.Function = KeyFunction.Steep;
+					Perform(animationHost, propertyPath, Animation.ZeroPoseId, zeroPoseKey);
+				}
+			}
+			DocumentHistory.Current.Perform(new SetKeyframe(animationHost, propertyPath, animationId, keyframe));
 		}
 
 		public static void Perform(IAnimator animator, IKeyframe keyframe)
@@ -321,7 +339,7 @@ namespace Tangerine.Core.Operations
 				animator.Keys.AddOrdered(op.Keyframe);
 				animator.ResetCache();
 				if (animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
+					Document.Current?.ForceAnimationUpdate();
 				}
 			}
 
@@ -347,7 +365,7 @@ namespace Tangerine.Core.Operations
 				}
 				b.Animator.ResetCache();
 				if (b.Animator.TargetPropertyPath == nameof(Node.Trigger)) {
-					Document.ForceAnimationUpdate();
+					Document.Current?.ForceAnimationUpdate();
 				}
 			}
 		}

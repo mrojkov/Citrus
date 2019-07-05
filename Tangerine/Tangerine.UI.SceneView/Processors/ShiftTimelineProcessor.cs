@@ -60,7 +60,7 @@ namespace Tangerine.UI.SceneView
 					prevMousPos = curMousePos;
 					prevDirection = curDirection != DragDirection.None ? curDirection : prevDirection;
 					distance = distance % step;
-					Document.ForceAnimationUpdate();
+					Document.Current?.ForceAnimationUpdate();
 					yield return null;
 				}
 				sv.Input.ConsumeKey(Key.Mouse0);

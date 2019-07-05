@@ -14,13 +14,13 @@ namespace Tangerine.Core
 
 		public static bool CacheAnimationsStates
 		{
-			get { return CurrentFrameSetter.CacheAnimationsStates; }
-			set { CurrentFrameSetter.CacheAnimationsStates = value; }
+			get => CurrentFrameSetter.CacheAnimationsStates;
+			set => CurrentFrameSetter.CacheAnimationsStates = value;
 		}
 
-		public static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
+		public static void SetCurrentFrameToNode(Animation animation, int frameIndex)
 		{
-			CurrentFrameSetter.SetCurrentFrameToNode(frameIndex, animation, animationMode);
+			CurrentFrameSetter.SetCurrentFrameToNode(animation, frameIndex, CoreUserPreferences.Instance.AnimationMode);
 		}
 
 		private static void FastForwardToFrame(Animation animation, int frameIndex)
@@ -34,14 +34,17 @@ namespace Tangerine.Core
 			}
 		}
 
-		public void TogglePreviewAnimation(bool animationMode, bool triggerMarkersBeforeCurrentFrame)
+		public void TogglePreviewAnimation(bool triggerMarkersBeforeCurrentFrame = false)
 		{
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
 				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
-					RestoreAnimationsTimes(animationMode);
+					foreach ((var animation, var time) in savedAnimationsTimes) {
+						animation.Time = CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
+					}
+					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
 				}
 				AudioSystem.StopAll();
 				CurrentFrameSetter.CacheAnimationsStates = true;
@@ -58,7 +61,7 @@ namespace Tangerine.Core
 				PreviewAnimation = true;
 				CurrentFrameSetter.CacheAnimationsStates = true;
 				if (triggerMarkersBeforeCurrentFrame) {
-					SetCurrentFrameToNode(0, Animation, true);
+					CurrentFrameSetter.SetCurrentFrameToNode(Animation, 0, animationMode: true);
 				}
 				Animation.IsRunning = PreviewAnimation;
 				if (triggerMarkersBeforeCurrentFrame) {
@@ -72,15 +75,9 @@ namespace Tangerine.Core
 		}
 
 
-		public static void ForceAnimationUpdate()
+		public void ForceAnimationUpdate()
 		{
-			if (Current == null) {
-				return;
-			}
-			SetCurrentFrameToNode(
-				Current.AnimationFrame,
-				Current.Animation,
-				CoreUserPreferences.Instance.AnimationMode);
+			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
 		}
 
 		private void SaveAnimationsTimes()
@@ -100,16 +97,6 @@ namespace Tangerine.Core
 				Save(currentNode);
 				currentNode = currentNode.Parent;
 			} while (currentNode != RootNode.Parent);
-		}
-
-		private void RestoreAnimationsTimes(bool animationMode)
-		{
-			foreach (var at in savedAnimationsTimes) {
-				at.Key.Time = animationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : at.Value;
-			}
-			SetCurrentFrameToNode(
-				PreviewAnimationBegin, Animation, animationMode
-			);
 		}
 
 		private static class CurrentFrameSetter
@@ -211,14 +198,14 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetCurrentFrameToNode(int frameIndex, Animation animation, bool animationMode)
+			internal static void SetCurrentFrameToNode(Animation animation, int frameIndex, bool animationMode)
 			{
 				Audio.GloballyEnable = false;
 				try {
 					bool movingBack;
 					var doc = Current;
 					var node = animation.Owner;
-					if (animationMode) {
+					if (animation.IsLegacy && animationMode) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.GetColumn(animation.Id);
 						// Terekhov Dmitry: First time cache creation that does not set IsRunning

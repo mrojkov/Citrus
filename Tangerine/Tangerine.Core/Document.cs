@@ -264,7 +264,7 @@ namespace Tangerine.Core
 		private void Document_PerformingOperation(IOperation operation)
 		{
 			if (PreviewAnimation) {
-				TogglePreviewAnimation(!PreviewAnimation, triggerMarkersBeforeCurrentFrame: true);
+				TogglePreviewAnimation();
 			}
 		}
 
@@ -343,7 +343,7 @@ namespace Tangerine.Core
 				if (doc != null) {
 					ProjectUserPreferences.Instance.CurrentDocument = doc.Path;
 				}
-				ForceAnimationUpdate();
+				Current?.ForceAnimationUpdate();
 			}
 		}
 

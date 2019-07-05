@@ -10,10 +10,10 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 	{
 		public static bool IsEnabled() => AddAnimationClipDialog.EnumerateAnimations().Any();
 
-		public static void Perform(IntVector2 cell)
+		public static void Perform(IntVector2 cell, string selectedAnimationId = null)
 		{
 			if (cell.Y >= 0 && IsEnabled()) {
-				new AddAnimationClipDialog(cell);
+				new AddAnimationClipDialog(cell, selectedAnimationId);
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 			private readonly ThemedDropDownList beginMarkerSelector;
 			private readonly ThemedDropDownList endMarkerSelector;
 
-			public AddAnimationClipDialog(IntVector2 cell)
+			public AddAnimationClipDialog(IntVector2 cell, string selectedAnimationId)
 			{
 				window = new Window(new WindowOptions {
 					ClientSize = new Vector2(250, 140),
@@ -81,11 +81,14 @@ namespace Tangerine.UI.Timeline.Operations.CompoundAnimations
 					animationSelector.Items.Add(new CommonDropDownList.Item(a.Id));
 				}
 				animationSelector.Index = 0;
+				if (selectedAnimationId != null) {
+					animationSelector.Index = animationSelector.Items.Select(i => i.Value).ToList().IndexOf(selectedAnimationId);
+				}
 				animationSelector.Changed += _ => RefreshMarkers();
 				RefreshMarkers();
 				cancelButton.Clicked += () => window.Close();
 				okButton.Clicked += () => {
-					var animation = Document.Current.Container.Animations.Find(animationSelector.Text);
+					var animation = Document.Current.Animation.Owner.Animations.Find(animationSelector.Text);
 					if (!animation.AnimationEngine.AreEffectiveAnimatorsValid(animation)) {
 						// Refreshes animation duration either
 						animation.AnimationEngine.BuildEffectiveAnimators(animation);

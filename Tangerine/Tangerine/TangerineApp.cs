@@ -89,8 +89,8 @@ namespace Tangerine
 				SetupMainWindowTitle(mainWidget);
 				TangerineMenu.RebuildCreateImportedTypeMenu();
 			});
-			mainWidget.AddChangeWatcher(() => CoreUserPreferences.Instance.AnimationMode, _ => Document.ForceAnimationUpdate());
-			mainWidget.AddChangeWatcher(() => Document.Current?.Container, _ => Document.ForceAnimationUpdate());
+			mainWidget.AddChangeWatcher(() => CoreUserPreferences.Instance.AnimationMode, _ => Document.Current?.ForceAnimationUpdate());
+			mainWidget.AddChangeWatcher(() => Document.Current?.Container, _ => Document.Current?.ForceAnimationUpdate());
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {

@@ -573,9 +573,10 @@ namespace Lime
 			);
 		}
 
-		private static float CalcPixelScale(float Dpi)
+		private static float CalcPixelScale(float dpi)
 		{
-			return Dpi * 1f / 96f;
+			// Round DPI to prevent artifacts on UI applications
+			return (int)(dpi * 1f / 96f + 0.5f);
 		}
 
 		private void OnMouseWheel(object sender, MouseEventArgs e)

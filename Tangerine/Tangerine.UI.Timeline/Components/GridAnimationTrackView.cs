@@ -24,7 +24,7 @@ namespace Tangerine.UI.Timeline.Components
 				Presenter = new SyncDelegatePresenter<Widget>(Render)
 			};
 			GridWidgetAwakeBehavior.Action += _ => {
-				GridWidget.AddChangeWatcher(() => CalcLabelsHashCode(track), __ => RefreshLabels(GridWidget, track));
+				GridWidget.AddChangeWatcher(() => CalcLabelsHashCode(GridWidget, track), __ => RefreshLabels(GridWidget, track));
 			};
 			OverviewWidget = new Widget {
 				LayoutCell = new LayoutCell { StretchY = 0 },
@@ -33,10 +33,12 @@ namespace Tangerine.UI.Timeline.Components
 			};
 		}
 
-		private static int CalcLabelsHashCode(AnimationTrack track)
+		private static int CalcLabelsHashCode(Widget gridWidget, AnimationTrack track)
 		{
 			unchecked {
 				var r = -511344;
+				r = r * -1521134295 + (int)(TimelineMetrics.ColWidth * 100);
+				r = r * -1521134295 + (int)(gridWidget.Height * 100);
 				foreach (var clip in track.Clips) {
 					r = r * -1521134295 + clip.AnimationIdComparisonCode;
 					r = r * -1521134295 + clip.BeginFrame;
@@ -70,6 +72,7 @@ namespace Tangerine.UI.Timeline.Components
 				widget.AddNode(new SimpleText {
 					Position = new Vector2((clip.BeginFrame + 0.5f) * TimelineMetrics.ColWidth, 0),
 					Size = new Vector2((clip.DurationInFrames + 0.5f) * TimelineMetrics.ColWidth, widget.Height),
+					Localizable = false,
 					Text = clipLabel,
 					Padding = new Thickness(4),
 					VAlignment = VAlignment.Center,

@@ -269,6 +269,19 @@ namespace Tangerine.UI.Timeline
 				return;
 			}
 
+			if (Document.Current.Animation.IsCompound) {
+				try {
+					// Dirty hack: using a file drag&drop mechanics for dropping animation clips on the grid.
+					var decodedAnimationId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(nodeCreatingEventArgs.AssetPath));
+					Operations.CompoundAnimations.AddAnimationClip.Perform(
+						new IntVector2(
+							cellUnderMouseOnFilesDrop.X + animateTextureCellOffset,
+							cellUnderMouseOnFilesDrop.Y),
+						decodedAnimationId);
+				} catch {
+				}
+			}
+
 			switch (nodeCreatingEventArgs.AssetType) {
 				case ".png": {
 					if (Document.Current.Rows.Count == 0) {
@@ -325,7 +338,8 @@ namespace Tangerine.UI.Timeline
 		public IntVector2 CellUnderMouse()
 		{
 			var mousePos = RootWidget.Input.MousePosition - ContentWidget.GlobalPosition;
-			var x = (int)(mousePos.X / TimelineMetrics.ColWidth);
+			var offset = Document.Current.Animation.IsCompound ? -0.5f : 0;
+			var x = (int)(mousePos.X / TimelineMetrics.ColWidth + offset);
 			if (mousePos.Y <= 0) {
 				return new IntVector2(x, Document.Current.Rows.Count > 0 ? 0 : -1);
 			}
