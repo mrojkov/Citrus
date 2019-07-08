@@ -139,6 +139,7 @@ namespace Tangerine.Core
 					registeredComponentTypes.Add(type);
 				}
 			}
+			PluginLoader.CurrentPlugin?.TangerineProjectOpened?.Invoke();
 		}
 
 		public bool Close()
@@ -149,6 +150,7 @@ namespace Tangerine.Core
 			if (Current == Null) {
 				return true;
 			}
+			PluginLoader.CurrentPlugin?.TangerineProjectClosing?.Invoke();
 			var modifiedDocuments = documents.Where(d => d.IsModified).ToList();
 			foreach (var d in modifiedDocuments) {
 				if (!d.Close()) {

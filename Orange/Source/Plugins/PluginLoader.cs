@@ -66,6 +66,12 @@ namespace Orange
 		/// </summary>
 		[ImportMany(nameof(MenuItemsWithErrorDetails), AllowRecomposition = true)]
 		public IEnumerable<Lazy<Func<string>, IMenuItemMetadata>> MenuItemsWithErrorDetails { get; set; }
+
+		[Import(nameof(TangerineProjectOpened), AllowRecomposition = true, AllowDefault = true)]
+		public Action TangerineProjectOpened;
+
+		[Import(nameof(TangerineProjectClosing), AllowRecomposition = true, AllowDefault = true)]
+		public Action TangerineProjectClosing;
 	}
 
 	public static class PluginLoader
