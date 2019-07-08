@@ -13,6 +13,8 @@ namespace Orange
 		[ExportMetadata("Label", "Update XCode Project")]
 		public static string UpdateXCodeProjectAction()
 		{
+			var target = The.UI.GetActiveTarget();
+
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
 			}
@@ -31,7 +33,7 @@ namespace Orange
 				foreach (var line in allText.Split('\n')) {
 					if (line.Contains("/bin/mtouch")) {
 						var mtouch = line;
-						GenerateUnsignedBinary(mtouch);
+						GenerateUnsignedBinary(target, mtouch);
 						var dstPath = GetXCodeProjectDataFolder();
 						CopyContent(appPath, dstPath);
 						CopyDSYM(appPath, Path.GetDirectoryName(dstPath));
@@ -132,7 +134,7 @@ namespace Orange
 			}
 		}
 
-		static void GenerateUnsignedBinary(string mtouch)
+		static void GenerateUnsignedBinary(Target target, string mtouch)
 		{
 			Console.WriteLine("======================================");
 			Console.WriteLine("Generating unsigned application bundle");
@@ -144,7 +146,7 @@ namespace Orange
 				var s = mtouch.Split(new string[] { "execution started with arguments:" }, StringSplitOptions.None);
 				app = s[0].Trim();
 				args = s[1];
-				var dir = Path.GetDirectoryName(The.Workspace.GetSolutionFilePath());
+				var dir = Path.GetDirectoryName(The.Workspace.GetSolutionFilePath(target.Platform));
 				using (new DirectoryChanger(dir)) {
 					Process.Start(app, args);
 				}

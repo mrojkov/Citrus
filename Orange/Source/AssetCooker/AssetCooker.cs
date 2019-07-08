@@ -39,11 +39,11 @@ namespace Orange
 		private static bool cookCanceled = false;
 		private static ICollection<string> bundleBackupFiles;
 
-		public static void CookForActivePlatform()
+		public static void CookForPlatform(Target target)
 		{
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
 			if (!skipCooking) {
-				Cook(The.Workspace.ActiveTarget, GetListOfAllBundles());
+				Cook(target, GetListOfAllBundles(target));
 			}
 			else {
 				Console.WriteLine("-------------  Skip Assets Cooking -------------");
@@ -79,9 +79,9 @@ namespace Orange
 			}
 		}
 
-		public static List<string> GetListOfAllBundles()
+		public static List<string> GetListOfAllBundles(Target target)
 		{
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
 			var bundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
@@ -107,7 +107,7 @@ namespace Orange
 			AssetCache.Instance.Initialize();
 			AssetCooker.Platform = target.Platform;
 			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
-			CookBundles(bundles);
+			CookBundles(target, bundles);
 		}
 
 		public static void Cook(TargetPlatform platform, List<string> bundles)
@@ -116,10 +116,10 @@ namespace Orange
 			Cook(firstPlatformTarget, bundles);
 		}
 
-		public static void CookCustomAssets(TargetPlatform platform, List<string> assets)
+		public static void CookCustomAssets(Target target, List<string> assets)
 		{
-			AssetCooker.Platform = platform;
-			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			AssetCooker.Platform = target.Platform;
+			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
 
 			var defaultAssetsEnumerator = The.Workspace.AssetFiles;
 			var assetsFileInfo = assets
@@ -130,16 +130,16 @@ namespace Orange
 			var defaultCookingProfile = AssetCooker.cookingProfile;
 			AssetCooker.cookingProfile = CookingProfile.Partial;
 
-			CookBundles(GetListOfAllBundles(), false);
+			CookBundles(target, GetListOfAllBundles(target), false);
 			The.Workspace.AssetFiles = defaultAssetsEnumerator;
 			AssetCooker.cookingProfile = defaultCookingProfile;
 		}
 
-		private static void CookBundles(List<string> bundles, bool requiredCookCode = true)
+		private static void CookBundles(Target target, List<string> bundles, bool requiredCookCode = true)
 		{
 			LogText = "";
 			var allTimer = StartBenchmark(
-				$"Asset cooking. Asset cache mode: {AssetCache.Instance.Mode}. Active platform: {The.Workspace.ActivePlatform}" +
+				$"Asset cooking. Asset cache mode: {AssetCache.Instance.Mode}. Active platform: {target.Platform}" +
 				System.Environment.NewLine +
 				DateTime.Now +
 				System.Environment.NewLine
@@ -151,12 +151,12 @@ namespace Orange
 			}
 
 			try {
-				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(bundles));
+				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(target, bundles));
 				BeginCookBundles?.Invoke();
 
 				foreach (var bundle in bundles) {
 					var extraTimer = StartBenchmark();
-					CookBundle(bundle);
+					CookBundle(target, bundle);
 					StopBenchmark(extraTimer, $"{bundle} cooked: ");
 				}
 
@@ -165,7 +165,7 @@ namespace Orange
 				extraBundles.Reverse();
 				PluginLoader.AfterBundlesCooked(extraBundles);
 				if (requiredCookCode) {
-					CodeCooker.Cook(CookingRulesMap, extraBundles);
+					CodeCooker.Cook(target, CookingRulesMap, extraBundles);
 				}
 				StopBenchmark(allTimer, "All bundles cooked: ");
 				PrintBenchmark();
@@ -180,12 +180,12 @@ namespace Orange
 			}
 		}
 
-		private static int CalculateAssetCount(List<string> bundles)
+		private static int CalculateAssetCount(Target target, List<string> bundles)
 		{
 			var assetCount = 0;
 			var savedWorkspaceAssetFiles = The.Workspace.AssetFiles;
 			foreach (var bundleName in bundles) {
-				using (var bundle = CreateBundle(bundleName)) {
+				using (var bundle = CreateBundle(target, bundleName)) {
 					AssetBundle.SetCurrent(bundle, false);
 					The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
 					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
@@ -202,11 +202,11 @@ namespace Orange
 			return assetCount;
 		}
 
-		private static void CookBundle(string bundleName)
+		private static void CookBundle(Target target, string bundleName)
 		{
-			string bundlePath = The.Workspace.GetBundlePath(bundleName);
+			string bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName);
 			bool wasBundleModified = false;
-			using (var bundle = CreateBundle(bundleName)) {
+			using (var bundle = CreateBundle(target, bundleName)) {
 				AssetBundle.SetCurrent(bundle, false);
 				(AssetBundle.Current as PackedAssetBundle).OnModifying += () => {
 					if (!wasBundleModified) {
@@ -216,7 +216,7 @@ namespace Orange
 						bundleBackupFiles.Add(backupFilePath);
 					}
 				};
-				CookBundleHelper(bundleName);
+				CookBundleHelper(target, bundleName);
 				// Open the bundle again in order to make some plugin post-processing (e.g. generate code from scene assets)
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 					PluginLoader.AfterAssetsCooked(bundleName);
@@ -227,9 +227,9 @@ namespace Orange
 			}
 		}
 
-		private static AssetBundle CreateBundle(string bundleName)
+		private static AssetBundle CreateBundle(Target target, string bundleName)
 		{
-			var bundlePath = The.Workspace.GetBundlePath(bundleName);
+			var bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName);
 			// Create directory for bundle if it placed in subdirectory
 			try {
 				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
@@ -281,7 +281,7 @@ namespace Orange
 			}
 		}
 
-		private static void CookBundleHelper(string bundleName)
+		private static void CookBundleHelper(Target target, string bundleName)
 		{
 			Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 			var assetFilesEnumerator = The.Workspace.AssetFiles;
@@ -295,7 +295,7 @@ namespace Orange
 						.Select(kv => kv.Key);
 					foreach (var stage in profileCookStages) {
 						CheckCookCancelation();
-						stage.Action();
+						stage.Action(target);
 					}
 
 					// Warn about non-power of two textures

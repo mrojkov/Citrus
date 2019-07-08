@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 
 namespace Orange
 {
@@ -9,7 +9,9 @@ namespace Orange
 		[ExportMetadata("Priority", 4)]
 		public static void CookGameAssetsAction()
 		{
-			AssetCooker.CookForActivePlatform();
+			var target = The.UI.GetActiveTarget();
+
+			AssetCooker.CookForPlatform(target);
 		}
 	}
 }

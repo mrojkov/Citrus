@@ -15,9 +15,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(originalTextureExtension);
 
-		public void Action() => SyncUpdated.Sync(originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, originalTextureExtension)];
 			if (rules.TextureAtlas != null) {

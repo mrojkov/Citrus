@@ -5,7 +5,7 @@ namespace Orange
 {
 	public interface ICookStage
 	{
-		void Action();
+		void Action(Target target);
 		IEnumerable<string> ImportedExtensions { get; }
 		IEnumerable<string> BundleExtensions { get; }
 		int GetOperationsCount();

@@ -33,15 +33,15 @@ namespace Orange
 			FillDefaultTargets();
 		}
 
-		public string GetPlatformSuffix(TargetPlatform? platform = null)
+		public string GetPlatformSuffix(TargetPlatform platform)
 		{
-			return "." + (platform?.ToString() ?? ActivePlatform.ToString());
+			return "." + platform.ToString();
 		}
 
 		/// <summary>
 		/// Returns solution path. E.g: Zx3.Win/Zx3.Win.sln
 		/// </summary>
-		public string GetSolutionFilePath(TargetPlatform? platform = null)
+		public string GetSolutionFilePath(TargetPlatform platform)
 		{
 			string platformProjectName = The.Workspace.Title + GetPlatformSuffix(platform);
 			return Path.Combine(
@@ -51,21 +51,10 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Returns main project path. E.g: Zx3.Win/Zx3.Win.csproj
-		/// </summary>
-		public string GetMainCsprojFilePath()
-		{
-			return Path.ChangeExtension(GetSolutionFilePath(), ".csproj");
-		}
-
-		/// <summary>
 		/// Returns Citrus/Lime project path.
 		/// </summary>
-		public string GetLimeCsprojFilePath(TargetPlatform? platform = null)
+		public string GetLimeCsprojFilePath(TargetPlatform platform)
 		{
-			if (platform == null) {
-				platform = The.Workspace.ActivePlatform;
-			}
 			// Now Citrus can either be located beside the game or inside the game directory.
 			// In future projects Citrus location should be specified through "CitrusLocation" in citproj config file
 			var suffix = Path.Combine("Lime", "Lime" + GetPlatformSuffix(platform) + ".csproj");
@@ -82,14 +71,6 @@ namespace Orange
 		}
 
 		public static readonly Workspace Instance = new Workspace();
-
-		public TargetPlatform ActivePlatform => ActiveTarget.Platform;
-
-		public Target ActiveTarget => The.UI.GetActiveTarget();
-
-		public string CustomSolution => ActiveTarget?.ProjectPath;
-
-		public bool CleanBeforeBuild => (ActiveTarget?.CleanBeforeBuild == true);
 
 		public JObject JObject { get; private set; }
 
@@ -211,19 +192,14 @@ namespace Orange
 			ProjectJson.RewriteOrigin();
 		}
 
-		public string GetMainBundlePath()
-		{
-			return GetMainBundlePath(ActivePlatform);
-		}
-
 		public string GetMainBundlePath(TargetPlatform platform)
 		{
 			return Path.ChangeExtension(AssetsDirectory, platform.ToString());
 		}
 
-		public string GetBundlePath(string bundleName)
+		public string GetBundlePath(TargetPlatform platform, string bundleName)
 		{
-			return GetBundlePath(bundleName, ActivePlatform);
+			return GetBundlePath(bundleName, platform);
 		}
 
 		public string GetBundlePath(string bundleName, TargetPlatform platform)

@@ -76,7 +76,7 @@ namespace Orange
 				return;
 			}
 
-			OrangeActionsHelper.ExecuteOrangeActionInstantly(commandObj.Action, () => {
+			OrangeActionsHelper.ExecuteOrangeActionInstantly(GetActiveTarget(), commandObj.Action, () => {
 				}, () => {
 				}, DoesNeedSvnUpdate,
 				null

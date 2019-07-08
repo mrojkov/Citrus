@@ -13,9 +13,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotFontExtension);
 
-		public void Action() => SyncUpdated.Sync(hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			var importer = new HotFontImporter(false);
 			var font = importer.ParseFont(srcPath, dstPath);

@@ -40,7 +40,7 @@ namespace Orange
 			return result;
 		}
 
-		public void Action()
+		public void Action(Target target)
 		{
 			var assetFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {

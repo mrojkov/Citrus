@@ -15,7 +15,7 @@ namespace Orange
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(modelExtension).Count();
 
-		public void Action()
+		public void Action(Target target)
 		{
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(modelExtension)) {
 				var path = fileInfo.Path;

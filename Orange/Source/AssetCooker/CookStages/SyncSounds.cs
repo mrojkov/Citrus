@@ -15,9 +15,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(oggExtension);
 
-		public void Action() => SyncUpdated.Sync(oggExtension, soundExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, oggExtension, soundExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open)) {
 				// All sounds below 100kb size (can be changed with cooking rules) are converted

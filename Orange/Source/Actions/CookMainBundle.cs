@@ -9,8 +9,10 @@ namespace Orange
 		[ExportMetadata("Priority", 4)]
 		public static void CookMainBundleAction()
 		{
+			var target = The.UI.GetActiveTarget();
+
 			AssetCooker.Cook(
-				The.Workspace.ActiveTarget,
+				target,
 				new System.Collections.Generic.List<string>() { CookingRulesBuilder.MainBundleName }
 			);
 		}

@@ -13,9 +13,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotSceneExtension);
 
-		public void Action() => SyncUpdated.Sync(hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 				var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);

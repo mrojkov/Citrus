@@ -16,20 +16,20 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fbxExtension);
 
-		public void Action() => SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
+		public void Action(Target target) => SyncUpdated.Sync(target, fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			var cookingRules = AssetCooker.CookingRulesMap[srcPath];
 			var compression = cookingRules.ModelCompression;
 			Model3D model;
 			var options = new FbxImportOptions {
 				Path = srcPath,
-				Target = The.Workspace.ActiveTarget,
+				Target = target,
 				CookingRulesMap = AssetCooker.CookingRulesMap
 			};
 			using (var fbxImporter = new FbxModelImporter(options)) {
-				model = fbxImporter.LoadModel();
+				model = fbxImporter.LoadModel(target);
 			}
 			AssetAttributes assetAttributes;
 			switch (compression) {

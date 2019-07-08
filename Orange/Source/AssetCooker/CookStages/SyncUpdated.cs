@@ -7,11 +7,11 @@ namespace Orange
 {
 	class SyncUpdated
 	{
-		public delegate bool Converter(string srcPath, string dstPath);
+		public delegate bool Converter(Target target, string srcPath, string dstPath);
 
 		public static int GetOperationsCount(string fileExtension) => The.Workspace.AssetFiles.Enumerate(fileExtension).Count();
 
-		public static void Sync(string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
+		public static void Sync(Target target, string fileExtension, string bundleAssetExtension, AssetBundle bundle, Converter converter, Func<string, string, bool> extraOutOfDateChecker = null)
 		{
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {
 				UserInterface.Instance.IncreaseProgressBar();
@@ -25,7 +25,7 @@ namespace Orange
 				if (needUpdate) {
 					if (converter != null) {
 						try {
-							if (converter(srcPath, dstPath)) {
+							if (converter(target, srcPath, dstPath)) {
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 								CookingRules rules = null;
 								if (!string.IsNullOrEmpty(dstPath)) {

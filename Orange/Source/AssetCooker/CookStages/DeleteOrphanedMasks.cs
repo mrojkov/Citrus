@@ -15,7 +15,7 @@ namespace Orange
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(maskExtension).Count();
 
-		public void Action()
+		public void Action(Target target)
 		{
 			foreach (var maskPath in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
 				if (maskPath.EndsWith(maskExtension, StringComparison.OrdinalIgnoreCase)) {

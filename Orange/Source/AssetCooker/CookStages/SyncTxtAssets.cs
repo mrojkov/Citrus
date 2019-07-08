@@ -14,9 +14,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(txtExtension);
 
-		public void Action() => SyncUpdated.Sync(txtExtension, txtExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, txtExtension, txtExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			var modelAttachmentExtIndex = dstPath.LastIndexOf(Model3DAttachment.FileExtension);
 			if (modelAttachmentExtIndex >= 0) {

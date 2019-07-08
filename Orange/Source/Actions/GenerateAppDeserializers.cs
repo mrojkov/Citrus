@@ -10,13 +10,15 @@ namespace Orange
 		[ExportMetadata("Label", "Generate Yuzu Deserializers For Application Types")]
 		public static string GenerateYuzuDeserializersForApp()
 		{
-			AssetCooker.CookForActivePlatform();
-			if (!BuildGame()) {
+			var target = The.UI.GetActiveTarget();
+
+			AssetCooker.CookForPlatform(target);
+			if (!BuildGame(target)) {
 				return "Can not BuildGame";
 			}
 
 			var builder = new SolutionBuilder(
-				The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
+				target.Platform, target.ProjectPath);
 			int exitCode = builder.Run("--GenerateYuzuDeserializers");
 			if (exitCode != 0) {
 				return $"Application terminated with exit code {exitCode}";

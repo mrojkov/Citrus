@@ -29,9 +29,9 @@ namespace Orange
 			projectName = Path.GetFileNameWithoutExtension(projectDirectory);
 		}
 
-		public void SvnUpdate()
+		public void SvnUpdate(Target target)
 		{
-			Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath()));
+			Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath(target.Platform)));
 			Subversion.Update(Path.GetDirectoryName(projectDirectory));
 		}
 

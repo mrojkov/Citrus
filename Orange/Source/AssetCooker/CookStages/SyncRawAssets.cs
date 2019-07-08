@@ -20,9 +20,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(extension);
 
-		public void Action() => SyncUpdated.Sync(extension, extension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, extension, extension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			AssetCooker.AssetBundle.ImportFile(srcPath, dstPath, 0, extension, attributes, File.GetLastWriteTime(srcPath), AssetCooker.CookingRulesMap[srcPath].SHA1);
 			return true;

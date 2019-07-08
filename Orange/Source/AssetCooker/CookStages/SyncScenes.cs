@@ -13,9 +13,9 @@ namespace Orange
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(sceneExtension);
 
-		public void Action() => SyncUpdated.Sync(sceneExtension, sceneExtension, AssetBundle.Current, Converter);
+		public void Action(Target target) => SyncUpdated.Sync(target, sceneExtension, sceneExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(string srcPath, string dstPath)
+		private bool Converter(Target target, string srcPath, string dstPath)
 		{
 			var node = Serialization.ReadObjectFromFile<Node>(srcPath);
 			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Serialization.Format.Binary, sceneExtension,

@@ -9,8 +9,12 @@ namespace Orange
 		[ExportMetadata("Priority", 0)]
 		public static string BuildAndRunAction()
 		{
-			AssetCooker.CookForActivePlatform();
-			if (!Actions.BuildGame()) return "Can not BuildGame";
+			var target = The.UI.GetActiveTarget();
+
+			AssetCooker.CookForPlatform(target);
+			if (!Actions.BuildGame(target)) {
+				return "Can not BuildGame";
+			}
 			return null;
 		}
 	}

@@ -23,15 +23,15 @@ namespace Orange
 
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Analyze Resources")]
-		public static void AnalyzeResourcesAction()
+		public static void AnalyzeResourcesAction(Target target)
 		{
 			requestedPaths = new List<PathRequestRecord>();
 			var crossRefReport = new List<Tuple<string, List<string>>>();
 			var missingResourcesReport = new List<string>();
 			var suspiciousTexturesReport = new List<string>();
 			var bundles = new HashSet<string>();
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
-			AssetBundle.Current = new PackedAssetBundle(The.Workspace.GetBundlePath(CookingRulesBuilder.MainBundleName));
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
+			AssetBundle.Current = new PackedAssetBundle(The.Workspace.GetBundlePath(target.Platform, CookingRulesBuilder.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
 					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {
@@ -57,7 +57,7 @@ namespace Orange
 					}
 				}
 			}
-			AssetBundle.Current = new AggregateAssetBundle(bundles.Select(i => new PackedAssetBundle(The.Workspace.GetBundlePath(i))).ToArray());
+			AssetBundle.Current = new AggregateAssetBundle(bundles.Select(i => new PackedAssetBundle(The.Workspace.GetBundlePath(target.Platform, i))).ToArray());
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
@@ -154,7 +154,7 @@ namespace Orange
 				}
 				var reportList = new List<string>();
 				foreach (var rpr in requestedPaths) {
-					string pattern = String.Format(@".*[/\\](.*)\.{0}", The.Workspace.ActivePlatform.ToString());
+					string pattern = String.Format(@".*[/\\](.*)\.{0}", target.Platform.ToString());
 					string bundle = "";
 					foreach (Match m in Regex.Matches(rpr.bundle, pattern, RegexOptions.IgnoreCase)) {
 						bundle = m.Groups[1].Value;

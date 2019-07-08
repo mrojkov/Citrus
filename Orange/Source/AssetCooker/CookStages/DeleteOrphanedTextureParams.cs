@@ -14,7 +14,7 @@ namespace Orange
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureParamsExtension).Count();
 
-		public void Action()
+		public void Action(Target target)
 		{
 			foreach (var path in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(textureParamsExtension, StringComparison.OrdinalIgnoreCase)) {

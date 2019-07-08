@@ -13,7 +13,9 @@ namespace Orange
 		[ExportMetadata("Priority", 30)]
 		public static void RevealCookedAssetsAction()
 		{
-			AssetsUnpacker.Unpack(The.Workspace.ActivePlatform);
+			var target = The.UI.GetActiveTarget();
+
+			AssetsUnpacker.Unpack(target);
 		}
 	}
 }

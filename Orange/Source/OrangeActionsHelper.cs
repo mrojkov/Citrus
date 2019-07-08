@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -7,34 +7,34 @@ namespace Orange.Source
 	public static class OrangeActionsHelper
 	{
 
-		public static void ExecuteOrangeActionInstantly(Action action, Action onBegin, Action onEnd,
+		public static void ExecuteOrangeActionInstantly(Target target, Action action, Action onBegin, Action onEnd,
 			Func<Boolean> onDoesNeedSvnUpdate, Func<Action, IEnumerator<object>> onCreateOrNotAsynchTask)
 		{
-			IEnumerator<object> enumerator = ExecuteOrangeAction(action, onBegin, onEnd, onDoesNeedSvnUpdate, onCreateOrNotAsynchTask);
+			IEnumerator<object> enumerator = ExecuteOrangeAction(target, action, onBegin, onEnd, onDoesNeedSvnUpdate, onCreateOrNotAsynchTask);
 			while (enumerator.MoveNext()) {
 				Thread.Yield();
 			}
 		}
 
-		public static void ExecuteOrangeActionInstantly(Func<string> action, Action onBegin, Action onEnd,
+		public static void ExecuteOrangeActionInstantly(Target target, Func<string> action, Action onBegin, Action onEnd,
 			Func<Boolean> onDoesNeedSvnUpdate, Func<Action, IEnumerator<object>> onCreateOrNotAsynchTask)
 		{
-			IEnumerator<object> enumerator = ExecuteOrangeAction(action, onBegin, onEnd, onDoesNeedSvnUpdate, onCreateOrNotAsynchTask);
+			IEnumerator<object> enumerator = ExecuteOrangeAction(target, action, onBegin, onEnd, onDoesNeedSvnUpdate, onCreateOrNotAsynchTask);
 			while (enumerator.MoveNext()) {
 				Thread.Yield();
 			}
 		}
 
-		public static IEnumerator<object> ExecuteOrangeAction(Action action, Action onBegin, Action onEnd,
+		public static IEnumerator<object> ExecuteOrangeAction(Target target, Action action, Action onBegin, Action onEnd,
 			Func<Boolean> onDoesNeedSvnUpdate, Func<Action, IEnumerator<object>> onCreateOrNotAsynchTask)
 		{
-			return ExecuteOrangeAction(() => {
+			return ExecuteOrangeAction(target, () => {
 				action();
 				return null;
 			}, onBegin, onEnd, onDoesNeedSvnUpdate, onCreateOrNotAsynchTask);
 		}
 
-		public static IEnumerator<object> ExecuteOrangeAction(Func<string> action, Action onBegin, Action onEnd,
+		public static IEnumerator<object> ExecuteOrangeAction(Target target, Func<string> action, Action onBegin, Action onEnd,
 			Func<Boolean> onDoesNeedSvnUpdate, Func<Action, IEnumerator<object>> onCreateOrNotAsynchTask)
 		{
 			var startTime = DateTime.Now;
@@ -43,9 +43,9 @@ namespace Orange.Source
 			try {
 				var updateCompleted = true;
 				if (onDoesNeedSvnUpdate()) {
-					var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
+					var builder = new SolutionBuilder(target.Platform, target.ProjectPath);
 					Action svnUpdateAction = () => {
-						updateCompleted = SafeExecute(builder.SvnUpdate);
+						updateCompleted = SafeExecute(() => builder.SvnUpdate(target));
 						if (!updateCompleted) executonResultReadable = "Build Failed! Can not update a repository.";
 					};
 

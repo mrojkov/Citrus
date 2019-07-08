@@ -16,7 +16,7 @@ namespace Orange
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureExtension).Count();
 
-		public void Action()
+		public void Action(Target target)
 		{
 			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(textureExtension)) {

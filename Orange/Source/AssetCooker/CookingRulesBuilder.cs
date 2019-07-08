@@ -271,20 +271,20 @@ namespace Orange
 			}
 		}
 
-		public CookingRules(bool initialize = true)
+		public CookingRules(Target target, bool initialize = true)
 		{
 			if (!initialize) {
 				return;
 			}
-			foreach (var target in The.Workspace.Targets) {
-				TargetRules.Add(target, ParticularCookingRules.GetDefault(target.Platform));
+			foreach (var t in The.Workspace.Targets) {
+				TargetRules.Add(target, ParticularCookingRules.GetDefault(t.Platform));
 			}
-			CommonRules = ParticularCookingRules.GetDefault(The.Workspace.ActivePlatform);
+			CommonRules = ParticularCookingRules.GetDefault(target.Platform);
 		}
 
-		public CookingRules InheritClone()
+		public CookingRules InheritClone(Target target)
 		{
-			var r = new CookingRules(false);
+			var r = new CookingRules(target, false);
 			r.Parent = this;
 			foreach (var kv in TargetRules) {
 				r.TargetRules.Add(kv.Key, kv.Value.InheritClone());
@@ -401,7 +401,7 @@ namespace Orange
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>(StringComparer.OrdinalIgnoreCase);
 			pathStack.Push("");
-			var rootRules = new CookingRules();
+			var rootRules = new CookingRules(target);
 			rootRules.DeduceEffectiveRules(target);
 			rulesStack.Push(rootRules);
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
@@ -418,7 +418,7 @@ namespace Orange
 						rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, path);
 						rulesStack.Push(rules);
 						// Add 'ignore' cooking rules for this #CookingRules.txt itself
-						var ignoreRules = rules.InheritClone();
+						var ignoreRules = rules.InheritClone(target);
 						ignoreRules.Ignore = true;
 						map[path] = ignoreRules;
 						var directoryName = pathStack.Peek();
@@ -442,7 +442,7 @@ namespace Orange
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, target);
 							rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, rulesFile);
 							// Add 'ignore' cooking rules for this cooking rules text file
-							var ignoreRules = rules.InheritClone();
+							var ignoreRules = rules.InheritClone(target);
 							ignoreRules.Ignore = true;
 							map[rulesFile] = ignoreRules;
 						}
@@ -539,7 +539,7 @@ namespace Orange
 
 		private static CookingRules ParseCookingRules(CookingRules basicRules, string path, Target target)
 		{
-			var rules = basicRules.InheritClone();
+			var rules = basicRules.InheritClone(target);
 			var currentRules = rules.CommonRules;
 			try {
 				rules.CommonRules.LastChangeTime = File.GetLastWriteTime(path);
