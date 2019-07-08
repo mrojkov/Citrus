@@ -192,9 +192,7 @@ namespace Lime
 		{
 			var clone = (Animator<T>)MemberwiseClone();
 			clone.setter = null;
-#if TANGERINE
 			clone.animable = null;
-#endif // TANGERINE
 			clone.IsZombie = false;
 			clone.Owner = null;
 			clone.boxedKeys = null;
@@ -207,9 +205,7 @@ namespace Lime
 		{
 			IsZombie = false;
 			setter = null;
-#if TANGERINE
 			animable = null;
-#endif // TANGERINE
 		}
 
 		public int Duration => (ReadonlyKeys.Count == 0) ? 0 : ReadonlyKeys[ReadonlyKeys.Count - 1].Frame;
@@ -282,9 +278,7 @@ namespace Lime
 			if (IsZombie) {
 				return;
 			}
-#if TANGERINE
 			animable = a;
-#endif // TANGERINE
 			isTriggerable = p.Triggerable;
 			if (index == -1) {
 				setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), a, mi);
