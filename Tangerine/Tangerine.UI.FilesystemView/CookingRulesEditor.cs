@@ -94,8 +94,10 @@ namespace Tangerine.UI.FilesystemView
 
 		private static CookingRules GetAssociatedCookingRules(CookingRulesCollection crc, string path, bool createIfNotExists = false)
 		{
+			var target = Orange.The.UI.GetActiveTarget();
+
 			Action<string, CookingRules> ignoreRules = (p, r) => {
-				r = r.InheritClone();
+				r = r.InheritClone(target);
 				r.Ignore = true;
 				crc[NormalizePath(p)] = r;
 			};
@@ -109,7 +111,7 @@ namespace Tangerine.UI.FilesystemView
 					cr = crc[key];
 					if (cr.SourceFilename != crPath) {
 						if (createIfNotExists) {
-							cr = cr.InheritClone();
+							cr = cr.InheritClone(target);
 							crc[key] = cr;
 							ignoreRules(crPath, cr);
 						} else {
@@ -140,7 +142,7 @@ namespace Tangerine.UI.FilesystemView
 					} else if (!createIfNotExists) {
 						return null;
 					} else if (crc.ContainsKey(NormalizePath(path))) {
-						cr = crc[NormalizePath(path)].InheritClone();
+						cr = crc[NormalizePath(path)].InheritClone(target);
 						cr.SourceFilename = crPath;
 						ignoreRules(crPath, cr);
 						crc[key] = cr;

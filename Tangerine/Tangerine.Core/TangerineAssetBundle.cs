@@ -94,6 +94,8 @@ namespace Tangerine.Core
 
 		private void CheckFbx(string path)
 		{
+			var target = Orange.The.UI.GetActiveTarget();
+
 			using (var cacheBundle = OpenCacheBundle(AssetBundleFlags.Writable)) {
 				Model3DAttachment attachment = null;
 				Model3D model = null;
@@ -111,7 +113,7 @@ namespace Tangerine.Core
 					(!attachmentExists || cacheBundle.GetFileLastWriteTime(attachmentPath) >= base.GetFileLastWriteTime(attachmentPath));
 				var fbxImportOptions = new FbxImportOptions {
 					Path = fbxFullPath,
-					Target = Orange.The.Workspace.ActiveTarget,
+					Target = target,
 					ApplyAttachment = false
 				};
 
@@ -121,7 +123,7 @@ namespace Tangerine.Core
 					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) >= base.GetFileLastWriteTime(fbxPath);
 				if (!attachmentMetaUpToDate && fbxExists) {
 					using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
-						model = fbxImporter.LoadModel();
+						model = fbxImporter.LoadModel(target);
 						var meta = new Model3DAttachmentMeta();
 						foreach (var animation in model.Animations) {
 							meta.SourceAnimationIds.Add(animation.Id);
@@ -158,7 +160,7 @@ namespace Tangerine.Core
 				if (fbxExists) {
 					if (model == null) {
 						using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
-							model = fbxImporter.LoadModel();
+							model = fbxImporter.LoadModel(target);
 						}
 					}
 					if (attachmentExists) {
