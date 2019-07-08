@@ -1,15 +1,27 @@
 variables:
   GIT_STRATEGY: fetch
   GIT_SUBMODULE_STRATEGY: recursive
-pages:
- stage: build
- tags:
- - Orange, Tangerine, Citrus
- script:
- - chcp 65001
- - 'Orange\Toolchain.Win\nuget.exe restore Orange\Orange.Win.sln'
- - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Orange\Orange.Win.sln'
- - echo "Orange build OK"
- - 'Orange\Toolchain.Win\nuget.exe restore Tangerine\Tangerine.Win.sln'
- - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Tangerine\Tangerine.Win.sln'
- - echo "Tangerine build OK"
+  
+windows_build:
+  stage: build
+  tags:
+  - win
+  script:
+  - chcp 65001
+  - 'Orange\Toolchain.Win\nuget.exe restore Orange\Orange.Win.sln'
+  - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Orange\Orange.Win.sln'
+  - echo "Orange build OK"
+  - 'Orange\Toolchain.Win\nuget.exe restore Tangerine\Tangerine.Win.sln'
+  - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Tangerine\Tangerine.Win.sln'
+  - echo "Tangerine build OK"
+  
+osx_build:
+  stage: build
+  tags:
+  - osx
+  script:
+  - CITRUS_PATH="$(pwd)"
+  - './Orange/Launcher/bin/Mac/Release/Launcher.app/Contents/MacOS/Launcher -c -j -b $CITRUS_PATH/Orange/Orange.Mac.sln'
+  - echo "Orange build OK"
+  - './Orange/Launcher/bin/Mac/Release/Launcher.app/Contents/MacOS/Launcher -c -j -b $CITRUS_PATH/Tangerine/Tangerine.Mac.sln'
+  - echo "Tangerine build OK"
