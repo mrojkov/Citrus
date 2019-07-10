@@ -13,7 +13,7 @@ namespace Orange
 		public static Func<DictionaryExtractor> Factory = () => new DictionaryExtractor();
 
 		private static readonly Regex tanTextMatcher = new Regex(
-			@"^(\s*""Text""\s*:)\s*""(?<string>[^""\\]*(?:\\.[^""\\]*)*)"",?\s?$",
+			@"^(\s*""\S*""\s*:)\s*""(?<string>[^""\\]*(?:\\.[^""\\]*)*)"",?\s?$",
 			RegexOptions.Compiled | RegexOptions.Multiline);
 
 		private static readonly Regex tanAnimatedTextMatcher = new Regex(
@@ -23,7 +23,7 @@ namespace Orange
 		private static readonly Regex sourceTextMatcher = new Regex(
 			@"(?<prefix>[@$])?""(?<string>[^""\\]*(?:\\.[^""\\]*)*)""", RegexOptions.Compiled);
 
-		private static readonly Regex taggedStringMatcher = new Regex(@"^\[.*\](.+)$", RegexOptions.Compiled);
+		private static readonly Regex taggedStringMatcher = new Regex(@"^\[.*\]([^\.]{1}.*)$", RegexOptions.Compiled);
 
 		private LocalizationDictionary dictionary;
 
