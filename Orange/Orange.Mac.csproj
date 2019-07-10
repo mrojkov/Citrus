@@ -233,6 +233,7 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
     <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
+    <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

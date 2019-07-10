@@ -120,7 +120,7 @@ namespace Orange
 			if (ProjectFile != string.Empty) {
 				AssetCacheMode = config.AssetCacheMode;
 				AssetCacheLocalPath = config.AssetCacheLocalPath;
-				if (!Path.IsPathRooted(AssetCacheLocalPath)) {
+				if (ProjectDirectory != null && !Path.IsPathRooted(AssetCacheLocalPath)) {
 					AssetCacheLocalPath = Path.Combine(ProjectDirectory, AssetCacheLocalPath);
 				}
 			}
