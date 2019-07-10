@@ -150,6 +150,7 @@ namespace Lime
 			x = *(float*)&i;
 			// Duplicate this line to increase result accuracy
 			x = x * (1.5f - (half * x * x));
+			x = x * (1.5f - (half * x * x));
 			return x;
 		}
 

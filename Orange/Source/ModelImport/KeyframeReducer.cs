@@ -81,7 +81,7 @@ namespace Orange
 
 	public class QuaternionKeyReducer : KeyReducer<Quaternion>
 	{
-		public static readonly QuaternionKeyReducer Default = new QuaternionKeyReducer(3.8077177e-7f);
+		public static readonly QuaternionKeyReducer Default = new QuaternionKeyReducer(1e-7f);
 
 		public QuaternionKeyReducer(float tolerance) : base(tolerance) { }
 
