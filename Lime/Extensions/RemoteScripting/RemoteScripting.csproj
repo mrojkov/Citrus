@@ -41,6 +41,7 @@
     <Compile Include="Source\Host.cs" />
     <Compile Include="Source\HostClient.cs" />
     <Compile Include="Source\NetworkMember.cs" />
+    <Compile Include="Source\NetworkMessage\NetworkPing.cs" />
     <Compile Include="Source\NetworkMessage\NetworkRemoteProcedureCall.cs" />
     <Compile Include="Source\NetworkMessage\NetworkDeviceName.cs" />
     <Compile Include="Source\NetworkMessage\NetworkMessage.cs" />

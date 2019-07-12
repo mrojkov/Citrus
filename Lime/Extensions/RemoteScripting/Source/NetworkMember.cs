@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,10 +35,18 @@ namespace RemoteScripting
 
 		protected internal async Task ProcessConnectionAsync()
 		{
+			var stopWatch = new Stopwatch();
+			stopWatch.Start();
 			while (!cancellationToken.IsCancellationRequested) {
-				if (Stream.DataAvailable) {
+				while (Stream.DataAvailable) {
 					var message = await NetworkMessage.ReadMessageFromStreamAsync(Stream);
-					messagesReceiveQueue.Enqueue(message);
+					if (!(message is NetworkPing)) {
+						messagesReceiveQueue.Enqueue(message);
+					}
+				}
+				if (stopWatch.Elapsed > NetworkSettings.PingInterval) {
+					SendMessage(new NetworkPing());
+					stopWatch.Restart();
 				}
 				while (messagesSendQueue.TryDequeue(out var message)) {
 					isSending = true;

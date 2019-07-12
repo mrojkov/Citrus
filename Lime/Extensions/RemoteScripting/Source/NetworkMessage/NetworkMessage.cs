@@ -9,6 +9,7 @@ namespace RemoteScripting
 {
 	public enum NetworkMessageType
 	{
+		Ping,
 		DeviceName,
 		Text,
 		RemoteProcedureCall,
@@ -26,6 +27,8 @@ namespace RemoteScripting
 		public static NetworkMessage Create(NetworkMessageType type, byte[] body)
 		{
 			switch (type) {
+				case NetworkMessageType.Ping:
+					return new NetworkPing();
 				case NetworkMessageType.DeviceName:
 					return new NetworkDeviceName(body);
 				case NetworkMessageType.Text:
