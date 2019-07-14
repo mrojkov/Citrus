@@ -38,9 +38,7 @@ namespace Lime
 
 		private void OnFilterChanged(BehaviorComponent component)
 		{
-			if (component is UpdatableBehaviorComponent ub) {
-				behaviorSystem.OnFilterChanged(ub);
-			}
+			behaviorSystem.OnFilterChanged(ub);
 		}
 
 		protected internal override void Update(float delta)

@@ -168,7 +168,7 @@ namespace Lime
 		}
 	}
 
-	public abstract class LegacyBehaviorContainer : UpdatableBehaviorComponent
+	public abstract class LegacyBehaviorContainer : BehaviorComponent
 	{
 		private readonly List<NodeBehavior> behaviors = new List<NodeBehavior>();
 

@@ -229,7 +229,7 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(EarlyUpdateStage))]
 	[UpdateAfterBehavior(typeof(LegacyEarlyBehaviorContainer))]
-	public class ButtonBehavior : UpdatableBehaviorComponent
+	public class ButtonBehavior : BehaviorComponent
 	{
 		private Button button;
 

@@ -153,21 +153,18 @@ namespace Lime
 
 	public class BehaviorComponent : NodeComponent
 	{
+		internal BehaviorFamily Family;
+		internal int IndexInFamily = -1;
+
 		protected internal virtual void Start() { }
 
 		protected internal virtual void Stop() { }
-	}
 
-	public abstract class UpdatableBehaviorComponent : BehaviorComponent
-	{
-		internal UpdatableBehaviorFamily Family;
-		internal int IndexInFamily = -1;
-
-		protected internal abstract void Update(float delta);
+		protected internal virtual void Update(float delta) { }
 
 		public override NodeComponent Clone()
 		{
-			var clone = (UpdatableBehaviorComponent)base.Clone();
+			var clone = (BehaviorComponent)base.Clone();
 			clone.Family = null;
 			clone.IndexInFamily = -1;
 			return clone;
@@ -179,8 +176,8 @@ namespace Lime
 
 	internal class BehaviorUpdateStage
 	{
-		private DependencyGraph<UpdatableBehaviorFamily> behaviorFamilyGraph = new DependencyGraph<UpdatableBehaviorFamily>();
-		private List<UpdatableBehaviorFamily> behaviorFamilyQueue = new List<UpdatableBehaviorFamily>();
+		private DependencyGraph<BehaviorFamily> behaviorFamilyGraph = new DependencyGraph<BehaviorFamily>();
+		private List<BehaviorFamily> behaviorFamilyQueue = new List<BehaviorFamily>();
 		private bool behaviorFamilyQueueDirty;
 
 		public readonly Type StageType;
@@ -190,15 +187,15 @@ namespace Lime
 			StageType = stageType;
 		}
 
-		internal UpdatableBehaviorFamily CreateBehaviorFamily(Type behaviorType)
+		internal BehaviorFamily CreateBehaviorFamily(Type behaviorType)
 		{
-			var bf = new UpdatableBehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType);
+			var bf = new BehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType);
 			behaviorFamilyGraph.Add(bf);
 			behaviorFamilyQueueDirty = true;
 			return bf;
 		}
 
-		internal void AddDependency(UpdatableBehaviorFamily successor, UpdatableBehaviorFamily predecessor)
+		internal void AddDependency(BehaviorFamily successor, BehaviorFamily predecessor)
 		{
 			if (successor.UpdateStage != this || predecessor.UpdateStage != this) {
 				throw new InvalidOperationException();
@@ -277,7 +274,7 @@ namespace Lime
 	internal class BehaviorSystem
 	{
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
-		private Dictionary<Type, UpdatableBehaviorFamily> behaviorFamilies = new Dictionary<Type, UpdatableBehaviorFamily>();
+		private Dictionary<Type, BehaviorFamily> behaviorFamilies = new Dictionary<Type, BehaviorFamily>();
 		private HashSet<BehaviorComponent> pendingBehaviors = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
 		private HashSet<BehaviorComponent> pendingBehaviors2 = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
 
@@ -297,8 +294,8 @@ namespace Lime
 				pendingBehaviors = pendingBehaviors2;
 				pendingBehaviors2 = t;
 				foreach (var b in pendingBehaviors2) {
-					if (b is UpdatableBehaviorComponent ub) {
-						ub.Family = GetUpdatableBehaviorFamily(ub.GetType());
+					if (b is BehaviorComponent ub) {
+						ub.Family = GetBehaviorFamily(ub.GetType());
 						EnqueueDequeueBehavior(ub);
 					}
 					b.Start();
@@ -315,7 +312,7 @@ namespace Lime
 		public void Remove(BehaviorComponent behavior)
 		{
 			if (!pendingBehaviors.Remove(behavior)) {
-				if (behavior is UpdatableBehaviorComponent ub) {
+				if (behavior is BehaviorComponent ub) {
 					if (ub.Family != null) {
 						ub.Family.Dequeue(ub);
 						ub.Family = null;
@@ -325,14 +322,14 @@ namespace Lime
 			}
 		}
 
-		public void OnFilterChanged(UpdatableBehaviorComponent behavior)
+		public void OnFilterChanged(BehaviorComponent behavior)
 		{
 			if (!pendingBehaviors.Contains(behavior)) {
 				EnqueueDequeueBehavior(behavior);
 			}
 		}
 
-		private void EnqueueDequeueBehavior(UpdatableBehaviorComponent behavior)
+		private void EnqueueDequeueBehavior(BehaviorComponent behavior)
 		{
 			var enabled = !behavior.Owner.GloballyFrozen;
 			var bf = behavior.Family;
@@ -345,26 +342,23 @@ namespace Lime
 			}
 		}
 
-		private UpdatableBehaviorFamily GetUpdatableBehaviorFamily(Type behaviorType)
+		private BehaviorFamily GetBehaviorFamily(Type behaviorType)
 		{
 			if (behaviorFamilies.TryGetValue(behaviorType, out var behaviorFamily)) {
 				return behaviorFamily;
 			}
-			if (!typeof(UpdatableBehaviorComponent).IsAssignableFrom(behaviorType)) {
-				throw new InvalidOperationException();
-			}
 			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
 			if (updateStageAttr == null) {
-				throw new InvalidOperationException();
+				return null;
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
 			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType);
 			behaviorFamilies.Add(behaviorType, behaviorFamily);
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
-				updateStage.AddDependency(behaviorFamily, GetUpdatableBehaviorFamily(i.BehaviorType));
+				updateStage.AddDependency(behaviorFamily, GetBehaviorFamily(i.BehaviorType));
 			}
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>()) {
-				updateStage.AddDependency(GetUpdatableBehaviorFamily(i.BehaviorType), behaviorFamily);
+				updateStage.AddDependency(GetBehaviorFamily(i.BehaviorType), behaviorFamily);
 			}
 			return behaviorFamily;
 		}
@@ -403,22 +397,22 @@ namespace Lime
 		}
 	}
 
-	internal class UpdatableBehaviorFamily
+	internal class BehaviorFamily
 	{
-		private List<UpdatableBehaviorComponent> behaviors = new List<UpdatableBehaviorComponent>();
+		private List<BehaviorComponent> behaviors = new List<BehaviorComponent>();
 
 		public readonly BehaviorUpdateStage UpdateStage;
 		public readonly int Index;
 		public readonly Type BehaviorType;
 
-		public UpdatableBehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType)
+		public BehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType)
 		{
 			UpdateStage = updateStage;
 			Index = index;
 			BehaviorType = behaviorType;
 		}
 
-		public bool Enqueue(UpdatableBehaviorComponent b)
+		public bool Enqueue(BehaviorComponent b)
 		{
 			if (b.IndexInFamily < 0) {
 				b.IndexInFamily = behaviors.Count;
@@ -428,7 +422,7 @@ namespace Lime
 			return false;
 		}
 
-		public bool Dequeue(UpdatableBehaviorComponent b)
+		public bool Dequeue(BehaviorComponent b)
 		{
 			if (b.IndexInFamily >= 0) {
 				behaviors[b.IndexInFamily] = null;

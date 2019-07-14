@@ -1466,7 +1466,7 @@ namespace Lime
 	[MutuallyExclusiveDerivedComponents]
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(LateUpdateStage))]
-	public class UpdatableNodeBehavior : UpdatableBehaviorComponent
+	public class UpdatableNodeBehavior : BehaviorComponent
 	{
 		private IUpdatableNode node;
 
@@ -1539,7 +1539,7 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(LateUpdateStage))]
 	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
-	public class BoneArrayUpdaterBehavior : UpdatableBehaviorComponent
+	public class BoneArrayUpdaterBehavior : BehaviorComponent
 	{
 		private List<Bone> bones = new List<Bone>();
 		private bool needResort = false;
