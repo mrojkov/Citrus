@@ -130,23 +130,10 @@ namespace Lime
 			}
 		}
 
-		private bool updating = false;
-
-		public int Frame;
-
 		public void Update(float delta)
 		{
-			if (updating) {
-				throw new InvalidOperationException();
-			}
-			try {
-				updating = true;
-				foreach (var p in Processors) {
-					p.Update(delta);
-				}
-			} finally {
-				updating = false;
-				Frame++;
+			foreach (var p in Processors) {
+				p.Update(delta);
 			}
 		}
 	}
