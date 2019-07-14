@@ -99,20 +99,21 @@ namespace Lime
 			node.Manager = null;
 		}
 
+		private HashSet<Node> frozenNodes = new HashSet<Node>();
+
 		internal void OnFilterChanged(Node node)
 		{
 			var frozen = node.GloballyFrozen;
-			foreach (var component in node.Components) {
-				foreach (var p in GetProcessorsForComponentType(component.GetType())) {
-					if (frozen) {
-						p.Freeze(component);
-					} else {
-						p.Unfreeze(component);
+			var frozenChanged = frozen ? frozenNodes.Add(node) : frozenNodes.Remove(node);
+			if (frozenChanged) {
+				foreach (var c in node.Components) {
+					foreach (var p in GetProcessorsForComponentType(c.GetType())) {
+						p.OnNodeFrozenChanged(c);
 					}
 				}
-			}
-			foreach (var child in node.Nodes) {
-				OnFilterChanged(child);
+				foreach (var n in node.Nodes) {
+					OnFilterChanged(n);
+				}
 			}
 		}
 
@@ -148,6 +149,10 @@ namespace Lime
 		protected internal virtual void Stop() { }
 
 		protected internal virtual void Update(float delta) { }
+
+		protected internal virtual void OnEnabled() { }
+
+		protected internal virtual void OnDisabled() { }
 
 		public override NodeComponent Clone()
 		{
@@ -299,17 +304,15 @@ namespace Lime
 		public void Remove(BehaviorComponent behavior)
 		{
 			if (!pendingBehaviors.Remove(behavior)) {
-				if (behavior is BehaviorComponent ub) {
-					if (ub.Family != null) {
-						ub.Family.Dequeue(ub);
-						ub.Family = null;
-					}
+				if (behavior.Family != null) {
+					behavior.Family.Dequeue(behavior);
+					behavior.Family = null;
 				}
 				behavior.Stop();
 			}
 		}
 
-		public void OnFilterChanged(BehaviorComponent behavior)
+		public void OnNodeFrozenChanged(BehaviorComponent behavior)
 		{
 			if (!pendingBehaviors.Contains(behavior)) {
 				EnqueueDequeueBehavior(behavior);
@@ -404,6 +407,7 @@ namespace Lime
 			if (b.IndexInFamily < 0) {
 				b.IndexInFamily = behaviors.Count;
 				behaviors.Add(b);
+				b.OnEnabled();
 				return true;
 			}
 			return false;
@@ -414,6 +418,7 @@ namespace Lime
 			if (b.IndexInFamily >= 0) {
 				behaviors[b.IndexInFamily] = null;
 				b.IndexInFamily = -1;
+				b.OnDisabled();
 				return true;
 			}
 			return false;

@@ -26,9 +26,7 @@ namespace Lime
 
 		protected internal virtual void Remove(NodeComponent component) { }
 
-		protected internal virtual void Freeze(NodeComponent component) => Remove(component);
-
-		protected internal virtual void Unfreeze(NodeComponent component) => Add(component);
+		protected internal virtual void OnNodeFrozenChanged(NodeComponent component) { }
 	}
 
 	public class NodeComponentProcessor<TComponent> : NodeComponentProcessor where TComponent : NodeComponent
@@ -45,22 +43,15 @@ namespace Lime
 			Remove((TComponent)component);
 		}
 
-		protected internal sealed override void Freeze(NodeComponent component)
+		protected internal sealed override void OnNodeFrozenChanged(NodeComponent component)
 		{
-			Freeze((TComponent)component);
-		}
-
-		protected internal sealed override void Unfreeze(NodeComponent component)
-		{
-			Unfreeze((TComponent)component);
+			OnNodeFrozenChanged((TComponent)component);
 		}
 
 		protected virtual void Add(TComponent component) { }
 
 		protected virtual void Remove(TComponent component) { }
 
-		protected virtual void Freeze(TComponent component) => Remove(component);
-
-		protected virtual void Unfreeze(TComponent component) => Add(component);
+		protected virtual void OnNodeFrozenChanged(TComponent component) { }
 	}
 }

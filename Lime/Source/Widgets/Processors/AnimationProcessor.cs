@@ -8,6 +8,27 @@ namespace Lime
 
 		protected override void Add(AnimationComponent component)
 		{
+			if (!component.Owner.GloballyFrozen) {
+				Enable(component);
+			}
+		}
+
+		protected override void Remove(AnimationComponent component)
+		{
+			Disable(component);
+		}
+
+		protected override void OnNodeFrozenChanged(AnimationComponent component)
+		{
+			if (component.Owner.GloballyFrozen) {
+				Disable(component);
+			} else {
+				Enable(component);
+			}
+		}
+
+		private void Enable(AnimationComponent component)
+		{
 			component.AnimationRun += OnAnimationRun;
 			component.AnimationStopped += OnAnimationStopped;
 			foreach (var a in component.Animations) {
@@ -17,7 +38,7 @@ namespace Lime
 			}
 		}
 
-		protected override void Remove(AnimationComponent component)
+		private void Disable(AnimationComponent component)
 		{
 			component.AnimationRun -= OnAnimationRun;
 			component.AnimationStopped -= OnAnimationStopped;
