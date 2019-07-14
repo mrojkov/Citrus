@@ -286,10 +286,8 @@ namespace Lime
 				pendingBehaviors = pendingBehaviors2;
 				pendingBehaviors2 = t;
 				foreach (var b in pendingBehaviors2) {
-					if (b is BehaviorComponent ub) {
-						ub.Family = GetBehaviorFamily(ub.GetType());
-						EnqueueDequeueBehavior(ub);
-					}
+					b.Family = GetBehaviorFamily(b.GetType());
+					EnqueueDequeueBehavior(b);
 					b.Start();
 				}
 				pendingBehaviors2.Clear();
