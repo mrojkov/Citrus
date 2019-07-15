@@ -37,9 +37,9 @@ namespace Lime
 		private NodeManager CreateManager()
 		{
 			var services = new ServiceRegistry();
-			services.Add(new BehaviorSystem());
+			services.Add(new BehaviorSystem(typeof(EarlyUpdateStage)));
 			services.Add(LayoutManager);
-			services.Add(WidgetContext.GestureManager);
+			services.Add(WidgetContext);
 
 			var manager = new NodeManager(services);
 			manager.Processors.Add(new GestureProcessor());

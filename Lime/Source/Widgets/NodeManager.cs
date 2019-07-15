@@ -80,6 +80,9 @@ namespace Lime
 		internal void RegisterNode(Node node)
 		{
 			node.Manager = this;
+			if (node.GloballyFrozen) {
+				frozenNodes.Add(node);
+			}
 			foreach (var component in node.Components) {
 				RegisterComponent(component);
 			}
@@ -96,6 +99,7 @@ namespace Lime
 			foreach (var component in node.Components) {
 				UnregisterComponent(component);
 			}
+			frozenNodes.Remove(node);
 			node.Manager = null;
 		}
 
@@ -179,9 +183,9 @@ namespace Lime
 			StageType = stageType;
 		}
 
-		internal BehaviorFamily CreateBehaviorFamily(Type behaviorType)
+		internal BehaviorFamily CreateBehaviorFamily(Type behaviorType, bool keepActiveWhenNodeFrozen)
 		{
-			var bf = new BehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType);
+			var bf = new BehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType, keepActiveWhenNodeFrozen);
 			behaviorFamilyGraph.Add(bf);
 			behaviorFamilyQueueDirty = true;
 			return bf;
@@ -265,10 +269,16 @@ namespace Lime
 
 	internal class BehaviorSystem
 	{
+		private BehaviorUpdateStage defaultUpdateStage;
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
 		private Dictionary<Type, BehaviorFamily> behaviorFamilies = new Dictionary<Type, BehaviorFamily>();
 		private HashSet<BehaviorComponent> pendingBehaviors = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
 		private HashSet<BehaviorComponent> pendingBehaviors2 = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
+
+		public BehaviorSystem(Type defaultUpdateStageType)
+		{
+			defaultUpdateStage = GetUpdateStage(defaultUpdateStageType);
+		}
 
 		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
@@ -287,8 +297,8 @@ namespace Lime
 				pendingBehaviors2 = t;
 				foreach (var b in pendingBehaviors2) {
 					b.Family = GetBehaviorFamily(b.GetType());
-					EnqueueDequeueBehavior(b);
 					b.Start();
+					EnqueueDequeueBehavior(b);
 				}
 				pendingBehaviors2.Clear();
 			}
@@ -303,7 +313,9 @@ namespace Lime
 		{
 			if (!pendingBehaviors.Remove(behavior)) {
 				if (behavior.Family != null) {
-					behavior.Family.Dequeue(behavior);
+					if (behavior.Family.Dequeue(behavior)) {
+						behavior.OnDisabled();
+					}
 					behavior.Family = null;
 				}
 				behavior.Stop();
@@ -319,13 +331,14 @@ namespace Lime
 
 		private void EnqueueDequeueBehavior(BehaviorComponent behavior)
 		{
-			var enabled = !behavior.Owner.GloballyFrozen;
-			var bf = behavior.Family;
-			if (bf != null) {
-				if (enabled) {
-					bf.Enqueue(behavior);
-				} else {
-					bf.Dequeue(behavior);
+			var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.KeepActiveWhenNodeFrozen;
+			if (enabled) {
+				if (behavior.Family.Enqueue(behavior)) {
+					behavior.OnEnabled();
+				}
+			} else {
+				if (behavior.Family.Dequeue(behavior)) {
+					behavior.OnDisabled();
 				}
 			}
 		}
@@ -335,12 +348,13 @@ namespace Lime
 			if (behaviorFamilies.TryGetValue(behaviorType, out var behaviorFamily)) {
 				return behaviorFamily;
 			}
+			var updateStage = defaultUpdateStage;
 			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
-			if (updateStageAttr == null) {
-				return null;
+			if (updateStageAttr != null) {
+				updateStage = GetUpdateStage(updateStageAttr.StageType);
 			}
-			var updateStage = GetUpdateStage(updateStageAttr.StageType);
-			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType);
+			var keepActiveWhenNodeFrozen = behaviorType.IsDefined(typeof(KeepActiveWhenNodeFrozenAttribute));
+			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType, keepActiveWhenNodeFrozen);
 			behaviorFamilies.Add(behaviorType, behaviorFamily);
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
 				updateStage.AddDependency(behaviorFamily, GetBehaviorFamily(i.BehaviorType));
@@ -385,6 +399,11 @@ namespace Lime
 		}
 	}
 
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	public class KeepActiveWhenNodeFrozenAttribute : Attribute
+	{
+	}
+
 	internal class BehaviorFamily
 	{
 		private List<BehaviorComponent> behaviors = new List<BehaviorComponent>();
@@ -392,12 +411,14 @@ namespace Lime
 		public readonly BehaviorUpdateStage UpdateStage;
 		public readonly int Index;
 		public readonly Type BehaviorType;
+		public readonly bool KeepActiveWhenNodeFrozen;
 
-		public BehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType)
+		public BehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType, bool keepActiveWhenNodeFrozen)
 		{
 			UpdateStage = updateStage;
 			Index = index;
 			BehaviorType = behaviorType;
+			KeepActiveWhenNodeFrozen = keepActiveWhenNodeFrozen;
 		}
 
 		public bool Enqueue(BehaviorComponent b)
@@ -405,7 +426,6 @@ namespace Lime
 			if (b.IndexInFamily < 0) {
 				b.IndexInFamily = behaviors.Count;
 				behaviors.Add(b);
-				b.OnEnabled();
 				return true;
 			}
 			return false;
@@ -416,7 +436,6 @@ namespace Lime
 			if (b.IndexInFamily >= 0) {
 				behaviors[b.IndexInFamily] = null;
 				b.IndexInFamily = -1;
-				b.OnDisabled();
 				return true;
 			}
 			return false;
@@ -424,16 +443,18 @@ namespace Lime
 
 		public void Update(float delta)
 		{
-			for (var i = behaviors.Count - 1; i >= 0; i--) {
-				var b = behaviors[i];
+			var idx = 0;
+			while (idx < behaviors.Count) {
+				var b = behaviors[idx];
 				if (b != null) {
 					b.Update(delta * b.Owner.EffectiveAnimationSpeed);
+					idx++;
 				} else {
 					b = behaviors[behaviors.Count - 1];
 					if (b != null) {
-						b.IndexInFamily = i;
+						b.IndexInFamily = idx;
 					}
-					behaviors[i] = b;
+					behaviors[idx] = b;
 					behaviors.RemoveAt(behaviors.Count - 1);
 				}
 			}

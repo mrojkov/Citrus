@@ -149,6 +149,7 @@ namespace Lime
 
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(EarlyUpdateStage))]
+	[KeepActiveWhenNodeFrozen]
 	public class LegacyEarlyBehaviorContainer : LegacyBehaviorContainer
 	{
 		protected override void UpdateBehavior(NodeBehavior b, float delta)
@@ -160,6 +161,7 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
 	[UpdateStage(typeof(LateUpdateStage))]
+	[KeepActiveWhenNodeFrozen]
 	public class LegacyLateBehaviorContainer : LegacyBehaviorContainer
 	{
 		protected override void UpdateBehavior(NodeBehavior b, float delta)
@@ -170,9 +172,17 @@ namespace Lime
 
 	public abstract class LegacyBehaviorContainer : BehaviorComponent
 	{
-		private readonly List<NodeBehavior> behaviors = new List<NodeBehavior>();
+		private List<NodeBehavior> behaviors = new List<NodeBehavior>();
+		private LegacyBehaviorActivator activator;
 
 		public bool IsEmpty => behaviors.Count == 0;
+
+		private bool active;
+
+		internal void SetActive(bool active)
+		{
+			this.active = active;
+		}
 
 		internal void Add(NodeBehavior b)
 		{
@@ -191,8 +201,26 @@ namespace Lime
 			}
 		}
 
+		protected internal override void Start()
+		{
+			activator = Owner.Parent?.Components.GetOrAdd<LegacyBehaviorActivator>();
+			if (activator != null) {
+				activator?.AddContainer(this);
+			} else {
+				active = true;
+			}
+		}
+
+		protected internal override void Stop()
+		{
+			activator?.RemoveContainer(this);
+		}
+
 		protected internal override void Update(float delta)
 		{
+			if (!active) {
+				return;
+			}
 			for (var i = behaviors.Count - 1; i >= 0; i--) {
 				var b = behaviors[i];
 				if (b != null) {
@@ -209,7 +237,50 @@ namespace Lime
 		{
 			// TODO: This component should not be cloned
 			var clone = (LegacyBehaviorContainer)base.Clone();
-			clone.behaviors.Clear();
+			clone.behaviors = new List<NodeBehavior>();
+			return clone;
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	public class LegacyBehaviorActivator : BehaviorComponent
+	{
+		private bool enabled;
+		private List<LegacyBehaviorContainer> containers = new List<LegacyBehaviorContainer>();
+
+		public void AddContainer(LegacyBehaviorContainer container)
+		{
+			containers.Add(container);
+			container.SetActive(!Owner.GloballyFrozen);
+		}
+
+		public void RemoveContainer(LegacyBehaviorContainer container)
+		{
+			containers.Remove(container);
+			container.SetActive(false);
+		}
+
+		protected internal override void OnEnabled()
+		{
+			SetActive(true);
+		}
+
+		protected internal override void OnDisabled()
+		{
+			SetActive(false);
+		}
+
+		private void SetActive(bool active)
+		{
+			foreach (var i in containers) {
+				i.SetActive(active);
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (LegacyBehaviorActivator)base.Clone();
+			clone.containers = new List<LegacyBehaviorContainer>();
 			return clone;
 		}
 	}
