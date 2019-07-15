@@ -273,7 +273,7 @@ namespace Lime
 				foreach (var a in animation.EffectiveAnimators) {
 					animatorBindings.Add(new AnimatorBinding(a));
 				}
-				AddZeroPoseAnimatorsRecursively(animatorBindings, animation.Owner);
+				AddZeroPoseAnimatorsRecursively(animatorBindings, animation.OwnerNode);
 			}
 
 			void AddEffectiveAnimatorsRecursively(Node node)
