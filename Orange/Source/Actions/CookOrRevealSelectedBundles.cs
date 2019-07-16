@@ -13,9 +13,11 @@ namespace Orange
 		private static Window window;
 		private static WindowWidget windowWidget;
 		private static Widget mainVBox;
+		private static ThemedEditBox filter;
 		private static ThemedScrollView scrollView;
 		private static ThemedButton selectButton;
-		private static Dictionary<string, ThemedCheckBox> bundleMap;
+		private static Dictionary<string, ThemedCheckBox> checkboxes;
+		private static Dictionary<string, Widget> lines;
 		private static Action action;
 		private static bool windowClosed;
 
@@ -27,7 +29,8 @@ namespace Orange
 		{
 			windowClosed = false;
 			action = null;
-			bundleMap = new Dictionary<string, ThemedCheckBox>();
+			checkboxes = new Dictionary<string, ThemedCheckBox>();
+			lines = new Dictionary<string, Widget>();
 			Application.InvokeOnMainThread(CreateSelectionWindow);
 			// Selection window can be created only on main thread
 			// We should wait for that window to close, or user will
@@ -73,21 +76,26 @@ namespace Orange
 				Clicked = SelectButtonClickHandler
 			};
 
+			filter = new ThemedEditBox();
+			filter.Tasks.Add(FilterBundles);
+			mainVBox.AddNode(filter);
+
 			mainVBox.AddNode(scrollView);
 			foreach (var bundle in GetBundles()) {
-				bundleMap[bundle] = new ThemedCheckBox();
-				scrollView.Content.AddNode(new Widget {
+				checkboxes[bundle] = new ThemedCheckBox();
+				lines[bundle] = new Widget {
 					Layout = new HBoxLayout {
 						Spacing = 8
 					},
 					Nodes = {
-						bundleMap[bundle],
+						checkboxes[bundle],
 						new ThemedSimpleText(bundle) {
 							HitTestTarget = true,
-							Clicked = bundleMap[bundle].Toggle
+							Clicked = checkboxes[bundle].Toggle
 						}
 					}
-				});
+				};
+				scrollView.Content.AddNode(lines[bundle]);
 			}
 
 			var cookButton = new ThemedButton {
@@ -127,25 +135,23 @@ namespace Orange
 
 		private static void SelectButtonClickHandler()
 		{
-			var unfold = true;
-			foreach (var bundle in bundleMap.Keys) {
-				if (!bundleMap[bundle].Checked) {
-					unfold = false;
+			var deselect = true;
+			foreach (var bundle in checkboxes.Keys) {
+				if (!checkboxes[bundle].Checked) {
+					deselect = false;
 				}
 			}
-
-			foreach (var bundle in bundleMap.Keys) {
-				bundleMap[bundle].Checked = !unfold;
+			foreach (var bundle in checkboxes.Keys) {
+				checkboxes[bundle].Checked = !deselect;
 			}
-
 		}
 
 		private static IEnumerator<object> UpdateTextOfSelectButton()
 		{
 			while (true) {
 				var allChecked = true;
-				foreach (var bundle in bundleMap.Keys) {
-					if (!bundleMap[bundle].Checked) {
+				foreach (var bundle in checkboxes.Keys) {
+					if (!checkboxes[bundle].Checked) {
 						allChecked = false;
 					}
 				}
@@ -158,11 +164,27 @@ namespace Orange
 			}
 		}
 
+		private static IEnumerator<object> FilterBundles()
+		{
+			var lastText = string.Empty;
+			while (true) {
+				var text = filter.Text;
+				if (text == lastText) {
+					yield return null;
+				}
+				lastText = text;
+				foreach (var bundle in lines.Keys) {
+					lines[bundle].Visible = bundle.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+				}
+				yield return null;
+			}
+		}
+
 		private static void CookButtonClickHandler()
 		{
 			var bundles = new List<string>();
-			foreach (var bundle in bundleMap.Keys) {
-				if (bundleMap[bundle].Checked) {
+			foreach (var bundle in checkboxes.Keys) {
+				if (checkboxes[bundle].Checked) {
 					bundles.Add(bundle);
 				}
 			}
@@ -173,8 +195,8 @@ namespace Orange
 		private static void RevealButtonClickHandler()
 		{
 			var bundles = new List<string>();
-			foreach (var bundle in bundleMap.Keys) {
-				if (bundleMap[bundle].Checked) {
+			foreach (var bundle in checkboxes.Keys) {
+				if (checkboxes[bundle].Checked) {
 					bundles.Add(bundle);
 				}
 			}
