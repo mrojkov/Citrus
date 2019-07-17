@@ -105,6 +105,7 @@ namespace Tangerine.UI.Timeline
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
 			DockManager.Instance.AddFilesDropHandler(FilesDropHandler);
+			UpdateTitle();
 		}
 
 		public void Detach()
@@ -184,21 +185,22 @@ namespace Tangerine.UI.Timeline
 			);
 		}
 
-		ITaskProvider PanelTitleUpdater()
+		void UpdateTitle()
 		{
-			return new Property<Node>(() => Document.Current.Container).WhenChanged(_ => {
-				Panel.Title = "Timeline";
-				var t = "";
-				for (var n = Document.Current.Container; n != Document.Current.RootNode; n = n.Parent) {
-					var id = string.IsNullOrEmpty(n.Id) ? "?" : n.Id;
-					t = id + ((t != "") ? ": " + t : t);
-				}
-				if (t != "") {
-					Panel.Title += " - '" + t + "'";
-				}
-			});
+			Panel.Title = "Timeline";
+			var t = "";
+			for (var n = Document.Current.Container; n != Document.Current.RootNode; n = n.Parent) {
+				var id = string.IsNullOrEmpty(n.Id) ? "?" : n.Id;
+				t = id + ((t != "") ? ": " + t : t);
+			}
+			if (t != "") {
+				Panel.Title += " - '" + t + "'";
+			}
 		}
 
+		ITaskProvider PanelTitleUpdater() =>
+			new Property<Node>(() => Document.Current.Container).WhenChanged(_ => UpdateTitle());
+		
 		ITaskProvider ShowCurveEditorTask()
 		{
 			var editCurvesProp = new Property<bool>(() => TimelineUserPreferences.Instance.EditCurves);
