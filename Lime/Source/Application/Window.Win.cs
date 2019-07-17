@@ -477,6 +477,7 @@ namespace Lime
 			form.Deactivate += OnDeactivate;
 			form.FormClosing += OnClosing;
 			form.FormClosed += OnClosed;
+			form.Shown += OnShown;
 			active = Form.ActiveForm == form;
 
 			if (options.UseTimer) {
@@ -528,6 +529,8 @@ namespace Lime
 			}
 			Application.Windows.Add(this);
 		}
+
+		private void OnShown(object sender, EventArgs e) => renderControl.Focus();
 
 		public override bool VSync
 		{
