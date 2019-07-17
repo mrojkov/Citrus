@@ -56,10 +56,7 @@ namespace Lime
 			System.Diagnostics.Process.Start(startInfo);
 		}
 
-		public static string GetDataDirectory(string appName)
-		{
-			return GetDataDirectory(null, appName, "1.0");
-		}
+		public static string GetDataDirectory(string appName) => GetDataDirectory("Game Forest", appName, "1.0");
 
 		public static string GetPathInsideDataDirectory(string appName, string path)
 		{

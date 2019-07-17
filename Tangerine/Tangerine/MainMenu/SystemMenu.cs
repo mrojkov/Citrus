@@ -13,7 +13,7 @@ namespace Tangerine.MainMenu
 		public override void Execute()
 		{
 			if (new AlertDialog("Are you sure you want to purge all backups?", "Yes", "Cancel").Show() == 0) {
-				var path = Path.Combine(Environment.GetDataDirectory(null, "Tangerine", "1.0"), "Backups",
+				var path = Path.Combine(Environment.GetDataDirectory("Tangerine"), "Backups",
 					Path.GetFileNameWithoutExtension(Project.Current?.CitprojPath ?? ""));
 				if (Directory.Exists(path)) {
 					Directory.Delete(path, true);
