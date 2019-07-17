@@ -120,7 +120,7 @@ namespace Lime
 		{
 			if (property == "Action") {
 				var action = (AudioAction)value;
-				if (GloballyEnable) {
+				if (GloballyEnable && !GetTangerineFlag(TangerineFlags.Hidden)) {
 					if (action == AudioAction.Play) {
 						Play();
 					} else {
