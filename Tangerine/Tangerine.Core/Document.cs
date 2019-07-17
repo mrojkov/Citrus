@@ -199,19 +199,24 @@ namespace Tangerine.Core
 			animations.Insert(0, Container.DefaultAnimation);
 		}
 
+		private readonly HashSet<string> usedAnimations = new HashSet<string>();
+
 		private void GetAnimationsHelper(List<Animation> animations)
 		{
 			var ancestor = Container;
-			while (true) {
-				foreach (var a in ancestor.Animations) {
-					if (!a.IsLegacy) {
-						animations.Add(a);
+			lock (usedAnimations) {
+				usedAnimations.Clear();
+				while (true) {
+					foreach (var a in ancestor.Animations) {
+						if (!a.IsLegacy && usedAnimations.Add(a.Id)) {
+							animations.Add(a);
+						}
 					}
+					if (ancestor == RootNode) {
+						return;
+					}
+					ancestor = ancestor.Parent;
 				}
-				if (ancestor == RootNode) {
-					return;
-				}
-				ancestor = ancestor.Parent;
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System.Linq;
+using Lime;
 
 namespace Tangerine.Core.Operations
 {
@@ -24,7 +25,26 @@ namespace Tangerine.Core.Operations
 		{
 			protected override void InternalRedo(TimelineHorizontalShift op)
 			{
-				foreach (var node in Document.Current.Container.Nodes) {
+				if (Document.Current.Animation.IsLegacy) {
+					foreach (var node in Document.Current.Container.Nodes) {
+						Shift(node);
+					}
+				} else {
+					Node namesakeAnimationOwner = null;
+					foreach (var descendant in Document.Current.Animation.Owner.Descendants) {
+						if (descendant.Animations.TryFind(Document.Current.AnimationId, out _)) {
+							namesakeAnimationOwner = descendant;
+							Shift(descendant);
+						}
+						if (namesakeAnimationOwner != null && descendant != namesakeAnimationOwner.NextSibling) {
+							continue;
+						}
+						namesakeAnimationOwner = null;
+						Shift(descendant);
+					}
+				}
+				void Shift(Node node)
+				{
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId)) {
 						var keys = op.delta > 0 ? animator.ReadonlyKeys.Reverse() : animator.ReadonlyKeys;
 						foreach (var k in keys) {
