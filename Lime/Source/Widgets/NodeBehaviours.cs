@@ -11,8 +11,9 @@ namespace Lime
 
 		public bool IsAwoken { get; private set; }
 
-		public override void Update(float delta)
+		protected override void OnRegister()
 		{
+			base.OnRegister();
 			if (IsAwoken) {
 				return;
 			}

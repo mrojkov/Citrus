@@ -63,18 +63,23 @@ namespace Lime
 
 		public virtual int Order => 0;
 
-		public void Register()
+		internal virtual void Register()
 		{
 			if (!registered) {
-				if (behaviorEarlyUpdateChecker.Value.IsMethodOverriden(GetType())) {
-					earlyBehaviorContainer = Owner.Components.GetOrAdd<LegacyEarlyBehaviorContainer>();
-					earlyBehaviorContainer.Add(this);
-				}
-				if (behaviorLateUpdateChecker.Value.IsMethodOverriden(GetType())) {
-					lateBehaviorContainer = Owner.Components.GetOrAdd<LegacyLateBehaviorContainer>();
-					lateBehaviorContainer.Add(this);
-				}
+				OnRegister();
 				registered = true;
+			}
+		}
+
+		protected virtual void OnRegister()
+		{
+			if (behaviorEarlyUpdateChecker.Value.IsMethodOverriden(GetType())) {
+				earlyBehaviorContainer = Owner.Components.GetOrAdd<LegacyEarlyBehaviorContainer>();
+				earlyBehaviorContainer.Add(this);
+			}
+			if (behaviorLateUpdateChecker.Value.IsMethodOverriden(GetType())) {
+				lateBehaviorContainer = Owner.Components.GetOrAdd<LegacyLateBehaviorContainer>();
+				lateBehaviorContainer.Add(this);
 			}
 		}
 
