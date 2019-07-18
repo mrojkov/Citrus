@@ -15,6 +15,8 @@ namespace Tangerine.UI.Timeline
 		private static Marker copiedMarker;
 		private static List<Marker> copiedMarkers;
 
+		private static ITexture warningIcon = null;
+
 		public Rulerbar()
 		{
 			RootWidget = new Widget {
@@ -37,6 +39,7 @@ namespace Tangerine.UI.Timeline
 			RootWidget.AddChangeWatcher(() => Document.Current.Container, (value) => {
 				upperMarker = null;
 			});
+			warningIcon = IconPool.GetTexture("Inspector.Warning");
 		}
 
 		void RootWidget_DoubleClick(WidgetInput input, Key key)
@@ -108,7 +111,15 @@ namespace Tangerine.UI.Timeline
 			r.AY = r.BY - 5;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
 			Renderer.DrawRectOutline(r.A, r.B, ColorTheme.Current.TimelineRuler.MarkerBorder);
-			if (!string.IsNullOrWhiteSpace(marker.Id)) {
+			if (
+				marker.Action == MarkerAction.Jump &&
+				(string.IsNullOrEmpty(marker.JumpTo) || (!string.IsNullOrEmpty(marker.Id) && (marker.Id == marker.JumpTo)))
+			) {
+				var size = new Vector2(RootWidget.Height, RootWidget.Height);
+				var pos = new Vector2(r.Left - (size.X - r.Size.X) / 2.0f, r.Bottom - RootWidget.Height - 2);
+				Renderer.DrawSprite(warningIcon, Color4.White, pos, size, Vector2.Zero, Vector2.One);
+			}
+			else if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = Theme.Metrics.TextHeight;
 				var padding = new Thickness { Left = 3.0f, Right = 5.0f, Top = 1.0f, Bottom = 1.0f };
 				var extent = FontPool.Instance.DefaultFont.MeasureTextLine(marker.Id, h, 0.0f);

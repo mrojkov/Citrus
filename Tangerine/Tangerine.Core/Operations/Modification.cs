@@ -802,9 +802,8 @@ namespace Tangerine.Core.Operations
 							continue;
 						}
 						removedJumpToMarkers.Insert(0, marker);
-						Document.Current.Animation.Markers.RemoveAt(i);
+						marker.JumpTo = null;
 					}
-
 					op.Save(new Backup(removedJumpToMarkers));
 				}
 			}
@@ -817,7 +816,7 @@ namespace Tangerine.Core.Operations
 				if (op.Find(out backup)) {
 					backup = op.Restore<Backup>();
 					foreach (var marker in backup.RemovedJumpToMarkers) {
-						Document.Current.Animation.Markers.AddOrdered(marker);
+						marker.JumpTo = op.marker.Id;
 					}
 				}
 			}
