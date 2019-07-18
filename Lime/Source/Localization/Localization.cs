@@ -6,31 +6,31 @@ using Foundation;
 namespace Lime
 {
 	/// <summary>
-	/// Класс, предоставляющий функции локализации
+	/// РљР»Р°СЃСЃ, РїСЂРµРґРѕСЃС‚Р°РІР»СЏСЋС‰РёР№ С„СѓРЅРєС†РёРё Р»РѕРєР°Р»РёР·Р°С†РёРё
 	/// </summary>
 	public static class Localization
 	{
 		/// <summary>Default dictionaries path relative to project assets directory.</summary>
-		public const string DictionariesPath = "Localization";
+		public static string DictionariesPath = "Localization";
 
 		private static bool useNumericKeys;
 
 		/// <summary>
-		/// Устаревший. Использовать только для совместимости со старыми проектами.
-		/// Раньше в словаре в качестве ключей использовались числа. Сейчас - вся строка. Этот флаг включает старый режим
+		/// РЈСЃС‚Р°СЂРµРІС€РёР№. РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃРѕ СЃС‚Р°СЂС‹РјРё РїСЂРѕРµРєС‚Р°РјРё.
+		/// Р Р°РЅСЊС€Рµ РІ СЃР»РѕРІР°СЂРµ РІ РєР°С‡РµСЃС‚РІРµ РєР»СЋС‡РµР№ РёСЃРїРѕР»СЊР·РѕРІР°Р»РёСЃСЊ С‡РёСЃР»Р°. РЎРµР№С‡Р°СЃ - РІСЃСЏ СЃС‚СЂРѕРєР°. Р­С‚РѕС‚ С„Р»Р°Рі РІРєР»СЋС‡Р°РµС‚ СЃС‚Р°СЂС‹Р№ СЂРµР¶РёРј
 		/// </summary>
 		public static bool UseNumericKeys { get { return useNumericKeys; } set { useNumericKeys = value; } }
 
 		public static bool DebugKeys { get; set; }
 		/// <summary>
-		/// Текущий словарь локализации
+		/// РўРµРєСѓС‰РёР№ СЃР»РѕРІР°СЂСЊ Р»РѕРєР°Р»РёР·Р°С†РёРё
 		/// </summary>
 		public static LocalizationDictionary Dictionary = new LocalizationDictionary();
 
 		/// <summary>
-		/// Возвращает две буквы для имени текущего языка.
-		/// Например "en" для English, "es" для Spanish, "de" для Deutch и т.п.
-		/// Для более подробной информации см ссылку (особенно раздел 639-1)
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РґРІРµ Р±СѓРєРІС‹ РґР»СЏ РёРјРµРЅРё С‚РµРєСѓС‰РµРіРѕ СЏР·С‹РєР°.
+		/// РќР°РїСЂРёРјРµСЂ "en" РґР»СЏ English, "es" РґР»СЏ Spanish, "de" РґР»СЏ Deutch Рё С‚.Рї.
+		/// Р”Р»СЏ Р±РѕР»РµРµ РїРѕРґСЂРѕР±РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё СЃРј СЃСЃС‹Р»РєСѓ (РѕСЃРѕР±РµРЅРЅРѕ СЂР°Р·РґРµР» 639-1)
 		/// http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 		/// </summary>
 		public static string GetCurrentLanguage()
@@ -60,7 +60,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает локализованную строку из текущего словаря по ее ключу
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р»РѕРєР°Р»РёР·РѕРІР°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РёР· С‚РµРєСѓС‰РµРіРѕ СЃР»РѕРІР°СЂСЏ РїРѕ РµРµ РєР»СЋС‡Сѓ
 		/// </summary>
 		public static string GetString(string format, params object[] args)
 		{
@@ -74,7 +74,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает локализованную строку из текущего словаря по ее ключу
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р»РѕРєР°Р»РёР·РѕРІР°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РёР· С‚РµРєСѓС‰РµРіРѕ СЃР»РѕРІР°СЂСЏ РїРѕ РµРµ РєР»СЋС‡Сѓ
 		/// </summary>
 		public static string GetString(string key)
 		{
