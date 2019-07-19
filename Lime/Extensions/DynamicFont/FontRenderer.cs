@@ -5,7 +5,7 @@ using SharpFont.TrueType;
 
 namespace Lime
 {
-	internal class FontRenderer : IDisposable
+	public class FontRenderer : IDisposable
 	{
 		public class Glyph
 		{
@@ -28,7 +28,7 @@ namespace Lime
 		private Face face;
 		private Library library;
 		private int lastHeight;
-		private bool lcdSupported;
+		public bool LcdSupported { get; set; } = true;
 		/// <summary>
 		/// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
 		/// so the visual font height for the same fontHeight will be different for different ttf files.
@@ -42,16 +42,16 @@ namespace Lime
 			library = new Library();
 			face = library.NewMemoryFace(fontData, 0);
 #if SUBPIXEL_TEXT
-			lcdSupported = true;
+			LcdSupported = true;
 			try {
 				// can not use any other filtration to achive a windows like look, 
 				// becouse filtering creates wrong spacing between chars, and no visible way to correct it
 				library.SetLcdFilter(LcdFilter.None);
 			} catch (FreeTypeException) {
-				lcdSupported = false;
+				LcdSupported = false;
 			}
 #else
-			lcdSupported = false;
+			LcdSupported = false;
 #endif
 		}
 
@@ -83,8 +83,8 @@ namespace Lime
 				return null;
 			}
 
-			face.LoadGlyph(glyphIndex, LoadFlags.Default, lcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
-			face.Glyph.RenderGlyph(lcdSupported ? RenderMode.Lcd : RenderMode.Normal);
+			face.LoadGlyph(glyphIndex, LoadFlags.Default, LcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
+			face.Glyph.RenderGlyph(LcdSupported ? RenderMode.Lcd : RenderMode.Normal);
 			FTBitmap bitmap = face.Glyph.Bitmap;
 
 			var verticalOffset = height - face.Glyph.BitmapTop + face.Size.Metrics.Descender.Round();

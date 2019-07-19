@@ -34,10 +34,22 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calamansi.cs" />
+    <Compile Include="CalamansiCharCache.cs" />
+    <Compile Include="CalamansiConfig.cs" />
+    <Compile Include="CalamansiFont.cs" />
+    <Compile Include="CalamansiFontCharCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SDFConverter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Yuzu\Yuzu.Win.csproj">
+      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
+      <Name>Yuzu.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Lime.Win.csproj">
+      <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DynamicFont\DynamicFont.Win.csproj">
       <Project>{fe8512bc-7a55-425c-8bc1-ad4d9785cf12}</Project>
       <Name>DynamicFont.Win</Name>
