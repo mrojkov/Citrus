@@ -6,6 +6,8 @@ namespace Lime
 	[TangerineAllowedParentTypes(typeof(DistortionMesh))]
 	public class DistortionMeshPoint : PointObject
 	{
+		private Vector2 offset;
+
 		[YuzuMember]
 		public Color4 Color { get; set; }
 
@@ -13,17 +15,21 @@ namespace Lime
 		public Vector2 UV { get; set; }
 
 		[YuzuMember]
-		public override Vector2 Offset { get; set; }
+		public override Vector2 Offset
+		{
+			get => offset;
+			set
+			{
+				if (offset != value) {
+					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					offset = value;
+				}
+			}
+		}
 
 		public DistortionMeshPoint()
 		{
 			Color = Color4.White;
-		}
-
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-			(Parent as Widget)?.ExpandBoundingRect(TransformedPosition);
 		}
 	}
 }
