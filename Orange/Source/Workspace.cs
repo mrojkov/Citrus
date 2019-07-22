@@ -192,6 +192,7 @@ namespace Orange
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 			pluginName = ProjectJson.GetValue("Plugin", "");
 			citrusLocation = ProjectJson.GetValue("CitrusLocation", string.Empty);
+			Lime.Localization.DictionariesPath = ProjectJson.GetValue<string>("DictionariesPath", null) ?? Lime.Localization.DictionariesPath;
 
 			foreach (var target in ProjectJson.GetArray("Targets", new Dictionary<string, object>[0])) {
 				var cleanBeforeBuild = false;
