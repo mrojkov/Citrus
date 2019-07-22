@@ -95,6 +95,15 @@ namespace Tangerine.UI
 		public static readonly ICommand ClearCache = new Command("Clear cache");
 		public static readonly ICommand PurgeBackups = new Command("Purge Backups");
 		public static readonly ICommand ResetGlobalSettings = new Command("Reset global settings");
+		public static readonly ICommand Overlay1 = new Command("Overlay 1", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number1));
+		public static readonly ICommand Overlay2 = new Command("Overlay 2", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number2));
+		public static readonly ICommand Overlay3 = new Command("Overlay 3", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number3));
+		public static readonly ICommand Overlay4 = new Command("Overlay 4", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number4));
+		public static readonly ICommand Overlay5 = new Command("Overlay 5", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number5));
+		public static readonly ICommand Overlay6 = new Command("Overlay 6", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number6));
+		public static readonly ICommand Overlay7 = new Command("Overlay 7", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number7));
+		public static readonly ICommand Overlay8 = new Command("Overlay 8", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number8));
+		public static readonly ICommand Overlay9 = new Command("Overlay 9", new Shortcut(Modifiers.Shift | Modifiers.Control, Key.Number9));
 	}
 
 	public static class SceneViewCommands

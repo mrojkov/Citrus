@@ -40,7 +40,7 @@ namespace Tangerine.Core
 		public delegate void HandleMissingDocumentsDelegate(IEnumerable<Document> missingDocuments);
 		public static HandleMissingDocumentsDelegate HandleMissingDocuments;
 		public static TaskList Tasks { get; set; }
-		public Dictionary<string, Widget> Overlays { get; } = new Dictionary<string, Widget>();
+		public SortedDictionary<string, Widget> Overlays { get; } = new SortedDictionary<string, Widget>();
 		public ProjectPreferences Preferences { get; private set; } = new ProjectPreferences();
 		public ProjectUserPreferences UserPreferences { get; private set; } = new ProjectUserPreferences();
 		public IReadOnlyList<Type> RegisteredNodeTypes => registeredNodeTypes;

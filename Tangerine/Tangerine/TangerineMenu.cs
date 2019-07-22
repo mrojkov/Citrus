@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lime;
 using Orange;
@@ -358,15 +359,21 @@ namespace Tangerine
 			}
 		}
 
-		private static void AddOverlaysCommands(Dictionary<string, Widget> overlays)
+		private static void AddOverlaysCommands(SortedDictionary<string, Widget> overlays)
 		{
+			var commands = new List<ICommand>(overlays.Count) {
+				GenericCommands.Overlay1, GenericCommands.Overlay2, GenericCommands.Overlay3,
+				GenericCommands.Overlay4, GenericCommands.Overlay5, GenericCommands.Overlay6,
+				GenericCommands.Overlay7, GenericCommands.Overlay8, GenericCommands.Overlay9
+			};
+			int lastIndex = 0;
 			foreach (var overlayPair in overlays) {
-				Command command;
-				overlayPair.Value.Components.Add(new NodeCommandComponent {
-					Command = (command = new Command(overlayPair.Key))
-				});
+				var command = lastIndex < 9 ? commands[lastIndex] : new Command(overlayPair.Key);
+				overlayPair.Value.Components.Add(new NodeCommandComponent { Command = command });
 				overlaysMenu.Add(command);
-				CommandHandlerList.Global.Connect(command, new OverlayToggleCommandHandler(overlayPair.Key));
+				var commandHandler = new OverlayToggleCommandHandler(overlayPair.Key);
+				CommandHandlerList.Global.Connect(command, commandHandler);
+				lastIndex++;
 			}
 		}
 
@@ -406,8 +413,13 @@ namespace Tangerine
 		{
 			private readonly string overlayName;
 
-			public override bool GetChecked() => ProjectUserPreferences.Instance
-				.DisplayedOverlays.Contains(overlayName);
+			public override bool GetChecked()
+			{
+				if (overlayName == null) {
+					return false;
+				}
+				return ProjectUserPreferences.Instance.DisplayedOverlays.Contains(overlayName);
+			}
 
 			public OverlayToggleCommandHandler(string overlayName)
 			{
@@ -416,6 +428,9 @@ namespace Tangerine
 
 			public override void ExecuteTransaction()
 			{
+				if (overlayName == null) {
+					return;
+				}
 				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedOverlays.Contains(overlayName)) {
 					prefs.DisplayedOverlays.Remove(overlayName);
