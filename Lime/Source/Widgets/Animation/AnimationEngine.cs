@@ -268,7 +268,7 @@ namespace Lime
 			animation.EffectiveAnimatorsVersion = animation.Owner.DescendantAnimatorsVersion;
 			AddEffectiveAnimatorsRecursively(animation.Owner);
 
-			if (!animation.IsLegacy) {
+			if (!animation.IsLegacy && animation.ApplyZeroPose) {
 				var animatorBindings = new HashSet<AnimatorBinding>();
 				foreach (var a in animation.EffectiveAnimators) {
 					animatorBindings.Add(new AnimatorBinding(a));

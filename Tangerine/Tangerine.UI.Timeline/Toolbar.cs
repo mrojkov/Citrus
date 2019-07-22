@@ -28,6 +28,7 @@ namespace Tangerine.UI.Timeline
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
 					CreateFrameProgressionButton(),
+					CreateApplyZeroPoseButton(),
 					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
@@ -158,6 +159,18 @@ namespace Tangerine.UI.Timeline
 			});
 			button.Components.Add(new DocumentationComponent("LockAnimation"));
 			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
+			return button;
+		}
+
+		ToolbarButton CreateApplyZeroPoseButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ApplyZeroPose")) { Tip = "Apply zero pose" };
+			button.AddTransactionClickHandler(() => {
+				Core.Operations.SetProperty.Perform(Document.Current.Animation, nameof(Animation.ApplyZeroPose), !Document.Current.Animation.ApplyZeroPose);
+			});
+			button.AddChangeWatcher(() => Document.Current.Animation.ApplyZeroPose, i => button.Checked = i);
+			button.Components.Add(new DocumentationComponent("ApplyZeroPose"));
+			button.AddChangeWatcher(() => !Document.Current.Animation.IsLegacy && !Document.Current.Animation.IsCompound, v => button.Visible = v);
 			return button;
 		}
 
