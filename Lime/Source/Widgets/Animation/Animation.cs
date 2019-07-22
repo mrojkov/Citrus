@@ -16,6 +16,7 @@ namespace Lime
 		private bool isRunning;
 		private bool animatorsArePropagated;
 		private bool? hasEasings;
+		private bool applyZeroPose = true;
 		internal Animation Next;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
@@ -56,6 +57,19 @@ namespace Lime
 		[YuzuMember]
 		[TangerineIgnore]
 		public bool IsLegacy { get; set; }
+
+		[YuzuMember]
+		public bool ApplyZeroPose
+		{
+			get => applyZeroPose;
+			set
+			{
+				if (applyZeroPose != value) {
+					applyZeroPose = value;
+					EffectiveAnimators = null;
+				}
+			}
+		}
 
 		[YuzuMember]
 		public string ContentsPath { get; set; }
