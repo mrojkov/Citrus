@@ -26,6 +26,7 @@ namespace Tangerine
 
 		private TangerineApp(string[] args)
 		{
+			ChangeTangerineSettingsFolderIfNeed();
 			Orange.UserInterface.Instance = new OrangeInterface();
 			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
@@ -352,6 +353,34 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
+		}
+
+		private void ChangeTangerineSettingsFolderIfNeed()
+		{
+			string appdataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+			string tangerineOldPath = Path.Combine(appdataPath, "Tangerine");
+			string tangerineNewPath = Path.Combine(appdataPath, "Game Forest", "Tangerine");
+			// if the Tangerine folder exists in %APPDATA%\Roaming\Tangerine
+			// then move it to the %APPDATA%\Roaming\Game Forest\Tangerine folder
+			if (Directory.Exists(tangerineOldPath) && !Directory.Exists(tangerineNewPath)) {
+				var dirSource = new DirectoryInfo(tangerineOldPath);
+				var dirTarget = new DirectoryInfo(tangerineNewPath);
+				CopyAllFilesRecursively(dirSource, dirTarget);
+				Directory.Delete(tangerineOldPath, true);
+			}
+		}
+
+		private void CopyAllFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+		{
+			Directory.CreateDirectory(target.FullName);
+			foreach (FileInfo fi in source.GetFiles()) {
+				fi.MoveTo(Path.Combine(target.FullName, fi.Name));
+			}
+			foreach (DirectoryInfo diSourceSubDir in source.GetDirectories()) {
+				DirectoryInfo nextTargetSubDir =
+					target.CreateSubdirectory(diSourceSubDir.Name);
+				CopyAllFilesRecursively(diSourceSubDir, nextTargetSubDir);
+			}
 		}
 
 		private List<Document> missingDocumentsList = new List<Document>();
