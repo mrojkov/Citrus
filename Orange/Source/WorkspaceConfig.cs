@@ -34,6 +34,9 @@ namespace Orange
 		[YuzuOptional]
 		public bool BenchmarkEnabled;
 
+		[YuzuOptional]
+		public bool BundlePickerVisible = false;
+
 		public static string GetDataPath()
 		{
 			var name = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;

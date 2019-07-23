@@ -12,7 +12,9 @@ namespace Orange
 	{
 		private readonly Window window;
 		private readonly WindowWidget windowWidget;
+		private Widget hBox;
 		private Widget mainVBox;
+		private Widget bundlePicker;
 		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
@@ -24,10 +26,11 @@ namespace Orange
 		private ProgressBarField progressBarField;
 		private ICommand actionsCommand;
 
-		private Command CacheLocalAndRemote;
-		private Command CacheRemote;
-		private Command CacheLocal;
-		private Command CacheNone;
+		private Command cacheLocalAndRemote;
+		private Command cacheRemote;
+		private Command cacheLocal;
+		private Command cacheNone;
+		private Command bundlePickerCommand;
 
 		public OrangeInterface()
 		{
@@ -49,6 +52,11 @@ namespace Orange
 				Padding = new Thickness(6),
 				Size = windowSize
 			};
+			hBox = new Widget {
+				Layout = new HBoxLayout {
+					Spacing = 6
+				}
+			};
 			mainVBox = new Widget {
 				Layout = new VBoxLayout {
 					Spacing = 6
@@ -59,17 +67,30 @@ namespace Orange
 			progressBarField = new ProgressBarField();
 			mainVBox.AddNode(progressBarField);
 			mainVBox.AddNode(CreateFooterSection());
-			windowWidget.AddNode(mainVBox);
+			hBox.AddNode(mainVBox);
+			bundlePicker = BundlePicker.CreateBundlePicker();
+			hBox.AddNode(bundlePicker);
+			windowWidget.AddNode(hBox);
+			CreateMenu();
+		}
 
+		private void CreateMenu()
+		{
 			// TODO Duplicates code from Tangerine.TangerineMenu.cs. Both should be presented at one file
-			CacheLocalAndRemote = new Command("Local &and remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local | AssetCacheMode.Remote));
-			CacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
-			CacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
-			CacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
+			cacheLocalAndRemote = new Command("Local &and remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local | AssetCacheMode.Remote));
+			cacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
+			cacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
+			cacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
+			bundlePickerCommand = new Command("&Bundle picker", () => UpdateBundlePicker(!bundlePicker.Visible));
 
 			Application.MainMenu = new Menu {
 				new Command("&File", new Menu {
 					new Command("&Quit", () => { Application.Exit(); })
+				}),
+				new Command("&View", new Menu {
+					new Command("&Panels", new Menu {
+						bundlePickerCommand
+					})
 				}),
 				(actionsCommand = new Command("&Actions", new Menu { })),
 				new Command("&Cache", new Menu {
@@ -81,10 +102,10 @@ namespace Orange
 						))
 					}),
 					new Command("&Mode", new Menu {
-						CacheLocalAndRemote,
-						CacheRemote,
-						CacheLocal,
-						CacheNone
+						cacheLocalAndRemote,
+						cacheRemote,
+						cacheLocal,
+						cacheNone
 					})
 				})
 			};
@@ -93,10 +114,10 @@ namespace Orange
 		// TODO Duplicates code from Tangerine.OrangeInterface.cs. Both should be presented at one file
 		private void UpdateCacheModeCheckboxes(AssetCacheMode state)
 		{
-			CacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
-			CacheRemote.Checked = state == AssetCacheMode.Remote;
-			CacheLocal.Checked = state == AssetCacheMode.Local;
-			CacheNone.Checked = state == AssetCacheMode.None;
+			cacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
+			cacheRemote.Checked = state == AssetCacheMode.Remote;
+			cacheLocal.Checked = state == AssetCacheMode.Local;
+			cacheNone.Checked = state == AssetCacheMode.None;
 			The.Workspace.AssetCacheMode = state;
 		}
 
@@ -214,6 +235,13 @@ namespace Orange
 			progressBarField.Progress(amount);
 		}
 
+		public void UpdateBundlePicker(bool value)
+		{
+			bundlePicker.Visible = value;
+			bundlePickerCommand.Checked = value;
+			The.Workspace.BundlePickerVisible = value;
+		}
+
 		private void Execute(Func<string> action)
 		{
 			windowWidget.Tasks.Add(ExecuteTask(action));
@@ -240,6 +268,7 @@ namespace Orange
 			goButton.Visible = value;
 			abortButton.Visible = !value;
 			EnableChildren(windowWidget, value);
+			hBox.Enabled = true;
 			mainVBox.Enabled = true;
 			EnableChildren(mainVBox, value);
 			footerSection.Enabled = true;
@@ -247,6 +276,8 @@ namespace Orange
 			abortButton.Enabled = !value;
 			textView.Enabled = true;
 			progressBarField.Enabled = true;
+			bundlePicker.Enabled = true;
+			EnableChildren(bundlePicker, value);
 		}
 
 		private void EnableChildren(Widget widget, bool value)
@@ -363,6 +394,7 @@ namespace Orange
 		public override void SaveToWorkspaceConfig(ref WorkspaceConfig config)
 		{
 			config.ActiveTargetIndex = platformPicker.Index;
+			config.BundlePickerVisible = bundlePicker.Visible;
 			if (window.State != WindowState.Minimized) {
 				config.ClientPosition = window.ClientPosition;
 				config.ClientSize = window.ClientSize;
@@ -390,6 +422,7 @@ namespace Orange
 				window.ClientSize = config.ClientSize;
 			}
 			UpdateCacheModeCheckboxes(config.AssetCacheMode);
+			UpdateBundlePicker(config.BundlePickerVisible);
 		}
 
 		private class TextViewWriter : TextWriter

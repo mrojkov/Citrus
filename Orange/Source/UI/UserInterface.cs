@@ -32,6 +32,7 @@ namespace Orange
 		public abstract void StopProgressBar();
 		public abstract void SetupProgressBar(int maxPosition);
 		public abstract void IncreaseProgressBar(int amount = 1);
+		public virtual void CreateBundlesList() => BundlePicker.CreateBundlesList();
 
 		public virtual void ExitWithErrorIfPossible() { }
 
