@@ -369,6 +369,7 @@ namespace Tangerine
 			int lastIndex = 0;
 			foreach (var overlayPair in overlays) {
 				var command = lastIndex < 9 ? commands[lastIndex] : new Command(overlayPair.Key);
+				command.Text = overlayPair.Key;
 				overlayPair.Value.Components.Add(new NodeCommandComponent { Command = command });
 				overlaysMenu.Add(command);
 				var commandHandler = new OverlayToggleCommandHandler(overlayPair.Key);
@@ -413,24 +414,12 @@ namespace Tangerine
 		{
 			private readonly string overlayName;
 
-			public override bool GetChecked()
-			{
-				if (overlayName == null) {
-					return false;
-				}
-				return ProjectUserPreferences.Instance.DisplayedOverlays.Contains(overlayName);
-			}
+			public override bool GetChecked() => ProjectUserPreferences.Instance.DisplayedOverlays.Contains(overlayName);
 
-			public OverlayToggleCommandHandler(string overlayName)
-			{
-				this.overlayName = overlayName;
-			}
+			public OverlayToggleCommandHandler(string overlayName) => this.overlayName = overlayName;
 
 			public override void ExecuteTransaction()
 			{
-				if (overlayName == null) {
-					return;
-				}
 				var prefs = ProjectUserPreferences.Instance;
 				if (prefs.DisplayedOverlays.Contains(overlayName)) {
 					prefs.DisplayedOverlays.Remove(overlayName);
