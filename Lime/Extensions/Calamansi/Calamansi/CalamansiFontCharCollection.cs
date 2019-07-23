@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Lime;
 
 namespace Calamansi
@@ -10,20 +11,32 @@ namespace Calamansi
 		{
 			var chars = new CalamansiCharCache(config.Height, null, Textures);
 			foreach (var option in config.Options) {
+				ProcessOption(config, option);
+			}
+			foreach (var option in config.AlwaysInclude) {
+				ProcessOption(config, option);
+			}
+			void ProcessOption(CalamansiConfig cfg, CalamansiConfig.CalamansiOption option)
+			{
 				var fontData = File.ReadAllBytes(AssetPath.Combine(assetDirectory, option.Font));
 				var fontRenderer = new FontRenderer(fontData) { LcdSupported = false };
 				chars.FontRenderer = fontRenderer;
-				chars.HPadding = chars.VPadding = config.Padding;
+				chars.HPadding = chars.VPadding = cfg.Padding;
+				var exclude = cfg.AlwaysExclude.FirstOrDefault(o => o.Font == option.Font);
 				foreach (var c in option.Charset) {
-					var fontChar = chars.Get(c);
-					if (config.SDF) {
-						fontChar.ACWidths *= config.SDFScale;
-						fontChar.Height *= config.SDFScale;
-						fontChar.Width *= config.SDFScale;
+					if (exclude != null && exclude.Charset.Contains(c)) {
+						continue;
 					}
-					((ICollection<FontChar>) this).Add(fontChar);
+					var fontChar = chars.Get(c);
+					if (cfg.SDF) {
+						fontChar.ACWidths *= cfg.SDFScale;
+						fontChar.Height *= cfg.SDFScale;
+						fontChar.Width *= cfg.SDFScale;
+					}
+					((ICollection<FontChar>)this).Add(fontChar);
 				}
 			}
+
 		}
 	}
 }

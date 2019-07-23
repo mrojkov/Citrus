@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -5,7 +6,7 @@ namespace Calamansi
 {
 	public class CalamansiConfig
 	{
-		public class CalamansiOptions
+		public class CalamansiOption
 		{
 			[YuzuMember]
 			public string Font { get; set; }
@@ -14,7 +15,11 @@ namespace Calamansi
 		}
 
 		[YuzuMember]
-		public readonly List<CalamansiOptions> Options = new List<CalamansiOptions>();
+		public readonly List<CalamansiOption> Options = new List<CalamansiOption>();
+		[YuzuMember]
+		public List<CalamansiOption> AlwaysInclude = new List<CalamansiOption>();
+		[YuzuMember]
+		public List<CalamansiOption> AlwaysExclude= new List<CalamansiOption>();
 		[YuzuMember]
 		public int Height { get; set; }
 		[YuzuMember]
