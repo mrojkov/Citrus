@@ -11,13 +11,15 @@ namespace Orange.Source.Actions
 	public static class GenerateFonts
 	{
 		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
-		[ExportMetadata("Label", "Generate Fonts")]
+		[ExportMetadata("Label", "Invalidate Fonts")]
 		public static string GenerateFontsAction()
 		{
 			foreach (var configPath in EnumerateFontConfigs(AssetPath.Combine(The.Workspace.AssetsDirectory, "Fonts/"))) {
 				Console.WriteLine($"Processing {configPath}..");
 				try {
 					var config = Lime.Yuzu.Instance.Value.ReadObjectFromFile<CalamansiConfig>(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath));
+					Calamansi.Calamansi.UpdateMainCharset(config, The.Workspace.AssetsDirectory);
+					Lime.Yuzu.Instance.Value.WriteObjectToFile(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath), config, Serialization.Format.JSON);
 					var font = new CalamansiFont(config, The.Workspace.AssetsDirectory);
 					font.SaveAsTft(Path.ChangeExtension(configPath, null), The.Workspace.AssetsDirectory);
 				} catch (Exception e) {

@@ -15,6 +15,8 @@ namespace Calamansi
 		}
 
 		[YuzuMember]
+		public string Localization;
+		[YuzuMember]
 		public CalamansiOption Main;
 		[YuzuMember]
 		public List<CalamansiOption> AlwaysInclude = new List<CalamansiOption>();
