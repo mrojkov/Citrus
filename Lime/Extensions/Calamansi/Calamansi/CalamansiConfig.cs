@@ -8,14 +8,14 @@ namespace Calamansi
 	{
 		public class CalamansiOption
 		{
-			[YuzuMember]
+			[YuzuOptional]
 			public string Font { get; set; }
 			[YuzuMember]
 			public string Charset { get; set; }
 		}
 
 		[YuzuMember]
-		public readonly List<CalamansiOption> Options = new List<CalamansiOption>();
+		public CalamansiOption Main;
 		[YuzuMember]
 		public List<CalamansiOption> AlwaysInclude = new List<CalamansiOption>();
 		[YuzuMember]
