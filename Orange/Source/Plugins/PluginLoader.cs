@@ -10,8 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Lime;
-using Action = System.Action;
-using Exception = System.Exception;
+using Newtonsoft.Json.Linq;
 
 namespace Orange
 {
@@ -85,6 +84,11 @@ namespace Orange
 			"^(Lime|System.*|mscorlib.*|Microsoft.*)",
 			RegexOptions.Compiled
 		);
+		private const string PluginsField = "PluginAssemblies";
+		private const string OrangeAndTangerineField = "OrangeAndTangerine";
+		private const string OrangeField = "Orange";
+		private const string TangerineField = "Tangerine";
+
 		static PluginLoader()
 		{
 			AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
@@ -127,62 +131,48 @@ namespace Orange
 			CurrentPlugin = new OrangePlugin();
 			ResetPlugins();
 			try {
-				var orangePluginAssemblies = The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies");
-				if (orangePluginAssemblies == null) {
-					var msg = "Warning: Field 'OrangePluginAssemblies' not found in " + citrusProjectFile;
-					The.UI.ShowError(msg);
-					Console.WriteLine(msg);
-				} else if (orangePluginAssemblies.Length == 0) {
-					Console.WriteLine("Warning: Field 'OrangePluginAssemblies' in " + citrusProjectFile + " is empty");
-				} else {
-					foreach (var path in The.Workspace.ProjectJson.GetArray<string>("OrangePluginAssemblies")) {
-						if (!path.Contains("$CONFIGURATION")) {
-							Console.WriteLine(
-								"Warning: Using '$CONFIGURATION' instead of 'Debug' or 'Release' in dll path" +
-								$" is strictly recommended ($CONFIGURATION line not found in {path}");
-						}
-						var assemblyPath = path.Replace("$CONFIGURATION", pluginConfiguration);
-#if TANGERINE
-						assemblyPath = assemblyPath.Replace("$HOST_APPLICATION", "Tangerine");
-#else
-						assemblyPath = assemblyPath.Replace("$HOST_APPLICATION", "Orange");
-#endif
-						var absPath = Path.Combine(The.Workspace.ProjectDirectory, assemblyPath);
-						if (!File.Exists(absPath)) {
-							var msg = "File not found on attempt to import OrangePluginAssemblies: " + absPath;
-							The.UI.ShowError(msg);
-							throw new FileNotFoundException(msg);
-						}
-
-						var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-						if (!TryFindDomainAssembliesByPath(domainAssemblies, absPath, out var assembly)) {
-							var assemblyName = AssemblyName.GetAssemblyName(absPath);
-							TryFindDomainAssembliesByName(domainAssemblies, assemblyName.Name, out assembly);
-						}
-						try {
-							if (assembly == null) {
-								assembly = LoadAssembly(absPath);
-							}
-							catalog.Catalogs.Add(new AssemblyCatalog(assembly));
-						} catch (ReflectionTypeLoadException e) {
-							var msg = "Failed to import OrangePluginAssemblies: " + absPath;
-							foreach (var loaderException in e.LoaderExceptions) {
-								msg += $"\n{loaderException}";
-							}
-							The.UI.ShowError(msg);
-							throw new Exception(msg);
-						} catch (Exception e) {
-							var msg = $"Unhandled exception while importing OrangePluginAssemblies: {absPath}\n{e}";
-							The.UI.ShowError(msg);
-							throw new Exception(msg);
-						}
-						resolvedAssemblies[assembly.GetName().Name] = assembly;
-					}
+				The.Workspace.ProjectJson.JObject.TryGetValue(PluginsField, out var token);
+				if (token == null) {
+					throw new KeyNotFoundException($"Warning: Field '{PluginsField}' not found in {citrusProjectFile}");
 				}
+				(token as JObject).TryGetValue(OrangeAndTangerineField, out token);
+				if (token == null) {
+					throw new KeyNotFoundException($"Warning: Field '{OrangeAndTangerineField}' not found in '{PluginsField}' in {citrusProjectFile}");
+				}
+				var orangeAndTangerine = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{OrangeAndTangerineField}");
+				foreach (var path in orangeAndTangerine) {
+					TryLoadAssembly(path, pluginConfiguration);
+				}
+#if TANGERINE
+				var tangerine = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{TangerineField}");
+				if (tangerine != null) {
+					foreach (var path in tangerine) {
+						TryLoadAssembly(path, pluginConfiguration);
+					}
+					if (tangerine.Length > 0) {
+						Console.WriteLine("Tangerine specific assemblies loaded successfully");
+					}
+				} else {
+					Console.WriteLine($"WARNING: Field '{TangerineField}' not found in '{PluginsField}' in {citrusProjectFile}");
+				}
+#else
+				var orange = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{OrangeField}");
+				if (orange != null) {
+					foreach (var path in orange) {
+						TryLoadAssembly(path, pluginConfiguration);
+					}
+					if (orange.Length > 0) {
+						Console.WriteLine("Orange specific assemblies loaded successfully");
+					}
+				} else {
+					Console.WriteLine($"WARNING: Field '{OrangeField}' not found in '{PluginsField}' in {citrusProjectFile}");
+				}
+#endif
 				ValidateComposition();
 			} catch (BadImageFormatException e) {
 				Console.WriteLine(e.Message);
 			} catch (System.Exception e) {
+				The.UI.ShowError(e.Message);
 				Console.WriteLine(e.Message);
 			}
 			CurrentPlugin?.Initialize?.Invoke();
@@ -196,6 +186,49 @@ namespace Orange
 				Orange.UserInterface.Instance.ShowError($"Failed to build Orange Plugin UI with an error: {e.Message}\n{e.StackTrace}");
 			}
 			The.MenuController.CreateAssemblyMenuItems();
+		}
+
+		private static void TryLoadAssembly(string path, string pluginConfiguration)
+		{
+			if (!path.Contains("$(CONFIGURATION)")) {
+				Console.WriteLine(
+					"Warning: Using '$(CONFIGURATION)' instead of 'Debug' or 'Release' in dll path" +
+					$" is strictly recommended ($(CONFIGURATION) line not found in {path}");
+			}
+			var assemblyPath = path.Replace("$(CONFIGURATION)", pluginConfiguration);
+#if TANGERINE
+			assemblyPath = assemblyPath.Replace("$(HOST_APPLICATION)", "Tangerine");
+#else
+			assemblyPath = assemblyPath.Replace("$(HOST_APPLICATION)", "Orange");
+#endif
+			var absPath = Path.Combine(The.Workspace.ProjectDirectory, assemblyPath);
+			if (!File.Exists(absPath)) {
+				throw new FileNotFoundException("File not found on attempt to import PluginAssemblies: " + absPath);
+			}
+
+			var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+			if (!TryFindDomainAssembliesByPath(domainAssemblies, absPath, out var assembly)) {
+				var assemblyName = AssemblyName.GetAssemblyName(absPath);
+				TryFindDomainAssembliesByName(domainAssemblies, assemblyName.Name, out assembly);
+			}
+			try {
+				if (assembly == null) {
+					assembly = LoadAssembly(absPath);
+				}
+				catalog.Catalogs.Add(new AssemblyCatalog(assembly));
+			}
+			catch (ReflectionTypeLoadException e) {
+				var msg = "Failed to import OrangePluginAssemblies: " + absPath;
+				foreach (var loaderException in e.LoaderExceptions) {
+					msg += $"\n{loaderException}";
+				}
+				throw new System.Exception(msg);
+			}
+			catch (System.Exception e) {
+				var msg = $"Unhandled exception while importing OrangePluginAssemblies: {absPath}\n{e}";
+				throw new System.Exception(msg);
+			}
+			resolvedAssemblies[assembly.GetName().Name] = assembly;
 		}
 
 		public static void AfterAssetUpdated(Lime.AssetBundle bundle, CookingRules cookingRules, string path)
@@ -288,7 +321,7 @@ namespace Orange
 				Type[] exportedTypes;
 				try {
 					exportedTypes = assembly.GetExportedTypes();
-				} catch (Exception) {
+				} catch (System.Exception) {
 					exportedTypes = null;
 				}
 				if (exportedTypes != null) {
