@@ -299,6 +299,8 @@
     <Compile Include="Source\Widgets\Animation\BezierEasing.cs" />
     <Compile Include="Source\Widgets\Materials\DissolveComponent.cs" />
     <Compile Include="Source\Widgets\Materials\DissolveMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\AlphaIntensityComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\AlphaIntensityMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
