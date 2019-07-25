@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	public enum TextureBlending
+	{
+		None,
+		Multiply,
+		CutOut
+	}
+
 	public class WidgetMaterial : IMaterial
 	{
 		private static Dictionary<int, WidgetMaterial> instanceCache = new Dictionary<int, WidgetMaterial>();
@@ -18,30 +25,33 @@ namespace Lime
 		public string Id { get; set; }
 		public int PassCount { get; private set; }
 
-		public static WidgetMaterial GetInstance(Blending blending, ShaderId shader, int numTextures, bool premulAlpha = false)
+		public static WidgetMaterial GetInstance(Blending blending, ShaderId shader, int numTextures, TextureBlending textureBlending = TextureBlending.Multiply, bool premulAlpha = false)
 		{
 			lock (instanceCache) {
-				var instanceKey = GetInstanceKey(blending, shader, numTextures, premulAlpha);
+				var instanceKey = GetInstanceKey(blending, shader, numTextures, textureBlending, premulAlpha);
 				WidgetMaterial instance;
 				if (!instanceCache.TryGetValue(instanceKey, out instance)) {
-					instance = new WidgetMaterial(blending, shader, numTextures, premulAlpha);
+					instance = new WidgetMaterial(blending, shader, numTextures, textureBlending, premulAlpha);
 					instanceCache.Add(instanceKey, instance);
 				}
 				return instance;
 			}
 		}
 
-		private static int GetInstanceKey(Blending blending, ShaderId shader, int numTextures, bool premulAlpha)
+		private static int GetInstanceKey(Blending blending, ShaderId shader, int numTextures, TextureBlending textureBlending, bool premulAlpha)
 		{
 			var premulAlphaFlag = premulAlpha ? 1 : 0;
-			return (int)blending | ((int)shader << 8) | (numTextures << 16) | (premulAlphaFlag << 24);
+			return (int)blending | ((int)shader << 8) | (numTextures << 16) | (premulAlphaFlag << 24) | ((int)textureBlending << 25);
 		}
 
-		private WidgetMaterial(Blending blending, ShaderId shader, int numTextures, bool premulAlpha)
+		private WidgetMaterial(Blending blending, ShaderId shader, int numTextures, TextureBlending textureBlending, bool premulAlpha)
 		{
 			PremulAlpha = premulAlpha || blending == Blending.Burn || blending == Blending.Darken;
-			ShaderProgram = ShaderPrograms.Instance.GetShaderProgram(shader, numTextures,
-				PremulAlpha ? ShaderOptions.PremultiplyAlpha : ShaderOptions.None);
+			var options = PremulAlpha ? ShaderOptions.PremultiplyAlpha : ShaderOptions.None;
+			if (textureBlending == TextureBlending.CutOut) {
+				options |= ShaderOptions.CutOutTextureBlending;
+			}
+			ShaderProgram = ShaderPrograms.Instance.GetShaderProgram(shader, numTextures, options);
 			Blending = blending;
 			PassCount = Blending == Blending.Glow || Blending == Blending.Darken ? 2 : 1;
 		}
