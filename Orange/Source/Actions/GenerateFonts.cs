@@ -19,7 +19,7 @@ namespace Orange.Source.Actions
 				try {
 					var config = Lime.Yuzu.Instance.Value.ReadObjectFromFile<CalamansiConfig>(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath));
 					Calamansi.Calamansi.UpdateMainCharset(config, The.Workspace.AssetsDirectory);
-					Lime.Yuzu.Instance.Value.WriteObjectToFile(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath), config, Serialization.Format.JSON);
+					config.SaveTo(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath));
 					var font = new CalamansiFont(config, The.Workspace.AssetsDirectory);
 					font.SaveAsTft(Path.ChangeExtension(configPath, null), The.Workspace.AssetsDirectory);
 				} catch (Exception e) {

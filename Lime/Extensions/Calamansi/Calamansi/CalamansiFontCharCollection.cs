@@ -5,7 +5,7 @@ using Lime;
 
 namespace Calamansi
 {
-	class CalamansiFontCharCollection : FontCharCollection
+	public class CalamansiFontCharCollection : FontCharCollection
 	{
 		public CalamansiFontCharCollection(CalamansiConfig config, string assetDirectory)
 		{
@@ -33,6 +33,7 @@ namespace Calamansi
 					}
 					((ICollection<FontChar>)this).Add(fontChar);
 				}
+				Calamansi.GenerateKerningPairs(this, fontRenderer, option.Charset);
 			}
 
 		}

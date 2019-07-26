@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Lime;
 using Yuzu;
 
 namespace Calamansi
@@ -30,5 +31,8 @@ namespace Calamansi
 		public bool SDF { get; set; }
 		[YuzuMember]
 		public float SDFScale { get; set; } = 0.25f;
+
+		public void SaveTo(string path) =>
+			Lime.Yuzu.Instance.Value.WriteObjectToFile(path, this, Serialization.Format.JSON);
 	}
 }
