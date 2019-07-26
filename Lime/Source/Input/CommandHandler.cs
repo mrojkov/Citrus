@@ -41,14 +41,16 @@ namespace Lime
 
 		public void ProcessCommands()
 		{
-			foreach (var i in items) {
-				if (!i.Command.IsConsumed()) {
-					i.Handler.RefreshCommand(i.Command);
-					if (i.Command.WasIssued()) {
-						i.Command.Consume();
-						i.Handler.Execute();
+			// We are not using foreach because collection might be modified on command execution
+			for (int i = 0; i < items.Count; i++) {
+				var item = items[i];
+				if (!item.Command.IsConsumed()) {
+					item.Handler.RefreshCommand(item.Command);
+					if (item.Command.WasIssued()) {
+						item.Command.Consume();
+						item.Handler.Execute();
 					} else {
-						i.Command.Consume();
+						item.Command.Consume();
 					}
 				}
 			}
