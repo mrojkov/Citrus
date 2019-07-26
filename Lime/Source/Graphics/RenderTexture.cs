@@ -35,6 +35,12 @@ namespace Lime
 
 		public RenderTexture(int width, int height, Format format = Format.R8G8B8A8_UNorm)
 		{
+			if (width <= 0) {
+				throw new ArgumentOutOfRangeException("width", "width must be greater than zero");
+			}
+			if (height <= 0) {
+				throw new ArgumentOutOfRangeException("height", "height must be greater than zero");
+			}
 			Format = format;
 			size.Width = width;
 			size.Height = height;
