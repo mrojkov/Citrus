@@ -111,6 +111,14 @@
     <Compile Include="CharCache.cs" />
     <Compile Include="DynamicFont.cs" />
     <Compile Include="FontRenderer.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Buffer.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Direction.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Font.cs" />
+    <Compile Include="SharpFont.HarfBuzz\GlyphInfo.cs" />
+    <Compile Include="SharpFont.HarfBuzz\GlyphPosition.cs" />
+    <Compile Include="SharpFont.HarfBuzz\HB.cs" />
+    <Compile Include="SharpFont.HarfBuzz\HB.Internal.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Script.cs" />
     <Compile Include="SharpFont\AutoHinterScript.cs" />
     <Compile Include="SharpFont\BBox.cs" />
     <Compile Include="SharpFont\Bdf\Internal\PropertyRec.cs" />
@@ -294,13 +302,26 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\3rdParty\FreeType\freetype6.dll">
-      <Link>freetype6.dll</Link>
+    <Content Include="..\..\..\3rdParty\FreeType\freetype-6.dll">
+      <Link>freetype-6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SharpFont\Properties\" />
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\iconv.dll">
+      <Link>iconv.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libglib-2.0-0.dll">
+      <Link>libglib-2.0-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libharfbuzz-0.dll">
+      <Link>libharfbuzz-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libintl-8.dll">
+      <Link>libintl-8.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

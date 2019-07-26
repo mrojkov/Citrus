@@ -51,10 +51,10 @@ namespace SharpFont
 		/// The result of ‘(a*b)/c’. This function never traps when trying to divide by zero; it simply returns
 		/// ‘MaxInt’ or ‘MinInt’ depending on the signs of ‘a’ and ‘b’.
 		/// </returns>
-		[Obsolete ("Use Fixed16Dot16.MultiplyDivide() instead.")]
-		public static Fixed16Dot16 MulDiv (Fixed16Dot16 a, Fixed16Dot16 b, Fixed16Dot16 c)
+		[Obsolete("Use Fixed16Dot16.MultiplyDivide() instead.")]
+		public static Fixed16Dot16 MulDiv(Fixed16Dot16 a, Fixed16Dot16 b, Fixed16Dot16 c)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_MulDiv ((IntPtr)a.Value, (IntPtr)b.Value, (IntPtr)c.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_MulDiv((IntPtr)a.Value, (IntPtr)b.Value, (IntPtr)c.Value));
 		}
 
 		/// <summary>
@@ -72,10 +72,10 @@ namespace SharpFont
 		/// <param name="a">The first multiplier.</param>
 		/// <param name="b">The second multiplier. Use a 16.16 factor here whenever possible (see note below).</param>
 		/// <returns>The result of ‘(a*b)/0x10000’.</returns>
-		[Obsolete ("Use Fixed16Dot16.MultiplyFix() instead.")]
-		public static Fixed16Dot16 MulFix (int a, Fixed16Dot16 b)
+		[Obsolete("Use Fixed16Dot16.MultiplyFix() instead.")]
+		public static Fixed16Dot16 MulFix(int a, Fixed16Dot16 b)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_MulFix ((IntPtr)a, (IntPtr)b.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_MulFix((IntPtr)a, (IntPtr)b.Value));
 		}
 
 		/// <summary>
@@ -89,10 +89,10 @@ namespace SharpFont
 		/// <param name="a">The first multiplier.</param>
 		/// <param name="b">The second multiplier. Use a 16.16 factor here whenever possible (see note below).</param>
 		/// <returns>The result of ‘(a*0x10000)/b’.</returns>
-		[Obsolete ("Use Fixed16Dot16.DivideFix() instead.")]
-		public static Fixed16Dot16 DivFix (int a, Fixed16Dot16 b)
+		[Obsolete("Use Fixed16Dot16.DivideFix() instead.")]
+		public static Fixed16Dot16 DivFix(int a, Fixed16Dot16 b)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_DivFix ((IntPtr)a, (IntPtr)b.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_DivFix((IntPtr)a, (IntPtr)b.Value));
 		}
 
 		/// <summary>
@@ -100,10 +100,10 @@ namespace SharpFont
 		/// </summary>
 		/// <param name="a">The number to be rounded.</param>
 		/// <returns>The result of ‘(a + 0x8000) &amp; -0x10000’.</returns>
-		[Obsolete ("Use Fixed16Dot16.RoundFix() instead.")]
-		public static Fixed16Dot16 RoundFix (Fixed16Dot16 a)
+		[Obsolete("Use Fixed16Dot16.RoundFix() instead.")]
+		public static Fixed16Dot16 RoundFix(Fixed16Dot16 a)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_RoundFix ((IntPtr)a.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_RoundFix((IntPtr)a.Value));
 		}
 
 		/// <summary>
@@ -111,10 +111,10 @@ namespace SharpFont
 		/// </summary>
 		/// <param name="a">The number for which the ceiling function is to be computed.</param>
 		/// <returns>The result of ‘(a + 0x10000 - 1) &amp; -0x10000’.</returns>
-		[Obsolete ("Use Fixed16Dot16.CeilingFix() instead.")]
-		public static Fixed16Dot16 CeilFix (Fixed16Dot16 a)
+		[Obsolete("Use Fixed16Dot16.CeilingFix() instead.")]
+		public static Fixed16Dot16 CeilFix(Fixed16Dot16 a)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_CeilFix ((IntPtr)a.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_CeilFix((IntPtr)a.Value));
 		}
 
 		/// <summary>
@@ -122,10 +122,10 @@ namespace SharpFont
 		/// </summary>
 		/// <param name="a">The number for which the floor function is to be computed.</param>
 		/// <returns>The result of ‘a &amp; -0x10000’.</returns>
-		[Obsolete ("Use Fixed16Dot16.FloorFix() instead.")]
-		public static Fixed16Dot16 FloorFix (Fixed16Dot16 a)
+		[Obsolete("Use Fixed16Dot16.FloorFix() instead.")]
+		public static Fixed16Dot16 FloorFix(Fixed16Dot16 a)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_FloorFix ((IntPtr)a.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_FloorFix((IntPtr)a.Value));
 		}
 
 		/// <summary>
@@ -136,10 +136,10 @@ namespace SharpFont
 		/// </remarks>
 		/// <param name="angle">The input angle.</param>
 		/// <returns>The sinus value.</returns>
-		[Obsolete ("Use Fixed16Dot16.Sin() instead.")]
-		public static Fixed16Dot16 Sin (Fixed16Dot16 angle)
+		[Obsolete("Use Fixed16Dot16.Sin() instead.")]
+		public static Fixed16Dot16 Sin(Fixed16Dot16 angle)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_Sin ((IntPtr)angle.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_Sin((IntPtr)angle.Value));
 		}
 
 		/// <summary>
@@ -150,10 +150,10 @@ namespace SharpFont
 		/// </remarks>
 		/// <param name="angle">The input angle.</param>
 		/// <returns>The cosinus value.</returns>
-		[Obsolete ("Use Fixed16Dot16.Cos() instead.")]
-		public static Fixed16Dot16 Cos (Fixed16Dot16 angle)
+		[Obsolete("Use Fixed16Dot16.Cos() instead.")]
+		public static Fixed16Dot16 Cos(Fixed16Dot16 angle)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_Cos ((IntPtr)angle.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_Cos((IntPtr)angle.Value));
 		}
 
 		/// <summary>
@@ -161,10 +161,10 @@ namespace SharpFont
 		/// </summary>
 		/// <param name="angle">The input angle.</param>
 		/// <returns>The tangent value.</returns>
-		[Obsolete ("Use Fixed16Dot16.Tan() instead.")]
-		public static Fixed16Dot16 Tan (Fixed16Dot16 angle)
+		[Obsolete("Use Fixed16Dot16.Tan() instead.")]
+		public static Fixed16Dot16 Tan(Fixed16Dot16 angle)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_Tan ((IntPtr)angle.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_Tan((IntPtr)angle.Value));
 		}
 
 		/// <summary>
@@ -173,10 +173,10 @@ namespace SharpFont
 		/// <param name="x">The horizontal vector coordinate.</param>
 		/// <param name="y">The vertical vector coordinate.</param>
 		/// <returns>The arc-tangent value (i.e. angle).</returns>
-		[Obsolete ("Use Fixed16Dot16.Atan2() instead.")]
-		public static Fixed16Dot16 Atan2 (Fixed16Dot16 x, Fixed16Dot16 y)
+		[Obsolete("Use Fixed16Dot16.Atan2() instead.")]
+		public static Fixed16Dot16 Atan2(Fixed16Dot16 x, Fixed16Dot16 y)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_Atan2 ((IntPtr)x.Value, (IntPtr)y.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_Atan2((IntPtr)x.Value, (IntPtr)y.Value));
 		}
 
 		/// <summary>
@@ -185,16 +185,15 @@ namespace SharpFont
 		/// <param name="angle1">First angle.</param>
 		/// <param name="angle2">Second angle.</param>
 		/// <returns>Constrained value of ‘value2-value1’.</returns>
-		[Obsolete ("Use Fixed16Dot16.AngleDiff() instead.")]
-		public static Fixed16Dot16 AngleDiff (Fixed16Dot16 angle1, Fixed16Dot16 angle2)
+		[Obsolete("Use Fixed16Dot16.AngleDiff() instead.")]
+		public static Fixed16Dot16 AngleDiff(Fixed16Dot16 angle1, Fixed16Dot16 angle2)
 		{
-			return Fixed16Dot16.FromRawValue ((int)FT.FT_Angle_Diff ((IntPtr)angle1.Value, (IntPtr)angle2.Value));
+			return Fixed16Dot16.FromRawValue((int)FT.FT_Angle_Diff((IntPtr)angle1.Value, (IntPtr)angle2.Value));
 		}
 
 		#endregion
 
-#if !iOS
-#region Mac Specific Interface
+		#region Mac Specific Interface
 
 		/// <summary>
 		/// Return an FSSpec for the disk file containing the named font.
@@ -268,7 +267,6 @@ namespace SharpFont
 			return faceIndex;
 		}
 
-#endregion
-#endif
+		#endregion
 	}
 }
