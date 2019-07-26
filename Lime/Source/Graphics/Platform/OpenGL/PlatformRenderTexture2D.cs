@@ -75,12 +75,34 @@ namespace Lime.Graphics.Platform.OpenGL
 					RenderbufferTarget.Renderbuffer, GLStencilBuffer);
 				GLHelper.CheckGLErrors();
 			}
-			var fbStatus = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-			GLHelper.CheckGLErrors();
-			if (fbStatus != FramebufferErrorCode.FramebufferComplete) {
-				throw new InvalidOperationException();
-			}
+			CheckFramebufferStatus();
 			Context.InvalidateRenderTargetBinding();
+		}
+
+		private void CheckFramebufferStatus()
+		{
+			var fbStatus = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+			if (fbStatus != FramebufferErrorCode.FramebufferComplete) {
+				string fbStatusName;
+				switch (fbStatus) {
+					case FramebufferErrorCode.FramebufferIncompleteAttachment:
+						fbStatusName = "FramebufferIncompleteAttachment";
+						break;
+					case FramebufferErrorCode.FramebufferIncompleteDimensions:
+						fbStatusName = "FramebufferIncompleteDimensions";
+						break;
+					case FramebufferErrorCode.FramebufferIncompleteMissingAttachment:
+						fbStatusName = "FramebufferIncompleteMissingAttachment";
+						break;
+					case FramebufferErrorCode.FramebufferUnsupported:
+						fbStatusName = "FramebufferUnsupported";
+						break;
+					default:
+						fbStatusName = ((int)fbStatus).ToString();
+						break;
+				}
+				throw new InvalidOperationException($"Framebuffer incomplete. Framebuffer status: {fbStatusName}.");
+			}
 		}
 
 		private void GetGLDepthStencilFormat(out All glDepthFormat, out All glStencilFormat)
