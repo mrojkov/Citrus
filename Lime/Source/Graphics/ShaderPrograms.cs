@@ -9,7 +9,8 @@ namespace Lime
 		None = 0,
 		PremultiplyAlpha = 1,
 		VertexAnimation = 2,
-		Count = 2,
+		CutOutTextureBlending = 4,
+		Count = 3,
 	}
 
 	public class ShaderPrograms
@@ -216,7 +217,11 @@ namespace Lime
 			uniform lowp sampler2D tex2;
 			void main()
 			{
-				gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2);
+				#ifdef CutOutTextureBlending
+					gl_FragColor = color * (texture2D(tex1, texCoords1) - vec4(0.0, 0.0, 0.0, texture2D(tex2, texCoords2).a));
+				#else
+					gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2);
+				#endif
 				#ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
 				#endif
@@ -239,7 +244,11 @@ namespace Lime
 			uniform lowp sampler2D tex2;
 			void main()
 			{
-				gl_FragColor = texture2D(tex1, texCoords1) * color * vec4(1.0, 1.0, 1.0, texture2D(tex2, texCoords2).a);
+				#ifdef CutOutTextureBlending
+					gl_FragColor = color * (vec4(1.0, 1.0, 1.0, texture2D(tex1, texCoords1).a - texture2D(tex2, texCoords2).a));
+				#else
+					gl_FragColor = color * vec4(1.0, 1.0, 1.0, texture2D(tex1, texCoords1).a * texture2D(tex2, texCoords2).a);
+				#endif
 			}";
 
 		readonly string inversedSilhouetteFragmentShader = @"
