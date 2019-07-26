@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumquat.Win", "..\Kumquat\K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.RemoteScripting.Win", "Tangerine.UI.RemoteScripting\Tangerine.UI.RemoteScripting.Win.csproj", "{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calamansi", "..\Lime\Extensions\Calamansi\Calamansi\Calamansi.csproj", "{206E03D2-269A-433E-9BB0-CA07B30C3F19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calamansi.Win", "..\Lime\Extensions\Calamansi\Calamansi.Win.csproj", "{206E03D2-269A-433E-9BB0-CA07B30C3F19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
