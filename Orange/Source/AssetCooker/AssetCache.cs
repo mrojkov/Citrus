@@ -94,8 +94,7 @@ namespace Orange
 			if (!ftpClient.IsConnected) {
 				try {
 					ftpClient.Connect();
-				}
-				catch (System.Exception e) {
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleSetupFailure("Can't connect");
 				}
@@ -171,8 +170,7 @@ namespace Orange
 			if (IsRemoteEnabled && ftpClient.IsConnected) {
 				try {
 					return ftpClient.FileExists(GetRemotePath(hashString));
-				}
-				catch(System.Exception e) {
+				} catch(System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Can't check existance of file");
 					return false;
@@ -195,8 +193,7 @@ namespace Orange
 						HandleRemoteCacheFailure(hashString, "Upload failed");
 						return false;
 					}
-				}
-				catch (System.Exception e) {
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Upload failed");
 					return false;
@@ -220,22 +217,14 @@ namespace Orange
 					if (!successful) {
 						ftpClient.Disconnect();
 						HandleRemoteCacheFailure(hashString, "Download failed");
-						if (File.Exists(tempFilePath)) {
-							File.Delete(tempFilePath);
-						}
 						return false;
 					}
-					var fullLocalPath = GetLocalPath(hashString);
-					Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
-					File.Copy(tempFilePath, fullLocalPath, true);
-					File.Delete(tempFilePath);
-				}
-				catch (System.Exception e) {
+					var localPath = GetLocalPath(hashString);
+					Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+					File.Move(tempFilePath, localPath);
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Download failed");
-					if (File.Exists(tempFilePath)) {
-							File.Delete(tempFilePath);
-					}
 					return false;
 				}
 
@@ -271,6 +260,9 @@ namespace Orange
 				ending = "Cache disabled";
 			}
 			Console.WriteLine($"[Cache] ERROR {serverUsername}@{serverAddress}: {errorMessage} ({hashString}). {ending}");
+			if (File.Exists(tempFilePath)) {
+				File.Delete(tempFilePath);
+			}
 		}
 	}
 
