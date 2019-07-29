@@ -135,15 +135,6 @@ namespace Lime
 				return null;
 			}
 			var ro = RenderObjectPool<RenderObject>.Acquire();
-			ro.Operation = Operation;
-			ro.Arg1Texture = texture1;
-			ro.Arg2Texture = texture2;
-			ro.Arg1Transform = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
-			ro.Arg2Transform = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
-			ro.Arg1UVTransform = arg1.UVTransform;
-			ro.Arg2UVTransform = arg2.UVTransform;
-			ro.LocalToWorldTransform = Parent.AsWidget.LocalToWorldTransform;
-			ro.Color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
 			ro.Arg12CommonMaterial = CustomMaterial;
 			ro.Arg1Material = CustomMaterial;
 			if (ro.Arg1Material == null) {
@@ -161,6 +152,15 @@ namespace Lime
 					blending, shader, WidgetMaterial.GetNumTextures(texture1, texture2),
 					Operation == ImageCombinerOperation.Multiply ? TextureBlending.Multiply : TextureBlending.CutOut);
 			}
+			ro.Arg1Texture = texture1;
+			ro.Arg2Texture = texture2;
+			ro.Operation = Operation;
+			ro.Arg1Transform = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
+			ro.Arg2Transform = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
+			ro.Arg1UVTransform = arg1.UVTransform;
+			ro.Arg2UVTransform = arg2.UVTransform;
+			ro.LocalToWorldTransform = Parent.AsWidget.LocalToWorldTransform;
+			ro.Color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
 			return ro;
 		}
 

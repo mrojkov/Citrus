@@ -247,7 +247,7 @@ namespace Lime
 				#ifdef CutOutTextureBlending
 					gl_FragColor = color * (vec4(1.0, 1.0, 1.0, texture2D(tex1, texCoords1).a - texture2D(tex2, texCoords2).a));
 				#else
-					gl_FragColor = color * vec4(1.0, 1.0, 1.0, texture2D(tex1, texCoords1).a * texture2D(tex2, texCoords2).a);
+					gl_FragColor = color * texture2D(tex1, texCoords1) * vec4(1.0, 1.0, 1.0, texture2D(tex2, texCoords2).a);
 				#endif
 			}";
 
