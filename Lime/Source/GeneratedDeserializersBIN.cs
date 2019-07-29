@@ -170,10 +170,10 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.MarkersOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.MarkerBlending>)null;
+				result.MarkersOptions = (global::System.Collections.Generic.Dictionary<string, global::Lime.MarkerBlending>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.MarkersOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.MarkerBlending>();
+					result.MarkersOptions = new global::System.Collections.Generic.Dictionary<string, global::Lime.MarkerBlending>();
 					while (--tmp1 >= 0) {
 						var tmp2 = d.Reader.ReadString();
 						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
@@ -1373,7 +1373,7 @@ namespace GeneratedDeserializersBIN
 
 		private static void Read_Lime__Animator_Boolean(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Animator<global::System.Boolean>)obj;
+			var result = (global::Lime.Animator<bool>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -1386,7 +1386,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.Boolean>)dg.ReadObject<global::Lime.Keyframe<global::System.Boolean>>();
+						var tmp2 = (global::Lime.Keyframe<bool>)dg.ReadObject<global::Lime.Keyframe<bool>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -1402,14 +1402,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Animator_Boolean(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Animator<global::System.Boolean>();
+			var result = new global::Lime.Animator<bool>();
 			Read_Lime__Animator_Boolean(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Animator_Int32(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Animator<global::System.Int32>)obj;
+			var result = (global::Lime.Animator<int>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -1422,7 +1422,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.Int32>)dg.ReadObject<global::Lime.Keyframe<global::System.Int32>>();
+						var tmp2 = (global::Lime.Keyframe<int>)dg.ReadObject<global::Lime.Keyframe<int>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -1438,14 +1438,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Animator_Int32(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Animator<global::System.Int32>();
+			var result = new global::Lime.Animator<int>();
 			Read_Lime__Animator_Int32(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Animator_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Animator<global::System.Single>)obj;
+			var result = (global::Lime.Animator<float>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -1458,7 +1458,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.Single>)dg.ReadObject<global::Lime.Keyframe<global::System.Single>>();
+						var tmp2 = (global::Lime.Keyframe<float>)dg.ReadObject<global::Lime.Keyframe<float>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -1474,14 +1474,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Animator_Single(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Animator<global::System.Single>();
+			var result = new global::Lime.Animator<float>();
 			Read_Lime__Animator_Single(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Animator_String(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Animator<global::System.String>)obj;
+			var result = (global::Lime.Animator<string>)obj;
 			var dg = (BinaryDeserializerGen)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
@@ -1494,7 +1494,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.String>)dg.ReadObject<global::Lime.Keyframe<global::System.String>>();
+						var tmp2 = (global::Lime.Keyframe<string>)dg.ReadObject<global::Lime.Keyframe<string>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -1510,7 +1510,7 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Animator_String(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Animator<global::System.String>();
+			var result = new global::Lime.Animator<string>();
 			Read_Lime__Animator_String(d, def, result);
 			return result;
 		}
@@ -3509,7 +3509,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.Int32>)dg.ReadObject<global::Lime.Keyframe<global::System.Int32>>();
+						var tmp2 = (global::Lime.Keyframe<int>)dg.ReadObject<global::Lime.Keyframe<int>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -4083,7 +4083,7 @@ namespace GeneratedDeserializersBIN
 
 		private static void Read_Lime__Keyframe_Boolean(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Keyframe<global::System.Boolean>)obj;
+			var result = (global::Lime.Keyframe<bool>)obj;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadBoolean();
@@ -4091,14 +4091,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Keyframe_Boolean(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Keyframe<global::System.Boolean>();
+			var result = new global::Lime.Keyframe<bool>();
 			Read_Lime__Keyframe_Boolean(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Keyframe_Int32(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Keyframe<global::System.Int32>)obj;
+			var result = (global::Lime.Keyframe<int>)obj;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadInt32();
@@ -4106,14 +4106,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Keyframe_Int32(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Keyframe<global::System.Int32>();
+			var result = new global::Lime.Keyframe<int>();
 			Read_Lime__Keyframe_Int32(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Keyframe_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Keyframe<global::System.Single>)obj;
+			var result = (global::Lime.Keyframe<float>)obj;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadSingle();
@@ -4121,14 +4121,14 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Keyframe_Single(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Keyframe<global::System.Single>();
+			var result = new global::Lime.Keyframe<float>();
 			Read_Lime__Keyframe_Single(d, def, result);
 			return result;
 		}
 
 		private static void Read_Lime__Keyframe_String(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
-			var result = (global::Lime.Keyframe<global::System.String>)obj;
+			var result = (global::Lime.Keyframe<string>)obj;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = d.Reader.ReadString();
@@ -4137,7 +4137,7 @@ namespace GeneratedDeserializersBIN
 
 		private static object Make_Lime__Keyframe_String(BinaryDeserializer d, ReaderClassDef def)
 		{
-			var result = new global::Lime.Keyframe<global::System.String>();
+			var result = new global::Lime.Keyframe<string>();
 			Read_Lime__Keyframe_String(d, def, result);
 			return result;
 		}
@@ -4305,10 +4305,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.SourceMarkersOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.BlendingOption>)null;
+				result.SourceMarkersOptions = (global::System.Collections.Generic.Dictionary<string, global::Lime.BlendingOption>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.SourceMarkersOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.BlendingOption>();
+					result.SourceMarkersOptions = new global::System.Collections.Generic.Dictionary<string, global::Lime.BlendingOption>();
 					while (--tmp1 >= 0) {
 						var tmp2 = d.Reader.ReadString();
 						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
@@ -4409,10 +4409,10 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.AttributeLocations = (global::System.Int32[])null;
+				result.AttributeLocations = (int[])null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					var tmp2 = new global::System.Int32[tmp1];
+					var tmp2 = new int[tmp1];
 					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
 						tmp2[tmp1] = d.Reader.ReadInt32();
 					}
@@ -4421,10 +4421,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.Indices = (global::System.UInt16[])null;
+				result.Indices = (ushort[])null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
-					var tmp4 = new global::System.UInt16[tmp3];
+					var tmp4 = new ushort[tmp3];
 					for(tmp3 = 0; tmp3 < tmp4.Length; ++tmp3) {
 						tmp4[tmp3] = d.Reader.ReadUInt16();
 					}
@@ -4897,14 +4897,14 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.Blending = d.Reader.ReadBoolean() ? (global::System.Int32?)null : d.Reader.ReadInt32();
+				result.Blending = d.Reader.ReadBoolean() ? (int?)null : d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.IgnoredNodes = (global::System.Collections.Generic.List<global::System.String>)null;
+				result.IgnoredNodes = (global::System.Collections.Generic.List<string>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.IgnoredNodes = new global::System.Collections.Generic.List<global::System.String>();
+					result.IgnoredNodes = new global::System.Collections.Generic.List<string>();
 					while (--tmp1 >= 0) {
 						var tmp2 = d.Reader.ReadString();
 						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
@@ -4918,10 +4918,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.Markers = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelMarkerFormat>)null;
+				result.Markers = (global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelMarkerFormat>)null;
 				var tmp3 = d.Reader.ReadInt32();
 				if (tmp3 >= 0) {
-					result.Markers = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelMarkerFormat>();
+					result.Markers = new global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelMarkerFormat>();
 					while (--tmp3 >= 0) {
 						var tmp4 = d.Reader.ReadString();
 						if (tmp4 == "" && d.Reader.ReadBoolean()) tmp4 = null;
@@ -4932,10 +4932,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.Nodes = (global::System.Collections.Generic.List<global::System.String>)null;
+				result.Nodes = (global::System.Collections.Generic.List<string>)null;
 				var tmp6 = d.Reader.ReadInt32();
 				if (tmp6 >= 0) {
-					result.Nodes = new global::System.Collections.Generic.List<global::System.String>();
+					result.Nodes = new global::System.Collections.Generic.List<string>();
 					while (--tmp6 >= 0) {
 						var tmp7 = d.Reader.ReadString();
 						if (tmp7 == "" && d.Reader.ReadBoolean()) tmp7 = null;
@@ -4970,10 +4970,10 @@ namespace GeneratedDeserializersBIN
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.Animations = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelAnimationFormat>)null;
+				result.Animations = (global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelAnimationFormat>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.Animations = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelAnimationFormat>();
+					result.Animations = new global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelAnimationFormat>();
 					while (--tmp1 >= 0) {
 						var tmp2 = d.Reader.ReadString();
 						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
@@ -5001,10 +5001,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
-				result.MeshOptions = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
+				result.MeshOptions = (global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.MeshOptionFormat>)null;
 				var tmp6 = d.Reader.ReadInt32();
 				if (tmp6 >= 0) {
-					result.MeshOptions = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
+					result.MeshOptions = new global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.MeshOptionFormat>();
 					while (--tmp6 >= 0) {
 						var tmp7 = d.Reader.ReadString();
 						if (tmp7 == "" && d.Reader.ReadBoolean()) tmp7 = null;
@@ -5015,10 +5015,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.NodeComponents = (global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
+				result.NodeComponents = (global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelComponentsFormat>)null;
 				var tmp9 = d.Reader.ReadInt32();
 				if (tmp9 >= 0) {
-					result.NodeComponents = new global::System.Collections.Generic.Dictionary<global::System.String,global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
+					result.NodeComponents = new global::System.Collections.Generic.Dictionary<string, global::Lime.Model3DAttachmentParser.ModelComponentsFormat>();
 					while (--tmp9 >= 0) {
 						var tmp10 = d.Reader.ReadString();
 						if (tmp10 == "" && d.Reader.ReadBoolean()) tmp10 = null;
@@ -5029,10 +5029,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (6 == fd.OurIndex) {
-				result.NodeRemovals = (global::System.Collections.Generic.List<global::System.String>)null;
+				result.NodeRemovals = (global::System.Collections.Generic.List<string>)null;
 				var tmp12 = d.Reader.ReadInt32();
 				if (tmp12 >= 0) {
-					result.NodeRemovals = new global::System.Collections.Generic.List<global::System.String>();
+					result.NodeRemovals = new global::System.Collections.Generic.List<string>();
 					while (--tmp12 >= 0) {
 						var tmp13 = d.Reader.ReadString();
 						if (tmp13 == "" && d.Reader.ReadBoolean()) tmp13 = null;
@@ -5046,10 +5046,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (8 == fd.OurIndex) {
-				result.SourceAnimationIds = (global::System.Collections.Generic.List<global::System.String>)null;
+				result.SourceAnimationIds = (global::System.Collections.Generic.List<string>)null;
 				var tmp14 = d.Reader.ReadInt32();
 				if (tmp14 >= 0) {
-					result.SourceAnimationIds = new global::System.Collections.Generic.List<global::System.String>();
+					result.SourceAnimationIds = new global::System.Collections.Generic.List<string>();
 					while (--tmp14 >= 0) {
 						var tmp15 = d.Reader.ReadString();
 						if (tmp15 == "" && d.Reader.ReadBoolean()) tmp15 = null;
@@ -5129,7 +5129,7 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.Blending = d.Reader.ReadBoolean() ? (global::System.Int32?)null : d.Reader.ReadInt32();
+				result.Blending = d.Reader.ReadBoolean() ? (int?)null : d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
@@ -5142,10 +5142,10 @@ namespace GeneratedDeserializersBIN
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.SourceMarkersBlending = (global::System.Collections.Generic.Dictionary<global::System.String,global::System.Int32>)null;
+				result.SourceMarkersBlending = (global::System.Collections.Generic.Dictionary<string, int>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
-					result.SourceMarkersBlending = new global::System.Collections.Generic.Dictionary<global::System.String,global::System.Int32>();
+					result.SourceMarkersBlending = new global::System.Collections.Generic.Dictionary<string, int>();
 					while (--tmp1 >= 0) {
 						var tmp2 = d.Reader.ReadString();
 						if (tmp2 == "" && d.Reader.ReadBoolean()) tmp2 = null;
@@ -5790,7 +5790,7 @@ namespace GeneratedDeserializersBIN
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
-						var tmp2 = (global::Lime.Keyframe<global::System.Single>)dg.ReadObject<global::Lime.Keyframe<global::System.Single>>();
+						var tmp2 = (global::Lime.Keyframe<float>)dg.ReadObject<global::Lime.Keyframe<float>>();
 						result.ReadonlyKeys.Add(tmp2);
 					}
 				}
@@ -10339,10 +10339,10 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Animator<global::Lime.VAlignment>)] = Read_Lime__Animator_VAlignment;
 			readCache[typeof(global::Lime.Animator<global::Lime.Vector2>)] = Read_Lime__Animator_Vector2;
 			readCache[typeof(global::Lime.Animator<global::Lime.Vector3>)] = Read_Lime__Animator_Vector3;
-			readCache[typeof(global::Lime.Animator<global::System.Boolean>)] = Read_Lime__Animator_Boolean;
-			readCache[typeof(global::Lime.Animator<global::System.Int32>)] = Read_Lime__Animator_Int32;
-			readCache[typeof(global::Lime.Animator<global::System.Single>)] = Read_Lime__Animator_Single;
-			readCache[typeof(global::Lime.Animator<global::System.String>)] = Read_Lime__Animator_String;
+			readCache[typeof(global::Lime.Animator<bool>)] = Read_Lime__Animator_Boolean;
+			readCache[typeof(global::Lime.Animator<int>)] = Read_Lime__Animator_Int32;
+			readCache[typeof(global::Lime.Animator<float>)] = Read_Lime__Animator_Single;
+			readCache[typeof(global::Lime.Animator<string>)] = Read_Lime__Animator_String;
 			readCache[typeof(global::Lime.Audio)] = Read_Lime__Audio;
 			readCache[typeof(global::Lime.BlendingOption)] = Read_Lime__BlendingOption;
 			readCache[typeof(global::Lime.Bone)] = Read_Lime__Bone;
@@ -10395,10 +10395,10 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Keyframe<global::Lime.VAlignment>)] = Read_Lime__Keyframe_VAlignment;
 			readCache[typeof(global::Lime.Keyframe<global::Lime.Vector2>)] = Read_Lime__Keyframe_Vector2;
 			readCache[typeof(global::Lime.Keyframe<global::Lime.Vector3>)] = Read_Lime__Keyframe_Vector3;
-			readCache[typeof(global::Lime.Keyframe<global::System.Boolean>)] = Read_Lime__Keyframe_Boolean;
-			readCache[typeof(global::Lime.Keyframe<global::System.Int32>)] = Read_Lime__Keyframe_Int32;
-			readCache[typeof(global::Lime.Keyframe<global::System.Single>)] = Read_Lime__Keyframe_Single;
-			readCache[typeof(global::Lime.Keyframe<global::System.String>)] = Read_Lime__Keyframe_String;
+			readCache[typeof(global::Lime.Keyframe<bool>)] = Read_Lime__Keyframe_Boolean;
+			readCache[typeof(global::Lime.Keyframe<int>)] = Read_Lime__Keyframe_Int32;
+			readCache[typeof(global::Lime.Keyframe<float>)] = Read_Lime__Keyframe_Single;
+			readCache[typeof(global::Lime.Keyframe<string>)] = Read_Lime__Keyframe_String;
 			readCache[typeof(global::Lime.LayoutCell)] = Read_Lime__LayoutCell;
 			readCache[typeof(global::Lime.LayoutConstraints)] = Read_Lime__LayoutConstraints;
 			readCache[typeof(global::Lime.LinearLayout)] = Read_Lime__LinearLayout;
@@ -10505,10 +10505,10 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Animator<global::Lime.VAlignment>)] = Make_Lime__Animator_VAlignment;
 			makeCache[typeof(global::Lime.Animator<global::Lime.Vector2>)] = Make_Lime__Animator_Vector2;
 			makeCache[typeof(global::Lime.Animator<global::Lime.Vector3>)] = Make_Lime__Animator_Vector3;
-			makeCache[typeof(global::Lime.Animator<global::System.Boolean>)] = Make_Lime__Animator_Boolean;
-			makeCache[typeof(global::Lime.Animator<global::System.Int32>)] = Make_Lime__Animator_Int32;
-			makeCache[typeof(global::Lime.Animator<global::System.Single>)] = Make_Lime__Animator_Single;
-			makeCache[typeof(global::Lime.Animator<global::System.String>)] = Make_Lime__Animator_String;
+			makeCache[typeof(global::Lime.Animator<bool>)] = Make_Lime__Animator_Boolean;
+			makeCache[typeof(global::Lime.Animator<int>)] = Make_Lime__Animator_Int32;
+			makeCache[typeof(global::Lime.Animator<float>)] = Make_Lime__Animator_Single;
+			makeCache[typeof(global::Lime.Animator<string>)] = Make_Lime__Animator_String;
 			makeCache[typeof(global::Lime.Audio)] = Make_Lime__Audio;
 			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__BezierEasing;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
@@ -10571,10 +10571,10 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Keyframe<global::Lime.VAlignment>)] = Make_Lime__Keyframe_VAlignment;
 			makeCache[typeof(global::Lime.Keyframe<global::Lime.Vector2>)] = Make_Lime__Keyframe_Vector2;
 			makeCache[typeof(global::Lime.Keyframe<global::Lime.Vector3>)] = Make_Lime__Keyframe_Vector3;
-			makeCache[typeof(global::Lime.Keyframe<global::System.Boolean>)] = Make_Lime__Keyframe_Boolean;
-			makeCache[typeof(global::Lime.Keyframe<global::System.Int32>)] = Make_Lime__Keyframe_Int32;
-			makeCache[typeof(global::Lime.Keyframe<global::System.Single>)] = Make_Lime__Keyframe_Single;
-			makeCache[typeof(global::Lime.Keyframe<global::System.String>)] = Make_Lime__Keyframe_String;
+			makeCache[typeof(global::Lime.Keyframe<bool>)] = Make_Lime__Keyframe_Boolean;
+			makeCache[typeof(global::Lime.Keyframe<int>)] = Make_Lime__Keyframe_Int32;
+			makeCache[typeof(global::Lime.Keyframe<float>)] = Make_Lime__Keyframe_Single;
+			makeCache[typeof(global::Lime.Keyframe<string>)] = Make_Lime__Keyframe_String;
 			makeCache[typeof(global::Lime.LayoutCell)] = Make_Lime__LayoutCell;
 			makeCache[typeof(global::Lime.LayoutConstraints)] = Make_Lime__LayoutConstraints;
 			makeCache[typeof(global::Lime.LinearLayout)] = Make_Lime__LinearLayout;
