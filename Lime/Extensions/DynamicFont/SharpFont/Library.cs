@@ -69,14 +69,14 @@ namespace SharpFont
 		/// that you're trying to run your program as a 64-bit process and have a 32-bit version of FreeType or vice
 		/// versa. See the SharpFont.Examples project for how to handle this situation.
 		/// </remarks>
-		public Library()
-			: this(false)
+		public Library ()
+			: this (false)
 		{
 			IntPtr libraryRef;
-			Error err = FT.FT_Init_FreeType(out libraryRef);
+			Error err = FT.FT_Init_FreeType (out libraryRef);
 
 			if (err != Error.Ok)
-				throw new FreeTypeException(err);
+				throw new FreeTypeException (err);
 
 			Reference = libraryRef;
 		}
@@ -85,34 +85,34 @@ namespace SharpFont
 		/// Initializes a new instance of the <see cref="Library"/> class.
 		/// </summary>
 		/// <param name="memory">A custom FreeType memory manager.</param>
-		public Library(Memory memory)
-			: this(false)
+		public Library (Memory memory)
+			: this (false)
 		{
 			IntPtr libraryRef;
-			Error err = FT.FT_New_Library(memory.Reference, out libraryRef);
+			Error err = FT.FT_New_Library (memory.Reference, out libraryRef);
 
 			if (err != Error.Ok)
-				throw new FreeTypeException(err);
+				throw new FreeTypeException (err);
 
 			Reference = libraryRef;
 			customMemory = true;
 		}
 
-		private Library(bool duplicate)
+		private Library (bool duplicate)
 		{
-			childFaces = new List<Face>();
-			childGlyphs = new List<Glyph>();
-			childOutlines = new List<Outline>();
-			childStrokers = new List<Stroker>();
-			childManagers = new List<Manager>();
+			childFaces = new List<Face> ();
+			childGlyphs = new List<Glyph> ();
+			childOutlines = new List<Outline> ();
+			childStrokers = new List<Stroker> ();
+			childManagers = new List<Manager> ();
 		}
 
 		/// <summary>
 		/// Finalizes an instance of the <see cref="Library"/> class.
 		/// </summary>
-		~Library()
+		~Library ()
 		{
-			Dispose(false);
+			Dispose (false);
 		}
 
 		#endregion
@@ -138,11 +138,11 @@ namespace SharpFont
 			get
 			{
 				if (disposed)
-					throw new ObjectDisposedException("Version", "Cannot access a disposed object.");
+					throw new ObjectDisposedException ("Version", "Cannot access a disposed object.");
 
 				int major, minor, patch;
-				FT.FT_Library_Version(Reference, out major, out minor, out patch);
-				return new Version(major, minor, patch);
+				FT.FT_Library_Version (Reference, out major, out minor, out patch);
+				return new Version (major, minor, patch);
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace SharpFont
 			get
 			{
 				if (disposed)
-					throw new ObjectDisposedException("Reference", "Cannot access a disposed object.");
+					throw new ObjectDisposedException ("Reference", "Cannot access a disposed object.");
 
 				return reference;
 			}
@@ -159,7 +159,7 @@ namespace SharpFont
 			set
 			{
 				if (disposed)
-					throw new ObjectDisposedException("Reference", "Cannot access a disposed object.");
+					throw new ObjectDisposedException ("Reference", "Cannot access a disposed object.");
 
 				reference = value;
 			}
@@ -180,12 +180,12 @@ namespace SharpFont
 		/// A handle to a new face object. If ‘faceIndex’ is greater than or equal to zero, it must be non-NULL.
 		/// </returns>
 		/// <see cref="OpenFace"/>
-		public Face NewFace(string path, int faceIndex)
+		public Face NewFace (string path, int faceIndex)
 		{
 			if (disposed)
-				throw new ObjectDisposedException("Library", "Cannot access a disposed object.");
+				throw new ObjectDisposedException ("Library", "Cannot access a disposed object.");
 
-			return new Face(this, path, faceIndex);
+			return new Face (this, path, faceIndex);
 		}
 
 		/// <summary>
@@ -200,12 +200,12 @@ namespace SharpFont
 		/// A handle to a new face object. If ‘faceIndex’ is greater than or equal to zero, it must be non-NULL.
 		/// </returns>
 		/// <see cref="OpenFace"/>
-		public Face NewMemoryFace(byte[] file, int faceIndex)
+		public Face NewMemoryFace (byte [] file, int faceIndex)
 		{
 			if (disposed)
-				throw new ObjectDisposedException("Library", "Cannot access a disposed object.");
+				throw new ObjectDisposedException ("Library", "Cannot access a disposed object.");
 
-			return new Face(this, file, faceIndex);
+			return new Face (this, file, faceIndex);
 		}
 
 		/// <summary>
@@ -217,12 +217,12 @@ namespace SharpFont
 		/// <returns>
 		/// A handle to a new face object. If ‘faceIndex’ is greater than or equal to zero, it must be non-NULL.
 		/// </returns>
-		public Face NewMemoryFace(IntPtr bufferPtr, int length, int faceIndex)
+		public Face NewMemoryFace (IntPtr bufferPtr, int length, int faceIndex)
 		{
 			if (disposed)
-				throw new ObjectDisposedException("Library", "Cannot access a disposed object.");
+				throw new ObjectDisposedException ("Library", "Cannot access a disposed object.");
 
-			return new Face(this, bufferPtr, length, faceIndex);
+			return new Face (this, bufferPtr, length, faceIndex);
 		}
 
 		/// <summary>
@@ -251,24 +251,25 @@ namespace SharpFont
 		/// <returns>
 		/// A handle to a new face object. If ‘faceIndex’ is greater than or equal to zero, it must be non-NULL.
 		/// </returns>
-		public Face OpenFace(OpenArgs args, int faceIndex)
+		public Face OpenFace (OpenArgs args, int faceIndex)
 		{
 			if (disposed)
-				throw new ObjectDisposedException("Library", "Cannot access a disposed object.");
+				throw new ObjectDisposedException ("Library", "Cannot access a disposed object.");
 
 			IntPtr faceRef;
 
-			Error err = FT.FT_Open_Face(Reference, args.Reference, faceIndex, out faceRef);
+			Error err = FT.FT_Open_Face (Reference, args.Reference, faceIndex, out faceRef);
 
 			if (err != Error.Ok)
-				throw new FreeTypeException(err);
+				throw new FreeTypeException (err);
 
-			return new Face(faceRef, this);
+			return new Face (faceRef, this);
 		}
 
 		#endregion
 
-		#region Mac Specific Interface
+#if !iOS
+#region Mac Specific Interface
 
 		/// <summary>
 		/// Create a new face object from a FOND resource.
@@ -361,9 +362,10 @@ namespace SharpFont
 			return new Face(faceRef, this);
 		}
 
-		#endregion
+#endregion
+#endif
 
-		#region Module Management
+#region Module Management
 
 		/// <summary>
 		/// Add a new module to a given library instance.
@@ -716,9 +718,9 @@ namespace SharpFont
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region LCD Filtering
+#region LCD Filtering
 
 		/// <summary>
 		/// This function is used to apply color filtering to LCD decimated bitmaps, like the ones used when calling
@@ -793,9 +795,9 @@ namespace SharpFont
 				throw new FreeTypeException(err);
 		}
 
-		#endregion
+#endregion
 
-		#region The TrueType Engine
+#region The TrueType Engine
 
 		/// <summary>
 		/// Return an <see cref="EngineType"/> value to indicate which level of the TrueType virtual machine a given
@@ -810,7 +812,7 @@ namespace SharpFont
 			return FT.FT_Get_TrueType_Engine_Type(Reference);
 		}
 
-		#endregion
+#endregion
 
 		/// <summary>
 		/// Disposes the Library.
@@ -904,6 +906,6 @@ namespace SharpFont
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }

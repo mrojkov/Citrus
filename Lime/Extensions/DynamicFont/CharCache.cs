@@ -4,24 +4,16 @@ using Lime.Graphics.Platform;
 
 namespace Lime
 {
-	public class CharCache
+	class CharCache
 	{
-		protected FontRenderer fontRenderer;
-		protected List<ITexture> textures;
-		protected int fontHeight;
-
+		private FontRenderer fontRenderer;
 		private DynamicTexture texture;
 		private IntVector2 position;
 		private int lineAdditionalHeight; // Used for lines containing glyphs with diacritics.
+		private List<ITexture> textures;
 		private int textureIndex;
+		private int fontHeight;
 		private readonly CharMap charMap = new CharMap();
-
-		// We add 1px left and right padding to each char on the texture and also to the UV
-		// so that chars will be blurred correctly after stretching or drawing to float position.
-		// And we compensate this padding by ACWidth, so that the text will take the same space.
-		// See "texture bleeding"
-		public int HPadding { get; set; } = 1;
-		public int VPadding { get; set; }
 
 		public CharCache(int fontHeight, FontRenderer fontRenderer, List<ITexture> textures)
 		{
@@ -54,28 +46,33 @@ namespace Lime
 			if (glyph == null)
 				return null;
 
+			// We add 1px left and right padding to each char on the texture and also to the UV
+			// so that chars will be blurred correctly after stretching or drawing to float position.
+			// And we compensate this padding by ACWidth, so that the text will take the same space.
+			// See "texture bleeding"
+			const int padding = 1;
+
 			// Space between characters on the texture
 			const int spacing = 1;
-			var paddedGlyphWidth = glyph.Width + HPadding * 2;
-			var paddedHeight = fontHeight + VPadding * 2;
+			var paddedGlyphWidth = glyph.Width + padding * 2;
 			if (position.X + paddedGlyphWidth + spacing >= texture.ImageSize.Width) {
 				position.X = 0;
-				position.Y += paddedHeight + spacing + lineAdditionalHeight;
+				position.Y += fontHeight + spacing + lineAdditionalHeight;
 				lineAdditionalHeight = 0;
 			}
 			if (glyph.VerticalOffset < -lineAdditionalHeight) {
 				lineAdditionalHeight = -glyph.VerticalOffset;
 			}
-			if (position.Y + paddedHeight + spacing + lineAdditionalHeight >= texture.ImageSize.Height) {
+			if (position.Y + fontHeight + spacing + lineAdditionalHeight >= texture.ImageSize.Height) {
 				CreateNewFontTexture();
 				position = IntVector2.Zero;
 			}
-			CopyGlyphToTexture(glyph, texture, position + new IntVector2(HPadding, VPadding));
+			CopyGlyphToTexture(glyph, texture, position + new IntVector2(padding, 0));
 			var fontChar = new FontChar {
 				Char = code,
 				UV0 = (Vector2)position / (Vector2)texture.ImageSize,
-				UV1 = ((Vector2)position + new Vector2(paddedGlyphWidth, paddedHeight)) / (Vector2)texture.ImageSize,
-				ACWidths = glyph.ACWidths - new Vector2(HPadding, 1),
+				UV1 = ((Vector2)position + new Vector2(paddedGlyphWidth, fontHeight)) / (Vector2)texture.ImageSize,
+				ACWidths = glyph.ACWidths - Vector2.One * padding,
 				Width = paddedGlyphWidth,
 				Height = fontHeight,
 				RgbIntensity = glyph.RgbIntensity,
@@ -94,14 +91,14 @@ namespace Lime
 			textures.Add(texture);
 		}
 
-		protected virtual Size CalcTextureSize()
+		private Size CalcTextureSize()
 		{
 			const int glyphsPerTexture = 30;
 			var glyphMaxArea = fontHeight * (fontHeight / 2);
 			var size =
 				CalcUpperPowerOfTwo((int)Math.Sqrt(glyphMaxArea * glyphsPerTexture))
 				.Clamp(64, 2048);
-			return new Size(2048, 2048);
+			return new Size(size, size);
 		}
 
 		private static int CalcUpperPowerOfTwo(int x)
@@ -152,7 +149,7 @@ namespace Lime
 		}
 
 		// Use inheritance instead of composition in a sake of performance
-		public class DynamicTexture : Texture2D
+		private class DynamicTexture : Texture2D
 		{
 			public readonly Color4[] Data;
 			public bool Invalidated;
@@ -174,11 +171,6 @@ namespace Lime
 					Invalidated = false;
 				}
 				return base.GetPlatformTexture();
-			}
-
-			public override Color4[] GetPixels()
-			{
-				return Data;
 			}
 		}
 	}
