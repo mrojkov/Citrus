@@ -6,10 +6,10 @@ namespace Lime
 	public class DissolveComponent : MaterialComponent<DissolveMaterial>
 	{
 		[YuzuMember]
-		public float Radius
+		public Vector2 Range
 		{
-			get => 1.0f - CustomMaterial.Radius;
-			set => CustomMaterial.Radius = 1.0f - value;
+			get => CustomMaterial.Range;
+			set => CustomMaterial.Range = value;
 		}
 
 		[YuzuMember]

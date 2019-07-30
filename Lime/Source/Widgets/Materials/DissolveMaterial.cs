@@ -6,12 +6,12 @@ namespace Lime
 	{
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
-		private readonly ShaderParamKey<float> radiusKey;
 		private readonly ShaderParamKey<float> brightnessKey;
+		private readonly ShaderParamKey<Vector2> rangeKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
 
-		public float Radius = 0;
 		public float Brightness = 1;
+		public Vector2 Range = new Vector2(0.0f, -0.001f);
 		public Vector4 Color = Vector4.One;
 		public ITexture MaskTexture;
 		public Func<Blending> BlendingGetter;
@@ -23,15 +23,15 @@ namespace Lime
 		{
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
-			radiusKey = shaderParams.GetParamKey<float>("radius");
 			brightnessKey = shaderParams.GetParamKey<float>("brightness");
+			rangeKey = shaderParams.GetParamKey<Vector2>("range");
 			colorKey = shaderParams.GetParamKey<Vector4>("glowColor");
 		}
 
 		public void Apply(int pass)
 		{
-			shaderParams.Set(radiusKey, Radius);
 			shaderParams.Set(brightnessKey, Brightness);
+			shaderParams.Set(rangeKey, Range);
 			shaderParams.Set(colorKey, Color);
 			PlatformRenderer.SetTexture(1, MaskTexture);
 			PlatformRenderer.SetBlendState(BlendingGetter.Invoke().GetBlendState());
@@ -42,8 +42,8 @@ namespace Lime
 		public void Invalidate() { }
 
 		public IMaterial Clone() => new DissolveMaterial() {
-			Radius = Radius,
 			Brightness = Brightness,
+			Range = Range,
 			Color = Color,
 			MaskTexture = MaskTexture
 		};
@@ -73,8 +73,8 @@ namespace Lime
 			private const string FragmentShader = @"
 				uniform lowp sampler2D tex1;
 				uniform lowp sampler2D tex2;
-				uniform lowp float radius;
 				uniform lowp float brightness;
+				uniform lowp vec2 range;
 				uniform lowp vec4 glowColor;
 
 				varying lowp vec2 texCoords1;
@@ -83,10 +83,12 @@ namespace Lime
 				void main()
 				{
 					lowp vec4 color = texture2D(tex1, texCoords1);
-					lowp float mask = max(0.0, texture2D(tex2, texCoords1).r - radius);
-					gl_FragColor = (1.0 - color.a * (1.0 - mask))
-								 * brightness * vec4((glowColor.rgb + vec3(0.2 * mask)), mask)
-								 + outColor * color * color.a;
+					lowp float mask = texture2D(tex2, texCoords1).r;
+					lowp float rl = (range.y - range.x);
+					lowp float glow = (0.5 * rl - abs(mask - 0.5 * (range.y + range.x))) / rl;
+					gl_FragColor = step(0.5 * (range.y + range.x), mask) * color * outColor
+								 + color.a * step(range.x, mask) * (1.0 - step(range.y, mask))
+								 * vec4(brightness * (glowColor.rgb + vec3(glow, glow, glow)), glow);
 				}";
 
 			private DissolveMaterialShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
