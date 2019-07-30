@@ -339,7 +339,7 @@ namespace Lime
 			return reader.ReadBytes(length);
 		}
 
-		public virtual Color4[] GetPixels()
+		public Color4[] GetPixels()
 		{
 			throw new NotSupportedException();
 		}

@@ -233,7 +233,6 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
     <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
-    <Compile Include="Source\Actions\GenerateFonts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
@@ -267,10 +266,6 @@
     <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
       <Project>{B5F74505-80BB-4373-B194-219D743C1FA0}</Project>
       <Name>DynamicFont.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lime\Extensions\Calamansi\Calamansi.Mac.csproj">
-      <Project>{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}</Project>
-      <Name>Calamansi.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -90,15 +90,41 @@
     <Compile Include="FontRenderer.cs" />
     <Compile Include="SharpFont\AutoHinterScript.cs" />
     <Compile Include="SharpFont\BBox.cs" />
+    <Compile Include="SharpFont\Bdf\Internal\PropertyRec.cs" />
+    <Compile Include="SharpFont\Bdf\Property.cs" />
+    <Compile Include="SharpFont\Bdf\PropertyType.cs" />
     <Compile Include="SharpFont\BitmapGlyph.cs" />
     <Compile Include="SharpFont\BitmapSize.cs" />
+    <Compile Include="SharpFont\Cache\CMapCache.cs" />
+    <Compile Include="SharpFont\Cache\FaceRequester.cs" />
+    <Compile Include="SharpFont\Cache\ImageCache.cs" />
+    <Compile Include="SharpFont\Cache\ImageType.cs" />
+    <Compile Include="SharpFont\Cache\Internal\CMapCacheRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\ImageCacheRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\ImageTypeRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\ManagerRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\NodeRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\SBitCacheRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\SBitRec.cs" />
+    <Compile Include="SharpFont\Cache\Internal\ScalerRec.cs" />
+    <Compile Include="SharpFont\Cache\Manager.cs" />
+    <Compile Include="SharpFont\Cache\Node.cs" />
+    <Compile Include="SharpFont\Cache\SBit.cs" />
+    <Compile Include="SharpFont\Cache\SBitCache.cs" />
+    <Compile Include="SharpFont\Cache\Scaler.cs" />
+    <Compile Include="SharpFont\Cff\HintingEngine.cs" />
     <Compile Include="SharpFont\CharMap.cs" />
     <Compile Include="SharpFont\ClassicKernValidationFlags.cs" />
     <Compile Include="SharpFont\Data.cs" />
     <Compile Include="SharpFont\EmbeddingTypes.cs" />
     <Compile Include="SharpFont\Encoding.cs" />
     <Compile Include="SharpFont\Error.cs" />
-    <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="SharpFont\FaceFlags.cs" />
+    <Compile Include="SharpFont\Fixed16Dot16.cs" />
+    <Compile Include="SharpFont\Fixed2Dot14.cs" />
+    <Compile Include="SharpFont\Fnt\Header.cs" />
+    <Compile Include="SharpFont\Fnt\Internal\HeaderRec.cs" />
+    <Compile Include="SharpFont\Fnt\WinFntID.cs" />
     <Compile Include="SharpFont\FT.Public.cs" />
     <Compile Include="SharpFont\FTBitmap.cs" />
     <Compile Include="SharpFont\FTList.cs" />
@@ -109,10 +135,7 @@
     <Compile Include="SharpFont\FTVector.cs" />
     <Compile Include="SharpFont\FTVector26Dot6.cs" />
     <Compile Include="SharpFont\Face.cs" />
-    <Compile Include="SharpFont\FaceFlags.cs" />
-    <Compile Include="SharpFont\Fixed16Dot16.cs" />
     <Compile Include="SharpFont\Fixed26Dot6.cs" />
-    <Compile Include="SharpFont\Fixed2Dot14.cs" />
     <Compile Include="SharpFont\FreeTypeException.cs" />
     <Compile Include="SharpFont\Gasp.cs" />
     <Compile Include="SharpFont\Generic.cs" />
@@ -123,6 +146,29 @@
     <Compile Include="SharpFont\GlyphSlot.cs" />
     <Compile Include="SharpFont\GlyphToScriptMapProperty.cs" />
     <Compile Include="SharpFont\IncreaseXHeightProperty.cs" />
+    <Compile Include="SharpFont\Internal\BitmapGlyphRec.cs" />
+    <Compile Include="SharpFont\Internal\BitmapSizeRec.cs" />
+    <Compile Include="SharpFont\Internal\CharMapRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphToScriptMapPropertyRec.cs" />
+    <Compile Include="SharpFont\Internal\IncreaseXHeightPropertyRec.cs" />
+    <Compile Include="SharpFont\Internal\ListNodeRec.cs" />
+    <Compile Include="SharpFont\Internal\ListRec.cs" />
+    <Compile Include="SharpFont\Internal\MemoryRec.cs" />
+    <Compile Include="SharpFont\Internal\ModuleClassRec.cs" />
+    <Compile Include="SharpFont\Internal\NativeObject.cs" />
+    <Compile Include="SharpFont\Internal\NativeReference.cs" />
+    <Compile Include="SharpFont\Internal\OpenArgsRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineFuncsRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineGlyphRec.cs" />
+    <Compile Include="SharpFont\Internal\ParameterRec.cs" />
+    <Compile Include="SharpFont\Internal\RasterFuncsRec.cs" />
+    <Compile Include="SharpFont\Internal\RasterParamsRec.cs" />
+    <Compile Include="SharpFont\Internal\RendererClassRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRequestRec.cs" />
+    <Compile Include="SharpFont\Internal\SpanRec.cs" />
+    <Compile Include="SharpFont\Internal\StreamDescRec.cs" />
+    <Compile Include="SharpFont\Internal\StreamRec.cs" />
     <Compile Include="SharpFont\KerningMode.cs" />
     <Compile Include="SharpFont\LcdFilter.cs" />
     <Compile Include="SharpFont\Library.cs" />
@@ -132,6 +178,16 @@
     <Compile Include="SharpFont\Memory.cs" />
     <Compile Include="SharpFont\Module.cs" />
     <Compile Include="SharpFont\ModuleClass.cs" />
+    <Compile Include="SharpFont\MultipleMasters\Internal\MMAxisRec.cs" />
+    <Compile Include="SharpFont\MultipleMasters\Internal\MMVarRec.cs" />
+    <Compile Include="SharpFont\MultipleMasters\Internal\MultiMasterRec.cs" />
+    <Compile Include="SharpFont\MultipleMasters\Internal\VarAxisRec.cs" />
+    <Compile Include="SharpFont\MultipleMasters\Internal\VarNamedStyleRec.cs" />
+    <Compile Include="SharpFont\MultipleMasters\MMAxis.cs" />
+    <Compile Include="SharpFont\MultipleMasters\MMVar.cs" />
+    <Compile Include="SharpFont\MultipleMasters\MultiMaster.cs" />
+    <Compile Include="SharpFont\MultipleMasters\VarAxis.cs" />
+    <Compile Include="SharpFont\MultipleMasters\VarNamedStyle.cs" />
     <Compile Include="SharpFont\OpenArgs.cs" />
     <Compile Include="SharpFont\OpenFlags.cs" />
     <Compile Include="SharpFont\OpenTypeValidationFlags.cs" />
@@ -140,18 +196,39 @@
     <Compile Include="SharpFont\OutlineFlags.cs" />
     <Compile Include="SharpFont\OutlineFuncs.cs" />
     <Compile Include="SharpFont\OutlineGlyph.cs" />
-    <Compile Include="SharpFont\PInvokeHelper.cs" />
-    <Compile Include="SharpFont\ParamTag.cs" />
     <Compile Include="SharpFont\Parameter.cs" />
+    <Compile Include="SharpFont\ParamTag.cs" />
+    <Compile Include="SharpFont\PInvokeHelper.cs" />
     <Compile Include="SharpFont\PixelMode.cs" />
+    <Compile Include="SharpFont\PostScript\BlendFlags.cs" />
+    <Compile Include="SharpFont\PostScript\DictionaryKeys.cs" />
+    <Compile Include="SharpFont\PostScript\EncodingType.cs" />
+    <Compile Include="SharpFont\PostScript\FaceDict.cs" />
+    <Compile Include="SharpFont\PostScript\FaceInfo.cs" />
+    <Compile Include="SharpFont\PostScript\FontInfo.cs" />
+    <Compile Include="SharpFont\PostScript\Internal\FaceDictRec.cs" />
+    <Compile Include="SharpFont\PostScript\Internal\FaceInfoRec.cs" />
+    <Compile Include="SharpFont\PostScript\Internal\FontInfoRec.cs" />
+    <Compile Include="SharpFont\PostScript\Internal\PrivateRec.cs" />
+    <Compile Include="SharpFont\PostScript\Private.cs" />
     <Compile Include="SharpFont\Raster.cs" />
     <Compile Include="SharpFont\RasterFlags.cs" />
     <Compile Include="SharpFont\RasterFuncs.cs" />
     <Compile Include="SharpFont\RasterParams.cs" />
-    <Compile Include="SharpFont\RenderMode.cs" />
     <Compile Include="SharpFont\Renderer.cs" />
     <Compile Include="SharpFont\RendererClass.cs" />
+    <Compile Include="SharpFont\RenderMode.cs" />
     <Compile Include="SharpFont\SizeMetrics.cs" />
+    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
+    <Compile Include="SharpFont\Internal\FaceRec.cs" />
+    <Compile Include="SharpFont\Internal\GenericRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRec.cs" />
+    <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpFont\SizeRequest.cs" />
     <Compile Include="SharpFont\SizeRequestType.cs" />
     <Compile Include="SharpFont\Span.cs" />
@@ -164,94 +241,10 @@
     <Compile Include="SharpFont\SubGlyph.cs" />
     <Compile Include="SharpFont\SubGlyphFlags.cs" />
     <Compile Include="SharpFont\TrueTypeValidationFlags.cs" />
-    <Compile Include="SharpFont\Bdf\Property.cs" />
-    <Compile Include="SharpFont\Bdf\PropertyType.cs" />
-    <Compile Include="SharpFont\Bdf\Internal\PropertyRec.cs" />
-    <Compile Include="SharpFont\Cache\CMapCache.cs" />
-    <Compile Include="SharpFont\Cache\FaceRequester.cs" />
-    <Compile Include="SharpFont\Cache\ImageCache.cs" />
-    <Compile Include="SharpFont\Cache\ImageType.cs" />
-    <Compile Include="SharpFont\Cache\Manager.cs" />
-    <Compile Include="SharpFont\Cache\Node.cs" />
-    <Compile Include="SharpFont\Cache\SBit.cs" />
-    <Compile Include="SharpFont\Cache\SBitCache.cs" />
-    <Compile Include="SharpFont\Cache\Scaler.cs" />
-    <Compile Include="SharpFont\Cache\Internal\CMapCacheRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\ImageCacheRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\ImageTypeRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\ManagerRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\NodeRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\SBitCacheRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\SBitRec.cs" />
-    <Compile Include="SharpFont\Cache\Internal\ScalerRec.cs" />
-    <Compile Include="SharpFont\Cff\HintingEngine.cs" />
-    <Compile Include="SharpFont\Fnt\Header.cs" />
-    <Compile Include="SharpFont\Fnt\WinFntID.cs" />
-    <Compile Include="SharpFont\Fnt\Internal\HeaderRec.cs" />
-    <Compile Include="SharpFont\Internal\BitmapGlyphRec.cs" />
-    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
-    <Compile Include="SharpFont\Internal\BitmapSizeRec.cs" />
-    <Compile Include="SharpFont\Internal\CharMapRec.cs" />
-    <Compile Include="SharpFont\Internal\FaceRec.cs" />
-    <Compile Include="SharpFont\Internal\GenericRec.cs" />
-    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
-    <Compile Include="SharpFont\Internal\GlyphRec.cs" />
-    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
-    <Compile Include="SharpFont\Internal\GlyphToScriptMapPropertyRec.cs" />
-    <Compile Include="SharpFont\Internal\IncreaseXHeightPropertyRec.cs" />
-    <Compile Include="SharpFont\Internal\ListNodeRec.cs" />
-    <Compile Include="SharpFont\Internal\ListRec.cs" />
-    <Compile Include="SharpFont\Internal\MemoryRec.cs" />
-    <Compile Include="SharpFont\Internal\ModuleClassRec.cs" />
-    <Compile Include="SharpFont\Internal\NativeObject.cs" />
-    <Compile Include="SharpFont\Internal\NativeReference.cs" />
-    <Compile Include="SharpFont\Internal\OpenArgsRec.cs" />
-    <Compile Include="SharpFont\Internal\OutlineFuncsRec.cs" />
-    <Compile Include="SharpFont\Internal\OutlineGlyphRec.cs" />
-    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
-    <Compile Include="SharpFont\Internal\ParameterRec.cs" />
-    <Compile Include="SharpFont\Internal\RasterFuncsRec.cs" />
-    <Compile Include="SharpFont\Internal\RasterParamsRec.cs" />
-    <Compile Include="SharpFont\Internal\RendererClassRec.cs" />
-    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
-    <Compile Include="SharpFont\Internal\SizeRec.cs" />
-    <Compile Include="SharpFont\Internal\SizeRequestRec.cs" />
-    <Compile Include="SharpFont\Internal\SpanRec.cs" />
-    <Compile Include="SharpFont\Internal\StreamDescRec.cs" />
-    <Compile Include="SharpFont\Internal\StreamRec.cs" />
-    <Compile Include="SharpFont\MultipleMasters\MMAxis.cs" />
-    <Compile Include="SharpFont\MultipleMasters\MMVar.cs" />
-    <Compile Include="SharpFont\MultipleMasters\MultiMaster.cs" />
-    <Compile Include="SharpFont\MultipleMasters\VarAxis.cs" />
-    <Compile Include="SharpFont\MultipleMasters\VarNamedStyle.cs" />
-    <Compile Include="SharpFont\MultipleMasters\Internal\MMAxisRec.cs" />
-    <Compile Include="SharpFont\MultipleMasters\Internal\MMVarRec.cs" />
-    <Compile Include="SharpFont\MultipleMasters\Internal\MultiMasterRec.cs" />
-    <Compile Include="SharpFont\MultipleMasters\Internal\VarAxisRec.cs" />
-    <Compile Include="SharpFont\MultipleMasters\Internal\VarNamedStyleRec.cs" />
-    <Compile Include="SharpFont\PostScript\BlendFlags.cs" />
-    <Compile Include="SharpFont\PostScript\DictionaryKeys.cs" />
-    <Compile Include="SharpFont\PostScript\EncodingType.cs" />
-    <Compile Include="SharpFont\PostScript\FaceDict.cs" />
-    <Compile Include="SharpFont\PostScript\FaceInfo.cs" />
-    <Compile Include="SharpFont\PostScript\FontInfo.cs" />
-    <Compile Include="SharpFont\PostScript\Private.cs" />
-    <Compile Include="SharpFont\PostScript\Internal\FaceDictRec.cs" />
-    <Compile Include="SharpFont\PostScript\Internal\FaceInfoRec.cs" />
-    <Compile Include="SharpFont\PostScript\Internal\FontInfoRec.cs" />
-    <Compile Include="SharpFont\PostScript\Internal\PrivateRec.cs" />
     <Compile Include="SharpFont\TrueType\EncodingId.cs" />
     <Compile Include="SharpFont\TrueType\EngineType.cs" />
     <Compile Include="SharpFont\TrueType\Header.cs" />
     <Compile Include="SharpFont\TrueType\HoriHeader.cs" />
-    <Compile Include="SharpFont\TrueType\MaxProfile.cs" />
-    <Compile Include="SharpFont\TrueType\OS2.cs" />
-    <Compile Include="SharpFont\TrueType\Pclt.cs" />
-    <Compile Include="SharpFont\TrueType\PlatformId.cs" />
-    <Compile Include="SharpFont\TrueType\Postscript.cs" />
-    <Compile Include="SharpFont\TrueType\SfntName.cs" />
-    <Compile Include="SharpFont\TrueType\SfntTag.cs" />
-    <Compile Include="SharpFont\TrueType\VertHeader.cs" />
     <Compile Include="SharpFont\TrueType\Internal\HeaderRec.cs" />
     <Compile Include="SharpFont\TrueType\Internal\HoriHeaderRec.cs" />
     <Compile Include="SharpFont\TrueType\Internal\MaxProfileRec.cs" />
@@ -260,14 +253,14 @@
     <Compile Include="SharpFont\TrueType\Internal\PostscriptRec.cs" />
     <Compile Include="SharpFont\TrueType\Internal\SfntNameRec.cs" />
     <Compile Include="SharpFont\TrueType\Internal\VertHeaderRec.cs" />
-    <Compile Include="SharpFont.HarfBuzz\Buffer.cs" />
-    <Compile Include="SharpFont.HarfBuzz\Direction.cs" />
-    <Compile Include="SharpFont.HarfBuzz\Font.cs" />
-    <Compile Include="SharpFont.HarfBuzz\GlyphInfo.cs" />
-    <Compile Include="SharpFont.HarfBuzz\GlyphPosition.cs" />
-    <Compile Include="SharpFont.HarfBuzz\HB.Internal.cs" />
-    <Compile Include="SharpFont.HarfBuzz\HB.cs" />
-    <Compile Include="SharpFont.HarfBuzz\Script.cs" />
+    <Compile Include="SharpFont\TrueType\MaxProfile.cs" />
+    <Compile Include="SharpFont\TrueType\OS2.cs" />
+    <Compile Include="SharpFont\TrueType\Pclt.cs" />
+    <Compile Include="SharpFont\TrueType\PlatformId.cs" />
+    <Compile Include="SharpFont\TrueType\Postscript.cs" />
+    <Compile Include="SharpFont\TrueType\SfntName.cs" />
+    <Compile Include="SharpFont\TrueType\SfntTag.cs" />
+    <Compile Include="SharpFont\TrueType\VertHeader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime.Mac.csproj">
@@ -276,19 +269,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="SharpFont\Properties\" />
+  </ItemGroup>
+  <ItemGroup>
     <NativeReference Include="..\..\..\3rdParty\FreeType\libfreetype6.dylib">
       <Kind>Dynamic</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\..\3rdParty\FreeType\libfreetype-6.dylib">
-      <Link>libfreetype-6.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\3rdParty\HarfBuzz\Mac\libharfbuzz-0.dylib">
-      <Link>libharfbuzz-0.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>

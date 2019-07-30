@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Wi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.Win", "..\Yuzu\Yuzu.Win.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.Win.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win", "Orange.Win.csproj", "{6F0C1A51-492A-4E6E-B302-E212D441EBF3}"
 EndProject
@@ -18,8 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumquat.Win", "..\Kumquat\Kumquat.Win.csproj", "{B1A51655-D2AD-4D03-B3F2-619F27FECBC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Win", "..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj", "{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calamansi.Win", "..\Lime\Extensions\Calamansi\Calamansi.Win.csproj", "{206E03D2-269A-433E-9BB0-CA07B30C3F19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,18 +125,6 @@ Global
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|Mixed Platforms.Build.0 = Release.SubpixelText|x86
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|x86.ActiveCfg = Release.SubpixelText|x86
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|x86.Build.0 = Release.SubpixelText|x86
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Debug|x86.Build.0 = Debug|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|Any CPU.Build.0 = Release|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|x86.ActiveCfg = Release|Any CPU
-		{206E03D2-269A-433E-9BB0-CA07B30C3F19}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using SharpFont.TrueType;
 
 namespace Lime
 {
-	public class FontRenderer : IDisposable
+	internal class FontRenderer : IDisposable
 	{
 		public class Glyph
 		{
@@ -28,8 +28,7 @@ namespace Lime
 		private Face face;
 		private Library library;
 		private int lastHeight;
-		public bool LcdSupported { get; set; } = true;
-		public Face Face => face;
+		private bool lcdSupported;
 		/// <summary>
 		/// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
 		/// so the visual font height for the same fontHeight will be different for different ttf files.
@@ -43,16 +42,16 @@ namespace Lime
 			library = new Library();
 			face = library.NewMemoryFace(fontData, 0);
 #if SUBPIXEL_TEXT
-			LcdSupported = true;
+			lcdSupported = true;
 			try {
 				// can not use any other filtration to achive a windows like look, 
 				// becouse filtering creates wrong spacing between chars, and no visible way to correct it
 				library.SetLcdFilter(LcdFilter.None);
 			} catch (FreeTypeException) {
-				LcdSupported = false;
+				lcdSupported = false;
 			}
 #else
-			LcdSupported = false;
+			lcdSupported = false;
 #endif
 		}
 
@@ -84,15 +83,15 @@ namespace Lime
 				return null;
 			}
 
-			face.LoadGlyph(glyphIndex, LoadFlags.Default, LcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
-			face.Glyph.RenderGlyph(LcdSupported ? RenderMode.Lcd : RenderMode.Normal);
+			face.LoadGlyph(glyphIndex, LoadFlags.Default, lcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
+			face.Glyph.RenderGlyph(lcdSupported ? RenderMode.Lcd : RenderMode.Normal);
 			FTBitmap bitmap = face.Glyph.Bitmap;
 
 			var verticalOffset = height - face.Glyph.BitmapTop + face.Size.Metrics.Descender.Round();
 			var bearingX = (float) face.Glyph.Metrics.HorizontalBearingX;
 			bool rgbIntensity = bitmap.PixelMode == PixelMode.Lcd || bitmap.PixelMode == PixelMode.VerticalLcd;
 			var glyph = new Glyph {
-				Pixels =  char.IsWhiteSpace(@char) ? new byte[0] : bitmap.BufferData,
+				Pixels = bitmap.BufferData,
 				RgbIntensity = rgbIntensity,
 				Pitch = bitmap.Pitch,
 				Width = rgbIntensity ? bitmap.Width / 3 : bitmap.Width,

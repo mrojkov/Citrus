@@ -365,10 +365,10 @@ namespace SharpFont
 				throw new FreeTypeException(err);
 
 			//check if the pointer didn't change.
-			if (sourceRef == reference)
+			if (sourceRef == Reference)
 				return this;
 			else
-				return new Glyph(sourceRef, parentLibrary);
+				return new Glyph(sourceRef, Library);
 		}
 
 		/// <summary>
@@ -404,10 +404,10 @@ namespace SharpFont
 				throw new FreeTypeException(err);
 
 			//check if the pointer didn't change.
-			if (sourceRef == reference)
+			if (sourceRef == Reference)
 				return this;
 			else
-				return new Glyph(sourceRef, parentLibrary );
+				return new Glyph(sourceRef, Library);
 		}
 
 		#endregion

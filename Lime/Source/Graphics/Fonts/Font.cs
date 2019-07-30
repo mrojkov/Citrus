@@ -28,7 +28,7 @@ namespace Lime
 		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
 		public List<ITexture> Textures { get { return CharCollection.Textures; } }
 		[YuzuMember]
-		public FontCharCollection CharCollection { get; protected set; }
+		public FontCharCollection CharCollection { get; private set; }
 		public IFontCharSource Chars { get { return CharCollection; } }
 		[YuzuMember]
 		public bool RoundCoordinates { get; set; } = false;

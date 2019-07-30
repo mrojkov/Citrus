@@ -29,6 +29,7 @@ namespace SharpFont
 	/// <summary>
 	/// An exception that gets thrown when FreeType returns an error code.
 	/// </summary>
+	[Serializable]
 	public class FreeTypeException : Exception
 	{
 		private Error error;
