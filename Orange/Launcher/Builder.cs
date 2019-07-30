@@ -39,7 +39,7 @@ namespace Launcher
 
 		private void RestoreNuget()
 		{
-			Orange.Nuget.Restore(SolutionPath);
+			Orange.Nuget.Restore(SolutionPath, builderPath);
 		}
 
 		private void SynchronizeAllProjects()

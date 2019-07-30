@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using Orange.Source;
 
 namespace Orange
 {
@@ -15,7 +16,8 @@ namespace Orange
 			var projectDirectory = Path.Combine(Toolbox.CalcCitrusDirectory(), projectName);
 #if WIN
 			var solutionPath = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			Nuget.Restore(solutionPath);
+			MSBuild.TryGetMSBuildPath(out var msbuildPath);
+			Nuget.Restore(solutionPath, msbuildPath);
 			var solutionBuilder = new SolutionBuilder(
 				TargetPlatform.Win,
 				solutionPath,

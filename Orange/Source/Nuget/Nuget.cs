@@ -30,9 +30,11 @@ namespace Orange
 #endif
 		}
 
-		public static int Restore(string projectDirectory)
+		public static int Restore(string projectDirectory, string builderPath = null)
 		{
-			return Start($"restore \"{projectDirectory}\"");
+			var command = $"restore \"{projectDirectory}\" ";
+			command += builderPath == null ? "" : $"-MSBuildPath \"{Path.GetDirectoryName(builderPath)}\"";
+			return Start(command);
 		}
 
 		public static int Start(string args)

@@ -63,7 +63,7 @@ namespace Orange.Source
 			AddArgument("/p:Configuration=" + Configuration);
 		}
 
-		private static bool TryGetMSBuildPath(out string path)
+		public static bool TryGetMSBuildPath(out string path)
 		{
 			var msBuild16Path = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
