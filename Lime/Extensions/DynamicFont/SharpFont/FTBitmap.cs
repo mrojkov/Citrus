@@ -244,9 +244,7 @@ namespace SharpFont
 
 				//TODO deal with negative pitch
 				byte[] data = new byte[rec.rows * rec.pitch];
-				if (data.Length != 0) { 
-					Marshal.Copy(rec.buffer, data, 0, data.Length);
-				}
+				Marshal.Copy(rec.buffer, data, 0, data.Length);
 				return data;
 			}
 		}
