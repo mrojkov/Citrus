@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,11 +11,13 @@ namespace Calamansi
 {
 	public class Calamansi
 	{
-		private static HashSet<char> kerningsCharacters = new HashSet<char>(
-			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"" +
-			"#$%&ˆ‘’“”´˜`'„()–—*+-÷~,.…/:;<>=?@[]\\^_¯{}|€‚ƒ‹›•§«»©®™¨°¿" +
-			"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿšœžŸŒŽŠ¡¢£¤¥µ¶ " +
-			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯабвгдеёжзийклмнопрстуфхшщчцъьыэюя");
+		private static List<HashSet<char>> kerningsCharsets = new List<HashSet<char>> {
+			new HashSet<char>("0123456789"),
+			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"),
+			new HashSet<char>("abcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
+			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯ"),
+			new HashSet<char>("абвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
+		};
 
 		public static void UpdateMainCharset(CalamansiConfig config, string assetDirectory)
 		{
@@ -41,19 +44,29 @@ namespace Calamansi
 			config.Main.Charset = string.Join("", characters.OrderBy(c => c));
 		}
 
-		public static void GenerateKerningPairs(CalamansiFontCharCollection fnt, FontRenderer renderer, IEnumerable<char> charset)
+		private static float CalcPixelSize(int height, Face face)
 		{
-			//var pixelSize = (uint) Math.Round(Math.Abs(CalcPixelSize(height)));
-			//face.SetCharSize(0, height, pixelSize, pixelSize);
+			var designHeight = (float)(face.BBox.Top - face.BBox.Bottom);
+			var scale = height / designHeight;
+			var pixelSize = scale * face.UnitsPerEM;
+			return pixelSize;
+		}
 
+		public static void GenerateKerningPairs(CalamansiFontCharCollection fnt, FontRenderer renderer,
+			CalamansiConfig config, IEnumerable<char> charset)
+		{
 			var face = renderer.Face;
 			var font = SharpFont.HarfBuzz.Font.FromFTFace(face);
+			var height = (int)(config.SDF ? config.Height * config.SDFScale : config.Height);
+			var pixelSize = (uint)Math.Round(Math.Abs(CalcPixelSize(height, face)));
+			face.SetCharSize(0, height, pixelSize, pixelSize);
 			foreach (var lhs in charset) {
-				if (!kerningsCharacters.Contains(lhs)) {
+				var kerningCharset = kerningsCharsets.FirstOrDefault(c => c.Contains(lhs));
+				if (kerningCharset == null) {
 					continue;
 				}
-				var fontChar = fnt.Get('a', 0f);
-				foreach (var rhs in kerningsCharacters) {
+				var fontChar = fnt.Get(lhs, 0f);
+				foreach (var rhs in kerningCharset) {
 					var buf = new Buffer {
 						Direction = Direction.LeftToRight,
 						Script = Script.Latin
@@ -66,18 +79,17 @@ namespace Calamansi
 					var glyphPositions = buf.GlyphPositions();
 
 					if (glyphInfos.Length != 2) {
-						// Impossible to recognize this case
 						continue;
 					}
 					face.LoadGlyph(glyphInfos[1].codepoint, LoadFlags.Default, LoadTarget.Normal);
 					face.Glyph.RenderGlyph(RenderMode.Normal);
 					var bufferShift = glyphPositions[1].xAdvance >> 6;
 					var simpleShift = (int) (face.Glyph.Metrics.HorizontalBearingX * 2 + face.Glyph.Metrics.Width * 2 -
-					                         face.Glyph.Metrics.HorizontalAdvance);
-					var kerningAmout = bufferShift - simpleShift;
-					if (kerningAmout != 0) {
+											face.Glyph.Metrics.HorizontalAdvance);
+					var kerningAmount = bufferShift - simpleShift;
+					if (kerningAmount != 0) {
 						fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
-						fontChar.KerningPairs.Add(new KerningPair { Char = rhs, Kerning = kerningAmout });
+						fontChar.KerningPairs.Add(new KerningPair { Char = rhs, Kerning = kerningAmount });
 					}
 				}
 			}

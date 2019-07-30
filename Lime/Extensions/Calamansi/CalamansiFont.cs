@@ -23,6 +23,7 @@ namespace Calamansi
 		public void SaveAsTft(string path, string assetDirectory)
 		{
 			var basePath = Path.ChangeExtension(path, null);
+			var absolutePath = AssetPath.Combine(assetDirectory, path);
 			for (int i = 0; i < CharCollection.Textures.Count; i++) {
 				var texture = CharCollection.Textures[i];
 				var pixels = texture.GetPixels();
@@ -37,12 +38,12 @@ namespace Calamansi
 
 				} else {
 					using (var bm = new Bitmap(pixels, w, h)) {
-						bm.SaveTo(basePath + (i > 0 ? $"{i:00}.png" : ".png"));
+						bm.SaveTo(AssetPath.Combine(assetDirectory, basePath + (i > 0 ? $"{i:00}.png" : ".png")));
 					}
 				}
 				CharCollection.Textures[i] = new SerializableTexture(basePath + (i > 0 ? $"{i:00}" : ""));
 			}
-			Serialization.WriteObjectToFile(Path.ChangeExtension(path, "tft"), this, Serialization.Format.JSON);
+			Serialization.WriteObjectToFile(Path.ChangeExtension(absolutePath, "tft"), this, Serialization.Format.JSON);
 		}
 	}
 }

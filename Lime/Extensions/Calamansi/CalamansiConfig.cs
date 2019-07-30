@@ -31,6 +31,8 @@ namespace Calamansi
 		public bool SDF { get; set; }
 		[YuzuMember]
 		public float SDFScale { get; set; } = 0.25f;
+		[YuzuMember]
+		public Size TextureSize { get; set; }
 
 		public void SaveTo(string path) =>
 			Lime.Yuzu.Instance.Value.WriteObjectToFile(path, this, Serialization.Format.JSON);

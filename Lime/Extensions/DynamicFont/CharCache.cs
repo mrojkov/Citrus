@@ -94,14 +94,14 @@ namespace Lime
 			textures.Add(texture);
 		}
 
-		private Size CalcTextureSize()
+		protected virtual Size CalcTextureSize()
 		{
 			const int glyphsPerTexture = 30;
 			var glyphMaxArea = fontHeight * (fontHeight / 2);
 			var size =
 				CalcUpperPowerOfTwo((int)Math.Sqrt(glyphMaxArea * glyphsPerTexture))
 				.Clamp(64, 2048);
-			return new Size(size, size);
+			return new Size(2048, 2048);
 		}
 
 		private static int CalcUpperPowerOfTwo(int x)

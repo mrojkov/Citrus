@@ -9,8 +9,11 @@ namespace Calamansi
 	{
 		public CalamansiFontCharCollection(CalamansiConfig config, string assetDirectory)
 		{
-			var chars = new CalamansiCharCache(config.Height, null, Textures);
-			chars.HPadding = chars.VPadding = config.Padding;
+			var chars = new CalamansiCharCache(config.Height, null, Textures) {
+				TextureSize = config.TextureSize,
+				VPadding = config.Padding,
+				HPadding = config.Padding,
+			};
 			ProcessOption(config, config.Main);
 			foreach (var option in config.AlwaysInclude) {
 				ProcessOption(config, option);
@@ -33,7 +36,7 @@ namespace Calamansi
 					}
 					((ICollection<FontChar>)this).Add(fontChar);
 				}
-				Calamansi.GenerateKerningPairs(this, fontRenderer, option.Charset);
+				Calamansi.GenerateKerningPairs(this, fontRenderer, cfg, option.Charset);
 			}
 
 		}
