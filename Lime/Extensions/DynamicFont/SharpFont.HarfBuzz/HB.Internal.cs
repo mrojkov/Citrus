@@ -8,19 +8,22 @@ namespace SharpFont.HarfBuzz
 {
 	public static partial class HB
 	{
+#if MAC
+		private const string HarfBuzzDll = "libharfbuzz-0.dylib";
+#else
 		private const string HarfBuzzDll = "libharfbuzz-0.dll";
-
+#endif
 		private const CallingConvention CallConvention = CallingConvention.Cdecl;
 
-		#region hb-blob
+#region hb-blob
 
-		#endregion
+#endregion
 
-		#region hb-buffer
+#region hb-buffer
 
-		#endregion
+#endregion
 
-		#region hb-common
+#region hb-common
 
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern Direction hb_direction_from_string(string str, int len);
@@ -28,21 +31,21 @@ namespace SharpFont.HarfBuzz
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern string hb_direction_to_string(Direction dir);
 
-		#endregion
+#endregion
 
-		#region hb-coretext
+#region hb-coretext
 
-		#endregion
+#endregion
 
-		#region hb-face
+#region hb-face
 
-		#endregion
+#endregion
 
-		#region hb-font
+#region hb-font
 
-		#endregion
+#endregion
 
-		#region hb-ft
+#region hb-ft
 
 		//TODO get proper delegate type for "destroy" parameters
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
@@ -60,45 +63,45 @@ namespace SharpFont.HarfBuzz
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern IntPtr hb_ft_font_get_face(IntPtr font);
 
-		#endregion
+#endregion
 
-		#region hb-glib
+#region hb-glib
 
-		#endregion
+#endregion
 
-		#region hb-gobject
+#region hb-gobject
 
-		#endregion
+#endregion
 
-		#region hb-graphite2
+#region hb-graphite2
 
-		#endregion
+#endregion
 
-		#region hb-icu
+#region hb-icu
 
-		#endregion
+#endregion
 
-		#region hb-ot
+#region hb-ot
 
-		#endregion
+#endregion
 
-		#region hb-set
+#region hb-set
 
-		#endregion
+#endregion
 
-		#region hb-shape
+#region hb-shape
 
-		#endregion
+#endregion
 
-		#region hb-unicode
+#region hb-unicode
 
-		#endregion
+#endregion
 
-		#region hb-uniscribe
+#region hb-uniscribe
 
-		#endregion
+#endregion
 
-		#region hb-version
+#region hb-version
 
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern void hb_version(out uint major, out uint minor, out uint micro);
@@ -109,9 +112,9 @@ namespace SharpFont.HarfBuzz
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern IntPtr hb_version_string();
 
-		#endregion
+#endregion
 
-		#region Unfinished Entry Points
+#region Unfinished Entry Points
 
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern void hb_blob_create();
@@ -827,6 +830,6 @@ namespace SharpFont.HarfBuzz
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern void hb_uniscribe_font_get_logfontw();
 
-		#endregion
+#endregion
 	}
 }

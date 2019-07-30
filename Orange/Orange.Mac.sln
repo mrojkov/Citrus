@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderCompilerBinding.Mac",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoltenVK", "..\3rdParty\MoltenVK\MoltenVK.csproj", "{25A88ABB-AC39-41AD-92EF-DD91341863C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calamansi.Mac", "..\Lime\Extensions\Calamansi\Calamansi.Mac.csproj", "{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -69,6 +71,10 @@ Global
 		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Debug|x86.Build.0 = Debug|Any CPU
 		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Release|x86.ActiveCfg = Release|Any CPU
 		{25A88ABB-AC39-41AD-92EF-DD91341863C8}.Release|x86.Build.0 = Release|Any CPU
+		{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}.Debug|x86.Build.0 = Debug|Any CPU
+		{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}.Release|x86.ActiveCfg = Release|Any CPU
+		{B108E9B8-E6B8-4E50-B47E-5E53F5571CC1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
