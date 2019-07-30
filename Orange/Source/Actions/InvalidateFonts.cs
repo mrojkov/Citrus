@@ -8,7 +8,7 @@ using Exception = Lime.Exception;
 
 namespace Orange.Source.Actions
 {
-	public static class GenerateFonts
+	public static class InvalidateFonts
 	{
 		[Export(nameof(OrangePlugin.MenuItemsWithErrorDetails))]
 		[ExportMetadata("Label", "Invalidate Fonts")]
@@ -19,9 +19,10 @@ namespace Orange.Source.Actions
 				try {
 					var config = Lime.Yuzu.Instance.Value.ReadObjectFromFile<CalamansiConfig>(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath));
 					Calamansi.Calamansi.UpdateMainCharset(config, The.Workspace.AssetsDirectory);
-					config.SaveTo(AssetPath.Combine(The.Workspace.AssetsDirectory, configPath));
+					var basePath = new Uri(The.Workspace.AssetsDirectory + "\\").MakeRelativeUri(new Uri(configPath));
+					config.SaveTo(configPath);
 					var font = new CalamansiFont(config, The.Workspace.AssetsDirectory);
-					font.SaveAsTft(Path.ChangeExtension(configPath, null), The.Workspace.AssetsDirectory);
+					font.SaveAsTft(Path.ChangeExtension(basePath.OriginalString, null), The.Workspace.AssetsDirectory);
 				} catch (Exception e) {
 					Console.WriteLine($"Failed to generate font using {configPath} config");
 					Console.WriteLine(e);
