@@ -33,6 +33,9 @@ namespace Lime
 		{
 #if TANGERINE
 			// Do not cache sounds for Tangerine to avoid troubles with sound editing
+			if (!AssetBundle.Current.FileExists(path)) {
+				return null;
+			}
 			using (var stream = PackedAssetBundle.Current.OpenFileLocalized(path)) {
 				var memStream = new MemoryStream((int)stream.Length);
 				stream.CopyTo(memStream);

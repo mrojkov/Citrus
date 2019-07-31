@@ -23,6 +23,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
 		public readonly FilesDropHandler FilesDropHandler;
+		public readonly WaveformCache WaveformCache;
 
 		private Vector2 offset;
 		public Vector2 Offset
@@ -88,6 +89,7 @@ namespace Tangerine.UI.Timeline
 			Roll = new RollPane();
 			CreateProcessors();
 			InitializeWidgets();
+			WaveformCache = new WaveformCache(Project.Current.FileSystemWatcher);
 			RootWidget.AddChangeWatcher(() => Document.Current.Container, (container) => {
 				Offset = container.Components.GetOrAdd<TimelineOffset>().Offset;
 			});
@@ -200,7 +202,7 @@ namespace Tangerine.UI.Timeline
 
 		ITaskProvider PanelTitleUpdater() =>
 			new Property<Node>(() => Document.Current.Container).WhenChanged(_ => UpdateTitle());
-		
+
 		ITaskProvider ShowCurveEditorTask()
 		{
 			var editCurvesProp = new Property<bool>(() => TimelineUserPreferences.Instance.EditCurves);
