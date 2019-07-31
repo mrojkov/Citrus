@@ -31,6 +31,15 @@ namespace Lime
 
 		public Stream OpenStream(string path)
 		{
+#if TANGERINE
+			// Do not cache sounds for Tangerine to avoid troubles with sound editing
+			using (var stream = PackedAssetBundle.Current.OpenFileLocalized(path)) {
+				var memStream = new MemoryStream((int)stream.Length);
+				stream.CopyTo(memStream);
+				memStream.Position = 0;
+				return memStream;
+			}
+#else
 			var stream = GetCachedStream(path);
 			if (stream != null) {
 				return stream;
@@ -44,6 +53,7 @@ namespace Lime
 				CacheSoundAsync(path);
 			}
 			return stream;
+#endif
 		}
 
 		private void CacheSoundAsync(string path)
