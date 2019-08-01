@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -9,16 +9,12 @@ namespace Tangerine.UI.Timeline.Components
 {
 	public class GridAudioView : GridNodeView
 	{
-		static Dictionary<string, Waveform> waveforms = new Dictionary<string, Waveform>();
-
 		readonly Audio audio;
 
 		public GridAudioView(Audio audio) : base(audio)
 		{
 			this.audio = audio;
 		}
-
-		const int pixelsPerFrame = 30;
 
 		protected override void Render(Widget widget)
 		{
@@ -32,14 +28,14 @@ namespace Tangerine.UI.Timeline.Components
 					var sample = GetSampleAtFrame(key.Frame);
 					Waveform waveform = null;
 					try {
-						waveform = GetWaveform(sample.Path);
+						waveform = Timeline.Instance.WaveformCache.GetWaveform(sample.Path);
 					} catch (System.Exception) {
 						continue;
 					}
 					var pos = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
 					var scale = Document.Current.Format == DocumentFormat.Scene ? 0.5f : 1;
 					foreach (var p in waveform.Parts) {
-						var size = new Vector2(p.Width * scale * TimelineMetrics.ColWidth / pixelsPerFrame, widget.Height);
+						var size = new Vector2(p.Width * scale * TimelineMetrics.ColWidth / WaveformCache.PixelsPerFrame, widget.Height);
 						Renderer.DrawRect(pos, pos + size, ColorTheme.Current.TimelineGrid.WaveformBackground);
 						Renderer.DrawSprite(p.Texture, ColorTheme.Current.TimelineGrid.WaveformColor, pos, size, Vector2.Zero, Vector2.One);
 						pos.X += size.X;
@@ -48,7 +44,60 @@ namespace Tangerine.UI.Timeline.Components
 			}
 		}
 
-		static unsafe Waveform GetWaveform(string path)
+		SerializableSample GetSampleAtFrame(int frame)
+		{
+			Animator<SerializableSample> sampleAnimator;
+			if (!audio.Animators.TryFind("Sample", out sampleAnimator)) {
+				return audio.Sample;
+			}
+			var keys = sampleAnimator.ReadonlyKeys;
+			var sample = keys.Count > 0 ? keys[0].Value : audio.Sample;
+			foreach (var key in keys) {
+				if (key.Frame <= frame) {
+					sample = key.Value;
+				}
+			}
+			return sample;
+		}
+	}
+
+	public class Waveform
+	{
+		public struct Part
+		{
+			public int Width;
+			public ITexture Texture;
+		}
+
+		public readonly List<Part> Parts = new List<Part>();
+	}
+
+	public class WaveformCache
+	{
+		public const int PixelsPerFrame = 30;
+
+		private readonly Dictionary<string, Waveform> waveforms = new Dictionary<string, Waveform>();
+
+		public WaveformCache(IFileSystemWatcher fsWatcher)
+		{
+			fsWatcher.Changed += HandleFileSystemEvent;
+			fsWatcher.Deleted += HandleFileSystemEvent;
+			fsWatcher.Renamed += (oldName, _) => HandleFileSystemEvent(oldName);
+		}
+
+		private void HandleFileSystemEvent(string path)
+		{
+			if (path.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase)) {
+				Purge();
+			}
+		}
+
+		public void Purge()
+		{
+			waveforms.Clear();
+		}
+
+		public unsafe Waveform GetWaveform(string path)
 		{
 			Waveform waveform;
 			if (waveforms.TryGetValue(path, out waveform)) {
@@ -57,42 +106,48 @@ namespace Tangerine.UI.Timeline.Components
 			waveform = new Waveform();
 			var textureWidth = 256;
 			var textureHeight = 64;
-			using (var fs = AssetBundle.Current.OpenFile(path + ".ogg")) {
+			try {
+				using (var fs = AssetBundle.Current.OpenFile(path + ".ogg")) {
 					using (var decoder = AudioDecoderFactory.CreateDecoder(fs)) {
-					var stereo = decoder.GetFormat() == AudioFormat.Stereo16;
-					while (true) {
-						var maxPartLength = textureWidth / (AnimationUtils.FramesPerSecond * pixelsPerFrame);
-						var maxPartSamples = (int)(maxPartLength * decoder.GetFrequency());
-						var maxBlocks = maxPartSamples / decoder.GetBlockSize() * (stereo ? 4 : 2);
-						var samples = Marshal.AllocHGlobal(maxBlocks * decoder.GetBlockSize());
-						try {
-							var numBlocks = decoder.ReadBlocks(samples, 0, maxBlocks);
-							if (numBlocks == 0) {
-								break;
+						var stereo = decoder.GetFormat() == AudioFormat.Stereo16;
+						while (true) {
+							var maxPartLength = textureWidth / (AnimationUtils.FramesPerSecond * PixelsPerFrame);
+							var maxPartSamples = (int)(maxPartLength * decoder.GetFrequency());
+							var maxBlocks = maxPartSamples / decoder.GetBlockSize() * (stereo ? 4 : 2);
+							var samples = Marshal.AllocHGlobal(maxBlocks * decoder.GetBlockSize());
+							try {
+								var numBlocks = decoder.ReadBlocks(samples, 0, maxBlocks);
+								if (numBlocks == 0) {
+									break;
+								}
+								var numSamples = numBlocks * decoder.GetBlockSize() / (stereo ? 4 : 2);
+								var pixels = new Color4[textureWidth * textureHeight];
+								int width = numSamples * textureWidth / maxPartSamples;
+								if (stereo) {
+									BuildMonoWaveform((short*)samples, 2, numSamples, pixels, textureWidth, width, 0, textureHeight / 2 - 1);
+									BuildMonoWaveform(((short*)samples + 1), 2, numSamples, pixels, textureWidth, width, textureHeight / 2 + 1, textureHeight - 1);
+								} else {
+									BuildMonoWaveform((short*)samples, 1, numSamples, pixels, textureWidth, width, 0, textureHeight - 1);
+								}
+								var texture = new Texture2D();
+								texture.LoadImage(pixels, textureWidth, textureHeight);
+								waveform.Parts.Add(new Waveform.Part { Texture = texture, Width = width });
+							} finally {
+								Marshal.FreeHGlobal(samples);
 							}
-							var numSamples = numBlocks * decoder.GetBlockSize() / (stereo ? 4 : 2);
-							var pixels = new Color4[textureWidth * textureHeight];
-							int width = numSamples * textureWidth / maxPartSamples;
-							if (stereo) {
-								BuildMonoWaveform((short *)samples, 2, numSamples, pixels, textureWidth, width, 0, textureHeight / 2 - 1);
-								BuildMonoWaveform(((short *)samples + 1), 2, numSamples, pixels, textureWidth, width, textureHeight / 2 + 1, textureHeight - 1);
-							} else {
-								BuildMonoWaveform((short *)samples, 1, numSamples, pixels, textureWidth, width, 0, textureHeight - 1);
-							}
-							var texture = new Texture2D();
-							texture.LoadImage(pixels, textureWidth, textureHeight);
-							waveform.Parts.Add(new Waveform.Part { Texture = texture, Width = width });
-						} finally {
-							Marshal.FreeHGlobal(samples);
 						}
 					}
 				}
+			} catch {
+				var texture = new Texture2D();
+				texture.LoadImage(new Color4[1], 1, 1);
+				waveform.Parts.Add(new Waveform.Part { Texture = texture, Width = 1 });
 			}
 			waveforms.Add(path, waveform);
 			return waveform;
 		}
 
-		unsafe static void BuildMonoWaveform(short* samples, int stride, int numSamples, Color4[] pixels, int textureWidth, int width, int top, int bottom)
+		private unsafe static void BuildMonoWaveform(short* samples, int stride, int numSamples, Color4[] pixels, int textureWidth, int width, int top, int bottom)
 		{
 			int currentSample = 0;
 			int accumulator = 0;
@@ -118,33 +173,6 @@ namespace Tangerine.UI.Timeline.Components
 					pixels[i + j * textureWidth] = Color4.White;
 				}
 			}
-		}
-
-		SerializableSample GetSampleAtFrame(int frame)
-		{
-			Animator<SerializableSample> sampleAnimator;
-			if (!audio.Animators.TryFind("Sample", out sampleAnimator)) {
-				return audio.Sample;
-			}
-			var keys = sampleAnimator.ReadonlyKeys;
-			var sample = keys.Count > 0 ? keys[0].Value : audio.Sample;
-			foreach (var key in keys) {
-				if (key.Frame <= frame) {
-					sample = key.Value;
-				}
-			}
-			return sample;
-		}
-
-		class Waveform
-		{
-			public struct Part
-			{
-				public int Width;
-				public ITexture Texture;
-			}
-
-			public readonly List<Part> Parts = new List<Part>();
 		}
 	}
 }

@@ -21,7 +21,7 @@ namespace Tangerine.Core
 		private readonly List<Type> registeredNodeTypes = new List<Type>();
 		private readonly List<Type> registeredComponentTypes = new List<Type>();
 
-		private Lime.FileSystemWatcher fsWatcher;
+		public Lime.FileSystemWatcher FileSystemWatcher { get; private set; }
 
 		public static readonly Project Null = new Project();
 		public static Project Current { get; private set; } = Null;
@@ -77,6 +77,7 @@ namespace Tangerine.Core
 			}
 			Preferences = new ProjectPreferences();
 			Preferences.Initialize();
+			FileSystemWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			if (File.Exists(UserprefsPath)) {
 				try {
 					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
@@ -103,11 +104,10 @@ namespace Tangerine.Core
 				}
 			}
 			SetLocale(Locale);
-			fsWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
-			fsWatcher.Changed += (path) => HandleFileSystemWatcherEvent(path);
-			fsWatcher.Created += (path) => HandleFileSystemWatcherEvent(path);
-			fsWatcher.Deleted += HandleFileSystemWatcherEvent;
-			fsWatcher.Renamed += (previousPath, path) => {
+			FileSystemWatcher.Changed += (path) => HandleFileSystemWatcherEvent(path);
+			FileSystemWatcher.Created += (path) => HandleFileSystemWatcherEvent(path);
+			FileSystemWatcher.Deleted += HandleFileSystemWatcherEvent;
+			FileSystemWatcher.Renamed += (previousPath, path) => {
 				// simulating rename as pairs of deleted / created events
 				HandleFileSystemWatcherEvent(path);
 				if (File.Exists(path)) {
@@ -157,8 +157,8 @@ namespace Tangerine.Core
 					return false;
 				}
 			}
-			fsWatcher?.Dispose();
-			fsWatcher = null;
+			FileSystemWatcher?.Dispose();
+			FileSystemWatcher = null;
 			UserPreferences.Documents.Clear();
 			foreach (var d in documents) {
 				UserPreferences.Documents.Add(d.Path);
