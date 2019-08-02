@@ -342,6 +342,8 @@
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingPresenter.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderChainBuilder.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingRenderObject.cs" />
+    <Compile Include="Source\Widgets\Materials\TwistComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\TwistMaterial.cs" />
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
