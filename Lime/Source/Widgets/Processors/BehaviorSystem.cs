@@ -42,7 +42,7 @@ namespace Lime
 				behaviorsToStart.Remove(behavior.StartQueueNode);
 				behavior.StartQueueNode = null;
 			} else {
-				behavior.UpdateFamily?.Dequeue(behavior);
+				behavior.UpdateFamily?.Remove(behavior);
 				behavior.UpdateFamily = null;
 				behavior.Stop();
 			}
@@ -172,30 +172,26 @@ namespace Lime
 		public void Filter(BehaviorComponent b)
 		{
 			if ((b.Owner.GloballyFrozen && !UpdateFrozen) || b.Suspended) {
-				Dequeue(b);
+				Remove(b);
 			} else {
-				Enqueue(b);
+				Add(b);
 			}
 		}
 
-		public bool Enqueue(BehaviorComponent b)
+		public void Add(BehaviorComponent b)
 		{
 			if (b.IndexInUpdateFamily < 0) {
 				b.IndexInUpdateFamily = behaviors.Count;
 				behaviors.Add(b);
-				return true;
 			}
-			return false;
 		}
 
-		public bool Dequeue(BehaviorComponent b)
+		public void Remove(BehaviorComponent b)
 		{
 			if (b.IndexInUpdateFamily >= 0) {
 				behaviors[b.IndexInUpdateFamily] = null;
 				b.IndexInUpdateFamily = -1;
-				return true;
 			}
-			return false;
 		}
 
 		public void Update(float delta)
