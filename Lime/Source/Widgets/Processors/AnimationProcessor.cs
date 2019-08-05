@@ -1,104 +1,110 @@
+using System;
 using System.Collections.Generic;
 
 namespace Lime
 {
 	public class AnimationProcessor : NodeComponentProcessor<AnimationComponent>
 	{
-		private List<List<Animation>> runningAnimationsByDepth = new List<List<Animation>>();
+		private BucketQueue<Animation> currQueue = new BucketQueue<Animation>(0);
+		private BucketQueue<Animation> nextQueue = new BucketQueue<Animation>(0);
+		private Stack<BucketQueueNode<Animation>> freeQueueNodes = new Stack<BucketQueueNode<Animation>>();
+
+		private BucketQueueNode<Animation> AcquireQueueNode(Animation animation)
+		{
+			var node = freeQueueNodes.Count > 0 ? freeQueueNodes.Pop() : new BucketQueueNode<Animation>();
+			node.Value = animation;
+			return node;
+		}
+
+		private void ReleaseQueueNode(BucketQueueNode<Animation> node)
+		{
+			node.Value = null;
+			freeQueueNodes.Push(node);
+		}
 
 		protected override void Add(AnimationComponent component)
 		{
-			if (!component.Owner.GloballyFrozen) {
-				Enable(component);
+			component.Processor = this;
+			component.Depth = GetNodeDepth(component.Owner);
+			if (component.Depth >= currQueue.BucketCount) {
+				BucketQueue<Animation>.Resize(ref currQueue, component.Depth + 1);
+				BucketQueue<Animation>.Resize(ref nextQueue, component.Depth + 1);
+			}
+			if (component.Owner.GloballyFrozen) {
+				return;
+			}
+			foreach (var a in component.Animations) {
+				if (a.IsRunning) {
+					Activate(a);
+				}
 			}
 		}
 
 		protected override void Remove(AnimationComponent component, Node owner)
 		{
-			Disable(component);
+			component.Processor = null;
+			component.Depth = -1;
+			foreach (var a in component.Animations) {
+				Deactivate(a);
+			}
+		}
+
+		internal void OnAnimationRun(Animation animation)
+		{
+			if (!animation.OwnerNode.GloballyFrozen) {
+				Activate(animation);
+			}
+		}
+
+		internal void OnAnimationStopped(Animation animation)
+		{
+			Deactivate(animation);
 		}
 
 		protected override void OnOwnerFrozenChanged(AnimationComponent component)
 		{
 			if (component.Owner.GloballyFrozen) {
-				Disable(component);
+				foreach (var a in component.Animations) {
+					Deactivate(a);
+				}
 			} else {
-				Enable(component);
-			}
-		}
-
-		private void Enable(AnimationComponent component)
-		{
-			component.AnimationRun += OnAnimationRun;
-			component.AnimationStopped += OnAnimationStopped;
-			foreach (var a in component.Animations) {
-				if (a.IsRunning) {
-					OnAnimationRun(component, a);
-				}
-			}
-		}
-
-		private void Disable(AnimationComponent component)
-		{
-			component.AnimationRun -= OnAnimationRun;
-			component.AnimationStopped -= OnAnimationStopped;
-			foreach (var a in component.Animations) {
-				if (a.IsRunning) {
-					OnAnimationStopped(component, a);
-				}
-			}
-		}
-
-		internal void OnAnimationRun(AnimationComponent component, Animation animation)
-		{
-			if (animation.Depth < 0) {
-				var depth = GetDepth(animation.OwnerNode);
-				var list = GetRunningAnimationList(depth);
-				animation.Depth = depth;
-				animation.Index = list.Count;
-				list.Add(animation);
-			}
-		}
-
-		internal void OnAnimationStopped(AnimationComponent component, Animation animation)
-		{
-			if (animation.Depth >= 0) {
-				var list = GetRunningAnimationList(animation.Depth);
-				list[animation.Index] = null;
-				animation.Depth = -1;
-				animation.Index = -1;
-			}
-		}
-
-		private List<Animation> GetRunningAnimationList(int depth)
-		{
-			while (depth >= runningAnimationsByDepth.Count) {
-				runningAnimationsByDepth.Add(new List<Animation>());
-			}
-			return runningAnimationsByDepth[depth];
-		}
-
-		protected internal override void Update(float delta)
-		{
-			for (var i = 0; i < runningAnimationsByDepth.Count; i++) {
-				var runningAnimations = runningAnimationsByDepth[i];
-				for (var j = runningAnimations.Count - 1; j >= 0; j--) {
-					var a = runningAnimations[j];
-					if (a != null) {
-						a.Advance(delta * a.OwnerNode.EffectiveAnimationSpeed);
-					} else {
-						a = runningAnimations[runningAnimations.Count - 1];
-						if (a != null) {
-							a.Index = j;
-						}
-						runningAnimations[j] = a;
-						runningAnimations.RemoveAt(runningAnimations.Count - 1);
+				foreach (var a in component.Animations) {
+					if (a.IsRunning) {
+						Activate(a);
 					}
 				}
 			}
 		}
 
-		private int GetDepth(Node node)
+		private void Activate(Animation animation)
+		{
+			if (animation.QueueNode == null) {
+				animation.QueueNode = AcquireQueueNode(animation);
+				currQueue.Enqueue(animation.Owner.Depth, animation.QueueNode);
+			}
+		}
+
+		private void Deactivate(Animation animation)
+		{
+			if (animation.QueueNode != null) {
+				currQueue.Remove(animation.QueueNode);
+				nextQueue.Remove(animation.QueueNode);
+				ReleaseQueueNode(animation.QueueNode);
+				animation.QueueNode = null;
+			}
+		}
+
+		protected internal override void Update(float delta)
+		{
+			while (currQueue.Count > 0) {
+				var animation = currQueue.Dequeue().Value;
+				nextQueue.Enqueue(animation.Owner.Depth, animation.QueueNode);
+				animation.Advance(delta);
+			}
+			Toolbox.Swap(ref currQueue, ref nextQueue);
+		}
+
+		private static int GetNodeDepth(Node node)
 		{
 			var depth = 0;
 			var p = node.Parent;

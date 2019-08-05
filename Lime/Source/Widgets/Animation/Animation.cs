@@ -18,8 +18,7 @@ namespace Lime
 		private bool? hasEasings;
 		private bool applyZeroPose = true;
 		internal Animation Next;
-		internal int Depth = -1;
-		internal int Index = -1;
+		internal BucketQueueNode<Animation> QueueNode;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
 		public event Action Stopped;
@@ -205,8 +204,7 @@ namespace Lime
 			clone.EffectiveTriggerableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
 			clone.BezierEasingCalculator = new AnimationBezierEasingCalculator(clone.Markers, clone);
-			clone.Index = -1;
-			clone.Depth = -1;
+			clone.QueueNode = null;
 			return clone;
 		}
 

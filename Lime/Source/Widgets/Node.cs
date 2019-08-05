@@ -1497,6 +1497,9 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class AnimationComponent : NodeComponent
 	{
+		internal AnimationProcessor Processor;
+		internal int Depth = -1;
+
 		public AnimationCollection Animations { get; private set; }
 
 		public Animation DefaultAnimation
@@ -1513,17 +1516,14 @@ namespace Lime
 			}
 		}
 
-		public event Action<AnimationComponent, Animation> AnimationRun;
-		public event Action<AnimationComponent, Animation> AnimationStopped;
-
 		internal void OnAnimationRun(Animation animation)
 		{
-			AnimationRun?.Invoke(this, animation);
+			Processor?.OnAnimationRun(animation);
 		}
 
 		internal void OnAnimationStopped(Animation animation)
 		{
-			AnimationStopped?.Invoke(this, animation);
+			Processor?.OnAnimationStopped(animation);
 		}
 
 		public AnimationComponent()
@@ -1535,8 +1535,8 @@ namespace Lime
 		{
 			var clone = (AnimationComponent)base.Clone();
 			clone.Animations = new AnimationCollection(clone);
-			clone.AnimationRun = null;
-			clone.AnimationStopped = null;
+			clone.Processor = null;
+			clone.Depth = -1;
 			foreach (var a in Animations) {
 				clone.Animations.Add(a.Clone());
 			}
