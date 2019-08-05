@@ -437,18 +437,16 @@ namespace Lime
 
 		public void Update(float delta)
 		{
-			var idx = 0;
-			while (idx < behaviors.Count) {
-				var b = behaviors[idx];
+			for (var i = behaviors.Count - 1; i >= 0; i--) {
+				var b = behaviors[i];
 				if (b != null) {
 					b.Update(delta * b.Owner.EffectiveAnimationSpeed);
-					idx++;
 				} else {
 					b = behaviors[behaviors.Count - 1];
 					if (b != null) {
-						b.IndexInFamily = idx;
+						b.IndexInFamily = i;
 					}
-					behaviors[idx] = b;
+					behaviors[i] = b;
 					behaviors.RemoveAt(behaviors.Count - 1);
 				}
 			}
