@@ -469,7 +469,7 @@ namespace Lime
 					color = value;
 					if (visibilityChanged) {
 						PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible | DirtyFlags.Frozen);
-						Manager?.OnFilterChanged(this);
+						Manager?.FilterNode(this);
 					} else {
 						PropagateDirtyFlags(DirtyFlags.Color);
 					}
@@ -546,7 +546,7 @@ namespace Lime
 					visible = value;
 					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
 					InvalidateParentConstraintsAndArrangement();
-					Manager?.OnFilterChanged(this);
+					Manager?.FilterNode(this);
 				}
 			}
 		}
@@ -751,7 +751,7 @@ namespace Lime
 				if (freezeInvisible != value) {
 					freezeInvisible = value;
 					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
-					Manager?.OnFilterChanged(this);
+					Manager?.FilterNode(this);
 				}
 			}
 		}

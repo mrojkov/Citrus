@@ -193,7 +193,7 @@ namespace Lime
 				if (tangerineFlags != value) {
 					tangerineFlags = value;
 					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
-					Manager?.OnFilterChanged(this);
+					Manager?.FilterNode(this);
 				}
 			}
 		}
@@ -1371,7 +1371,7 @@ namespace Lime
 				if (frozen != value) {
 					frozen = value;
 					PropagateDirtyFlags(DirtyFlags.Frozen);
-					Manager?.OnFilterChanged(this);
+					Manager?.FilterNode(this);
 				}
 			}
 		}

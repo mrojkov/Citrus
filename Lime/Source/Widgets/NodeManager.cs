@@ -7,6 +7,7 @@ namespace Lime
 	public class NodeManager
 	{
 		private Dictionary<Type, List<NodeComponentProcessor>> processorsByComponentType = new Dictionary<Type, List<NodeComponentProcessor>>();
+		private HashSet<Node> frozenNodes = new HashSet<Node>(ReferenceEqualityComparer.Instance);
 
 		public NodeManagerRootNodeCollection RootNodes { get; }
 
@@ -103,9 +104,7 @@ namespace Lime
 			node.Manager = null;
 		}
 
-		private HashSet<Node> frozenNodes = new HashSet<Node>(ReferenceEqualityComparer.Instance);
-
-		internal void OnFilterChanged(Node node)
+		internal void FilterNode(Node node)
 		{
 			var frozen = node.GloballyFrozen;
 			var frozenChanged = frozen ? frozenNodes.Add(node) : frozenNodes.Remove(node);
@@ -117,7 +116,7 @@ namespace Lime
 				}
 			}
 			foreach (var n in node.Nodes) {
-				OnFilterChanged(n);
+				FilterNode(n);
 			}
 		}
 
