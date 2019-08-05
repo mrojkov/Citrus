@@ -17,7 +17,6 @@ namespace Lime
 		private bool animatorsArePropagated;
 		private bool? hasEasings;
 		private bool applyZeroPose = true;
-		internal Animation Next;
 		internal BucketQueueNode<Animation> QueueNode;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
