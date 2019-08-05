@@ -183,9 +183,9 @@ namespace Lime
 
 		internal void Add(NodeBehavior b)
 		{
-			var index = 0;
-			while (index < behaviors.Count && (behaviors[index] == null || behaviors[index].Order > b.Order)) {
-				index++;
+			var index = behaviors.Count;
+			while (index > 0 && (behaviors[index - 1] == null || behaviors[index - 1].Order <= b.Order)) {
+				index--;
 			}
 			behaviors.Insert(index, b);
 		}
