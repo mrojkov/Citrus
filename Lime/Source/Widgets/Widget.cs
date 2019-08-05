@@ -773,9 +773,9 @@ namespace Lime
 			globallyFreezeInvisible = FreezeInvisible;
 			if (Parent != null) {
 				if (Parent.AsWidget != null) {
-					globallyFreezeInvisible &= Parent.AsWidget.GloballyFreezeInvisible;
+					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
 				} else if (Parent.AsNode3D != null) {
-					globallyFreezeInvisible &= Parent.AsNode3D.GloballyFreezeInvisible;
+					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
 				}
 			}
 		}
