@@ -149,6 +149,8 @@ namespace Lime
 		internal BehaviorFamily Family;
 		internal int IndexInFamily = -1;
 
+		protected internal bool Suspended { get; private set; }
+
 		protected internal virtual void Start() { }
 
 		protected internal virtual void Stop() { }
@@ -157,10 +159,23 @@ namespace Lime
 
 		protected internal virtual void OnOwnerFrozenChanged() { }
 
+		protected void Suspend()
+		{
+			Suspended = true;
+			Family.Filter(this);
+		}
+
+		public void Resume()
+		{
+			Suspended = false;
+			Family.Filter(this);
+		}
+
 		public override NodeComponent Clone()
 		{
 			var clone = (BehaviorComponent)base.Clone();
 			clone.StartQueueNode = null;
+			clone.Suspended = false;
 			clone.Family = null;
 			clone.IndexInFamily = -1;
 			return clone;
@@ -295,8 +310,8 @@ namespace Lime
 				behaviorsToStart.RemoveFirst();
 				b.StartQueueNode = null;
 				b.Family = GetBehaviorFamily(b.GetType());
+				b.Family?.Filter(b);
 				b.Start();
-				EnqueueDequeueBehavior(b);
 			}
 		}
 
@@ -320,20 +335,8 @@ namespace Lime
 		public void OnNodeFrozenChanged(BehaviorComponent behavior)
 		{
 			if (behavior.StartQueueNode == null) {
-				EnqueueDequeueBehavior(behavior);
+				behavior.Family?.Filter(behavior);
 				behavior.OnOwnerFrozenChanged();
-			}
-		}
-
-		private void EnqueueDequeueBehavior(BehaviorComponent behavior)
-		{
-			if (behavior.Family != null) {
-				var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.UpdateFrozen;
-				if (enabled) {
-					behavior.Family.Enqueue(behavior);
-				} else {
-					behavior.Family.Dequeue(behavior);
-				}
 			}
 		}
 
@@ -413,6 +416,15 @@ namespace Lime
 			Index = index;
 			BehaviorType = behaviorType;
 			UpdateFrozen = updateFrozen;
+		}
+
+		public void Filter(BehaviorComponent b)
+		{
+			if ((b.Owner.GloballyFrozen && !UpdateFrozen) || b.Suspended) {
+				Dequeue(b);
+			} else {
+				Enqueue(b);
+			}
 		}
 
 		public bool Enqueue(BehaviorComponent b)
