@@ -44,12 +44,15 @@ namespace Lime
 			var manager = new NodeManager(services);
 			manager.Processors.Add(new GestureProcessor());
 			manager.Processors.Add(new BehaviorSetupProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
 			manager.Processors.Add(new AnimationProcessor());
 			manager.Processors.Add(new LayoutProcessor());
 			manager.Processors.Add(new BoundingRectProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
-
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
 			return manager;
 		}
 

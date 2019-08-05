@@ -182,8 +182,17 @@ namespace Lime
 		}
 	}
 
+	public class PreEarlyUpdateStage { }
+
 	public class EarlyUpdateStage { }
+
+	public class PostEarlyUpdateStage { }
+
+	public class PreLateUpdateStage { }
+
 	public class LateUpdateStage { }
+
+	public class PostLateUpdateStage { }
 
 	internal class BehaviorUpdateStage
 	{
