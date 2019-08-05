@@ -155,9 +155,7 @@ namespace Lime
 
 		protected internal virtual void Update(float delta) { }
 
-		protected internal virtual void OnEnabled() { }
-
-		protected internal virtual void OnDisabled() { }
+		protected internal virtual void OnOwnerFrozenChanged() { }
 
 		public override NodeComponent Clone()
 		{
@@ -313,12 +311,8 @@ namespace Lime
 				behaviorsToStart.Remove(behavior.StartQueueNode);
 				behavior.StartQueueNode = null;
 			} else {
-				if (behavior.Family != null) {
-					if (behavior.Family.Dequeue(behavior)) {
-						behavior.OnDisabled();
-					}
-					behavior.Family = null;
-				}
+				behavior.Family?.Dequeue(behavior);
+				behavior.Family = null;
 				behavior.Stop();
 			}
 		}
@@ -327,19 +321,18 @@ namespace Lime
 		{
 			if (behavior.StartQueueNode == null) {
 				EnqueueDequeueBehavior(behavior);
+				behavior.OnOwnerFrozenChanged();
 			}
 		}
 
 		private void EnqueueDequeueBehavior(BehaviorComponent behavior)
 		{
-			var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.KeepActiveWhenNodeFrozen;
-			if (enabled) {
-				if (behavior.Family.Enqueue(behavior)) {
-					behavior.OnEnabled();
-				}
-			} else {
-				if (behavior.Family.Dequeue(behavior)) {
-					behavior.OnDisabled();
+			if (behavior.Family != null) {
+				var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.KeepActiveWhenNodeFrozen;
+				if (enabled) {
+					behavior.Family.Enqueue(behavior);
+				} else {
+					behavior.Family.Dequeue(behavior);
 				}
 			}
 		}

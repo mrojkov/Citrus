@@ -265,14 +265,9 @@ namespace Lime
 			container.SetActive(false);
 		}
 
-		protected internal override void OnEnabled()
+		protected internal override void OnOwnerFrozenChanged()
 		{
-			SetActive(true);
-		}
-
-		protected internal override void OnDisabled()
-		{
-			SetActive(false);
+			SetActive(!Owner.GloballyFrozen);
 		}
 
 		private void SetActive(bool active)
