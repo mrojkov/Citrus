@@ -1376,25 +1376,24 @@ namespace Lime
 			}
 		}
 
-		private bool globallyFrozen;
+		protected bool globallyFrozen;
 
 		public bool GloballyFrozen
 		{
 			get {
 				if (CleanDirtyFlags(DirtyFlags.Frozen)) {
-					globallyFrozen = CheckForGloballyFrozen();
+					RecalcGloballyFrozen();
 				}
 				return globallyFrozen;
 			}
 		}
 
-		protected virtual bool CheckForGloballyFrozen()
+		protected virtual void RecalcGloballyFrozen()
 		{
-			var result = frozen;
+			globallyFrozen = Frozen;
 			if (Parent != null) {
-				result |= Parent.GloballyFrozen;
+				globallyFrozen |= Parent.GloballyFrozen;
 			}
-			return result;
 		}
 	}
 

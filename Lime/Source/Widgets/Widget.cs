@@ -1468,9 +1468,10 @@ namespace Lime
 			}
 		}
 
-		protected override bool CheckForGloballyFrozen()
+		protected override void RecalcGloballyFrozen()
 		{
-			return base.CheckForGloballyFrozen() || (GloballyFreezeInvisible && !GloballyVisible);
+			base.RecalcGloballyFrozen();
+			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
 		}
 	}
 }
