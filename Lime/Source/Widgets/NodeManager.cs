@@ -112,7 +112,7 @@ namespace Lime
 			if (frozenChanged) {
 				foreach (var c in node.Components) {
 					foreach (var p in GetProcessorsForComponentType(c.GetType())) {
-						p.OnNodeFrozenChanged(c);
+						p.OnOwnerFrozenChanged(c);
 					}
 				}
 				foreach (var n in node.Nodes) {
@@ -335,7 +335,7 @@ namespace Lime
 			}
 		}
 
-		public void OnNodeFrozenChanged(BehaviorComponent behavior)
+		public void OnOwnerFrozenChanged(BehaviorComponent behavior)
 		{
 			if (behavior.StartQueueNode == null) {
 				behavior.UpdateFamily?.Filter(behavior);

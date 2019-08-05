@@ -26,7 +26,7 @@ namespace Lime
 
 		protected internal virtual void Remove(NodeComponent component) { }
 
-		protected internal virtual void OnNodeFrozenChanged(NodeComponent component) { }
+		protected internal virtual void OnOwnerFrozenChanged(NodeComponent component) { }
 	}
 
 	public class NodeComponentProcessor<TComponent> : NodeComponentProcessor where TComponent : NodeComponent
@@ -43,15 +43,15 @@ namespace Lime
 			Remove((TComponent)component);
 		}
 
-		protected internal sealed override void OnNodeFrozenChanged(NodeComponent component)
+		protected internal sealed override void OnOwnerFrozenChanged(NodeComponent component)
 		{
-			OnNodeFrozenChanged((TComponent)component);
+			OnOwnerFrozenChanged((TComponent)component);
 		}
 
 		protected virtual void Add(TComponent component) { }
 
 		protected virtual void Remove(TComponent component) { }
 
-		protected virtual void OnNodeFrozenChanged(TComponent component) { }
+		protected virtual void OnOwnerFrozenChanged(TComponent component) { }
 	}
 }

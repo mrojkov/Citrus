@@ -18,7 +18,7 @@ namespace Lime
 			Disable(component);
 		}
 
-		protected override void OnNodeFrozenChanged(AnimationComponent component)
+		protected override void OnOwnerFrozenChanged(AnimationComponent component)
 		{
 			if (component.Owner.GloballyFrozen) {
 				Disable(component);

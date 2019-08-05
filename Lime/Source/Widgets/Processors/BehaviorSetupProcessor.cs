@@ -26,9 +26,9 @@ namespace Lime
 			behaviorSystem.Remove(component);
 		}
 
-		protected override void OnNodeFrozenChanged(BehaviorComponent component)
+		protected override void OnOwnerFrozenChanged(BehaviorComponent component)
 		{
-			behaviorSystem.OnNodeFrozenChanged(component);
+			behaviorSystem.OnOwnerFrozenChanged(component);
 		}
 
 		protected internal override void Update(float delta)
