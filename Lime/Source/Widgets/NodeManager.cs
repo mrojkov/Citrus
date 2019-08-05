@@ -145,6 +145,7 @@ namespace Lime
 
 	public class BehaviorComponent : NodeComponent
 	{
+		internal LinkedListNode<BehaviorComponent> StartQueueNode;
 		internal BehaviorFamily Family;
 		internal int IndexInFamily = -1;
 
@@ -161,6 +162,7 @@ namespace Lime
 		public override NodeComponent Clone()
 		{
 			var clone = (BehaviorComponent)base.Clone();
+			clone.StartQueueNode = null;
 			clone.Family = null;
 			clone.IndexInFamily = -1;
 			return clone;
@@ -272,8 +274,7 @@ namespace Lime
 		private BehaviorUpdateStage defaultUpdateStage;
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
 		private Dictionary<Type, BehaviorFamily> behaviorFamilies = new Dictionary<Type, BehaviorFamily>();
-		private HashSet<BehaviorComponent> pendingBehaviors = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
-		private HashSet<BehaviorComponent> pendingBehaviors2 = new HashSet<BehaviorComponent>(ReferenceEqualityComparer.Instance);
+		private LinkedList<BehaviorComponent> behaviorsToStart = new LinkedList<BehaviorComponent>();
 
 		public BehaviorSystem(Type defaultUpdateStageType)
 		{
@@ -291,27 +292,27 @@ namespace Lime
 
 		public void StartPendingBehaviors()
 		{
-			while (pendingBehaviors.Count > 0) {
-				var t = pendingBehaviors;
-				pendingBehaviors = pendingBehaviors2;
-				pendingBehaviors2 = t;
-				foreach (var b in pendingBehaviors2) {
-					b.Family = GetBehaviorFamily(b.GetType());
-					b.Start();
-					EnqueueDequeueBehavior(b);
-				}
-				pendingBehaviors2.Clear();
+			while (behaviorsToStart.Count > 0) {
+				var b = behaviorsToStart.First.Value;
+				behaviorsToStart.RemoveFirst();
+				b.StartQueueNode = null;
+				b.Family = GetBehaviorFamily(b.GetType());
+				b.Start();
+				EnqueueDequeueBehavior(b);
 			}
 		}
 
 		public void Add(BehaviorComponent behavior)
 		{
-			pendingBehaviors.Add(behavior);
+			behavior.StartQueueNode = behaviorsToStart.AddLast(behavior);
 		}
 
 		public void Remove(BehaviorComponent behavior)
 		{
-			if (!pendingBehaviors.Remove(behavior)) {
+			if (behavior.StartQueueNode != null) {
+				behaviorsToStart.Remove(behavior.StartQueueNode);
+				behavior.StartQueueNode = null;
+			} else {
 				if (behavior.Family != null) {
 					if (behavior.Family.Dequeue(behavior)) {
 						behavior.OnDisabled();
@@ -324,7 +325,7 @@ namespace Lime
 
 		public void OnNodeFrozenChanged(BehaviorComponent behavior)
 		{
-			if (!pendingBehaviors.Contains(behavior)) {
+			if (behavior.StartQueueNode == null) {
 				EnqueueDequeueBehavior(behavior);
 			}
 		}
