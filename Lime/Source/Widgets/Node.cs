@@ -1443,8 +1443,16 @@ namespace Lime
 					a.Advance(delta);
 				}
 			}
-			for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-				Update(child, delta * child.AnimationSpeed);
+			var visible = true;
+			if (node.AsWidget != null) {
+				visible = node.AsWidget.GloballyVisible;
+			} else if (node.AsNode3D != null) {
+				visible = node.AsNode3D.GloballyVisible;
+			}
+			if (visible) {
+				for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+					Update(child, delta * child.AnimationSpeed);
+				}
 			}
 			RegisterLegacyBehaviors(node);
 			var legacyLateBehaviorContainer = node.Components.Get<LegacyLateBehaviorContainer>();
