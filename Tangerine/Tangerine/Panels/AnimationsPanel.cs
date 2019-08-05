@@ -160,7 +160,7 @@ namespace Tangerine.Panels
 				}
 				Core.Operations.InsertIntoList.Perform(owner.Animations, owner.Animations.Count, animation);
 				SelectAnimation(GetAnimations().IndexOf(animation));
-				DuplicateAnimators(animation.Owner);
+				DuplicateAnimators(animation.OwnerNode);
 
 				void DuplicateAnimators(Node node)
 				{
@@ -261,7 +261,7 @@ namespace Tangerine.Panels
 					SelectAnimation(index + 1);
 				}
 				var animation = GetAnimations()[index];
-				DeleteAnimators(animation.Owner);
+				DeleteAnimators(animation.OwnerNode);
 				Core.Operations.RemoveFromList.Perform(animation.Owner.Animations, animation.Owner.Animations.IndexOf(animation));
 
 				void DeleteAnimators(Node node)
