@@ -183,9 +183,9 @@ namespace Lime
 			StageType = stageType;
 		}
 
-		internal BehaviorFamily CreateBehaviorFamily(Type behaviorType, bool keepActiveWhenNodeFrozen)
+		internal BehaviorFamily CreateBehaviorFamily(Type behaviorType, bool updateFrozen)
 		{
-			var bf = new BehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType, keepActiveWhenNodeFrozen);
+			var bf = new BehaviorFamily(this, behaviorFamilyGraph.Count, behaviorType, updateFrozen);
 			behaviorFamilyGraph.Add(bf);
 			behaviorFamilyQueueDirty = true;
 			return bf;
@@ -328,7 +328,7 @@ namespace Lime
 		private void EnqueueDequeueBehavior(BehaviorComponent behavior)
 		{
 			if (behavior.Family != null) {
-				var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.KeepActiveWhenNodeFrozen;
+				var enabled = !behavior.Owner.GloballyFrozen || behavior.Family.UpdateFrozen;
 				if (enabled) {
 					behavior.Family.Enqueue(behavior);
 				} else {
@@ -347,8 +347,8 @@ namespace Lime
 			if (updateStageAttr != null) {
 				updateStage = GetUpdateStage(updateStageAttr.StageType);
 			}
-			var keepActiveWhenNodeFrozen = behaviorType.IsDefined(typeof(KeepActiveWhenNodeFrozenAttribute));
-			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType, keepActiveWhenNodeFrozen);
+			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute));
+			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType, updateFrozen);
 			behaviorFamilies.Add(behaviorType, behaviorFamily);
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
 				updateStage.AddDependency(behaviorFamily, GetBehaviorFamily(i.BehaviorType));
@@ -394,7 +394,7 @@ namespace Lime
 	}
 
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public class KeepActiveWhenNodeFrozenAttribute : Attribute
+	public class UpdateFrozenAttribute : Attribute
 	{
 	}
 
@@ -405,14 +405,14 @@ namespace Lime
 		public readonly BehaviorUpdateStage UpdateStage;
 		public readonly int Index;
 		public readonly Type BehaviorType;
-		public readonly bool KeepActiveWhenNodeFrozen;
+		public readonly bool UpdateFrozen;
 
-		public BehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType, bool keepActiveWhenNodeFrozen)
+		public BehaviorFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType, bool updateFrozen)
 		{
 			UpdateStage = updateStage;
 			Index = index;
 			BehaviorType = behaviorType;
-			KeepActiveWhenNodeFrozen = keepActiveWhenNodeFrozen;
+			UpdateFrozen = updateFrozen;
 		}
 
 		public bool Enqueue(BehaviorComponent b)

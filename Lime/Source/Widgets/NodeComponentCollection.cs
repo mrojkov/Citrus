@@ -154,7 +154,7 @@ namespace Lime
 
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(EarlyUpdateStage))]
-	[KeepActiveWhenNodeFrozen]
+	[UpdateFrozen]
 	public class LegacyEarlyBehaviorContainer : LegacyBehaviorContainer
 	{
 		protected override void UpdateBehavior(NodeBehavior b, float delta)
@@ -166,7 +166,7 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
 	[UpdateStage(typeof(LateUpdateStage))]
-	[KeepActiveWhenNodeFrozen]
+	[UpdateFrozen]
 	public class LegacyLateBehaviorContainer : LegacyBehaviorContainer
 	{
 		protected override void UpdateBehavior(NodeBehavior b, float delta)
