@@ -31,11 +31,5 @@ namespace Lime
 		{
 			Color = Color4.White;
 		}
-		
-		public override void OnUpdate(float delta)
-		{
-			base.OnUpdate(delta);
-			(Parent as Widget)?.ExpandBoundingRect(TransformedPosition);
-		}
 	}
 }

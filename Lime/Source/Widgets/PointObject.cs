@@ -2,7 +2,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class PointObject : Node, IUpdatableNode
+	public class PointObject : Node
 	{
 		private Vector2 position;
 		private Vector2 transformedPosition;
@@ -10,7 +10,6 @@ namespace Lime
 
 		public PointObject()
 		{
-			Components.Add(new UpdatableNodeBehavior());
 #if !TANGERINE
 			RenderChainBuilder = null;
 #endif // !TANGERINE
@@ -77,11 +76,6 @@ namespace Lime
 				}
 				return transformedPosition;
 			}
-		}
-		
-		public virtual void OnUpdate(float delta)
-		{
-			RecalcTransformedPosition();
 		}
 
 		private void RecalcTransformedPosition()
