@@ -284,15 +284,9 @@ namespace Lime
 
 	internal class BehaviorSystem
 	{
-		private BehaviorUpdateStage defaultUpdateStage;
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
 		private Dictionary<Type, BehaviorFamily> behaviorFamilies = new Dictionary<Type, BehaviorFamily>();
 		private LinkedList<BehaviorComponent> behaviorsToStart = new LinkedList<BehaviorComponent>();
-
-		public BehaviorSystem(Type defaultUpdateStageType)
-		{
-			defaultUpdateStage = GetUpdateStage(defaultUpdateStageType);
-		}
 
 		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
@@ -345,11 +339,11 @@ namespace Lime
 			if (behaviorFamilies.TryGetValue(behaviorType, out var behaviorFamily)) {
 				return behaviorFamily;
 			}
-			var updateStage = defaultUpdateStage;
 			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
-			if (updateStageAttr != null) {
-				updateStage = GetUpdateStage(updateStageAttr.StageType);
+			if (updateStageAttr == null) {
+				return null;
 			}
+			var updateStage = GetUpdateStage(updateStageAttr.StageType);
 			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute));
 			behaviorFamily = updateStage.CreateBehaviorFamily(behaviorType, updateFrozen);
 			behaviorFamilies.Add(behaviorType, behaviorFamily);

@@ -37,7 +37,7 @@ namespace Lime
 		private NodeManager CreateManager()
 		{
 			var services = new ServiceRegistry();
-			services.Add(new BehaviorSystem(typeof(EarlyUpdateStage)));
+			services.Add(new BehaviorSystem());
 			services.Add(LayoutManager);
 			services.Add(WidgetContext);
 
