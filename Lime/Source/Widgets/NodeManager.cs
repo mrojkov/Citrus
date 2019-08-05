@@ -103,7 +103,7 @@ namespace Lime
 			node.Manager = null;
 		}
 
-		private HashSet<Node> frozenNodes = new HashSet<Node>();
+		private HashSet<Node> frozenNodes = new HashSet<Node>(ReferenceEqualityComparer.Instance);
 
 		internal void OnFilterChanged(Node node)
 		{
@@ -115,9 +115,9 @@ namespace Lime
 						p.OnOwnerFrozenChanged(c);
 					}
 				}
-				foreach (var n in node.Nodes) {
-					OnFilterChanged(n);
-				}
+			}
+			foreach (var n in node.Nodes) {
+				OnFilterChanged(n);
 			}
 		}
 

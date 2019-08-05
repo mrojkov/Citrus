@@ -46,6 +46,7 @@ namespace Lime
 		private Color4 color;
 		private bool enabled = true;
 		private bool visible;
+		private bool freezeInvisible = true;
 		private Blending blending;
 		private ShaderId shader;
 		private Vector2 pivot;
@@ -71,6 +72,7 @@ namespace Lime
 		protected ShaderId globalShader;
 		protected bool globallyEnabled;
 		protected bool globallyVisible;
+		protected bool globallyFreezeInvisible;
 
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
@@ -739,6 +741,43 @@ namespace Lime
 			globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
 			globallyVisible &= !GetTangerineFlag(TangerineFlags.HiddenOnExposition);
 #endif // TANGERINE
+		}
+
+		public bool FreezeInvisible
+		{
+			get => freezeInvisible;
+			set
+			{
+				if (freezeInvisible != value) {
+					freezeInvisible = value;
+					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					Manager?.OnFilterChanged(this);
+				}
+			}
+		}
+
+		public bool GloballyFreezeInvisible
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
+					RecalcGloballyFreezeInvisible();
+				}
+				return globallyFreezeInvisible;
+			}
+		}
+
+		private void RecalcGloballyFreezeInvisible()
+		{
+			globallyFreezeInvisible = FreezeInvisible;
+			if (Parent != null) {
+				if (Parent.AsWidget != null) {
+					globallyFreezeInvisible &= Parent.AsWidget.GloballyFreezeInvisible;
+				} else if (Parent.AsNode3D != null) {
+					globallyFreezeInvisible &= Parent.AsNode3D.GloballyFreezeInvisible;
+				}
+			}
 		}
 
 		// Temporary property for changing bounding rectangle in game code
@@ -1431,7 +1470,7 @@ namespace Lime
 
 		protected override bool CheckForGloballyFrozen()
 		{
-			return base.CheckForGloballyFrozen() || !GloballyVisible;
+			return base.CheckForGloballyFrozen() || (GloballyFreezeInvisible && !GloballyVisible);
 		}
 	}
 }
