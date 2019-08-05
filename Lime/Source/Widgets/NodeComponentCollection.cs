@@ -198,11 +198,24 @@ namespace Lime
 			}
 		}
 
+		protected internal override void Start()
+		{
+			if (Owner.Parent?.GloballyFrozen ?? false) {
+				Suspend();
+			}
+		}
+
+		protected internal override void OnOwnerFrozenChanged()
+		{
+			if (Owner.Parent?.GloballyFrozen ?? false) {
+				Suspend();
+			} else {
+				Resume();
+			}
+		}
+
 		protected internal override void Update(float delta)
 		{
-			if (Owner.Parent != null && Owner.Parent.GloballyFrozen) {
-				return;
-			}
 			for (var i = behaviors.Count - 1; i >= 0; i--) {
 				var b = behaviors[i];
 				if (b != null) {
