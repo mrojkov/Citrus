@@ -99,7 +99,7 @@ namespace Lime
 			while (currQueue.Count > 0) {
 				var animation = currQueue.Dequeue().Value;
 				nextQueue.Enqueue(animation.Owner.Depth, animation.QueueNode);
-				animation.Advance(delta);
+				animation.Advance(delta * animation.OwnerNode.EffectiveAnimationSpeed);
 			}
 			Toolbox.Swap(ref currQueue, ref nextQueue);
 		}
