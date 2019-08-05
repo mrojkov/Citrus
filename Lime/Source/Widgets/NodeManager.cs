@@ -195,9 +195,11 @@ namespace Lime
 
 	internal class BehaviorUpdateStage
 	{
-		private DependencyGraph<BehaviorUpdateFamily> familyGraph = new DependencyGraph<BehaviorUpdateFamily>();
-		private List<BehaviorUpdateFamily> familyQueue = new List<BehaviorUpdateFamily>();
-		private bool familyQueueDirty;
+		private Dictionary<BehaviorUpdateFamily, int> familyIndexMap = new Dictionary<BehaviorUpdateFamily, int>();
+		private List<BehaviorUpdateFamily> families = new List<BehaviorUpdateFamily>();
+		private List<List<int>> afterFamilyIndices = new List<List<int>>();
+		private List<BehaviorUpdateFamily> sortedFamilies = new List<BehaviorUpdateFamily>();
+		private bool shouldSortFamilies;
 
 		public readonly Type StageType;
 
@@ -208,84 +210,62 @@ namespace Lime
 
 		internal BehaviorUpdateFamily CreateFamily(Type behaviorType, bool updateFrozen)
 		{
-			var family = new BehaviorUpdateFamily(this, familyGraph.Count, behaviorType, updateFrozen);
-			familyGraph.Add(family);
-			familyQueueDirty = true;
+			var family = new BehaviorUpdateFamily(behaviorType, updateFrozen);
+			familyIndexMap.Add(family, families.Count);
+			families.Add(family);
+			afterFamilyIndices.Add(new List<int>());
+			shouldSortFamilies = true;
 			return family;
 		}
 
-		internal void AddDependency(BehaviorUpdateFamily successor, BehaviorUpdateFamily predecessor)
+		internal void AddDependency(BehaviorUpdateFamily before, BehaviorUpdateFamily after)
 		{
-			if (successor.UpdateStage != this || predecessor.UpdateStage != this) {
+			if (!familyIndexMap.TryGetValue(before, out var beforeIndex) ||
+				!familyIndexMap.TryGetValue(after, out var afterIndex)
+			) {
 				throw new InvalidOperationException();
 			}
-			familyGraph.AddDependency(successor.Index, predecessor.Index);
-			familyQueueDirty = true;
+			afterFamilyIndices[beforeIndex].Add(afterIndex);
+			shouldSortFamilies = true;
 		}
 
 		public void Update(float delta)
 		{
-			if (familyQueueDirty) {
-				familyQueue.Clear();
-				familyGraph.Walk(familyQueue);
-				familyQueueDirty = false;
+			if (shouldSortFamilies) {
+				SortFamilies();
+				shouldSortFamilies = false;
 			}
-			foreach (var f in familyQueue) {
+			foreach (var f in sortedFamilies) {
 				f.Update(delta);
 			}
 		}
-	}
 
-	internal class DependencyGraph<T>
-	{
-		private List<List<int>> edges = new List<List<int>>();
-		private List<T> items = new List<T>();
-
-		public int Count => items.Count;
-
-		public void Add(T item)
+		private void SortFamilies()
 		{
-			items.Add(item);
-			edges.Add(new List<int>());
-		}
-
-		public void AddDependency(int successor, int predecessor)
-		{
-			edges[successor].Add(predecessor);
-		}
-
-		private enum NodeColor
-		{
-			White,
-			Gray,
-			Black
-		}
-
-		private List<NodeColor> colors = new List<NodeColor>();
-
-		public void Walk(List<T> result)
-		{
-			colors.Clear();
-			for (var i = 0; i < items.Count; i++) {
-				colors.Add(NodeColor.White);
-			}
-			for (var i = 0; i < items.Count; i++) {
-				Walk(i, result);
-			}
-		}
-
-		private void Walk(int index, List<T> result)
-		{
-			if (colors[index] == NodeColor.Gray) {
-				throw new InvalidOperationException();
-			}
-			if (colors[index] == NodeColor.White) {
-				colors[index] = NodeColor.Gray;
-				foreach (var i in edges[index]) {
-					Walk(i, result);
+			sortedFamilies.Clear();
+			var beforeCounter = new int[families.Count];
+			for (var i = 0; i < families.Count; i++) {
+				foreach (var j in afterFamilyIndices[i]) {
+					beforeCounter[j]++;
 				}
-				colors[index] = NodeColor.Black;
-				result.Add(items[index]);
+			}
+			var queue = new Queue<int>();
+			for (var i = 0; i < families.Count; i++) {
+				if (beforeCounter[i] == 0) {
+					queue.Enqueue(i);
+				}
+			}
+			while (queue.Count > 0) {
+				var i = queue.Dequeue();
+				sortedFamilies.Add(families[i]);
+				foreach (var j in afterFamilyIndices[i]) {
+					if (--beforeCounter[j] == 0) {
+						queue.Enqueue(j);
+					}
+				}
+			}
+			if (sortedFamilies.Count != families.Count) {
+				throw new InvalidOperationException();
 			}
 		}
 	}
@@ -344,8 +324,8 @@ namespace Lime
 
 		private BehaviorUpdateFamily GetUpdateFamily(Type behaviorType)
 		{
-			if (updateFamilies.TryGetValue(behaviorType, out var behaviorFamily)) {
-				return behaviorFamily;
+			if (updateFamilies.TryGetValue(behaviorType, out var updateFamily)) {
+				return updateFamily;
 			}
 			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
 			if (updateStageAttr == null) {
@@ -353,15 +333,15 @@ namespace Lime
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
 			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute));
-			behaviorFamily = updateStage.CreateFamily(behaviorType, updateFrozen);
-			updateFamilies.Add(behaviorType, behaviorFamily);
+			updateFamily = updateStage.CreateFamily(behaviorType, updateFrozen);
+			updateFamilies.Add(behaviorType, updateFamily);
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
-				updateStage.AddDependency(behaviorFamily, GetUpdateFamily(i.BehaviorType));
+				updateStage.AddDependency(GetUpdateFamily(i.BehaviorType), updateFamily);
 			}
 			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>()) {
-				updateStage.AddDependency(GetUpdateFamily(i.BehaviorType), behaviorFamily);
+				updateStage.AddDependency(updateFamily, GetUpdateFamily(i.BehaviorType));
 			}
-			return behaviorFamily;
+			return updateFamily;
 		}
 	}
 
@@ -407,15 +387,11 @@ namespace Lime
 	{
 		private List<BehaviorComponent> behaviors = new List<BehaviorComponent>();
 
-		public readonly BehaviorUpdateStage UpdateStage;
-		public readonly int Index;
 		public readonly Type BehaviorType;
 		public readonly bool UpdateFrozen;
 
-		public BehaviorUpdateFamily(BehaviorUpdateStage updateStage, int index, Type behaviorType, bool updateFrozen)
+		public BehaviorUpdateFamily(Type behaviorType, bool updateFrozen)
 		{
-			UpdateStage = updateStage;
-			Index = index;
 			BehaviorType = behaviorType;
 			UpdateFrozen = updateFrozen;
 		}
