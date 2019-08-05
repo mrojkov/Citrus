@@ -13,7 +13,7 @@ namespace Lime
 
 		protected internal virtual void Start() { }
 
-		protected internal virtual void Stop() { }
+		protected internal virtual void Stop(Node owner) { }
 
 		protected internal virtual void Update(float delta) { }
 

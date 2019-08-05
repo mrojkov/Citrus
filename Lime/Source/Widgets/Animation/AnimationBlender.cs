@@ -40,19 +40,16 @@ namespace Lime
 
 		public bool Enabled { get; set; } = true;
 
-		private Node savedOwner;
-
 		protected internal override void Start()
 		{
 			foreach (var animation in Owner.Animations) {
 				animation.AnimationEngine = BlendAnimationEngine.Instance;
 			}
-			savedOwner = Owner;
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(Node owner)
 		{
-			foreach (var animation in savedOwner.Animations) {
+			foreach (var animation in owner.Animations) {
 				animation.AnimationEngine = DefaultAnimationEngine.Instance;
 			}
 		}

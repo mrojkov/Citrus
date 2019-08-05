@@ -88,7 +88,7 @@ namespace Lime
 			Register();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(Node owner)
 		{
 			RemoveFromContainer(earlyBehaviorContainer);
 			RemoveFromContainer(lateBehaviorContainer);
@@ -207,7 +207,7 @@ namespace Lime
 			CheckActivity();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(Node owner)
 		{
 			attached = false;
 		}
@@ -275,7 +275,7 @@ namespace Lime
 			if (component != null && component.Owner == owner) {
 				base.Remove(component);
 				component.Owner = null;
-				owner?.Manager?.UnregisterComponent(component);
+				owner.Manager?.UnregisterComponent(component, owner);
 				return true;
 			}
 			return false;
@@ -286,7 +286,7 @@ namespace Lime
 			for (int i = 0; i < buckets.Length; i++) {
 				if (buckets[i].Key > 0) {
 					buckets[i].Component.Owner = null;
-					owner?.Manager?.UnregisterComponent(buckets[i].Component);
+					owner.Manager?.UnregisterComponent(buckets[i].Component, owner);
 				}
 			}
 			base.Clear();

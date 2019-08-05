@@ -21,9 +21,9 @@ namespace Lime
 			behaviorSystem.Add(component);
 		}
 
-		protected override void Remove(BehaviorComponent component)
+		protected override void Remove(BehaviorComponent component, Node owner)
 		{
-			behaviorSystem.Remove(component);
+			behaviorSystem.Remove(component, owner);
 		}
 
 		protected override void OnOwnerFrozenChanged(BehaviorComponent component)

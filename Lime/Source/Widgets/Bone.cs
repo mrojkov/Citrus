@@ -315,7 +315,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(Node owner)
 		{
 			boneArrayUpdater.RemoveBone(bone);
 		}

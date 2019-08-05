@@ -24,7 +24,7 @@ namespace Lime
 
 		protected internal virtual void Add(NodeComponent component) { }
 
-		protected internal virtual void Remove(NodeComponent component) { }
+		protected internal virtual void Remove(NodeComponent component, Node owner) { }
 
 		protected internal virtual void OnOwnerFrozenChanged(NodeComponent component) { }
 	}
@@ -38,9 +38,9 @@ namespace Lime
 			Add((TComponent)component);
 		}
 
-		protected internal sealed override void Remove(NodeComponent component)
+		protected internal sealed override void Remove(NodeComponent component, Node owner)
 		{
-			Remove((TComponent)component);
+			Remove((TComponent)component, owner);
 		}
 
 		protected internal sealed override void OnOwnerFrozenChanged(NodeComponent component)
@@ -50,7 +50,7 @@ namespace Lime
 
 		protected virtual void Add(TComponent component) { }
 
-		protected virtual void Remove(TComponent component) { }
+		protected virtual void Remove(TComponent component, Node owner) { }
 
 		protected virtual void OnOwnerFrozenChanged(TComponent component) { }
 	}

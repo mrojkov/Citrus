@@ -36,7 +36,7 @@ namespace Lime
 			behavior.StartQueueNode = behaviorsToStart.AddLast(behavior);
 		}
 
-		public void Remove(BehaviorComponent behavior)
+		public void Remove(BehaviorComponent behavior, Node owner)
 		{
 			if (behavior.StartQueueNode != null) {
 				behaviorsToStart.Remove(behavior.StartQueueNode);
@@ -44,7 +44,7 @@ namespace Lime
 			} else {
 				behavior.UpdateFamily?.Remove(behavior);
 				behavior.UpdateFamily = null;
-				behavior.Stop();
+				behavior.Stop(owner);
 			}
 		}
 

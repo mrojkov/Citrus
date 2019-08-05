@@ -13,7 +13,7 @@ namespace Lime
 			}
 		}
 
-		protected override void Remove(AnimationComponent component)
+		protected override void Remove(AnimationComponent component, Node owner)
 		{
 			Disable(component);
 		}

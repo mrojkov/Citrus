@@ -33,12 +33,12 @@ namespace Lime
 					}
 				}
 				foreach (var node in RootNodes) {
-					AddComponentsToProcessor(node, componentProcessor);
+					RegisterHierarchyComponentsWithinProcessor(node, componentProcessor);
 				}
 			}
 		}
 
-		private void AddComponentsToProcessor(Node node, NodeComponentProcessor processor)
+		private void RegisterHierarchyComponentsWithinProcessor(Node node, NodeComponentProcessor processor)
 		{
 			foreach (var component in node.Components) {
 				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
@@ -46,21 +46,36 @@ namespace Lime
 				}
 			}
 			foreach (var child in node.Nodes) {
-				AddComponentsToProcessor(child, processor);
+				RegisterHierarchyComponentsWithinProcessor(child, processor);
 			}
 		}
 
 		internal void UnregisterNodeProcessor(NodeProcessor processor)
 		{
+			processor.Manager = null;
 			if (processor is NodeComponentProcessor componentProcessor) {
 				foreach (var (componentType, componentProcessors) in processorsByComponentType) {
 					if (componentProcessor.TargetComponentType.IsAssignableFrom(componentType)) {
 						componentProcessors.Remove(componentProcessor);
 					}
 				}
+				foreach (var rootNode in RootNodes) {
+					UnregisterHierarchyComponentsWithinProcessor(rootNode, componentProcessor);
 			}
-			processor.Manager = null;
+			}
 			processor.Stop();
+		}
+
+		private void UnregisterHierarchyComponentsWithinProcessor(Node node, NodeComponentProcessor processor)
+		{
+			foreach (var child in node.Nodes) {
+				UnregisterHierarchyComponentsWithinProcessor(child, processor);
+			}
+			foreach (var component in node.Components) {
+				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
+					processor.Remove(component, node);
+				}
+			}
 		}
 
 		private List<NodeComponentProcessor> GetProcessorsForComponentType(Type type)
@@ -98,7 +113,7 @@ namespace Lime
 				UnregisterNode(child);
 			}
 			foreach (var component in node.Components) {
-				UnregisterComponent(component);
+				UnregisterComponent(component, node);
 			}
 			frozenNodes.Remove(node);
 			node.Manager = null;
@@ -127,10 +142,10 @@ namespace Lime
 			}
 		}
 
-		internal void UnregisterComponent(NodeComponent component)
+		internal void UnregisterComponent(NodeComponent component, Node owner)
 		{
 			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
-				p.Remove(component);
+				p.Remove(component, owner);
 			}
 		}
 

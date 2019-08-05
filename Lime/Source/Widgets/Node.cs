@@ -1577,7 +1577,7 @@ namespace Lime
 			CheckActivity();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(Node owner)
 		{
 			attached = false;
 		}
