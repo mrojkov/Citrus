@@ -1437,12 +1437,6 @@ namespace Lime
 			if (legacyEarlyBehaviorContainer != null) {
 				legacyEarlyBehaviorContainer.Update(delta);
 			}
-			var animationComponent = node.Components.Get<AnimationComponent>();
-			if (animationComponent != null) {
-				foreach (var a in animationComponent.Animations) {
-					a.Advance(delta);
-				}
-			}
 			var visible = true;
 			if (node.AsWidget != null) {
 				visible = node.AsWidget.GloballyVisible;
@@ -1450,6 +1444,12 @@ namespace Lime
 				visible = node.AsNode3D.GloballyVisible;
 			}
 			if (visible) {
+				var animationComponent = node.Components.Get<AnimationComponent>();
+				if (animationComponent != null) {
+					foreach (var a in animationComponent.Animations) {
+						a.Advance(delta);
+					}
+				}
 				for (var child = node.FirstChild; child != null; child = child.NextSibling) {
 					Update(child, delta * child.AnimationSpeed);
 				}
