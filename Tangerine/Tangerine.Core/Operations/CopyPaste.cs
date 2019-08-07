@@ -77,7 +77,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			frame.SyncFolderDescriptorsAndNodes();
-			TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, frame, Serialization.Format.JSON);
+			TangerineYuzu.Instance.Value.WriteObject(null, stream, frame, Serialization.Format.JSON);
 		}
 
 		static Folder CloneFolder(Folder folder)

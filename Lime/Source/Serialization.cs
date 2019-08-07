@@ -201,7 +201,11 @@ namespace Lime
 
 		private string GetCurrentSerializationDirectory()
 		{
-			return Path.GetDirectoryName(pathStack.Peek());
+			var path = Path.GetDirectoryName(pathStack.Peek());
+			if (!string.IsNullOrEmpty(path)) {
+				path = AssetPath.CorrectSlashes(path);
+			}
+			return path;
 		}
 
 		private void WriteYuzuBinarySignature(Stream s)

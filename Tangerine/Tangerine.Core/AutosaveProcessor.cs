@@ -30,9 +30,9 @@ namespace Tangerine.Core
 				yield return delayGetter();
 				foreach (var document in Project.Current.Documents) {
 					if (document.Loaded && document.IsModified) {
-						var path = GetTemporaryFilePath(document.Path);
+						var filePath = $"{GetTemporaryFilePath(document.Path)}.{document.GetFileExtension()}";
 						try {
-							document.SaveTo(path, FileAttributes.Hidden);
+							document.ExportToFile(filePath, document.Path, FileAttributes.Hidden);
 						} catch (Exception e) {
 							Console.WriteLine("Error on autosave document '{0}':\n{1}", document.Path, e);
 						}
