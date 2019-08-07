@@ -25,7 +25,7 @@ namespace Lime
 			UpdateFamily.Filter(this);
 		}
 
-		public void Resume()
+		protected void Resume()
 		{
 			Suspended = false;
 			UpdateFamily.Filter(this);
