@@ -1458,13 +1458,13 @@ namespace Lime
 
 		public override void UpdateBoundingRect()
 		{
-			if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
-				ExpandParentBoundingRect();
-			}
 			if (GloballyVisible) {
 				for (var n = FirstChild; n != null; n = n.NextSibling) {
 					n.UpdateBoundingRect();
 				}
+			}
+			if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+				ExpandParentBoundingRect();
 			}
 		}
 
