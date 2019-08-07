@@ -53,7 +53,6 @@ namespace Tangerine.Core
 
 		public readonly DocumentHistory History = new DocumentHistory();
 		public bool IsModified => History.IsDocumentModified;
-		public event Action<Document> Saving;
 
 		/// <summary>
 		/// The list of Tangerine node decorators.
@@ -423,16 +422,17 @@ namespace Tangerine.Core
 
 		public void SaveAs(string path)
 		{
-			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
+			if (System.IO.Path.IsPathRooted(path)) {
+				throw new InvalidOperationException("The path must be project relative");
+			}
 			if (!Loaded && IsModified) {
 				Load();
 			}
 			Project.RaiseDocumentSaving(this);
-			Saving?.Invoke(this);
 			History.AddSavePoint();
 			Path = path;
-			var needSupressCreatedEvent = !File.Exists(FullPath);
-			WriteNodeToFile(path, Format, RootNodeUnwrapped);
+			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
+			ExportNodeToFile(FullPath, Path, Format, RootNodeUnwrapped);
 			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
 				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
@@ -440,12 +440,12 @@ namespace Tangerine.Core
 			Project.Current.AddRecentDocument(Path);
 		}
 
-		public void SaveTo(string path, FileAttributes attributes = 0)
+		public void ExportToFile(string filePath, string assetPath, FileAttributes attributes = 0)
 		{
-			WriteNodeToFile(path, Format, RootNodeUnwrapped, attributes);
+			ExportNodeToFile(filePath, assetPath, Format, RootNodeUnwrapped, attributes);
 		}
 
-		public static void WriteNodeToFile(string path, DocumentFormat format, Node node, FileAttributes attributes = 0)
+		public static void ExportNodeToFile(string filePath, string assetPath, DocumentFormat format, Node node, FileAttributes attributes = 0)
 		{
 			// Save the document into memory at first to avoid a torn file in the case of a serialization error.
 			var ms = new MemoryStream();
@@ -453,19 +453,17 @@ namespace Tangerine.Core
 			using (node = CreateCloneForSerialization(node)) {
 				if (format == DocumentFormat.Scene) {
 					var serializer = new HotSceneSerializer();
-					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, serializer);
+					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, serializer);
 				} else {
-					TangerineYuzu.Instance.Value.WriteObject(path, ms, node, Serialization.Format.JSON);
+					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, Serialization.Format.JSON);
 				}
 			}
-			var fullPath = Project.Current.GetFullPath(path, GetFileExtension(format));
-
-			FileMode fileModeForHiddenFile = File.Exists(fullPath) ? FileMode.Truncate : FileMode.Create;
-			using (var fs = new FileStream(fullPath, fileModeForHiddenFile)) {
+			FileMode fileModeForHiddenFile = File.Exists(filePath) ? FileMode.Truncate : FileMode.Create;
+			using (var fs = new FileStream(filePath, fileModeForHiddenFile)) {
 				var a = ms.ToArray();
 				fs.Write(a, 0, a.Length);
 			}
-			var FileInfo = new FileInfo(fullPath);
+			var FileInfo = new FileInfo(filePath);
 			FileInfo.Attributes |= attributes;
 		}
 

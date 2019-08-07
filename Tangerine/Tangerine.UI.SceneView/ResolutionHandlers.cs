@@ -121,9 +121,9 @@ namespace Tangerine.UI.SceneView
 			set {
 				var document = Document.Current;
 				if (!document.ResolutionPreview.Enabled && value) {
-					document.Saving += DocumentOnSaving;
+					Project.DocumentSaving += DocumentOnSaving;
 				} else if (document.ResolutionPreview.Enabled && !value) {
-					document.Saving -= DocumentOnSaving;
+					Project.DocumentSaving -= DocumentOnSaving;
 				}
 				document.ResolutionPreview = new ResolutionPreview {
 					Enabled = value,
