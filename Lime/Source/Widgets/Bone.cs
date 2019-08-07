@@ -318,6 +318,7 @@ namespace Lime
 		protected internal override void Stop(Node owner)
 		{
 			boneArrayUpdater.RemoveBone(bone);
+			bone = null;
 		}
 
 		public override NodeComponent Clone()
