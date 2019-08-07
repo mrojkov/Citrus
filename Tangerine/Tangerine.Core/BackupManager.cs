@@ -154,15 +154,17 @@ namespace Tangerine.Core
 
 		private void SaveBackup(Document document)
 		{
-			var path = GetTemporaryPath(document.Path);
-			Directory.CreateDirectory(path);
+			var directory = GetTemporaryPath(document.Path);
+			Directory.CreateDirectory(directory);
 			try {
-				document.SaveTo(Path.Combine(path, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
+				var filePath = Path.Combine(directory,
+					$"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.{document.GetFileExtension()}");
+				document.ExportToFile(filePath, document.Path);
 			} catch (Exception e) {
 				Console.WriteLine($"Error on autosave document '{document.Path}':\n{e}");
 			}
 
-			var history = GetHistory(path);
+			var history = GetHistory(directory);
 			if (history != null) {
 				if (!(document == Document.Current && mode == Mode.SaveOriginal)) {
 					RemoveBackups(history);
