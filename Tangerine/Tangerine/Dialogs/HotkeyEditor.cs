@@ -120,7 +120,7 @@ namespace Tangerine.Dialogs
 
 		private void PressButton(Key key)
 		{
-			if (key == Main) {
+			if (key == Main || !buttons.ContainsKey(key)) {
 				return;
 			}
 			if (key != Key.Unknown) {
