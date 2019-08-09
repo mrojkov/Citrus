@@ -4686,6 +4686,13 @@ namespace GeneratedDeserializersBIN
 				result.Normal.Z = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (7 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				result.Tangent.X = d.Reader.ReadSingle();
+				result.Tangent.Y = d.Reader.ReadSingle();
+				result.Tangent.Z = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 			return result;
 		}

@@ -107,6 +107,9 @@ namespace Lime
 			[YuzuMember("5")]
 			public Vector3 Normal;
 
+			[YuzuMember("6")]
+			public Vector3 Tangent;
+
 			public bool Equals(Vertex other)
 			{
 				return Pos == other.Pos &&
@@ -114,7 +117,8 @@ namespace Lime
 					UV1 == other.UV1 &&
 					BlendIndices.Equals(other.BlendIndices) &&
 					BlendWeights.Equals(other.BlendWeights) &&
-					Normal == other.Normal;
+					Normal == other.Normal &&
+					Tangent == other.Tangent;
 			}
 
 			public override int GetHashCode()
@@ -126,6 +130,7 @@ namespace Lime
 					hashCode = (hashCode * 397) ^ BlendIndices.GetHashCode();
 					hashCode = (hashCode * 397) ^ BlendWeights.GetHashCode();
 					hashCode = (hashCode * 397) ^ Normal.GetHashCode();
+					hashCode = (hashCode * 397) ^ Tangent.GetHashCode();
 					return hashCode;
 				}
 			}

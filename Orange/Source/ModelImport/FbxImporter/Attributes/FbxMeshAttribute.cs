@@ -79,26 +79,28 @@ namespace Orange.FbxImporter
 					Normals = new Vector3[newSize],
 					Bones = bones,
 				};
-
+				var hasColors = colorsContainer.Size != 0 && colorsContainer.Mode != ReferenceMode.None;
+				var hasNormals = normalsContainer.Size != 0 && normalsContainer.Mode != ReferenceMode.None;
+				var hasUV = uvContainer.Size != 0 && uvContainer.Mode != ReferenceMode.None;
 				for (var j = 0; j < submesh.Vertices.Length; j++) {
 					var index = i * size + j;
 					var controlPointIndex = indices[index];
 					var controlPoint = controlPoints[controlPointIndex];
 					submesh.Indices[j] = j;
 					submesh.Vertices[j].Pos = controlPoint.ToLime();
-					if (colorsContainer.Size != 0 && colorsContainer.Mode != ReferenceMode.None) {
+					if (hasColors) {
 						submesh.Vertices[j].Color = colorsContainer.Mode == ReferenceMode.ControlPoint ?
 							colors[controlPointIndex].ToLimeColor() : colors[index].ToLimeColor();
 					} else {
 						submesh.Vertices[j].Color = Color4.White;
 					}
 
-					if (normalsContainer.Size != 0 && normalsContainer.Mode != ReferenceMode.None) {
+					if (hasNormals) {
 						submesh.Vertices[j].Normal = normalsContainer.Mode == ReferenceMode.ControlPoint ?
 							normals[controlPointIndex].ToLime() : normals[index].ToLime();
 					}
 
-					if (uvContainer.Size != 0 && uvContainer.Mode != ReferenceMode.None) {
+					if (hasUV) {
 						submesh.Vertices[j].UV1 = normalsContainer.Mode == ReferenceMode.ControlPoint ?
 							uv[controlPointIndex].ToLime() : uv[index].ToLime();
 						submesh.Vertices[j].UV1.Y = 1 - submesh.Vertices[j].UV1.Y;
@@ -132,9 +134,82 @@ namespace Orange.FbxImporter
 						}
 					}
 				}
+				if (hasUV) {
+					if (!hasNormals) {
+						ComputeNormals(submesh.Vertices, submesh.Indices);
+					}
+					ComputeTangents(submesh.Vertices, submesh.Indices);
+				}
 				list.Add(submesh);
 			}
 			return list;
+		}
+
+		private static void ComputeNormals(Mesh3D.Vertex[] vertices, int[] indices)
+		{
+			for (var i = 0; i < vertices.Length; i++) {
+				vertices[i].Normal = Vector3.Zero;
+			}
+			for (var i = 0; i < indices.Length - 2; i += 3) {
+				var idx1 = indices[i];
+				var idx2 = indices[i + 1];
+				var idx3 = indices[i + 2];
+				var v1 = vertices[idx1];
+				var v2 = vertices[idx2];
+				var v3 = vertices[idx3];
+				var e1 = v2.Pos - v1.Pos;
+				var e2 = v3.Pos - v1.Pos;
+				var n = Vector3.CrossProduct(e1, e2).Normalized;
+				vertices[idx1].Normal += n;
+				vertices[idx2].Normal += n;
+				vertices[idx3].Normal += n;
+			}
+			for (var i = 0; i < vertices.Length; i++) {
+				vertices[i].Normal = vertices[i].Normal.Normalized;
+			}
+		}
+
+		private static void ComputeTangents(Mesh3D.Vertex[] vertices, int[] indices)
+		{
+			var tangents = new Vector3[vertices.Length];
+			var bitangents = new Vector3[vertices.Length];
+			for (var i = 0; i < indices.Length - 2; i += 3) {
+				var idx1 = indices[i];
+				var idx2 = indices[i + 1];
+				var idx3 = indices[i + 2];
+				var v1 = vertices[idx1];
+				var v2 = vertices[idx2];
+				var v3 = vertices[idx3];
+				var d1p = v2.Pos - v1.Pos;
+				var d2p = v3.Pos - v1.Pos;
+				var d1uv = v2.UV1 - v1.UV1;
+				var d2uv = v3.UV1 - v1.UV1;
+				var r = 1.0f / (d1uv.X * d2uv.Y - d2uv.X * d1uv.Y);
+				var tangent = ((d1p * d2uv.Y - d2p * d1uv.Y) * r).Normalized;
+				var bitangent = ((d2p * d1uv.X - d1p * d2uv.X) * r).Normalized;
+				tangents[idx1] += tangent;
+				tangents[idx2] += tangent;
+				tangents[idx3] += tangent;
+				bitangents[idx1] += bitangent;
+				bitangents[idx2] += bitangent;
+				bitangents[idx3] += bitangent;
+			}
+			for (var i = 0; i < vertices.Length; i++) {
+				var n = vertices[i].Normal;
+				var t = tangents[i];
+				Orthonormalize(ref n, ref t);
+				if (Vector3.DotProduct(Vector3.CrossProduct(n, t), bitangents[i]) < 0.0f) {
+					t = -t;
+				}
+				vertices[i].Tangent = t;
+			}
+		}
+
+		private static void Orthonormalize(ref Vector3 a, ref Vector3 b)
+		{
+			a = a.Normalized;
+			b -= Vector3.DotProduct(a, b) * a;
+			b = b.Normalized;
 		}
 
 		private SkinningMode GetSkinningMode(FbxSkinningMode meshSkinningMode)
