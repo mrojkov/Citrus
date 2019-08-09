@@ -24,7 +24,7 @@ namespace Orange
 		private string serverAddress;
 		private string serverUsername;
 		private string serverPath;
-		private string localPath = Path.Combine(".orange", "Cache");
+		private string tempFilePath;
 		public AssetCacheMode Mode { get; private set; }
 
 		private bool IsLocalEnabled => (Mode & AssetCacheMode.Local) != 0;
@@ -45,6 +45,7 @@ namespace Orange
 				Console.WriteLine("[Cache] Cache disabled via WorkspaceConfig");
 				return;
 			}
+			tempFilePath = Path.Combine(The.Workspace.AssetCacheLocalPath, "cache.tmp");
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
@@ -93,8 +94,7 @@ namespace Orange
 			if (!ftpClient.IsConnected) {
 				try {
 					ftpClient.Connect();
-				}
-				catch (System.Exception e) {
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleSetupFailure("Can't connect");
 				}
@@ -170,8 +170,7 @@ namespace Orange
 			if (IsRemoteEnabled && ftpClient.IsConnected) {
 				try {
 					return ftpClient.FileExists(GetRemotePath(hashString));
-				}
-				catch(System.Exception e) {
+				} catch(System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Can't check existance of file");
 					return false;
@@ -194,8 +193,7 @@ namespace Orange
 						HandleRemoteCacheFailure(hashString, "Upload failed");
 						return false;
 					}
-				}
-				catch (System.Exception e) {
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Upload failed");
 					return false;
@@ -215,14 +213,16 @@ namespace Orange
 					if (ExistsLocal(hashString)) {
 						return true;
 					}
-					bool successful = ftpClient.DownloadFile(GetLocalPath(hashString), GetRemotePath(hashString));
+					bool successful = ftpClient.DownloadFile(tempFilePath, GetRemotePath(hashString));
 					if (!successful) {
 						ftpClient.Disconnect();
 						HandleRemoteCacheFailure(hashString, "Download failed");
 						return false;
 					}
-				}
-				catch (System.Exception e) {
+					var localPath = GetLocalPath(hashString);
+					Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+					File.Move(tempFilePath, localPath);
+				} catch (System.Exception e) {
 					Console.WriteLine(e.Message);
 					HandleRemoteCacheFailure(hashString, "Download failed");
 					return false;
@@ -260,6 +260,9 @@ namespace Orange
 				ending = "Cache disabled";
 			}
 			Console.WriteLine($"[Cache] ERROR {serverUsername}@{serverAddress}: {errorMessage} ({hashString}). {ending}");
+			if (File.Exists(tempFilePath)) {
+				File.Delete(tempFilePath);
+			}
 		}
 	}
 
