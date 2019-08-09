@@ -413,6 +413,14 @@
     <Compile Include="Source\Widgets\Animation\EasedAnimator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\PipelineCache.cs" />
     <Compile Include="Source\Localization\Pluralizer.cs" />
+    <Compile Include="Source\Widgets\Materials\AlphaIntensityComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\AlphaIntensityMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\DissolveComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\DissolveMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\TwistComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\TwistMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\WaveComponent.cs" />
+    <Compile Include="Source\Widgets\Materials\WaveMaterial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

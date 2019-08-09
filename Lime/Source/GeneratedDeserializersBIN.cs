@@ -16,6 +16,41 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__AlphaIntensityComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.AlphaIntensityComponent)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.Color = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Radius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__AlphaIntensityComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.AlphaIntensityComponent();
+			Read_Lime__AlphaIntensityComponent(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Animation(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animation)obj;
@@ -2323,6 +2358,45 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.DefaultLayoutCell();
 			Read_Lime__DefaultLayoutCell(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__DissolveComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.DissolveComponent)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.Color = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Range = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__DissolveComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.DissolveComponent();
+			Read_Lime__DissolveComponent(d, def, result);
 			return result;
 		}
 
@@ -9366,6 +9440,26 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__TwistComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.TwistComponent)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Angle = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__TwistComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.TwistComponent();
+			Read_Lime__TwistComponent(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__VBoxLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.VBoxLayout)obj;
@@ -9853,6 +9947,58 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
+		private static void Read_Lime__WaveComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.WaveComponent)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp1 = new global::Lime.Vector2();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				result.Amplitude = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.AutoLoopEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Frequency = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Point = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Time = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp3 = new global::Lime.Vector2();
+				tmp3.X = d.Reader.ReadSingle();
+				tmp3.Y = d.Reader.ReadSingle();
+				result.TimeSpeed = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__WaveComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.WaveComponent();
+			Read_Lime__WaveComponent(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Widget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Widget)obj;
@@ -10149,6 +10295,7 @@ namespace GeneratedDeserializersBIN
 
 		static BinaryDeserializerGen()
 		{
+			readCache[typeof(global::Lime.AlphaIntensityComponent)] = Read_Lime__AlphaIntensityComponent;
 			readCache[typeof(global::Lime.Animation)] = Read_Lime__Animation;
 			readCache[typeof(global::Lime.Animation.AnimationData)] = Read_Lime__Animation__AnimationData;
 			readCache[typeof(global::Lime.AnimationBlender)] = Read_Lime__AnimationBlender;
@@ -10197,6 +10344,7 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.Color4Animator)] = Read_Lime__Color4Animator;
 			readCache[typeof(global::Lime.CommonMaterial)] = Read_Lime__CommonMaterial;
 			readCache[typeof(global::Lime.DefaultLayoutCell)] = Read_Lime__DefaultLayoutCell;
+			readCache[typeof(global::Lime.DissolveComponent)] = Read_Lime__DissolveComponent;
 			readCache[typeof(global::Lime.DistortionMesh)] = Read_Lime__DistortionMesh;
 			readCache[typeof(global::Lime.DistortionMeshPoint)] = Read_Lime__DistortionMeshPoint;
 			readCache[typeof(global::Lime.EmitterShapePoint)] = Read_Lime__EmitterShapePoint;
@@ -10303,14 +10451,17 @@ namespace GeneratedDeserializersBIN
 			readCache[typeof(global::Lime.TextureParams)] = Read_Lime__TextureParams;
 			readCache[typeof(global::Lime.ThicknessAnimator)] = Read_Lime__ThicknessAnimator;
 			readCache[typeof(global::Lime.TiledImage)] = Read_Lime__TiledImage;
+			readCache[typeof(global::Lime.TwistComponent)] = Read_Lime__TwistComponent;
 			readCache[typeof(global::Lime.VBoxLayout)] = Read_Lime__VBoxLayout;
 			readCache[typeof(global::Lime.Vector2Animator)] = Read_Lime__Vector2Animator;
 			readCache[typeof(global::Lime.Vector3Animator)] = Read_Lime__Vector3Animator;
 			readCache[typeof(global::Lime.VideoPlayer)] = Read_Lime__VideoPlayer;
 			readCache[typeof(global::Lime.Viewport3D)] = Read_Lime__Viewport3D;
+			readCache[typeof(global::Lime.WaveComponent)] = Read_Lime__WaveComponent;
 			readCache[typeof(global::Lime.Widget)] = Read_Lime__Widget;
 			readCache[typeof(global::Lime.WidgetAdapter3D)] = Read_Lime__WidgetAdapter3D;
 			makeCache[typeof(global::Lime.Alignment)] = Make_Lime__Alignment;
+			makeCache[typeof(global::Lime.AlphaIntensityComponent)] = Make_Lime__AlphaIntensityComponent;
 			makeCache[typeof(global::Lime.Animation)] = Make_Lime__Animation;
 			makeCache[typeof(global::Lime.Animation.AnimationData)] = Make_Lime__Animation__AnimationData;
 			makeCache[typeof(global::Lime.AnimationBlender)] = Make_Lime__AnimationBlender;
@@ -10366,6 +10517,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Color4Animator)] = Make_Lime__Color4Animator;
 			makeCache[typeof(global::Lime.CommonMaterial)] = Make_Lime__CommonMaterial;
 			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
+			makeCache[typeof(global::Lime.DissolveComponent)] = Make_Lime__DissolveComponent;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;
@@ -10488,6 +10640,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Thickness)] = Make_Lime__Thickness;
 			makeCache[typeof(global::Lime.ThicknessAnimator)] = Make_Lime__ThicknessAnimator;
 			makeCache[typeof(global::Lime.TiledImage)] = Make_Lime__TiledImage;
+			makeCache[typeof(global::Lime.TwistComponent)] = Make_Lime__TwistComponent;
 			makeCache[typeof(global::Lime.VBoxLayout)] = Make_Lime__VBoxLayout;
 			makeCache[typeof(global::Lime.Vector2)] = Make_Lime__Vector2;
 			makeCache[typeof(global::Lime.Vector2Animator)] = Make_Lime__Vector2Animator;
@@ -10496,6 +10649,7 @@ namespace GeneratedDeserializersBIN
 			makeCache[typeof(global::Lime.Vector4)] = Make_Lime__Vector4;
 			makeCache[typeof(global::Lime.VideoPlayer)] = Make_Lime__VideoPlayer;
 			makeCache[typeof(global::Lime.Viewport3D)] = Make_Lime__Viewport3D;
+			makeCache[typeof(global::Lime.WaveComponent)] = Make_Lime__WaveComponent;
 			makeCache[typeof(global::Lime.Widget)] = Make_Lime__Widget;
 			makeCache[typeof(global::Lime.WidgetAdapter3D)] = Make_Lime__WidgetAdapter3D;
 		}
