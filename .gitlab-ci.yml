@@ -13,7 +13,7 @@ windows_build:
   - 'Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime deserializers"'
   - 'git status -s > ..\changes.txt'
   - 'cat .\..\changes.txt'
-  - 'if ((Get-Item "..\changes.txt").length -ne 0) {exit 1}'
+  - 'if ((Get-Item "..\changes.txt").length -ne 0) {exit 1} else {"Orange build OK"}'
   - 'Orange\Toolchain.Win\nuget.exe restore Tangerine\Tangerine.Win.sln'
   - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Tangerine\Tangerine.Win.sln'
   - echo "Tangerine build OK"
