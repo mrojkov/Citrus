@@ -42,6 +42,7 @@ namespace Orange
 				IncludeNewItems(doc, ref changed);
 			}
 			if (changed) {
+				SortCompileElements(doc);
 				// disble BOM
 				using (var writer = new XmlTextWriter(projectFileName, new UTF8Encoding(false)))
 				{
@@ -54,9 +55,7 @@ namespace Orange
 
 		private static void IncludeNewItems(XmlDocument doc, ref bool changed)
 		{
-			var itemGroups = doc["Project"].EnumerateElements("ItemGroup").ToArray();
-			// It is assumed that the second <ItemGroup> tag contains compile items
-			var compileItems = itemGroups[1];
+			var compileItems = GetCompileItemGroup(doc);
 			foreach (var file in new ScanOptimizedFileEnumerator(".", SkipUnwantedDirectoriesPredicate).Enumerate(".cs")) {
 				var path = ToWindowsSlashes(file.Path);
 				if (Path.GetFileName(path).StartsWith("TemporaryGeneratedFile")) {
@@ -75,6 +74,13 @@ namespace Orange
 			}
 		}
 
+		private static XmlNode GetCompileItemGroup(XmlDocument doc)
+		{
+			var itemGroups = doc["Project"].EnumerateElements("ItemGroup").ToArray();
+			// It is assumed that the second <ItemGroup> tag contains compile items
+			return itemGroups[1];
+		}
+
 		private static bool HasCompileItem(XmlDocument doc, string path)
 		{
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup");
@@ -84,6 +90,21 @@ namespace Orange
 					if (itemPath.ToLower() == path.ToLower()) {
 						return true;
 					}
+				}
+			}
+			return false;
+		}
+
+		private static bool SortCompileElements(XmlDocument doc)
+		{
+			var itemGroups = doc["Project"].EnumerateElements("ItemGroup");
+			foreach (var group in itemGroups) {
+				var compileElements = group.EnumerateElements("Compile").OrderBy(e => e.Attributes["Include"].Value).ToList();
+				foreach (var ce in compileElements) {
+					group.RemoveChild(ce);
+				}
+				foreach (var ce in compileElements) {
+					group.AppendChild(ce);
 				}
 			}
 			return false;
