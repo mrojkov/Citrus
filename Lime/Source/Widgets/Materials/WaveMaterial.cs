@@ -62,6 +62,7 @@ namespace Lime
 			Point = Point,
 			TimeSpeed = TimeSpeed,
 			Amplitude = Amplitude,
+			AutoLoopEnabled = AutoLoopEnabled,
 		};
 
 		public class WaveShaderProgram : ShaderProgram
