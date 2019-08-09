@@ -134,8 +134,12 @@ namespace Orange
 				Console.WriteLine($"WARNING: {bundlePath} do not exists! Skipping...");
 				return;
 			}
-			Directory.Delete(bundlePath, true);
-			Console.WriteLine($"{bundlePath} deleted.");
+			try {
+				Directory.Delete(bundlePath, true);
+				Console.WriteLine($"{bundlePath} deleted.");
+			} catch (System.Exception exception) {
+				Console.WriteLine($"{bundlePath} deletion skipped because of exception: {exception.Message}");
+			}
 		}
 	}
 }
