@@ -114,7 +114,8 @@ namespace Orange.FbxImporter
 						ShaderPrograms.Attributes.UV1,
 						ShaderPrograms.Attributes.BlendIndices,
 						ShaderPrograms.Attributes.BlendWeights,
-						ShaderPrograms.Attributes.Normal
+						ShaderPrograms.Attributes.Normal,
+						ShaderPrograms.Attributes.Tangent
 					}
 				},
 				Material = meshAttribute.MaterialIndex != -1 && node.Materials != null
