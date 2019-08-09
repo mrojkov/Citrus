@@ -15,7 +15,7 @@ namespace Orange
 		public static void UploadCacheToServerAction()
 		{
 			AssetCache.Instance.Initialize();
-			if (AssetCache.Instance.Mode != AssetCacheMode.Both) {
+			if (AssetCache.Instance.Mode != (AssetCacheMode.Local | AssetCacheMode.Remote)) {
 				Console.WriteLine("Both LOCAL and REMOTE cache should be active. Execution aborted");
 				return;
 			}
@@ -24,8 +24,13 @@ namespace Orange
 				" It will overwrite all existing files with same names on it. Are you sure?")) {
 				return;
 			}
+			if (!Directory.Exists(The.Workspace.AssetCacheLocalPath)) {
+				Console.WriteLine($"{The.Workspace.AssetCacheLocalPath} do not exist. Execution aborted");
+			}
 			var filePaths = Directory.GetFiles(The.Workspace.AssetCacheLocalPath, "*", SearchOption.AllDirectories);
 			var hashStrings = filePaths.Select(path => Path.GetFileName(path)).ToList();
+			// Since we are downloading cache to temporary file, we should make sure that it won't be uploaded to server
+			hashStrings.Remove(AssetCache.TempFileName);
 			The.UI.SetupProgressBar(hashStrings.Count);
 			foreach (var hashString in hashStrings) {
 				if (!AssetCache.Instance.UploadFromLocal(hashString)) {
