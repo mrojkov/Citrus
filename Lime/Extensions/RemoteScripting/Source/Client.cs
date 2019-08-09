@@ -14,7 +14,7 @@ namespace RemoteScripting
 		public async void Connect(IPAddress ipAddress)
 		{
 			try {
-				await TcpClient.ConnectAsync(ipAddress, NetworkSettings.Port);
+				await TcpClient.ConnectAsync(ipAddress, NetworkSettings.Port).ConfigureAwait(continueOnCapturedContext: false);
 			} catch (Exception exception) {
 				WasFailed = true;
 				TcpClient?.Close();
@@ -23,7 +23,7 @@ namespace RemoteScripting
 			}
 
 			try {
-				await ProcessConnectionAsync();
+				await ProcessConnectionAsync().ConfigureAwait(continueOnCapturedContext: false);
 			} catch (Exception exception) {
 				WasFailed = true;
 				TcpClient?.Close();
