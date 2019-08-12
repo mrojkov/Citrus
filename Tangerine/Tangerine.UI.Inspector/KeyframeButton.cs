@@ -101,7 +101,7 @@ namespace Tangerine.UI.Inspector
 						SetKeyframe(!kf.HasValue);
 						if (!kf.HasValue) {
 							keyFunctionFlow.Poll(out kf);
-							SetKeyFunction(kf ?? KeyFunction.Linear);
+							SetKeyFunction(kf ?? button.AllowedKeyFunctions[0]);
 						}
 					});
 				}
@@ -114,18 +114,13 @@ namespace Tangerine.UI.Inspector
 					} else {
 						Document.Current.History.DoTransaction(() => {
 							SetKeyframe(true);
-							SetKeyFunction(KeyFunction.Linear);
+							SetKeyFunction(button.AllowedKeyFunctions[0]);
 						});
 					}
 				}
 				yield return null;
 			}
 		}
-
-		private static readonly KeyFunction[] nextKeyFunction = {
-			KeyFunction.Spline, KeyFunction.ClosedSpline,
-			KeyFunction.Steep, KeyFunction.Linear
-		};
 
 		private KeyFunction GetNextKeyFunction(KeyFunction value)
 		{
