@@ -301,11 +301,11 @@ namespace Lime
 
 	public sealed class TangerineKeyframeInterpolationAttribute : Attribute
 	{
-		public KeyFunction KeyframeInterpolation { get; private set; }
+		public KeyFunction[] KeyframeInterpolations;
 
-		public TangerineKeyframeInterpolationAttribute(KeyFunction keyFunction)
+		public TangerineKeyframeInterpolationAttribute(params KeyFunction[] keyFunctions)
 		{
-			KeyframeInterpolation = keyFunction;
+			KeyframeInterpolations = keyFunctions;
 		}
 	}
 }

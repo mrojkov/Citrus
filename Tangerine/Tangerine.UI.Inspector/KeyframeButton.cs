@@ -19,6 +19,7 @@ namespace Tangerine.UI.Inspector
 		private bool @checked;
 
 		public Color4 KeyColor { get; set; }
+		public KeyFunction[] AllowedKeyFunctions { get; set; }
 		public bool Checked
 		{
 			get => @checked;
@@ -126,7 +127,15 @@ namespace Tangerine.UI.Inspector
 			KeyFunction.Steep, KeyFunction.Linear
 		};
 
-		private static KeyFunction GetNextKeyFunction(KeyFunction value) => nextKeyFunction[(int)value];
+		private KeyFunction GetNextKeyFunction(KeyFunction value)
+		{
+			for (int i = 0; i < button.AllowedKeyFunctions.Length - 1; i++) {
+				if (button.AllowedKeyFunctions[i] == value) {
+					return button.AllowedKeyFunctions[i + 1];
+				}
+			}
+			return button.AllowedKeyFunctions[0];
+		}
 
 		internal void SetKeyFunction(KeyFunction value)
 		{
