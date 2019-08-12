@@ -39,12 +39,9 @@ namespace Tangerine.UI.Timeline.Components
 			var color = KeyframePalette.Colors[colorIndex];
 			for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {
 				var key = animator.ReadonlyKeys[i];
-				Renderer.Transform1 =
-					Matrix32.RotationRough(Mathf.Pi / 4) *
-					Matrix32.Translation((key.Frame + 0.5f) * TimelineMetrics.ColWidth + 0.5f, widget.Height / 2 + 0.5f) *
-					widget.LocalToWorldTransform;
-				var v = TimelineMetrics.ColWidth / 3 * Vector2.One;
-				Renderer.DrawRect(-v, v, color);
+				var a = new Vector2(key.Frame * TimelineMetrics.ColWidth + 1, 0);
+				var b = a + new Vector2(TimelineMetrics.ColWidth - 1, widget.Height);
+				KeyframeFigure.Render(a, b, color, key.Function);
 			}
 		}
 	}

@@ -108,6 +108,7 @@
     <Compile Include="Components\GridFolderView.cs" />
     <Compile Include="CommandBindings.cs" />
     <Compile Include="Components\RowView.cs" />
+    <Compile Include="Utils\KeyframeFigure.cs" />
     <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Operations\DeselectGridSpan.cs" />
     <Compile Include="Components\GridAudioView.cs" />
