@@ -72,13 +72,14 @@ namespace Tangerine.UI.SceneView
 						}
 						history.CommitTransaction();
 					}
+					history.CommitTransaction();
 				}
 				if (input.WasMousePressed(1) || input.WasKeyPressed(Key.Escape)) {
 					break;
 				}
 				yield return null;
 			}
-			history.CommitTransaction();
+
 			command.Checked = false;
 			Utils.ChangeCursorIfDefault(MouseCursor.Default);
 		}
