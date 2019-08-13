@@ -33,9 +33,10 @@ namespace Lime
 		private Lime.Graphics.Platform.Vulkan.PlatformRenderContext vkContext;
 		private Lime.Graphics.Platform.Vulkan.Swapchain vkSwapChain;
 		private CAMetalLayer metalLayer;
+		private bool shouldUpdateMetalLayerSize;
 
 		public Vector2 ClientSize { get; private set; }
-		public float PixelScale { get; private set; }
+		public float PixelScale => (float)ContentScaleFactor;
 
 		public event Action<float> UpdateFrame;
 		public event Action RenderFrame;
@@ -44,16 +45,37 @@ namespace Lime
 		{
 			return UIDevice.CurrentDevice.CheckSystemVersion(10, 0) && MTLDevice.SystemDefault != null;
 		}
-		
+
 		public MetalGameView(CGRect frame) : base(frame, MTLDevice.SystemDefault)
 		{
 			stopwatch = new System.Diagnostics.Stopwatch();
 			Delegate = this;
+			SetupMetal();
 		}
- 				
+
 		public void Draw(MTKView view)
 		{
-			EnsureInitialized();
+			if (vkContext == null) {
+				vkContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
+				PlatformRenderer.Initialize(vkContext);
+			}
+			if (vkSwapChain == null) {
+				shouldUpdateMetalLayerSize = true;
+			}
+			if (shouldUpdateMetalLayerSize) {
+				var screen = Window?.Screen ?? UIScreen.MainScreen;
+				var drawableSize = Bounds.Size;
+				drawableSize.Width *= screen.NativeScale;
+				drawableSize.Height *= screen.NativeScale;
+				metalLayer.DrawableSize = drawableSize;
+				if (vkSwapChain == null) {
+					vkSwapChain = new Graphics.Platform.Vulkan.Swapchain(vkContext, this.Handle, (int)metalLayer.DrawableSize.Width, (int)metalLayer.DrawableSize.Height);
+				} else {
+					vkSwapChain.Resize((int)metalLayer.DrawableSize.Width, (int)metalLayer.DrawableSize.Height);
+				}
+				shouldUpdateMetalLayerSize = false;
+			}
+			shouldUpdateMetalLayerSize = false;
 			var curUpdateTime = stopwatch.Elapsed;
 			if (prevUpdateTime == TimeSpan.Zero) {
 				prevUpdateTime = curUpdateTime;
@@ -64,31 +86,13 @@ namespace Lime
 			RenderFrame?.Invoke();
 		}
 
-		private void EnsureInitialized()
-		{
-			if (metalLayer == null) {
-				SetupMetal();
-			}
-			if (vkContext == null) {
-				vkContext = new Graphics.Platform.Vulkan.PlatformRenderContext();
-				PlatformRenderer.Initialize(vkContext);
-			}
-			if (vkSwapChain == null) {
-				var size = metalLayer.DrawableSize;
-				GetDrawableSize(out var drawableWidth, out var drawableHeight);
-				vkSwapChain = new Graphics.Platform.Vulkan.Swapchain(
-					vkContext, this.Handle, drawableWidth, drawableHeight);
-			}
-		}
-
 		void IMTKViewDelegate.DrawableSizeWillChange(MTKView view, CGSize size) { }
  		
 		void SetupMetal()
 		{
 			metalLayer = (CAMetalLayer)Layer;
-			PixelScale = (float)metalLayer.ContentsScale;
 			// Setup metal layer and add as sub layer to view
-			// metalLayer.Device = mtlDevice;
+			metalLayer.Opaque = true;
 			metalLayer.PixelFormat = MTLPixelFormat.BGRA8Unorm;
 			// Change this to NO if the compute encoder is used as the last pass on the drawable texture
 			metalLayer.FramebufferOnly = true;
@@ -113,21 +117,28 @@ namespace Lime
 			base.Dispose(disposing);
 			disposed = true;
 		}
-		
+
+		public override void MovedToWindow()
+		{
+			base.MovedToWindow();
+			ContentScaleFactor = Window.Screen.NativeScale;
+		}
+
+		public override nfloat ContentScaleFactor
+		{
+			get => base.ContentScaleFactor;
+			set
+			{
+				base.ContentScaleFactor = value;
+				shouldUpdateMetalLayerSize = true;
+			}
+		}
 
 		public override void LayoutSubviews()
 		{
-			var bounds = Bounds;
-		    ClientSize = new Vector2((float)Layer.Bounds.Size.Width, (float)Layer.Bounds.Size.Height);
-		    EnsureInitialized();
-		    GetDrawableSize(out var drawableWidth, out var drawableHeight);
-		    vkSwapChain.Resize(drawableWidth, drawableHeight);
-		}
-		
-		private void GetDrawableSize(out int width, out int height)
-		{
-			width = (int)(Layer.Bounds.Width * Layer.ContentsScale);
-		    height = (int)(Layer.Bounds.Height * Layer.ContentsScale);
+			base.LayoutSubviews();
+			ClientSize = new Vector2((float)Layer.Bounds.Size.Width, (float)Layer.Bounds.Size.Height);
+			shouldUpdateMetalLayerSize = true;
 		}
 		
 		public void MakeCurrent()
