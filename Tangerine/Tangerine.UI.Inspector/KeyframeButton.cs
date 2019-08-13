@@ -20,6 +20,7 @@ namespace Tangerine.UI.Inspector
 
 		public Color4 KeyColor { get; set; }
 		public KeyFunction[] AllowedKeyFunctions { get; set; }
+
 		public bool Checked
 		{
 			get => @checked;
@@ -127,21 +128,15 @@ namespace Tangerine.UI.Inspector
 			if (button.AllowedKeyFunctions == null) {
 				return nextKeyFunction[(int)value];
 			}
-			else {
-				KeyFunction k = nextKeyFunction[(int)value];
-				while (true) {
-					if (button.AllowedKeyFunctions.Contains<KeyFunction>(k)) {
-						return k;
-					}
-					k = nextKeyFunction[(int)k];
+			while (true) {
+				value = nextKeyFunction[(int)value];
+				if (button.AllowedKeyFunctions.Contains<KeyFunction>(value)) {
+					return value;
 				}
 			}
 		}
 
-		private KeyFunction GetDefaultKeyFunction()
-		{
-			return button.AllowedKeyFunctions?[0] ?? KeyFunction.Linear;  
-		}
+		private KeyFunction GetDefaultKeyFunction() => button.AllowedKeyFunctions?[0] ?? KeyFunction.Linear;
 
 		private static readonly KeyFunction[] nextKeyFunction = {
 			KeyFunction.Spline, KeyFunction.ClosedSpline,
