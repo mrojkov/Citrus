@@ -20,7 +20,9 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			SceneView.Instance.Frame.PrepareRendererState();
-			DrawSpline(spline);
+			if (Document.Current.Container == spline.Parent || Document.Current.Container == spline || CoreUserPreferences.Instance.ShowSplinesGlobally) {
+				DrawSpline(spline);
+			}
 		}
 
 		void DrawSpline(Spline spline)
