@@ -518,8 +518,7 @@ namespace Tangerine.UI.Inspector
 			if (editor.EditorParams.IsAnimable) {
 				var keyColor = KeyframePalette.Colors[editor.EditorParams.TangerineAttribute.ColorIndex];
 				var allowedKeyFunctions = PropertyAttributes<TangerineKeyframeInterpolationAttribute>
-					.Get(editor.EditorParams.PropertyInfo)?.KeyframeInterpolations ??
-					new KeyFunction[] { KeyFunction.Spline, KeyFunction.Steep};
+					.Get(editor.EditorParams.PropertyInfo)?.KeyframeInterpolations;
 		var keyframeButton = new KeyframeButton {
 					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 					KeyColor = keyColor,
