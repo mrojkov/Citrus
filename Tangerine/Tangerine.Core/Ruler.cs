@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Lime;
 using Yuzu;
 
@@ -16,6 +16,26 @@ namespace Tangerine.Core
 		public bool AnchorToRoot { get; set; }
 
 		public readonly ComponentCollection<Component> Components = new ComponentCollection<Component>();
+
+		public void DeleteLine(RulerLine line)
+		{
+			foreach (RulerLine l in Lines) {
+				if ((l.RulerOrientation == line.RulerOrientation) && (l.Value == line.Value)) {
+					Lines.Remove(l);
+					break;
+				}
+			}
+		}
+
+		public bool ContainsLine(RulerLine line)
+		{
+			foreach (RulerLine l in Lines) {
+				if ((l.RulerOrientation == line.RulerOrientation) && (l.Value == line.Value)) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	public class RulerLine
@@ -48,6 +68,11 @@ namespace Tangerine.Core
 		public void MakePassingThroughPoint(Vector2 vector)
 		{
 			Value = RulerOrientation == RulerOrientation.Vertical ? vector.X : vector.Y;
+		}
+
+		public RulerLine Clone()
+		{
+			return (RulerLine) this.MemberwiseClone();
 		}
 	}
 

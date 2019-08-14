@@ -68,6 +68,7 @@
     <Compile Include="Operations\DistortionMeshProcessor.cs" />
     <Compile Include="Operations\DummyOperation.cs" />
     <Compile Include="Operations\EnterLeaveNode.cs" />
+    <Compile Include="Operations\RulerAction.cs" />
     <Compile Include="Operations\SelectRow.cs" />
     <Compile Include="Operations\SelectRowRange.cs" />
     <Compile Include="Operations\SyncFolderDescriptorsProcessor.cs" />

@@ -304,7 +304,9 @@ namespace Tangerine
 				typeof(TriggersValidatorOnSetKeyframe),
 				typeof(UpdateNodesAndApplyAnimatorsProcessor),
 				typeof(RowsSynchronizer),
-				typeof(Core.Operations.ReplaceContents.Processor)
+				typeof(Core.Operations.ReplaceContents.Processor),
+				typeof(Core.Operations.DeleteRuler.Processor),
+				typeof(Core.Operations.CreateRuler.Processor),
 			});
 			DocumentHistory.AddOperationProcessorTypes(UI.Timeline.Timeline.GetOperationProcessorTypes());
 
@@ -789,7 +791,12 @@ namespace Tangerine
 		private void ClearActiveRuler()
 		{
 			if (new AlertDialog("Are you sure you want to clear active ruler?", "Yes", "No").Show() == 0) {
-				ProjectUserPreferences.Instance.ActiveRuler.Lines.Clear();
+				using (Document.Current.History.BeginTransaction()) {
+					foreach (var line in ProjectUserPreferences.Instance.ActiveRuler.Lines.ToList()) {
+						Core.Operations.DeleteRuler.Perform(ProjectUserPreferences.Instance.ActiveRuler, line);
+					}
+					Document.Current.History.CommitTransaction();
+				}
 			}
 		}
 

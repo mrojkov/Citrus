@@ -39,18 +39,27 @@ namespace Tangerine.UI.SceneView
 					if (line != null) {
 						Utils.ChangeCursorIfDefault(line.RulerOrientation == RulerOrientation.Horizontal ? MouseCursor.SizeNS : MouseCursor.SizeWE);
 						if (sceneView.Input.ConsumeKeyPress(Key.Mouse0) || lineCaptured) {
-							SceneView.Instance.Components.GetOrAdd<LineSelectionComponent>().Line = line;
 							Window.Current.Invalidate();
-							Ruler.Lines.Remove(line);
-							while (Window.Current.Input.IsMousePressed()) {
-								SnapLineToNearestPoint(line, hulls);
-								yield return null;
+							using (Document.Current.History.BeginTransaction()) {
+								if (Ruler.ContainsLine(line)) {
+									Core.Operations.DeleteRuler.Perform(Ruler, line = line.Clone());
+								}
+								line = line.Clone();
+								SceneView.Instance.Components.GetOrAdd<LineSelectionComponent>().Line = line;
+								while (Window.Current.Input.IsMousePressed()) {
+									SnapLineToNearestPoint(line, hulls);
+									yield return null;
+								}
+								Core.Operations.CreateRuler.Perform(ProjectUserPreferences.Instance.ActiveRuler, line = line.Clone());
+								Document.Current.History.CommitTransaction();
 							}
-							Ruler.Lines.Add(line);
 							Window.Current.Invalidate();
 							SceneView.Instance.Components.Remove<LineSelectionComponent>();
 						} else if (Window.Current.Input.WasMouseReleased(1)) {
-							ProjectUserPreferences.Instance.ActiveRuler.Lines.Remove(line);
+							using (Document.Current.History.BeginTransaction()) {
+								Core.Operations.DeleteRuler.Perform(ProjectUserPreferences.Instance.ActiveRuler, line);
+								Document.Current.History.CommitTransaction();
+							}
 							Window.Current.Invalidate();
 						}
 					}
