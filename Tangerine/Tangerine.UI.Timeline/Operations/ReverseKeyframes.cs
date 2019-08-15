@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline.Operations
 					continue;
 				}
 				Document.Current.History.DoTransaction(() => {
-					foreach (var animator in animable.Animators) {
+					foreach (var animator in animable.Animators.ToList()) {
 						var saved = animator.Keys.Where(k =>
 							Boundaries.Value.Left <= k.Frame &&
 							k.Frame < Boundaries.Value.Right).ToList();
