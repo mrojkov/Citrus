@@ -9,6 +9,7 @@ using CoreGraphics;
 
 namespace Lime
 {
+	[YuzuDontGenerateDeserializer]
 	public class WebBrowser : Widget
 	{
 		private WebView webView;
