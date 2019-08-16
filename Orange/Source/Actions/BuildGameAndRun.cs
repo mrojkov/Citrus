@@ -18,7 +18,7 @@ namespace Orange
 
 		public static string BuildAndRun(Target target, string configuration)
 		{
-			AssetCooker.CookForPlatform(target);
+			AssetCooker.CookForTarget(target);
 			if (!BuildGame(target, configuration)) {
 				return "Can not BuildGame";
 			}

@@ -21,7 +21,7 @@ namespace Orange
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
 			}
-			AssetCooker.CookForPlatform(
+			AssetCooker.CookForTarget(
 				target,
 				new [] { CookingRulesBuilder.MainBundleName }
 			);

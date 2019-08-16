@@ -12,7 +12,7 @@ namespace Orange
 		{
 			var target = The.UI.GetActiveTarget();
 
-			AssetCooker.CookForPlatform(target);
+			AssetCooker.CookForTarget(target);
 			if (!BuildGame(target)) {
 				return "Can not BuildGame";
 			}

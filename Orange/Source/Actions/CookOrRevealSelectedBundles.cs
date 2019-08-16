@@ -190,7 +190,7 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetCooker.CookForPlatform(target, bundles);
+			action = () => AssetCooker.CookForTarget(target, bundles);
 			window.Close();
 		}
 

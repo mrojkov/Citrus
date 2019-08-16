@@ -42,7 +42,7 @@ namespace Orange
 		public readonly Target Target;
 		public TargetPlatform Platform => Target.Platform;
 
-		public static void CookForPlatform(Target target, IEnumerable<string> bundles = null)
+		public static void CookForTarget(Target target, IEnumerable<string> bundles = null)
 		{
 			var assetCooker = new AssetCooker(target);
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
