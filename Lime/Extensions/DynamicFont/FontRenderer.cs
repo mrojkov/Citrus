@@ -91,7 +91,7 @@ namespace Lime
 			var bearingX = (float) face.Glyph.Metrics.HorizontalBearingX;
 			bool rgbIntensity = bitmap.PixelMode == PixelMode.Lcd || bitmap.PixelMode == PixelMode.VerticalLcd;
 			var glyph = new Glyph {
-				Pixels = bitmap.BufferData,
+				Pixels = char.IsWhiteSpace(@char) ? new byte[0] : bitmap.BufferData,
 				RgbIntensity = rgbIntensity,
 				Pitch = bitmap.Pitch,
 				Width = rgbIntensity ? bitmap.Width / 3 : bitmap.Width,
