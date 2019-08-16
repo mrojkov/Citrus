@@ -15,17 +15,17 @@ namespace Orange
 		Partial
 	}
 
-	public static class AssetCooker
+	public class AssetCooker
 	{
 		private static readonly CookingProfile[] defaultCookingProfiles = { CookingProfile.Total, CookingProfile.Partial };
-		private static readonly Dictionary<ICookStage, CookingProfile[]> cookStages = new Dictionary<ICookStage, CookingProfile[]>();
+		private readonly Dictionary<ICookStage, CookingProfile[]> cookStages = new Dictionary<ICookStage, CookingProfile[]>();
 		private static CookingProfile cookingProfile = CookingProfile.Total;
-		public static IEnumerable<ICookStage> CookStages => cookStages.Keys;
+		public IEnumerable<ICookStage> CookStages => cookStages.Keys;
 
 		private delegate bool Converter(string srcPath, string dstPath);
 
-		public static AssetBundle AssetBundle => AssetBundle.Current;
-		public static TargetPlatform Platform;
+		public AssetBundle AssetBundle => AssetBundle.Current;
+		//public static TargetPlatform Platform;
 		public static Dictionary<string, CookingRules> CookingRulesMap;
 		public static HashSet<string> ModelsToRebuild = new HashSet<string>();
 
@@ -37,25 +37,28 @@ namespace Orange
 		public static event Action EndCookBundles;
 
 		private static bool cookCanceled = false;
-		private static ICollection<string> bundleBackupFiles;
+		private ICollection<string> bundleBackupFiles;
 
-		public static void CookForPlatform(Target target)
+		public readonly Target Target;
+		public TargetPlatform Platform => Target.Platform;
+
+		public static void CookForPlatform(Target target, IEnumerable<string> bundles = null)
 		{
+			var assetCooker = new AssetCooker(target);
 			var skipCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipAssetsCooking");
 			if (!skipCooking) {
-				Cook(target, GetListOfAllBundles(target));
-			}
-			else {
+				assetCooker.Cook(bundles ?? assetCooker.GetListOfAllBundles());
+			} else {
 				Console.WriteLine("-------------  Skip Assets Cooking -------------");
 			}
 		}
 
-		public static void AddStage(ICookStage stage, params CookingProfile[] cookingProfiles)
+		public void AddStage(ICookStage stage, params CookingProfile[] cookingProfiles)
 		{
 			cookStages.Add(stage, cookingProfiles.Length == 0 ? defaultCookingProfiles : cookingProfiles);
 		}
 
-		public static void RemoveStage(ICookStage stage)
+		public void RemoveStage(ICookStage stage)
 		{
 			cookStages.Remove(stage);
 		}
@@ -79,9 +82,9 @@ namespace Orange
 			}
 		}
 
-		public static List<string> GetListOfAllBundles(Target target)
+		public List<string> GetListOfAllBundles()
 		{
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, Target);
 			var bundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
@@ -91,9 +94,9 @@ namespace Orange
 			return bundles.ToList();
 		}
 
-		public static string GetPlatformTextureExtension()
+		public string GetPlatformTextureExtension()
 		{
-			switch (Platform) {
+			switch (Target.Platform) {
 				case TargetPlatform.iOS:
 				case TargetPlatform.Android:
 					return ".pvr";
@@ -102,24 +105,16 @@ namespace Orange
 			}
 		}
 
-		public static void Cook(Target target, List<string> bundles)
+		public void Cook(IEnumerable<string> bundles)
 		{
 			AssetCache.Instance.Initialize();
-			AssetCooker.Platform = target.Platform;
-			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
-			CookBundles(target, bundles);
+			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, Target);
+			CookBundles(bundles);
 		}
 
-		public static void Cook(TargetPlatform platform, List<string> bundles)
+		public void CookCustomAssets(List<string> assets)
 		{
-			var firstPlatformTarget = The.Workspace.Targets.FirstOrDefault(t => t.Platform == platform);
-			Cook(firstPlatformTarget, bundles);
-		}
-
-		public static void CookCustomAssets(Target target, List<string> assets)
-		{
-			AssetCooker.Platform = target.Platform;
-			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
+			CookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, Target);
 
 			var defaultAssetsEnumerator = The.Workspace.AssetFiles;
 			var assetsFileInfo = assets
@@ -130,16 +125,16 @@ namespace Orange
 			var defaultCookingProfile = AssetCooker.cookingProfile;
 			AssetCooker.cookingProfile = CookingProfile.Partial;
 
-			CookBundles(target, GetListOfAllBundles(target), false);
+			CookBundles(GetListOfAllBundles(), false);
 			The.Workspace.AssetFiles = defaultAssetsEnumerator;
 			AssetCooker.cookingProfile = defaultCookingProfile;
 		}
 
-		private static void CookBundles(Target target, List<string> bundles, bool requiredCookCode = true)
+		private void CookBundles(IEnumerable<string> bundles, bool requiredCookCode = true)
 		{
 			LogText = "";
 			var allTimer = StartBenchmark(
-				$"Asset cooking. Asset cache mode: {AssetCache.Instance.Mode}. Active platform: {target.Platform}" +
+				$"Asset cooking. Asset cache mode: {AssetCache.Instance.Mode}. Active platform: {Target.Platform}" +
 				System.Environment.NewLine +
 				DateTime.Now +
 				System.Environment.NewLine
@@ -151,12 +146,12 @@ namespace Orange
 			}
 
 			try {
-				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(target, bundles));
+				UserInterface.Instance.SetupProgressBar(CalculateAssetCount(bundles));
 				BeginCookBundles?.Invoke();
 
 				foreach (var bundle in bundles) {
 					var extraTimer = StartBenchmark();
-					CookBundle(target, bundle);
+					CookBundle(bundle);
 					StopBenchmark(extraTimer, $"{bundle} cooked: ");
 				}
 
@@ -165,7 +160,7 @@ namespace Orange
 				extraBundles.Reverse();
 				PluginLoader.AfterBundlesCooked(extraBundles);
 				if (requiredCookCode) {
-					CodeCooker.Cook(target, CookingRulesMap, extraBundles);
+					CodeCooker.Cook(Target, CookingRulesMap, extraBundles);
 				}
 				StopBenchmark(allTimer, "All bundles cooked: ");
 				PrintBenchmark();
@@ -180,12 +175,12 @@ namespace Orange
 			}
 		}
 
-		private static int CalculateAssetCount(Target target, List<string> bundles)
+		private int CalculateAssetCount(IEnumerable<string> bundles)
 		{
 			var assetCount = 0;
 			var savedWorkspaceAssetFiles = The.Workspace.AssetFiles;
 			foreach (var bundleName in bundles) {
-				using (var bundle = CreateBundle(target, bundleName)) {
+				using (var bundle = CreateBundle(bundleName)) {
 					AssetBundle.SetCurrent(bundle, false);
 					The.Workspace.AssetFiles = new FilteredFileEnumerator(savedWorkspaceAssetFiles, (info) => AssetIsInBundlePredicate(info, bundleName));
 					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
@@ -202,11 +197,11 @@ namespace Orange
 			return assetCount;
 		}
 
-		private static void CookBundle(Target target, string bundleName)
+		private void CookBundle(string bundleName)
 		{
-			string bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName);
+			string bundlePath = The.Workspace.GetBundlePath(Target.Platform, bundleName);
 			bool wasBundleModified = false;
-			using (var bundle = CreateBundle(target, bundleName)) {
+			using (var bundle = CreateBundle(bundleName)) {
 				AssetBundle.SetCurrent(bundle, false);
 				(AssetBundle.Current as PackedAssetBundle).OnModifying += () => {
 					if (!wasBundleModified) {
@@ -216,7 +211,7 @@ namespace Orange
 						bundleBackupFiles.Add(backupFilePath);
 					}
 				};
-				CookBundleHelper(target, bundleName);
+				CookBundleHelper(bundleName);
 				// Open the bundle again in order to make some plugin post-processing (e.g. generate code from scene assets)
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 					PluginLoader.AfterAssetsCooked(bundleName);
@@ -227,9 +222,9 @@ namespace Orange
 			}
 		}
 
-		private static AssetBundle CreateBundle(Target target, string bundleName)
+		private AssetBundle CreateBundle(string bundleName)
 		{
-			var bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName);
+			var bundlePath = The.Workspace.GetBundlePath(Target.Platform, bundleName);
 			// Create directory for bundle if it placed in subdirectory
 			try {
 				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath));
@@ -281,7 +276,7 @@ namespace Orange
 			}
 		}
 
-		private static void CookBundleHelper(Target target, string bundleName)
+		private void CookBundleHelper(string bundleName)
 		{
 			Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 			var assetFilesEnumerator = The.Workspace.AssetFiles;
@@ -295,7 +290,7 @@ namespace Orange
 						.Select(kv => kv.Key);
 					foreach (var stage in profileCookStages) {
 						CheckCookCancelation();
-						stage.Action(target);
+						stage.Action();
 					}
 
 					// Warn about non-power of two textures
@@ -312,49 +307,50 @@ namespace Orange
 			}
 		}
 
-		static AssetCooker()
+		public AssetCooker(Target target)
 		{
+			this.Target = target;
 			bundleBackupFiles = new List<String>();
 
-			AddStage(new RemoveDeprecatedModels());
-			AddStage(new SyncAtlases(), CookingProfile.Total);
-			AddStage(new SyncDeleted(), CookingProfile.Total);
-			AddStage(new SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
-			AddStage(new SyncRawAssets(".cfg", AssetAttributes.ZippedDeflate));
-			AddStage(new SyncTxtAssets());
-			AddStage(new SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
+			AddStage(new RemoveDeprecatedModels(this));
+			AddStage(new SyncAtlases(this), CookingProfile.Total);
+			AddStage(new SyncDeleted(this), CookingProfile.Total);
+			AddStage(new SyncRawAssets(this, ".json", AssetAttributes.ZippedDeflate));
+			AddStage(new SyncRawAssets(this, ".cfg", AssetAttributes.ZippedDeflate));
+			AddStage(new SyncTxtAssets(this));
+			AddStage(new SyncRawAssets(this, ".csv", AssetAttributes.ZippedDeflate));
 			var rawAssetExtensions = The.Workspace.ProjectJson["RawAssetExtensions"] as string;
 			if (rawAssetExtensions != null) {
 				foreach (var extension in rawAssetExtensions.Split(' ')) {
-					AddStage(new SyncRawAssets(extension, AssetAttributes.ZippedDeflate));
+					AddStage(new SyncRawAssets(this, extension, AssetAttributes.ZippedDeflate));
 				}
 			}
-			AddStage(new SyncTextures(), CookingProfile.Total);
-			AddStage(new DeleteOrphanedMasks(), CookingProfile.Total);
-			AddStage(new DeleteOrphanedTextureParams(), CookingProfile.Total);
-			AddStage(new SyncFonts());
-			AddStage(new SyncHotFonts());
-			AddStage(new SyncCompoundFonts());
-			AddStage(new SyncRawAssets(".ttf"));
-			AddStage(new SyncRawAssets(".otf"));
-			AddStage(new SyncRawAssets(".ogv"));
-			AddStage(new SyncScenes());
-			AddStage(new SyncHotScenes());
-			AddStage(new SyncSounds());
-			AddStage(new SyncRawAssets(".shader"));
-			AddStage(new SyncRawAssets(".xml"));
-			AddStage(new SyncRawAssets(".raw"));
-			AddStage(new SyncRawAssets(".bin"));
-			AddStage(new SyncModels());
+			AddStage(new SyncTextures(this), CookingProfile.Total);
+			AddStage(new DeleteOrphanedMasks(this), CookingProfile.Total);
+			AddStage(new DeleteOrphanedTextureParams(this), CookingProfile.Total);
+			AddStage(new SyncFonts(this));
+			AddStage(new SyncHotFonts(this));
+			AddStage(new SyncCompoundFonts(this));
+			AddStage(new SyncRawAssets(this, ".ttf"));
+			AddStage(new SyncRawAssets(this, ".otf"));
+			AddStage(new SyncRawAssets(this, ".ogv"));
+			AddStage(new SyncScenes(this));
+			AddStage(new SyncHotScenes(this));
+			AddStage(new SyncSounds(this));
+			AddStage(new SyncRawAssets(this, ".shader"));
+			AddStage(new SyncRawAssets(this, ".xml"));
+			AddStage(new SyncRawAssets(this, ".raw"));
+			AddStage(new SyncRawAssets(this, ".bin"));
+			AddStage(new SyncModels(this));
 		}
 
-		public static void DeleteFileFromBundle(string path)
+		public void DeleteFileFromBundle(string path)
 		{
 			Console.WriteLine("- " + path);
 			AssetBundle.DeleteFile(path);
 		}
 
-		public static string GetAtlasPath(string atlasChain, int index)
+		public string GetAtlasPath(string atlasChain, int index)
 		{
 			var path = AssetPath.Combine(
 				"Atlases" + atlasesPostfix, atlasChain + '.' + index.ToString("000") + GetPlatformTextureExtension());
@@ -368,7 +364,7 @@ namespace Orange
 				rules.WrapMode == TextureParams.Default.WrapModeU;
 		}
 
-		public static void ImportTexture(string path, Bitmap texture, ICookingRules rules, DateTime time, byte[] CookingRulesSHA1)
+		public void ImportTexture(string path, Bitmap texture, ICookingRules rules, DateTime time, byte[] CookingRulesSHA1)
 		{
 			var textureParamsPath = Path.ChangeExtension(path, ".texture");
 			var textureParams = new TextureParams {
@@ -401,7 +397,7 @@ namespace Orange
 			if (!TextureConverterUtils.IsPowerOf2(texture.Width) || !TextureConverterUtils.IsPowerOf2(texture.Height)) {
 				attributes |= AssetAttributes.NonPowerOf2Texture;
 			}
-			switch (Platform) {
+			switch (Target.Platform) {
 				case TargetPlatform.Android:
 				//case TargetPlatform.iOS:
 					var f = rules.PVRFormat;
@@ -423,7 +419,7 @@ namespace Orange
 			}
 		}
 
-		public static void DeleteModelExternalAnimations(string pathPrefix)
+		public void DeleteModelExternalAnimations(string pathPrefix)
 		{
 			foreach (var path in AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(".ant") && path.StartsWith(pathPrefix)) {
@@ -433,7 +429,7 @@ namespace Orange
 			}
 		}
 
-		public static void ExportModelAnimations(Model3D model, string pathPrefix, AssetAttributes assetAttributes, byte[] cookingRulesSHA1)
+		public void ExportModelAnimations(Model3D model, string pathPrefix, AssetAttributes assetAttributes, byte[] cookingRulesSHA1)
 		{
 			foreach (var animation in model.Animations) {
 				if (animation.IsLegacy) {
@@ -506,7 +502,7 @@ namespace Orange
 			return false;
 		}
 
-		private static void RemoveBackups()
+		private void RemoveBackups()
 		{
 			foreach (var backupPath in bundleBackupFiles) {
 				try {
@@ -518,7 +514,7 @@ namespace Orange
 			bundleBackupFiles.Clear();
 		}
 
-		private static void RestoreBackups()
+		private void RestoreBackups()
 		{
 			foreach (var backupPath in bundleBackupFiles) {
 				TryRestoreBackup(backupPath);

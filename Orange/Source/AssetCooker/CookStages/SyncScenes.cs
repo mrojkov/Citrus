@@ -4,18 +4,20 @@ using Lime;
 
 namespace Orange
 {
-	class SyncScenes : ICookStage
+	class SyncScenes : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return sceneExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return sceneExtension; } }
 
 		private readonly string sceneExtension = ".tan";
 
+		public SyncScenes(AssetCooker assetCooker) : base(assetCooker) { }
+
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(sceneExtension);
 
-		public void Action(Target target) => SyncUpdated.Sync(target, sceneExtension, sceneExtension, AssetBundle.Current, Converter);
+		public void Action() => SyncUpdated.Sync(sceneExtension, sceneExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(Target target, string srcPath, string dstPath)
+		private bool Converter(string srcPath, string dstPath)
 		{
 			var node = Serialization.ReadObjectFromFile<Node>(srcPath);
 			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Serialization.Format.Binary, sceneExtension,

@@ -6,7 +6,7 @@ using Lime;
 
 namespace Orange
 {
-	class SyncAtlases : ICookStage
+	class SyncAtlases : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return textureExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return atlasPartExtension; } }
@@ -14,9 +14,11 @@ namespace Orange
 		private readonly string textureExtension = ".png";
 		private readonly string atlasPartExtension = ".atlasPart";
 
+		public SyncAtlases(AssetCooker assetCooker) : base(assetCooker) { }
+
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureExtension).Count();
 
-		public void Action(Target target)
+		public void Action()
 		{
 			var textures = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(textureExtension)) {
@@ -102,14 +104,14 @@ namespace Orange
 					};
 					var bitmapInfo = TextureTools.BitmapInfo.FromFile(fileInfo.Path);
 					if (bitmapInfo == null) {
-						using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(item)) {
+						using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(AssetCooker.Platform, item)) {
 							item.BitmapInfo = TextureTools.BitmapInfo.FromBitmap(bitmap);
 						}
 					}
 					else {
 						var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(item.Path, item.SourceExtension));
-						if (TextureTools.ShouldDownscale(bitmapInfo, item.CookingRules)) {
-							TextureTools.DownscaleTextureInfo(bitmapInfo, srcTexturePath, item.CookingRules);
+						if (TextureTools.ShouldDownscale(AssetCooker.Platform, bitmapInfo, item.CookingRules)) {
+							TextureTools.DownscaleTextureInfo(AssetCooker.Platform, bitmapInfo, srcTexturePath, item.CookingRules);
 						}
 						// Ensure that no image exceeded maxAtlasSize limit
 						TextureTools.DownscaleTextureToFitAtlas(bitmapInfo, srcTexturePath);
@@ -285,7 +287,7 @@ namespace Orange
 			var atlasPath = AssetCooker.GetAtlasPath(atlasChain, atlasId);
 			var atlasPixels = new Color4[size.Width * size.Height];
 			foreach (var item in items.Where(i => i.Allocated)) {
-				using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(item)) {
+				using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(AssetCooker.Platform, item)) {
 					CopyPixels(bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
 				}
 				var atlasPart = new TextureAtlasElement.Params();

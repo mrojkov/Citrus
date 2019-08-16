@@ -8,11 +8,6 @@ namespace Orange
 	static partial class Actions
 	{
 		// [MenuItem("Extract Tangerine Scenes")]
-		public static void ExtractTangerineScenes()
-		{
-			var target = The.UI.GetActiveTarget();
-
-			AssetsUnpacker.UnpackTangerineScenes(target);
-		}
+		public static void ExtractTangerineScenes() => AssetsUnpacker.UnpackTangerineScenes(The.UI.GetActiveTarget().Platform);
 	}
 }

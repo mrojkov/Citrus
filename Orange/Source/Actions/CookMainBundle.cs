@@ -11,9 +11,9 @@ namespace Orange
 		{
 			var target = The.UI.GetActiveTarget();
 
-			AssetCooker.Cook(
+			AssetCooker.CookForPlatform(
 				target,
-				new System.Collections.Generic.List<string>() { CookingRulesBuilder.MainBundleName }
+				new [] { CookingRulesBuilder.MainBundleName }
 			);
 		}
 	}

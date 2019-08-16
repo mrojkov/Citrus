@@ -11,10 +11,7 @@ namespace Orange
 	{
 		private const string UnpackedSuffix = ".Unpacked";
 
-		public static void Unpack(Target target)
-		{
-			Unpack(target.Platform, AssetCooker.GetListOfAllBundles(target));
-		}
+		public static void Unpack(Target target) => Unpack(target.Platform, new AssetCooker(target).GetListOfAllBundles());
 
 		public static void Unpack(TargetPlatform platform, List<string> bundles)
 		{
@@ -28,7 +25,7 @@ namespace Orange
 
 		public static void Delete(Target target)
 		{
-			var bundles = AssetCooker.GetListOfAllBundles(target);
+			var bundles = new AssetCooker(target).GetListOfAllBundles();
 			The.UI.SetupProgressBar(bundles.Count);
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, target.Platform) + UnpackedSuffix;

@@ -4,18 +4,20 @@ using Lime;
 
 namespace Orange
 {
-	class SyncHotScenes : ICookStage
+	class SyncHotScenes : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return hotSceneExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return hotSceneExtension; } }
 
 		private readonly string hotSceneExtension = ".scene";
 
+		public SyncHotScenes(AssetCooker assetCooker) : base(assetCooker) { }
+
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotSceneExtension);
 
-		public void Action(Target target) => SyncUpdated.Sync(target, hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
+		public void Action() => SyncUpdated.Sync(hotSceneExtension, hotSceneExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(Target target, string srcPath, string dstPath)
+		private bool Converter(string srcPath, string dstPath)
 		{
 			using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 				var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);

@@ -4,18 +4,20 @@ using Lime;
 
 namespace Orange
 {
-	class SyncHotFonts : ICookStage
+	class SyncHotFonts : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return hotFontExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return hotFontExtension; } }
 
 		private readonly string hotFontExtension = ".fnt";
 
+		public SyncHotFonts(AssetCooker assetCooker) : base(assetCooker) { }
+
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotFontExtension);
 
-		public void Action(Target target) => SyncUpdated.Sync(target, hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
+		public void Action() => SyncUpdated.Sync(hotFontExtension, hotFontExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(Target target, string srcPath, string dstPath)
+		private bool Converter(string srcPath, string dstPath)
 		{
 			var importer = new HotFontImporter(false);
 			var font = importer.ParseFont(srcPath, dstPath);

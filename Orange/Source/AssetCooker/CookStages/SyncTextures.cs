@@ -5,19 +5,22 @@ using Lime;
 
 namespace Orange
 {
-	class SyncTextures: ICookStage
+	class SyncTextures : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return PlatformTextureExtension; } }
 
 		private readonly string originalTextureExtension = ".png";
+
+		public SyncTextures(AssetCooker assetCooker) : base(assetCooker) { }
+
 		private string PlatformTextureExtension => AssetCooker.GetPlatformTextureExtension();
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(originalTextureExtension);
 
-		public void Action(Target target) => SyncUpdated.Sync(target, originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
+		public void Action() => SyncUpdated.Sync(originalTextureExtension, PlatformTextureExtension, AssetBundle.Current, Converter);
 
-		private bool Converter(Target target, string srcPath, string dstPath)
+		private bool Converter(string srcPath, string dstPath)
 		{
 			var rules = AssetCooker.CookingRulesMap[Path.ChangeExtension(dstPath, originalTextureExtension)];
 			if (rules.TextureAtlas != null) {
@@ -26,8 +29,8 @@ namespace Orange
 			}
 			using (var stream = File.OpenRead(srcPath)) {
 				var bitmap = new Bitmap(stream);
-				if (TextureTools.ShouldDownscale(bitmap, rules)) {
-					var scaledBitmap = TextureTools.DownscaleTexture(bitmap, srcPath, rules);
+				if (TextureTools.ShouldDownscale(AssetCooker.Platform, bitmap, rules)) {
+					var scaledBitmap = TextureTools.DownscaleTexture(AssetCooker.Platform, bitmap, srcPath, rules);
 					bitmap.Dispose();
 					bitmap = scaledBitmap;
 				}

@@ -105,7 +105,7 @@ namespace Orange
 				Text = "Cook"
 			};
 			var revealButton = new ThemedButton {
-				Clicked = () => RevealButtonClickHandler(target),
+				Clicked = () => RevealButtonClickHandler(target.Platform),
 				Text = "Reveal"
 			};
 			var buttonLine = new Widget {
@@ -190,11 +190,11 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetCooker.Cook(target, bundles);
+			action = () => AssetCooker.CookForPlatform(target, bundles);
 			window.Close();
 		}
 
-		private static void RevealButtonClickHandler(Target target)
+		private static void RevealButtonClickHandler(TargetPlatform platform)
 		{
 			var bundles = new List<string>();
 			foreach (var bundle in checkboxes.Keys) {
@@ -202,7 +202,7 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetsUnpacker.Unpack(target, bundles);
+			action = () => AssetsUnpacker.Unpack(platform, bundles);
 			window.Close();
 		}
 	}

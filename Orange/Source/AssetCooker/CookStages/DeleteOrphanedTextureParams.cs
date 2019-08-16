@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Orange
 {
-	class DeleteOrphanedTextureParams: ICookStage
+	class DeleteOrphanedTextureParams : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield break; } }
 		public IEnumerable<string> BundleExtensions { get { yield return textureParamsExtension; } }
@@ -14,7 +14,9 @@ namespace Orange
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(textureParamsExtension).Count();
 
-		public void Action(Target target)
+		public DeleteOrphanedTextureParams(AssetCooker assetCooker) : base(assetCooker) { }
+
+		public void Action()
 		{
 			foreach (var path in AssetCooker.AssetBundle.EnumerateFiles().ToList()) {
 				if (path.EndsWith(textureParamsExtension, StringComparison.OrdinalIgnoreCase)) {

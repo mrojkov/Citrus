@@ -6,7 +6,7 @@ using Orange.FbxImporter;
 
 namespace Orange
 {
-	class SyncModels : ICookStage
+	class SyncModels : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return fbxExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return t3dExtension; } }
@@ -14,22 +14,24 @@ namespace Orange
 		private readonly string fbxExtension = ".fbx";
 		private readonly string t3dExtension = ".t3d";
 
+		public SyncModels(AssetCooker assetCooker) : base(assetCooker) { }
+
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fbxExtension);
 
-		public void Action(Target target) => SyncUpdated.Sync(target, fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
+		public void Action() => SyncUpdated.Sync(fbxExtension, t3dExtension, AssetBundle.Current, Converter, (srcPath, dstPath) => AssetCooker.ModelsToRebuild.Contains(dstPath));
 
-		private bool Converter(Target target, string srcPath, string dstPath)
+		private bool Converter(string srcPath, string dstPath)
 		{
 			var cookingRules = AssetCooker.CookingRulesMap[srcPath];
 			var compression = cookingRules.ModelCompression;
 			Model3D model;
 			var options = new FbxImportOptions {
 				Path = srcPath,
-				Target = target,
+				Target = AssetCooker.Target,
 				CookingRulesMap = AssetCooker.CookingRulesMap
 			};
 			using (var fbxImporter = new FbxModelImporter(options)) {
-				model = fbxImporter.LoadModel(target);
+				model = fbxImporter.LoadModel(AssetCooker.Target);
 			}
 			AssetAttributes assetAttributes;
 			switch (compression) {

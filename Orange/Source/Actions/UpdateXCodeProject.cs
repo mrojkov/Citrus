@@ -14,13 +14,16 @@ namespace Orange
 		public static string UpdateXCodeProjectAction()
 		{
 			var target = The.UI.GetActiveTarget();
-
+			if (target.Platform != TargetPlatform.iOS) {
+				UserInterface.Instance.ExitWithErrorIfPossible();
+				return "Error updating XCode project: active target must target iOS platform.";
+			}
 			if (The.Workspace.ProjectJson.GetValue<bool>("XCodeProject/DoSvnUpdate")) {
 				Subversion.Update(GetXCodeProjectFolder());
 			}
-			AssetCooker.Cook(
-				TargetPlatform.iOS, 
-				new System.Collections.Generic.List<string> () { CookingRulesBuilder.MainBundleName }
+			AssetCooker.CookForPlatform(
+				target,
+				new [] { CookingRulesBuilder.MainBundleName }
 			);
 			var solutionPath = The.Workspace.GetSolutionFilePath(TargetPlatform.iOS);
 			var builder = new SolutionBuilder(TargetPlatform.iOS, solutionPath);
