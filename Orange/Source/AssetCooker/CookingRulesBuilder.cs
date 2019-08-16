@@ -277,7 +277,7 @@ namespace Orange
 				return;
 			}
 			foreach (var t in The.Workspace.Targets) {
-				TargetRules.Add(target, ParticularCookingRules.GetDefault(t.Platform));
+				TargetRules.Add(t, ParticularCookingRules.GetDefault(t.Platform));
 			}
 			CommonRules = ParticularCookingRules.GetDefault(target.Platform);
 		}
