@@ -13,6 +13,8 @@ namespace RemoteScripting
 		DeviceName,
 		Text,
 		RemoteProcedureCall,
+		RemoteFileRequest,
+		RemoteFile,
 	}
 
 	public abstract class NetworkMessage
@@ -45,6 +47,10 @@ namespace RemoteScripting
 					return new NetworkText(body);
 				case NetworkMessageType.RemoteProcedureCall:
 					return new NetworkRemoteProcedureCall(body);
+				case NetworkMessageType.RemoteFileRequest:
+					return new NetworkRemoteFileRequest(body);
+				case NetworkMessageType.RemoteFile:
+					return new NetworkRemoteFile(body);
 				default:
 					throw new NotSupportedException();
 			}

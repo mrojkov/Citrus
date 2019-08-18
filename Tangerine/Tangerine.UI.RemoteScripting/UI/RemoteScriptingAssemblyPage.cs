@@ -37,7 +37,10 @@ namespace Tangerine.UI.RemoteScripting
 			);
 
 			var preferences = ProjectPreferences.Instance;
-			var arePreferencesCorrect = !string.IsNullOrEmpty(preferences.ScriptsPath) && !string.IsNullOrEmpty(preferences.ScriptsAssemblyName);
+			var arePreferencesCorrect =
+				!string.IsNullOrEmpty(preferences.ScriptsPath) &&
+				!string.IsNullOrEmpty(preferences.ScriptsAssemblyName) &&
+				!string.IsNullOrEmpty(preferences.RemoteStoragePath);
 			if (!arePreferencesCorrect) {
 				buildAssemblyButton.Enabled = false;
 				buildGameAndAssemblyButton.Enabled = false;

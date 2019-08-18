@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Lime;
@@ -303,7 +304,37 @@ namespace Tangerine.UI.RemoteScripting
 							SetName((NetworkDeviceName)message);
 							break;
 						case NetworkMessageType.Text:
-							AppendApplicationOutput((NetworkText)message);
+							var networkText = (NetworkText)message;
+							AppendApplicationOutput(networkText.Text);
+							break;
+						case NetworkMessageType.RemoteFileRequest:
+							var fileRequest = (NetworkRemoteFileRequest)message;
+							AppendApplicationOutput($"Remote file request: \"{fileRequest.Data.Path}\"");
+							var absFilePath = Path.Combine(ProjectPreferences.Instance.RemoteStoragePath, fileRequest.Data.Path);
+							if (File.Exists(absFilePath)) {
+								async void SendFileAsync()
+								{
+									byte[] bytes;
+									using (var fileStream = File.Open(absFilePath, FileMode.Open)) {
+										bytes = new byte[fileStream.Length];
+										await fileStream.ReadAsync(bytes, 0, (int)fileStream.Length);
+									}
+									var remoteFile = new RemoteFile {
+										Path = fileRequest.Data.Path,
+										Bytes = bytes
+									};
+									Client.SendMessage(new NetworkRemoteFile(remoteFile));
+									AppendApplicationOutput($"Requested file \"{fileRequest.Data.Path}\" was sended.");
+								}
+								SendFileAsync();
+							} else {
+								var remoteFile = new RemoteFile {
+									Path = fileRequest.Data.Path,
+									Bytes = null
+								};
+								Client.SendMessage(new NetworkRemoteFile(remoteFile));
+								AppendApplicationOutput($"Can not send requested file: \"{fileRequest.Data.Path}\". File not found!");
+							}
 							break;
 						default:
 							throw new NotSupportedException($"Unknown message type: {message.MessageType}");
@@ -317,9 +348,9 @@ namespace Tangerine.UI.RemoteScripting
 				Updated?.Invoke();
 			}
 
-			private void AppendApplicationOutput(NetworkText message)
+			private void AppendApplicationOutput(string message)
 			{
-				ApplicationOutput.Append(message.Text);
+				ApplicationOutput.Append(message);
 			}
 
 			public class ApplicationOutputPage : RemoteScriptingWidgets.TabbedWidgetPage
