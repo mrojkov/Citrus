@@ -269,11 +269,18 @@
     <Compile Include="SharpFont.HarfBuzz\HB.Internal.cs" />
     <Compile Include="SharpFont.HarfBuzz\HB.cs" />
     <Compile Include="SharpFont.HarfBuzz\Script.cs" />
+    <Compile Include="TftConfig.cs" />
+    <Compile Include="SdfConverter.cs" />
+    <Compile Include="FontGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

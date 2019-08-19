@@ -142,6 +142,7 @@
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
+    <Compile Include="Source\Actions\InvalidateFonts.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />

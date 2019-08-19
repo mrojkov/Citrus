@@ -20,20 +20,13 @@ namespace Lime
 
 	public static class AssetPath
 	{
-		public static string GetDirectoryName(string path)
-		{
-			return CorrectSlashes(Path.GetDirectoryName(path));
-		}
+		public static string GetDirectoryName(string path) => CorrectSlashes(Path.GetDirectoryName(path));
 
-		public static string Combine(string path1, string path2)
-		{
-			return CorrectSlashes(Path.Combine(path1, path2));
-		}
+		public static string Combine(string path1, string path2) => CorrectSlashes(Path.Combine(path1, path2));
 
-		public static string CorrectSlashes(string path)
-		{
-			return path.IndexOf('\\') >= 0 ? path.Replace('\\', '/') : path;
-		}
+		public static string Combine(params string[] paths) => paths.Aggregate("", Combine);
+
+		public static string CorrectSlashes(string path) => path.IndexOf('\\') >= 0 ? path.Replace('\\', '/') : path;
 	}
 
 	public sealed class AssetStream : Stream

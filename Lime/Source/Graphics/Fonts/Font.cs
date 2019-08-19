@@ -41,6 +41,11 @@ namespace Lime
 			CharCollection = new FontCharCollection();
 		}
 
+		public Font(FontCharCollection charCollection)
+		{
+			CharCollection = charCollection;
+		}
+
 		public void Dispose()
 		{
 			foreach (var texture in Textures) {
