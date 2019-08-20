@@ -1609,6 +1609,7 @@ namespace Lime
 			var clone = (BoneArrayUpdaterBehavior)base.Clone();
 			clone.bones = new List<Bone>();
 			clone.needResort = false;
+			clone.attached = false;
 			return clone;
 		}
 	}

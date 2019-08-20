@@ -247,6 +247,7 @@ namespace Lime
 			// TODO: This component should not be cloned
 			var clone = (LegacyBehaviorContainer)base.Clone();
 			clone.behaviors = new List<NodeBehavior>();
+			clone.attached = false;
 			return clone;
 		}
 	}

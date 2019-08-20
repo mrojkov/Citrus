@@ -21,14 +21,18 @@ namespace Lime
 
 		protected void Suspend()
 		{
-			Suspended = true;
-			UpdateFamily.Filter(this);
+			if (!Suspended) {
+				Suspended = true;
+				UpdateFamily.Filter(this);
+			}
 		}
 
 		protected void Resume()
 		{
-			Suspended = false;
-			UpdateFamily.Filter(this);
+			if (Suspended) {
+				Suspended = false;
+				UpdateFamily.Filter(this);
+			}
 		}
 
 		public override NodeComponent Clone()
