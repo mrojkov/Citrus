@@ -6,6 +6,13 @@ namespace Lime
 	public class WaveComponent : MaterialComponent<WaveMaterial>
 	{
 		[YuzuMember]
+		public Blending Blending
+		{
+			get => CustomMaterial.Blending;
+			set => CustomMaterial.Blending = value;
+		}
+
+		[YuzuMember]
 		[TangerineKeyframeColor(1)]
 		public bool AutoLoopEnabled
 		{
@@ -52,10 +59,9 @@ namespace Lime
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
-				var image = (Image) Owner;
-				CustomMaterial.BlendingGetter = () => Owner.AsWidget.Blending;
-				CustomMaterial.UV0 = ((Image) Owner).UV0;
-				CustomMaterial.UV1 = ((Image)Owner).UV1;
+				var image = (Image)Owner;
+				CustomMaterial.UV0 = image.UV0;
+				CustomMaterial.UV1 = image.UV1;
 				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV0);
 				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV1);
 			}

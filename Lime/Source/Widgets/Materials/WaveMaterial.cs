@@ -24,8 +24,7 @@ namespace Lime
 		public Vector2 Amplitude = new Vector2(0.05f, 0.05f);
 		public Vector2 UV0;
 		public Vector2 UV1;
-
-		public Func<Blending> BlendingGetter;
+		public Blending Blending;
 
 		public string Id { get; set; }
 		public int PassCount => 1;
@@ -39,8 +38,8 @@ namespace Lime
 			pointKey = shaderParams.GetParamKey<Vector2>("point");
 			timeSpeedKey = shaderParams.GetParamKey<Vector2>("timeSpeed");
 			amplitudeKey = shaderParams.GetParamKey<Vector2>("amplitude");
-			uv0Key = shaderParams.GetParamKey<Vector2>("UV0");
-			uv1Key = shaderParams.GetParamKey<Vector2>("UV1");
+			uv0Key = shaderParams.GetParamKey<Vector2>("uv0");
+			uv1Key = shaderParams.GetParamKey<Vector2>("uv1");
 		}
 
 		public void Apply(int pass)
@@ -57,7 +56,7 @@ namespace Lime
 			shaderParams.Set(amplitudeKey, Amplitude);
 			shaderParams.Set(uv0Key, UV0);
 			shaderParams.Set(uv1Key, UV1);
-			PlatformRenderer.SetBlendState(BlendingGetter.Invoke().GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(WaveShaderProgram.Instance);
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
@@ -102,8 +101,8 @@ namespace Lime
 				uniform lowp vec2 point;
 				uniform lowp vec2 timeSpeed;
 				uniform lowp vec2 amplitude;
-				uniform lowp vec2 UV0;
-				uniform lowp vec2 UV1;
+				uniform lowp vec2 uv0;
+				uniform lowp vec2 uv1;
 
 				varying lowp vec2 uv;
 				varying lowp vec4 color;
@@ -116,13 +115,13 @@ namespace Lime
 
 				void main()
 				{
-					lowp vec2 localUV = (uv - UV0) / (UV1 - UV0);
+					lowp vec2 localUV = (uv - uv0) / (uv1 - uv0);
 					lowp vec2 coef = vec2(1.0 - distance(point, localUV), 0.0);
 					coef.y = coef.x;
 					coef.x = sin(frequency * coef.x + timeSpeed.x * time) * amplitude.x * SoftClamp(localUV.x);
 					coef.y = sin(frequency * coef.y + timeSpeed.y * time) * amplitude.y * SoftClamp(localUV.y);
 					lowp vec2 dir = coef * normalize(point - localUV);
-					gl_FragColor = texture2D(tex1, UV0 + (localUV + dir) * (UV1 - UV0)) * color;
+					gl_FragColor = texture2D(tex1, uv0 + (localUV + dir) * (uv1 - uv0)) * color;
 				}";
 
 

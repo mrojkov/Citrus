@@ -7,9 +7,13 @@ namespace Lime
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> angleKey;
+		private readonly ShaderParamKey<Vector2> uv0Key;
+		private readonly ShaderParamKey<Vector2> uv1Key;
 
 		public float Angle = 0;
-		public Func<Blending> BlendingGetter;
+		public Vector2 UV0;
+		public Vector2 UV1;
+		public Blending Blending;
 
 		public string Id { get; set; }
 		public int PassCount => 1;
@@ -19,12 +23,16 @@ namespace Lime
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			angleKey = shaderParams.GetParamKey<float>("angle");
+			uv0Key = shaderParams.GetParamKey<Vector2>("uv0");
+			uv1Key = shaderParams.GetParamKey<Vector2>("uv1");
 		}
 
 		public void Apply(int pass)
 		{
 			shaderParams.Set(angleKey, Angle);
-			PlatformRenderer.SetBlendState(BlendingGetter.Invoke().GetBlendState());
+			shaderParams.Set(uv1Key, UV1);
+			shaderParams.Set(uv0Key, UV0);
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(TwistShaderProgram.Instance);
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
@@ -53,29 +61,27 @@ namespace Lime
 				void main()
 				{
 					gl_Position = matProjection * inPos;
-					texCoords1 = inTexCoords1 - vec2(0.5, 0.5);
+					texCoords1 = inTexCoords1;
 					outColor = inColor;
 				}";
 
 			private const string FragmentShader = @"
 				uniform lowp sampler2D tex1;
 				uniform lowp float angle;
+				uniform lowp vec2 uv0;
+				uniform lowp vec2 uv1;
 
 				varying lowp vec2 texCoords1;
 				varying lowp vec4 outColor;
 
 				void main()
 				{
-					lowp float newAngle = (1.0 - length(texCoords1) * 1.3888) * 0.8;
-					newAngle = angle * newAngle * newAngle * newAngle;
-
+					lowp vec2 localUV = (texCoords1 - uv0) / (uv1 - uv0) - vec2(0.5);
+					lowp float newAngle = angle * pow(0.8 - length(localUV) * 1.11104, 3.0); // 1.3888 * 0.8 = 1.11104
 					lowp float cosAngle = cos(newAngle);
 					lowp float sinAngle = sin(newAngle);
-
-					lowp vec4 color = texture2D(tex1,
-						mat2(cosAngle, -sinAngle, sinAngle, cosAngle) * texCoords1 + vec2(0.5, 0.5)
-					);
-					gl_FragColor = color * outColor;
+					lowp vec2 uv = mat2(cosAngle, -sinAngle, sinAngle, cosAngle) * localUV + vec2(0.5);
+					gl_FragColor = texture2D(tex1, uv0 + uv * (uv1 - uv0)) * outColor;
 				}";
 
 			private TwistShaderProgram() : base(CreateShaders(), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
