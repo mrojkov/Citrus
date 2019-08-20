@@ -121,7 +121,9 @@ namespace Lime
 		public override void MovedToWindow()
 		{
 			base.MovedToWindow();
-			ContentScaleFactor = Window.Screen.NativeScale;
+			if (Window != null) {
+				ContentScaleFactor = Window.Screen.NativeScale;
+			}
 		}
 
 		public override nfloat ContentScaleFactor
