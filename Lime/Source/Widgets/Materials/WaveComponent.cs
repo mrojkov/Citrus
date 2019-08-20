@@ -52,7 +52,12 @@ namespace Lime
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
+				var image = (Image) Owner;
 				CustomMaterial.BlendingGetter = () => Owner.AsWidget.Blending;
+				CustomMaterial.UV0 = ((Image) Owner).UV0;
+				CustomMaterial.UV1 = ((Image)Owner).UV1;
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV0);
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV1);
 			}
 		}
 
