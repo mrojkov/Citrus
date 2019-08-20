@@ -8,6 +8,7 @@ namespace Lime
 	{
 		private bool skipRender;
 		private ITexture texture;
+		private ITexture filterTexture;
 		private IMaterial material;
 
 		[YuzuMember]
@@ -15,11 +16,29 @@ namespace Lime
 		[TangerineKeyframeColor(15)]
 		public override sealed ITexture Texture
 		{
-			get { return texture; }
+			get => texture;
 			set
 			{
 				if (texture != value) {
 					texture = value;
+					DiscardMaterial();
+					Window.Current?.Invalidate();
+				}
+			}
+		}
+
+		// Never serialize this because it's used only for filters via shaders / from code.
+		// The reason for implementing such field is that we don't want to write boilerplate / copy-paste code
+		// for render objects / presenters / some generics (in case of image).
+		// It has no side-effects for all current projects, but provides efficient and cheap way to apply one filter on some image.
+		// Of couse in future you need hard-refactor the whole render system (it's really ugly at the moment).
+		public ITexture FilterTexture
+		{
+			get => filterTexture;
+			set
+			{
+				if (filterTexture != value) {
+					filterTexture = value;
 					DiscardMaterial();
 					Window.Current?.Invalidate();
 				}
@@ -128,6 +147,7 @@ namespace Lime
 			}
 			var ro = RenderObjectPool<TRenderObject>.Acquire();
 			ro.Texture = Texture;
+			ro.FilterTexture = FilterTexture;
 			ro.Material = CustomMaterial ?? material;
 			ro.UV0 = UV0;
 			ro.UV1 = UV1;
@@ -146,6 +166,7 @@ namespace Lime
 		protected internal class RenderObject : Lime.RenderObject
 		{
 			public ITexture Texture;
+			public ITexture FilterTexture;
 			public IMaterial Material;
 			public Color4 Color;
 			public Vector2 Position;
@@ -157,12 +178,13 @@ namespace Lime
 			public override void Render()
 			{
 				Renderer.Transform1 = LocalToWorldTransform;
-				Renderer.DrawSprite(Texture, null, Material, Color, Position, Size, UV0, UV1, Vector2.Zero, Vector2.Zero);
+				Renderer.DrawSprite(Texture, FilterTexture, Material, Color, Position, Size, UV0, UV1, Vector2.Zero, Vector2.One);
 			}
 
 			protected override void OnRelease()
 			{
 				Texture = null;
+				FilterTexture = null;
 				Material = null;
 			}
 		}

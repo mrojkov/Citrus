@@ -307,6 +307,7 @@
     <Compile Include="Source\Widgets\BehaviorComponent.cs" />
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
+    <Compile Include="Source\Widgets\Materials\GradientComponent.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionDistortion.cs" />
     <Compile Include="Source\Widgets\Materials\SharpenMaterial.cs" />
