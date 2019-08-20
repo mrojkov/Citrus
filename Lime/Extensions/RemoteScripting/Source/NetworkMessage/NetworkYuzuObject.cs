@@ -5,24 +5,24 @@ namespace RemoteScripting
 {
 	public abstract class NetworkYuzuObject<T> : NetworkMessage where T : class, new()
 	{
-		public readonly T Instance;
+		public readonly T Data;
 
-		protected NetworkYuzuObject(T instance)
+		protected NetworkYuzuObject(T data)
 		{
-			Instance = instance;
+			Data = data;
 		}
 
 		protected NetworkYuzuObject(byte[] body)
 		{
 			using (var memoryStream = new MemoryStream(body)) {
-				Instance = Serialization.ReadObject<T>(string.Empty, memoryStream);
+				Data = Serialization.ReadObject<T>(string.Empty, memoryStream);
 			}
 		}
 
 		public override byte[] Serialize()
 		{
 			using (var memoryStream = new MemoryStream()) {
-				Serialization.WriteObject(string.Empty, memoryStream, Instance, Serialization.Format.Binary);
+				Serialization.WriteObject(string.Empty, memoryStream, Data, Serialization.Format.Binary);
 				return memoryStream.ToArray();
 			}
 		}

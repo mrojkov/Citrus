@@ -19,6 +19,7 @@ namespace Tangerine.Core
 		public string ScriptsAssemblyName { get; private set; }
 		public IReadOnlyList<string> ScriptsReferences => scriptReferences;
 		public string EntryPointsClass { get; private set; }
+		public string RemoteStoragePath { get; private set; }
 
 		public void Initialize()
 		{
@@ -88,6 +89,7 @@ namespace Tangerine.Core
 					scriptReferences.Add(AssetPath.CorrectSlashes(Path.Combine(scriptsReferencesPath, reference)));
 				}
 				EntryPointsClass = (string)projectJson.RemoteScripting.EntryPointsClass;
+				RemoteStoragePath = AssetPath.CorrectSlashes(Path.Combine(projectDirectory, (string)projectJson.RemoteScripting.RemoteStoragePath));
 				Console.WriteLine("Remote scripting preferences was successfully loaded.");
 			} catch {
 				InitializeDefaultRemoteScriptingPreferences();
@@ -100,6 +102,7 @@ namespace Tangerine.Core
 			ScriptsAssemblyName = null;
 			scriptReferences.Clear();
 			EntryPointsClass = null;
+			RemoteStoragePath = null;
 		}
 	}
 }

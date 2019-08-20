@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace RemoteScripting
 		private readonly CancellationTokenSource cancellationTokenSource;
 		private readonly CancellationToken cancellationToken;
 		private readonly ConcurrentDictionary<HostClient, object> clients = new ConcurrentDictionary<HostClient, object>();
-		public IReadOnlyCollection<HostClient> Clients => (IReadOnlyCollection<HostClient>)clients.Keys;
+		public IEnumerable<HostClient> Clients => clients.Keys.Where(c => c.WasVerified);
 
 		public Host(CancellationTokenSource abortTokenSource)
 		{
@@ -31,7 +32,7 @@ namespace RemoteScripting
 			
 			while (!cancellationToken.IsCancellationRequested) {
 				try {
-					var tcpClient = await listener.AcceptTcpClientAsync();
+					var tcpClient = await listener.AcceptTcpClientAsync().ConfigureAwait(continueOnCapturedContext: false);
 					CreateClient(tcpClient);
 				} catch (ObjectDisposedException) {
 					// Suppress
@@ -53,13 +54,19 @@ namespace RemoteScripting
 				if (!clients.TryAdd(client, null)) {
 					throw new InvalidOperationException();
 				}
-				await client.ProcessConnectionAsync();
-			} catch (System.IO.IOException) {
+				await client.ProcessConnectionAsync().ConfigureAwait(continueOnCapturedContext: false);
+			} catch (System.IO.IOException exception) {
 				// Suppress
-			} catch (ObjectDisposedException) {
+				Console.WriteLine(exception);
+			} catch (ObjectDisposedException exception) {
 				// Suppress
-			} catch (TaskCanceledException) {
+				Console.WriteLine(exception);
+			} catch (TaskCanceledException exception) {
 				// Suppress
+				Console.WriteLine(exception);
+			} catch (NetworkException exception) {
+				// Suppress
+				Console.WriteLine(exception);
 			} catch (Exception exception) {
 				Abort(exception);
 			} finally {
