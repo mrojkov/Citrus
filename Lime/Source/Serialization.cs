@@ -8,6 +8,7 @@ using System.Threading;
 using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Json;
+using Yuzu.Clone;
 
 namespace Lime
 {
@@ -237,6 +238,17 @@ namespace Lime
 			}
 			return r;
 		}
+
+		private AbstractCloner cloner;
+
+		public T Clone<T>(T obj)
+		{
+			if (cloner == null) {
+				cloner = new Cloner();
+				cloner.Options = YuzuCommonOptions;
+			}
+			return cloner.Deep(obj);
+		}
 	}
 
 	public static class Serialization
@@ -260,5 +272,6 @@ namespace Lime
 		public static int CalcObjectCheckSum<T>(string path, T obj) => Yuzu.Instance.Value.CalcObjectCheckSum(path, obj);
 		public static string GetCurrentSerializationPath() => Yuzu.Instance.Value.GetCurrentSerializationPath();
 		public static bool CheckBinarySignature(Stream s) => Yuzu.Instance.Value.CheckBinarySignature(s);
+		public static T Clone<T>(T obj) => Yuzu.Instance.Value.Clone(obj);
 	}
 }

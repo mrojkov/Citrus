@@ -41,16 +41,7 @@ namespace Lime
 			}
 		}
 
-		protected internal virtual void OnBeforeClone() { }
-		protected internal virtual void OnAfterClone() { }
 		protected virtual void OnOwnerChanged(Node oldOwner) { }
-
-		public virtual NodeComponent Clone()
-		{
-			var clone = (NodeComponent)MemberwiseClone();
-			clone.owner = null;
-			return clone;
-		}
 
 		public virtual void Dispose() { }
 	}

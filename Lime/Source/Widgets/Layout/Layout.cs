@@ -116,18 +116,6 @@ namespace Lime
 
 		public virtual void ArrangeChildren() { }
 
-		public override NodeComponent Clone()
-		{
-			Layout clone = (Layout)base.Clone();
-			clone.DebugRectangles = new List<Rectangle>();
-			clone.defaultCell = null;
-			clone.DefaultCell = (DefaultLayoutCell)DefaultCell?.Clone();
-			clone.ConstraintsValid = true;
-			clone.ArrangementValid = true;
-			clone.ignoreHidden = ignoreHidden;
-			return clone;
-		}
-
 		protected List<Widget> GetChildren()
 		{
 			return Owner.Nodes.OfType<Widget>().Where(

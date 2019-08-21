@@ -122,13 +122,6 @@ namespace Lime
 			}
 		}
 
-		protected override Node CloneInternal()
-		{
-			var vp = (Viewport3D)base.CloneInternal();
-			vp.CameraRef = CameraRef?.Clone();
-			return vp;
-		}
-
 		public Vector3 WorldToScreenPoint(Vector3 pt)
 		{
 			pt = WorldToViewportPoint(pt);

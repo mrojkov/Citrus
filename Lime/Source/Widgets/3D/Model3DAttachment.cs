@@ -280,7 +280,7 @@ namespace Lime
 				if (node != null) {
 					foreach (var component in nodeComponentData.Components) {
 						if (ValidateComponentType(node.GetType(), component.GetType())) {
-							node.Components.Add(component.Clone());
+							node.Components.Add(Serialization.Clone(component));
 						} else {
 							Console.WriteLine($"Warning: Unable to add {component.GetType().Name} to the {node.Id}." +
 								" This component type isn't allowed for this node type.");

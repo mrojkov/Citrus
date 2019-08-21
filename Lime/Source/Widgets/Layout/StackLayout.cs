@@ -86,10 +86,5 @@ namespace Lime
 				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 			}
 		}
-
-		public override NodeComponent Clone()
-		{
-			return (StackLayout)base.Clone();
-		}
 	}
 }

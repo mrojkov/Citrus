@@ -14,7 +14,6 @@ namespace Lime
 		float StretchX { get; set; }
 		float StretchY { get; set; }
 		bool Ignore { get; set; }
-		ILayoutCell Clone();
 	}
 
 	public class DefaultLayoutCell : Animable, ILayoutCell
@@ -129,12 +128,6 @@ namespace Lime
 			Alignment = alignment;
 			StretchX = stretchX;
 			StretchY = stretchY;
-		}
-
-		public new ILayoutCell Clone()
-		{
-			var clone = (DefaultLayoutCell)base.Clone();
-			return clone;
 		}
 	}
 
@@ -255,11 +248,6 @@ namespace Lime
 			base.OnOwnerChanged(oldOwner);
 			((Widget)oldOwner)?.InvalidateParentConstraintsAndArrangement();
 			Owner?.InvalidateParentConstraintsAndArrangement();
-		}
-
-		ILayoutCell ILayoutCell.Clone()
-		{
-			return (ILayoutCell)Clone();
 		}
 	}
 

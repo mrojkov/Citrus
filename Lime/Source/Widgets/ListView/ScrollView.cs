@@ -463,11 +463,6 @@ namespace Lime
 				}
 				LayoutWidgetWithinCell(content, p, s, Alignment.LeftTop);
 			}
-
-			public override NodeComponent Clone()
-			{
-				throw new NotImplementedException();
-			}
 		}
 	}
 }

@@ -524,13 +524,6 @@ namespace Lime
 			Window.Current?.Invalidate();
 		}
 
-		protected override Node CloneInternal()
-		{
-			var clone = base.CloneInternal() as SimpleText;
-			clone.Caret = clone.Caret.Clone();
-			return clone;
-		}
-
 		public bool GetCharPair(Vector2 point, out Tuple<SpriteList.CharDef, SpriteList.CharDef> pair)
 		{
 			PrepareSpriteListAndExtent();

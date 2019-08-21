@@ -315,14 +315,6 @@ namespace Lime
 			return null;
 		}
 
-		protected override Node CloneInternal()
-		{
-			var clone = base.CloneInternal().AsNode3D;
-			clone.Opaque = Opaque;
-			clone.viewport = null;
-			return clone;
-		}
-
 		public Matrix44 CalcTransformInSpaceOf(Node3D node)
 		{
 			return GlobalTransform * node.GlobalTransformInverse;

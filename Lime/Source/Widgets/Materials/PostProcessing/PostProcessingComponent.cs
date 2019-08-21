@@ -597,21 +597,5 @@ namespace Lime
 			node.Presenter = DefaultPresenter.Instance;
 			renderChainBuilder.Owner = null;
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (PostProcessingComponent)base.Clone();
-			clone.presenter = (PostProcessingPresenter)presenter.Clone();
-			clone.renderChainBuilder = (PostProcessingRenderChainBuilder)renderChainBuilder.Clone(null);
-			clone.ColorCorrectionMaterial = (ColorCorrectionMaterial)ColorCorrectionMaterial.Clone();
-			clone.BlurMaterial = (BlurMaterial)BlurMaterial.Clone();
-			clone.BloomMaterial = (BloomMaterial)BloomMaterial.Clone();
-			clone.DistortionMaterial = (DistortionMaterial)DistortionMaterial.Clone();
-			clone.SharpenMaterial = (SharpenMaterial)SharpenMaterial.Clone();
-			clone.NoiseMaterial = (NoiseMaterial)NoiseMaterial.Clone();
-			clone.FXAAMaterial = (FXAAMaterial)FXAAMaterial.Clone();
-			clone.VignetteMaterial = (VignetteMaterial)VignetteMaterial.Clone();
-			return clone;
-		}
 	}
 }

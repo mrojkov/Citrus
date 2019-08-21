@@ -281,18 +281,6 @@ namespace Lime
 			Clicked();
 		}
 
-		protected override Node CloneInternal()
-		{
-			var clone = base.CloneInternal() as Mesh3D;
-			clone.Submeshes = Submeshes.Clone(clone);
-			clone.BoundingSphere = BoundingSphere;
-			clone.Center = Center;
-			clone.SkinningMode = SkinningMode;
-			clone.CullMode = CullMode;
-			clone.SkipRender = SkipRender;
-			return clone;
-		}
-
 		public override void Dispose()
 		{
 			Submeshes.Clear();
@@ -452,6 +440,7 @@ namespace Lime
 		public IMaterial Material = new CommonMaterial();
 
 		[YuzuMember]
+		[YuzuCopyable]
 		public Mesh<Mesh3D.Vertex> Mesh { get; set; }
 
 		[YuzuMember]
@@ -481,17 +470,6 @@ namespace Lime
 			foreach (var boneName in BoneNames) {
 				Bones.Add(model.Find<Node3D>(boneName));
 			}
-		}
-
-		public Submesh3D Clone()
-		{
-			var clone = new Submesh3D();
-			clone.Mesh = Mesh;
-			clone.BoneNames = new List<string>(BoneNames);
-			clone.BoneBindPoses = new List<Matrix44>(BoneBindPoses);
-			clone.Material = Material.Clone();
-			clone.Owner = null;
-			return clone;
 		}
 	}
 
@@ -563,15 +541,6 @@ namespace Lime
 		{
 			get { return list[index]; }
 			set { list[index] = value; }
-		}
-
-		public Submesh3DCollection Clone(Mesh3D owner)
-		{
-			var clone = new Submesh3DCollection(owner);
-			for (int i = 0; i < Count; i++) {
-				clone.Add(this[i].Clone());
-			}
-			return clone;
 		}
 	}
 }

@@ -318,12 +318,5 @@ namespace Lime
 				throw new Lime.Exception($"Invalid FlowDirection: {Direction}");
 			}
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (FlowLayout)base.Clone();
-			clone.splitIndices = new List<int>();
-			return clone;
-		}
 	}
 }

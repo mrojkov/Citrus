@@ -128,8 +128,23 @@ namespace Lime
 
 		public Type ValueType => typeof(T);
 
+		private TypedKeyframeList<T> readonlyKeys;
+
 		[YuzuMember]
-		public TypedKeyframeList<T> ReadonlyKeys { get; private set; }
+		[YuzuCopyable]
+		public TypedKeyframeList<T> ReadonlyKeys
+		{
+			get => readonlyKeys;
+			set
+			{
+				if (readonlyKeys != value) {
+					readonlyKeys?.Release();
+					readonlyKeys = value;
+					readonlyKeys.AddRef();
+					boxedKeys = null;
+				}
+			}
+		}
 
 		[YuzuMember]
 		public string AnimationId { get; set; }
@@ -153,29 +168,21 @@ namespace Lime
 		{
 			get
 			{
-				if (ReadonlyKeys.RefCount > 1) {
-					ReadonlyKeys.Release();
-					ReadonlyKeys = ReadonlyKeys.Clone();
-					ReadonlyKeys.AddRef();
-				}
+				EnsureKeysAreNotShared();
 				return ReadonlyKeys;
 			}
 		}
 
-		IKeyframeList boxedKeys;
 		IKeyframeList IAnimator.Keys
 		{
 			get
 			{
-				if (ReadonlyKeys.RefCount > 1) {
-					boxedKeys = null;
-				}
-				if (boxedKeys == null) {
-					boxedKeys = new BoxedKeyframeList<T>(Keys);
-				}
-				return boxedKeys;
+				EnsureKeysAreNotShared();
+				return ((IAnimator)this).ReadonlyKeys;
 			}
 		}
+
+		IKeyframeList boxedKeys;
 
 		IKeyframeList IAnimator.ReadonlyKeys
 		{
@@ -185,6 +192,13 @@ namespace Lime
 					boxedKeys = new BoxedKeyframeList<T>(ReadonlyKeys);
 				}
 				return boxedKeys;
+			}
+		}
+
+		private void EnsureKeysAreNotShared()
+		{
+			if (ReadonlyKeys.RefCount > 1) {
+				ReadonlyKeys = Serialization.Clone(ReadonlyKeys);
 			}
 		}
 

@@ -331,12 +331,6 @@ namespace Lime
 			materialProvider = SDFMaterialProviderPool.Instance.GetProvider(key);
 		}
 
-		public override NodeComponent Clone()
-		{
-			var clone = (SignedDistanceFieldComponent)base.Clone();
-			return clone;
-		}
-
 		public SDFRenderObjectList GetRenderObject()
 		{
 			var roList = RenderObjectPool<SDFRenderObjectList>.Acquire();

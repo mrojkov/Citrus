@@ -599,47 +599,7 @@ namespace Lime
 		/// </summary>
 		public Node Clone()
 		{
-			foreach (var c in Components) {
-				c.OnBeforeClone();
-			}
-			var clone = CloneInternal();
-			clone.Components = new NodeComponentCollection(clone);
-			foreach (var c in Components) {
-				clone.Components.Add(c.Clone());
-			}
-			foreach (var c in Components) {
-				c.OnAfterClone();
-			}
-			return clone;
-		}
-
-		protected virtual Node CloneInternal()
-		{
-			var clone = (Node)MemberwiseClone();
-			++CreatedCount;
-			// it's important to initialize AsWidget and AsNode3D as sooon as possible since following clone process may access them
-			clone.AsWidget = clone as Widget;
-			clone.AsNode3D = clone as Node3D;
-			clone.Manager = null;
-			clone.Parent = null;
-			clone.FirstChild = null;
-			clone.NextSibling = null;
-			clone.gestures = null;
-			clone.DescendantAnimatorsVersion = 0;
-			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = Nodes.Clone(clone);
-			if (RenderChainBuilder != null) {
-				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
-			}
-			if (Presenter != null) {
-				clone.Presenter = Presenter.Clone();
-			}
-			if (PostPresenter != null) {
-				clone.PostPresenter = PostPresenter.Clone();
-			}
-			clone.DirtyMask = DirtyFlags.All;
-			clone.UserData = null;
-			return clone;
+			return Serialization.Clone(this);
 		}
 
 		/// <summary>
@@ -1164,9 +1124,6 @@ namespace Lime
 
 		public void ReplaceContent(Node content)
 		{
-			foreach (var c in content.Components) {
-				c.OnBeforeClone();
-			}
 			var nodeType = GetType();
 			var contentType = content.GetType();
 			if (content is IPropertyLocker propertyLocker) {
@@ -1213,7 +1170,7 @@ namespace Lime
 					Components.Remove(typeof(AssetBundlePathComponent));
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
-						Components.Add(assetBundlePathComponent.Clone());
+						Components.Add(Serialization.Clone(assetBundlePathComponent));
 					}
 					Components.Remove(typeof(AnimationComponent));
 					var animationBehavior = content.Components.Get<AnimationComponent>();
@@ -1226,11 +1183,8 @@ namespace Lime
 			} else {
 				Components.Clear();
 				foreach (var c in content.Components) {
-					Components.Add(c.Clone());
+					Components.Add(Serialization.Clone(c));
 				}
-			}
-			foreach (var c in content.Components) {
-				c.OnAfterClone();
 			}
 		}
 

@@ -970,18 +970,6 @@ namespace Lime
 			get { return Find<Widget>(string.Format(format, arg)); }
 		}
 
-		/// <summary>
-		/// Returns a copy of the widget's hierarchy.
-		/// </summary>
-		protected override Node CloneInternal()
-		{
-			var clone = base.CloneInternal().AsWidget;
-			clone.SkinningWeights = SkinningWeights?.Clone();
-			clone.BoneArray = new BoneArray();
-			clone.input = null;
-			return clone;
-		}
-
 		protected override void OnParentChanged(Node oldParent)
 		{
 			base.OnParentChanged(oldParent);
