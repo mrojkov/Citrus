@@ -15,10 +15,10 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public Blending Blending
+		public BlendMode BlendMode
 		{
-			get => CustomMaterial.Blending;
-			set => CustomMaterial.Blending = value;
+			get => CustomMaterial.BlendMode;
+			set => CustomMaterial.BlendMode = value;
 		}
 
 		[YuzuMember]
@@ -38,7 +38,8 @@ namespace Lime
 			if (Owner != null) {
 				var image = (Image)Owner;
 				lastFilter = image.FilterTexture;
-				image.FilterTexture = CustomMaterial?.GradientTexture;
+				image.FilterTexture = CustomMaterial.GradientTexture;
+				CustomMaterial.BlendStateGetter = () => Owner.AsWidget.Blending.GetBlendState();
 			}
 		}
 	}

@@ -3127,7 +3127,7 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				result.BlendMode = (global::Lime.BlendMode)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
