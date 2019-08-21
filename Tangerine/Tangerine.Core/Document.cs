@@ -39,6 +39,8 @@ namespace Tangerine.Core
 
 		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
 
+		private readonly Dictionary<Node, Animation> selectedAnimationPerContainer = new Dictionary<Node, Animation>();
+
 		private readonly MemoryStream preloadedSceneStream = null;
 		public DateTime LastWriteTime { get; private set; }
 
@@ -96,12 +98,9 @@ namespace Tangerine.Core
 			get => container;
 			set {
 				if (container != value) {
+					var oldContainer = container;
 					container = value;
-					var animations = new List<Animation>();
-					GetAnimations(animations);
-					if (!animations.Contains(Animation)) {
-						SelectedAnimation = null;
-					}
+					OnContainerChanged(oldContainer);
 				}
 			}
 		}
@@ -575,6 +574,23 @@ namespace Tangerine.Core
 			foreach (var text in RootNode.Descendants.OfType<IText>()) {
 				text.Invalidate();
 			}
+		}
+
+		private void OnContainerChanged(Node oldContainer)
+		{
+			if (oldContainer != null) {
+				selectedAnimationPerContainer[oldContainer] = SelectedAnimation;
+			}
+			var animations = new List<Animation>();
+			GetAnimations(animations);
+			if (animations.Contains(Animation)) {
+				return;
+			}
+			if (selectedAnimationPerContainer.TryGetValue(Container, out var animation) && animations.Contains(animation)) {
+				SelectedAnimation = animation;
+				return;
+			}
+			SelectedAnimation = null;
 		}
 
 		public class NodeDecoratorList : List<Action<Node>>
