@@ -44,17 +44,7 @@ namespace Tangerine.UI.Timeline
 
 		void RootWidget_DoubleClick(WidgetInput input, Key key)
 		{
-			Document.Current.History.DoTransaction(() => {
-				var timeline = Timeline.Instance;
-				var marker = Document.Current.Animation.Markers.GetByFrame(timeline.CurrentColumn);
-				var newMarker = marker?.Clone() ?? new Marker { Frame = timeline.CurrentColumn };
-				var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
-				if (r == MarkerPropertiesDialog.Result.Ok) {
-					Core.Operations.SetMarker.Perform(newMarker, true);
-				} else if (r == MarkerPropertiesDialog.Result.Delete) {
-					Core.Operations.DeleteMarker.Perform(marker, true);
-				}
-			});
+			ShowMarkerDialog(Timeline.Instance.CurrentColumn);
 			// To prevent RulerbarMouseScroll.
 			RootWidget.Input.ConsumeKey(Key.Mouse0);
 		}
@@ -177,6 +167,20 @@ namespace Tangerine.UI.Timeline
 			});
 		}
 
+		private static void ShowMarkerDialog(int frameUnderMouse)
+		{
+			Document.Current.History.DoTransaction(() => {
+				var marker = Document.Current.Animation.Markers.GetByFrame(frameUnderMouse);
+				var newMarker = marker?.Clone() ?? new Marker { Frame = frameUnderMouse };
+				var r = new MarkerPropertiesDialog().Show(newMarker, canDelete: marker != null);
+				if (r == MarkerPropertiesDialog.Result.Ok) {
+					Core.Operations.SetMarker.Perform(newMarker, true);
+				} else if (r == MarkerPropertiesDialog.Result.Delete) {
+					Core.Operations.DeleteMarker.Perform(marker, true);
+				}
+			});
+		}
+
 		private static void DeleteMarker(Marker marker)
 		{
 			Document.Current.History.DoTransaction(() => {
@@ -224,6 +228,7 @@ namespace Tangerine.UI.Timeline
 				var menu = new Menu();
 				var frameUnderMouse = Timeline.Instance.Grid.CellUnderMouse().X;
 				var marker = Document.Current.Animation.Markers.GetByFrame(frameUnderMouse);
+				menu.Add(new Command(marker == null ? "Add Marker" : "Edit Marker", () => ShowMarkerDialog(frameUnderMouse)));
 				menu.Add(new Command("Copy Marker", () => CopyMarker(marker)) {
 					Enabled = marker != null
 				});
