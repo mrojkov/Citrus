@@ -18,6 +18,7 @@ namespace Lime
 		private Thread renderThread;
 		private ManualResetEvent renderReady = new ManualResetEvent(false);
 		private ManualResetEvent renderCompleted = new ManualResetEvent(true);
+		private bool requestForRedraw;
 
 		private static readonly IWindowManager WindowManager =
 			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
@@ -100,6 +101,7 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
+			ActivityDelegate.Instance.GameView.SurfaceCreating += () => requestForRedraw = true;
 			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRender;
 			PixelScale = Resources.System.DisplayMetrics.Density;
 
@@ -146,7 +148,7 @@ namespace Lime
 			var delta = (float)((frameTimeNanos - prevFrameTime) / 1000000000d);
 			var gw = ActivityDelegate.Instance.GameView;
 			prevFrameTime = frameTimeNanos;
-			if (Active && gw.IsSurfaceCreated) {
+			if ((Active && gw.IsSurfaceCreated) || requestForRedraw) {
 				fpsCounter.Refresh();
 				gw.ProcessTextInput();
 				Update(delta);
@@ -160,7 +162,7 @@ namespace Lime
 		bool HandleUpdateState_WaitForRender()
 		{
 			if (renderCompleted.WaitOne(100)) {
-				if (Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) {
+				if ((Active && ActivityDelegate.Instance.GameView.IsSurfaceCreated) || requestForRedraw) {
 					renderCompleted.Reset();
 					updateState = UpdateState.RenderAsync;
 					return true;
@@ -177,6 +179,7 @@ namespace Lime
 			RaiseSync();
 			ActivityDelegate.Instance.GameView.UnbindContext();
 			renderReady.Set();
+			requestForRedraw = false;
 			updateState = UpdateState.Update;
 			return false;
 		}
@@ -185,6 +188,7 @@ namespace Lime
 		{
 			RaiseSync();
 			Render();
+			requestForRedraw = false;
 			updateState = UpdateState.Update;
 			return false;
 		}
