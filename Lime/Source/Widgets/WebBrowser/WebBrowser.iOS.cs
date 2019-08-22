@@ -7,7 +7,7 @@ using UIKit;
 
 namespace Lime
 {
-	public class WebBrowser : Widget
+	public class WebBrowser : Widget, IUpdatableNode
 	{
 		private UIWebView webView;
 		private UIActivityIndicatorView activityIndicator;
@@ -18,6 +18,7 @@ namespace Lime
 			: this()
 		{
 			AddToWidget(parentWidget);
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public WebBrowser()
@@ -92,7 +93,7 @@ namespace Lime
 			get { return new SizeF(aabbInDeviceSpace.Width, aabbInDeviceSpace.Height); }
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
 			if (webView == null) {
 				return;
@@ -103,7 +104,6 @@ namespace Lime
 			if (activityIndicator != null) {
 				activityIndicator.Center = ActivityIndicatorPosition;
 			}
-			base.Update(delta);
 		}
 
 		public override void Dispose()
