@@ -41,20 +41,29 @@ namespace Lime
 				MinTextureSize = config.TextureSize,
 				MaxTextureSize = config.TextureSize,
 			};
+			var missingCharacters = new List<char>();
 			foreach (var charSet in config.CharSets) {
 				var fontData = File.ReadAllBytes(AssetPath.Combine(assetDirectory, charSet.Font));
 				chars.FontRenderer = new FontRenderer(fontData) { LcdSupported = false };
+				missingCharacters.Clear();
 				foreach (var c in charSet.Chars) {
 					if (config.ExcludeChars.Any(character => character == c)) {
 						continue;
 					}
 					var fontChar = chars.Get(c);
+					if (fontChar == FontChar.Null) {
+						missingCharacters.Add(c);
+						continue;
+					}
 					if (config.IsSdf) {
 						fontChar.ACWidths *= config.SdfScale;
 						fontChar.Height *= config.SdfScale;
 						fontChar.Width *= config.SdfScale;
 					}
 					((ICollection<FontChar>)fontCharCollection).Add(fontChar);
+				}
+				if (missingCharacters.Count > 0) {
+					Console.WriteLine($"Characters: {string.Join("", missingCharacters)} -- are missing in font {charSet.Font}");
 				}
 				GenerateKerningPairs(fontCharCollection, chars.FontRenderer, config, charSet.Chars);
 			}
