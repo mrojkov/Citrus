@@ -296,6 +296,7 @@ namespace Tangerine.UI.SceneView
 			new InspectRootNodePresenter(this);
 			new NineGridLinePresenter(this);
 			new Animation2DPathPresenter(this);
+			new WavePivotPresenter(this);
 		}
 
 		public void CreateNode(Type nodeType, ICommand command)
