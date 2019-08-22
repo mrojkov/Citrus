@@ -137,16 +137,17 @@ namespace Lime
 		public static void UpdateCharsets(TftConfig config, string assetDirectory)
 		{
 			foreach (var charSet in config.CharSets) {
-				UpdateCharset(charSet, assetDirectory);
+				UpdateCharset(charSet, assetDirectory, sortByFrequency:true);
 			}
 		}
 
-		public static void UpdateCharset(TftConfig.CharSet charSet, string assetDirectory)
+		public static void UpdateCharset(TftConfig.CharSet charSet, string assetDirectory, bool sortByFrequency = false)
 		{
 			if (string.IsNullOrEmpty(charSet.ExtractFromDictionaries)) {
 				return;
 			}
 			var characters = new HashSet<char>();
+			var frequency = new Dictionary<char, int>();
 			var dict = new LocalizationDictionary();
 			foreach (var localization in charSet.ExtractFromDictionaries.Split(',')) {
 				// cause EN is default dictionary
@@ -156,20 +157,23 @@ namespace Lime
 				using (var stream = File.Open(dictPath, FileMode.Open)) {
 					dict.ReadFromStream(stream);
 				}
-				ExtractCharacters(dict, characters);
+				ExtractCharacters(dict, characters, frequency);
 			}
-			charSet.Chars = string.Join("", characters.OrderBy(c => c));
+			charSet.Chars = string.Join("", sortByFrequency ?
+				characters.OrderBy(c => frequency[c]) : characters.OrderBy(c => c));
 		}
 
-		private static void ExtractCharacters(LocalizationDictionary dictionary, HashSet<char> chars)
+		private static void ExtractCharacters(LocalizationDictionary dictionary, HashSet<char> chars,
+			Dictionary<char, int> frequency)
 		{
 			foreach (var (_, value) in dictionary) {
 				if (value.Text == null) {
 					continue;
 				}
 				foreach (var c in value.Text) {
-					if (c != 10) {
+					if (c != 10 && !char.IsSurrogate(c)) {
 						chars.Add(c);
+						frequency[c] = frequency.TryGetValue(c, out var v) ? v + 1 : 1;
 					}
 				}
 			}
