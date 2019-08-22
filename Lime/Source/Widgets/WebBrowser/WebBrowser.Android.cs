@@ -7,7 +7,7 @@ using Android.Widget;
 
 namespace Lime
 {
-	public class WebBrowser : Widget
+	public class WebBrowser : Widget, IUpdatableNode
 	{
 		private WebView webView;
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }
@@ -35,6 +35,7 @@ namespace Lime
 		public WebBrowser()
 		{
 			CreateWebView();
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		private void CreateWebView()
@@ -86,9 +87,8 @@ namespace Lime
 			webView.SetBackgroundColor(color);
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (webView == null) {
 				return;
 			}
