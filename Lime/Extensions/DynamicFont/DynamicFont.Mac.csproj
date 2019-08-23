@@ -314,5 +314,9 @@
       <Link>libpcre.1.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\3rdParty\FreeType\libfreetype-6.dylib">
+      <Link>libfreetype-6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
