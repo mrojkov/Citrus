@@ -172,11 +172,12 @@ namespace Lime
 		}
 	}
 
+	[YuzuCompact]
 	public struct KerningPair
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public char Char;
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Kerning;
 	}
 
