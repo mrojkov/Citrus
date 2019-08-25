@@ -128,7 +128,7 @@ namespace Lime
 
 			int si;
 			Color4 color = Color4.Black;
-			var dstPixels = texture.Data;
+			var dstPixels = texture.GetPixels();
 			int bytesPerPixel = glyph.RgbIntensity ? 3 : 1;
 
 			for (int i = 0; i < glyph.Height; i++) {
@@ -159,29 +159,29 @@ namespace Lime
 		// Use inheritance instead of composition in a sake of performance
 		private class DynamicTexture : Texture2D
 		{
-			public readonly Color4[] Data;
+			private readonly Color4[] data;
 			public bool Invalidated;
 
 			public DynamicTexture(Size size)
 			{
 				ImageSize = SurfaceSize = size;
-				Data = new Color4[size.Width * size.Height];
+				data = new Color4[size.Width * size.Height];
 				for (int i = 0; i < size.Width * size.Height; i++) {
-					Data[i] = Color4.Black;
-					Data[i].A = 0;
+					data[i] = Color4.Black;
+					data[i].A = 0;
 				}
 			}
 
 			public override IPlatformTexture2D GetPlatformTexture()
 			{
 				if (Invalidated) {
-					LoadImage(Data, ImageSize.Width, ImageSize.Height);
+					LoadImage(data, ImageSize.Width, ImageSize.Height);
 					Invalidated = false;
 				}
 				return base.GetPlatformTexture();
 			}
 
-			public override Color4[] GetPixels() => Data;
+			public override Color4[] GetPixels() => data;
 		}
 	}
 }

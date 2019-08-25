@@ -10,14 +10,6 @@ namespace Lime
 {
 	public static class FontGenerator
 	{
-		private static List<HashSet<char>> kerningsCharsets = new List<HashSet<char>> {
-			new HashSet<char>("0123456789"),
-			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"),
-			new HashSet<char>("abcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
-			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯ"),
-			new HashSet<char>("абвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
-		};
-
 		public static void UpdateCharSetsAndGenerateFont(string configPath, string assetDirectory)
 		{
 			var config = InternalPersistence.Instance.ReadObjectFromFile<TftConfig>(AssetPath.Combine(assetDirectory, configPath));
@@ -60,9 +52,9 @@ namespace Lime
 						fontChar.Height *= config.SdfScale;
 						fontChar.Width *= config.SdfScale;
 					}
-					((ICollection<FontChar>)fontCharCollection).Add(fontChar);
+					fontCharCollection.Add(fontChar);
 				}
-				if (missingCharacters.Count > 0) {
+		if (missingCharacters.Count > 0) {
 					Console.WriteLine($"Characters: {string.Join("", missingCharacters)} -- are missing in font {charSet.Font}");
 				}
 				GenerateKerningPairs(fontCharCollection, chars.FontRenderer, config, charSet.Chars);
@@ -86,7 +78,7 @@ namespace Lime
 			var pixelSize = (uint)Math.Round(Math.Abs(CalcPixelSize(height, face)));
 			face.SetCharSize(0, height, pixelSize, pixelSize);
 			foreach (var lhs in chars) {
-				var kerningCharset = kerningsCharsets.FirstOrDefault(c => c.Contains(lhs));
+				var kerningCharset = FontRenderer.KerningPairCharsets.FirstOrDefault(c => c.Contains(lhs));
 				if (kerningCharset == null) {
 					continue;
 				}
@@ -180,7 +172,7 @@ namespace Lime
 					continue;
 				}
 				foreach (var c in value.Text) {
-					if (c != 10 && !char.IsSurrogate(c)) {
+					if (c != '\n' && !char.IsSurrogate(c)) {
 						chars.Add(c);
 						frequency[c] = frequency.TryGetValue(c, out var v) ? v + 1 : 1;
 					}
@@ -195,8 +187,8 @@ namespace Lime
 			foreach (var file in Directory.EnumerateFiles(Path.GetDirectoryName(basePath), $"{Path.GetFileName(path)}??.png")) {
 				File.Delete(file);
 			}
-			for (int i = 0; i < font.CharCollection.Textures.Count; i++) {
-				var texture = font.CharCollection.Textures[i];
+			for (int i = 0; i < font.Textures.Count; i++) {
+				var texture = font.Textures[i];
 				var pixels = texture.GetPixels();
 				var w = texture.ImageSize.Width;
 				var h = texture.ImageSize.Height;
@@ -212,7 +204,7 @@ namespace Lime
 						bm.SaveTo(AssetPath.Combine(assetDirectory, basePath + (i > 0 ? $"{i:00}.png" : ".png")));
 					}
 				}
-				font.CharCollection.Textures[i] = new SerializableTexture(basePath + (i > 0 ? $"{i:00}" : ""));
+				font.Textures[i] = new SerializableTexture(basePath + (i > 0 ? $"{i:00}" : ""));
 			}
 			InternalPersistence.Instance.WriteObjectToFile(Path.ChangeExtension(absolutePath, "tft"), font, Persistence.Format.Json);
 		}

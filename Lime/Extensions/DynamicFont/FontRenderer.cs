@@ -19,11 +19,13 @@ namespace Lime
 			public List<KerningPair> KerningPairs;
 		}
 
-		public string KerningCharacters =
-			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"" +
-			"#$%&ˆ‘’“”´˜`'„()–—*+-÷~,.…/:;<>=?@[]\\^_¯{}|€‚ƒ‹›•§«»©®™¨°¿" +
-			"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿšœžŸŒŽŠ¡¢£¤¥µ¶ " +
-			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯабвгдеёжзийклмнопрстуфхшщчцъьыэюя";
+		public static List<HashSet<char>> KerningPairCharsets = new List<HashSet<char>> {
+			new HashSet<char>("0123456789"),
+			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"),
+			new HashSet<char>("abcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
+			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯ"),
+			new HashSet<char>("абвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
+		};
 
 		private Library library;
 		private int lastHeight;
@@ -103,14 +105,19 @@ namespace Lime
 				),
 			};
 			// Iterate through kerning pairs
-			foreach (var nextChar in KerningCharacters) {
-				var nextGlyphIndex = Face.GetCharIndex(nextChar);
-				var kerning = (float)Face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
-				if (kerning != 0) {
-					if (glyph.KerningPairs == null) {
-						glyph.KerningPairs = new List<KerningPair>();
+			foreach (var charset in KerningPairCharsets) {
+				if (!charset.Contains(@char)) {
+					continue;
+				}
+				foreach (var character in charset) {
+					var nextGlyphIndex = Face.GetCharIndex(character);
+					var kerning = (float)Face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
+					if (kerning != 0) {
+						if (glyph.KerningPairs == null) {
+							glyph.KerningPairs = new List<KerningPair>();
+						}
+						glyph.KerningPairs.Add(new KerningPair { Char = character, Kerning = kerning });
 					}
-					glyph.KerningPairs.Add(new KerningPair { Char = nextChar, Kerning = kerning });
 				}
 			}
 			return glyph;

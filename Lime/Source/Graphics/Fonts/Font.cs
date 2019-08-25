@@ -23,27 +23,28 @@ namespace Lime
 
 	public class Font : IFont
 	{
+		private FontCharCollection chars;
+
 		[YuzuMember]
 		public string About { get; set; }
 		[YuzuMember]
 		public float Spacing { get; set; }
 		[YuzuMember]
 		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
-		public List<ITexture> Textures { get { return CharCollection.Textures; } }
+		public List<ITexture> Textures => chars.Textures;
 		[YuzuMember]
-		public FontCharCollection CharCollection { get; private set; }
-		public IFontCharSource Chars { get { return CharCollection; } }
+		public IFontCharSource Chars => chars;
 		[YuzuMember]
 		public bool RoundCoordinates { get; set; } = false;
 
 		public Font()
 		{
-			CharCollection = new FontCharCollection();
+			chars = new FontCharCollection();
 		}
 
-		public Font(FontCharCollection charCollection)
+		public Font(FontCharCollection chars)
 		{
-			CharCollection = charCollection;
+			this.chars = chars;
 		}
 
 		public void Dispose()
@@ -96,21 +97,9 @@ namespace Lime
 
 		public readonly List<ITexture> Textures = new List<ITexture>();
 
-		int ICollection<FontChar>.Count
-		{
-			get
-			{
-				return charList.Count;
-			}
-		}
+		public int Count => charList.Count;
 
-		bool ICollection<FontChar>.IsReadOnly
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public bool IsReadOnly => false;
 
 		public bool Contains(char code)
 		{
@@ -133,43 +122,31 @@ namespace Lime
 		{
 		}
 
-		void ICollection<FontChar>.Add(FontChar item)
+		public void Add(FontChar item)
 		{
 			charMap[item.Char] = item;
 			charList.Add(item);
 		}
 
-		void ICollection<FontChar>.Clear()
+		public void Clear()
 		{
 			charList.Clear();
 			charMap.Clear();
 		}
 
-		bool ICollection<FontChar>.Contains(FontChar item)
-		{
-			return Contains(item.Char);
-		}
+		public bool Contains(FontChar item) => Contains(item.Char);
 
-		void ICollection<FontChar>.CopyTo(FontChar[] array, int arrayIndex)
-		{
-			charList.CopyTo(array, arrayIndex);
-		}
+		public void CopyTo(FontChar[] array, int arrayIndex) => charList.CopyTo(array, arrayIndex);
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return charList.GetEnumerator();
-		}
-
-		IEnumerator<FontChar> IEnumerable<FontChar>.GetEnumerator()
-		{
-			return charList.GetEnumerator();
-		}
-
-		bool ICollection<FontChar>.Remove(FontChar item)
+		public bool Remove(FontChar item)
 		{
 			charMap[item.Char] = null;
 			return charList.Remove(item);
 		}
+
+		public IEnumerator<FontChar> GetEnumerator() => charList.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
 	[YuzuCompact]
