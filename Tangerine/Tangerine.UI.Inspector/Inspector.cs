@@ -57,6 +57,7 @@ namespace Tangerine.UI.Inspector
 			PanelWidget.PushNode(RootWidget);
 			Docking.DockManager.Instance.FilesDropped += OnFilesDropped;
 			content.LoadExpandedStates();
+			Rebuild();
 		}
 
 		public void Detach()
