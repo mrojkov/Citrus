@@ -17,7 +17,7 @@ namespace Orange
 		{
 			The.UI.SetupProgressBar(GetAssetsToRevealCount(platform, bundles));
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform);
+				string bundlePath = The.Workspace.GetBundlePath(platform, bundleName);
 				UnpackBundle(platform, bundlePath);
 			}
 			The.UI.StopProgressBar();
@@ -28,7 +28,7 @@ namespace Orange
 			var bundles = new AssetCooker(target).GetListOfAllBundles();
 			The.UI.SetupProgressBar(bundles.Count);
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, target.Platform) + UnpackedSuffix;
+				string bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName) + UnpackedSuffix;
 				DeleteBundle(bundlePath);
 				The.UI.IncreaseProgressBar();
 			}
@@ -113,7 +113,7 @@ namespace Orange
 		{
 			var assetCount = 0;
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform);
+				string bundlePath = The.Workspace.GetBundlePath(platform, bundleName);
 				if (!File.Exists(bundlePath)) {
 					continue;
 				}

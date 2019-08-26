@@ -199,11 +199,6 @@ namespace Orange
 
 		public string GetBundlePath(TargetPlatform platform, string bundleName)
 		{
-			return GetBundlePath(bundleName, platform);
-		}
-
-		public string GetBundlePath(string bundleName, TargetPlatform platform)
-		{
 			if (bundleName == CookingRulesBuilder.MainBundleName) {
 				return The.Workspace.GetMainBundlePath(platform);
 			} else {
