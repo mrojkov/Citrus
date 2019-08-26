@@ -9,24 +9,31 @@ namespace Orange
 {
 	public static class AssetsUnpacker
 	{
+		private const string UnpackedSuffix = ".Unpacked";
+
 		public static void Unpack(TargetPlatform platform)
 		{
-			var bundles = AssetCooker.GetListOfAllBundles();
+			Unpack(platform, AssetCooker.GetListOfAllBundles());
+		}
 
-			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles.ToList()));
+		public static void Unpack(TargetPlatform platform, List<string> bundles)
+		{
+			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform);
 				UnpackBundle(bundlePath);
 			}
 			The.UI.StopProgressBar();
 		}
 
-		public static void Unpack(TargetPlatform platfotm, List<string> bundles)
+		public static void Delete(TargetPlatform platform)
 		{
-			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
+			var bundles = AssetCooker.GetListOfAllBundles();
+			The.UI.SetupProgressBar(bundles.Count);
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
-				UnpackBundle(bundlePath);
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform) + UnpackedSuffix;
+				DeleteBundle(bundlePath);
+				The.UI.IncreaseProgressBar();
 			}
 			The.UI.StopProgressBar();
 		}
@@ -37,7 +44,7 @@ namespace Orange
 				Console.WriteLine($"WARNING: {bundlePath} do not exists! Skipping...");
 				return;
 			}
-			string outputDirectory = bundlePath + ".Unpacked";
+			string outputDirectory = bundlePath + UnpackedSuffix;
 			using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 				AssetBundle.SetCurrent(bundle, false);
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
@@ -119,6 +126,20 @@ namespace Orange
 				}
 			}
 			return assetCount;
+		}
+
+		public static void DeleteBundle(string bundlePath)
+		{
+			if (!Directory.Exists(bundlePath)) {
+				Console.WriteLine($"WARNING: {bundlePath} do not exists! Skipping...");
+				return;
+			}
+			try {
+				Directory.Delete(bundlePath, true);
+				Console.WriteLine($"{bundlePath} deleted.");
+			} catch (System.Exception exception) {
+				Console.WriteLine($"{bundlePath} deletion skipped because of exception: {exception.Message}");
+			}
 		}
 	}
 }

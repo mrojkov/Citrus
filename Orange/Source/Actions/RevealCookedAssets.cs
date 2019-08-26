@@ -10,6 +10,7 @@ namespace Orange
 	{
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Reveal Cooked Assets")]
+		[ExportMetadata("Priority", 30)]
 		public static void RevealCookedAssetsAction()
 		{
 			AssetsUnpacker.Unpack(The.Workspace.ActivePlatform);
