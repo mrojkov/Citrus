@@ -68,6 +68,7 @@
     <Compile Include="GridSelection.cs" />
     <Compile Include="GridSpanList.cs" />
     <Compile Include="Commands\OrangeCommands.cs" />
+    <Compile Include="Operations\RulerAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Document.Animation.cs" />
