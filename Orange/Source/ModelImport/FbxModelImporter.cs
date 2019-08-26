@@ -32,11 +32,11 @@ namespace Orange.FbxImporter
 			manager = FbxManager.Create();
 		}
 
-		public Model3D LoadModel()
+		public Model3D LoadModel(Target target)
 		{
 			var scene = LoadRaw();
 			var model = new Model3D();
-			model.Nodes.Add(ImportNodes(scene.Root));
+			model.Nodes.Add(ImportNodes(target, scene.Root));
 			ImportAnimations(model, scene);
 			if (options.ApplyAttachment && Model3DAttachmentParser.IsAttachmentExists(options.Path)) {
 				Model3DAttachmentParser.GetModel3DAttachment(options.Path).Apply(model);
@@ -49,7 +49,7 @@ namespace Orange.FbxImporter
 			return manager.LoadScene(options);
 		}
 
-		private Lime.Node ImportNodes(FbxNode root, Node parent = null)
+		private Lime.Node ImportNodes(Target target, FbxNode root, Node parent = null)
 		{
 			Node3D node = null;
 			if (root == null)
@@ -62,7 +62,7 @@ namespace Orange.FbxImporter
 						SkinningMode = meshAttribute.SkinningMode
 					};
 					foreach (var submesh in meshAttribute.Submeshes) {
-						mesh.Submeshes.Add(ImportSubmesh(submesh, root));
+						mesh.Submeshes.Add(ImportSubmesh(target, submesh, root));
 					}
 					node = mesh;
 					if (mesh.Submeshes.Count != 0) {
@@ -95,14 +95,14 @@ namespace Orange.FbxImporter
 					parent.Nodes.Add(node);
 				}
 				foreach (var child in root.Children) {
-					ImportNodes(child, node);
+					ImportNodes(target, child, node);
 				}
 			}
 
 			return node;
 		}
 
-		private Submesh3D ImportSubmesh(FbxSubmesh meshAttribute, FbxNode node)
+		private Submesh3D ImportSubmesh(Target target, FbxSubmesh meshAttribute, FbxNode node)
 		{
 			var sm = new Submesh3D {
 				Mesh = new Mesh<Mesh3D.Vertex> {
@@ -119,7 +119,7 @@ namespace Orange.FbxImporter
 					}
 				},
 				Material = meshAttribute.MaterialIndex != -1 && node.Materials != null
-					? GetOrCreateLimeMaterial(node.Materials[meshAttribute.MaterialIndex])
+					? GetOrCreateLimeMaterial(target, node.Materials[meshAttribute.MaterialIndex])
 					: FbxMaterial.Default
 			};
 			MeshUtils.RemoveDuplicates(sm.Mesh);
@@ -134,7 +134,7 @@ namespace Orange.FbxImporter
 
 		private Dictionary<FbxMaterialDescriptor, CommonMaterial> MaterialPool = new Dictionary<FbxMaterialDescriptor, CommonMaterial>();
 
-		public CommonMaterial GetOrCreateLimeMaterial(FbxMaterial material)
+		public CommonMaterial GetOrCreateLimeMaterial(Target target, FbxMaterial material)
 		{
 			if (MaterialPool.ContainsKey(material.MaterialDescriptor)) {
 				return MaterialPool[material.MaterialDescriptor];
@@ -152,7 +152,7 @@ namespace Orange.FbxImporter
 				var mode = material.MaterialDescriptor.WrapModeU == TextureWrapMode.Repeat || material.MaterialDescriptor.WrapModeV == TextureWrapMode.Repeat ?
 						TextureWrapMode.Repeat : TextureWrapMode.Clamp;
 				if (options.CookingRulesMap.ContainsKey(rulesPath)) {
-					var cookingRules = options.CookingRulesMap[rulesPath] = options.CookingRulesMap[rulesPath].InheritClone();
+					var cookingRules = options.CookingRulesMap[rulesPath] = options.CookingRulesMap[rulesPath].InheritClone(target);
 					if (cookingRules.CommonRules.WrapMode != mode) {
 						cookingRules.CommonRules.WrapMode = mode;
 						cookingRules.SourceFilename = rulesPath + ".txt";

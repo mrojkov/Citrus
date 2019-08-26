@@ -4,7 +4,7 @@ using Lime;
 
 namespace Orange
 {
-	class SyncRawAssets: ICookStage
+	class SyncRawAssets : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return extension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return extension; } }
@@ -12,7 +12,8 @@ namespace Orange
 		private readonly string extension;
 		private readonly AssetAttributes attributes;
 
-		public SyncRawAssets(string extension, AssetAttributes attributes = AssetAttributes.None)
+		public SyncRawAssets(AssetCooker assetCooker, string extension, AssetAttributes attributes = AssetAttributes.None)
+			: base(assetCooker)
 		{
 			this.extension = extension;
 			this.attributes = attributes;

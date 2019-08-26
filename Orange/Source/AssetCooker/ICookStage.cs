@@ -10,4 +10,14 @@ namespace Orange
 		IEnumerable<string> BundleExtensions { get; }
 		int GetOperationsCount();
 	}
+
+	public abstract class AssetCookerCookStage
+	{
+		public AssetCookerCookStage(AssetCooker assetCooker)
+		{
+			this.AssetCooker = assetCooker;
+		}
+
+		protected readonly AssetCooker AssetCooker;
+	}
 }

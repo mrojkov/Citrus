@@ -4,12 +4,14 @@ using Lime;
 
 namespace Orange
 {
-	class SyncCompoundFonts : ICookStage
+	class SyncCompoundFonts : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return fontExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return fontExtension; } }
 
 		private readonly string fontExtension = ".cft";
+
+		public SyncCompoundFonts(AssetCooker assetCooker) : base(assetCooker) { }
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fontExtension);
 

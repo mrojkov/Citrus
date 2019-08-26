@@ -12,25 +12,26 @@ namespace Orange
 		[ExportMetadata("Priority", 0)]
 		public static string BuildAndRunAction()
 		{
-			return BuildAndRun(BuildConfiguration.Release);
+			var target = The.UI.GetActiveTarget();
+			return BuildAndRun(target, BuildConfiguration.Release);
 		}
 
-		public static string BuildAndRun(string configuration)
+		public static string BuildAndRun(Target target, string configuration)
 		{
-			AssetCooker.CookForActivePlatform();
-			if (!BuildGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, configuration)) {
+			AssetCooker.CookForTarget(target);
+			if (!BuildGame(target, configuration)) {
 				return "Can not BuildGame";
 			}
 			The.UI.ScrollLogToEnd();
-			RunGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution, configuration);
+			RunGame(target.Platform, target.ProjectPath, configuration);
 			return null;
 		}
 
-		public static void RunGame()
+		public static void RunGame(Target target)
 		{
 			RunGame(
-				The.Workspace.ActivePlatform,
-				The.Workspace.CustomSolution,
+				target.Platform,
+				target.ProjectPath,
 				BuildConfiguration.Release);
 		}
 

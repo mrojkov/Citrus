@@ -48,7 +48,7 @@ namespace Orange
 			}
 		}
 
-		public static Bitmap OpenAtlasItemBitmapAndRescaleIfNeeded(AtlasItem item)
+		public static Bitmap OpenAtlasItemBitmapAndRescaleIfNeeded(TargetPlatform platform, AtlasItem item)
 		{
 			var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(item.Path, item.SourceExtension));
 			Bitmap bitmap;
@@ -56,8 +56,8 @@ namespace Orange
 				bitmap = new Bitmap(stream);
 			}
 			if (item.BitmapInfo == null) {
-				if (ShouldDownscale(bitmap, item.CookingRules)) {
-					var newBitmap = DownscaleTexture(bitmap, srcTexturePath, item.CookingRules);
+				if (ShouldDownscale(platform, bitmap, item.CookingRules)) {
+					var newBitmap = DownscaleTexture(platform, bitmap, srcTexturePath, item.CookingRules);
 					bitmap.Dispose();
 					bitmap = newBitmap;
 				}
@@ -72,21 +72,21 @@ namespace Orange
 			return bitmap;
 		}
 
-		public static bool ShouldDownscale(Bitmap texture, CookingRules rules)
+		public static bool ShouldDownscale(TargetPlatform platform, Bitmap texture, CookingRules rules)
 		{
-			return ShouldDownscaleHelper(texture.Width, texture.Height, rules);
+			return ShouldDownscaleHelper(platform, texture.Width, texture.Height, rules);
 		}
 
-		public static bool ShouldDownscale(BitmapInfo textureInfo, CookingRules rules)
+		public static bool ShouldDownscale(TargetPlatform platform, BitmapInfo textureInfo, CookingRules rules)
 		{
-			return ShouldDownscaleHelper(textureInfo.Width, textureInfo.Height, rules);
+			return ShouldDownscaleHelper(platform, textureInfo.Width, textureInfo.Height, rules);
 		}
 
-		public static void DownscaleTextureInfo(BitmapInfo textureInfo, string path, CookingRules rules)
+		public static void DownscaleTextureInfo(TargetPlatform platform, BitmapInfo textureInfo, string path, CookingRules rules)
 		{
 			int newHeight;
 			int newWidth;
-			DownscaleTextureHelper(textureInfo.Width, textureInfo.Height, path, rules, out newWidth, out newHeight);
+			DownscaleTextureHelper(platform, textureInfo.Width, textureInfo.Height, path, rules, out newWidth, out newHeight);
 			textureInfo.Height = newHeight;
 			textureInfo.Width = newWidth;
 		}
@@ -112,11 +112,11 @@ namespace Orange
 			}
 		}
 
-		public static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
+		public static Bitmap DownscaleTexture(TargetPlatform platform, Bitmap texture, string path, CookingRules rules)
 		{
 			int newHeight;
 			int newWidth;
-			DownscaleTextureHelper(texture.Width, texture.Height, path, rules, out newWidth, out newHeight);
+			DownscaleTextureHelper(platform, texture.Width, texture.Height, path, rules, out newWidth, out newHeight);
 			return texture.Rescale(newWidth, newHeight);
 		}
 
@@ -169,10 +169,10 @@ namespace Orange
 			return true;
 		}
 
-		private static void DownscaleTextureHelper(int width, int height, string path, CookingRules rules, out int newWidth, out int newHeight)
+		private static void DownscaleTextureHelper(TargetPlatform platform, int width, int height, string path, CookingRules rules, out int newWidth, out int newHeight)
 		{
 			int MaxSize = GetMaxAtlasSize().Width;
-			int scaleThreshold = AssetCooker.Platform == TargetPlatform.Android ? 32 : 256;
+			int scaleThreshold = platform == TargetPlatform.Android ? 32 : 256;
 			var ratio = rules.TextureScaleFactor;
 			if (width > MaxSize || height > MaxSize) {
 				var max = (float)Math.Max(width, height);
@@ -189,10 +189,10 @@ namespace Orange
 			Console.WriteLine("{0} downscaled to {1}x{2}", path, newWidth, newHeight);
 		}
 
-		private static bool ShouldDownscaleHelper(int width, int height, CookingRules rules)
+		private static bool ShouldDownscaleHelper(TargetPlatform platform, int width, int height, CookingRules rules)
 		{
 			if (rules.TextureScaleFactor != 1.0f) {
-				int scaleThreshold = AssetCooker.Platform == TargetPlatform.Android ? 32 : 256;
+				int scaleThreshold = platform == TargetPlatform.Android ? 32 : 256;
 				if (width > scaleThreshold || height > scaleThreshold) {
 					return true;
 				}

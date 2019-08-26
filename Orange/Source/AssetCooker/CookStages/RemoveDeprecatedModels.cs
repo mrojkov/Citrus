@@ -6,12 +6,14 @@ using Lime;
 
 namespace Orange
 {
-	class RemoveDeprecatedModels: ICookStage
+	class RemoveDeprecatedModels : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield break; } }
 		public IEnumerable<string> BundleExtensions { get { yield return modelExtension; } }
 
 		private readonly string modelExtension = ".model";
+
+		public RemoveDeprecatedModels(AssetCooker assetCooker) : base(assetCooker) { }
 
 		public int GetOperationsCount() => The.Workspace.AssetFiles.Enumerate(modelExtension).Count();
 

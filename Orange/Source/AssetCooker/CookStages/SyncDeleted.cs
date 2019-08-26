@@ -6,7 +6,7 @@ using Lime;
 
 namespace Orange
 {
-	class SyncDeleted: ICookStage
+	class SyncDeleted : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield break; } }
 		public IEnumerable<string> BundleExtensions
@@ -22,6 +22,8 @@ namespace Orange
 
 		private readonly string[] toDeleteExtensions = { ".atlasPart", ".mask", ".texture", ".ant" };
 		private readonly string modelTanExtension = ".t3d";
+
+		public SyncDeleted(AssetCooker assetCooker) : base(assetCooker) { }
 
 		public int GetOperationsCount()
 		{

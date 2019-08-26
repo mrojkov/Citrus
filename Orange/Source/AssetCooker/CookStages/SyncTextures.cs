@@ -5,12 +5,15 @@ using Lime;
 
 namespace Orange
 {
-	class SyncTextures: ICookStage
+	class SyncTextures : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return originalTextureExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return PlatformTextureExtension; } }
 
 		private readonly string originalTextureExtension = ".png";
+
+		public SyncTextures(AssetCooker assetCooker) : base(assetCooker) { }
+
 		private string PlatformTextureExtension => AssetCooker.GetPlatformTextureExtension();
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(originalTextureExtension);
@@ -26,8 +29,8 @@ namespace Orange
 			}
 			using (var stream = File.OpenRead(srcPath)) {
 				var bitmap = new Bitmap(stream);
-				if (TextureTools.ShouldDownscale(bitmap, rules)) {
-					var scaledBitmap = TextureTools.DownscaleTexture(bitmap, srcPath, rules);
+				if (TextureTools.ShouldDownscale(AssetCooker.Platform, bitmap, rules)) {
+					var scaledBitmap = TextureTools.DownscaleTexture(AssetCooker.Platform, bitmap, srcPath, rules);
 					bitmap.Dispose();
 					bitmap = scaledBitmap;
 				}

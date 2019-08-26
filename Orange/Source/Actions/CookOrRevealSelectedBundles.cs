@@ -27,11 +27,13 @@ namespace Orange
 		[ExportMetadata("Priority", 15)]
 		public static void CookOrRevealSelectedBundlesAction()
 		{
+			var target = The.UI.GetActiveTarget();
+
 			windowClosed = false;
 			action = null;
 			checkboxes = new Dictionary<string, ThemedCheckBox>();
 			lines = new Dictionary<string, Widget>();
-			Application.InvokeOnMainThread(CreateSelectionWindow);
+			Application.InvokeOnMainThread(() => CreateSelectionWindow(target));
 			// Selection window can be created only on main thread
 			// We should wait for that window to close, or user will
 			// be able to run multiple actions at the same time, leading to crash
@@ -39,7 +41,7 @@ namespace Orange
 			action?.Invoke();
 		}
 
-		private static void CreateSelectionWindow()
+		private static void CreateSelectionWindow(Target target)
 		{
 			var windowSize = new Vector2(400, 400);
 			window = new Window(new WindowOptions {
@@ -81,7 +83,7 @@ namespace Orange
 			mainVBox.AddNode(filter);
 
 			mainVBox.AddNode(scrollView);
-			foreach (var bundle in GetBundles()) {
+			foreach (var bundle in GetBundles(target)) {
 				checkboxes[bundle] = new ThemedCheckBox();
 				lines[bundle] = new Widget {
 					Layout = new HBoxLayout {
@@ -99,11 +101,11 @@ namespace Orange
 			}
 
 			var cookButton = new ThemedButton {
-				Clicked = CookButtonClickHandler,
+				Clicked = () => CookButtonClickHandler(target),
 				Text = "Cook"
 			};
 			var revealButton = new ThemedButton {
-				Clicked = RevealButtonClickHandler,
+				Clicked = () => RevealButtonClickHandler(target.Platform),
 				Text = "Reveal"
 			};
 			var buttonLine = new Widget {
@@ -121,9 +123,9 @@ namespace Orange
 			window.ShowModal();
 		}
 
-		private static List<string> GetBundles()
+		private static List<string> GetBundles(Target target)
 		{
-			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, The.Workspace.ActiveTarget);
+			var cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, target);
 			var bundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
@@ -180,7 +182,7 @@ namespace Orange
 			}
 		}
 
-		private static void CookButtonClickHandler()
+		private static void CookButtonClickHandler(Target target)
 		{
 			var bundles = new List<string>();
 			foreach (var bundle in checkboxes.Keys) {
@@ -188,11 +190,11 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetCooker.Cook(The.Workspace.ActiveTarget, bundles);
+			action = () => AssetCooker.CookForTarget(target, bundles);
 			window.Close();
 		}
 
-		private static void RevealButtonClickHandler()
+		private static void RevealButtonClickHandler(TargetPlatform platform)
 		{
 			var bundles = new List<string>();
 			foreach (var bundle in checkboxes.Keys) {
@@ -200,7 +202,7 @@ namespace Orange
 					bundles.Add(bundle);
 				}
 			}
-			action = () => AssetsUnpacker.Unpack(The.Workspace.ActivePlatform, bundles);
+			action = () => AssetsUnpacker.Unpack(platform, bundles);
 			window.Close();
 		}
 	}

@@ -6,13 +6,15 @@ using Orange.FbxImporter;
 
 namespace Orange
 {
-	class SyncModels : ICookStage
+	class SyncModels : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return fbxExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return t3dExtension; } }
 
 		private readonly string fbxExtension = ".fbx";
 		private readonly string t3dExtension = ".t3d";
+
+		public SyncModels(AssetCooker assetCooker) : base(assetCooker) { }
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(fbxExtension);
 
@@ -25,11 +27,11 @@ namespace Orange
 			Model3D model;
 			var options = new FbxImportOptions {
 				Path = srcPath,
-				Target = The.Workspace.ActiveTarget,
+				Target = AssetCooker.Target,
 				CookingRulesMap = AssetCooker.CookingRulesMap
 			};
 			using (var fbxImporter = new FbxModelImporter(options)) {
-				model = fbxImporter.LoadModel();
+				model = fbxImporter.LoadModel(AssetCooker.Target);
 			}
 			AssetAttributes assetAttributes;
 			switch (compression) {

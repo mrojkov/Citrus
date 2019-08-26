@@ -11,34 +11,31 @@ namespace Orange
 	{
 		private const string UnpackedSuffix = ".Unpacked";
 
-		public static void Unpack(TargetPlatform platform)
-		{
-			Unpack(platform, AssetCooker.GetListOfAllBundles());
-		}
+		public static void Unpack(Target target) => Unpack(target.Platform, new AssetCooker(target).GetListOfAllBundles());
 
 		public static void Unpack(TargetPlatform platform, List<string> bundles)
 		{
-			The.UI.SetupProgressBar(GetAssetsToRevealCount(bundles));
+			The.UI.SetupProgressBar(GetAssetsToRevealCount(platform, bundles));
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform);
-				UnpackBundle(bundlePath);
+				UnpackBundle(platform, bundlePath);
 			}
 			The.UI.StopProgressBar();
 		}
 
-		public static void Delete(TargetPlatform platform)
+		public static void Delete(Target target)
 		{
-			var bundles = AssetCooker.GetListOfAllBundles();
+			var bundles = new AssetCooker(target).GetListOfAllBundles();
 			The.UI.SetupProgressBar(bundles.Count);
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform) + UnpackedSuffix;
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, target.Platform) + UnpackedSuffix;
 				DeleteBundle(bundlePath);
 				The.UI.IncreaseProgressBar();
 			}
 			The.UI.StopProgressBar();
 		}
 
-		private static void UnpackBundle(string bundlePath)
+		private static void UnpackBundle(TargetPlatform platform, string bundlePath)
 		{
 			if (!File.Exists(bundlePath)) {
 				Console.WriteLine($"WARNING: {bundlePath} do not exists! Skipping...");
@@ -58,7 +55,7 @@ namespace Orange
 							using (var streamCopy = new MemoryStream()) {
 								stream.CopyTo(streamCopy);
 								streamCopy.Seek(0, SeekOrigin.Begin);
-								var assetPath = ChangeExtensionIfKtx(streamCopy, asset);
+								var assetPath = ChangeExtensionIfKtx(platform, streamCopy, asset);
 								Console.WriteLine("> " + assetPath);
 								var assetDirectory = Path.GetDirectoryName(assetPath);
 								if (assetDirectory != "") {
@@ -75,9 +72,9 @@ namespace Orange
 			}
 		}
 
-		private static string ChangeExtensionIfKtx(Stream stream, string assetPath)
+		private static string ChangeExtensionIfKtx(TargetPlatform platform, Stream stream, string assetPath)
 		{
-			if (assetPath.EndsWith(".pvr") && The.Workspace.ActivePlatform == TargetPlatform.Android) {
+			if (assetPath.EndsWith(".pvr") && platform == TargetPlatform.Android) {
 				using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true)) {
 					var sign = reader.ReadInt32();
 					stream.Seek(0, SeekOrigin.Begin);
@@ -89,9 +86,9 @@ namespace Orange
 			return assetPath;
 		}
 
-		public static void UnpackTangerineScenes()
+		public static void UnpackTangerineScenes(TargetPlatform platform)
 		{
-			string bundlePath = The.Workspace.GetMainBundlePath();
+			string bundlePath = The.Workspace.GetMainBundlePath(platform);
 			string outputDirectory = The.Workspace.AssetsDirectory;
 			using (var bundle = new PackedAssetBundle(bundlePath, AssetBundleFlags.None)) {
 				AssetBundle.SetCurrent(bundle, false);
@@ -112,11 +109,11 @@ namespace Orange
 			}
 		}
 
-		private static int GetAssetsToRevealCount(List<string> bundles)
+		private static int GetAssetsToRevealCount(TargetPlatform platform, List<string> bundles)
 		{
 			var assetCount = 0;
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(bundleName, The.Workspace.ActivePlatform);
+				string bundlePath = The.Workspace.GetBundlePath(bundleName, platform);
 				if (!File.Exists(bundlePath)) {
 					continue;
 				}

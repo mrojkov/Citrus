@@ -222,7 +222,7 @@ namespace Orange
 
 		private IEnumerator<object> ExecuteTask(Func<string> action)
 		{
-			yield return OrangeActionsHelper.ExecuteOrangeAction(action, () => {
+			yield return OrangeActionsHelper.ExecuteOrangeAction(GetActiveTarget(), action, () => {
 				The.Workspace.Save();
 				EnableControls(false);
 				textView.Clear();

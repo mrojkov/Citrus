@@ -4,12 +4,14 @@ using Lime;
 
 namespace Orange
 {
-	class SyncHotScenes : ICookStage
+	class SyncHotScenes : AssetCookerCookStage, ICookStage
 	{
 		public IEnumerable<string> ImportedExtensions { get { yield return hotSceneExtension; } }
 		public IEnumerable<string> BundleExtensions { get { yield return hotSceneExtension; } }
 
 		private readonly string hotSceneExtension = ".scene";
+
+		public SyncHotScenes(AssetCooker assetCooker) : base(assetCooker) { }
 
 		public int GetOperationsCount() => SyncUpdated.GetOperationsCount(hotSceneExtension);
 
