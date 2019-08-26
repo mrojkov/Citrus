@@ -298,4 +298,14 @@ namespace Lime
 			return getDefaultValue();
 		}
 	}
+
+	public sealed class TangerineKeyframeInterpolationAttribute : Attribute
+	{
+		public KeyFunction[] KeyframeInterpolations;
+
+		public TangerineKeyframeInterpolationAttribute(params KeyFunction[] keyFunctions)
+		{
+			KeyframeInterpolations = keyFunctions;
+		}
+	}
 }

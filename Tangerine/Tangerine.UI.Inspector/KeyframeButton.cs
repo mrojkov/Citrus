@@ -19,6 +19,8 @@ namespace Tangerine.UI.Inspector
 		private bool @checked;
 
 		public Color4 KeyColor { get; set; }
+		public KeyFunction[] AllowedKeyFunctions { get; set; }
+
 		public bool Checked
 		{
 			get => @checked;
@@ -100,7 +102,7 @@ namespace Tangerine.UI.Inspector
 						SetKeyframe(!kf.HasValue);
 						if (!kf.HasValue) {
 							keyFunctionFlow.Poll(out kf);
-							SetKeyFunction(kf ?? KeyFunction.Linear);
+							SetKeyFunction(kf ?? GetDefaultKeyFunction());
 						}
 					});
 				}
@@ -113,7 +115,7 @@ namespace Tangerine.UI.Inspector
 					} else {
 						Document.Current.History.DoTransaction(() => {
 							SetKeyframe(true);
-							SetKeyFunction(KeyFunction.Linear);
+							SetKeyFunction(GetDefaultKeyFunction());
 						});
 					}
 				}
@@ -121,12 +123,25 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 
+		private KeyFunction GetNextKeyFunction(KeyFunction value)
+		{
+			if (button.AllowedKeyFunctions == null) {
+				return nextKeyFunction[(int)value];
+			}
+			while (true) {
+				value = nextKeyFunction[(int)value];
+				if (button.AllowedKeyFunctions.Contains<KeyFunction>(value)) {
+					return value;
+				}
+			}
+		}
+
+		private KeyFunction GetDefaultKeyFunction() => button.AllowedKeyFunctions?[0] ?? KeyFunction.Linear;
+
 		private static readonly KeyFunction[] nextKeyFunction = {
 			KeyFunction.Spline, KeyFunction.ClosedSpline,
 			KeyFunction.Steep, KeyFunction.Linear
 		};
-
-		private static KeyFunction GetNextKeyFunction(KeyFunction value) => nextKeyFunction[(int)value];
 
 		internal void SetKeyFunction(KeyFunction value)
 		{
