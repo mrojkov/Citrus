@@ -22,7 +22,7 @@ namespace Tangerine.UI.FilesystemView
 			public Yuzu.Metadata.Meta.Item YuzuItem;
 		}
 
-		private Target activeTarget { get; set; }
+		private Target activeTarget;
 		private Toolbar toolbar;
 		public Widget RootWidget;
 		private readonly ThemedScrollView scrollView;
@@ -42,7 +42,6 @@ namespace Tangerine.UI.FilesystemView
 					LayoutCell = new LayoutCell(Alignment.Center)
 				})
 			);
-			targetSelector.Items.Add(new DropDownList.Item("None", null));
 			foreach (var t in Orange.The.Workspace.Targets) {
 				targetSelector.Items.Add(new ThemedDropDownList.Item(t.Name, t));
 			}
@@ -52,8 +51,8 @@ namespace Tangerine.UI.FilesystemView
 					Invalidate(savedFilesystemSelection);
 				}
 			};
+			activeTarget = (Target)targetSelector.Items.First().Value;
 			targetSelector.Index = 0;
-			activeTarget = null;
 			RootWidget = new Widget {
 				Layout = new VBoxLayout(),
 				Nodes = {
@@ -92,12 +91,10 @@ namespace Tangerine.UI.FilesystemView
 			return isPerDirectory || isPerFile;
 		}
 
-		private static CookingRules GetAssociatedCookingRules(CookingRulesCollection crc, string path, bool createIfNotExists = false)
+		private CookingRules GetAssociatedCookingRules(CookingRulesCollection crc, string path, bool createIfNotExists = false)
 		{
-			var target = Orange.The.UI.GetActiveTarget();
-
 			Action<string, CookingRules> ignoreRules = (p, r) => {
-				r = r.InheritClone(target);
+				r = r.InheritClone(activeTarget);
 				r.Ignore = true;
 				crc[NormalizePath(p)] = r;
 			};
@@ -111,7 +108,7 @@ namespace Tangerine.UI.FilesystemView
 					cr = crc[key];
 					if (cr.SourceFilename != crPath) {
 						if (createIfNotExists) {
-							cr = cr.InheritClone(target);
+							cr = cr.InheritClone(activeTarget);
 							crc[key] = cr;
 							ignoreRules(crPath, cr);
 						} else {
@@ -142,7 +139,7 @@ namespace Tangerine.UI.FilesystemView
 					} else if (!createIfNotExists) {
 						return null;
 					} else if (crc.ContainsKey(NormalizePath(path))) {
-						cr = crc[NormalizePath(path)].InheritClone(target);
+						cr = crc[NormalizePath(path)].InheritClone(activeTarget);
 						cr.SourceFilename = crPath;
 						ignoreRules(crPath, cr);
 						crc[key] = cr;
