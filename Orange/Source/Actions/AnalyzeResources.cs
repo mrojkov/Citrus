@@ -23,8 +23,9 @@ namespace Orange
 
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Analyze Resources")]
-		public static void AnalyzeResourcesAction(Target target)
+		public static void AnalyzeResourcesAction()
 		{
+			var target = The.UI.GetActiveTarget();
 			requestedPaths = new List<PathRequestRecord>();
 			var crossRefReport = new List<Tuple<string, List<string>>>();
 			var missingResourcesReport = new List<string>();
