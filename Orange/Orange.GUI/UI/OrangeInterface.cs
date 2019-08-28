@@ -75,6 +75,13 @@ namespace Orange
 				}),
 				(actionsCommand = new Command("&Actions", new Menu { })),
 				new Command("&Cache", new Menu {
+					new Command("&Actions", new Menu {
+						new Command("&Upload cache to server", () => Execute(() => {
+								UploadCacheToServer.UploadCacheToServerAction();
+								return null;
+							}
+						))
+					}),
 					new Command("&Mode", new Menu {
 						CacheLocalAndRemote,
 						CacheRemote,

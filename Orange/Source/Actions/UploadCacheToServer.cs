@@ -6,12 +6,8 @@ using System.Linq;
 
 namespace Orange
 {
-
 	public static class UploadCacheToServer
 	{
-		[Export(nameof(OrangePlugin.MenuItems))]
-		[ExportMetadata("Label", "Upload Cache To Server")]
-		[ExportMetadata("Priority", 50)]
 		public static void UploadCacheToServerAction()
 		{
 			AssetCache.Instance.Initialize();
@@ -25,7 +21,7 @@ namespace Orange
 				return;
 			}
 			if (!Directory.Exists(The.Workspace.AssetCacheLocalPath)) {
-				Console.WriteLine($"{The.Workspace.AssetCacheLocalPath} do not exist. Execution aborted");
+				Console.WriteLine($"{The.Workspace.AssetCacheLocalPath} does not exist. Execution aborted");
 			}
 			var filePaths = Directory.GetFiles(The.Workspace.AssetCacheLocalPath, "*", SearchOption.AllDirectories);
 			var hashStrings = filePaths.Select(path => Path.GetFileName(path)).ToList();
