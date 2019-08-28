@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Orange.Source;
+using System.Linq;
 
 namespace Orange
 {
@@ -146,11 +147,12 @@ namespace Orange
 		{
 			var specifiedTarget = Toolbox.GetCommandLineArg("--target");
 			foreach (var target in The.Workspace.Targets) {
-				if (specifiedTarget == target.Name) {
+				if (string.Equals(specifiedTarget, target.Name, StringComparison.OrdinalIgnoreCase)) {
 					return target;
 				}
 			}
-			return null;
+			var validTargetsText = string.Join(", ", The.Workspace.Targets.Select(t => $"\"{t.Name}\""));
+			throw new System.ArgumentException($"target with name \"{specifiedTarget}\" not found. Valid targets are: {validTargetsText}", "--target");
 		}
 
 		public override void ScrollLogToEnd()
