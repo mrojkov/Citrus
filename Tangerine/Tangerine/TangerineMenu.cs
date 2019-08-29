@@ -270,7 +270,14 @@ namespace Tangerine
 			orangeInterfaceInstance.CacheRemote = new Command("&Remote", () => updateAction(Orange.AssetCacheMode.Remote));
 			orangeInterfaceInstance.CacheLocal = new Command("&Local", () => updateAction(Orange.AssetCacheMode.Local));
 			orangeInterfaceInstance.CacheNone = new Command("&None", () => updateAction(Orange.AssetCacheMode.None));
+
+			var uploadCacheToServerCommand = new Command("&Upload cache to server");
+			CommandHandlerList.Global.Connect(uploadCacheToServerCommand, new OrangeCommand(UploadCacheToServer.UploadCacheToServerAction) { Executing = OnOrangeCommandExecuting });
+
 			orangeMenu.Add(new Command("Cache", new Menu {
+				new Command("&Actions", new Menu {
+					uploadCacheToServerCommand
+				}),
 				new Command("Mode", new Menu{
 					orangeInterfaceInstance.CacheLocalAndRemote,
 					orangeInterfaceInstance.CacheRemote,

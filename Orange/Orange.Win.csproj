@@ -153,6 +153,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Actions\UploadCacheToServer.cs" />
     <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />

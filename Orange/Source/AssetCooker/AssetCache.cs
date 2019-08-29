@@ -8,6 +8,8 @@ namespace Orange
 	// This class is not thread safe. Use ThreadLocal if you want thread safety.
 	public class AssetCache
 	{
+		public const string TempFileName = "cache.tmp";
+
 		private static AssetCache instance;
 		public static AssetCache Instance
 		{
@@ -45,7 +47,7 @@ namespace Orange
 				Console.WriteLine("[Cache] Cache disabled via WorkspaceConfig");
 				return;
 			}
-			tempFilePath = Path.Combine(The.Workspace.AssetCacheLocalPath, "cache.tmp");
+			tempFilePath = Path.Combine(The.Workspace.AssetCacheLocalPath, TempFileName);
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
@@ -179,7 +181,8 @@ namespace Orange
 			return false;
 		}
 
-		private bool UploadFromLocal(string hashString)
+		/// <summary>Returns 'true' if uploading was successful. Returns 'false' if something went wrong.</summary>
+		public bool UploadFromLocal(string hashString)
 		{
 			if (Mode == (AssetCacheMode.Local | AssetCacheMode.Remote) && ftpClient.IsConnected) {
 				try {
