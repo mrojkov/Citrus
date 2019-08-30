@@ -14,7 +14,7 @@ namespace Orange
 		private readonly WindowWidget windowWidget;
 		private Widget hBox;
 		private Widget mainVBox;
-		private Widget bundlePicker;
+		private BundlePickerWidget bundlePickerWidget;
 		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
@@ -68,8 +68,8 @@ namespace Orange
 			mainVBox.AddNode(progressBarField);
 			mainVBox.AddNode(CreateFooterSection());
 			hBox.AddNode(mainVBox);
-			bundlePicker = BundlePicker.CreateBundlePicker();
-			hBox.AddNode(bundlePicker);
+			bundlePickerWidget = new BundlePickerWidget();
+			hBox.AddNode(bundlePickerWidget);
 			windowWidget.AddNode(hBox);
 			CreateMenu();
 		}
@@ -81,7 +81,7 @@ namespace Orange
 			cacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
 			cacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
 			cacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
-			bundlePickerCommand = new Command("&Bundle picker", () => UpdateBundlePicker(!bundlePicker.Visible));
+			bundlePickerCommand = new Command("&Bundle picker", () => UpdateBundlePicker(!bundlePickerWidget.Visible));
 
 			Application.MainMenu = new Menu {
 				new Command("&File", new Menu {
@@ -204,6 +204,7 @@ namespace Orange
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
 			}
 			actionPicker.Index = 0;
+			actionPicker.Changed += OnActionChanged;
 			footerSection.AddNode(actionPicker);
 
 			goButton = new ThemedButton("Go");
@@ -235,11 +236,25 @@ namespace Orange
 			progressBarField.Progress(amount);
 		}
 
-		public void UpdateBundlePicker(bool value)
+		private void UpdateBundlePicker(bool value)
 		{
-			bundlePicker.Visible = value;
+			bundlePickerWidget.Visible = value;
 			bundlePickerCommand.Checked = value;
 			The.Workspace.BundlePickerVisible = value;
+			BundlePicker.Enabled = value;
+		}
+
+		private void OnActionChanged(CommonDropDownList.ChangedEventArgs args)
+		{
+			var menuItem = The.MenuController.Items.Find(item => item.Label == actionPicker.Text);
+			if (menuItem.ApplicableToBundlesSubset) {
+                EnableChildren(bundlePickerWidget, true);
+                BundlePicker.Enabled = true;
+			} else {
+				bundlePickerWidget.SelectAll();
+				EnableChildren(bundlePickerWidget, false);
+                BundlePicker.Enabled = false;
+			}
 		}
 
 		private void Execute(Func<string> action)
@@ -265,6 +280,8 @@ namespace Orange
 
 		private void EnableControls(bool value)
 		{
+			// Nested nodes can't be enabled when their parent is disabled
+			// so we have to enable top-level nodes or all UI elements will look like they are in 'disabled' state
 			goButton.Visible = value;
 			abortButton.Visible = !value;
 			EnableChildren(windowWidget, value);
@@ -276,8 +293,8 @@ namespace Orange
 			abortButton.Enabled = !value;
 			textView.Enabled = true;
 			progressBarField.Enabled = true;
-			bundlePicker.Enabled = true;
-			EnableChildren(bundlePicker, value);
+			bundlePickerWidget.Enabled = true;
+			EnableChildren(bundlePickerWidget, value);
 		}
 
 		private void EnableChildren(Widget widget, bool value)
@@ -292,6 +309,14 @@ namespace Orange
 			platformPicker.Reload();
 			AssetCooker.BeginCookBundles += () => abortButton.Enabled = true;
 			AssetCooker.EndCookBundles += () => abortButton.Enabled = false;
+		}
+
+		public override void ReloadBundlePicker()
+		{
+			base.ReloadBundlePicker();
+			BundlePicker.Instance.Setup();
+			bundlePickerWidget.CreateBundlesList();
+			UpdateBundlePicker(The.Workspace.BundlePickerVisible);
 		}
 
 		public override void ClearLog()
@@ -339,6 +364,7 @@ namespace Orange
 				letterUsedCount[insertionPoints[0].Key]++;
 				actionsCommand.Menu.Add(new Command(labelWithAmpersand, () => { Execute(menuItem.Action); }));
 			}
+            OnActionChanged(null);
 		}
 
 		public override bool AskConfirmation(string text)
@@ -394,7 +420,7 @@ namespace Orange
 		public override void SaveToWorkspaceConfig(ref WorkspaceConfig config)
 		{
 			config.ActiveTargetIndex = platformPicker.Index;
-			config.BundlePickerVisible = bundlePicker.Visible;
+			config.BundlePickerVisible = bundlePickerWidget.Visible;
 			if (window.State != WindowState.Minimized) {
 				config.ClientPosition = window.ClientPosition;
 				config.ClientSize = window.ClientSize;
@@ -423,6 +449,148 @@ namespace Orange
 			}
 			UpdateCacheModeCheckboxes(config.AssetCacheMode);
 			UpdateBundlePicker(config.BundlePickerVisible);
+		}
+
+		private class BundlePickerWidget : Widget
+		{
+			private static ThemedEditBox filter;
+			private static ThemedScrollView scrollView;
+			private static ThemedButton selectButton;
+			private static Dictionary<string, ThemedCheckBox> checkboxes;
+			private static Dictionary<string, Widget> lines;
+
+            /// <summary>
+			/// Creates basic UI elements, but lefts bundle list empty. To fill it, call <see cref="CreateBundlesList"/>
+			/// </summary>
+			public BundlePickerWidget()
+			{
+				Layout = new VBoxLayout {
+					Spacing = 6
+				};
+				MaxWidth = 250f;
+
+				checkboxes = new Dictionary<string, ThemedCheckBox>();
+				lines = new Dictionary<string, Widget>();
+				scrollView = new ThemedScrollView();
+				scrollView.CompoundPostPresenter.Add(new WidgetBoundsPresenter(Lime.Theme.Colors.ControlBorder));
+				scrollView.Content.Layout = new VBoxLayout {
+					Spacing = 6
+				};
+				scrollView.Content.Padding = new Thickness(6);
+				scrollView.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.White));
+
+				selectButton = new ThemedButton {
+					Text = "Select all",
+					Clicked = SelectButtonClickHandler
+				};
+
+				filter = new ThemedEditBox();
+				filter.Tasks.Add(FilterBundlesTask);
+				AddNode(filter);
+				AddNode(scrollView);
+				var buttonLine = new Widget {
+					Layout = new HBoxLayout {
+						Spacing = 6
+					}
+				};
+				AddNode(buttonLine);
+				buttonLine.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = float.MaxValue }, MaxHeight = 0 });
+				buttonLine.AddNode(selectButton);
+				selectButton.Tasks.Add(UpdateTextOfSelectButton());
+			}
+
+            /// <summary>
+			/// Fills bundle list with bundles for current active project
+			/// </summary>
+			public void CreateBundlesList()
+			{
+				if (scrollView.Content.Nodes.Count > 0) {
+					scrollView.Content.Nodes.Clear();
+				}
+				foreach (var bundle in BundlePicker.Instance.GetSelectedBundles()) {
+					checkboxes[bundle] = new ThemedCheckBox();
+					lines[bundle] = new Widget {
+						Layout = new HBoxLayout {
+							Spacing = 8
+						},
+						Nodes = {
+						checkboxes[bundle],
+						new ThemedSimpleText(bundle) {
+							HitTestTarget = true,
+							Clicked = () => {
+								if (checkboxes[bundle].GloballyEnabled) {
+									checkboxes[bundle].Toggle();
+									BundlePicker.Instance.SetBundleSelection(bundle, checkboxes[bundle].Checked);
+								}
+							}
+						}
+					}
+					};
+					scrollView.Content.AddNode(lines[bundle]);
+					checkboxes[bundle].Checked = true;
+					checkboxes[bundle].Changed += args => BundlePicker.Instance.SetBundleSelection(bundle, checkboxes[bundle].Checked);
+				}
+			}
+
+			/// <summary>
+			/// Marks all bundles as selected
+			/// </summary>
+			public void SelectAll()
+            {
+	            foreach (var bundle in checkboxes.Keys) {
+		            checkboxes[bundle].Checked = true;
+		            BundlePicker.Instance.SetBundleSelection(bundle, true);
+				}
+            }
+
+			private void SelectButtonClickHandler()
+			{
+				var deselect = true;
+				foreach (var bundle in checkboxes.Keys) {
+					if (!checkboxes[bundle].Checked) {
+						deselect = false;
+					}
+				}
+				foreach (var bundle in checkboxes.Keys) {
+					checkboxes[bundle].Checked = !deselect;
+					BundlePicker.Instance.SetBundleSelection(bundle, !deselect);
+				}
+			}
+
+			private IEnumerator<object> UpdateTextOfSelectButton()
+			{
+				while (true) {
+					var allChecked = true;
+					foreach (var bundle in checkboxes.Keys) {
+						if (!checkboxes[bundle].Checked) {
+							allChecked = false;
+						}
+					}
+					if (allChecked) {
+						selectButton.Text = "Deselect all";
+					}
+					else {
+						selectButton.Text = "Select all";
+					}
+					yield return null;
+				}
+			}
+
+			private IEnumerator<object> FilterBundlesTask()
+			{
+				var lastText = string.Empty;
+				while (true) {
+					var text = filter.Text;
+					if (text == lastText) {
+						yield return null;
+					}
+					lastText = text;
+					foreach (var bundle in lines.Keys) {
+						lines[bundle].Visible = bundle.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+					}
+					yield return null;
+				}
+			}
 		}
 
 		private class TextViewWriter : TextWriter

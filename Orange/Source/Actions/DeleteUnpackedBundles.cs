@@ -7,6 +7,7 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Delete Unpacked Bundles")]
 		[ExportMetadata("Priority", 31)]
-		public static void DeleteUnpackedBundlesAction() => AssetsUnpacker.Delete(The.UI.GetActiveTarget());
+		[ExportMetadata("ApplicableToBundlesSubset", true)]
+		public static void DeleteUnpackedBundlesAction() => AssetsUnpacker.Delete(The.UI.GetActiveTarget(), BundlePicker.Instance.GetSelectedBundles());
 	}
 }

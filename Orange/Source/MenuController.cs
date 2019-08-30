@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,12 +9,14 @@ namespace Orange
 		public string Label;
 		public Func<string> Action;
 		public int Priority;
+		public bool ApplicableToBundlesSubset;
 
-		public MenuItem(Func<string> action, string label, int priority)
+		public MenuItem(Func<string> action, string label, int priority, bool applicableToBundlesSubset)
 		{
 			Label = label;
 			Action = action;
 			Priority = priority;
+			ApplicableToBundlesSubset = applicableToBundlesSubset;
 		}
 
 	}
@@ -43,7 +45,8 @@ namespace Orange
 						menuItem.Value();
 						return null;
 					}, menuItem.Metadata.Label,
-					menuItem.Metadata.Priority)
+					menuItem.Metadata.Priority,
+					menuItem.Metadata.ApplicableToBundlesSubset)
 				);
 			}
 			foreach (Lazy<Func<string>, IMenuItemMetadata> menuItem in PluginLoader.CurrentPlugin?.MenuItemsWithErrorDetails)
@@ -51,7 +54,8 @@ namespace Orange
 				Items.Add(new MenuItem(
 					menuItem.Value, 
 					menuItem.Metadata.Label,
-					menuItem.Metadata.Priority)
+					menuItem.Metadata.Priority,
+					menuItem.Metadata.ApplicableToBundlesSubset)
 				);
 			}
 			The.UI.RefreshMenu();

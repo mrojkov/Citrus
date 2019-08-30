@@ -221,7 +221,7 @@
     <Compile Include="Source\Toolbox\Process.cs" />
     <Compile Include="Source\Toolbox\Subversion.cs" />
     <Compile Include="Source\Toolbox\Toolbox.cs" />
-    <Compile Include="Source\UI\BundlePicker.cs" />
+    <Compile Include="Source\BundlePicker.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
     <Compile Include="Source\Updater.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />

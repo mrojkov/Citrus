@@ -230,9 +230,9 @@
     <Compile Include="Source\AssetCooker\CookStages\SyncTxtAssets.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncUpdated.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
-    <Compile Include="Source\UI\BundlePicker.cs" />
     <Compile Include="Source\Actions\UploadCacheToServer.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
+    <Compile Include="Source\BundlePicker.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
     <Compile Include="Source\Actions\ResaveAllScenes.cs" />
   </ItemGroup>

@@ -11,22 +11,25 @@ namespace Orange
 	{
 		private const string UnpackedSuffix = ".Unpacked";
 
-		public static void Unpack(Target target) => Unpack(target.Platform, new AssetCooker(target).GetListOfAllBundles());
-
-		public static void Unpack(TargetPlatform platform, List<string> bundles)
+		public static void Unpack(Target target, List<string> bundles = null)
 		{
-			The.UI.SetupProgressBar(GetAssetsToRevealCount(platform, bundles));
+			if (bundles == null) {
+				bundles = new AssetCooker(target).GetListOfAllBundles();
+			}
+			The.UI.SetupProgressBar(GetAssetsToRevealCount(target.Platform, bundles));
 			foreach (var bundleName in bundles) {
-				string bundlePath = The.Workspace.GetBundlePath(platform, bundleName);
-				UnpackBundle(platform, bundlePath);
+				string bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName);
+				UnpackBundle(target.Platform, bundlePath);
 			}
 			The.UI.StopProgressBar();
 		}
 
-		public static void Delete(Target target)
+		public static void Delete(Target target, IEnumerable<string> bundles = null)
 		{
-			var bundles = new AssetCooker(target).GetListOfAllBundles();
-			The.UI.SetupProgressBar(bundles.Count);
+			if (bundles == null) {
+				bundles = new AssetCooker(target).GetListOfAllBundles();
+			}
+			The.UI.SetupProgressBar(bundles.Count());
 			foreach (var bundleName in bundles) {
 				string bundlePath = The.Workspace.GetBundlePath(target.Platform, bundleName) + UnpackedSuffix;
 				DeleteBundle(bundlePath);

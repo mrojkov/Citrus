@@ -7,11 +7,12 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Cook Game Assets")]
 		[ExportMetadata("Priority", 4)]
+		[ExportMetadata("ApplicableToBundlesSubset", true)]
 		public static void CookGameAssetsAction()
 		{
 			var target = The.UI.GetActiveTarget();
 
-			AssetCooker.CookForTarget(target);
+			AssetCooker.CookForTarget(target, BundlePicker.Instance.GetSelectedBundles());
 		}
 	}
 }

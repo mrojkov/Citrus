@@ -151,7 +151,7 @@ namespace Orange
 				LoadCacheSettings();
 				TangerineCacheBundle = GetTangerineCacheBundlePath();
 				The.UI.OnWorkspaceOpened();
-				The.UI.CreateBundlesList();
+				The.UI.ReloadBundlePicker();
 			}
 			catch (System.Exception e) {
 				Console.WriteLine($"Can't open {file}:\n{e.Message}");
