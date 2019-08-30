@@ -88,6 +88,11 @@ namespace Orange
 		private const string OrangeAndTangerineField = "OrangeAndTangerine";
 		private const string OrangeField = "Orange";
 		private const string TangerineField = "Tangerine";
+#if DEBUG
+		private const string pluginConfiguration = BuildConfiguration.Debug;
+#else
+		private const string pluginConfiguration = BuildConfiguration.Release;
+#endif
 
 		static PluginLoader()
 		{
@@ -120,34 +125,20 @@ namespace Orange
 		public static void ScanForPlugins(string citrusProjectFile)
 		{
 			var pluginRoot = Path.ChangeExtension(citrusProjectFile, ".OrangePlugin");
-#if DEBUG
-			var pluginConfiguration = BuildConfiguration.Debug;
-#else
-			var pluginConfiguration = BuildConfiguration.Release;
-#endif
 			CurrentPluginDirectory = Path.Combine(pluginRoot, "bin", pluginConfiguration);
 			CurrentPlugin?.Finalize?.Invoke();
 			The.UI.DestroyPluginUI();
 			CurrentPlugin = new OrangePlugin();
 			ResetPlugins();
 			try {
-				The.Workspace.ProjectJson.JObject.TryGetValue(PluginsField, out var token);
-				if (token == null) {
-					throw new KeyNotFoundException($"Warning: Field '{PluginsField}' not found in {citrusProjectFile}");
-				}
-				(token as JObject).TryGetValue(OrangeAndTangerineField, out token);
-				if (token == null) {
-					throw new KeyNotFoundException($"Warning: Field '{OrangeAndTangerineField}' not found in '{PluginsField}' in {citrusProjectFile}");
-				}
-				var orangeAndTangerine = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{OrangeAndTangerineField}");
-				foreach (var path in orangeAndTangerine) {
-					TryLoadAssembly(path, pluginConfiguration);
+				foreach (var path in EnumerateOrangeAndTangerinePluginAssemblyPaths(citrusProjectFile)) {
+					TryLoadAssembly(path);
 				}
 #if TANGERINE
 				var tangerine = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{TangerineField}");
 				if (tangerine != null) {
 					foreach (var path in tangerine) {
-						TryLoadAssembly(path, pluginConfiguration);
+						TryLoadAssembly(path);
 					}
 					if (tangerine.Length > 0) {
 						Console.WriteLine("Tangerine specific assemblies loaded successfully");
@@ -159,7 +150,7 @@ namespace Orange
 				var orange = The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{OrangeField}");
 				if (orange != null) {
 					foreach (var path in orange) {
-						TryLoadAssembly(path, pluginConfiguration);
+						TryLoadAssembly(path);
 					}
 					if (orange.Length > 0) {
 						Console.WriteLine("Orange specific assemblies loaded successfully");
@@ -188,14 +179,31 @@ namespace Orange
 			The.MenuController.CreateAssemblyMenuItems();
 		}
 
-		private static void TryLoadAssembly(string path, string pluginConfiguration)
+		public static IEnumerable<Assembly> EnumerateOrangeAndTangerinePluginAssemblies() =>
+			EnumerateOrangeAndTangerinePluginAssemblyPaths(The.Workspace.ProjectFile)
+			.Select(s => PluginLoader.TryLoadAssembly(s));
+
+		private static IEnumerable<string> EnumerateOrangeAndTangerinePluginAssemblyPaths(string citrusProjectFile)
 		{
-			if (!path.Contains("$(CONFIGURATION)")) {
+			The.Workspace.ProjectJson.JObject.TryGetValue(PluginsField, out var token);
+			if (token == null) {
+				throw new KeyNotFoundException($"Warning: Field '{PluginsField}' not found in {citrusProjectFile}");
+			}
+				(token as JObject).TryGetValue(OrangeAndTangerineField, out token);
+			if (token == null) {
+				throw new KeyNotFoundException($"Warning: Field '{OrangeAndTangerineField}' not found in '{PluginsField}' in {citrusProjectFile}");
+			}
+			return The.Workspace.ProjectJson.GetArray<string>($"{PluginsField}/{OrangeAndTangerineField}");
+		}
+
+		private static Assembly TryLoadAssembly(string assemblyPath)
+		{
+			if (!assemblyPath.Contains("$(CONFIGURATION)")) {
 				Console.WriteLine(
 					"Warning: Using '$(CONFIGURATION)' instead of 'Debug' or 'Release' in dll path" +
-					$" is strictly recommended ($(CONFIGURATION) line not found in {path}");
+					$" is strictly recommended ($(CONFIGURATION) line not found in {assemblyPath}");
 			}
-			var assemblyPath = path.Replace("$(CONFIGURATION)", pluginConfiguration);
+			assemblyPath = assemblyPath.Replace("$(CONFIGURATION)", pluginConfiguration);
 #if TANGERINE
 			assemblyPath = assemblyPath.Replace("$(HOST_APPLICATION)", "Tangerine");
 #else
@@ -229,6 +237,7 @@ namespace Orange
 				throw new System.Exception(msg);
 			}
 			resolvedAssemblies[assembly.GetName().Name] = assembly;
+			return assembly;
 		}
 
 		public static void AfterAssetUpdated(Lime.AssetBundle bundle, CookingRules cookingRules, string path)
@@ -305,6 +314,7 @@ namespace Orange
 		private static readonly Dictionary<string, Assembly> resolvedAssemblies = new Dictionary<string, Assembly>();
 		public static IEnumerable<Type> EnumerateTangerineExportedTypes()
 		{
+			// TODO: use only citproj as source of assemblies with exported types?
 			var requiredAssemblies = CurrentPlugin?.GetRequiredAssemblies;
 			if (requiredAssemblies != null) {
 				foreach (var name in requiredAssemblies()) {
