@@ -30,8 +30,9 @@ namespace Tangerine
 			Orange.UserInterface.Instance = new OrangeInterface();
 			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
-			TangerineYuzu.Instance.Value.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
-			Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
+			Lime.Yuzu.ExtendDeserializers += (deserializerBuilders) => {
+				deserializerBuilders.Insert(0, DeserializeHotStudioAssets);
+			};
 
 			if (!UserPreferences.Initialize()) {
 				UserPreferences.Instance.Clear();
