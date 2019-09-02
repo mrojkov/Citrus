@@ -17,7 +17,7 @@ namespace Lime
 		private readonly ShaderParamKey<float> stretchParamKey;
 
 		public float Angle { get; set; }
-		public BlendMode BlendMode { get; set; } = BlendMode.Normal;
+		public GradientMaterialBlendMode BlendMode { get; set; } = GradientMaterialBlendMode.Normal;
 		public Texture2D GradientTexture { get; private set; }
 
 		public Func<BlendState> BlendStateGetter;
@@ -94,7 +94,7 @@ namespace Lime
 		}
 	}
 
-	public enum BlendMode
+	public enum GradientMaterialBlendMode
 	{
 		Normal,
 		Dissolve,
@@ -117,11 +117,11 @@ namespace Lime
 	{
 		private static GradientShaderProgram instance;
 		private static readonly Dictionary<int, GradientShaderProgram> instances =
-			new Dictionary<int, GradientShaderProgram>(Enum.GetNames(typeof(BlendMode)).Length);
+			new Dictionary<int, GradientShaderProgram>(Enum.GetNames(typeof(GradientMaterialBlendMode)).Length);
 
-		private static int GetInstanceKey(BlendMode blend) => (int)blend;
+		private static int GetInstanceKey(GradientMaterialBlendMode blend) => (int)blend;
 
-		public static GradientShaderProgram GetInstance(BlendMode blend)
+		public static GradientShaderProgram GetInstance(GradientMaterialBlendMode blend)
 		{
 			var key = GetInstanceKey(blend);
 			return
@@ -245,58 +245,58 @@ namespace Lime
 
 		// More about blending: https://photoblogstop.com/photoshop/photoshop-blend-modes-explained#BlendModeDescriptions
 
-		private GradientShaderProgram(BlendMode blend)
+		private GradientShaderProgram(GradientMaterialBlendMode blend)
 			: base(CreateShaders(blend), ShaderPrograms.Attributes.GetLocations(), ShaderPrograms.GetSamplers()) { }
 
-		private static Shader[] CreateShaders(BlendMode blend)
+		private static Shader[] CreateShaders(GradientMaterialBlendMode blend)
 		{
 			var fragmentShader = new StringBuilder(FragmentShader, FragmentShader.Length + FragmentBlendNormal.Length);
 
-			if (blend == BlendMode.Normal) {
+			if (blend == GradientMaterialBlendMode.Normal) {
 				fragmentShader.Append(FragmentBlendNormal);
 			} else {
 				fragmentShader.Append(FragmentFetchOriginalTexture);
 				switch (blend) {
-					case BlendMode.Dissolve:
+					case GradientMaterialBlendMode.Dissolve:
 						fragmentShader.Append(FragmentBlendDissolve);
 						break;
-					case BlendMode.Multiply:
+					case GradientMaterialBlendMode.Multiply:
 						fragmentShader.Append(FragmentBlendMultiply);
 						break;
-					case BlendMode.LinearBurn:
+					case GradientMaterialBlendMode.LinearBurn:
 						fragmentShader.Append(FragmentBlendLinearBurn);
 						break;
-					case BlendMode.ColorBurn:
+					case GradientMaterialBlendMode.ColorBurn:
 						fragmentShader.Append(FragmentBlendColorBurn);
 						break;
-					case BlendMode.ColorDodge:
+					case GradientMaterialBlendMode.ColorDodge:
 						fragmentShader.Append(FragmentBlendColorDodge);
 						break;
-					case BlendMode.Addition:
+					case GradientMaterialBlendMode.Addition:
 						fragmentShader.Append(FragmentBlendAddition);
 						break;
-					case BlendMode.Subtract:
+					case GradientMaterialBlendMode.Subtract:
 						fragmentShader.Append(FragmentBlendSubtract);
 						break;
-					case BlendMode.Divide:
+					case GradientMaterialBlendMode.Divide:
 						fragmentShader.Append(FragmentBlendDivide);
 						break;
-					case BlendMode.Difference:
+					case GradientMaterialBlendMode.Difference:
 						fragmentShader.Append(FragmentBlendDifference);
 						break;
-					case BlendMode.Exclusion:
+					case GradientMaterialBlendMode.Exclusion:
 						fragmentShader.Append(FragmentBlendExclusion);
 						break;
-					case BlendMode.Screen:
+					case GradientMaterialBlendMode.Screen:
 						fragmentShader.Append(FragmentBlendScreen);
 						break;
-					case BlendMode.Overlay:
+					case GradientMaterialBlendMode.Overlay:
 						fragmentShader.Append(FragmentBlendOverlay);
 						break;
-					case BlendMode.Lighten:
+					case GradientMaterialBlendMode.Lighten:
 						fragmentShader.Append(FragmentBlendLighten);
 						break;
-					case BlendMode.Darken:
+					case GradientMaterialBlendMode.Darken:
 						fragmentShader.Append(FragmentBlendDarken);
 						break;
 					default:

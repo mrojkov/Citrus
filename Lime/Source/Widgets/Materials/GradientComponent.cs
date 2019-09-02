@@ -15,7 +15,7 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public BlendMode BlendMode
+		public GradientMaterialBlendMode BlendMode
 		{
 			get => CustomMaterial.BlendMode;
 			set => CustomMaterial.BlendMode = value;
