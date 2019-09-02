@@ -1,12 +1,10 @@
 using System;
-using System.Reflection;
 
-using Yuzu;
 using Yuzu.Binary;
 
-namespace GeneratedDeserializersBIN
+namespace YuzuGenerated
 {
-	public class BinaryDeserializerGen: BinaryDeserializerGenBase
+	public class LimeDeserializer: BinaryDeserializerGenBase
 	{
 		private static object Make_Lime__Alignment(BinaryDeserializer d, ReaderClassDef def)
 		{
@@ -19,7 +17,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__AlphaIntensityComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.AlphaIntensityComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -54,7 +52,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animation(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animation)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -112,7 +110,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animation__AnimationData(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animation.AnimationData)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -138,7 +136,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__AnimationBlender(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.AnimationBlender)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -166,7 +164,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__AnimationBlending(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.AnimationBlending)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -200,7 +198,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__AnimationClip(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.AnimationClip)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -245,7 +243,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__AnimationTrack(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.AnimationTrack)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -294,7 +292,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Alignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Alignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -330,7 +328,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Anchors(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Anchors>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -366,7 +364,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_AudioAction(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.AudioAction>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -402,7 +400,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Blending(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Blending>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -438,7 +436,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_ClipMethod(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.ClipMethod>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -474,7 +472,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Color4(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Color4>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -510,7 +508,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_EmissionType(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.EmissionType>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -546,7 +544,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_EmitterShape(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.EmitterShape>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -582,7 +580,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_HAlignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.HAlignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -618,7 +616,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_ITexture(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.ITexture>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -654,7 +652,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_LayoutDirection(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.LayoutDirection>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -690,7 +688,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Matrix44(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Matrix44>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -726,7 +724,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_MovieAction(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.MovieAction>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -762,7 +760,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NodeReference_Camera3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NodeReference<global::Lime.Camera3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -798,7 +796,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NodeReference_Node3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NodeReference<global::Lime.Node3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -834,7 +832,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NodeReference_Spline(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NodeReference<global::Lime.Spline>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -870,7 +868,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NodeReference_Spline3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NodeReference<global::Lime.Spline3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -906,7 +904,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NodeReference_Widget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NodeReference<global::Lime.Widget>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -942,7 +940,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_NumericRange(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.NumericRange>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -978,7 +976,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_ParticlesLinkage(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.ParticlesLinkage>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1014,7 +1012,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Quaternion(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Quaternion>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1050,7 +1048,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_RenderTarget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.RenderTarget>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1086,7 +1084,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_SerializableFont(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.SerializableFont>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1122,7 +1120,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_SerializableSample(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.SerializableSample>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1158,7 +1156,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_ShaderId(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.ShaderId>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1194,7 +1192,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_TextOverflowMode(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.TextOverflowMode>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1230,7 +1228,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Thickness(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Thickness>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1266,7 +1264,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_VAlignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.VAlignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1302,7 +1300,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Vector2(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Vector2>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1338,7 +1336,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Vector3(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<global::Lime.Vector3>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1374,7 +1372,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Boolean(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<bool>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1410,7 +1408,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Int32(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<int>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1446,7 +1444,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<float>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1482,7 +1480,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Animator_String(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<string>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1518,7 +1516,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Audio(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Audio)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1658,7 +1656,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__BlendingOption(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.BlendingOption)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1678,7 +1676,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Bone(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Bone)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1817,7 +1815,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__BoneArray(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.BoneArray();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1847,7 +1845,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__BoundingSphere(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.BoundingSphere();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -1868,7 +1866,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Bounds(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Bounds();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			dg.EnsureClassDef(typeof(global::Lime.Vector3));
 			result.A.X = d.Reader.ReadSingle();
 			result.A.Y = d.Reader.ReadSingle();
@@ -1883,7 +1881,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Button(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Button)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2056,7 +2054,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Camera3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Camera3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2217,7 +2215,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Color4Animator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Color4Animator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2253,7 +2251,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__CommonMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.CommonMaterial)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2320,7 +2318,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__DefaultLayoutCell(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.DefaultLayoutCell)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2364,7 +2362,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__DissolveComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.DissolveComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2403,7 +2401,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__DistortionMesh(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.DistortionMesh)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2579,7 +2577,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__DistortionMeshPoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.DistortionMeshPoint)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2701,7 +2699,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__EmitterShapePoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.EmitterShapePoint)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2800,7 +2798,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Font(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Font)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2845,7 +2843,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__FontChar(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.FontChar)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -2915,7 +2913,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Frame(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Frame)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3087,7 +3085,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__GradientComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.GradientComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3123,7 +3121,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__GradientControlPoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.GradientControlPoint)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3150,7 +3148,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__HBoxLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.HBoxLayout)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3182,7 +3180,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__HSLComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.HSLComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3210,7 +3208,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Image(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Image)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3394,7 +3392,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ImageCombiner(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ImageCombiner)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3497,7 +3495,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__IntAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.IntAnimator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3533,7 +3531,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__IntRectangle(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.IntRectangle();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			dg.EnsureClassDef(typeof(global::Lime.IntVector2));
 			result.A.X = d.Reader.ReadInt32();
 			result.A.Y = d.Reader.ReadInt32();
@@ -3554,7 +3552,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__KerningPair(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.KerningPair();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -3572,7 +3570,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Alignment(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Alignment>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Alignment));
@@ -3652,7 +3650,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Color4(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Color4>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Color4));
@@ -3716,7 +3714,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_ITexture(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.ITexture>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
@@ -3747,7 +3745,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Matrix44(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Matrix44>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Matrix44));
@@ -3796,7 +3794,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NodeReference_Camera3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Camera3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Camera3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Camera3D>>();
@@ -3812,7 +3810,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NodeReference_Node3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Node3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Node3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Node3D>>();
@@ -3828,7 +3826,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NodeReference_Spline(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Spline>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Spline>>();
@@ -3844,7 +3842,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NodeReference_Spline3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline3D>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Spline3D>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Spline3D>>();
@@ -3860,7 +3858,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NodeReference_Widget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Widget>>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NodeReference<global::Lime.Widget>)dg.ReadObject<global::Lime.NodeReference<global::Lime.Widget>>();
@@ -3876,7 +3874,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_NumericRange(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.NumericRange>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.NumericRange)dg.ReadStruct<global::Lime.NumericRange>();
@@ -3907,7 +3905,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Quaternion(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Quaternion>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Quaternion));
@@ -3944,7 +3942,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_SerializableFont(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.SerializableFont>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.SerializableFont)dg.ReadObject<global::Lime.SerializableFont>();
@@ -3960,7 +3958,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_SerializableSample(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.SerializableSample>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			result.Value = (global::Lime.SerializableSample)dg.ReadObject<global::Lime.SerializableSample>();
@@ -4006,7 +4004,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Thickness(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Thickness>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Thickness));
@@ -4043,7 +4041,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Vector2(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Vector2>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector2));
@@ -4063,7 +4061,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Keyframe_Vector3(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<global::Lime.Vector3>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			result.Frame = d.Reader.ReadInt32();
 			result.PackedParams = d.Reader.ReadInt32();
 			dg.EnsureClassDef(typeof(global::Lime.Vector3));
@@ -4145,7 +4143,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__LayoutCell(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.LayoutCell)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4189,7 +4187,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__LayoutConstraints(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.LayoutConstraints)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4221,7 +4219,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__LinearLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.LinearLayout)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4253,7 +4251,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Marker(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Marker)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4297,7 +4295,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__MarkerBlending(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.MarkerBlending)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4331,7 +4329,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Matrix32(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Matrix32();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			dg.EnsureClassDef(typeof(global::Lime.Vector2));
 			result.U.X = d.Reader.ReadSingle();
 			result.U.Y = d.Reader.ReadSingle();
@@ -4369,7 +4367,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Matrix44Animator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Matrix44Animator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4405,7 +4403,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Mesh_Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Mesh<global::Lime.Mesh3D.Vertex>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4461,7 +4459,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Mesh3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Mesh3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4642,7 +4640,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Mesh3D__Vertex(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Mesh3D.Vertex();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4700,7 +4698,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4831,7 +4829,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachment__MaterialRemap(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachment.MaterialRemap)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4856,7 +4854,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__MeshOptionFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.MeshOptionFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4893,7 +4891,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__ModelAnimationFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.ModelAnimationFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -4966,7 +4964,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__ModelAttachmentFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.ModelAttachmentFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5083,7 +5081,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__ModelComponentsFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.ModelComponentsFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5120,7 +5118,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__ModelMarkerFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.ModelMarkerFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5168,7 +5166,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Model3DAttachmentParser__UVAnimationFormat(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Model3DAttachmentParser.UVAnimationFormat)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5228,7 +5226,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Movie(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Movie)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5401,7 +5399,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NineGrid(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NineGrid)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5585,7 +5583,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Node3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Node3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5715,7 +5713,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NodeReference_Camera3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NodeReference<global::Lime.Camera3D>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5736,7 +5734,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NodeReference_Spline(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NodeReference<global::Lime.Spline>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5757,7 +5755,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NodeReference_Widget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NodeReference<global::Lime.Widget>)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5778,7 +5776,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NumericAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NumericAnimator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5814,7 +5812,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__NumericRange(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.NumericRange();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5832,7 +5830,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__NumericRangeAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NumericRangeAnimator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -5868,7 +5866,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ParticleEmitter(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ParticleEmitter)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6137,7 +6135,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ParticleModifier(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ParticleModifier)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6291,7 +6289,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ParticlesMagnet(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ParticlesMagnet)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6467,7 +6465,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Plane(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Plane();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6488,7 +6486,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__PointObject(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.PointObject)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6587,7 +6585,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Polyline(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Polyline)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6763,7 +6761,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__PolylinePoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.PolylinePoint)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -6862,7 +6860,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__PostProcessingComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.PostProcessingComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7126,7 +7124,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__QuaternionAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.QuaternionAnimator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7162,7 +7160,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__Ray(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.Ray();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7196,7 +7194,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime_RenderOptimizer__ContentBox(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.RenderOptimizer.ContentBox)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7224,7 +7222,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime_RenderOptimizer__ContentPlane(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.RenderOptimizer.ContentPlane)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7252,7 +7250,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime_RenderOptimizer__ContentRectangle(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.RenderOptimizer.ContentRectangle)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7276,7 +7274,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime_RenderOptimizer__ContentSizeComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.RenderOptimizer.ContentSizeComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7296,7 +7294,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__RichText(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.RichText)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7481,7 +7479,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SerializableCompoundFont(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SerializableCompoundFont)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7508,7 +7506,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SerializableFont(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SerializableFont)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7529,7 +7527,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SerializableSample(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SerializableSample)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7550,7 +7548,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SerializableTexture(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SerializableTexture)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7571,7 +7569,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ShadowParams(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ShadowParams)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7614,7 +7612,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SignedDistanceFieldComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SignedDistanceFieldComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7699,7 +7697,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SimpleText(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SimpleText)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -7923,7 +7921,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SkinningWeights(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SkinningWeights)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			dg.EnsureClassDef(typeof(global::Lime.BoneWeight));
 			result.Bone0.Index = d.Reader.ReadInt32();
 			result.Bone0.Weight = d.Reader.ReadSingle();
@@ -7948,7 +7946,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Slider(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Slider)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8128,7 +8126,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Spline(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Spline)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8296,7 +8294,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Spline3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Spline3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8430,7 +8428,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SplineGear(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SplineGear)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8533,7 +8531,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SplineGear3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SplineGear3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8632,7 +8630,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SplinePoint(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SplinePoint)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8743,7 +8741,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__SplinePoint3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.SplinePoint3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8861,7 +8859,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__StackLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.StackLayout)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8893,7 +8891,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Submesh3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Submesh3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -8938,7 +8936,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__TableLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.TableLayout)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9002,7 +9000,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__TextStyle(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.TextStyle)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9155,7 +9153,7 @@ namespace GeneratedDeserializersBIN
 		private static object Make_Lime__TextureAtlasElement__Params(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.TextureAtlasElement.Params();
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9180,7 +9178,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__TextureParams(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.TextureParams)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9226,7 +9224,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__ThicknessAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.ThicknessAnimator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9262,7 +9260,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__TiledImage(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.TiledImage)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9450,7 +9448,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__TwistComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.TwistComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9470,7 +9468,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__VBoxLayout(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.VBoxLayout)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9510,7 +9508,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Vector2Animator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Vector2Animator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9555,7 +9553,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Vector3Animator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Vector3Animator)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9601,7 +9599,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__VideoPlayer(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.VideoPlayer)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9785,7 +9783,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Viewport3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Viewport3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -9957,7 +9955,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__WaveComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.WaveComponent)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -10009,7 +10007,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__Widget(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Widget)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -10173,7 +10171,7 @@ namespace GeneratedDeserializersBIN
 		private static void Read_Lime__WidgetAdapter3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.WidgetAdapter3D)obj;
-			var dg = (BinaryDeserializerGen)d;
+			var dg = (LimeDeserializer)d;
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
@@ -10300,7 +10298,7 @@ namespace GeneratedDeserializersBIN
 			return result;
 		}
 
-		static BinaryDeserializerGen()
+		static LimeDeserializer()
 		{
 			readCache[typeof(global::Lime.AlphaIntensityComponent)] = Read_Lime__AlphaIntensityComponent;
 			readCache[typeof(global::Lime.Animation)] = Read_Lime__Animation;

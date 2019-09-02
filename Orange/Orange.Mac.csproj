@@ -178,8 +178,6 @@
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
     <Compile Include="Source\Git.cs" />
     <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
-    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
-    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
     <Compile Include="Source\Actions\RunTangerine.cs" />
     <Compile Include="Source\Nuget\Nuget.cs" />
@@ -235,6 +233,7 @@
     <Compile Include="Source\Actions\CookOrRevealSelectedBundles.cs" />
     <Compile Include="Source\Actions\BuildGame.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
+    <Compile Include="Source\Actions\GenerateDeserializers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">

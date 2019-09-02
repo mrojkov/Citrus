@@ -32,7 +32,7 @@ namespace Lime
 		{
 			DeserializerBuilders.Add(
 				(path, stream) => CheckBinarySignature(stream)
-					? new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = YuzuCommonOptions }
+					? new YuzuGenerated.LimeDeserializer { Options = YuzuCommonOptions }
 					: null
 			);
 			DeserializerBuilders.Add(
