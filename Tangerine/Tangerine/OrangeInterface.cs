@@ -44,11 +44,6 @@ namespace Tangerine
 			return PlatformPicker.SelectedTarget;
 		}
 
-		public override bool DoesNeedSvnUpdate()
-		{
-			return false;
-		}
-
 		public override IPluginUIBuilder GetPluginUIBuilder()
 		{
 			PluginUIBuilder = new OrangePluginUIBuilder();

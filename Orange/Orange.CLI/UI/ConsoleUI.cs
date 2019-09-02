@@ -77,11 +77,7 @@ namespace Orange
 				return;
 			}
 
-			OrangeActionsHelper.ExecuteOrangeActionInstantly(GetActiveTarget(), commandObj.Action, () => {
-				}, () => {
-				}, DoesNeedSvnUpdate,
-				null
-			);
+			OrangeActionsHelper.ExecuteOrangeActionInstantly(commandObj.Action, () => { }, () => { }, null);
 		}
 
 		private static void WriteHelpAndExit()
@@ -100,11 +96,6 @@ namespace Orange
 				}
 			}
 			throw new TerminateException(1);
-		}
-
-		public override bool DoesNeedSvnUpdate()
-		{
-			return Toolbox.GetCommandLineFlag("--autoupdate");
 		}
 
 		private static void CreateMenuItems()

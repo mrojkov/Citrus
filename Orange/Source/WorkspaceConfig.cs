@@ -14,9 +14,6 @@ namespace Orange
 		public int ActiveTargetIndex;
 
 		[YuzuMember]
-		public bool UpdateBeforeBuild;
-
-		[YuzuMember]
 		public Vector2 ClientSize;
 
 		[YuzuMember]

@@ -18,7 +18,6 @@ namespace Orange
 		private PluginPanel pluginPanel;
 		private ThemedTextView textView;
 		private TextWriter textWriter;
-		private CheckBoxWithLabel updateVcs;
 		private Button goButton;
 		private Button abortButton;
 		private Widget footerSection;
@@ -56,7 +55,6 @@ namespace Orange
 				}
 			};
 			mainVBox.AddNode(CreateHeaderSection());
-			mainVBox.AddNode(CreateVcsSection());
 			mainVBox.AddNode(CreateTextView());
 			progressBarField = new ProgressBarField();
 			mainVBox.AddNode(progressBarField);
@@ -124,12 +122,6 @@ namespace Orange
 			AddPicker(header, "Target platform", platformPicker = new PlatformPicker());
 			AddPicker(header, "Citrus Project", projectPicker = CreateProjectPicker());
 			return header;
-		}
-
-		private Widget CreateVcsSection()
-		{
-			updateVcs = new CheckBoxWithLabel("Update project before build");
-			return updateVcs;
 		}
 
 		private static void AddPicker(Node table, string name, Node picker)
@@ -229,7 +221,7 @@ namespace Orange
 
 		private IEnumerator<object> ExecuteTask(Func<string> action)
 		{
-			yield return OrangeActionsHelper.ExecuteOrangeAction(GetActiveTarget(), action, () => {
+			yield return OrangeActionsHelper.ExecuteOrangeAction(action, () => {
 				The.Workspace.Save();
 				EnableControls(false);
 				textView.Clear();
@@ -238,7 +230,7 @@ namespace Orange
 				if (textView.ScrollPosition == textView.MaxScrollPosition) {
 					The.UI.ScrollLogToEnd();
 				}
-			}, DoesNeedSvnUpdate,
+			},
 				Task.ExecuteAsync
 			);
 		}
@@ -344,11 +336,6 @@ namespace Orange
 			return platformPicker.SelectedTarget;
 		}
 
-		public override bool DoesNeedSvnUpdate()
-		{
-			return updateVcs.Checked;
-		}
-
 		public override IPluginUIBuilder GetPluginUIBuilder()
 		{
 			return new PluginUIBuidler();
@@ -375,7 +362,6 @@ namespace Orange
 
 		public override void SaveToWorkspaceConfig(ref WorkspaceConfig config)
 		{
-			config.UpdateBeforeBuild = DoesNeedSvnUpdate();
 			config.ActiveTargetIndex = platformPicker.Index;
 			if (window.State != WindowState.Minimized) {
 				config.ClientPosition = window.ClientPosition;
@@ -390,7 +376,6 @@ namespace Orange
 				newIndex = 0;
 			}
 			platformPicker.Index = newIndex;
-			updateVcs.CheckBox.Checked = config.UpdateBeforeBuild;
 			projectPicker.ChosenFile = config.CitrusProject;
 			if (config.ClientPosition.X < 0) {
 				config.ClientPosition.X = 0;
