@@ -139,7 +139,11 @@ namespace Tangerine.Core
 					registeredComponentTypes.Add(type);
 				}
 			}
-			PluginLoader.CurrentPlugin?.TangerineProjectOpened?.Invoke();
+			if (PluginLoader.CurrentPlugin != null) {
+				foreach(var action in PluginLoader.CurrentPlugin.TangerineProjectOpened) {
+					action?.Invoke();
+				}
+			}
 		}
 
 		public bool Close()
@@ -150,7 +154,11 @@ namespace Tangerine.Core
 			if (Current == Null) {
 				return true;
 			}
-			PluginLoader.CurrentPlugin?.TangerineProjectClosing?.Invoke();
+			if (PluginLoader.CurrentPlugin != null) {
+				foreach(var action in PluginLoader.CurrentPlugin.TangerineProjectClosing) {
+					action?.Invoke();
+				}
+			}
 			var modifiedDocuments = documents.Where(d => d.IsModified).ToList();
 			foreach (var d in modifiedDocuments) {
 				if (!d.Close()) {
