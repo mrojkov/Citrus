@@ -13,7 +13,7 @@ using Yuzu.Metadata;
 namespace Orange
 {
 	// NB: When packing textures into atlases, Orange chooses texture format with highest value
-	// amoung all atlas items.
+	// among all atlas items.
 	public enum PVRFormat
 	{
 		PVRTC4,
@@ -82,7 +82,7 @@ namespace Orange
 	public class ParticularCookingRules : ICookingRules
 	{
 		// NOTE: function `Override` uses the fact that rule name being parsed matches the field name
-		// for all fields marked with `YuzuOptional`. So don't rename them or do so with cautiousness.
+		// for all fields marked with `YuzuMember`. So don't rename them or do so with cautiousness.
 		// e.g. don't rename `Bundle` to `Bundles`
 
 		[YuzuMember]
@@ -271,7 +271,7 @@ namespace Orange
 			}
 		}
 
-		public CookingRules(Target target, bool initialize = true)
+		public CookingRules(bool initialize = true)
 		{
 			if (!initialize) {
 				return;
@@ -279,12 +279,12 @@ namespace Orange
 			foreach (var t in The.Workspace.Targets) {
 				TargetRules.Add(t, ParticularCookingRules.GetDefault(t.Platform));
 			}
-			CommonRules = ParticularCookingRules.GetDefault(target.Platform);
+			CommonRules = ParticularCookingRules.GetDefault(The.UI.GetActiveTarget().Platform);
 		}
 
-		public CookingRules InheritClone(Target target)
+		public CookingRules InheritClone()
 		{
-			var r = new CookingRules(target, false);
+			var r = new CookingRules(false);
 			r.Parent = this;
 			foreach (var kv in TargetRules) {
 				r.TargetRules.Add(kv.Key, kv.Value.InheritClone());
@@ -367,9 +367,6 @@ namespace Orange
 							break;
 					}
 				}
-				if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
-					EffectiveRules.TextureAtlas = null;
-				}
 			}
 			if (EffectiveRules.WrapMode != TextureWrapMode.Clamp) {
 				EffectiveRules.TextureAtlas = null;
@@ -401,7 +398,7 @@ namespace Orange
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>(StringComparer.OrdinalIgnoreCase);
 			pathStack.Push("");
-			var rootRules = new CookingRules(target);
+			var rootRules = new CookingRules();
 			rootRules.DeduceEffectiveRules(target);
 			rulesStack.Push(rootRules);
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
@@ -418,7 +415,7 @@ namespace Orange
 						rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, path);
 						rulesStack.Push(rules);
 						// Add 'ignore' cooking rules for this #CookingRules.txt itself
-						var ignoreRules = rules.InheritClone(target);
+						var ignoreRules = rules.InheritClone();
 						ignoreRules.Ignore = true;
 						map[path] = ignoreRules;
 						var directoryName = pathStack.Peek();
@@ -442,7 +439,7 @@ namespace Orange
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, target);
 							rules.SourceFilename = AssetPath.Combine(fileEnumerator.Directory, rulesFile);
 							// Add 'ignore' cooking rules for this cooking rules text file
-							var ignoreRules = rules.InheritClone(target);
+							var ignoreRules = rules.InheritClone();
 							ignoreRules.Ignore = true;
 							map[rulesFile] = ignoreRules;
 						}
@@ -539,7 +536,7 @@ namespace Orange
 
 		private static CookingRules ParseCookingRules(CookingRules basicRules, string path, Target target)
 		{
-			var rules = basicRules.InheritClone(target);
+			var rules = basicRules.InheritClone();
 			var currentRules = rules.CommonRules;
 			try {
 				rules.CommonRules.LastChangeTime = File.GetLastWriteTime(path);

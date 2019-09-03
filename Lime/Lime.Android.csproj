@@ -276,7 +276,6 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
-    <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
@@ -468,6 +467,7 @@
     <Compile Include="Source\Widgets\Materials\TwistMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\WaveComponent.cs" />
     <Compile Include="Source\Widgets\Materials\WaveMaterial.cs" />
+    <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

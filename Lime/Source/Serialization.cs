@@ -13,6 +13,7 @@ namespace Lime
 {
 	public class Yuzu
 	{
+		public static Action<List<Serialization.DeserializerBuilder>> ExtendDeserializers;
 		public static Yuzu Current => stackOfCurrent.Value.Count > 0 ? stackOfCurrent.Value.Peek() : null;
 		private static void PushCurrent(Yuzu yuzu) => stackOfCurrent.Value.Push(yuzu);
 		private static Yuzu PopCurrent() => stackOfCurrent.Value.Pop();
@@ -23,18 +24,24 @@ namespace Lime
 
 		private Stack<string> pathStack = new Stack<string>();
 
-		public readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
+		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
 
 		public UInt32 BinarySignature = 0xdeadbabe;
 
 		private Yuzu()
 		{
 			DeserializerBuilders.Add(
+				(path, stream) => CheckBinarySignature(stream)
+					? new YuzuGenerated.LimeDeserializer { Options = YuzuCommonOptions }
+					: null
+			);
+			DeserializerBuilders.Add(
 				(path, stream) => new global::Yuzu.Json.JsonDeserializer {
 					JsonOptions = YuzuJsonOptions,
 					Options = YuzuCommonOptions,
 				}
 			);
+			ExtendDeserializers?.Invoke(this.DeserializerBuilders);
 		}
 
 		public Yuzu(CommonOptions yuzuCommonOptions, JsonSerializeOptions yuzuJsonOptions) : this()
@@ -143,14 +150,10 @@ namespace Lime
 			PushCurrent(this);
 			try {
 				AbstractDeserializer d = null;
-				if (CheckBinarySignature(stream)) {
-					d = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = YuzuCommonOptions };
-				} else {
-					foreach (var db in DeserializerBuilders) {
-						d = db(path, stream);
-						if (d != null)
-							break;
-					}
+				foreach (var db in DeserializerBuilders) {
+					d = db(path, stream);
+					if (d != null)
+						break;
 				}
 				var bd = d as BinaryDeserializer;
 				if (obj == null) {
@@ -214,7 +217,7 @@ namespace Lime
 			bw.Write(BinarySignature);
 		}
 
-		private bool CheckBinarySignature(Stream s)
+		public bool CheckBinarySignature(Stream s)
 		{
 			UInt32 signature;
 			try {
@@ -241,7 +244,6 @@ namespace Lime
 			Binary
 		}
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
-		public static List<DeserializerBuilder> DeserializerBuilders => Yuzu.Instance.Value.DeserializerBuilders;
 		public static CommonOptions YuzuCommonOptions => Yuzu.Instance.Value.YuzuCommonOptions;
 
 		public static void WriteObject<T>(string path, Stream stream, T instance, Format format) => Yuzu.Instance.Value.WriteObject(path, stream, instance, format);
@@ -253,5 +255,6 @@ namespace Lime
 		public static T ReadObjectFromFile<T>(string path, object obj = null) => Yuzu.Instance.Value.ReadObjectFromFile<T>(path, obj);
 		public static int CalcObjectCheckSum<T>(string path, T obj) => Yuzu.Instance.Value.CalcObjectCheckSum(path, obj);
 		public static string GetCurrentSerializationPath() => Yuzu.Instance.Value.GetCurrentSerializationPath();
+		public static bool CheckBinarySignature(Stream s) => Yuzu.Instance.Value.CheckBinarySignature(s);
 	}
 }

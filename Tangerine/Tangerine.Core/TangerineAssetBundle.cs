@@ -123,7 +123,7 @@ namespace Tangerine.Core
 					cacheBundle.GetFileLastWriteTime(attachmentMetaPath) >= base.GetFileLastWriteTime(fbxPath);
 				if (!attachmentMetaUpToDate && fbxExists) {
 					using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
-						model = fbxImporter.LoadModel(target);
+						model = fbxImporter.LoadModel();
 						var meta = new Model3DAttachmentMeta();
 						foreach (var animation in model.Animations) {
 							meta.SourceAnimationIds.Add(animation.Id);
@@ -160,7 +160,7 @@ namespace Tangerine.Core
 				if (fbxExists) {
 					if (model == null) {
 						using (var fbxImporter = new FbxModelImporter(fbxImportOptions)) {
-							model = fbxImporter.LoadModel(target);
+							model = fbxImporter.LoadModel();
 						}
 					}
 					if (attachmentExists) {

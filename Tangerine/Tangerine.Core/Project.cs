@@ -455,7 +455,7 @@ namespace Tangerine.Core
 
 		private void UpdateTextureParams()
 		{
-			var rules = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles, Orange.The.UI.GetActiveTarget());
+			var rules = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles, null);
 			foreach (var kv in rules) {
 				var path = kv.Key;
 				var rule = kv.Value;

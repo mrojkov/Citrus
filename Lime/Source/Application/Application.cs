@@ -50,7 +50,7 @@ namespace Lime
 		public bool DecodeAudioInSeparateThread = false;
 		public int NumChannels = 24;
 #if iOS
-		public RenderingBackend RenderingBackend = 
+		public RenderingBackend RenderingBackend =
 			MetalGameView.IsMetalSupported() ? RenderingBackend.Vulkan : RenderingBackend.ES20;
 #else
 		public RenderingBackend RenderingBackend = RenderingBackend.ES20;

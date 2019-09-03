@@ -181,11 +181,10 @@
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\AnalyzeResources.cs" />
-    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\GenerateDeserializers.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
-    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\RunTangerine.cs" />
