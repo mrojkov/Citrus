@@ -39,8 +39,6 @@ namespace Orange
 
 		public virtual void OnWorkspaceOpened() { }
 
-		public abstract bool DoesNeedSvnUpdate();
-
 		public abstract IPluginUIBuilder GetPluginUIBuilder();
 
 		public abstract void CreatePluginUI(IPluginUIBuilder builder);
