@@ -31,7 +31,7 @@ namespace Orange
 				CookingRulesMap = AssetCooker.CookingRulesMap
 			};
 			using (var fbxImporter = new FbxModelImporter(options)) {
-				model = fbxImporter.LoadModel(AssetCooker.Target);
+				model = fbxImporter.LoadModel();
 			}
 			AssetAttributes assetAttributes;
 			switch (compression) {
