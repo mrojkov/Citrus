@@ -18,7 +18,6 @@ namespace Lime
 			: this()
 		{
 			AddToWidget(parentWidget);
-			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public WebBrowser()
@@ -35,6 +34,7 @@ namespace Lime
 			webView.LoadStarted += WebView_LoadStarted;
 			webView.LoadFinished += WebView_LoadFinished;
 			GameView.AddSubview(webView);
+			Components.Add(new UpdatableNodeBehavior());
 		}	
 
 		public void AddToWidget(Widget parentWidget)
