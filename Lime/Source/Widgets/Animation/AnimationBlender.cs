@@ -6,7 +6,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterComponent]
-	public class AnimationBlender : NodeComponent
+	public class AnimationBlender : BehaviorComponent
 	{
 		private Dictionary<string, BlendingProcess> blendings = new Dictionary<string, BlendingProcess>();
 
@@ -40,17 +40,17 @@ namespace Lime
 
 		public bool Enabled { get; set; } = true;
 
-		protected override void OnOwnerChanged(Node oldOwner)
+		protected internal override void Start()
 		{
-			if (oldOwner != null) {
-				foreach (var animation in oldOwner.Animations) {
-					animation.AnimationEngine = DefaultAnimationEngine.Instance;
-				}
+			foreach (var animation in Owner.Animations) {
+				animation.AnimationEngine = BlendAnimationEngine.Instance;
 			}
-			if (Owner != null) {
-				foreach (var animation in Owner.Animations) {
-					animation.AnimationEngine = BlendAnimationEngine.Instance;
-				}
+		}
+
+		protected internal override void Stop(Node owner)
+		{
+			foreach (var animation in owner.Animations) {
+				animation.AnimationEngine = DefaultAnimationEngine.Instance;
 			}
 		}
 

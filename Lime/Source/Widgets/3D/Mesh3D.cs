@@ -7,7 +7,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Mesh3D : Node3D
+	public class Mesh3D : Node3D, IUpdatableNode
 	{
 		[YuzuCompact]
 		[StructLayout(LayoutKind.Sequential, Size = 16)]
@@ -180,6 +180,7 @@ namespace Lime
 			Presenter = DefaultPresenter.Instance;
 			Submeshes = new Submesh3DCollection(this);
 			CullMode = CullMode.Front;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		internal protected override bool PartialHitTest (ref HitTestArgs args)
@@ -259,10 +260,8 @@ namespace Lime
 			}
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
-
 			if (Clicked != null) {
 				HandleClick();
 			}

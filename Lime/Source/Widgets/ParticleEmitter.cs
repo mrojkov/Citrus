@@ -59,7 +59,7 @@ namespace Lime
 	[TangerineNodeBuilder("BuildForTangerine")]
 	[TangerineAllowedChildrenTypes(typeof(ParticleModifier), typeof(EmitterShapePoint))]
 	[TangerineVisualHintGroup("/All/Nodes/Particles")]
-	public partial class ParticleEmitter : Widget, ITangerinePreviewAnimationListener
+	public partial class ParticleEmitter : Widget, ITangerinePreviewAnimationListener, IUpdatableNode
 	{
 		internal static System.Random Rng = new System.Random();
 
@@ -300,6 +300,7 @@ namespace Lime
 			AlongPathOrientation = false;
 			TimeShift = 0;
 			ImmortalParticles = false;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		protected override Node CloneInternal()
@@ -598,9 +599,8 @@ namespace Lime
 			}
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (firstUpdate) {
 				firstUpdate = false;
 				const float ModellingStep = 0.04f;

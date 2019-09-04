@@ -6,7 +6,7 @@ namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
 	[TangerineAllowedChildrenTypes(typeof(Node))]
-	public class Tab : Widget
+	public class Tab : Widget, IUpdatableNode
 	{
 		private bool active;
 		private Widget closeButton;
@@ -22,6 +22,7 @@ namespace Lime
 			HitTestTarget = true;
 			Gestures.Add(new ClickGesture(2, () => Closing?.Invoke()));
 			Awoke += Awake;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public bool Active
@@ -54,9 +55,8 @@ namespace Lime
 			t.RefreshPresentation();
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (closeButton != null) {
 				closeButton.Visible = Closable;
 			}

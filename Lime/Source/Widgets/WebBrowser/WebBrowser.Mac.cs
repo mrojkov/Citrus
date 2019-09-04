@@ -10,7 +10,7 @@ using CoreGraphics;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	public class WebBrowser : Widget
+	public class WebBrowser : Widget, IUpdatableNode
 	{
 		private WebView webView;
 
@@ -35,6 +35,7 @@ namespace Lime
 			webView.AutoresizingMask = NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable; 
 			webView.WantsLayer = true;
 			Window.Current.NSGameView.AddSubview(webView);
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public override void Dispose()
@@ -50,13 +51,12 @@ namespace Lime
 			}
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
 			if (webView == null) {
 				return;
 			}
 			webView.Frame = CalculateAABBInWorldSpace(this);
-			base.Update(delta);
 		}
 
 		private CGRect CalculateAABBInWorldSpace(Widget widget)

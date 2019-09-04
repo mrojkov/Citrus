@@ -49,7 +49,7 @@ namespace Lime
 
 		public bool IsReadOnly => false;
 
-		public bool Contains(TComponent component) => ContainsKey(component.GetKey());
+		public virtual bool Contains(TComponent component) => ContainsKey(component.GetKey());
 		public bool Contains<T>() where T : TComponent => ContainsKey(ComponentKeyResolver<T>.Key);
 		public bool Contains(Type type) => ContainsKey(Component.GetKeyForType(type));
 
@@ -216,7 +216,11 @@ namespace Lime
 
 		public void CopyTo(TComponent[] array, int arrayIndex)
 		{
-			throw new NotImplementedException();
+			for (var i = 0; i < buckets.Length; i++) {
+				if (buckets[i].Key > 0) {
+					array[arrayIndex++] = buckets[i].Component;
+				}
+			}
 		}
 
 		private static class ComponentKeyResolver<T> where T : TComponent

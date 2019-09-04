@@ -74,8 +74,13 @@ namespace Lime
 			GlobalTransformInverse = 1 << 7,
 			ParentBoundingRect = 1 << 8,
 			Enabled = 1 << 9,
+			EffectiveAnimationSpeed = 1 << 10,
+			Frozen = 1 << 11,
+			FreezeInvisible = 1 << 12,
 			All = ~None
 		}
+
+		public NodeManager Manager { get; internal set; }
 
 		/// <summary>
 		/// Is invoked after default animation has been stopped (e.g. hit "Stop" marker).
@@ -187,7 +192,8 @@ namespace Lime
 			{
 				if (tangerineFlags != value) {
 					tangerineFlags = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
+					Manager?.FilterNode(this);
 				}
 			}
 		}
@@ -229,13 +235,6 @@ namespace Lime
 		public CompoundPresenter CompoundPostPresenter =>
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
-		internal int RunningAnimationCount;
-
-		/// <summary>
-		/// Gets the cached reference to the first animation in the animation collection.
-		/// </summary>
-		public Animation FirstAnimation { get; internal set; }
-
 		/// <summary>
 		/// Gets the cached reference to the first children node.
 		/// Use it for fast iteration through nodes collection in a performance-critical code.
@@ -254,16 +253,13 @@ namespace Lime
 			remove => Components.GetOrAdd<AwakeBehavior>().Action -= value;
 		}
 
-		internal NodeBehavior[] Behaviours = NodeComponentCollection.EmptyBehaviors;
-		internal NodeBehavior[] LateBehaviours = NodeComponentCollection.EmptyBehaviors;
-
 		/// <summary>
 		/// Called before Update.
 		/// </summary>
 		public UpdateHandler Updating
 		{
-			get => Components.GetOrAdd<UpdateBehaviour>().Updating;
-			set => Components.GetOrAdd<UpdateBehaviour>().Updating = value;
+			get => Components.GetOrAdd<UpdateBehavior>().Updating;
+			set => Components.GetOrAdd<UpdateBehavior>().Updating = value;
 		}
 
 		/// <summary>
@@ -271,24 +267,56 @@ namespace Lime
 		/// </summary>
 		public UpdateHandler Updated
 		{
-			get => Components.GetOrAdd<UpdatedBehaviour>().Updated;
-			set => Components.GetOrAdd<UpdatedBehaviour>().Updated = value;
+			get => Components.GetOrAdd<UpdatedBehavior>().Updated;
+			set => Components.GetOrAdd<UpdatedBehavior>().Updated = value;
 		}
 
 		/// <summary>
 		/// Tasks that are called before Update.
 		/// </summary>
-		public TaskList Tasks => Components.GetOrAdd<TasksBehaviour>().Tasks;
+		public TaskList Tasks => Components.GetOrAdd<TasksBehavior>().Tasks;
 
 		/// <summary>
 		/// Tasks that are called after Update.
 		/// </summary>
-		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehaviour>().Tasks;
+		public TaskList LateTasks => Components.GetOrAdd<LateTasksBehavior>().Tasks;
+
+		private float animationSpeed;
 
 		/// <summary>
 		/// Animation speed multiplier.
 		/// </summary>
-		public float AnimationSpeed { get; set; }
+		public float AnimationSpeed
+		{
+			get => animationSpeed;
+			set
+			{
+				if (animationSpeed != value) {
+					animationSpeed = value;
+					PropagateDirtyFlags(DirtyFlags.EffectiveAnimationSpeed);
+				}
+			}
+		}
+
+		private float effectiveAnimationSpeed;
+
+		public float EffectiveAnimationSpeed
+		{
+			get {
+				if (CleanDirtyFlags(DirtyFlags.EffectiveAnimationSpeed)) {
+					RecalcEffectiveAnimationSpeed();
+				}
+				return effectiveAnimationSpeed;
+			}
+		}
+
+		private void RecalcEffectiveAnimationSpeed()
+		{
+			effectiveAnimationSpeed = AnimationSpeed;
+			if (Parent != null) {
+				effectiveAnimationSpeed *= Parent.EffectiveAnimationSpeed;
+			}
+		}
 
 		public IRenderChainBuilder RenderChainBuilder { get; set; }
 
@@ -368,20 +396,7 @@ namespace Lime
 		/// Returns the first animation in the animation collection
 		/// or creates an animation if the collection is empty.
 		/// </summary>
-		public Animation DefaultAnimation
-		{
-			get {
-				Animation a;
-				for (a = FirstAnimation; a != null; a = a.Next) {
-					if (a.IsLegacy) {
-						return a;
-					}
-				}
-				a = new Animation() { IsLegacy = true };
-				Animations.Add(a);
-				return a;
-			}
-		}
+		public Animation DefaultAnimation => Components.GetOrAdd<AnimationComponent>().DefaultAnimation;
 
 		/// <summary>
 		/// Custom data. Can be set via Tangerine (this way it will contain path to external scene).
@@ -406,7 +421,8 @@ namespace Lime
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
-		public AnimationCollection Animations { get; private set; }
+		public AnimationCollection Animations => Components.GetOrAdd<AnimationComponent>().Animations;
+
 		internal int DescendantAnimatorsVersion { get; private set; }
 
 		void IAnimationHost.OnAnimatorCollectionChanged()
@@ -422,8 +438,11 @@ namespace Lime
 		protected bool ShouldInspectPosition() => !Parent?.GetTangerineFlag(TangerineFlags.SceneNode) ?? true;
 #endif // TANGERINE
 
-		public bool NeedSerializeAnimations() =>
-			Animations.Count > 1 || (Animations.Count == 1 && (!FirstAnimation.IsLegacy || FirstAnimation.Markers.Count > 0));
+		public bool NeedSerializeAnimations()
+		{
+			var c = Components.Get<AnimationComponent>();
+			return c != null && (c.Animations.Count > 1 || (c.Animations.Count == 1 && (!c.Animations[0].IsLegacy || c.Animations[0].Markers.Count > 0)));
+		}
 
 		[TangerineIgnore]
 		[YuzuMember]
@@ -473,7 +492,6 @@ namespace Lime
 			AnimationSpeed = 1;
 			Components = new NodeComponentCollection(this);
 			Animators = new AnimatorCollection(this);
-			Animations = new AnimationCollection(this);
 			Nodes = new NodeList(this);
 			Presenter = DefaultPresenter.Instance;
 			RenderChainBuilder = this;
@@ -501,16 +519,6 @@ namespace Lime
 			}
 			Nodes.Clear();
 			Animators.Dispose();
-		}
-
-		internal void RefreshRunningAnimationCount()
-		{
-			RunningAnimationCount = 0;
-			for (var a = FirstAnimation; a != null; a = a.Next) {
-				if (a.IsRunning) {
-					RunningAnimationCount++;
-				}
-			}
 		}
 
 		/// <summary>
@@ -612,17 +620,14 @@ namespace Lime
 			// it's important to initialize AsWidget and AsNode3D as sooon as possible since following clone process may access them
 			clone.AsWidget = clone as Widget;
 			clone.AsNode3D = clone as Node3D;
+			clone.Manager = null;
 			clone.Parent = null;
-			clone.FirstAnimation = null;
 			clone.FirstChild = null;
 			clone.NextSibling = null;
 			clone.gestures = null;
-			clone.Animations = Animations.Clone(clone);
 			clone.DescendantAnimatorsVersion = 0;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.Clone(clone);
-			clone.Behaviours = NodeComponentCollection.EmptyBehaviors;
-			clone.LateBehaviours = NodeComponentCollection.EmptyBehaviors;
 			if (RenderChainBuilder != null) {
 				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
 			}
@@ -679,27 +684,6 @@ namespace Lime
 		{
 			Unlink();
 			Dispose();
-		}
-
-		/// <summary>
-		/// Advances animations of this node and calls Update of all its children.
-		/// Usually called once a frame.
-		/// </summary>
-		/// <param name="delta">Time delta since last Update.</param>
-		public virtual void Update(float delta)
-		{
-			foreach (var b in Behaviours) {
-				b.Update(delta);
-			}
-			AdvanceAnimation(delta);
-			for (var node = FirstChild; node != null;) {
-				var next = node.NextSibling;
-				node.Update(node.AnimationSpeed * delta);
-				node = next;
-			}
-			foreach (var b in LateBehaviours) {
-				b.LateUpdate(delta);
-			}
 		}
 
 		protected internal virtual RenderObject GetRenderObject() => null;
@@ -1034,19 +1018,6 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Advances all running animations by provided delta.
-		/// </summary>
-		/// <param name="delta">Time delta (in seconds).</param>
-		public void AdvanceAnimation(float delta)
-		{
-			if (RunningAnimationCount > 0) {
-				for (var a = FirstAnimation; a != null; a = a.Next) {
-					a.Advance(delta);
-				}
-			}
-		}
-
-		/// <summary>
 		/// Loads all textures, fonts and animators for this node and for all its descendants.
 		/// Forces reloading of textures if they are null.
 		/// </summary>
@@ -1215,10 +1186,6 @@ namespace Lime
 				}
 			}
 
-			Animations.Clear();
-			var animations = content.Animations.ToList();
-			content.Animations.Clear();
-			Animations.AddRange(animations);
 			if ((content is Viewport3D) && (this is Node3D) && (content.Nodes.Count > 0)) {
 				// Handle a special case: the 3d scene is wrapped up with a Viewport3D.
 				var node = content.Nodes[0];
@@ -1242,6 +1209,11 @@ namespace Lime
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
 						Components.Add(assetBundlePathComponent.Clone());
+					}
+					Components.Remove(typeof(AnimationComponent));
+					var animationBehavior = content.Components.Get<AnimationComponent>();
+					if (animationBehavior != null) {
+						Components.Add(animationBehavior.Clone());
 					}
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
@@ -1381,6 +1353,264 @@ namespace Lime
 					current = null;
 				}
 			}
+		}
+
+		public virtual void UpdateBoundingRect()
+		{
+			for (var n = FirstChild; n != null; n = n.NextSibling) {
+				n.UpdateBoundingRect();
+			}
+		}
+
+		private bool frozen;
+
+		public bool Frozen
+		{
+			get => frozen;
+			set {
+				if (frozen != value) {
+					frozen = value;
+					PropagateDirtyFlags(DirtyFlags.Frozen);
+					Manager?.FilterNode(this);
+				}
+			}
+		}
+
+		protected bool globallyFrozen;
+
+		public bool GloballyFrozen
+		{
+			get {
+				if (CleanDirtyFlags(DirtyFlags.Frozen)) {
+					RecalcGloballyFrozen();
+				}
+				return globallyFrozen;
+			}
+		}
+
+		protected virtual void RecalcGloballyFrozen()
+		{
+			globallyFrozen = Frozen;
+			if (Parent != null) {
+				globallyFrozen |= Parent.GloballyFrozen;
+			}
+		}
+	}
+
+	public interface IUpdatableNode
+	{
+		void OnUpdate(float delta);
+	}
+
+	public static class NodeCompatibilityExtensions
+	{
+		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		{
+			var c = node.Components.Get<AnimationComponent>();
+			if (c != null) {
+				foreach (var a in c.Animations) {
+					a.Advance(delta);
+				}
+			}
+			foreach (var child in node.Nodes) {
+				AdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
+			}
+		}
+
+		private static void RegisterLegacyBehaviors(Node node)
+		{
+			foreach (var component in node.Components) {
+				if (component is NodeBehavior legacyBehavior) {
+					legacyBehavior.Register();
+				}
+			}
+		}
+
+		public static void Update(this Node node, float delta)
+		{
+			var boneBehavior = node.Components.Get<BoneBehavior>();
+			if (boneBehavior != null) {
+				boneBehavior.Register();
+			}
+			RegisterLegacyBehaviors(node);
+			var legacyEarlyBehaviorContainer = node.Components.Get<LegacyEarlyBehaviorContainer>();
+			if (legacyEarlyBehaviorContainer != null) {
+				legacyEarlyBehaviorContainer.Update(delta);
+			}
+			var visible = true;
+			if (node.AsWidget != null) {
+				visible = node.AsWidget.GloballyVisible;
+			} else if (node.AsNode3D != null) {
+				visible = node.AsNode3D.GloballyVisible;
+			}
+			if (visible) {
+				var animationComponent = node.Components.Get<AnimationComponent>();
+				if (animationComponent != null) {
+					foreach (var a in animationComponent.Animations) {
+						a.Advance(delta);
+					}
+				}
+				for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+					Update(child, delta * child.AnimationSpeed);
+				}
+			}
+			RegisterLegacyBehaviors(node);
+			var legacyLateBehaviorContainer = node.Components.Get<LegacyLateBehaviorContainer>();
+			if (legacyLateBehaviorContainer != null) {
+				legacyLateBehaviorContainer.Update(delta);
+			}
+			var boneArrayUpdaterBehavior = node.Components.Get<BoneArrayUpdaterBehavior>();
+			if (boneArrayUpdaterBehavior != null) {
+				boneArrayUpdaterBehavior.Update(delta);
+			}
+			var updatableNodeBehavior = node.Components.Get<UpdatableNodeBehavior>();
+			if (updatableNodeBehavior != null) {
+				updatableNodeBehavior.CheckOwner();
+				updatableNodeBehavior.Update(delta);
+			}
+		}
+	}
+
+	[MutuallyExclusiveDerivedComponents]
+	[NodeComponentDontSerialize]
+	[UpdateStage(typeof(LateUpdateStage))]
+	public class UpdatableNodeBehavior : BehaviorComponent
+	{
+		private IUpdatableNode node;
+
+		internal void CheckOwner()
+		{
+			node = (IUpdatableNode)Owner;
+		}
+
+		protected internal override void Start()
+		{
+			CheckOwner();
+		}
+
+		protected internal override void Update(float delta)
+		{
+			node.OnUpdate(delta);
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	public class AnimationComponent : NodeComponent
+	{
+		internal AnimationProcessor Processor;
+		internal int Depth = -1;
+
+		public AnimationCollection Animations { get; private set; }
+
+		public Animation DefaultAnimation
+		{
+			get {
+				foreach (var a in Animations) {
+					if (a.IsLegacy) {
+						return a;
+					}
+				}
+				var newAnimation = new Animation() { IsLegacy = true };
+				Animations.Add(newAnimation);
+				return newAnimation;
+			}
+		}
+
+		internal void OnAnimationRun(Animation animation)
+		{
+			Processor?.OnAnimationRun(animation);
+		}
+
+		internal void OnAnimationStopped(Animation animation)
+		{
+			Processor?.OnAnimationStopped(animation);
+		}
+
+		public AnimationComponent()
+		{
+			Animations = new AnimationCollection(this);
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (AnimationComponent)base.Clone();
+			clone.Animations = new AnimationCollection(clone);
+			clone.Processor = null;
+			clone.Depth = -1;
+			foreach (var a in Animations) {
+				clone.Animations.Add(a.Clone());
+			}
+			return clone;
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	[UpdateStage(typeof(LateUpdateStage))]
+	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
+	public class BoneArrayUpdaterBehavior : BehaviorComponent
+	{
+		private bool attached;
+		private List<Bone> bones = new List<Bone>();
+		private bool needResort = false;
+
+		public void AddBone(Bone bone)
+		{
+			bones.Add(bone);
+			OnBoneCollectionChanged();
+		}
+
+		public void RemoveBone(Bone bone)
+		{
+			bones.Remove(bone);
+			OnBoneCollectionChanged();
+		}
+
+		private void OnBoneCollectionChanged()
+		{
+			needResort = true;
+			CheckActivity();
+		}
+
+		protected internal override void Start()
+		{
+			attached = true;
+			CheckActivity();
+		}
+
+		protected internal override void Stop(Node owner)
+		{
+			attached = false;
+		}
+
+		protected internal override void Update(float delta)
+		{
+			if (needResort) {
+				bones.Sort((x, y) => x.Index.CompareTo(y.Index));
+				needResort = false;
+			}
+			foreach (var b in bones) {
+				b.OnUpdate(delta);
+			}
+		}
+		
+		private void CheckActivity()
+		{
+			if (attached) {
+				if (bones.Count > 0) {
+					Resume();
+				} else {
+					Suspend();
+				}
+			}
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (BoneArrayUpdaterBehavior)base.Clone();
+			clone.bones = new List<Bone>();
+			clone.needResort = false;
+			clone.attached = false;
+			return clone;
 		}
 	}
 }

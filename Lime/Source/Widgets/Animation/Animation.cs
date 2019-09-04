@@ -17,7 +17,7 @@ namespace Lime
 		private bool animatorsArePropagated;
 		private bool? hasEasings;
 		private bool applyZeroPose = true;
-		internal Animation Next;
+		internal BucketQueueNode<Animation> QueueNode;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
 		public event Action Stopped;
@@ -92,7 +92,9 @@ namespace Lime
 			set { Time = AnimationUtils.FramesToSeconds(value); }
 		}
 
-		public Node Owner { get; internal set; }
+		public AnimationComponent Owner { get; internal set; }
+
+		public Node OwnerNode => Owner?.Owner;
 
 		public bool IsRunning
 		{
@@ -104,7 +106,11 @@ namespace Lime
 					if (isRunning) {
 						Load();
 					}
-					Owner?.RefreshRunningAnimationCount();
+					if (isRunning) {
+						Owner?.OnAnimationRun(this);
+					} else {
+						Owner?.OnAnimationStopped(this);
+					}
 				}
 			}
 		}
@@ -125,9 +131,9 @@ namespace Lime
 
 		public void FindAnimators(List<IAnimator> animators)
 		{
-			if (Owner != null) {
-				foreach (var node in Owner.Nodes) {
-					FindAnimators(node, animators);
+			if (OwnerNode != null) {
+				foreach (var node in OwnerNode.Nodes) {
+					FindAnimators(OwnerNode, animators);
 				}
 			}
 		}
@@ -191,13 +197,13 @@ namespace Lime
 		{
 			var clone = (Animation)MemberwiseClone();
 			clone.Owner = null;
-			clone.Next = null;
 			clone.Markers = MarkerList.Clone(Markers, clone);
 			clone.Tracks = Tracks.Clone(clone);
 			clone.EffectiveAnimators = null;
 			clone.EffectiveTriggerableAnimators = null;
 			clone.EffectiveAnimatorsVersion = 0;
 			clone.BezierEasingCalculator = new AnimationBezierEasingCalculator(clone.Markers, clone);
+			clone.QueueNode = null;
 			return clone;
 		}
 
@@ -225,13 +231,13 @@ namespace Lime
 
 		public void Load()
 		{
-			if (animatorsArePropagated || string.IsNullOrEmpty(ContentsPath) || Owner == null) {
+			if (animatorsArePropagated || string.IsNullOrEmpty(ContentsPath) || OwnerNode == null) {
 				return;
 			}
 			var d = AnimationData.Load(ContentsPath);
 			foreach (var animator in d.Animators) {
 				var clone = animator.Clone();
-				var (host, index) = AnimationUtils.GetPropertyHost(Owner, clone.TargetPropertyPath);
+				var (host, index) = AnimationUtils.GetPropertyHost(OwnerNode, clone.TargetPropertyPath);
 				if (host == null) {
 					continue;
 				}
@@ -249,7 +255,7 @@ namespace Lime
 			foreach (var animator in animators) {
 				var node = (Node)animator.Owner;
 				var propertyPath = $"{node.Id}/{animator.TargetPropertyPath}";
-				while (node.Parent != Owner) {
+				while (node.Parent != OwnerNode) {
 					node = node.Parent;
 					propertyPath = $"{node.Id}/{propertyPath}";
 				}

@@ -400,7 +400,8 @@ namespace Lime
 				if (!model.Animations.TryFind(animation.SourceAnimationId, out var srcAnimation)) {
 					if (string.IsNullOrEmpty(animation.SourceAnimationId)) {
 						// If no source animation id is present, it means that model attachment has obsolete format.
-						srcAnimation = model.FirstAnimation;
+						var ac = model.Components.Get<AnimationComponent>();
+						srcAnimation = ac != null && ac.Animations.Count > 0 ? ac.Animations[0] : null;
 						// Check if the animation has been deleted but attachment hasn't been modified after that.
 						if (srcAnimation == null) {
 #if TANGERINE
@@ -481,7 +482,7 @@ namespace Lime
 				newAnimators.Clear();
 			}
 
-			foreach (var animation in model.Animations.Except(newAnimations)) {
+			foreach (var animation in model.Animations.Except(newAnimations).ToList()) {
 				var srcAnimators = new List<IAnimator>();
 				animation.FindAnimators(srcAnimators);
 				if (animationsToReduce.Keys.Contains(animation.Id)) {

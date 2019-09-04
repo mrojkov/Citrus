@@ -12,7 +12,7 @@ namespace Lime
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
 		{
-			var blender = animation.Owner.Components.Get<AnimationBlender>();
+			var blender = animation.OwnerNode.Components.Get<AnimationBlender>();
 			if (blender == null || !animation.Markers.TryFind(markerId, out var marker)) {
 				return base.TryRunAnimation(animation, markerId, animationTimeCorrection);
 			}
@@ -27,10 +27,10 @@ namespace Lime
 
 		protected override void ProcessMarker(Animation animation, Marker marker)
 		{
-			if ((animation.Owner.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+			if ((animation.OwnerNode.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
 				return;
 			}
-			var blender = animation.Owner.Components.Get<AnimationBlender>();
+			var blender = animation.OwnerNode.Components.Get<AnimationBlender>();
 			if (blender == null || marker.Action != MarkerAction.Jump) {
 				base.ProcessMarker(animation, marker);
 				return;
@@ -48,7 +48,7 @@ namespace Lime
 
 		private static void Blending(Animation animation, float delta = 0f)
 		{
-			var blender = animation.Owner.Components.Get<AnimationBlender>();
+			var blender = animation.OwnerNode.Components.Get<AnimationBlender>();
 			if (blender == null) {
 				return;
 			}

@@ -41,6 +41,7 @@ namespace Lime
 			if (Current == null) {
 				Current = this;
 			}
+			GestureManager = new GestureManager(this);
 		}
 	}
 }

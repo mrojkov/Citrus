@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -79,6 +79,7 @@
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
+    <Compile Include="Source\BucketQueue.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
@@ -95,6 +96,9 @@
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
+    <Compile Include="Source\ReferenceEqualityComparer.cs" />
+    <Compile Include="Source\ServiceProviderExtensions.cs" />
+    <Compile Include="Source\ServiceRegistry.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
     <Compile Include="Source\Types\IntVector2.cs" />
@@ -112,7 +116,19 @@
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets\BehaviorComponent.cs" />
     <Compile Include="Source\Widgets\EditorUtils.cs" />
+    <Compile Include="Source\Widgets\NodeManager.cs" />
+    <Compile Include="Source\Widgets\NodeManagerProcessorCollection.cs" />
+    <Compile Include="Source\Widgets\NodeManagerRootCollection.cs" />
+    <Compile Include="Source\Widgets\NodeProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\AnimationProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorSystem.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorUpdateProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BoundingRectProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Audio.cs" />

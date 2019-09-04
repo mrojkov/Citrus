@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 		public readonly Widget InputArea;
 		public WidgetInput Input => InputArea.Input;
 		// Container for the document root node.
-		public readonly SceneWidget Scene;
+		public readonly Widget Scene;
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
 		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
@@ -140,7 +140,7 @@ namespace Tangerine.UI.SceneView
 			this.Panel = panelWidget;
 			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
-			Scene = new SceneWidget {
+			Scene = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
 			Frame = new Widget {
@@ -153,8 +153,26 @@ namespace Tangerine.UI.SceneView
 			filesDropHandler = new FilesDropHandler(InputArea);
 			filesDropHandler.Handling += FilesDropOnHandling;
 			filesDropHandler.NodeCreated += FilesDropOnNodeCreated;
-			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => Scene.AnimationSpeed = v ? 0.1f : 1);
+			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
+			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
+		}
+
+		private void AdjustSceneAnimationSpeed()
+		{
+			Scene.AnimationSpeed = GetRequiredSceneAnimationSpeed();
+		}
+
+		private float GetRequiredSceneAnimationSpeed()
+		{
+			if (Document.Current.PreviewAnimation) {
+				if (Document.Current.SlowMotion) {
+					return 0.1f;
+				} else {
+					return 1.0f;
+				}
+			}
+			return 0.0f;
 		}
 
 		private void CenterDocumentRoot(Node node)
@@ -288,16 +306,6 @@ namespace Tangerine.UI.SceneView
 		public void DuplicateSelectedNodes()
 		{
 			DuplicateNodes();
-		}
-
-		public class SceneWidget : Widget
-		{
-			public override void Update(float delta)
-			{
-				if (Document.Current.PreviewAnimation) {
-					base.Update(delta);
-				}
-			}
 		}
 	}
 

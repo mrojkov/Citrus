@@ -3,7 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	[TangerineRegisterNode(Order = 17)]
-	public class SplineGear : Node
+	public class SplineGear : Node, IUpdatableNode
 	{
 		[YuzuMember]
 		[TangerineKeyframeColor(4)]
@@ -28,6 +28,7 @@ namespace Lime
 		public SplineGear()
 		{
 			RenderChainBuilder = null;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		protected override Node CloneInternal()
@@ -38,9 +39,8 @@ namespace Lime
 			return clone;
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (Parent == null) {
 				return;
 			}

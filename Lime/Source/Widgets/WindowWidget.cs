@@ -14,7 +14,7 @@ namespace Lime
 	{
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
-
+		
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -25,13 +25,35 @@ namespace Lime
 		public WindowWidget(IWindow window)
 		{
 			WidgetContext = new WidgetContext(this);
+			LayoutManager = new LayoutManager();
+			CreateManager().RootNodes.Add(this);
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, WidgetContext);
 			renderChain = new RenderChain();
-			WidgetContext.GestureManager = new GestureManager(WidgetContext);
 			window.Activated += () => windowActivated = true;
 			window.Sync += Sync;
-			LayoutManager = new LayoutManager();
+		}
+
+		private NodeManager CreateManager()
+		{
+			var services = new ServiceRegistry();
+			services.Add(new BehaviorSystem());
+			services.Add(LayoutManager);
+			services.Add(WidgetContext);
+
+			var manager = new NodeManager(services);
+			manager.Processors.Add(new GestureProcessor());
+			manager.Processors.Add(new BehaviorSetupProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
+			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new LayoutProcessor());
+			manager.Processors.Add(new BoundingRectProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
+			return manager;
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -51,7 +73,7 @@ namespace Lime
 			renderChain.GetRenderObjects(renderObjectList1);
 		}
 
-		public override void Update(float delta)
+		public virtual void Update(float delta)
 		{
 			if (ContinuousRendering()) {
 				Window.Invalidate();
@@ -72,20 +94,14 @@ namespace Lime
 			}
 			prevAnyCaptureKeyPressed = anyCaptureKeyPressed;
 
-			// Process mouse/touch screen input.
-			context.GestureManager.Process();
-
 			// Update the widget hierarchy.
 			context.MouseCursor = MouseCursor.Default;
-			base.Update(delta);
+			Manager.Update(delta);
 			Window.Cursor = context.MouseCursor;
 
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				SetFocus(null);
 			}
-
-			// Refresh widgets layout.
-			LayoutManager.Layout();
 
 			ManageFocusOnWindowActivation();
 

@@ -26,7 +26,7 @@ namespace Lime
 				}
 			}
 		}
-
+		
 		public DistortionMeshPoint()
 		{
 			Color = Color4.White;

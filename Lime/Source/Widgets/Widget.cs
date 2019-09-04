@@ -46,6 +46,7 @@ namespace Lime
 		private Color4 color;
 		private bool enabled = true;
 		private bool visible;
+		private bool freezeInvisible = true;
 		private Blending blending;
 		private ShaderId shader;
 		private Vector2 pivot;
@@ -71,6 +72,7 @@ namespace Lime
 		protected ShaderId globalShader;
 		protected bool globallyEnabled;
 		protected bool globallyVisible;
+		protected bool globallyFreezeInvisible;
 
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
@@ -463,8 +465,14 @@ namespace Lime
 			set
 			{
 				if (color.ABGR != value.ABGR) {
-					PropagateDirtyFlags((color.A == 0) != (value.A == 0) ? DirtyFlags.Color | DirtyFlags.Visible : DirtyFlags.Color);
+					var visibilityChanged = (color.A == 0) != (value.A == 0);
 					color = value;
+					if (visibilityChanged) {
+						PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible | DirtyFlags.Frozen);
+						Manager?.FilterNode(this);
+					} else {
+						PropagateDirtyFlags(DirtyFlags.Color);
+					}
 				}
 			}
 		}
@@ -477,11 +485,9 @@ namespace Lime
 			get { return color.A * (1 / 255f); }
 			set
 			{
-				var a = (byte)(value * 255f);
-				if (color.A != a) {
-					color.A = a;
-					PropagateDirtyFlags(DirtyFlags.Color | DirtyFlags.Visible);
-				}
+				var newColor = Color;
+				newColor.A = (byte)(value * 255f);
+				Color = newColor;
 			}
 		}
 
@@ -538,8 +544,9 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
 					InvalidateParentConstraintsAndArrangement();
+					Manager?.FilterNode(this);
 				}
 			}
 		}
@@ -734,6 +741,43 @@ namespace Lime
 			globallyVisible |= GetTangerineFlag(TangerineFlags.Shown | TangerineFlags.DisplayContent);
 			globallyVisible &= !GetTangerineFlag(TangerineFlags.HiddenOnExposition);
 #endif // TANGERINE
+		}
+
+		public bool FreezeInvisible
+		{
+			get => freezeInvisible;
+			set
+			{
+				if (freezeInvisible != value) {
+					freezeInvisible = value;
+					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					Manager?.FilterNode(this);
+				}
+			}
+		}
+
+		public bool GloballyFreezeInvisible
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
+					RecalcGloballyFreezeInvisible();
+				}
+				return globallyFreezeInvisible;
+			}
+		}
+
+		private void RecalcGloballyFreezeInvisible()
+		{
+			globallyFreezeInvisible = FreezeInvisible;
+			if (Parent != null) {
+				if (Parent.AsWidget != null) {
+					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
+				} else if (Parent.AsNode3D != null) {
+					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
+				}
+			}
 		}
 
 		// Temporary property for changing bounding rectangle in game code
@@ -957,43 +1001,6 @@ namespace Lime
 					w?.Layout.InvalidateConstraintsAndArrangement();
 				}
 			}
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		public override void Update(float delta)
-		{
-#if PROFILE
-			var watch = System.Diagnostics.Stopwatch.StartNew();
-#endif
-			foreach (var b in Behaviours) {
-				b.Update(delta);
-			}
-			if (GloballyVisible) {
-				AdvanceAnimation(delta);
-#if PROFILE
-				watch.Stop();
-#endif
-				for (var node = FirstChild; node != null;) {
-					var next = node.NextSibling;
-					node.Update(node.AnimationSpeed * delta);
-					node = next;
-				}
-#if PROFILE
-				watch.Start();
-#endif
-			}
-			foreach (var b in LateBehaviours) {
-				b.LateUpdate(delta);
-			}
-			if (EnableViewCulling && CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
-				ExpandParentBoundingRect();
-			}
-#if PROFILE
-			watch.Stop();
-			NodeProfiler.RegisterUpdate(this, watch.ElapsedTicks);
-#endif
 		}
 
 		/// <summary>
@@ -1447,6 +1454,24 @@ namespace Lime
 			Anchors = Anchors.None;
 			Size = ParentWidget.Size;
 			Anchors = Anchors.LeftRightTopBottom;
+		}
+
+		public override void UpdateBoundingRect()
+		{
+			if (GloballyVisible) {
+				for (var n = FirstChild; n != null; n = n.NextSibling) {
+					n.UpdateBoundingRect();
+				}
+			}
+			if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+				ExpandParentBoundingRect();
+			}
+		}
+
+		protected override void RecalcGloballyFrozen()
+		{
+			base.RecalcGloballyFrozen();
+			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
 		}
 	}
 }

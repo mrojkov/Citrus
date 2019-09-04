@@ -215,6 +215,7 @@
     <Compile Include="Source\Audio\OpenAL\PcmDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\BucketQueue.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
@@ -275,6 +276,9 @@
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
+    <Compile Include="Source\ReferenceEqualityComparer.cs" />
+    <Compile Include="Source\ServiceProviderExtensions.cs" />
+    <Compile Include="Source\ServiceRegistry.cs" />
     <Compile Include="Source\TangerineAttributes.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -300,6 +304,7 @@
     <Compile Include="Source\Widgets\Materials\DissolveMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\AlphaIntensityComponent.cs" />
     <Compile Include="Source\Widgets\Materials\AlphaIntensityMaterial.cs" />
+    <Compile Include="Source\Widgets\BehaviorComponent.cs" />
     <Compile Include="Source\Widgets\Materials\FXAAMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DistortionMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\PostProcessing\PostProcessingActionFXAA.cs" />
@@ -352,8 +357,19 @@
     <Compile Include="Source\Widgets\MorphableMesh.cs" />
     <Compile Include="Source\Widgets\MorphableMeshBuilder.cs" />
     <Compile Include="Source\Widgets\NodeBehaviours.cs" />
+    <Compile Include="Source\Widgets\NodeManagerProcessorCollection.cs" />
+    <Compile Include="Source\Widgets\NodeProcessor.cs" />
+    <Compile Include="Source\Widgets\NodeManager.cs" />
+    <Compile Include="Source\Widgets\NodeManagerRootCollection.cs" />
     <Compile Include="Source\Widgets\NodeReference.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
+    <Compile Include="Source\Widgets\Processors\AnimationProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorSystem.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorUpdateProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BoundingRectProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
+    <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
     <Compile Include="Source\Widgets\RenderObject.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

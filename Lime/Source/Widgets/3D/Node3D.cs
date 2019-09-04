@@ -13,6 +13,7 @@ namespace Lime
 		private Quaternion rotation;
 		private Vector3 position;
 		private bool visible;
+		private bool freezeInvisible = true;
 		private Color4 color;
 		private Viewport3D viewport;
 
@@ -20,6 +21,7 @@ namespace Lime
 		protected Matrix44 globalTransform;
 		protected Matrix44 globalTransformInverse;
 		protected bool globallyVisible;
+		protected bool globallyFreezeInvisible;
 		protected Color4 globalColor;
 
 		public Viewport3D Viewport
@@ -46,7 +48,21 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					PropagateDirtyFlags(DirtyFlags.Visible);
+					PropagateDirtyFlags(DirtyFlags.Visible | DirtyFlags.Frozen);
+					Manager?.FilterNode(this);
+				}
+			}
+		}
+
+		public bool FreezeInvisible
+		{
+			get { return freezeInvisible; }
+			set
+			{
+				if (freezeInvisible != value) {
+					freezeInvisible = value;
+					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					Manager?.FilterNode(this);
 				}
 			}
 		}
@@ -187,6 +203,29 @@ namespace Lime
 			}
 		}
 
+		public bool GloballyFreezeInvisible
+		{
+			get
+			{
+				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
+					RecalcGloballyFreezeInvisible();
+				}
+				return globallyFreezeInvisible;
+			}
+		}
+
+		private void RecalcGloballyFreezeInvisible()
+		{
+			globallyFreezeInvisible = FreezeInvisible;
+			if (Parent != null) {
+				if (Parent.AsWidget != null) {
+					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
+				} else if (Parent.AsNode3D != null) {
+					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
+				}
+			}
+		}
+
 		public Color4 GlobalColor
 		{
 			get
@@ -208,6 +247,12 @@ namespace Lime
 					globalColor *= Parent.AsNode3D.GlobalColor;
 				}
 			}
+		}
+
+		protected override void RecalcGloballyFrozen()
+		{
+			base.RecalcGloballyFrozen();
+			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
 		}
 
 		public Node3D()

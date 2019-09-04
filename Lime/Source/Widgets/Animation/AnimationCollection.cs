@@ -6,9 +6,10 @@ namespace Lime
 {
 	public sealed class AnimationCollection : IList<Animation>, IList
 	{
-		private Node owner;
+		private AnimationComponent owner;
+		private List<Animation> items = new List<Animation>();
 
-		public int Count { get; private set; }
+		public int Count => items.Count;
 
 		bool ICollection<Animation>.IsReadOnly => false;
 
@@ -28,18 +29,7 @@ namespace Lime
 
 		public Animation this[int index]
 		{
-			get
-			{
-				if (unchecked((uint)index) >= Count) {
-					throw new ArgumentOutOfRangeException(nameof(index));
-				}
-				var animation = owner.FirstAnimation;
-				while (index > 0) {
-					animation = animation.Next;
-					index--;
-				}
-				return animation;
-			}
+			get => items[index];
 			set
 			{
 				if (unchecked((uint)index) > Count) {
@@ -56,18 +46,9 @@ namespace Lime
 			}
 		}
 
-		public AnimationCollection(Node owner)
+		public AnimationCollection(AnimationComponent owner)
 		{
 			this.owner = owner;
-		}
-
-		public AnimationCollection Clone(Node owner)
-		{
-			var result = new AnimationCollection(owner);
-			for (var a = this.owner.FirstAnimation; a != null; a = a.Next) {
-				result.Add(a.Clone());
-			}
-			return result;
 		}
 
 		public Animation Find(string id)
@@ -81,7 +62,7 @@ namespace Lime
 
 		public bool TryFind(string id, out Animation animation)
 		{
-			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
+			foreach (var a in items) {
 				if (a.Id == id) {
 					animation = a;
 					return true;
@@ -93,7 +74,7 @@ namespace Lime
 
 		public bool TryFind(int idComparisonCode, out Animation animation)
 		{
-			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
+			foreach (var a in items) {
 				if (a.IdComparisonCode == idComparisonCode) {
 					animation = a;
 					return true;
@@ -135,25 +116,16 @@ namespace Lime
 
 		public void Clear()
 		{
-			for (var a = owner.FirstAnimation; a != null; ) {
-				var t = a.Next;
-				a.Owner = null;
-				a.Next = null;
-				a = t;
+			while (Count > 0) {
+				RemoveAt(Count - 1);
 			}
-			owner.FirstAnimation = null;
-			Count = 0;
-			owner.RefreshRunningAnimationCount();
 		}
 
 		public bool Contains(Animation item) => item != null && item.Owner == owner;
 
 		public void CopyTo(Animation[] array, int arrayIndex)
 		{
-			int i = arrayIndex;
-			for (var a = owner.FirstAnimation; a != null; a = a.Next) {
-				array[i++] = a;
-			}
+			items.CopyTo(array, arrayIndex);
 		}
 
 		public bool Remove(Animation item)
@@ -166,73 +138,42 @@ namespace Lime
 			return false;
 		}
 
-		IEnumerator<Animation> IEnumerable<Animation>.GetEnumerator() => new Enumerator(owner.FirstAnimation);
-		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(owner.FirstAnimation);
+		IEnumerator<Animation> IEnumerable<Animation>.GetEnumerator() => GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		public Enumerator GetEnumerator() => new Enumerator(owner.FirstAnimation);
+		public List<Animation>.Enumerator GetEnumerator() => items.GetEnumerator();
 
 		public int IndexOf(Animation item)
 		{
 			if (item != null && item.Owner == owner) {
-				var index = 0;
-				var animation = owner.FirstAnimation;
-				while (animation != item) {
-					animation = animation.Next;
-					index++;
-				}
-				return index;
+				return items.IndexOf(item);
 			}
 			return -1;
 		}
 
 		public void Insert(int index, Animation item)
 		{
-			if (unchecked((uint)index) > Count) {
-				throw new ArgumentOutOfRangeException(nameof(index));
-			}
 			if (item == null) {
 				throw new ArgumentNullException(nameof(item));
 			}
 			if (item.Owner != null) {
-				throw new InvalidOperationException();
+				throw new ArgumentException(nameof(item));
 			}
+			items.Insert(index, item);
 			item.Owner = owner;
-			if (index == 0) {
-				item.Next = owner.FirstAnimation;
-				owner.FirstAnimation = item;
-			} else {
-				var a = owner.FirstAnimation;
-				while (index > 1) {
-					a = a.Next;
-					index--;
-				}
-				item.Next = a.Next;
-				a.Next = item;
+			if (item.IsRunning) {
+				owner.OnAnimationRun(item);
 			}
-			Count++;
-			owner.RefreshRunningAnimationCount();
 		}
 
 		public void RemoveAt(int index)
 		{
-			if (unchecked((uint)index) >= Count) {
-				throw new ArgumentOutOfRangeException(nameof(index));
+			var item = items[index];
+			items.RemoveAt(index);
+			item.Owner = null;
+			if (item.IsRunning) {
+				owner.OnAnimationStopped(item);
 			}
-			Animation prev = null;
-			Animation curr = null;
-			var oldIdx = index;
-			for (curr = owner.FirstAnimation; index > 0; curr = curr.Next, index--) {
-				prev = curr;
-			}
-			if (prev == null) {
-				owner.FirstAnimation = curr.Next;
-			} else {
-				prev.Next = curr.Next;
-			}
-			curr.Owner = null;
-			curr.Next = null;
-			Count--;
-			owner.RefreshRunningAnimationCount();
 		}
 
 		int IList.Add(object value)
@@ -255,35 +196,5 @@ namespace Lime
 		}
 
 		void ICollection.CopyTo(Array array, int index) => CopyTo((Animation[])array, index);
-
-		public struct Enumerator : IEnumerator<Animation>
-		{
-			private Animation first;
-			private Animation current;
-
-			public Enumerator(Animation first)
-			{
-				this.first = first;
-				current = null;
-			}
-
-			object IEnumerator.Current => current;
-
-			public bool MoveNext()
-			{
-				if (current == null) {
-					current = first;
-				} else {
-					current = current.Next;
-				}
-				return current != null;
-			}
-
-			public void Reset() => current = null;
-
-			public Animation Current => current;
-
-			public void Dispose() { }
-		}
 	}
 }

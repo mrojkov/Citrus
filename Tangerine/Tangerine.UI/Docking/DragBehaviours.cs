@@ -27,8 +27,9 @@ namespace Tangerine.UI.Docking
 
 		private IEnumerator<object> MoveTask()
 		{
-			// Skip one frame here to let Input system respong to artificially setting Mouse0 key state to true
+			// Skip several frames here to let Input system respong to artificially setting Mouse0 key state to true
 			// with Input Simulator, so dragging will continue, disregaring clearing mouse keys state on window deactivate
+			yield return null;
 			yield return null;
 			while (true) {
 				if (Input.IsMousePressed()) {

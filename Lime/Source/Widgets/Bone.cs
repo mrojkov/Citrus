@@ -136,11 +136,11 @@ namespace Lime
 			EffectiveRadius = 100;
 			FadeoutZone = 50;
 			IKStopper = true;
+			Components.Add(new BoneBehavior());
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;
 				e.Joint = Position;
@@ -292,6 +292,41 @@ namespace Lime
 				bone = root;
 			}
 			return bone;
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	internal class BoneBehavior : BehaviorComponent
+	{
+		private Bone bone;
+		private BoneArrayUpdaterBehavior boneArrayUpdater;
+
+		protected internal override void Start()
+		{
+			Register();
+		}
+
+		public void Register()
+		{
+			if (bone == null) {
+				bone = (Bone)Owner;
+				boneArrayUpdater = Owner.Parent.Components.GetOrAdd<BoneArrayUpdaterBehavior>();
+				boneArrayUpdater.AddBone(bone);
+			}
+		}
+
+		protected internal override void Stop(Node owner)
+		{
+			boneArrayUpdater.RemoveBone(bone);
+			bone = null;
+		}
+
+		public override NodeComponent Clone()
+		{
+			var clone = (BoneBehavior)base.Clone();
+			clone.bone = null;
+			clone.boneArrayUpdater = null;
+			return clone;
 		}
 	}
 }

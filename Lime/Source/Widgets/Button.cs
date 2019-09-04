@@ -16,6 +16,7 @@ namespace Lime
 		private ClickGesture clickGesture;
 		private bool isChangingState;
 		private bool isDisabledState;
+		private bool awoken;
 
 		public BitSet32 EnableMask = BitSet32.Full;
 
@@ -42,7 +43,7 @@ namespace Lime
 		{
 			HitTestTarget = true;
 			Input.AcceptMouseBeyondWidget = false;
-			Awoke += Awake;
+			Components.Add(new ButtonBehavior());
 		}
 
 		private void SetState(IEnumerator<int> newState)
@@ -63,15 +64,27 @@ namespace Lime
 
 		public override bool WasClicked() => clickGesture?.WasRecognized() ?? false;
 
-		private static void Awake(Node owner)
+		protected override Node CloneInternal()
 		{
-			// On the current frame the button contents may not be loaded,
-			// so delay its initialization until the next frame.
-			var button = (Button)owner;
-			button.SetState(button.InitialState());
-			button.textPresentersFeeder = new TextPresentersFeeder(button);
-			button.clickGesture = new ClickGesture();
-			button.Gestures.Add(button.clickGesture);
+			var clone = (Button)base.CloneInternal();
+			clone.awoken = false;
+			return clone;
+		}
+
+		internal void Awake()
+		{
+			if (!awoken) {
+				OnAwake();
+				awoken = true;
+			}
+		}
+
+		protected virtual void OnAwake()
+		{
+			SetState(InitialState());
+			textPresentersFeeder = new TextPresentersFeeder(this);
+			clickGesture = new ClickGesture();
+			Gestures.Add(clickGesture);
 		}
 
 		private IEnumerator<int> NormalState()
@@ -185,9 +198,8 @@ namespace Lime
 			SetState(NormalState());
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (GloballyVisible) {
 				stateHandler.MoveNext();
 				textPresentersFeeder.Update();
@@ -211,6 +223,25 @@ namespace Lime
 			for (var i = 0; i < 5; i++) {
 				DefaultAnimation.Markers.Add(new Marker(makerIds[i], markerFrames[i], MarkerAction.Stop));
 			}
+		}
+	}
+
+	[NodeComponentDontSerialize]
+	[UpdateStage(typeof(EarlyUpdateStage))]
+	[UpdateAfterBehavior(typeof(LegacyEarlyBehaviorContainer))]
+	public class ButtonBehavior : BehaviorComponent
+	{
+		private Button button;
+
+		protected internal override void Start()
+		{
+			button = (Button)Owner;
+			button.Awake();
+		}
+
+		protected internal override void Update(float delta)
+		{
+			button.OnUpdate(delta);
 		}
 	}
 

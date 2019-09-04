@@ -30,7 +30,7 @@ namespace Tangerine.UI.Timeline
 				var gridRow = row.Components.Get<Components.RowView>().GridRow;
 				var widget = gridRow.OverviewWidget;
 				if (!gridRow.OverviewWidgetAwakeBehavior.IsAwoken) {
-					widget.Update(0);
+					gridRow.OverviewWidgetAwakeBehavior.Update(0);
 				}
 				content.AddNode(widget);
 			}

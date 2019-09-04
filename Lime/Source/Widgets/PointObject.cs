@@ -66,7 +66,7 @@ namespace Lime
 			}
 
 		}
-
+		
 		public Vector2 TransformedPosition
 		{
 			get

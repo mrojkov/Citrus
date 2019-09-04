@@ -25,7 +25,7 @@ namespace Tangerine.Core
 
 		private static void FastForwardToFrame(Animation animation, int frameIndex)
 		{
-			var node = animation.Owner;
+			var node = animation.OwnerNode;
 			node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 			try {
 				CurrentFrameSetter.FastForwardToFrame(animation, frameIndex);
@@ -204,7 +204,7 @@ namespace Tangerine.Core
 				try {
 					bool movingBack;
 					var doc = Current;
-					var node = animation.Owner;
+					var node = animation.OwnerNode;
 					if (animation.IsLegacy && animationMode) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.GetColumn(animation.Id);
@@ -271,7 +271,7 @@ namespace Tangerine.Core
 				var remainDelta = delta;
 				do {
 					delta = Mathf.Min(remainDelta, Application.MaxDelta);
-					animation.Owner.Update(delta);
+					animation.OwnerNode.Update(delta);
 					remainDelta -= delta;
 				} while (remainDelta > 0f);
 			}

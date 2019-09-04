@@ -4,7 +4,7 @@ using System;
 namespace Lime
 {
 	[YuzuDontGenerateDeserializer]
-	public class WebBrowser : Widget
+	public class WebBrowser : Widget, IUpdatableNode
 	{
 		public static Func<Widget, IWebBrowserImplementation> BrowserFactory = widget => new WinFormsWebBrowser(widget);
 		private IWebBrowserImplementation implementation;
@@ -19,6 +19,7 @@ namespace Lime
 		{
 			Presenter = DefaultPresenter.Instance;
 			implementation = BrowserFactory(this);
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public WebBrowser(Widget parentWidget)
@@ -42,9 +43,8 @@ namespace Lime
 				implementation.OnSizeChanged(sizeDelta);
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			implementation.Update(delta);
 			implementation.Render();
 		}

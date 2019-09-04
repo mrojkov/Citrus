@@ -4,7 +4,7 @@ namespace Lime
 {
 	[TangerineRegisterNode(Order = 27)]
 	[TangerineAllowedParentTypes(typeof(Node3D), typeof(Viewport3D))]
-	public class SplineGear3D : Node
+	public class SplineGear3D : Node, IUpdatableNode
 	{
 		[YuzuMember]
 		[TangerineKeyframeColor(2)]
@@ -25,6 +25,7 @@ namespace Lime
 		public SplineGear3D()
 		{
 			RenderChainBuilder = null;
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		protected override Node CloneInternal()
@@ -35,9 +36,8 @@ namespace Lime
 			return clone;
 		}
 
-		public override void Update(float delta)
+		public virtual void OnUpdate(float delta)
 		{
-			base.Update(delta);
 			if (Parent == null) {
 				return;
 			}
