@@ -62,6 +62,7 @@ namespace Lime
 				var stretch = hull.ToAABB().Size.X;
 				shaderParams.Set(stretchParamKey, stretch);
 				shaderParams.Set(angleParamKey, radianAngle);
+				PlatformRenderer.SetTexture(1, GradientTexture);
 				PlatformRenderer.SetBlendState(BlendStateGetter?.Invoke() ?? Blending.Inherited.GetBlendState());
 				PlatformRenderer.SetShaderParams(shaderParamsArray);
 				PlatformRenderer.SetShaderProgram(GradientShaderProgram.GetInstance(BlendMode));
