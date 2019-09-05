@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -7,16 +8,23 @@ namespace Lime
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<Vector4> amountKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float BarrelPincushion { get; set; }
+		[YuzuMember]
 		public float ChromaticAberration { get; set; }
+		[YuzuMember]
 		public float Red { get; set; } = 1f;
+		[YuzuMember]
 		public float Green { get; set; }
+		[YuzuMember]
 		public float Blue { get; set; } = -1f;
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		public string Id { get; set; }
@@ -26,7 +34,7 @@ namespace Lime
 
 		public DistortionMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			amountKey = shaderParams.GetParamKey<Vector4>("uAmount");
@@ -35,24 +43,12 @@ namespace Lime
 		public void Apply(int pass)
 		{
 			shaderParams.Set(amountKey, new Vector4(ChromaticAberration * Red, ChromaticAberration * Green, ChromaticAberration * Blue, BarrelPincushion));
-			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.GetBlendState() : disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(DistortionShaderProgram.GetInstance(Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new DistortionMaterial(blending) {
-				BarrelPincushion = BarrelPincushion,
-				ChromaticAberration = ChromaticAberration,
-				Red = Red,
-				Green = Green,
-				Blue = Blue,
-				Opaque = Opaque
-			};
-		}
 	}
 
 	public class DistortionShaderProgram : ShaderProgram

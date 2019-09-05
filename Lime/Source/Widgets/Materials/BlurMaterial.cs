@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -8,17 +9,24 @@ namespace Lime
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<Vector2> stepKey;
 		private readonly ShaderParamKey<float> alphaCorrectionKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Radius { get; set; } = 1f;
+		[YuzuMember]
 		public BlurShaderId BlurShaderId { get; set; } = BlurShaderId.GaussOneDimensionalWith5Samples;
+		[YuzuMember]
 		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
+		[YuzuMember]
 		public Vector2 Dir { get; set; } = new Vector2(0, 1);
+		[YuzuMember]
 		public float AlphaCorrection { get; set; } = 1f;
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		public string Id { get; set; }
@@ -28,7 +36,7 @@ namespace Lime
 
 		public BlurMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			stepKey = shaderParams.GetParamKey<Vector2>("step");
@@ -39,24 +47,12 @@ namespace Lime
 		{
 			shaderParams.Set(stepKey, Dir * Radius * Step);
 			shaderParams.Set(alphaCorrectionKey, 1f / AlphaCorrection);
-			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.GetBlendState() : disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(BlurShaderProgram.GetInstance(BlurShaderId, Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new BlurMaterial(blending) {
-				Radius = Radius,
-				BlurShaderId = BlurShaderId,
-				Step = Step,
-				Dir = Dir,
-				AlphaCorrection = AlphaCorrection,
-				Opaque = Opaque
-			};
-		}
 	}
 
 	public enum BlurShaderId

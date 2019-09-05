@@ -7,7 +7,6 @@ namespace Lime
 		string Id { get; set; }
 		int PassCount { get; }
 		void Apply(int pass);
-		IMaterial Clone();
 		void Invalidate();
 	}
 

@@ -602,6 +602,22 @@ namespace Lime
 			return Serialization.Clone(this);
 		}
 
+		[YuzuBeforeSerialization]
+		public void OnBeforeSerialization()
+		{
+			foreach (var c in Components) {
+				c.OnBeforeNodeSerialization();
+			}
+		}
+
+		[YuzuAfterSerialization]
+		public void OnAfterSerialization()
+		{
+			foreach (var c in Components) {
+				c.OnAfterNodeSerialization();
+			}
+		}
+
 		/// <summary>
 		/// Returns a clone of the node hierarchy.
 		/// </summary>
@@ -654,8 +670,6 @@ namespace Lime
 		/// of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.
 		/// </summary>
 		public abstract void AddToRenderChain(RenderChain chain);
-
-		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
 
 		public void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
@@ -1161,9 +1175,6 @@ namespace Lime
 				Nodes.AddRange(nodes);
 			}
 
-			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
-			Presenter = content.Presenter?.Clone();
-			PostPresenter = content.PostPresenter?.Clone();
 			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {

@@ -58,8 +58,6 @@ namespace Lime
 				this.scrollView = scrollView;
 			}
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var slider = (Widget)node;

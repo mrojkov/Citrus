@@ -49,6 +49,10 @@ namespace Lime
 		{
 			return !type.IsDefined(typeof(NodeComponentDontSerializeAttribute), true);
 		}
+
+		protected internal virtual void OnBeforeNodeSerialization() { }
+
+		protected internal virtual void OnAfterNodeSerialization() { }
 	}
 
 	public class NodeBehavior : BehaviorComponent

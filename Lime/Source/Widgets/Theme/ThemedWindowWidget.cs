@@ -28,8 +28,6 @@ namespace Lime
 	[YuzuDontGenerateDeserializer]
 	internal class WindowWidgetPresenter : IPresenter
 	{
-		public IPresenter Clone() => this;
-
 		public Lime.RenderObject GetRenderObject(Node node)
 		{
 			var widget = (Widget)node;

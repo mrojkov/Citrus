@@ -44,8 +44,6 @@ namespace Lime
 
 		protected abstract class SeparatorsRenderPresenterBase : IPresenter
 		{
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var splitter = (Splitter)node;
@@ -221,8 +219,6 @@ namespace Lime
 		class SeparatorsHitTestPresenter : IPresenter
 		{
 			public int SeparatorUnderMouse { get; private set; } = -1;
-
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
 
 			public RenderObject GetRenderObject(Node node) => null;
 

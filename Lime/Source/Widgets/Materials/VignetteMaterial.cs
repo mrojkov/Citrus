@@ -1,8 +1,9 @@
+using Yuzu;
+
 namespace Lime
 {
 	public class VignetteMaterial : IMaterial
 	{
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> radiusKey;
@@ -11,10 +12,17 @@ namespace Lime
 		private readonly ShaderParamKey<Vector2> uvOffsetKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Radius { get; set; } = 0.75f;
+		[YuzuMember]
 		public float Softness { get; set; } = 0.45f;
+		[YuzuMember]
 		public Vector2 UV1 { get; set; } = Vector2.One;
+		[YuzuMember]
 		public Vector2 UVOffset { get; set; } = Vector2.Half;
+		[YuzuMember]
 		public Color4 Color { get; set; } = Color4.Black;
 
 		public string Id { get; set; }
@@ -24,7 +32,7 @@ namespace Lime
 
 		public VignetteMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			radiusKey = shaderParams.GetParamKey<float>("radius");
@@ -41,23 +49,12 @@ namespace Lime
 			shaderParams.Set(uv1Key, UV1);
 			shaderParams.Set(uvOffsetKey, UVOffset);
 			shaderParams.Set(colorKey, Color.ToVector4());
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(VignetteShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new VignetteMaterial(blending) {
-				Radius = Radius,
-				Softness = Softness,
-				UV1 = UV1,
-				UVOffset = UVOffset,
-				Color = Color
-			};
-		}
 	}
 
 	public class VignetteShaderProgram : ShaderProgram

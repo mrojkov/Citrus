@@ -1,4 +1,5 @@
 using System;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,9 +11,13 @@ namespace Lime
 		private readonly ShaderParamKey<Vector2> uv0Key;
 		private readonly ShaderParamKey<Vector2> uv1Key;
 
+		[YuzuMember]
 		public float Angle = 0;
+		[YuzuMember]
 		public Vector2 UV0;
+		[YuzuMember]
 		public Vector2 UV1;
+		[YuzuMember]
 		public Blending Blending;
 
 		public string Id { get; set; }
@@ -38,10 +43,6 @@ namespace Lime
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone() => new TwistMaterial() {
-			Angle = Angle,
-		};
 
 		public class TwistShaderProgram : ShaderProgram
 		{

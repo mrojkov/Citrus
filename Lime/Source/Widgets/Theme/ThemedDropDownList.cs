@@ -41,8 +41,6 @@ namespace Lime
 				new VectorShape.Line(0.5f, 0.55f, 0.3f, 0.35f, Color4.White.Transparentify(0.5f), 0.04f, false),
 			};
 
-			public IPresenter Clone() => this;
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var dd = (CommonDropDownList)node;

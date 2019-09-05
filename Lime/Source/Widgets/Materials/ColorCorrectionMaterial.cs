@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,16 +11,21 @@ namespace Lime
 		private const float DefaultContrast = 1f;
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<Vector3> hslKey;
 		private readonly ShaderParamKey<float> brightnessKey;
 		private readonly ShaderParamKey<float> contrastKey;
 
-		public Vector3 HSL = defaultHSL;
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
+		public Vector3 HSL { get; set; } = defaultHSL;
+		[YuzuMember]
 		public float Brightness { get; set; } = DefaultBrightness;
+		[YuzuMember]
 		public float Contrast { get; set; } = DefaultContrast;
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		private bool RequiredBrightnessContrastProcess =>
@@ -34,7 +40,7 @@ namespace Lime
 
 		public ColorCorrectionMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			hslKey = shaderParams.GetParamKey<Vector3>("inHsl");
@@ -47,19 +53,12 @@ namespace Lime
 			shaderParams.Set(hslKey, HSL);
 			shaderParams.Set(brightnessKey, Brightness);
 			shaderParams.Set(contrastKey, Contrast);
-			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.GetBlendState() : disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(ColorCorrectionShaderProgram.GetInstance(RequiredBrightnessContrastProcess, RequiredHSLProcess, Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone() => new ColorCorrectionMaterial(blending) {
-			HSL = HSL,
-			Brightness = Brightness,
-			Contrast = Contrast,
-			Opaque = Opaque
-		};
 	}
 
 	public class ColorCorrectionShaderProgram : ShaderProgram

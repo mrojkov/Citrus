@@ -257,8 +257,6 @@ namespace Lime
 				this.thickness = thikness;
 			}
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;
@@ -291,8 +289,6 @@ namespace Lime
 
 		internal class MouseHoverBorderPresenter : IPresenter
 		{
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;

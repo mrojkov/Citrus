@@ -7,7 +7,6 @@ namespace Lime
 	{
 		RenderObject GetRenderObject(Node node);
 		bool PartialHitTest(Node node, ref HitTestArgs args);
-		IPresenter Clone();
 	}
 
 	public class DefaultPresenter : IPresenter
@@ -22,11 +21,6 @@ namespace Lime
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
 			return node.PartialHitTest(ref args);
-		}
-
-		public IPresenter Clone()
-		{
-			return Instance;
 		}
 	}
 
@@ -66,15 +60,6 @@ namespace Lime
 				}
 			}
 			return false;
-		}
-
-		public IPresenter Clone()
-		{
-			var r = new CompoundPresenter();
-			foreach (var i in this) {
-				r.Add(i.Clone());
-			}
-			return r;
 		}
 
 		private class RenderObject : Lime.RenderObject
@@ -124,11 +109,6 @@ namespace Lime
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
-		public IPresenter Clone()
-		{
-			return (WidgetBoundsPresenter)MemberwiseClone();
-		}
-
 		private class RenderObject : WidgetRenderObject
 		{
 			public Vector2 Position;
@@ -172,11 +152,6 @@ namespace Lime
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
-		public IPresenter Clone()
-		{
-			return (WidgetFlatFillPresenter)MemberwiseClone();
-		}
-
 		private class RenderObject : WidgetRenderObject
 		{
 			public Vector2 Position;
@@ -209,8 +184,6 @@ namespace Lime
 		public virtual void Render(Node node) { }
 
 		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) => false;
-
-		public virtual IPresenter Clone() => (IPresenter)MemberwiseClone();
 
 		private class RenderObject : Lime.RenderObject
 		{

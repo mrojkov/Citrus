@@ -1,4 +1,5 @@
 using System;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,10 +11,15 @@ namespace Lime
 		private readonly ShaderParamKey<Vector2> rangeKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
 
+		[YuzuMember]
 		public float Brightness = 1;
+		[YuzuMember]
 		public Vector2 Range = new Vector2(0.0f, -0.001f);
+		[YuzuMember]
 		public Vector4 Color = Vector4.One;
+		[YuzuMember]
 		public ITexture MaskTexture;
+		[YuzuMember]
 		public Blending Blending;
 
 		public string Id { get; set; }
@@ -40,13 +46,6 @@ namespace Lime
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone() => new DissolveMaterial() {
-			Brightness = Brightness,
-			Range = Range,
-			Color = Color,
-			MaskTexture = MaskTexture
-		};
 
 		public class DissolveMaterialShaderProgram : ShaderProgram
 		{

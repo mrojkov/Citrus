@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,6 +11,7 @@ namespace Lime
 		CutOut
 	}
 
+	[YuzuCopyable]
 	public class WidgetMaterial : IMaterial
 	{
 		private static Dictionary<int, WidgetMaterial> instanceCache = new Dictionary<int, WidgetMaterial>();
@@ -56,8 +58,6 @@ namespace Lime
 			PassCount = Blending == Blending.Glow || Blending == Blending.Darken ? 2 : 1;
 		}
 
-		public IMaterial Clone() => this;
-
 		public void Apply(int pass)
 		{
 			if (PassCount == 2 && pass == 0) {
@@ -77,6 +77,7 @@ namespace Lime
 		}
 	}
 
+	[YuzuCopyable]
 	public class ColorfulTextMaterial : IMaterial
 	{
 		private static Dictionary<int, ColorfulTextMaterial> instanceCache = new Dictionary<int, ColorfulTextMaterial>();
@@ -114,8 +115,6 @@ namespace Lime
 		{
 			return (int)blending | (styleIndex << 8);
 		}
-
-		public IMaterial Clone() => this;
 
 		public void Invalidate()
 		{

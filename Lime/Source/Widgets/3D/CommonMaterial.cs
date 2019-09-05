@@ -184,23 +184,6 @@ namespace Lime
 			shadowsProgram = program = null;
 		}
 
-		public IMaterial Clone()
-		{
-			return new CommonMaterial {
-				Id = Id,
-				DiffuseColor = DiffuseColor,
-				FogMode = FogMode,
-				FogColor = FogColor,
-				FogStart = FogStart,
-				FogEnd = FogEnd,
-				FogDensity = FogDensity,
-				Blending = Blending,
-				DiffuseTexture = DiffuseTexture,
-				SkinEnabled = SkinEnabled,
-				SkinningMode = SkinningMode
-			};
-		}
-
 		private class ShaderParamKeys
 		{
 			public readonly ShaderParamKey<Matrix44> WorldViewProj;

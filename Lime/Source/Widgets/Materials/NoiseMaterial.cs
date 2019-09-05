@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -14,9 +15,16 @@ namespace Lime
 		private readonly ShaderParamKey<float> darkThresholdKey;
 		private readonly ShaderParamKey<float> softLightKey;
 
+		[YuzuMember]
 		public float BrightThreshold { get; set; } = 1f;
+
+		[YuzuMember]
 		public float DarkThreshold { get; set; }
+
+		[YuzuMember]
 		public float SoftLight { get; set; } = 1f;
+
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		public string Id { get; set; }
@@ -42,12 +50,6 @@ namespace Lime
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone() => new NoiseMaterial {
-			BrightThreshold = BrightThreshold,
-			DarkThreshold = DarkThreshold,
-			SoftLight = SoftLight
-		};
 	}
 
 	public class NoiseShaderProgram : ShaderProgram

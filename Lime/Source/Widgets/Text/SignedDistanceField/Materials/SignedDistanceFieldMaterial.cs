@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime.SignedDistanceField
 {
@@ -12,7 +13,6 @@ namespace Lime.SignedDistanceField
 
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> softnessKey;
@@ -24,11 +24,19 @@ namespace Lime.SignedDistanceField
 		private int currentVersion;
 		private ColorGradient gradient;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Softness { get; set; } = 0f;
+		[YuzuMember]
 		public float Dilate { get; set; } = 0f;
+		[YuzuMember]
 		public float Thickness { get; set; } = 0f;
+		[YuzuMember]
 		public Color4 OutlineColor { get; set; } = Color4.Black;
+		[YuzuMember]
 		public bool GradientEnabled { get; set; }
+		[YuzuMember]
 		public ColorGradient Gradient
 		{
 			get => gradient;
@@ -39,6 +47,7 @@ namespace Lime.SignedDistanceField
 				}
 			}
 		}
+		[YuzuMember]
 		public float GradientAngle { get; set; } = 0f;
 		public Texture2D GradientTexture { get; private set; }
 
@@ -50,7 +59,7 @@ namespace Lime.SignedDistanceField
 
 		public SignedDistanceFieldMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			softnessKey = shaderParams.GetParamKey<float>("softness");
@@ -68,7 +77,7 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(outlineColorKey, OutlineColor.ToVector4());
 			shaderParams.Set(gradientAngleKey, GradientAngle * Mathf.DegToRad);
 
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShaderProgram.GetInstance(GradientEnabled, Thickness > Mathf.ZeroTolerance));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 			if (GradientEnabled && Gradient != null) {
@@ -99,16 +108,6 @@ namespace Lime.SignedDistanceField
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new SignedDistanceFieldMaterial(blending) {
-				Softness = Softness,
-				Dilate = Dilate,
-				Thickness = Thickness,
-			};
-		}
-
 	}
 
 	public class SDFMaterialProvider : Sprite.IMaterialProvider

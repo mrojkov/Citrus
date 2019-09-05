@@ -118,8 +118,6 @@ namespace Lime
 		{
 			public int SeparatorUnderMouse { get; private set; }
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public RenderObject GetRenderObject(Node node) => null;
 
 			public bool PartialHitTest(Node node, ref HitTestArgs args)

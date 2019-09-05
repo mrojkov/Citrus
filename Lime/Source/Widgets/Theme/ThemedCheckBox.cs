@@ -57,8 +57,6 @@ namespace Lime
 				return ro;
 			}
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			private class RenderObject : WidgetRenderObject
 			{
 				public Vector2 Size;

@@ -238,8 +238,6 @@ namespace Lime
 			return false;
 		}
 
-		public IPresenter Clone() => new PostProcessingPresenter();
-
 		public enum DebugViewMode
 		{
 			None,

@@ -52,8 +52,6 @@ namespace Lime
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
 
-		public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 		private class RenderObject : WidgetRenderObject
 		{
 			public Vector2 Position;
@@ -179,8 +177,6 @@ namespace Lime
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args) => false;
-
-		public IPresenter Clone() => (IPresenter)MemberwiseClone();
 
 		private class RenderObject : WidgetRenderObject
 		{
