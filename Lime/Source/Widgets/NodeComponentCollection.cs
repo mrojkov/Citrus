@@ -124,6 +124,10 @@ namespace Lime
 		{
 		}
 
+		public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)
+		{
+		}
+
 		private static ThreadLocal<OverridenBehaviorMethodChecker> behaviorEarlyUpdateChecker =
 			new ThreadLocal<OverridenBehaviorMethodChecker>(() => new OverridenBehaviorMethodChecker(nameof(NodeBehavior.Update)));
 
