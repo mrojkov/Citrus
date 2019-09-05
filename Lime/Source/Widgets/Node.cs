@@ -1057,6 +1057,7 @@ namespace Lime
 		[NodeComponentDontSerialize]
 		public class AssetBundlePathComponent : NodeComponent
 		{
+			[YuzuMember]
 			public string Path;
 			public AssetBundlePathComponent()
 			{
