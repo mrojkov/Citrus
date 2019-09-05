@@ -433,7 +433,7 @@ namespace Lime
 					foreach (var node in GetAnimationNodes(model, animation)) {
 						foreach (var animator in node.Animators) {
 							if (animator.AnimationId == srcAnimation.Id) {
-								var newAnimator = animator.Clone();
+								var newAnimator = Serialization.Clone(animator);
 								animator.AnimationId = newAnimation.Id;
 								CopyKeys(animator, newAnimator, animation.StartFrame, animation.LastFrame);
 								if (newAnimator.Keys.Count > 0) {

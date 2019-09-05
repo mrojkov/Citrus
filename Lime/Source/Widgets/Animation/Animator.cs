@@ -30,7 +30,6 @@ namespace Lime
 	public interface IAnimator : IDisposable, IAbstractAnimator
 	{
 		IAnimationHost Owner { get; set; }
-		IAnimator Clone();
 		string TargetPropertyPath { get; set; }
 		string AnimationId { get; set; }
 		bool Enabled { get; set; }
@@ -200,19 +199,6 @@ namespace Lime
 			if (ReadonlyKeys.RefCount > 1) {
 				ReadonlyKeys = Serialization.Clone(ReadonlyKeys);
 			}
-		}
-
-		public IAnimator Clone()
-		{
-			var clone = (Animator<T>)MemberwiseClone();
-			clone.setter = null;
-			clone.animable = null;
-			clone.IsZombie = false;
-			clone.Owner = null;
-			clone.boxedKeys = null;
-			boxedKeys = null;
-			ReadonlyKeys.AddRef();
-			return clone;
 		}
 
 		public void Unbind()

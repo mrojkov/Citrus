@@ -79,19 +79,6 @@ namespace Lime
 		}
 
 		void IAnimationHost.OnTrigger(string property, object value, double animationTimeCorrection) { }
-
-		public AnimationTrack Clone()
-		{
-			var clone = (AnimationTrack)MemberwiseClone();
-			clone.cachedTime = double.NaN;
-			clone.Owner = null;
-			clone.Clips = new AnimationClipList(clone, Clips.Count);
-			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			foreach (var clip in Clips) {
-				clone.Clips.Add(clip.Clone());
-			}
-			return clone;
-		}
 	}
 
 	public class AnimationTrackList : IList<AnimationTrack>
@@ -155,15 +142,6 @@ namespace Lime
 		{
 			get { return tracks[index]; }
 			set { throw new NotSupportedException(); }
-		}
-
-		public AnimationTrackList Clone(Animation newOwner)
-		{
-			var result = new AnimationTrackList(newOwner, Count);
-			foreach (var track in this) {
-				result.Add(track.Clone());
-			}
-			return result;
 		}
 
 		public int FindIndex(Predicate<AnimationTrack> match)
