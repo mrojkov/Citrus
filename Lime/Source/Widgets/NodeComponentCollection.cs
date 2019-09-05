@@ -44,6 +44,11 @@ namespace Lime
 		protected virtual void OnOwnerChanged(Node oldOwner) { }
 
 		public virtual void Dispose() { }
+
+		public static bool IsSerializable(Type type)
+		{
+			return !type.IsDefined(typeof(NodeComponentDontSerializeAttribute), true);
+		}
 	}
 
 	public class NodeBehavior : BehaviorComponent
@@ -86,15 +91,6 @@ namespace Lime
 			earlyBehaviorContainer = null;
 			lateBehaviorContainer = null;
 			registered = false;
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (NodeBehavior)base.Clone();
-			clone.earlyBehaviorContainer = null;
-			clone.lateBehaviorContainer = null;
-			clone.registered = false;
-			return clone;
 		}
 
 		private void RemoveFromContainer(LegacyBehaviorContainer container)
@@ -236,15 +232,6 @@ namespace Lime
 		}
 
 		protected abstract void UpdateBehavior(NodeBehavior b, float delta);
-
-		public override NodeComponent Clone()
-		{
-			// TODO: This component should not be cloned
-			var clone = (LegacyBehaviorContainer)base.Clone();
-			clone.behaviors = new List<NodeBehavior>();
-			clone.attached = false;
-			return clone;
-		}
 	}
 
 	public class NodeComponentCollection : ComponentCollection<NodeComponent>
@@ -296,7 +283,7 @@ namespace Lime
 		[global::Yuzu.YuzuSerializeItemIf]
 		private bool SerializeItemIf(int index, Object component)
 		{
-			return !component.GetType().IsDefined(typeof(NodeComponentDontSerializeAttribute), true);
+			return NodeComponent.IsSerializable(component.GetType());
 		}
 	}
 }

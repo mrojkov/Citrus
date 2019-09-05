@@ -1173,18 +1173,24 @@ namespace Lime
 						Components.Add(Serialization.Clone(assetBundlePathComponent));
 					}
 					Components.Remove(typeof(AnimationComponent));
-					var animationBehavior = content.Components.Get<AnimationComponent>();
-					if (animationBehavior != null) {
-						Components.Add(animationBehavior.Clone());
-					}
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
 				}
 			} else {
 				Components.Clear();
 				foreach (var c in content.Components) {
-					Components.Add(Serialization.Clone(c));
+					if (NodeComponent.IsSerializable(c.GetType())) {
+						Components.Add(Serialization.Clone(c));
+					}
 				}
+			}
+			var animationComponent = content.Components.Get<AnimationComponent>();
+			if (animationComponent != null) {
+				var newAnimationComponent = new AnimationComponent();
+				foreach (var a in animationComponent.Animations) {
+					newAnimationComponent.Animations.Add(Serialization.Clone(a));
+				}
+				Components.Add(newAnimationComponent);
 			}
 		}
 
@@ -1489,18 +1495,6 @@ namespace Lime
 		{
 			Animations = new AnimationCollection(this);
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (AnimationComponent)base.Clone();
-			clone.Animations = new AnimationCollection(clone);
-			clone.Processor = null;
-			clone.Depth = -1;
-			foreach (var a in Animations) {
-				clone.Animations.Add(a.Clone());
-			}
-			return clone;
-		}
 	}
 
 	[NodeComponentDontSerialize]
@@ -1561,15 +1555,6 @@ namespace Lime
 					Suspend();
 				}
 			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (BoneArrayUpdaterBehavior)base.Clone();
-			clone.bones = new List<Bone>();
-			clone.needResort = false;
-			clone.attached = false;
-			return clone;
 		}
 	}
 }
