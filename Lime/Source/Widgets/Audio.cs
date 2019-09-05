@@ -143,10 +143,10 @@ namespace Lime
 		public List<SerializableSample> Samples { get; private set; } = new List<SerializableSample>();
 
 		[YuzuMember]
-		public NumericRange Pitch { get; set; }
+		public NumericRange Pitch { get; set; } = new NumericRange(1, 0);
 
 		[YuzuMember]
-		public NumericRange Volume { get; set; }
+		public NumericRange Volume { get; set; } = new NumericRange(1, 0);
 
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
