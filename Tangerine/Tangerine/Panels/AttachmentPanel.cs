@@ -446,7 +446,7 @@ namespace Tangerine
 								attachment.Materials,
 								attachment.Materials.Count,
 								new Model3DAttachment.MaterialRemap {
-									Material = material.Clone(),
+									Material = Serialization.Clone(material),
 									SourceName = material.Id,
 							}));
 						});
@@ -561,7 +561,7 @@ namespace Tangerine
 				var submeshes = source.Descendants.OfType<Mesh3D>().SelectMany(sm => sm.Submeshes);
 				foreach (var submesh3D in submeshes) {
 					if (submesh3D.Material != null) {
-						meta.SourceMaterials.Add(submesh3D.Material.Clone());
+						meta.SourceMaterials.Add(Serialization.Clone(submesh3D.Material));
 					}
 				}
 			}

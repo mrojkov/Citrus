@@ -50,7 +50,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			foreach (var animator in from.Animators) {
-				to.Animators.Add(animator.Clone());
+				to.Animators.Add(Serialization.Clone(animator));
 			}
 		}
 

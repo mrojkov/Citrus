@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core;
 using Tangerine.UI;
+using Yuzu;
 
 namespace Tangerine.Panels
 {
@@ -167,7 +168,10 @@ namespace Tangerine.Panels
 
 		private class Joint : Widget
 		{
+			[YuzuMember]
 			public JointType Type { get; set; }
+
+			public Joint() { }
 
 			public Joint(JointType type, float size)
 			{

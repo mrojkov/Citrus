@@ -30,7 +30,7 @@ namespace Tangerine.Core.Operations
 			to.Components.Remove(typeof(Node.AssetBundlePathComponent));
 			var assetBundlePathComponent = from.Components.Get<Node.AssetBundlePathComponent>();
 			if (assetBundlePathComponent != null) {
-				to.Components.Add(assetBundlePathComponent.Clone());
+				to.Components.Add(Serialization.Clone(assetBundlePathComponent));
 			}
 			to.Animations.Clear();
 			var animations = from.Animations.ToList();
@@ -40,9 +40,6 @@ namespace Tangerine.Core.Operations
 			from.Nodes.Clear();
 			to.Nodes.Clear();
 			to.Nodes.AddRange(nodes);
-			to.RenderChainBuilder = from.RenderChainBuilder?.Clone(to);
-			to.Presenter = from.Presenter?.Clone();
-			to.PostPresenter = from.PostPresenter?.Clone();
 		}
 
 		public class Processor : OperationProcessor<ReplaceContents>
