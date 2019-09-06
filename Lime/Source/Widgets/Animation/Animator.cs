@@ -139,7 +139,7 @@ namespace Lime
 				if (readonlyKeys != value) {
 					readonlyKeys?.Release();
 					readonlyKeys = value;
-					readonlyKeys.AddRef();
+					readonlyKeys?.AddRef();
 					boxedKeys = null;
 				}
 			}
