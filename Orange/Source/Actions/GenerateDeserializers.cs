@@ -8,30 +8,31 @@ using System.Text;
 using Lime;
 using Yuzu.Binary;
 using Yuzu.Metadata;
+using Yuzu.Clone;
 
 namespace Orange
 {
 	static partial class Actions
 	{
 		[Export(nameof(OrangePlugin.MenuItems))]
-		[ExportMetadata("Label", "Generate Lime deserializers")]
+		[ExportMetadata("Label", "Generate Lime Deserializers And Cloners")]
 		[ExportMetadata("Priority", 5)]
-		public static void GenerateLimeDeserializersAction()
+		public static void GenerateLimeDeserializersAndClonersAction()
 		{
-			GenerateBinaryDeserializers();
+			GenerateBinaryDeserializersAndCloners();
 			Console.WriteLine("Done. Please rebuild Orange.");
 		}
 
 		[Export(nameof(OrangePlugin.MenuItems))]
-		[ExportMetadata("Label", "Generate Project Deserializers")]
+		[ExportMetadata("Label", "Generate Project Deserializers And Cloners")]
 		[ExportMetadata("Priority", 5)]
-		public static void GenerateProjectDeserializersAction()
+		public static void GenerateProjectDeserializersAndClonersAction()
 		{
-			GenerateBinaryDeserializersForApp();
+			GenerateBinaryDeserializersAndClonersForApp();
 			Console.WriteLine("Done.");
 		}
 
-		public static void GenerateBinaryDeserializersForApp()
+		public static void GenerateBinaryDeserializersAndClonersForApp()
 		{
 			// Ensure all game dlls are up to date
 			// TODO: Require game project to support TangerineRelease and OrangerRelease build configurations
@@ -47,9 +48,15 @@ namespace Orange
 				},
 				GenerateForAssemblies(PluginLoader.EnumerateOrangeAndTangerinePluginAssemblies())
 			);
+			Generate(Path.Combine(generatedDeserializersPath, "YuzuGeneratedCloners.cs"),
+				new ClonerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, $"{The.Workspace.Title}Cloner", "LimeCloner") {
+					LineSeparator = "\n",
+				},
+				GenerateForAssemblies(PluginLoader.EnumerateOrangeAndTangerinePluginAssemblies())
+			);
 		}
 
-		public static void GenerateBinaryDeserializers()
+		public static void GenerateBinaryDeserializersAndCloners()
 		{
 			var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.StartsWith("Lime", StringComparison.OrdinalIgnoreCase)).First();
 			Generate(Path.Combine(Toolbox.CalcCitrusDirectory(), "Lime", "Source", "YuzuGeneratedBinaryDeserializer.cs"),
@@ -58,11 +65,17 @@ namespace Orange
 				},
 				GenerateForAssemblies(new[] { assembly })
 			);
+			Generate(Path.Combine(Toolbox.CalcCitrusDirectory(), "Lime", "Source", "YuzuGeneratedCloners.cs"),
+				new ClonerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, "LimeCloner") {
+					LineSeparator = "\n",
+				},
+				GenerateForAssemblies(new[] { assembly })
+			);
 		}
 
-		private static Action<BinaryDeserializerGenerator> GenerateForAssemblies(IEnumerable<Assembly> assemblies)
+		private static Action<Yuzu.IGenerator> GenerateForAssemblies(IEnumerable<Assembly> assemblies)
 		{
-			return (ybdg) => {
+			return (yg) => {
 				var types = new List<Type>();
 				foreach (var assembly in assemblies) {
 					foreach (var t in assembly.GetTypes()) {
@@ -93,21 +106,21 @@ namespace Orange
 					}
 					types.Sort((a, b) => a.FullName.CompareTo(b.FullName));
 					foreach (var t in types) {
-						ybdg.Generate(t);
+						yg.Generate(t);
 						Console.WriteLine(t.FullName);
 					}
 				}
 			};
 		}
 
-		private static void Generate(string filename, BinaryDeserializerGenerator ybdg, Action<BinaryDeserializerGenerator> fill)
+		private static void Generate(string filename, Yuzu.IGenerator yg, Action<Yuzu.IGenerator> fill)
 		{
 			using (var ms = new MemoryStream())
 			using (var sw = new StreamWriter(ms)) {
-				ybdg.GenWriter = sw;
-				ybdg.GenerateHeader();
-				fill(ybdg);
-				ybdg.GenerateFooter();
+				yg.GenWriter = sw;
+				yg.GenerateHeader();
+				fill(yg);
+				yg.GenerateFooter();
 				sw.Flush();
 				ms.WriteTo(new FileStream(filename, FileMode.Create));
 			}
