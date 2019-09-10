@@ -365,7 +365,9 @@ namespace Tangerine
 						var clone = node.Clone().AsWidget;
 						clone.Position = Vector2.Zero;
 						clone.Visible = true;
-						Document.ExportNodeToFile(assetPath, assetPath, DocumentFormat.Tan, clone);
+						clone.LoadExternalScenes();
+						clone.ContentsPath = null;
+						Document.ExportNodeToFile(dlg.FileName, assetPath, Document.Current.Format, clone);
 					} catch (System.Exception e) {
 						AlertDialog.Show(e.Message);
 					}
