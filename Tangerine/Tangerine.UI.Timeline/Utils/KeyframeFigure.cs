@@ -49,13 +49,11 @@ namespace Tangerine.UI
 					var circleRadius = 0f;
 					if (segmentWidth < segmentHeight) {
 						circleRadius = circleCenter.X - a.X - 0.5f;
-					}
-					else {
+					} else {
 						circleRadius = circleCenter.Y - a.Y - 0.5f;
 					}
 					Renderer.DrawRound(circleCenter, circleRadius, numSegments: 6, color);
 					break;
-
 				default:
 					throw new System.NotImplementedException("Unknown KeyFunction value");
 			}
