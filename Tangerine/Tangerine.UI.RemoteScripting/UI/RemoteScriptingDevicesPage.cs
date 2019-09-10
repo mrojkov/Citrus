@@ -209,7 +209,7 @@ namespace Tangerine.UI.RemoteScripting
 					var caughtClients = new HashSet<HostClient>();
 					while (!cancellationToken.IsCancellationRequested) {
 						foreach (var client in host.Clients) {
-							if (!caughtClients.Contains(client)) {
+							if (client.WasVerified && !caughtClients.Contains(client)) {
 								caughtClients.Add(client);
 								RegisterDevice(client);
 							}

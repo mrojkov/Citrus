@@ -50,6 +50,9 @@ namespace RemoteScripting
 		private async void CreateClient(TcpClient tcpClient)
 		{
 			var client = new HostClient(tcpClient);
+
+			void EnqueueClientException(Exception exception) => client.EnqueueReceivedMessage(new NetworkText($"\nClient disconnected with exception:\n{exception}"));
+
 			try {
 				if (!clients.TryAdd(client, null)) {
 					throw new InvalidOperationException();
@@ -57,16 +60,16 @@ namespace RemoteScripting
 				await client.ProcessConnectionAsync().ConfigureAwait(continueOnCapturedContext: false);
 			} catch (System.IO.IOException exception) {
 				// Suppress
-				Console.WriteLine(exception);
+				EnqueueClientException(exception);
 			} catch (ObjectDisposedException exception) {
 				// Suppress
-				Console.WriteLine(exception);
+				EnqueueClientException(exception);
 			} catch (TaskCanceledException exception) {
 				// Suppress
-				Console.WriteLine(exception);
+				EnqueueClientException(exception);
 			} catch (NetworkException exception) {
 				// Suppress
-				Console.WriteLine(exception);
+				EnqueueClientException(exception);
 			} catch (Exception exception) {
 				Abort(exception);
 			} finally {
