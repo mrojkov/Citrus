@@ -35,6 +35,8 @@ namespace RemoteScripting
 
 		public bool TryReceiveMessage(out NetworkMessage message) => messagesReceiveQueue.TryDequeue(out message);
 
+		internal void EnqueueReceivedMessage(NetworkMessage message) => messagesReceiveQueue.Enqueue(message);
+
 		protected internal async Task ProcessConnectionAsync()
 		{
 			var stopWatch = new Stopwatch();
