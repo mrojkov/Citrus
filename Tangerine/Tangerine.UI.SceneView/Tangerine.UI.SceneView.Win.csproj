@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Presenters\Animation2DPathPresenter.cs" />
     <Compile Include="Presenters\Animation3DPathPresenter.cs" />
+    <Compile Include="Presenters\WavePivotPresenter.cs" />
     <Compile Include="Processors\FrameProgressionProcessor.cs" />
     <Compile Include="Presenters\InspectRootNodePresenter.cs" />
     <Compile Include="Presenters\NineGridLinePresenter.cs" />

@@ -47,7 +47,7 @@ namespace Lime
 			get => CustomMaterial.Amplitude;
 			set => CustomMaterial.Amplitude = value;
 		}
-
+		
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
@@ -55,5 +55,6 @@ namespace Lime
 				CustomMaterial.BlendingGetter = () => Owner.AsWidget.Blending;
 			}
 		}
+
 	}
 }
