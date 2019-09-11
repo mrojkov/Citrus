@@ -739,6 +739,11 @@ namespace Lime
 		/// </summary>
 		public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
+			foreach (var c in Components) {
+				if (c is NodeBehavior b) {
+					b.OnTrigger(property, value, animationTimeCorrection);
+				}
+			}
 			if (property != "Trigger") {
 				return;
 			}

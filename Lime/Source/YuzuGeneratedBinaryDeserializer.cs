@@ -1636,6 +1636,40 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__AudioRandomizerComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.AudioRandomizerComponent)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Pitch = (global::Lime.NumericRange)dg.ReadStruct<global::Lime.NumericRange>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.SerializableSample)dg.ReadObject<global::Lime.SerializableSample>();
+						result.Samples.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Volume = (global::Lime.NumericRange)dg.ReadStruct<global::Lime.NumericRange>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__AudioRandomizerComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.AudioRandomizerComponent();
+			Read_Lime__AudioRandomizerComponent(d, def, result);
+			return result;
+		}
+
 		private static object Make_Lime__BezierEasing(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.BezierEasing();
@@ -10342,6 +10376,7 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.Animator<float>)] = Read_Lime__Animator_Single;
 			readCache[typeof(global::Lime.Animator<string>)] = Read_Lime__Animator_String;
 			readCache[typeof(global::Lime.Audio)] = Read_Lime__Audio;
+			readCache[typeof(global::Lime.AudioRandomizerComponent)] = Read_Lime__AudioRandomizerComponent;
 			readCache[typeof(global::Lime.BlendingOption)] = Read_Lime__BlendingOption;
 			readCache[typeof(global::Lime.Bone)] = Read_Lime__Bone;
 			readCache[typeof(global::Lime.Button)] = Read_Lime__Button;
@@ -10508,6 +10543,7 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Animator<float>)] = Make_Lime__Animator_Single;
 			makeCache[typeof(global::Lime.Animator<string>)] = Make_Lime__Animator_String;
 			makeCache[typeof(global::Lime.Audio)] = Make_Lime__Audio;
+			makeCache[typeof(global::Lime.AudioRandomizerComponent)] = Make_Lime__AudioRandomizerComponent;
 			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__BezierEasing;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
 			makeCache[typeof(global::Lime.BlendingOption)] = Make_Lime__BlendingOption;

@@ -1,4 +1,5 @@
 using Yuzu;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -93,8 +94,10 @@ namespace Lime
 
 		public void Play()
 		{
-			sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
-			sound.StopChecker = ShouldStop;
+			if (Sample != null) {
+				sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
+				sound.StopChecker = ShouldStop;
+			}
 		}
 
 		public void Stop()
@@ -118,6 +121,7 @@ namespace Lime
 
 		public override void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
+			base.OnTrigger(property, value, animationTimeCorrection);
 			if (property == "Action") {
 				var action = (AudioAction)value;
 				if (GloballyEnable && !GetTangerineFlag(TangerineFlags.Hidden)) {
@@ -127,8 +131,35 @@ namespace Lime
 						Stop();
 					}
 				}
-			} else {
-				base.OnTrigger(property, value, animationTimeCorrection);
+			}
+		}
+	}
+
+	[TangerineRegisterComponent]
+	[AllowedComponentOwnerTypes(typeof(Audio))]
+	public class AudioRandomizerComponent : NodeBehavior
+	{
+		[YuzuMember]
+		public List<SerializableSample> Samples { get; private set; } = new List<SerializableSample>();
+
+		[YuzuMember]
+		public NumericRange Pitch { get; set; } = new NumericRange(1, 0);
+
+		[YuzuMember]
+		public NumericRange Volume { get; set; } = new NumericRange(1, 0);
+
+		protected override void OnOwnerChanged(Node oldOwner)
+		{
+			base.OnOwnerChanged(oldOwner);
+		}
+
+		public override void OnTrigger(string property, object value, double animationTimeCorrection = 0)
+		{
+			if (Samples.Count > 0) {
+				var audio = (Audio)Owner;
+				audio.Sample = Samples[Mathf.RandomInt(Samples.Count)];
+				audio.Pitch = Pitch.NormalRandomNumber();
+				audio.Volume = Volume.NormalRandomNumber();
 			}
 		}
 	}
