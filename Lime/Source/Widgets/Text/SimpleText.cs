@@ -83,9 +83,10 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineKeyframeColor(31)]
+		[TangerineValidRange(0f, float.MaxValue, WarningLevel = ValidationResult.Warning)]
 		public float FontHeight
 		{
-			get { return fontHeight; }
+			get => fontHeight;
 			set
 			{
 				if (value != fontHeight) {
