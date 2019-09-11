@@ -160,7 +160,7 @@ namespace Orange
 				extraBundles.Reverse();
 				PluginLoader.AfterBundlesCooked(extraBundles);
 				if (requiredCookCode) {
-					CodeCooker.Cook(Target, CookingRulesMap, extraBundles);
+					CodeCooker.Cook(Target, CookingRulesMap, bundles.ToList());
 				}
 				StopBenchmark(allTimer, "All bundles cooked: ");
 				PrintBenchmark();
