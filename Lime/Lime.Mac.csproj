@@ -481,6 +481,7 @@
     <Compile Include="Source\Widgets\Processors\BoundingRectProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
+    <Compile Include="Source\Widgets\Materials\GradientComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

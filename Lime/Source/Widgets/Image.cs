@@ -15,7 +15,7 @@ namespace Lime
 		[TangerineKeyframeColor(15)]
 		public override sealed ITexture Texture
 		{
-			get { return texture; }
+			get => texture;
 			set
 			{
 				if (texture != value) {
@@ -157,7 +157,7 @@ namespace Lime
 			public override void Render()
 			{
 				Renderer.Transform1 = LocalToWorldTransform;
-				Renderer.DrawSprite(Texture, null, Material, Color, Position, Size, UV0, UV1, Vector2.Zero, Vector2.Zero);
+				Renderer.DrawSprite(Texture, null, Material, Color, Position, Size, UV0, UV1, Vector2.Zero, Vector2.One);
 			}
 
 			protected override void OnRelease()

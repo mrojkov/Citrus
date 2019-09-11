@@ -45,6 +45,10 @@ namespace Lime
 
 		public void Rasterize(ref Color4[] pixels)
 		{
+			if (Count == 0) {
+				return;
+			}
+
 			var pixelCount = pixels.Length;
 			var i = 0;
 			var sorted = Ordered().ToList();
@@ -57,6 +61,7 @@ namespace Lime
 					pixels[i++] = Color4.Lerp(ratio, sorted[j].Color, sorted[j + 1].Color);
 				}
 			}
+
 			while (i < pixelCount - 1) {
 				pixels[i++] = sorted[Count - 1].Color;
 			}
