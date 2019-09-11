@@ -258,7 +258,7 @@ namespace Lime
 
 		public bool CanDisplay(char ch)
 		{
-			return Font.Chars.Get(ch, fontHeight) != FontChar.Null;
+			return Font.CharSource.Get(ch, fontHeight) != FontChar.Null;
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)

@@ -233,7 +233,7 @@ namespace Lime.Text
 						k -= 1;
 						var font = Styles[word.Style].Font;
 						var fontHeight = Styles[word.Style].Size;
-						var fontChar = font.Chars.Get(texts[word.TextIndex][word.Start], fontHeight);
+						var fontChar = font.CharSource.Get(texts[word.TextIndex][word.Start], fontHeight);
 						if (fontChar == FontChar.Null) {
 							continue;
 						}

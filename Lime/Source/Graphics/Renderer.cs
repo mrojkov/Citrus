@@ -383,7 +383,7 @@ namespace Lime
 			if (list != null) {
 				for (int i = 0; i < length; i++) {
 					char ch = text[i + start];
-					if (ch != '\n' && ch != '\r' && font.Chars.Get(ch, fontHeight) != FontChar.Null)
+					if (ch != '\n' && ch != '\r' && font.CharSource.Get(ch, fontHeight) != FontChar.Null)
 						++j;
 				}
 			}
@@ -404,7 +404,7 @@ namespace Lime
 				} else if (ch == '\r') {
 					continue;
 				}
-				FontChar fontChar = font.Chars.Get(ch, fontHeight);
+				FontChar fontChar = font.CharSource.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					continue;

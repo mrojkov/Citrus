@@ -10,7 +10,7 @@ namespace Lime
 	{
 		string About { get; }
 		float Spacing { get; }
-		IFontCharSource Chars { get; }
+		IFontCharSource CharSource { get; }
 		void ClearCache();
 		bool RoundCoordinates { get; }
 	}
@@ -23,28 +23,26 @@ namespace Lime
 
 	public class Font : IFont
 	{
-		private FontCharCollection chars;
-
 		[YuzuMember]
 		public string About { get; set; }
 		[YuzuMember]
 		public float Spacing { get; set; }
 		[YuzuMember]
-		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
-		public List<ITexture> Textures => chars.Textures;
+		public List<ITexture> Textures => CharCollection.Textures;
 		[YuzuMember]
-		public IFontCharSource Chars => chars;
+		public FontCharCollection CharCollection { get; private set; }
+		public IFontCharSource CharSource => CharCollection;
 		[YuzuMember]
 		public bool RoundCoordinates { get; set; } = false;
 
 		public Font()
 		{
-			chars = new FontCharCollection();
+			CharCollection = new FontCharCollection();
 		}
 
 		public Font(FontCharCollection chars)
 		{
-			this.chars = chars;
+			CharCollection = chars;
 		}
 
 		public void Dispose()
@@ -77,7 +75,7 @@ namespace Lime
 					prevChar = null;
 					continue;
 				}
-				var fontChar = font.Chars.Get(ch, fontHeight);
+				var fontChar = font.CharSource.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					continue;
 				}

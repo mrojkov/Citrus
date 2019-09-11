@@ -36,7 +36,7 @@ namespace Lime
 			var vc = new VerticalLineCaret { Color = Theme.Colors.TextCaret };
 			eb.Updated += delta => {
 				vc.Width = eb.Editor.OverwriteMode && !eb.Editor.HasSelection() ?
-					tw.Font.Chars.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
+					tw.Font.CharSource.Get(eb.Editor.CurrentChar(), tw.FontHeight)?.Width ?? 5f : 0f;
 				if (eb.IsMouseOverThisOrDescendant() && WidgetContext.Current.MouseCursor == MouseCursor.Default) {
 					var rect = new Rectangle {
 						A = tw.ContentPosition,

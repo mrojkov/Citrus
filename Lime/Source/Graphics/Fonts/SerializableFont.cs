@@ -44,13 +44,13 @@ namespace Lime
 			}
 		}
 
-		public IFontCharSource Chars
+		public IFontCharSource CharSource
 		{
 			get
 			{
 				if (font == null)
 					font = FontPool.Instance[Name];
-				return font.Chars;
+				return font.CharSource;
 			}
 		}
 
