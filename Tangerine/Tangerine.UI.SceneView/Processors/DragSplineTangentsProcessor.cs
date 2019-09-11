@@ -54,8 +54,12 @@ namespace Tangerine.UI.SceneView
 						var o = point.TransformedPosition;
 						var angle = (index == 0 ? o - p : p - o).Atan2Deg;
 						var weight = (p - o).Length / SplinePointPresenter.TangentWeightRatio;
-						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentAngle), angle, CoreUserPreferences.Instance.AutoKeyframes);
-						Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentWeight), weight, CoreUserPreferences.Instance.AutoKeyframes);
+						if (!Window.Current.Input.IsKeyPressed(Key.Shift)) {
+							Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentAngle), angle, CoreUserPreferences.Instance.AutoKeyframes);
+						}
+						if (!Window.Current.Input.IsKeyPressed(Key.Control)) {
+							Core.Operations.SetAnimableProperty.Perform(point, nameof(SplinePoint.TangentWeight), weight, CoreUserPreferences.Instance.AutoKeyframes);
+						}
 					}
 					yield return null;
 				}
