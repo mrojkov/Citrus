@@ -53,7 +53,7 @@ namespace Lime
 				LcdSupported = false;
 			}
 #else
-			lcdSupported = false;
+			LcdSupported = false;
 #endif
 		}
 
