@@ -19,7 +19,10 @@ namespace Orange.Source.Actions
 			foreach (var configPath in EnumerateFontConfigs(AssetPath.Combine(The.Workspace.AssetsDirectory, "Fonts/"))) {
 				Console.WriteLine($"Processing {configPath}..");
 				try {
-					FontGenerator.UpdateCharSetsAndGenerateFont(configPath, The.Workspace.AssetsDirectory);
+					FontGenerator.UpdateCharSetsAndGenerateFont(
+						new Uri(The.Workspace.AssetsDirectory + "\\").MakeRelativeUri(new Uri(configPath)).OriginalString,
+						The.Workspace.AssetsDirectory
+					);
 				} catch (Exception e) {
 					Console.WriteLine($"Failed to generate font using {configPath} config");
 					Console.WriteLine(e);

@@ -14,7 +14,7 @@ namespace Lime
 		{
 			var config = InternalPersistence.Instance.ReadObjectFromFile<TftConfig>(AssetPath.Combine(assetDirectory, configPath));
 			UpdateCharsets(config, assetDirectory);
-			InternalPersistence.Instance.WriteObjectToFile(configPath, config, Persistence.Format.Json);
+			InternalPersistence.Instance.WriteObjectToFile(AssetPath.Combine(assetDirectory, configPath), config, Persistence.Format.Json);
 			GenerateFont(config, assetDirectory, Path.ChangeExtension(configPath, null));
 		}
 
@@ -184,7 +184,7 @@ namespace Lime
 		{
 			var basePath = Path.ChangeExtension(path, null);
 			var absolutePath = AssetPath.Combine(assetDirectory, path);
-			foreach (var file in Directory.EnumerateFiles(Path.GetDirectoryName(basePath), $"{Path.GetFileName(path)}??.png")) {
+			foreach (var file in Directory.EnumerateFiles(Path.GetDirectoryName(absolutePath), $"{Path.GetFileName(path)}??.png")) {
 				File.Delete(file);
 			}
 			for (int i = 0; i < font.Textures.Count; i++) {
