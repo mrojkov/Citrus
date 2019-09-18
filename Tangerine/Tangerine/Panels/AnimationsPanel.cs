@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 
 namespace Tangerine.Panels
 {
@@ -216,12 +217,20 @@ namespace Tangerine.Panels
 		{
 			SelectAnimationBasedOnMousePosition();
 			var menu = new Menu();
-			menu.Add(new Command("Add", () => AddAnimation(Document.Current.RootNode, false)));
-			menu.Add(new Command("Add Compound", () => AddAnimation(Document.Current.RootNode, true)));
+			var rootNode = Document.Current.RootNode;
+			menu.Add(new Command("Add", () => AddAnimation(rootNode, false)));
+			menu.Add(new Command("Add Compound", () => AddAnimation(rootNode, true)));
+			menu.Add(new Command("Add ZeroPose", () => AddZeroPoseAnimation(rootNode)) {
+				Enabled = !rootNode.Animations.TryFind(Animation.ZeroPoseId, out _)
+			});
 			var path = GetNodePath(Document.Current.Container);
 			if (!string.IsNullOrEmpty(path)) {
-				menu.Add(new Command($"Add To '{path}'", () => AddAnimation(Document.Current.Container, false)));
-				menu.Add(new Command($"Add Compound To '{path}'", () => AddAnimation(Document.Current.Container, true)));
+				var container = Document.Current.Container;
+				menu.Add(new Command($"Add To '{path}'", () => AddAnimation(container, false)));
+				menu.Add(new Command($"Add Compound To '{path}'", () => AddAnimation(container, true)));
+				menu.Add(new Command($"Add ZeroPose To '{path}'", () => AddZeroPoseAnimation(container)) {
+					Enabled = !container.Animations.TryFind(Animation.ZeroPoseId, out _)
+				});
 			}
 			menu.Add(Command.MenuSeparator);
 			menu.Add(new Command("Rename", RenameAnimation));
@@ -242,6 +251,25 @@ namespace Tangerine.Panels
 				});
 				// Schedule animation rename on the next update, since the widgets are not built yet
 				panelWidget.Tasks.Add(DelayedRenameAnimation());
+			}
+
+			void AddZeroPoseAnimation(Node node)
+			{
+				Document.Current.History.DoTransaction(() => {
+					var animation = new Animation { Id = Animation.ZeroPoseId };
+					InsertIntoList.Perform(node.Animations, node.Animations.Count, animation);
+					foreach (var a in node.Descendants.SelectMany(n => n.Animators).ToList()) {
+						var (propertyData, animable, index) =
+							AnimationUtils.GetPropertyByPath(a.Owner, a.TargetPropertyPath);
+						var zeroPoseKey = Keyframe.CreateForType(propertyData.Info.PropertyType);
+						zeroPoseKey.Value = index == -1
+							? propertyData.Info.GetValue(animable)
+							: propertyData.Info.GetValue(animable, new object[]{index});
+						zeroPoseKey.Function = KeyFunction.Steep;
+						SetKeyframe.Perform(a.Owner, a.TargetPropertyPath, Animation.ZeroPoseId, zeroPoseKey);
+					}
+					SelectAnimation(GetAnimations().IndexOf(animation));
+				});
 			}
 
 			IEnumerator<object> DelayedRenameAnimation()
@@ -332,7 +360,7 @@ namespace Tangerine.Panels
 					SelectAnimation(GetSelectedAnimationIndex() - 1);
 				}
 				if (!Commands.Delete.IsConsumed()) {
-					Command.Delete.Enabled = !Document.Current.Animation.IsLegacy && Document.Current.Animation.Id != Animation.ZeroPoseId;
+					Command.Delete.Enabled = !Document.Current.Animation.IsLegacy;
 					if (Commands.Delete.Consume()) {
 						Delete();
 					}
@@ -361,7 +389,7 @@ namespace Tangerine.Panels
 			}
 		}
 
-		public void Refresh()
+		private void Refresh()
 		{
 			int index = GetSelectedAnimationIndex();
 			var content = scrollView.Content;

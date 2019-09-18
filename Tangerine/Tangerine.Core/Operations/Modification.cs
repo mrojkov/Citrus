@@ -273,12 +273,12 @@ namespace Tangerine.Core.Operations
 		public static void Perform(IAnimationHost animationHost, string propertyPath, string animationId, IKeyframe keyframe)
 		{
 			if (animationHost is Node && animationId != Animation.ZeroPoseId && !Document.Current.Animation.IsLegacy) {
-				// If there is no zero pose keyframe -- create one
 				var animations = Document.Current.Animation.Owner.Animations;
-				if (!animations.TryFind(Animation.ZeroPoseId, out _)) {
-					InsertIntoList.Perform(animations, animations.Count, new Animation { Id = Animation.ZeroPoseId });
-				}
-				if (!animationHost.Animators.TryFind(propertyPath, out _, Animation.ZeroPoseId)) {
+				// If there is a zero pose animation without corresponding keyframe -- create one.
+				if (
+					animations.TryFind(Animation.ZeroPoseId, out _) &&
+					!animationHost.Animators.TryFind(propertyPath, out _, Animation.ZeroPoseId)
+				) {
 					var (propertyData, animable, index) = AnimationUtils.GetPropertyByPath(animationHost, propertyPath);
 					var zeroPoseKey = Lime.Keyframe.CreateForType(propertyData.Info.PropertyType);
 					zeroPoseKey.Value = index == -1 ? propertyData.Info.GetValue(animable) : propertyData.Info.GetValue(animable, new object [] { index });
