@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Lime
 {
@@ -59,7 +60,9 @@ namespace Lime
 			var b = PeekBucket();
 			var node = b.First;
 			b.First = node.Next;
-			if (b.First == null) {
+			if (b.First != null) {
+				b.First.Prev = null;
+			} else {
 				b.Last = null;
 			}
 			node.Queue = null;
@@ -104,9 +107,20 @@ namespace Lime
 			count = 0;
 			lastNearestBucketIndex = buckets.Length;
 			for (var i = 0; i < buckets.Length; i++) {
-				buckets[i].First = null;
-				buckets[i].Last = null;
+				ClearBucket(buckets[i]);
 			}
+		}
+
+		private void ClearBucket(Bucket b)
+		{
+			for (var n = b.First; n != null; n = n.Next) {
+				n.Queue = null;
+				n.Prev = null;
+				n.Next = null;
+				n.BucketIndex = -1;
+			}
+			b.First = null;
+			b.Last = null;
 		}
 
 		public static void Resize(ref BucketQueue<T> queue, int newBucketCount)
