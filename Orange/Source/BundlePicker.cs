@@ -12,27 +12,10 @@ namespace Orange
 		private Dictionary<string, bool> bundleSelectionStates;
 		private List<string> allBundles;
 
-		private static BundlePicker instance = new BundlePicker();
-
-		public static BundlePicker Instance
-		{
-			get {
-				if (instance == null) {
-                    instance = new BundlePicker();
-				}
-				return instance;
-			}
-		}
-
-		private bool enabled;
 		/// <summary>
 		/// When enabled, user can select which bundles to use in actions. When disabled, actions will use all bundles.
 		/// </summary>
-		public static bool Enabled
-		{
-			get => Instance.enabled;
-			set => Instance.enabled = value;
-		}
+		public bool Enabled;
 
 		/// <summary>
 		/// Creates selection states dictionary for bundles in current project.
@@ -40,17 +23,45 @@ namespace Orange
 		/// </summary>
 		public void Setup()
 		{
-			if (Instance.bundleSelectionStates == null) {
-				Instance.bundleSelectionStates = new Dictionary<string, bool>();
+			if (bundleSelectionStates == null) {
+				bundleSelectionStates = new Dictionary<string, bool>();
 			} else {
-                Instance.bundleSelectionStates.Clear();
+				bundleSelectionStates.Clear();
 			}
 			Enabled = false;
 
-			Instance.allBundles = new AssetCooker(The.UI.GetActiveTarget()).GetListOfAllBundles();
-			foreach (var bundle in Instance.allBundles) {
-				Instance.bundleSelectionStates.Add(bundle, true);
+			allBundles = new AssetCooker(The.UI.GetActiveTarget()).GetListOfAllBundles();
+			foreach (var bundle in allBundles) {
+				bundleSelectionStates.Add(bundle, true);
 			}
+		}
+
+		/// <summary>
+		/// Updates current bundle list: new bundles will be added to list (default state: checked),
+		/// deleted bundles will be removed from list. Returns list of changed (added or deleted) bundles.
+		/// </summary>
+		public List<string> Refresh()
+		{
+			var changed = new List<string>();
+			allBundles = new AssetCooker(The.UI.GetActiveTarget()).GetListOfAllBundles();
+
+			// Remove no longer existing bundles
+			foreach (var bundle in bundleSelectionStates.Keys.ToArray()) {
+				if (!allBundles.Contains(bundle)) {
+					changed.Add(bundle);
+					bundleSelectionStates.Remove(bundle);
+				}
+			}
+
+			// Add new bundles
+			foreach (var bundle in allBundles) {
+				if (!bundleSelectionStates.ContainsKey(bundle)) {
+					changed.Add(bundle);
+					bundleSelectionStates.Add(bundle, true);
+				}
+			}
+
+			return changed;
 		}
 
 		/// <summary>
@@ -58,14 +69,14 @@ namespace Orange
 		/// </summary>
 		public List<string> GetSelectedBundles()
 		{
-			if (Instance.allBundles == null) {
-                Setup();
+			if (allBundles == null) {
+				Setup();
 			}
-
 			if (!Enabled) {
-				return Instance.allBundles;
+				Refresh();
+				return allBundles;
 			}
-			return Instance.bundleSelectionStates.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+			return bundleSelectionStates.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
 		}
 
 		/// <summary>
@@ -75,7 +86,7 @@ namespace Orange
 		/// <param name="state">'true' if bundle should be selected, 'false' otherwise</param>
 		public void SetBundleSelection(string bundle, bool state)
 		{
-			Instance.bundleSelectionStates[bundle] = state;
+			bundleSelectionStates[bundle] = state;
 		}
 	}
 }

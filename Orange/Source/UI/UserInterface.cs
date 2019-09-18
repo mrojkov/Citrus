@@ -8,11 +8,13 @@ namespace Orange
 	public abstract class UserInterface
 	{
 		public static UserInterface Instance;
+		protected static BundlePicker bundlePicker;
 
 		public virtual void Initialize()
 		{
 			var w = new Lime.DummyWindow();
 			var windowWidget = new Lime.WindowWidget(w);
+			bundlePicker = new BundlePicker();
 		}
 
 		public virtual void ClearLog() { }
@@ -36,10 +38,17 @@ namespace Orange
 		/// <summary>
 		/// Reloads bundle list in BundlePicker and recreates its UI if neccessary
 		/// </summary>
-		public virtual void ReloadBundlePicker()
-		{
-			BundlePicker.Instance.Setup();
-		}
+		public virtual void ReloadBundlePicker() => bundlePicker.Setup();
+
+		/// <summary>
+		/// Updates current bundle list
+		/// </summary>
+		public virtual List<string> RefreshBundlesList() => bundlePicker.Refresh();
+
+		/// <summary>
+		/// Returns list of currently selected bundles
+		/// </summary>
+		public virtual List<string> GetSelectedBundles() => bundlePicker.GetSelectedBundles();
 
 		public virtual void ExitWithErrorIfPossible() { }
 

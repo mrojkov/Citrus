@@ -16,7 +16,7 @@ namespace Orange
 		{
 			var target = The.UI.GetActiveTarget();
 
-			AssetsUnpacker.Unpack(target, BundlePicker.Instance.GetSelectedBundles());
+			AssetsUnpacker.Unpack(target, The.UI.GetSelectedBundles());
 		}
 	}
 }

@@ -30,6 +30,7 @@ namespace Tangerine
 		{
 			ChangeTangerineSettingsFolderIfNeed();
 			Orange.UserInterface.Instance = new OrangeInterface();
+			Orange.UserInterface.Instance.Initialize();
 			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Lime.Yuzu.ExtendDeserializers += (deserializerBuilders) => {

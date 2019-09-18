@@ -12,7 +12,7 @@ namespace Orange
 		{
 			var target = The.UI.GetActiveTarget();
 
-			AssetCooker.CookForTarget(target, BundlePicker.Instance.GetSelectedBundles());
+			AssetCooker.CookForTarget(target, The.UI.GetSelectedBundles());
 		}
 	}
 }
