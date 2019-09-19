@@ -65,6 +65,8 @@ namespace Tangerine.UI
 						OnValueChanged?.Invoke(ExpandableContent);
 						Expanded = true;
 					};
+					var value = CoalescedPropertyValue().GetValue();
+					b.Visible = Equals(value.Value, defaultValue);
 					resetToDefaultButton.Clicked = () => {
 						b.Visible = true;
 						SetProperty(defaultValue);
@@ -72,6 +74,7 @@ namespace Tangerine.UI
 					};
 					EditorContainer.AddNode(b);
 					EditorContainer.AddNode(Spacer.HStretch());
+					OnValueChanged?.Invoke(ExpandableContent);
 				} else {
 					EditorContainer.Nodes.Insert(0, Selector);
 				}
