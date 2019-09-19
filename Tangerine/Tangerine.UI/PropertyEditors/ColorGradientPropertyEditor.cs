@@ -359,7 +359,7 @@ namespace Tangerine.UI
 			Components.Add(new UpdatableNodeBehavior());
 		}
 
-		public virtual void OnUpdate(float delta)
+		public void OnUpdate(float delta)
 		{
 			Position = new Vector2(ParentWidget.Size.X * ControlPoint.Position, ParentWidget.Size.Y);
 		}
@@ -371,6 +371,7 @@ namespace Tangerine.UI
 			CompoundPresenter.Add(new SyncDelegatePresenter<Widget>(Render));
 			HitTestTarget = true;
 			chessTexture = PrepareChessTexture(Color4.White, Color4.Black);
+			Components.Add(new UpdatableNodeBehavior());
 		}
 
 		public static ITexture PrepareChessTexture(Color4 color1, Color4 color2)
@@ -387,7 +388,8 @@ namespace Tangerine.UI
 		private void Render(Widget w)
 		{
 			w.PrepareRendererState();
-			Renderer.DrawRect(new Vector2(0, w.Size.Y * tipBodyRatio), w.Size, new Color4(ControlPoint.Color.R, ControlPoint.Color.G, ControlPoint.Color.B));
+			Renderer.DrawRect(new Vector2(0, w.Size.Y * tipBodyRatio), w.Size,
+				new Color4(ControlPoint.Color.R, ControlPoint.Color.G, ControlPoint.Color.B));
 			var spriteColor = Color4.White.Transparentify(ControlPoint.Color.A / 255f);
 			Renderer.DrawSprite(chessTexture, spriteColor,
 				new Vector2(w.Size.X / 2, w.Size.Y * tipBodyRatio),
