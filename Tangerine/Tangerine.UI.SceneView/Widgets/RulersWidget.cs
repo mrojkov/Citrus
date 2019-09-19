@@ -64,7 +64,7 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				var rect = new Rectangle(Vector2.Zero, widget.Size);
 				if (rect.Contains(widget.LocalMousePosition()) &&
-					!Document.Current.PreviewAnimation &&
+					!Document.Current.PreviewScene &&
 					!Document.Current.ExpositionMode
 				) {
 					if (widget.Input.WasMousePressed()) {
@@ -90,7 +90,7 @@ namespace Tangerine.UI.SceneView
 
 			protected override void InternalRender(Widget widget)
 			{
-				if (Document.Current.PreviewAnimation || Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
+				if (Document.Current.PreviewScene || Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
 					return;
 
 				widget.PrepareRendererState();

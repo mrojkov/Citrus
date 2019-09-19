@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 
 		private static void Render(Widget widget)
 		{
-			if (!Document.Current.PreviewAnimation && Document.Current.Container is Spline) {
+			if (!Document.Current.PreviewScene && Document.Current.Container is Spline) {
 				var spline = Document.Current.Container;
 				foreach (SplinePoint point in spline.Nodes) {
 					var color = GetSelectedPoints().Contains(point) ?

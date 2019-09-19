@@ -108,7 +108,7 @@ namespace Tangerine.UI.SceneView.Presenters
 			while (true) {
 				yield return null;
 				if (
-					Document.Current.PreviewAnimation ||
+					Document.Current.PreviewScene ||
 					Document.Current.ExpositionMode || !CoreUserPreferences.Instance.ShowFrameProgression
 				) {
 					if (widgets.Count != 0) {

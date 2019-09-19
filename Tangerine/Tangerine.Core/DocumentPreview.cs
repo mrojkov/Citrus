@@ -59,11 +59,10 @@ namespace Tangerine.Core
 			} else {
 				newWidth *= size.X / size.Y;
 			}
-			// Andrey Tyshchenko: Enable animation preview to disable presenters while rendering document preview
-			var savedPreviewAnimation = Document.Current.PreviewAnimation;
-			Document.Current.PreviewAnimation = true;
+			var savedPreviewScene = Document.Current.PreviewScene;
+			Document.Current.PreviewScene = true;
 			var bitmap = Document.Current.RootNode.AsWidget.ToBitmap().Rescale(newWidth.Round(), newHeight.Round());
-			Document.Current.PreviewAnimation = savedPreviewAnimation;
+			Document.Current.PreviewScene = savedPreviewScene;
 			var stream = new MemoryStream();
 			bitmap.SaveTo(stream, compressionFormat);
 			SetProperty.Perform(Document.Current, nameof(Document.Preview), Convert.ToBase64String(stream.ToArray()));

@@ -18,7 +18,7 @@ namespace Tangerine.UI.SceneView
 
 		protected override void InternalRender(Widget node)
 		{
-			if (Document.Current.ExpositionMode || Document.Current.PreviewAnimation) {
+			if (Document.Current.ExpositionMode || Document.Current.PreviewScene) {
 				return;
 			}
 

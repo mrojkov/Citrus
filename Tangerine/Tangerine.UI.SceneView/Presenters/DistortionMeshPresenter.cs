@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 
 		void Render(Widget canvas)
 		{
-			if (MeshHint.Enabled && !Document.Current.PreviewAnimation && Document.Current.Container is DistortionMesh) {
+			if (MeshHint.Enabled && !Document.Current.PreviewScene && Document.Current.Container is DistortionMesh) {
 				var mesh = Document.Current.Container as DistortionMesh;
 				canvas.PrepareRendererState();
 				for (int i = 0; i <= mesh.NumRows; i++) {

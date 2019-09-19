@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 		protected override void InternalRender(Viewport3D viewport)
 		{
 			if (
-				Document.Current.PreviewAnimation ||
+				Document.Current.PreviewScene ||
 				Document.Current.ExpositionMode ||
 				!AnimationPathHint.Enabled
 			) {

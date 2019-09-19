@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 
 		private static void Render(Widget canvas)
 		{
-			if (Core.Document.Current.ExpositionMode || Core.Document.Current.PreviewAnimation) {
+			if (Core.Document.Current.ExpositionMode || Core.Document.Current.PreviewScene) {
 				return;
 			}
 			var grids = Core.Document.Current.SelectedNodes().Editable().OfType<NineGrid>();

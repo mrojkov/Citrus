@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 		{
 			if (
 				Core.Document.Current.ExpositionMode ||
-				Core.Document.Current.PreviewAnimation
+				Core.Document.Current.PreviewScene
 			) {
 				return;
 			}

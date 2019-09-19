@@ -24,7 +24,7 @@ namespace Tangerine.UI.SceneView
 		void Render(Widget canvas)
 		{
 			canvas.PrepareRendererState();
-			if (!Document.Current.PreviewAnimation &&
+			if (!Document.Current.PreviewScene &&
 				!Document.Current.ExpositionMode &&
 				SceneUserPreferences.Instance.DrawFrameBorder
 			) {

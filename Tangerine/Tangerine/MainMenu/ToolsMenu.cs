@@ -40,6 +40,8 @@ namespace Tangerine.MainMenu
 			var i = 0;
 			var animation = Document.Current.Animation;
 			animation.IsRunning = true;
+			var savedDebugDraw = Document.Current.PreviewScene;
+			Document.Current.PreviewScene = true;
 			while (start < end) {
 				currentWindow.InvokeOnRendering(() => {
 					var bitmap = Document.Current.Container.AsWidget.ToBitmap();
@@ -52,6 +54,7 @@ namespace Tangerine.MainMenu
 				Application.InvalidateWindows();
 				i += 1;
 			}
+			Document.Current.PreviewScene = savedDebugDraw;
 			animation.IsRunning = false;
 		}
 	}

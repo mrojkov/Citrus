@@ -38,6 +38,7 @@ namespace Tangerine.Core
 		{
 			if (PreviewAnimation) {
 				PreviewAnimation = false;
+				PreviewScene = false;
 				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
@@ -58,6 +59,7 @@ namespace Tangerine.Core
 					}
 				}
 				int savedAnimationFrame = AnimationFrame;
+				PreviewScene = true;
 				PreviewAnimation = true;
 				CurrentFrameSetter.CacheAnimationsStates = true;
 				if (triggerMarkersBeforeCurrentFrame) {
