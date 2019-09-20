@@ -118,7 +118,7 @@ namespace Lime
 			var map = new Dictionary<int, List<Mesh3D>>();
 			foreach(var mesh in meshes) {
 				if (mesh.Animators.Any() ||
-					mesh.Components.Any() ||
+					mesh.Components.Any(c => !(c is UpdatableNodeBehavior)) ||
 					(MeshOptions.FirstOrDefault(m => m.Id == mesh.Id)?.DisableMerging ?? mesh.Nodes.Count != 0)
 				) {
 					continue;
