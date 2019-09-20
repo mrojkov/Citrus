@@ -46,7 +46,7 @@ namespace Lime
 
 		private Vector2 previousMousePosition;
 		protected virtual Vector2 PreviousMousePosition => IsMotionInProgress() ? previousMotionStrategyPosition : previousMousePosition;
-		protected float DragThreshold { get; set; }
+		public float DragThreshold { get; set; }
 
 		/// <summary>
 		/// Occurs when dragged.
