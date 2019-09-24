@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -16,7 +17,9 @@ namespace Lime
 		private readonly ShaderParamKey<float> angleParamKey;
 		private readonly ShaderParamKey<float> stretchParamKey;
 
+		[YuzuMember]
 		public float Angle { get; set; }
+		[YuzuMember]
 		public GradientMaterialBlendMode BlendMode { get; set; } = GradientMaterialBlendMode.Normal;
 		public Texture2D GradientTexture { get; private set; }
 		public Blending Blending;
@@ -24,6 +27,7 @@ namespace Lime
 		public string Id { get; set; }
 		public int PassCount => 1;
 
+		[YuzuMember]
 		public ColorGradient Gradient
 		{
 			get => gradient;
@@ -86,11 +90,6 @@ namespace Lime
 		public void Invalidate()
 		{
 			IsTextureValidated(forceInvalidate: true);
-		}
-
-		public IMaterial Clone()
-		{
-			return (IMaterial) MemberwiseClone();
 		}
 	}
 

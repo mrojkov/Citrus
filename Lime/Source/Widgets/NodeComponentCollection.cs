@@ -285,7 +285,7 @@ namespace Lime
 		}
 
 		[global::Yuzu.YuzuSerializeItemIf]
-		private bool SerializeItemIf(int index, Object component)
+		public bool SerializeItemIf(int index, Object component)
 		{
 			return NodeComponent.IsSerializable(component.GetType());
 		}

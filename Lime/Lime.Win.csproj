@@ -597,6 +597,7 @@
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
     <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
+    <Compile Include="Source\YuzuGeneratedCloners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

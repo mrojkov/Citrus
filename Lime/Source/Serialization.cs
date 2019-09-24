@@ -29,6 +29,8 @@ namespace Lime
 
 		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
 
+		public static Func<Yuzu, AbstractCloner> ClonerFactory = yuzu => new YuzuGenerated.LimeCloner { Options = yuzu.YuzuCommonOptions };
+
 		public UInt32 BinarySignature = 0xdeadbabe;
 
 		private Yuzu()
@@ -247,8 +249,7 @@ namespace Lime
 				return null;
 			}
 			if (cloner == null) {
-				cloner = new Cloner();
-				cloner.Options = YuzuCommonOptions;
+				cloner = ClonerFactory(this);
 			}
 			return cloner.DeepObject(obj);
 		}
@@ -263,7 +264,14 @@ namespace Lime
 		}
 
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
+		
 		public static CommonOptions YuzuCommonOptions => Yuzu.Instance.Value.YuzuCommonOptions;
+
+		public static Func<Yuzu, AbstractCloner> ClonerFactory
+		{
+			get => Yuzu.ClonerFactory;
+			set => Yuzu.ClonerFactory = value;
+		}
 
 		public static void WriteObject<T>(string path, Stream stream, T instance, Format format) => Yuzu.Instance.Value.WriteObject(path, stream, instance, format);
 		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer) => Yuzu.Instance.Value.WriteObject(path, stream, instance, serializer);

@@ -82,6 +82,9 @@ namespace Orange
 						if (t.GetCustomAttribute<YuzuDontGenerateDeserializerAttribute>(false) != null) {
 							continue;
 						}
+						if (t.IsInterface || t.IsAbstract) {
+							continue;
+						}
 						if (t.IsGenericType) {
 							if (t == typeof(Keyframe<>) || t == typeof(Animator<>)) {
 								foreach (var specializationType in AnimatorRegistry.Instance.EnumerateRegisteredTypes()) {
