@@ -112,15 +112,15 @@ namespace Lime
 				return null;
 			}
 			switch (path) {
-				case "#a":
-				case "#b":
+				case "#a": case "#A":
+				case "#b": case "#B":
 					return new RenderTexture(256, 256);
-				case "#c":
+				case "#c": case "#C":
 					return new RenderTexture(512, 512);
-				case "#d":
-				case "#e":
-				case "#f":
-				case "#g":
+				case "#d": case "#D":
+				case "#e": case "#E":
+				case "#f": case "#F":
+				case "#g": case "#G":
 					return new RenderTexture(1024, 1024);
 				default:
 					return null;
