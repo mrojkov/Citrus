@@ -19,8 +19,7 @@ namespace Lime
 		public float Angle { get; set; }
 		public GradientMaterialBlendMode BlendMode { get; set; } = GradientMaterialBlendMode.Normal;
 		public Texture2D GradientTexture { get; private set; }
-
-		public Func<BlendState> BlendStateGetter;
+		public Blending Blending;
 
 		public string Id { get; set; }
 		public int PassCount => 1;
@@ -63,7 +62,7 @@ namespace Lime
 				shaderParams.Set(stretchParamKey, stretch);
 				shaderParams.Set(angleParamKey, radianAngle);
 				PlatformRenderer.SetTexture(1, GradientTexture);
-				PlatformRenderer.SetBlendState(BlendStateGetter?.Invoke() ?? Blending.Inherited.GetBlendState());
+				PlatformRenderer.SetBlendState(Blending.GetBlendState());
 				PlatformRenderer.SetShaderParams(shaderParamsArray);
 				PlatformRenderer.SetShaderProgram(GradientShaderProgram.GetInstance(BlendMode));
 			}
