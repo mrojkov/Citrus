@@ -9,6 +9,12 @@ namespace Lime
 {
 	public static class FontGenerator
 	{
+		/// <summary>
+		/// Extracts characters from specified dictionaries for each element of CharSets
+		/// and generates Tangerine Font.
+		/// </summary>
+		/// <param name="configPath"> Path to configuration file relative to <paramref name="assetDirectory"/>. </param>
+		/// <param name="assetDirectory"> Path to asset directory. </param>
 		public static void UpdateCharSetsAndGenerateFont(string configPath, string assetDirectory)
 		{
 			var config = InternalPersistence.Instance.ReadObjectFromFile<TftConfig>(AssetPath.Combine(assetDirectory, configPath));
@@ -17,12 +23,23 @@ namespace Lime
 			GenerateFont(config, assetDirectory, Path.ChangeExtension(configPath, null));
 		}
 
+		/// <summary>
+		/// Generates Tangerine Font.
+		/// </summary>
+		/// <param name="configPath"> Path to configuration file relative to <paramref name="assetDirectory"/>. </param>
+		/// <param name="assetDirectory"> Path to asset directory. </param>
 		public static void GenerateFont(string configPath, string assetDirectory)
 		{
 			var config = InternalPersistence.Instance.ReadObjectFromFile<TftConfig>(AssetPath.Combine(assetDirectory, configPath));
 			GenerateFont(config, assetDirectory, Path.ChangeExtension(configPath, null));
 		}
 
+		/// <summary>
+		/// Generates Tangerine Font.
+		/// </summary>
+		/// <param name="config"> Tangerine Font Config. </param>
+		/// <param name="assetDirectory"> Path to asset directory. </param>
+		/// <param name="outputPath"> Path for Tangerine Font and it's textures </param>
 		public static void GenerateFont(TftConfig config, string assetDirectory, string outputPath)
 		{
 			var fontCharCollection = new FontCharCollection();
@@ -56,7 +73,7 @@ namespace Lime
 				if (missingCharacters.Count > 0) {
 					Console.WriteLine($"Characters: {string.Join("", missingCharacters)} -- are missing in font {charSet.Font}");
 				}
-				GenerateKerningPairs(fontCharCollection, chars.FontRenderer, config, charSet.Chars);
+				GenerateKerningPairs(fontCharCollection, chars.FontRenderer.Face, config, charSet.Chars);
 			}
 			if (config.IsSdf) {
 				foreach (var texture in fontCharCollection.Textures) {
@@ -68,10 +85,12 @@ namespace Lime
 			}
 		}
 
-		private static void GenerateKerningPairs(FontCharCollection fnt, FontRenderer renderer,
+		/// <summary>
+		/// Generates kerning pairs using HarfBuzz.
+		/// </summary>
+		private static void GenerateKerningPairs(FontCharCollection fontChars, Face face,
 			TftConfig config, IEnumerable<char> chars)
 		{
-			var face = renderer.Face;
 			var font = SharpFont.HarfBuzz.Font.FromFTFace(face);
 			var height = (int)(config.IsSdf ? config.Height * config.SdfScale : config.Height);
 			var pixelSize = (uint)Math.Round(Math.Abs(CalcPixelSize(height, face)));
@@ -81,7 +100,7 @@ namespace Lime
 				if (kerningCharset == null) {
 					continue;
 				}
-				var fontChar = fnt.Get(lhs, 0f);
+				var fontChar = fontChars.Get(lhs, 0f);
 				config.CustomKerningPairs.TryGetValue(lhs, out var customKernings);
 				foreach (var rhs in kerningCharset) {
 					if (customKernings != null && TryGetKerning(rhs, out var kerningPair)) {
