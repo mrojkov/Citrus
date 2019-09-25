@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using SharpFont;
 using SharpFont.HarfBuzz;
 
@@ -54,7 +53,7 @@ namespace Lime
 					}
 					fontCharCollection.Add(fontChar);
 				}
-		if (missingCharacters.Count > 0) {
+				if (missingCharacters.Count > 0) {
 					Console.WriteLine($"Characters: {string.Join("", missingCharacters)} -- are missing in font {charSet.Font}");
 				}
 				GenerateKerningPairs(fontCharCollection, chars.FontRenderer, config, charSet.Chars);
@@ -198,7 +197,6 @@ namespace Lime
 					sourceBitmap.Dispose();
 					bitmap.SaveTo(AssetPath.Combine(assetDirectory, basePath + (i > 0 ? $"{i:00}.png" : ".png")));
 					bitmap.Dispose();
-
 				} else {
 					using (var bm = new Bitmap(pixels, w, h)) {
 						bm.SaveTo(AssetPath.Combine(assetDirectory, basePath + (i > 0 ? $"{i:00}.png" : ".png")));
