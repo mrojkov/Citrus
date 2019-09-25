@@ -245,6 +245,7 @@ namespace Tangerine.UI.Inspector
 						return prop.GetValue(obj);
 					},
 					IsAnimableByPath = animableByPath,
+					DisplayName = PropertyAttributes<TangerineDisplayNameAttribute>.Get(property)?.DisplayName,
 				};
 				@params.PropertySetter = @params.IsAnimable ? (PropertySetterDelegate)SetAnimableProperty : SetProperty;
 				if (!editorParams.Keys.Contains(@params.Group)) {

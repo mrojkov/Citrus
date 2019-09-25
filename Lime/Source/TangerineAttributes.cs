@@ -308,4 +308,14 @@ namespace Lime
 			KeyframeInterpolations = keyFunctions;
 		}
 	}
+
+	public sealed class TangerineDisplayNameAttribute : Attribute
+	{
+		public string DisplayName;
+
+		public TangerineDisplayNameAttribute(string displayName)
+		{
+			DisplayName = displayName;
+		}
+	}
 }
