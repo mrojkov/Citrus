@@ -52,7 +52,7 @@ namespace Lime
 			}
 			shaderParams.Set(phaseKey, Phase);
 			shaderParams.Set(pointKey, Point);
-			shaderParams.Set(frequencyKey, Frequency);
+			shaderParams.Set(frequencyKey, 2f * Mathf.Pi * Frequency);
 			shaderParams.Set(amplitudeKey, Amplitude);
 			shaderParams.Set(uv0Key, UV0);
 			shaderParams.Set(uv1Key, UV1);
