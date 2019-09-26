@@ -28,10 +28,10 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public float Frequency
+		public Vector2 Phase
 		{
-			get => CustomMaterial.Frequency;
-			set => CustomMaterial.Frequency = value;
+			get => CustomMaterial.Phase;
+			set => CustomMaterial.Phase = value;
 		}
 
 		[YuzuMember]
@@ -42,10 +42,10 @@ namespace Lime
 		}
 
 		[YuzuMember]
-		public Vector2 TimeSpeed
+		public Vector2 Frequency
 		{
-			get => CustomMaterial.TimeSpeed;
-			set => CustomMaterial.TimeSpeed = value;
+			get => CustomMaterial.Frequency;
+			set => CustomMaterial.Frequency = value;
 		}
 
 		[YuzuMember]
@@ -54,7 +54,7 @@ namespace Lime
 			get => CustomMaterial.Amplitude;
 			set => CustomMaterial.Amplitude = value;
 		}
-		
+
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
