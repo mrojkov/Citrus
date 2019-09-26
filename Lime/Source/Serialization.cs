@@ -245,9 +245,6 @@ namespace Lime
 
 		public object Clone(object obj)
 		{
-			if (obj == null) {
-				return null;
-			}
 			if (cloner == null) {
 				cloner = ClonerFactory(this);
 			}
