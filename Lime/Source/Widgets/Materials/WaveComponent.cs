@@ -2,9 +2,15 @@ using Yuzu;
 
 namespace Lime
 {
+	/// <summary>
+	/// WaveComponent applies wave deformation to its owner.
+	/// </summary>
 	[TangerineRegisterComponent]
 	public class WaveComponent : MaterialComponent<WaveMaterial>
 	{
+		/// <summary>
+		/// Material's blend mode.
+		/// </summary>
 		[YuzuMember]
 		public Blending Blending
 		{
@@ -12,28 +18,9 @@ namespace Lime
 			set => CustomMaterial.Blending = value;
 		}
 
-		[YuzuMember]
-		[TangerineKeyframeColor(1)]
-		public bool AutoLoopEnabled
-		{
-			get => CustomMaterial.AutoLoopEnabled;
-			set => CustomMaterial.AutoLoopEnabled = value;
-		}
-
-		[YuzuMember]
-		public float Time
-		{
-			get => CustomMaterial.Time;
-			set => CustomMaterial.Time = value;
-		}
-
-		[YuzuMember]
-		public Vector2 Phase
-		{
-			get => CustomMaterial.Phase;
-			set => CustomMaterial.Phase = value;
-		}
-
+		/// <summary>
+		/// The origin of the wave. Valid range: (0, 0)..(1, 1)
+		/// </summary>
 		[YuzuMember]
 		public Vector2 Point
 		{
@@ -41,6 +28,20 @@ namespace Lime
 			set => CustomMaterial.Point = value;
 		}
 
+		/// <summary>
+		/// The wave phase alongside x and y axes.
+		/// (0, 0) -- initial state, (1, 0) -- one full cycle, (2, 2) -- two cycles, etc.
+		/// </summary>
+		[YuzuMember]
+		public Vector2 Phase
+		{
+			get => CustomMaterial.Phase;
+			set => CustomMaterial.Phase = value;
+		}
+
+		/// <summary>
+		/// The frequency of the wave alongside x and y axes.
+		/// </summary>
 		[YuzuMember]
 		public Vector2 Frequency
 		{
@@ -48,6 +49,9 @@ namespace Lime
 			set => CustomMaterial.Frequency = value;
 		}
 
+		/// <summary>
+		/// The strength for the wave alongside x and y axes.
+		/// </summary>
 		[YuzuMember]
 		public Vector2 Amplitude
 		{
@@ -60,10 +64,12 @@ namespace Lime
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
 				var image = (Image)Owner;
-				CustomMaterial.UV0 = image.UV0;
-				CustomMaterial.UV1 = image.UV1;
-				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV0);
-				image.Texture.TransformUVCoordinatesToAtlasSpace(ref CustomMaterial.UV1);
+				var uv0 = image.UV0;
+				var uv1 = image.UV1;
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+				CustomMaterial.UV0 = uv0;
+				CustomMaterial.UV1 = uv1;
 			}
 		}
 

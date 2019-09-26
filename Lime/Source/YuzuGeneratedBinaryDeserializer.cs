@@ -10017,14 +10017,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.AutoLoopEnabled = d.Reader.ReadBoolean();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (3 == fd.OurIndex) {
 				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (3 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp2 = new global::Lime.Vector2();
 				tmp2.X = d.Reader.ReadSingle();
@@ -10032,7 +10028,7 @@ namespace YuzuGenerated
 				result.Frequency = tmp2;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp3 = new global::Lime.Vector2();
 				tmp3.X = d.Reader.ReadSingle();
@@ -10040,16 +10036,12 @@ namespace YuzuGenerated
 				result.Phase = tmp3;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (6 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp4 = new global::Lime.Vector2();
 				tmp4.X = d.Reader.ReadSingle();
 				tmp4.Y = d.Reader.ReadSingle();
 				result.Point = tmp4;
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (7 == fd.OurIndex) {
-				result.Time = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
