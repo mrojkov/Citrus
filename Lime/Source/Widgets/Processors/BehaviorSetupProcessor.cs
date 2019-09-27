@@ -30,10 +30,5 @@ namespace Lime
 		{
 			behaviorSystem.OnOwnerFrozenChanged(component);
 		}
-
-		protected internal override void Update(float delta)
-		{
-			behaviorSystem.StartPendingBehaviors();
-		}
 	}
 }
