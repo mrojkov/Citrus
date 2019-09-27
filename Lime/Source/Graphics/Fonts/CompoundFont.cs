@@ -57,6 +57,9 @@ namespace Lime
 
 		private class CompoundFontCharSource : IFontCharSource
 		{
+			public static bool UsePlaceholders = false;
+			public static char PlaceHolderCharacter = '�';
+
 			private readonly List<IFont> fonts;
 
 			public CompoundFontCharSource(List<IFont> fonts)
@@ -65,6 +68,12 @@ namespace Lime
 			}
 
 			public FontChar Get(char code, float heightHint)
+			{
+				var fc = TryGet(code, heightHint);
+				return fc == FontChar.Null && UsePlaceholders ? TryGet(PlaceHolderCharacter, heightHint) : fc;
+			}
+
+			private FontChar TryGet(char code, float heightHint)
 			{
 				foreach (var font in fonts) {
 					var c = font.Chars.Get(code, heightHint);
