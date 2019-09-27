@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using Lime;
+using Orange;
 using Exception = Lime.Exception;
-using Yuzu = Lime.Yuzu;
 
 namespace Tangerine.Core
 {
@@ -81,18 +80,31 @@ namespace Tangerine.Core
 		{
 			Console.WriteLine($"Loading: {path}, external: {external}");
 			if (!external) {
+				HasGitConflicts();
 				return false;
 			}
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
+				HasGitConflicts();
 				contentPathToCacheEntry.Add(path, new CacheEntry());
 				return false;
 			}
 			if (t.Node == null) {
+				HasGitConflicts();
 				return false;
 			}
 			instance = t.Node.Clone();
 			Document.Current?.Decorate(instance);
 			return true;
+			void HasGitConflicts()
+			{
+				var pathWithExtension = Node.ResolveScenePath(path);
+				if (pathWithExtension == null) {
+					return;
+				}
+				if (Git.HasGitConflicts(AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension))) {
+					throw new InvalidOperationException($"{pathWithExtension} has git conflicts.");
+				}
+			}
 		}
 
 		private void SceneCache_SceneLoaded(string path, Node instance, bool external)
