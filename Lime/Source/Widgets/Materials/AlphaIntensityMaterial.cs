@@ -14,7 +14,7 @@ namespace Lime
 		public float Brightness = 1;
 		public Vector4 Color = Vector4.One;
 		public ITexture MaskTexture;
-		public Func<Blending> BlendingGetter;
+		public Blending Blending;
 
 		public string Id { get; set; }
 		public int PassCount => 1;
@@ -34,7 +34,7 @@ namespace Lime
 			shaderParams.Set(brightnessKey, Brightness);
 			shaderParams.Set(colorKey, Color);
 			PlatformRenderer.SetTexture(1, MaskTexture);
-			PlatformRenderer.SetBlendState(BlendingGetter.Invoke().GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(AlphaIntensityShaderProgram.Instance);
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}

@@ -6,6 +6,13 @@ namespace Lime
 	public class GradientComponent : MaterialComponent<GradientMaterial>
 	{
 		[YuzuMember]
+		public Blending Blending
+		{
+			get => CustomMaterial.Blending;
+			set => CustomMaterial.Blending = value;
+		}
+
+		[YuzuMember]
 		public float Angle
 		{
 			get => CustomMaterial.Angle;
@@ -24,14 +31,6 @@ namespace Lime
 		{
 			get => CustomMaterial.Gradient;
 			set => CustomMaterial.Gradient = value;
-		}
-
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (Owner != null) {
-				CustomMaterial.BlendStateGetter = () => Owner.AsWidget.Blending.GetBlendState();
-			}
 		}
 	}
 }

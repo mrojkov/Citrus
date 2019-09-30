@@ -6,6 +6,13 @@ namespace Lime
 	public class DissolveComponent : MaterialComponent<DissolveMaterial>
 	{
 		[YuzuMember]
+		public Blending Blending
+		{
+			get => CustomMaterial.Blending;
+			set => CustomMaterial.Blending = value;
+		}
+
+		[YuzuMember]
 		public Vector2 Range
 		{
 			get => CustomMaterial.Range;
@@ -36,14 +43,6 @@ namespace Lime
 		{
 			get => CustomMaterial.MaskTexture;
 			set => CustomMaterial.MaskTexture = value;
-		}
-
-		protected override void OnOwnerChanged(Node oldOwner)
-		{
-			base.OnOwnerChanged(oldOwner);
-			if (Owner != null) {
-				CustomMaterial.BlendingGetter = () => Owner.AsWidget.Blending;
-			}
 		}
 	}
 }

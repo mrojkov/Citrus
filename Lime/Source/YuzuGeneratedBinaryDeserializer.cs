@@ -21,21 +21,25 @@ namespace YuzuGenerated
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.Brightness = d.Reader.ReadSingle();
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp1 = new global::Lime.Color4();
 				tmp1.ABGR = d.Reader.ReadUInt32();
 				result.Color = tmp1;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (3 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				result.Radius = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
@@ -2400,21 +2404,25 @@ namespace YuzuGenerated
 			ReaderClassDef.FieldDef fd;
 			fd = def.Fields[d.Reader.ReadInt16()];
 			if (1 == fd.OurIndex) {
-				result.Brightness = d.Reader.ReadSingle();
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Color4));
 				var tmp1 = new global::Lime.Color4();
 				tmp1.ABGR = d.Reader.ReadUInt32();
 				result.Color = tmp1;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (3 == fd.OurIndex) {
+			if (4 == fd.OurIndex) {
 				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (4 == fd.OurIndex) {
+			if (5 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp2 = new global::Lime.Vector2();
 				tmp2.X = d.Reader.ReadSingle();
@@ -3131,6 +3139,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
 				result.Gradient = (global::Lime.ColorGradient)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
