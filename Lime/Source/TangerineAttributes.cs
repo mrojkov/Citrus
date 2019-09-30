@@ -301,7 +301,7 @@ namespace Lime
 
 	public sealed class TangerineKeyframeInterpolationAttribute : Attribute
 	{
-		public KeyFunction[] KeyframeInterpolations;
+		public readonly KeyFunction[] KeyframeInterpolations;
 
 		public TangerineKeyframeInterpolationAttribute(params KeyFunction[] keyFunctions)
 		{
@@ -311,7 +311,7 @@ namespace Lime
 
 	public sealed class TangerineDisplayNameAttribute : Attribute
 	{
-		public string DisplayName;
+		public readonly string DisplayName;
 
 		public TangerineDisplayNameAttribute(string displayName)
 		{
