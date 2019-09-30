@@ -10041,7 +10041,7 @@ namespace YuzuGenerated
 				var tmp4 = new global::Lime.Vector2();
 				tmp4.X = d.Reader.ReadSingle();
 				tmp4.Y = d.Reader.ReadSingle();
-				result.Point = tmp4;
+				result.Pivot = tmp4;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");

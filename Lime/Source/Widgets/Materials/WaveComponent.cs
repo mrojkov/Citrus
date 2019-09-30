@@ -3,7 +3,7 @@ using Yuzu;
 namespace Lime
 {
 	/// <summary>
-	/// WaveComponent applies wave deformation to its owner.
+	/// WaveComponent applies the wave deformation to its owner.
 	/// </summary>
 	[TangerineRegisterComponent]
 	public class WaveComponent : MaterialComponent<WaveMaterial>
@@ -19,18 +19,38 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// The origin of the wave. Valid range: (0, 0)..(1, 1)
+		/// Whether the waving is clamped withing the widget bounds.
 		/// </summary>
 		[YuzuMember]
-		public Vector2 Point
+		public bool IsClamped
 		{
-			get => CustomMaterial.Point;
-			set => CustomMaterial.Point = value;
+			get => CustomMaterial.IsClamped;
+			set => CustomMaterial.IsClamped = value;
 		}
 
 		/// <summary>
-		/// The wave phase alongside x and y axes.
-		/// (0, 0) -- initial state, (1, 0) -- one full cycle, (2, 2) -- two cycles, etc.
+		/// Wave type
+		/// </summary>
+		[YuzuMember]
+		public WaveType WaveType
+		{
+			get => CustomMaterial.Type;
+			set => CustomMaterial.Type = value;
+		}
+
+		/// <summary>
+		/// Denotes the fixed point on the waving surface. Top-left: (0, 0), right-bottom: (1, 1)
+		/// </summary>
+		[YuzuMember]
+		public Vector2 Pivot
+		{
+			get => CustomMaterial.Pivot;
+			set => CustomMaterial.Pivot = value;
+		}
+
+		/// <summary>
+		/// Phase of waving along x and y axes.
+		/// (0, 0) -- initial state, (1, 1) -- one full cycle, (2, 2) -- two cycles, etc.
 		/// </summary>
 		[YuzuMember]
 		public Vector2 Phase
@@ -40,7 +60,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// The frequency of the wave alongside x and y axes.
+		/// The frequency of the wave along x and y axes.
 		/// </summary>
 		[YuzuMember]
 		public Vector2 Frequency
@@ -50,7 +70,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// The strength for the wave alongside x and y axes.
+		/// The strength of the wave along x and y axes.
 		/// </summary>
 		[YuzuMember]
 		public Vector2 Amplitude
@@ -72,6 +92,5 @@ namespace Lime
 				CustomMaterial.UV1 = uv1;
 			}
 		}
-
 	}
 }
