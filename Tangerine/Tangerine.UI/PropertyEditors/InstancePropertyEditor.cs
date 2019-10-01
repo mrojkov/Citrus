@@ -121,16 +121,20 @@ namespace Tangerine.UI
 				if (!cache.TryGetValue(propertyType, out HashSet<Type> derivedTypes)) {
 					cache.Add(propertyType, derivedTypes = new HashSet<Type>());
 					foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-						var types = assembly
-							.GetTypes()
-							.Where(t =>
-								!t.IsInterface &&
-								t.GetCustomAttribute<TangerineIgnoreAttribute>(false) == null &&
-								t != propertyType &&
-								propertyType.IsAssignableFrom(t)).ToList();
-							foreach (var type in types) {
-								derivedTypes.Add(type);
-							}
+						try {
+							var types = assembly
+								.GetTypes()
+								.Where(t =>
+									!t.IsInterface &&
+									t.GetCustomAttribute<TangerineIgnoreAttribute>(false) == null &&
+									t != propertyType &&
+									propertyType.IsAssignableFrom(t)).ToList();
+								foreach (var type in types) {
+									derivedTypes.Add(type);
+								}
+						} catch (ReflectionTypeLoadException e) {
+							Debug.Write($"Failed to enumerate types in '{assembly.FullName}'");
+						}
 					}
 				}
 				return derivedTypes;
