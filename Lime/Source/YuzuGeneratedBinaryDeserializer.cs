@@ -10029,6 +10029,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (4 == fd.OurIndex) {
+				result.IsClamped = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp3 = new global::Lime.Vector2();
 				tmp3.X = d.Reader.ReadSingle();
@@ -10036,12 +10040,16 @@ namespace YuzuGenerated
 				result.Phase = tmp3;
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
-			if (5 == fd.OurIndex) {
+			if (6 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp4 = new global::Lime.Vector2();
 				tmp4.X = d.Reader.ReadSingle();
 				tmp4.Y = d.Reader.ReadSingle();
 				result.Pivot = tmp4;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.WaveType = (global::Lime.WaveType)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
