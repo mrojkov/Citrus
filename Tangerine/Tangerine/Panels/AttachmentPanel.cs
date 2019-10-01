@@ -270,22 +270,29 @@ namespace Tangerine
 			if (PanelState.ActiveTabIndex != -1) {
 				content.ActivateTab(PanelState.ActiveTabIndex);
 			}
-			content.AddChangeLateWatcher(() => content.ActiveTabIndex, activeTabIndex => {
-				PanelState.ActiveTabIndex = activeTabIndex;
-				if (PanelState.ActiveTabIndex == 3) {
-					var t = animationsPane["Container"];
-					foreach (var node in t.Nodes) {
-						if (node is AnimationRow ar) {
-							(ar["AnimationRowExpandedButton"] as ThemedExpandButton).Expanded = true;
-							ar.Expand();
-							ar.LateTasks.Add(ExpandMarkers(ar));
+
+			IEnumerator<object> AddChangeWatcherTask()
+			{
+				content.AddChangeLateWatcher(() => content.ActiveTabIndex, activeTabIndex => {
+					PanelState.ActiveTabIndex = activeTabIndex;
+					if (PanelState.ActiveTabIndex == 3) {
+						var t = animationsPane["Container"];
+						foreach (var node in t.Nodes) {
+							if (node is AnimationRow ar) {
+								(ar["AnimationRowExpandedButton"] as ThemedExpandButton).Expanded = true;
+								ar.Expand();
+								ar.LateTasks.Add(ExpandMarkers(ar));
+							}
+						}
+						if (panelState.AnimationsScrollPosition != 1) {
+							UpdateScrollPosition(animationsPane, panelState.AnimationsScrollPosition);
 						}
 					}
-					if (panelState.AnimationsScrollPosition != 1) {
-						UpdateScrollPosition(animationsPane, panelState.AnimationsScrollPosition);
-					}
-				}
-			});
+				});
+				yield return null;
+			}
+
+			content.Tasks.Add(AddChangeWatcherTask);
 			Button okButton;
 			Widget rootWidget = new Widget {
 				Padding = new Thickness(8),
