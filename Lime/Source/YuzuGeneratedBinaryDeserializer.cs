@@ -9501,6 +9501,10 @@ namespace YuzuGenerated
 				result.Angle = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
@@ -10013,31 +10017,39 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.AutoLoopEnabled = d.Reader.ReadBoolean();
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.Frequency = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (4 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp2 = new global::Lime.Vector2();
 				tmp2.X = d.Reader.ReadSingle();
 				tmp2.Y = d.Reader.ReadSingle();
-				result.Point = tmp2;
+				result.Frequency = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.IsClamped = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.Time = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (6 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp3 = new global::Lime.Vector2();
 				tmp3.X = d.Reader.ReadSingle();
 				tmp3.Y = d.Reader.ReadSingle();
-				result.TimeSpeed = tmp3;
+				result.Phase = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp4 = new global::Lime.Vector2();
+				tmp4.X = d.Reader.ReadSingle();
+				tmp4.Y = d.Reader.ReadSingle();
+				result.Pivot = tmp4;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.WaveType = (global::Lime.WaveType)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");

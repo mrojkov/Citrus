@@ -2,59 +2,95 @@ using Yuzu;
 
 namespace Lime
 {
+	/// <summary>
+	/// WaveComponent applies the wave deformation to its owner.
+	/// </summary>
 	[TangerineRegisterComponent]
 	public class WaveComponent : MaterialComponent<WaveMaterial>
 	{
+		/// <summary>
+		/// Material's blend mode.
+		/// </summary>
 		[YuzuMember]
-		[TangerineKeyframeColor(1)]
-		public bool AutoLoopEnabled
+		public Blending Blending
 		{
-			get => CustomMaterial.AutoLoopEnabled;
-			set => CustomMaterial.AutoLoopEnabled = value;
+			get => CustomMaterial.Blending;
+			set => CustomMaterial.Blending = value;
 		}
 
+		/// <summary>
+		/// Whether the waving is clamped withing the widget bounds.
+		/// </summary>
 		[YuzuMember]
-		public float Time
+		public bool IsClamped
 		{
-			get => CustomMaterial.Time;
-			set => CustomMaterial.Time = value;
+			get => CustomMaterial.IsClamped;
+			set => CustomMaterial.IsClamped = value;
 		}
 
+		/// <summary>
+		/// Wave type
+		/// </summary>
 		[YuzuMember]
-		public float Frequency
+		public WaveType WaveType
+		{
+			get => CustomMaterial.Type;
+			set => CustomMaterial.Type = value;
+		}
+
+		/// <summary>
+		/// Denotes the fixed point on the waving surface. Top-left: (0, 0), right-bottom: (1, 1)
+		/// </summary>
+		[YuzuMember]
+		public Vector2 Pivot
+		{
+			get => CustomMaterial.Pivot;
+			set => CustomMaterial.Pivot = value;
+		}
+
+		/// <summary>
+		/// Phase of waving along x and y axes.
+		/// (0, 0) -- initial state, (1, 1) -- one full cycle, (2, 2) -- two cycles, etc.
+		/// </summary>
+		[YuzuMember]
+		public Vector2 Phase
+		{
+			get => CustomMaterial.Phase;
+			set => CustomMaterial.Phase = value;
+		}
+
+		/// <summary>
+		/// The frequency of the wave along x and y axes.
+		/// </summary>
+		[YuzuMember]
+		public Vector2 Frequency
 		{
 			get => CustomMaterial.Frequency;
 			set => CustomMaterial.Frequency = value;
 		}
 
-		[YuzuMember]
-		public Vector2 Point
-		{
-			get => CustomMaterial.Point;
-			set => CustomMaterial.Point = value;
-		}
-
-		[YuzuMember]
-		public Vector2 TimeSpeed
-		{
-			get => CustomMaterial.TimeSpeed;
-			set => CustomMaterial.TimeSpeed = value;
-		}
-
+		/// <summary>
+		/// The strength of the wave along x and y axes.
+		/// </summary>
 		[YuzuMember]
 		public Vector2 Amplitude
 		{
 			get => CustomMaterial.Amplitude;
 			set => CustomMaterial.Amplitude = value;
 		}
-		
+
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);
 			if (Owner != null) {
-				CustomMaterial.BlendingGetter = () => Owner.AsWidget.Blending;
+				var image = (Image)Owner;
+				var uv0 = image.UV0;
+				var uv1 = image.UV1;
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
+				image.Texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
+				CustomMaterial.UV0 = uv0;
+				CustomMaterial.UV1 = uv1;
 			}
 		}
-
 	}
 }
