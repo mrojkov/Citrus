@@ -23,7 +23,7 @@ namespace Orange
 				needUpdate = needUpdate || !srcRules.SHA1.SequenceEqual(bundle.GetCookingRulesSHA1(dstPath));
 				needUpdate = needUpdate || (extraOutOfDateChecker?.Invoke(srcPath, dstPath) ?? false);
 				if (needUpdate) {
-					if (Git.HasGitConflicts(AssetPath.Combine(The.Workspace.AssetsDirectory, srcPath))) {
+					if (Git.HasConflicts(AssetPath.Combine(The.Workspace.AssetsDirectory, srcPath))) {
 						throw new InvalidOperationException($"{srcPath} has git conflicts.");
 					}
 					if (converter != null) {

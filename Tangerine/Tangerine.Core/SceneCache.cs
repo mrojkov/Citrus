@@ -80,28 +80,29 @@ namespace Tangerine.Core
 		{
 			Console.WriteLine($"Loading: {path}, external: {external}");
 			if (!external) {
-				HasGitConflicts();
+				ThrowIfGitConflicts();
 				return false;
 			}
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
-				HasGitConflicts();
+				ThrowIfGitConflicts();
 				contentPathToCacheEntry.Add(path, new CacheEntry());
 				return false;
 			}
 			if (t.Node == null) {
-				HasGitConflicts();
+				ThrowIfGitConflicts();
 				return false;
 			}
 			instance = t.Node.Clone();
 			Document.Current?.Decorate(instance);
 			return true;
-			void HasGitConflicts()
+			
+			void ThrowIfGitConflicts()
 			{
 				var pathWithExtension = Node.ResolveScenePath(path);
 				if (pathWithExtension == null) {
 					return;
 				}
-				if (Git.HasGitConflicts(AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension))) {
+				if (Git.HasConflicts(AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension))) {
 					throw new InvalidOperationException($"{pathWithExtension} has git conflicts.");
 				}
 			}

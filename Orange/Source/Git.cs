@@ -7,7 +7,7 @@ namespace Orange
 {
 	public static class Git
 	{
-		private static readonly Regex gitConflictRegex = new Regex("^<<<<<<<.*?^=======.*?^>>>>>>>",
+		private static readonly Regex conflictRegex = new Regex("^<<<<<<<.*?^=======.*?^>>>>>>>",
 			RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.Singleline);
 
 		public static bool Exec(string workingDirectory, string gitArgs, StringBuilder output = null)
@@ -42,7 +42,7 @@ namespace Orange
 			}).Start();
 		}
 
-		public static bool HasGitConflicts(string path) =>
-			gitConflictRegex.IsMatch(System.IO.File.ReadAllText(path));
+		public static bool HasConflicts(string path) =>
+			conflictRegex.IsMatch(System.IO.File.ReadAllText(path));
 	}
 }
