@@ -1,11 +1,15 @@
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Orange
 {
 	public static class Git
 	{
+		private static readonly Regex conflictRegex = new Regex("^<<<<<<<.*?^=======.*?^>>>>>>>",
+			RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.Singleline);
+
 		public static bool Exec(string workingDirectory, string gitArgs, StringBuilder output = null)
 		{
 			return Process.Start("git", gitArgs, workingDirectory, Process.Options.RedirectErrors | Process.Options.RedirectOutput, output) == 0;
@@ -37,5 +41,8 @@ namespace Orange
 				Exec(gitDir, $"pull --ff-only origin {branch}");
 			}).Start();
 		}
+
+		public static bool HasConflicts(string path) =>
+			conflictRegex.IsMatch(System.IO.File.ReadAllText(path));
 	}
 }
