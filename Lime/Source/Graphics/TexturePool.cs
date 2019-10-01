@@ -71,6 +71,9 @@ namespace Lime
 				if (path == null) {
 					path = string.Empty;
 				}
+				if (path.StartsWith("#")) { // It's supposed render target texture
+					path = path.ToLower();
+				}
 				if (!textures.TryGetValue(path, out r)) {
 					texture = CreateTexture(path);
 					textures[path] = new WeakReference(texture);
@@ -108,19 +111,19 @@ namespace Lime
 
 		private static ITexture TryCreateRenderTarget(string path)
 		{
-			if (path.Length <= 0 || path[0] != '#') {
+			if (path.Length != 2 || path[0] != '#') {
 				return null;
 			}
-			switch (path) {
-				case "#a":
-				case "#b":
+			switch (path[1]) {
+				case 'a':
+				case 'b':
 					return new RenderTexture(256, 256);
-				case "#c":
+				case 'c':
 					return new RenderTexture(512, 512);
-				case "#d":
-				case "#e":
-				case "#f":
-				case "#g":
+				case 'd':
+				case 'e':
+				case 'f':
+				case 'g':
 					return new RenderTexture(1024, 1024);
 				default:
 					return null;
