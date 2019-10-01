@@ -31,16 +31,17 @@ namespace Tangerine.UI
 					SetProperty<object>((_) => type != null ? Activator.CreateInstance(type) : null);
 				}
 			};
-			Selector.AddChangeWatcher(CoalescedPropertyValue(
+			EditorContainer.AddChangeWatcher(CoalescedPropertyValue(
 				comparator: (t1, t2) => t1 == null && t2 == null || t1 != null && t2 != null && t1.GetType() == t2.GetType()),
 				v => {
-				OnValueChanged?.Invoke(ExpandableContent);
-				if (v.IsDefined) {
-					Selector.Value = v.Value?.GetType();
-				} else {
-					Selector.Text = ManyValuesText;
+					OnValueChanged?.Invoke(ExpandableContent);
+					if (v.IsDefined) {
+						Selector.Value = v.Value?.GetType();
+					} else {
+						Selector.Text = ManyValuesText;
+					}
 				}
-			});
+			);
 
 			var propertyMetaItem = meta.Items.FirstOrDefault(i => i.Name == editorParams.PropertyName);
 			object defaultValue = null;
