@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Lime;
 using Orange;
@@ -80,29 +81,30 @@ namespace Tangerine.Core
 		{
 			Console.WriteLine($"Loading: {path}, external: {external}");
 			if (!external) {
-				ThrowIfGitConflicts();
+				ThrowIfHasGitConflicts();
 				return false;
 			}
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
-				ThrowIfGitConflicts();
+				ThrowIfHasGitConflicts();
 				contentPathToCacheEntry.Add(path, new CacheEntry());
 				return false;
 			}
 			if (t.Node == null) {
-				ThrowIfGitConflicts();
+				ThrowIfHasGitConflicts();
 				return false;
 			}
 			instance = t.Node.Clone();
 			Document.Current?.Decorate(instance);
 			return true;
-			
-			void ThrowIfGitConflicts()
+
+			void ThrowIfHasGitConflicts()
 			{
 				var pathWithExtension = Node.ResolveScenePath(path);
 				if (pathWithExtension == null) {
 					return;
 				}
-				if (Git.HasConflicts(AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension))) {
+				var fullPath = AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension);
+				if (File.Exists(fullPath) && Git.HasConflicts(fullPath)) {
 					throw new InvalidOperationException($"{pathWithExtension} has git conflicts.");
 				}
 			}
