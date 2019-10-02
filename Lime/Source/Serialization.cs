@@ -22,6 +22,8 @@ namespace Lime
 
 		public static ThreadLocal<Yuzu> Instance { get; } = new ThreadLocal<Yuzu>(() => new Yuzu());
 
+		public static event Action<string> OnBeforeReadObject;
+
 		private Stack<string> pathStack = new Stack<string>();
 
 		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
@@ -140,6 +142,7 @@ namespace Lime
 
 		public T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
+			OnBeforeReadObject?.Invoke(path);
 			if (!(stream is MemoryStream)) {
 				var ms = new MemoryStream();
 				stream.CopyTo(ms);
@@ -243,6 +246,7 @@ namespace Lime
 			JSON,
 			Binary
 		}
+
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
 		public static CommonOptions YuzuCommonOptions => Yuzu.Instance.Value.YuzuCommonOptions;
 

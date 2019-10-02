@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Lime;
+using Orange;
 using Tangerine.Core;
 using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline;
+using FileInfo = System.IO.FileInfo;
 
 namespace Tangerine
 {
@@ -356,6 +358,11 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
+			Lime.Yuzu.OnBeforeReadObject += path => {
+				if (Git.HasConflicts(AssetPath.Combine(Project.Current.AssetsDirectory, path))) {
+					throw new InvalidOperationException($"{path} has git conflicts.");
+				}
+			};
 		}
 
 		private void ChangeTangerineSettingsFolderIfNeed()
