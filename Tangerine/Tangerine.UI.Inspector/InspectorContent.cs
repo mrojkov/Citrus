@@ -92,15 +92,13 @@ namespace Tangerine.UI.Inspector
 
 		private string SerializeMutuallyExclusiveComponentGroupBaseType(Type t)
 		{
-			while (true) {
-				var bt = t.BaseType;
-				if (bt == typeof(NodeComponent) || bt == typeof(NodeBehavior)) {
+			var current = t;
+			while (current != typeof(NodeComponent)) {
+				if (current.IsDefined(typeof(MutuallyExclusiveDerivedComponentsAttribute), false)) {
+					t = current;
 					break;
 				}
-				t = bt;
-				if (t?.GetCustomAttribute<MutuallyExclusiveDerivedComponentsAttribute>(true) != null) {
-					break;
-				}
+				current = current.BaseType;
 			}
 			return $"[{Yuzu.Util.TypeSerializer.Serialize(t)}]";
 		}
