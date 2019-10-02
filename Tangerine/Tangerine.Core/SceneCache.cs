@@ -81,33 +81,18 @@ namespace Tangerine.Core
 		{
 			Console.WriteLine($"Loading: {path}, external: {external}");
 			if (!external) {
-				ThrowIfHasGitConflicts();
 				return false;
 			}
 			if (!contentPathToCacheEntry.TryGetValue(path, out var t)) {
-				ThrowIfHasGitConflicts();
 				contentPathToCacheEntry.Add(path, new CacheEntry());
 				return false;
 			}
 			if (t.Node == null) {
-				ThrowIfHasGitConflicts();
 				return false;
 			}
 			instance = t.Node.Clone();
 			Document.Current?.Decorate(instance);
 			return true;
-
-			void ThrowIfHasGitConflicts()
-			{
-				var pathWithExtension = Node.ResolveScenePath(path);
-				if (pathWithExtension == null) {
-					return;
-				}
-				var fullPath = AssetPath.Combine(Project.Current.AssetsDirectory, pathWithExtension);
-				if (File.Exists(fullPath) && Git.HasConflicts(fullPath)) {
-					throw new InvalidOperationException($"{pathWithExtension} has git conflicts.");
-				}
-			}
 		}
 
 		private void SceneCache_SceneLoaded(string path, Node instance, bool external)

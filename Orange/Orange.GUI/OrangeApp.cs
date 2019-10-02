@@ -1,3 +1,4 @@
+using System;
 using Lime;
 
 namespace Orange
@@ -18,6 +19,11 @@ namespace Orange
 			LoadFont();
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();
+			Yuzu.OnBeforeReadObject += path => {
+				if (Git.HasConflicts(AssetPath.Combine(The.Workspace.AssetsDirectory, path))) {
+					throw new InvalidOperationException($"{path} has git conflicts.");
+				}
+			};
 			CreateActionMenuItems();
 		}
 
