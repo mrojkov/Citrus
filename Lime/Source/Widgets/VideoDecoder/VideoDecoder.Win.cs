@@ -329,7 +329,6 @@ namespace Lime
 			private readonly ShaderParams[] shaderParamsArray;
 			private readonly ShaderParams shaderParams;
 
-			[YuzuMember]
 			public float Strength { get; set; } = 1f;
 
 			public string Id { get; set; }

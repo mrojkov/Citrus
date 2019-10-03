@@ -10334,26 +10334,6 @@ namespace YuzuGenerated
 			return result;
 		}
 
-		private static void Read_Lime__VideoDecoder__YUVtoRGBMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
-		{
-			var result = (global::Lime.VideoDecoder.YUVtoRGBMaterial)obj;
-			var dg = (LimeDeserializer)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Strength = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-		}
-
-		private static object Make_Lime__VideoDecoder__YUVtoRGBMaterial(BinaryDeserializer d, ReaderClassDef def)
-		{
-			var result = new global::Lime.VideoDecoder.YUVtoRGBMaterial();
-			Read_Lime__VideoDecoder__YUVtoRGBMaterial(d, def, result);
-			return result;
-		}
-
 		private static void Read_Lime__VideoPlayer(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.VideoPlayer)obj;
@@ -11369,7 +11349,6 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.VBoxLayout)] = Read_Lime__VBoxLayout;
 			readCache[typeof(global::Lime.Vector2Animator)] = Read_Lime__Vector2Animator;
 			readCache[typeof(global::Lime.Vector3Animator)] = Read_Lime__Vector3Animator;
-			readCache[typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial)] = Read_Lime__VideoDecoder__YUVtoRGBMaterial;
 			readCache[typeof(global::Lime.VideoPlayer)] = Read_Lime__VideoPlayer;
 			readCache[typeof(global::Lime.Viewport3D)] = Read_Lime__Viewport3D;
 			readCache[typeof(global::Lime.VignetteMaterial)] = Read_Lime__VignetteMaterial;
@@ -11580,7 +11559,6 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Vector3)] = Make_Lime__Vector3;
 			makeCache[typeof(global::Lime.Vector3Animator)] = Make_Lime__Vector3Animator;
 			makeCache[typeof(global::Lime.Vector4)] = Make_Lime__Vector4;
-			makeCache[typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial)] = Make_Lime__VideoDecoder__YUVtoRGBMaterial;
 			makeCache[typeof(global::Lime.VideoPlayer)] = Make_Lime__VideoPlayer;
 			makeCache[typeof(global::Lime.Viewport3D)] = Make_Lime__Viewport3D;
 			makeCache[typeof(global::Lime.VignetteMaterial)] = Make_Lime__VignetteMaterial;

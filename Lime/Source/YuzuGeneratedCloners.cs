@@ -4492,17 +4492,6 @@ namespace YuzuGenerated
 			return result;
 		}
 
-		protected static global::Lime.VideoDecoder.YUVtoRGBMaterial Clone_Lime__VideoDecoder__YUVtoRGBMaterial(Cloner cl, object src)
-		{
-			if (src == null) return null;
-			if (src.GetType() != typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial))
-				return (global::Lime.VideoDecoder.YUVtoRGBMaterial)cl.DeepObject(src);
-			var s = (global::Lime.VideoDecoder.YUVtoRGBMaterial)src;
-			var result = new global::Lime.VideoDecoder.YUVtoRGBMaterial();
-			result.Strength = s.Strength;
-			return result;
-		}
-
 		static LimeCloner()
 		{
 			clonerCache[typeof(global::Lime.Alignment)] = ValueCopyCloner;
@@ -4715,7 +4704,6 @@ namespace YuzuGenerated
 			clonerCache[typeof(global::Lime.WaveMaterial)] = Clone_Lime__WaveMaterial;
 			clonerCache[typeof(global::Lime.Widget)] = Clone_Lime__Widget;
 			clonerCache[typeof(global::Lime.WidgetAdapter3D)] = Clone_Lime__WidgetAdapter3D;
-			clonerCache[typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial)] = Clone_Lime__VideoDecoder__YUVtoRGBMaterial;
 		}
 	}
 }
