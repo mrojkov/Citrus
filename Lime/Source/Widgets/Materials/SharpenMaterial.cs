@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -7,15 +8,20 @@ namespace Lime
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<Vector2> stepKey;
 		private readonly ShaderParamKey<Vector3> sharpnessKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Strength { get; set; } = 5f;
+		[YuzuMember]
 		public float Limit { get; set; } = 0.1f;
+		[YuzuMember]
 		public Vector2 Step { get; set; } = Vector2.One * (1f / 128f);
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		public string Id { get; set; }
@@ -25,7 +31,7 @@ namespace Lime
 
 		public SharpenMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			stepKey = shaderParams.GetParamKey<Vector2>("step");
@@ -36,22 +42,12 @@ namespace Lime
 		{
 			shaderParams.Set(stepKey, Step);
 			shaderParams.Set(sharpnessKey, new Vector3(Strength, Strength * 0.25f, Limit));
-			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.GetBlendState() : disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(SharpenShaderProgram.GetInstance(Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new SharpenMaterial(blending) {
-				Strength = Strength,
-				Limit = Limit,
-				Step = Step,
-				Opaque = Opaque
-			};
-		}
 	}
 
 	public class SharpenShaderProgram : ShaderProgram

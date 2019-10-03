@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -15,14 +16,23 @@ namespace Lime
 		private readonly ShaderParamKey<Vector2> uv0Key;
 		private readonly ShaderParamKey<Vector2> uv1Key;
 
+		[YuzuMember]
 		public bool IsClamped { get; set; } = true;
+		[YuzuMember]
 		public Blending Blending { get; set; } = Blending.Alpha;
+		[YuzuMember]
 		public WaveType Type { get; set; } = WaveType.Sinusoidal;
+		[YuzuMember]
 		public Vector2 Pivot { get; set; } = new Vector2(0.5f, 0.5f);
+		[YuzuMember]
 		public Vector2 Phase { get; set; }
+		[YuzuMember]
 		public Vector2 Frequency { get; set; }
+		[YuzuMember]
 		public Vector2 Amplitude { get; set; } = new Vector2(0.05f, 0.05f);
+		[YuzuMember]
 		public Vector2 UV0 { get; set; }
+		[YuzuMember]
 		public Vector2 UV1 { get; set; }
 
 		public string Id { get; set; }
@@ -54,16 +64,6 @@ namespace Lime
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone() => new WaveMaterial {
-			Blending = Blending,
-			Phase = Phase,
-			Frequency = Frequency,
-			Pivot = Pivot,
-			Amplitude = Amplitude,
-			IsClamped = IsClamped,
-			Type = Type
-		};
 	}
 
 	public enum WaveType

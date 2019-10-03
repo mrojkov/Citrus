@@ -110,13 +110,6 @@ namespace Lime
 			}
 		}
 
-		public override NodeComponent Clone()
-		{
-			var clone = (AnimationBlender)base.Clone();
-			clone.blendings = new Dictionary<string, BlendingProcess>();
-			return clone;
-		}
-
 		private class BlendingProcess
 		{
 			private readonly double duration;

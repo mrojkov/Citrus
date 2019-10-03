@@ -17,13 +17,6 @@ namespace Lime
 			CustomMaterial = new T();
 		}
 
-		public override NodeComponent Clone()
-		{
-			var clone = (MaterialComponent<T>)base.Clone();
-			clone.CustomMaterial = (T)CustomMaterial.Clone();
-			return clone;
-		}
-
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);

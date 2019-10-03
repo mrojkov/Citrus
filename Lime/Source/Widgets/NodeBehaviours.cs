@@ -26,13 +26,6 @@ namespace Lime
 			base.OnOwnerChanged(oldOwner);
 			IsAwoken = false;
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (AwakeBehavior)base.Clone();
-			clone.IsAwoken = false;
-			return clone;
-		}
 	}
 
 	[NodeComponentDontSerialize]
@@ -42,13 +35,6 @@ namespace Lime
 
 		public override void Update(float delta) => Updating?.Invoke(delta);
 		public override int Order => -1000000;
-
-		public override NodeComponent Clone()
-		{
-			var clone = (UpdateBehavior)base.Clone();
-			clone.Updating = null;
-			return clone;
-		}
 	}
 
 	[NodeComponentDontSerialize]
@@ -58,13 +44,6 @@ namespace Lime
 
 		public override void LateUpdate(float delta) => Updated?.Invoke(delta);
 		public override int Order => 1000000;
-
-		public override NodeComponent Clone()
-		{
-			var clone = (UpdatedBehavior)base.Clone();
-			clone.Updated = null;
-			return clone;
-		}
 	}
 
 	[NodeComponentDontSerialize]
@@ -79,13 +58,6 @@ namespace Lime
 		{
 			Tasks?.Stop();
 			Tasks = Owner == null ? null : new TaskList(Owner);
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (TasksBehavior)base.Clone();
-			clone.Tasks = null;
-			return clone;
 		}
 
 		public override void Dispose()
@@ -106,13 +78,6 @@ namespace Lime
 		{
 			Tasks?.Stop();
 			Tasks = Owner == null ? null : new TaskList(Owner);
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (LateTasksBehavior)base.Clone();
-			clone.Tasks = null;
-			return clone;
 		}
 
 		public override void Dispose()

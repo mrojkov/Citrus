@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -7,17 +8,24 @@ namespace Lime
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<Vector2> texelStepKey;
 		private readonly ShaderParamKey<Vector4> amountKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public Vector2 TexelStep { get; set; }
+		[YuzuMember]
 		public float LumaTreshold { get; set; }
+		[YuzuMember]
 		public float MulReduce { get; set; }
+		[YuzuMember]
 		public float MinReduce { get; set; }
+		[YuzuMember]
 		public float MaxSpan { get; set; }
+		[YuzuMember]
 		public bool Opaque { get; set; }
 
 		public string Id { get; set; }
@@ -27,7 +35,7 @@ namespace Lime
 
 		public FXAAMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			texelStepKey = shaderParams.GetParamKey<Vector2>("uTexelStep");
@@ -38,19 +46,12 @@ namespace Lime
 		{
 			shaderParams.Set(texelStepKey, TexelStep);
 			shaderParams.Set(amountKey, new Vector4(LumaTreshold, 0.25f / MulReduce, 1f / MinReduce, MaxSpan));
-			PlatformRenderer.SetBlendState(!Opaque ? blending.GetBlendState() : disabledBlendingState);
+			PlatformRenderer.SetBlendState(!Opaque ? Blending.GetBlendState() : disabledBlendingState);
 			PlatformRenderer.SetShaderProgram(FXAAShaderProgram.GetInstance(Opaque));
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new FXAAMaterial(blending) {
-				Opaque = Opaque
-			};
-		}
 	}
 
 	public class FXAAShaderProgram : ShaderProgram

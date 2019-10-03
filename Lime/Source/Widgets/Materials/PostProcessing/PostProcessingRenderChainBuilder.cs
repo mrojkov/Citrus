@@ -16,7 +16,5 @@ namespace Lime
 				chain.Add(Owner, Owner.Presenter);
 			}
 		}
-
-		public IRenderChainBuilder Clone(Node newOwner) => new PostProcessingRenderChainBuilder { Owner = (Widget)newOwner };
 	}
 }

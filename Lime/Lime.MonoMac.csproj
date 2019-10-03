@@ -421,7 +421,8 @@
     <Compile Include="Source\Widgets\Materials\WaveComponent.cs" />
     <Compile Include="Source\Widgets\Materials\WaveMaterial.cs" />
     <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
-	<Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\Cloner.cs" />
     <Compile Include="Source\ReferenceEqualityComparer.cs" />
     <Compile Include="Source\ServiceProviderExtensions.cs" />
     <Compile Include="Source\ServiceRegistry.cs" />
@@ -438,6 +439,7 @@
     <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
     <Compile Include="Source\Widgets\Materials\GradientComponent.cs" />
+    <Compile Include="Source\YuzuGeneratedCloners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

@@ -64,13 +64,6 @@ namespace Lime
 
 		public override bool WasClicked() => clickGesture?.WasRecognized() ?? false;
 
-		protected override Node CloneInternal()
-		{
-			var clone = (Button)base.CloneInternal();
-			clone.awoken = false;
-			return clone;
-		}
-
 		internal void Awake()
 		{
 			if (!awoken) {

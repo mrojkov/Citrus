@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Yuzu;
 
 namespace Lime
 {
@@ -74,7 +75,8 @@ namespace Lime
 
 			public Sprite ProcessSprite(Sprite s) => s;
 		}
-		
+
+		[YuzuCopyable]
 		public class LcdFontMaterial : IMaterial
 		{
 			public static readonly LcdFontMaterial Instance = new LcdFontMaterial();
@@ -118,8 +120,6 @@ namespace Lime
 
 			private LcdFontMaterial()
 			{ }
-
-			public IMaterial Clone() => Instance;
 			
 			public void Apply(int pass)
 			{

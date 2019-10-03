@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime.SignedDistanceField
 {
@@ -7,15 +8,19 @@ namespace Lime.SignedDistanceField
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> dilateKey;
 		private readonly ShaderParamKey<float> softnessKey;
 		private readonly ShaderParamKey<Vector4> colorKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Dilate { get; set; } = 0f;
+		[YuzuMember]
 		public float Softness { get; set; } = 0f;
+		[YuzuMember]
 		public Color4 Color { get; set; } = Color4.Black;
 
 		public int PassCount => 1;
@@ -26,7 +31,7 @@ namespace Lime.SignedDistanceField
 
 		public SDFShadowMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
@@ -39,21 +44,12 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(dilateKey, 0.5f - Dilate * 0.01f);
 			shaderParams.Set(softnessKey, Mathf.Max(Softness * 0.01f, 0.001f));
 			shaderParams.Set(colorKey, Color.ToVector4());
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFShadowShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new SDFShadowMaterial(blending) {
-				Dilate = Dilate,
-				Color = Color,
-				Softness = Softness,
-			};
-		}
 	}
 
 	public class SDFShadowMaterialProvider : Sprite.IMaterialProvider

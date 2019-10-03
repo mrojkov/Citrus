@@ -72,13 +72,6 @@ namespace Lime
 			return thumb;
 		}
 
-		protected override Node CloneInternal()
-		{
-			var result = base.CloneInternal() as Slider;
-			result.thumb = null;
-			return result;
-		}
-
 		private Spline Rail
 		{
 			get { return Nodes.TryFind("Rail") as Spline; }

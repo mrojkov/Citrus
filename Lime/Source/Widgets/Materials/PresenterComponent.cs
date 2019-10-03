@@ -14,13 +14,6 @@ namespace Lime
 			CustomPresenter = new T();
 		}
 
-		public override NodeComponent Clone()
-		{
-			var clone = (PresenterComponent<T>)base.Clone();
-			clone.CustomPresenter = (T)CustomPresenter.Clone();
-			return clone;
-		}
-
 		protected override void OnOwnerChanged(Node oldOwner)
 		{
 			base.OnOwnerChanged(oldOwner);

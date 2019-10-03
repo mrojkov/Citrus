@@ -216,6 +216,7 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\Cloner.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
@@ -597,6 +598,7 @@
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Enums.cs" />
     <Compile Include="Source\Graphics\Platform\OpenGL\ES20Functions.cs" />
     <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
+    <Compile Include="Source\YuzuGeneratedCloners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

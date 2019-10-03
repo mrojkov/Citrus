@@ -78,8 +78,6 @@ namespace Lime
 				return ro;
 			}
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			private class RenderObject : WidgetRenderObject
 			{
 				public Color4 Color;
@@ -132,8 +130,6 @@ namespace Lime
 			ro.Shape = Shape;
 			return ro;
 		}
-
-		public IPresenter Clone() => (IPresenter)MemberwiseClone();
 
 		private class RenderObject : WidgetRenderObject
 		{

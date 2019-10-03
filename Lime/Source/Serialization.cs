@@ -8,6 +8,7 @@ using System.Threading;
 using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Json;
+using Yuzu.Clone;
 
 namespace Lime
 {
@@ -27,6 +28,8 @@ namespace Lime
 		private Stack<string> pathStack = new Stack<string>();
 
 		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
+
+		public static Func<Yuzu, AbstractCloner> ClonerFactory = yuzu => new YuzuGenerated.LimeCloner { Options = yuzu.YuzuCommonOptions };
 
 		public UInt32 BinarySignature = 0xdeadbabe;
 
@@ -237,6 +240,16 @@ namespace Lime
 			}
 			return r;
 		}
+
+		private AbstractCloner cloner;
+
+		public object Clone(object obj)
+		{
+			if (cloner == null) {
+				cloner = ClonerFactory(this);
+			}
+			return cloner.DeepObject(obj);
+		}
 	}
 
 	public static class Serialization
@@ -248,7 +261,14 @@ namespace Lime
 		}
 
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
+		
 		public static CommonOptions YuzuCommonOptions => Yuzu.Instance.Value.YuzuCommonOptions;
+
+		public static Func<Yuzu, AbstractCloner> ClonerFactory
+		{
+			get => Yuzu.ClonerFactory;
+			set => Yuzu.ClonerFactory = value;
+		}
 
 		public static void WriteObject<T>(string path, Stream stream, T instance, Format format) => Yuzu.Instance.Value.WriteObject(path, stream, instance, format);
 		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer) => Yuzu.Instance.Value.WriteObject(path, stream, instance, serializer);
@@ -260,5 +280,20 @@ namespace Lime
 		public static int CalcObjectCheckSum<T>(string path, T obj) => Yuzu.Instance.Value.CalcObjectCheckSum(path, obj);
 		public static string GetCurrentSerializationPath() => Yuzu.Instance.Value.GetCurrentSerializationPath();
 		public static bool CheckBinarySignature(Stream s) => Yuzu.Instance.Value.CheckBinarySignature(s);
+
+		/// <summary>
+		/// Clone object using serialization scheme.
+		/// </summary>
+		/// <typeparam name="T">A type of object that need to be returned.</typeparam>
+		/// <param name="obj">A source object to clone.</param>
+		/// <returns></returns>
+		public static T Clone<T>(T obj) => (T)Clone((object)obj);
+
+		/// <summary>
+		/// Clone object using serialization scheme.
+		/// </summary>
+		/// <param name="obj">A source object to clone.</param>
+		/// <returns></returns>
+		public static object Clone(object obj) => Yuzu.Instance.Value.Clone(obj);
 	}
 }

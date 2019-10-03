@@ -74,8 +74,6 @@ namespace Lime
 				}
 			}
 
-			public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 			public bool PartialHitTest(Node node, ref HitTestArgs args)
 			{
 				return node.PartialHitTest(ref args);

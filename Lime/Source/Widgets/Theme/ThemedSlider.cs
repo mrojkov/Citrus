@@ -28,8 +28,6 @@ namespace Lime
 
 		class SliderThumbPresenter : IPresenter
 		{
-			public IPresenter Clone() => this;
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;
@@ -61,8 +59,6 @@ namespace Lime
 
 		class SliderPresenter : IPresenter
 		{
-			public IPresenter Clone() => this;
-
 			public Lime.RenderObject GetRenderObject(Node node)
 			{
 				var widget = (Widget)node;

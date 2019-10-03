@@ -1,3 +1,5 @@
+using Yuzu;
+
 namespace Lime
 {
 	public class BloomMaterial : IMaterial
@@ -9,7 +11,9 @@ namespace Lime
 		private readonly ShaderParamKey<float> brightThresholdKey;
 		private readonly ShaderParamKey<Vector3> inversedGammaCorrectionKey;
 
+		[YuzuMember]
 		public float BrightThreshold { get; set; } = 1f;
+		[YuzuMember]
 		public Vector3 InversedGammaCorrection { get; set; } = Vector3.One;
 
 		public string Id { get; set; }
@@ -33,14 +37,6 @@ namespace Lime
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new BloomMaterial {
-				BrightThreshold = BrightThreshold,
-				InversedGammaCorrection = InversedGammaCorrection
-			};
-		}
 	}
 
 	public class BloomShaderProgram : ShaderProgram

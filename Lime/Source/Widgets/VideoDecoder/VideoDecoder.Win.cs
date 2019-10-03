@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Yuzu;
 
 namespace Lime
 {
@@ -348,8 +349,6 @@ namespace Lime
 			}
 
 			public void Invalidate() { }
-
-			public IMaterial Clone() => new YUVtoRGBMaterial();
 		}
 
 		private class YUVtoRGBProgram : ShaderProgram

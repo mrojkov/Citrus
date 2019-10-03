@@ -25,8 +25,6 @@ namespace Lime
 			this.borderColor = borderColor;
 		}
 
-		public IPresenter Clone() => (IPresenter)MemberwiseClone();
-
 		public Lime.RenderObject GetRenderObject(Node node)
 		{
 			var widget = (Widget)node;

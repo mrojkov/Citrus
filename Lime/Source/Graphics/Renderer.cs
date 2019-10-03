@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Yuzu;
 
 namespace Lime
 {
@@ -1155,6 +1156,7 @@ namespace Lime
 		Projection = 1 << 13
 	}
 
+	[YuzuCopyable]
 	public class DashedLineMaterial : IMaterial
 	{
 		public string Id { get; set; }
@@ -1170,8 +1172,6 @@ namespace Lime
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 			PlatformRenderer.SetShaderProgram(ShaderPrograms.DashedLineShaderProgram.GetInstance());
 		}
-
-		public IMaterial Clone() => this;
 
 		public void Invalidate() { }
 	}

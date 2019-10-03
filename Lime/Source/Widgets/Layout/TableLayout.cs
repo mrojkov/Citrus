@@ -259,13 +259,5 @@ namespace Lime
 			var cd = EffectiveLayoutCell(cell, row, column);
 			return Mathf.Clamp(cd.ColumnSpan, 1, ColumnCount - column);
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (TableLayout)base.Clone();
-			clone.ColumnDefaults = new List<DefaultLayoutCell>();
-			clone.RowDefaults = new List<DefaultLayoutCell>();
-			return clone;
-		}
 	}
 }

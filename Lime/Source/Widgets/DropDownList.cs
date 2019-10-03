@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,6 +12,8 @@ namespace Lime
 		public event Action<ChangedEventArgs> Changed;
 		public event Action ShowingDropDownList;
 		public readonly ObservableCollection<Item> Items = new ObservableCollection<Item>();
+
+		[YuzuMember]
 		public NodeReference<Widget> TextWidgetRef { get; set; } = new NodeReference<Widget>("TextWidget");
 
 		public Widget TextWidget => TextWidgetRef.GetNode(this);
@@ -57,13 +60,6 @@ namespace Lime
 			Items.CollectionChanged += (sender, e) => RefreshTextWidget();
 			HitTestTarget = true;
 			Awoke += owner => owner.Tasks.Add(((CommonDropDownList)owner).Loop());
-		}
-
-		protected override Node CloneInternal()
-		{
-			var clone = (CommonDropDownList)base.CloneInternal();
-			clone.TextWidgetRef = clone.TextWidgetRef?.Clone();
-			return clone;
 		}
 
 		IEnumerator<object> Loop()

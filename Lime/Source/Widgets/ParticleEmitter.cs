@@ -303,17 +303,6 @@ namespace Lime
 			Components.Add(new UpdatableNodeBehavior());
 		}
 
-		protected override Node CloneInternal()
-		{
-			var clone = base.CloneInternal() as ParticleEmitter;
-			clone.particles = new List<Particle>();
-			clone.emitterShapePoints = new List<EmitterShapePoint>();
-			clone.cachedShapePoints = new List<Vector2>();
-			clone.cachedShapeTriangles = new List<int>();
-			clone.cachedShapeTriangleSizes = new List<float>();
-			return clone;
-		}
-
 		public void ClearParticles()
 		{
 			particles.Clear();

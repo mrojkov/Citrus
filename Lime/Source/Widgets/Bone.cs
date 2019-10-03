@@ -320,13 +320,5 @@ namespace Lime
 			boneArrayUpdater.RemoveBone(bone);
 			bone = null;
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (BoneBehavior)base.Clone();
-			clone.bone = null;
-			clone.boneArrayUpdater = null;
-			return clone;
-		}
 	}
 }

@@ -13,13 +13,6 @@ namespace Lime
 			RebuildSkeleton();
 		}
 
-		protected override Node CloneInternal()
-		{
-			var model = base.CloneInternal() as Model3D;
-			model.RebuildSkeleton();
-			return model;
-		}
-
 		public void RebuildSkeleton()
 		{
 			var submeshes = Descendants

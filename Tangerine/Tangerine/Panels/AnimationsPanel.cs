@@ -152,7 +152,7 @@ namespace Tangerine.Panels
 			var owner = sourceAnimation.Owner;
 
 			Document.Current.History.DoTransaction(() => {
-				var animation = sourceAnimation.Clone();
+				var animation = Cloner.Clone(sourceAnimation);
 				animation.Id = GenerateAnimationId(sourceAnimation.Id + "Copy");
 				foreach (var track in animation.Tracks) {
 					foreach (var animator in track.Animators) {
@@ -168,7 +168,7 @@ namespace Tangerine.Panels
 					foreach (var child in node.Nodes) {
 						foreach (var animator in child.Animators.ToList()) {
 							if (animator.AnimationId == sourceAnimation.Id) {
-								var clone = animator.Clone();
+								var clone = Cloner.Clone(animator);
 								clone.AnimationId = animation.Id;
 								Core.Operations.AddIntoCollection<AnimatorCollection, IAnimator>.Perform(child.Animators, clone);
 							}

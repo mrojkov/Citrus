@@ -594,60 +594,20 @@ namespace Lime
 			return this;
 		}
 
-		/// <summary>
-		/// Returns a clone of the node hierarchy.
-		/// </summary>
-		public Node Clone()
+		[YuzuBeforeSerialization]
+		public void OnBeforeSerialization()
 		{
 			foreach (var c in Components) {
-				c.OnBeforeClone();
+				c.OnBeforeNodeSerialization();
 			}
-			var clone = CloneInternal();
-			clone.Components = new NodeComponentCollection(clone);
-			foreach (var c in Components) {
-				clone.Components.Add(c.Clone());
-			}
-			foreach (var c in Components) {
-				c.OnAfterClone();
-			}
-			return clone;
 		}
 
-		protected virtual Node CloneInternal()
+		[YuzuAfterSerialization]
+		public void OnAfterSerialization()
 		{
-			var clone = (Node)MemberwiseClone();
-			++CreatedCount;
-			// it's important to initialize AsWidget and AsNode3D as sooon as possible since following clone process may access them
-			clone.AsWidget = clone as Widget;
-			clone.AsNode3D = clone as Node3D;
-			clone.Manager = null;
-			clone.Parent = null;
-			clone.FirstChild = null;
-			clone.NextSibling = null;
-			clone.gestures = null;
-			clone.DescendantAnimatorsVersion = 0;
-			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = Nodes.Clone(clone);
-			if (RenderChainBuilder != null) {
-				clone.RenderChainBuilder = RenderChainBuilder.Clone(clone);
+			foreach (var c in Components) {
+				c.OnAfterNodeSerialization();
 			}
-			if (Presenter != null) {
-				clone.Presenter = Presenter.Clone();
-			}
-			if (PostPresenter != null) {
-				clone.PostPresenter = PostPresenter.Clone();
-			}
-			clone.DirtyMask = DirtyFlags.All;
-			clone.UserData = null;
-			return clone;
-		}
-
-		/// <summary>
-		/// Returns a clone of the node hierarchy.
-		/// </summary>
-		public T Clone<T>() where T : Node
-		{
-			return (T)Clone();
 		}
 
 		/// <summary>
@@ -694,8 +654,6 @@ namespace Lime
 		/// of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.
 		/// </summary>
 		public abstract void AddToRenderChain(RenderChain chain);
-
-		IRenderChainBuilder IRenderChainBuilder.Clone(Node newOwner) => newOwner;
 
 		public void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
@@ -1083,6 +1041,7 @@ namespace Lime
 		[NodeComponentDontSerialize]
 		public class AssetBundlePathComponent : NodeComponent
 		{
+			[YuzuMember]
 			public string Path;
 			public AssetBundlePathComponent()
 			{
@@ -1164,9 +1123,6 @@ namespace Lime
 
 		public void ReplaceContent(Node content)
 		{
-			foreach (var c in content.Components) {
-				c.OnBeforeClone();
-			}
 			var nodeType = GetType();
 			var contentType = content.GetType();
 			if (content is IPropertyLocker propertyLocker) {
@@ -1204,33 +1160,33 @@ namespace Lime
 				Nodes.AddRange(nodes);
 			}
 
-			RenderChainBuilder = content.RenderChainBuilder?.Clone(this);
-			Presenter = content.Presenter?.Clone();
-			PostPresenter = content.PostPresenter?.Clone();
 			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
 					Components.Remove(typeof(AssetBundlePathComponent));
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
-						Components.Add(assetBundlePathComponent.Clone());
+						Components.Add(Cloner.Clone(assetBundlePathComponent));
 					}
 					Components.Remove(typeof(AnimationComponent));
-					var animationBehavior = content.Components.Get<AnimationComponent>();
-					if (animationBehavior != null) {
-						Components.Add(animationBehavior.Clone());
-					}
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
 				}
 			} else {
 				Components.Clear();
 				foreach (var c in content.Components) {
-					Components.Add(c.Clone());
+					if (NodeComponent.IsSerializable(c.GetType())) {
+						Components.Add(Cloner.Clone(c));
+					}
 				}
 			}
-			foreach (var c in content.Components) {
-				c.OnAfterClone();
+			var animationComponent = content.Components.Get<AnimationComponent>();
+			if (animationComponent != null) {
+				var newAnimationComponent = new AnimationComponent();
+				foreach (var a in animationComponent.Animations) {
+					newAnimationComponent.Animations.Add(Cloner.Clone(a));
+				}
+				Components.Add(newAnimationComponent);
 			}
 		}
 
@@ -1409,6 +1365,22 @@ namespace Lime
 
 	public static class NodeCompatibilityExtensions
 	{
+		/// <summary>
+		/// Returns a clone of the node hierarchy.
+		/// </summary>
+		public static T Clone<T>(this Node node) where T : Node
+		{
+			return (T)Clone(node);
+		}
+
+		/// <summary>
+		/// Returns a clone of the node hierarchy.
+		/// </summary>
+		public static Node Clone(this Node node)
+		{
+			return Cloner.Clone(node);
+		}
+
 		public static void AdvanceAnimationsRecursive(this Node node, float delta)
 		{
 			var c = node.Components.Get<AnimationComponent>();
@@ -1535,18 +1507,6 @@ namespace Lime
 		{
 			Animations = new AnimationCollection(this);
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (AnimationComponent)base.Clone();
-			clone.Animations = new AnimationCollection(clone);
-			clone.Processor = null;
-			clone.Depth = -1;
-			foreach (var a in Animations) {
-				clone.Animations.Add(a.Clone());
-			}
-			return clone;
-		}
 	}
 
 	[NodeComponentDontSerialize]
@@ -1607,15 +1567,6 @@ namespace Lime
 					Suspend();
 				}
 			}
-		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (BoneArrayUpdaterBehavior)base.Clone();
-			clone.bones = new List<Bone>();
-			clone.needResort = false;
-			clone.attached = false;
-			return clone;
 		}
 	}
 }

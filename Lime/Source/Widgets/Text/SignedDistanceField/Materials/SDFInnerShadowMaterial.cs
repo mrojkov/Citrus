@@ -1,13 +1,12 @@
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime.SignedDistanceField
 {
-
 	public class SDFInnerShadowMaterial : IMaterial
 	{
 		private static readonly BlendState disabledBlendingState = new BlendState { Enable = false };
 
-		private readonly Blending blending;
 		private readonly ShaderParams[] shaderParamsArray;
 		private readonly ShaderParams shaderParams;
 		private readonly ShaderParamKey<float> dilateKey;
@@ -16,10 +15,17 @@ namespace Lime.SignedDistanceField
 		private readonly ShaderParamKey<Vector4> colorKey;
 		private readonly ShaderParamKey<Vector2> offsetKey;
 
+		[YuzuMember]
+		public Blending Blending { get; set; }
+		[YuzuMember]
 		public float Dilate { get; set; } = 0f;
+		[YuzuMember]
 		public float TextDilate { get; set; } = 0f;
+		[YuzuMember]
 		public float Softness { get; set; } = 0f;
+		[YuzuMember]
 		public Color4 Color { get; set; } = Color4.Black;
+		[YuzuMember]
 		public Vector2 Offset { get; set; } = new Vector2();
 
 		public int PassCount => 1;
@@ -30,7 +36,7 @@ namespace Lime.SignedDistanceField
 
 		public SDFInnerShadowMaterial(Blending blending)
 		{
-			this.blending = blending;
+			Blending = blending;
 			shaderParams = new ShaderParams();
 			shaderParamsArray = new[] { Renderer.GlobalShaderParams, shaderParams };
 			dilateKey = shaderParams.GetParamKey<float>("dilate");
@@ -47,23 +53,12 @@ namespace Lime.SignedDistanceField
 			shaderParams.Set(softnessKey, Mathf.Max(Softness * 0.001f, 0.001f));
 			shaderParams.Set(colorKey, Color.ToVector4());
 			shaderParams.Set(offsetKey, Offset);
-			PlatformRenderer.SetBlendState(blending.GetBlendState());
+			PlatformRenderer.SetBlendState(Blending.GetBlendState());
 			PlatformRenderer.SetShaderProgram(SDFInnerShadowShaderProgram.GetInstance());
 			PlatformRenderer.SetShaderParams(shaderParamsArray);
 		}
 
 		public void Invalidate() { }
-
-		public IMaterial Clone()
-		{
-			return new SDFInnerShadowMaterial(blending) {
-				Dilate = Dilate,
-				TextDilate = TextDilate,
-				Color = Color,
-				Softness = Softness,
-				Offset = Offset,
-			};
-		}
 	}
 
 	public class SDFInnerShadowMaterialProvider : Sprite.IMaterialProvider

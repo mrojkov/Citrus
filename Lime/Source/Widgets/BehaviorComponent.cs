@@ -34,16 +34,6 @@ namespace Lime
 				UpdateFamily.Filter(this);
 			}
 		}
-
-		public override NodeComponent Clone()
-		{
-			var clone = (BehaviorComponent)base.Clone();
-			clone.StartQueueNode = null;
-			clone.Suspended = false;
-			clone.UpdateFamily = null;
-			clone.IndexInUpdateFamily = -1;
-			return clone;
-		}
 	}
 
 	public class PreEarlyUpdateStage { }

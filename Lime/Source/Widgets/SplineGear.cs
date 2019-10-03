@@ -31,14 +31,6 @@ namespace Lime
 			Components.Add(new UpdatableNodeBehavior());
 		}
 
-		protected override Node CloneInternal()
-		{
-			var clone = (SplineGear)base.CloneInternal();
-			clone.WidgetRef = clone.WidgetRef?.Clone();
-			clone.SplineRef = clone.SplineRef?.Clone();
-			return clone;
-		}
-
 		public virtual void OnUpdate(float delta)
 		{
 			if (Parent == null) {

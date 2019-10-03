@@ -5,7 +5,7 @@ using Yuzu;
 
 namespace Lime
 {
-	public class Animation : ICloneable
+	public class Animation
 	{
 		public const string ZeroPoseId = "ZeroPose";
 		public readonly static int ZeroPoseIdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(ZeroPoseId);
@@ -193,20 +193,6 @@ namespace Lime
 			Stopped?.Invoke();
 		}
 
-		public Animation Clone()
-		{
-			var clone = (Animation)MemberwiseClone();
-			clone.Owner = null;
-			clone.Markers = MarkerList.Clone(Markers, clone);
-			clone.Tracks = Tracks.Clone(clone);
-			clone.EffectiveAnimators = null;
-			clone.EffectiveTriggerableAnimators = null;
-			clone.EffectiveAnimatorsVersion = 0;
-			clone.BezierEasingCalculator = new AnimationBezierEasingCalculator(clone.Markers, clone);
-			clone.QueueNode = null;
-			return clone;
-		}
-
 		public int CalcDurationInFrames()
 		{
 			if (!AnimationEngine.AreEffectiveAnimatorsValid(this)) {
@@ -224,11 +210,6 @@ namespace Lime
 
 		public double CalcDurationInSeconds() => CalcDurationInFrames() * AnimationUtils.SecondsPerFrame;
 
-		object ICloneable.Clone()
-		{
-			return Clone();
-		}
-
 		public void Load()
 		{
 			if (animatorsArePropagated || string.IsNullOrEmpty(ContentsPath) || OwnerNode == null) {
@@ -236,7 +217,7 @@ namespace Lime
 			}
 			var d = AnimationData.Load(ContentsPath);
 			foreach (var animator in d.Animators) {
-				var clone = animator.Clone();
+				var clone = Cloner.Clone(animator);
 				var (host, index) = AnimationUtils.GetPropertyHost(OwnerNode, clone.TargetPropertyPath);
 				if (host == null) {
 					continue;
@@ -259,7 +240,7 @@ namespace Lime
 					node = node.Parent;
 					propertyPath = $"{node.Id}/{propertyPath}";
 				}
-				var clone = animator.Clone();
+				var clone = Cloner.Clone(animator);
 				clone.TargetPropertyPath = propertyPath;
 				d.Animators.Add(clone);
 			}

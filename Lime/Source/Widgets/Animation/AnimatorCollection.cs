@@ -73,15 +73,6 @@ namespace Lime
 			owner.OnAnimatorCollectionChanged();
 		}
 
-		internal static AnimatorCollection SharedClone(IAnimationHost owner, AnimatorCollection source)
-		{
-			var result = new AnimatorCollection(owner);
-			foreach (var animator in source) {
-				result.Add(animator.Clone());
-			}
-			return result;
-		}
-
 		public bool TryFind(string propertyPath, out IAnimator animator, string animationId = null)
 		{
 			animator = null;
