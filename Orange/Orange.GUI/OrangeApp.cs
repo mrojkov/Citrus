@@ -1,5 +1,6 @@
 using System;
 using Lime;
+using System.IO;
 
 namespace Orange
 {
@@ -20,7 +21,8 @@ namespace Orange
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();
 			Yuzu.OnBeforeReadObject += path => {
-				if (Git.HasConflicts(AssetPath.Combine(The.Workspace.AssetsDirectory, path))) {
+				var fullPath = Path.IsPathRooted(path) ? path : AssetPath.Combine(The.Workspace.AssetsDirectory, path);
+				if (File.Exists(fullPath) && Git.HasConflicts(fullPath)) {
 					throw new InvalidOperationException($"{path} has git conflicts.");
 				}
 			};
