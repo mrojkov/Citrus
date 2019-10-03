@@ -49,13 +49,6 @@ namespace Lime
 			webView.SetWebViewClient(new CustomClient());
 		}
 
-		protected override Node CloneInternal()
-		{
-			var result = (WebBrowser)base.CloneInternal();
-			result.CreateWebView();
-			return result;
-		}
-
 		public override void Dispose()
 		{
 			if (webView != null) {
