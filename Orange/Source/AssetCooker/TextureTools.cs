@@ -14,6 +14,7 @@ namespace Orange
 			public CookingRules CookingRules;
 			public string SourceExtension;
 			public BitmapInfo BitmapInfo;
+			public RectAllocator.Padding EffectivePadding;
 		}
 
 		public class BitmapInfo
