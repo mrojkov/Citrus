@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Yuzu;
 using Yuzu.Binary;
@@ -21,13 +20,16 @@ namespace Lime
 
 		private static ThreadLocal<Stack<Yuzu>> stackOfCurrent = new ThreadLocal<Stack<Yuzu>>(() => new Stack<Yuzu>());
 
-		public static ThreadLocal<Yuzu> Instance { get; } = new ThreadLocal<Yuzu>(() => new Yuzu());
 
-		public static event Action<string> OnBeforeReadObject;
+		private static readonly Regex conflictRegex = new Regex("^<<<<<<<.*?^=======.*?^>>>>>>>",
+			RegexOptions.Multiline | RegexOptions.Compiled | RegexOptions.Singleline);
+
+		public static ThreadLocal<Yuzu> Instance { get; } = new ThreadLocal<Yuzu>(() => new Yuzu());
 
 		private Stack<string> pathStack = new Stack<string>();
 
-		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders = new List<Serialization.DeserializerBuilder>();
+		private readonly List<Serialization.DeserializerBuilder> DeserializerBuilders =
+			new List<Serialization.DeserializerBuilder>();
 
 		public static Func<Yuzu, AbstractCloner> ClonerFactory = yuzu => new YuzuGenerated.LimeCloner { Options = yuzu.YuzuCommonOptions };
 
@@ -37,7 +39,7 @@ namespace Lime
 		{
 			DeserializerBuilders.Add(
 				(path, stream) => CheckBinarySignature(stream)
-					? new YuzuGenerated.LimeDeserializer { Options = YuzuCommonOptions }
+					? new YuzuGenerated.LimeDeserializer {Options = YuzuCommonOptions}
 					: null
 			);
 			DeserializerBuilders.Add(
@@ -99,7 +101,7 @@ namespace Lime
 			try {
 				if (format == Serialization.Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new global::Yuzu.Binary.BinarySerializer { Options = YuzuCommonOptions };
+					ys = new global::Yuzu.Binary.BinarySerializer {Options = YuzuCommonOptions};
 				} else if (format == Serialization.Format.JSON) {
 					ys = new global::Yuzu.Json.JsonSerializer {
 						Options = YuzuCommonOptions,
@@ -134,7 +136,8 @@ namespace Lime
 				WriteObject(path, stream, instance, format);
 		}
 
-		public void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Serialization.Format format, string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1)
+		public void WriteObjectToBundle<T>(AssetBundle bundle, string path, T instance, Serialization.Format format,
+			string sourceExtension, DateTime time, AssetAttributes attributes, byte[] cookingRulesSHA1)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance, format);
@@ -145,7 +148,6 @@ namespace Lime
 
 		public T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
-			OnBeforeReadObject?.Invoke(path);
 			if (!(stream is MemoryStream)) {
 				var ms = new MemoryStream();
 				stream.CopyTo(ms);
@@ -156,28 +158,44 @@ namespace Lime
 			PushCurrent(this);
 			try {
 				AbstractDeserializer d = null;
-				foreach (var db in DeserializerBuilders) {
-					d = db(path, stream);
-					if (d != null)
-						break;
-				}
-				var bd = d as BinaryDeserializer;
-				if (obj == null) {
-					if (bd != null) {
-						return bd.FromReader<T>(new BinaryReader(stream));
-					} else {
-						return d.FromStream<T>(stream);
+				try {
+					foreach (var db in DeserializerBuilders) {
+						d = db(path, stream);
+						if (d != null)
+							break;
 					}
-				} else {
-					if (bd != null) {
-						return (T)bd.FromReader(obj, new BinaryReader(stream));
+					var bd = d as BinaryDeserializer;
+					if (obj == null) {
+						if (bd != null) {
+							return bd.FromReader<T>(new BinaryReader(stream));
+						} else {
+							return d.FromStream<T>(stream);
+						}
 					} else {
-						return (T)d.FromStream(obj, stream);
+						if (bd != null) {
+							return (T) bd.FromReader(obj, new BinaryReader(stream));
+						} else {
+							return (T) d.FromStream(obj, stream);
+						}
+					}
+				} catch {
+					if (!(d is BinaryDeserializer) && HasConflicts(path, stream)) {
+						throw new InvalidOperationException($"{path} has git conflicts");
+					} else {
+						throw;
 					}
 				}
 			} finally {
 				pathStack.Pop();
 				PopCurrent();
+			}
+		}
+
+		private bool HasConflicts(string path, Stream stream)
+		{
+			stream.Seek(0, SeekOrigin.Begin);
+			using (var reader = new StreamReader(stream)) {
+				return conflictRegex.IsMatch(reader.ReadToEnd());
 			}
 		}
 

@@ -358,12 +358,6 @@ namespace Tangerine
 
 			Documentation.Init();
 			DocumentationComponent.Clicked = page => Documentation.ShowHelp(page);
-			Lime.Yuzu.OnBeforeReadObject += path => {
-				var fullPath = Path.IsPathRooted(path) ? path : AssetPath.Combine(Project.Current.AssetsDirectory, path);
-				if (File.Exists(fullPath) && Git.HasConflicts(fullPath)) {
-					throw new InvalidOperationException($"{path} has git conflicts.");
-				}
-			};
 		}
 
 		private void ChangeTangerineSettingsFolderIfNeed()
