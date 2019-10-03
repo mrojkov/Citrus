@@ -80,6 +80,7 @@
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\Cloner.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
