@@ -483,6 +483,7 @@
     <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
     <Compile Include="Source\Widgets\Materials\GradientComponent.cs" />
+    <Compile Include="Source\YuzuGeneratedCloners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
