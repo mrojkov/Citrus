@@ -10,7 +10,7 @@ windows_build:
   - chcp 65001
   - 'Orange\Toolchain.Win\nuget.exe restore Orange\Orange.Win.sln'
   - 'Orange\Launcher\bin\Win\Release\Launcher.exe -c -j -b .\Orange\Orange.Win.sln'
-  - 'Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime deserializers"'
+  - 'Orange\bin\Win\Release\Orange.CLI.exe --command:"Generate Lime Deserializers And Cloners"'
   - 'git status -s > ..\changes.txt'
   - 'cat .\..\changes.txt'
   - 'if ((Get-Item "..\changes.txt").length -ne 0) {exit 1} else {"Orange build OK"}'
@@ -25,7 +25,7 @@ osx_build:
   script:
   - CITRUS_PATH="$(pwd)"
   - './Orange/Launcher/bin/Mac/Release/Launcher.app/Contents/MacOS/Launcher -c -j -b $CITRUS_PATH/Orange/Orange.Mac.sln'
-  - 'Orange/bin/Mac/Release/Orange.CLI.app/Contents/MacOS/Orange.CLI --command:"Generate Lime deserializers"'
+  - 'Orange/bin/Mac/Release/Orange.CLI.app/Contents/MacOS/Orange.CLI --command:"Generate Lime Deserializers And Cloners"'
   - 'git status -s > ../changes.txt'
   - 'cat ./../changes.txt'
   - if [ -s ./../changes.txt ]; then exit 1; else echo "Orange build OK"; fi
