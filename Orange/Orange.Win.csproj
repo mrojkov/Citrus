@@ -252,6 +252,7 @@
     <Compile Include="Source\OrangeActionsHelper.cs" />
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\AssetCooker\CookStages\SyncCompoundFonts.cs" />
+    <Compile Include="Source\Actions\ResaveAllScenes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Win\zlib1.dll">

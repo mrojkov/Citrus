@@ -234,6 +234,7 @@
     <Compile Include="Source\Actions\BuildGame.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
+    <Compile Include="Source\Actions\ResaveAllScenes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Orange.Mac.userprefs">
