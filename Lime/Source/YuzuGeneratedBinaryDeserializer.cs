@@ -53,6 +53,46 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__AlphaIntensityMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.AlphaIntensityMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector4));
+				result.Color.X = d.Reader.ReadSingle();
+				result.Color.Y = d.Reader.ReadSingle();
+				result.Color.Z = d.Reader.ReadSingle();
+				result.Color.W = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Radius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__AlphaIntensityMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.AlphaIntensityMaterial();
+			Read_Lime__AlphaIntensityMaterial(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Animation(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animation)obj;
@@ -305,8 +345,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Alignment>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Alignment>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Alignment>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Alignment>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -341,8 +383,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Anchors>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Anchors>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Anchors>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Anchors>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -377,8 +421,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.AudioAction>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.AudioAction>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.AudioAction>)dg.ReadObject<global::Lime.Keyframe<global::Lime.AudioAction>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -413,8 +459,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Blending>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Blending>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Blending>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Blending>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -449,8 +497,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.ClipMethod>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.ClipMethod>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ClipMethod>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ClipMethod>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -485,8 +535,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Color4>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Color4>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Color4>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Color4>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -521,8 +573,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.EmissionType>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.EmissionType>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.EmissionType>)dg.ReadObject<global::Lime.Keyframe<global::Lime.EmissionType>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -557,8 +611,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.EmitterShape>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.EmitterShape>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.EmitterShape>)dg.ReadObject<global::Lime.Keyframe<global::Lime.EmitterShape>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -593,8 +649,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.HAlignment>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.HAlignment>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.HAlignment>)dg.ReadObject<global::Lime.Keyframe<global::Lime.HAlignment>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -629,8 +687,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.ITexture>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.ITexture>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ITexture>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ITexture>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -665,8 +725,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.LayoutDirection>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.LayoutDirection>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.LayoutDirection>)dg.ReadObject<global::Lime.Keyframe<global::Lime.LayoutDirection>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -701,8 +763,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Matrix44>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Matrix44>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Matrix44>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Matrix44>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -737,8 +801,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.MovieAction>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.MovieAction>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.MovieAction>)dg.ReadObject<global::Lime.Keyframe<global::Lime.MovieAction>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -773,8 +839,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Camera3D>>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Camera3D>>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Camera3D>>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Camera3D>>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -809,8 +877,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Node3D>>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Node3D>>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Node3D>>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Node3D>>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -845,8 +915,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Spline>>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Spline>>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline>>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline>>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -881,8 +953,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Spline3D>>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Spline3D>>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline3D>>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Spline3D>>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -917,8 +991,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Widget>>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NodeReference<global::Lime.Widget>>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Widget>>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NodeReference<global::Lime.Widget>>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -953,8 +1029,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NumericRange>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NumericRange>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NumericRange>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NumericRange>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -989,8 +1067,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.ParticlesLinkage>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.ParticlesLinkage>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ParticlesLinkage>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ParticlesLinkage>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1025,8 +1105,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Quaternion>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Quaternion>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Quaternion>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Quaternion>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1061,8 +1143,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.RenderTarget>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.RenderTarget>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.RenderTarget>)dg.ReadObject<global::Lime.Keyframe<global::Lime.RenderTarget>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1097,8 +1181,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.SerializableFont>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.SerializableFont>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.SerializableFont>)dg.ReadObject<global::Lime.Keyframe<global::Lime.SerializableFont>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1133,8 +1219,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.SerializableSample>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.SerializableSample>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.SerializableSample>)dg.ReadObject<global::Lime.Keyframe<global::Lime.SerializableSample>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1169,8 +1257,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.ShaderId>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.ShaderId>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.ShaderId>)dg.ReadObject<global::Lime.Keyframe<global::Lime.ShaderId>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1205,8 +1295,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.TextOverflowMode>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.TextOverflowMode>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.TextOverflowMode>)dg.ReadObject<global::Lime.Keyframe<global::Lime.TextOverflowMode>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1241,8 +1333,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Thickness>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Thickness>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Thickness>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Thickness>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1277,8 +1371,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.VAlignment>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.VAlignment>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.VAlignment>)dg.ReadObject<global::Lime.Keyframe<global::Lime.VAlignment>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1313,8 +1409,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Vector2>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Vector2>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector2>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector2>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1349,8 +1447,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Vector3>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Vector3>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector3>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector3>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1385,8 +1485,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<bool>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<bool>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<bool>)dg.ReadObject<global::Lime.Keyframe<bool>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1421,8 +1523,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<int>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<int>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<int>)dg.ReadObject<global::Lime.Keyframe<int>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1457,8 +1561,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<float>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<float>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<float>)dg.ReadObject<global::Lime.Keyframe<float>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1493,8 +1599,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<string>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<string>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<string>)dg.ReadObject<global::Lime.Keyframe<string>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -1708,6 +1816,87 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.BlendingOption();
 			Read_Lime__BlendingOption(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__BloomMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.BloomMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.BrightThreshold = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				var tmp1 = new global::Lime.Vector3();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				tmp1.Z = d.Reader.ReadSingle();
+				result.InversedGammaCorrection = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__BloomMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.BloomMaterial();
+			Read_Lime__BloomMaterial(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__BlurMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.BlurMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.AlphaCorrection = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.BlurShaderId = (global::Lime.BlurShaderId)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp1 = new global::Lime.Vector2();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				result.Dir = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.Radius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Step = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__BlurMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.BlurMaterial();
+			Read_Lime__BlurMaterial(d, def, result);
 			return result;
 		}
 
@@ -2262,8 +2451,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Color4>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Color4>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Color4>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Color4>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -2283,6 +2474,47 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.Color4Animator();
 			Read_Lime__Color4Animator(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__ColorCorrectionMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.ColorCorrectionMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Contrast = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector3));
+				var tmp1 = new global::Lime.Vector3();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				tmp1.Z = d.Reader.ReadSingle();
+				result.HSL = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__ColorCorrectionMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.ColorCorrectionMaterial();
+			Read_Lime__ColorCorrectionMaterial(d, def, result);
 			return result;
 		}
 
@@ -2437,6 +2669,92 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.DissolveComponent();
 			Read_Lime__DissolveComponent(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__DissolveMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.DissolveMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Brightness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector4));
+				result.Color.X = d.Reader.ReadSingle();
+				result.Color.Y = d.Reader.ReadSingle();
+				result.Color.Z = d.Reader.ReadSingle();
+				result.Color.W = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.MaskTexture = (global::Lime.ITexture)dg.ReadObject<global::Lime.ITexture>();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				result.Range.X = d.Reader.ReadSingle();
+				result.Range.Y = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__DissolveMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.DissolveMaterial();
+			Read_Lime__DissolveMaterial(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__DistortionMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.DistortionMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.BarrelPincushion = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Blue = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.ChromaticAberration = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Green = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.Red = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__DistortionMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.DistortionMaterial();
+			Read_Lime__DistortionMaterial(d, def, result);
 			return result;
 		}
 
@@ -3124,6 +3442,54 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__FXAAMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.FXAAMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.LumaTreshold = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.MaxSpan = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.MinReduce = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.MulReduce = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp1 = new global::Lime.Vector2();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				result.TexelStep = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__FXAAMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.FXAAMaterial();
+			Read_Lime__FXAAMaterial(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__GradientComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.GradientComponent)obj;
@@ -3188,6 +3554,42 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.GradientControlPoint();
 			Read_Lime__GradientControlPoint(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__GradientMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.GradientMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Angle = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.BlendMode = (global::Lime.GradientMaterialBlendMode)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Gradient = (global::Lime.ColorGradient)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.Gradient = new global::Lime.ColorGradient();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.GradientControlPoint)dg.ReadObject<global::Lime.GradientControlPoint>();
+						result.Gradient.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__GradientMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.GradientMaterial();
+			Read_Lime__GradientMaterial(d, def, result);
 			return result;
 		}
 
@@ -3550,8 +3952,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<int>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<int>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<int>)dg.ReadObject<global::Lime.Keyframe<int>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -4422,8 +4826,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Matrix44>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Matrix44>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Matrix44>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Matrix44>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -5626,6 +6032,27 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__Node__AssetBundlePathComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Node.AssetBundlePathComponent)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Path = d.Reader.ReadString();
+				if (result.Path == "" && d.Reader.ReadBoolean()) result.Path = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__Node__AssetBundlePathComponent(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.Node.AssetBundlePathComponent();
+			Read_Lime__Node__AssetBundlePathComponent(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Node3D(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Node3D)obj;
@@ -5819,6 +6246,38 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__NoiseMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.NoiseMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.BrightThreshold = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.DarkThreshold = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.SoftLight = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__NoiseMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.NoiseMaterial();
+			Read_Lime__NoiseMaterial(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__NumericAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.NumericAnimator)obj;
@@ -5831,8 +6290,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<float>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<float>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<float>)dg.ReadObject<global::Lime.Keyframe<float>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -5885,8 +6346,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.NumericRange>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.NumericRange>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.NumericRange>)dg.ReadObject<global::Lime.Keyframe<global::Lime.NumericRange>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -7179,8 +7642,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Quaternion>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Quaternion>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Quaternion>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Quaternion>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -7652,6 +8117,187 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.ShadowParams();
 			Read_Lime__ShadowParams(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__SharpenMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SharpenMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Limit = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Opaque = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp1 = new global::Lime.Vector2();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				result.Step = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Strength = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__SharpenMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SharpenMaterial();
+			Read_Lime__SharpenMaterial(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime_SignedDistanceField__SDFInnerShadowMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SignedDistanceField.SDFInnerShadowMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.Color = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Dilate = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Offset = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.Softness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				result.TextDilate = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime_SignedDistanceField__SDFInnerShadowMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SignedDistanceField.SDFInnerShadowMaterial();
+			Read_Lime_SignedDistanceField__SDFInnerShadowMaterial(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime_SignedDistanceField__SDFShadowMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SignedDistanceField.SDFShadowMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.Color = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Dilate = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Softness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime_SignedDistanceField__SDFShadowMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SignedDistanceField.SDFShadowMaterial();
+			Read_Lime_SignedDistanceField__SDFShadowMaterial(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime_SignedDistanceField__SignedDistanceFieldMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SignedDistanceField.SignedDistanceFieldMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Dilate = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Gradient = (global::Lime.ColorGradient)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.Gradient = new global::Lime.ColorGradient();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.GradientControlPoint)dg.ReadObject<global::Lime.GradientControlPoint>();
+						result.Gradient.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.GradientAngle = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				result.GradientEnabled = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp3 = new global::Lime.Color4();
+				tmp3.ABGR = d.Reader.ReadUInt32();
+				result.OutlineColor = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.Softness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (8 == fd.OurIndex) {
+				result.Thickness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime_SignedDistanceField__SignedDistanceFieldMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SignedDistanceField.SignedDistanceFieldMaterial();
+			Read_Lime_SignedDistanceField__SignedDistanceFieldMaterial(d, def, result);
 			return result;
 		}
 
@@ -9279,8 +9925,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Thickness>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Thickness>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Thickness>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Thickness>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -9501,6 +10149,10 @@ namespace YuzuGenerated
 				result.Angle = d.Reader.ReadSingle();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
 		}
 
@@ -9508,6 +10160,42 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.TwistComponent();
 			Read_Lime__TwistComponent(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__TwistMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.TwistMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Angle = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				result.UV0.X = d.Reader.ReadSingle();
+				result.UV0.Y = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				result.UV1.X = d.Reader.ReadSingle();
+				result.UV1.Y = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__TwistMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.TwistMaterial();
+			Read_Lime__TwistMaterial(d, def, result);
 			return result;
 		}
 
@@ -9563,8 +10251,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Vector2>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Vector2>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector2>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector2>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -9608,8 +10298,10 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<global::Lime.Vector3>)null;
 				var tmp1 = d.Reader.ReadInt32();
 				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<global::Lime.Vector3>();
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.Keyframe<global::Lime.Vector3>)dg.ReadObject<global::Lime.Keyframe<global::Lime.Vector3>>();
 						result.ReadonlyKeys.Add(tmp2);
@@ -9639,6 +10331,26 @@ namespace YuzuGenerated
 			result.Y = d.Reader.ReadSingle();
 			result.Z = d.Reader.ReadSingle();
 			result.W = d.Reader.ReadSingle();
+			return result;
+		}
+
+		private static void Read_Lime__VideoDecoder__YUVtoRGBMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.VideoDecoder.YUVtoRGBMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Strength = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__VideoDecoder__YUVtoRGBMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.VideoDecoder.YUVtoRGBMaterial();
+			Read_Lime__VideoDecoder__YUVtoRGBMaterial(d, def, result);
 			return result;
 		}
 
@@ -9998,6 +10710,57 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__VignetteMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.VignetteMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Color4));
+				var tmp1 = new global::Lime.Color4();
+				tmp1.ABGR = d.Reader.ReadUInt32();
+				result.Color = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.Radius = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.Softness = d.Reader.ReadSingle();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.UV1 = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp3 = new global::Lime.Vector2();
+				tmp3.X = d.Reader.ReadSingle();
+				tmp3.Y = d.Reader.ReadSingle();
+				result.UVOffset = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__VignetteMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.VignetteMaterial();
+			Read_Lime__VignetteMaterial(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__WaveComponent(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.WaveComponent)obj;
@@ -10013,31 +10776,39 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (2 == fd.OurIndex) {
-				result.AutoLoopEnabled = d.Reader.ReadBoolean();
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (3 == fd.OurIndex) {
-				result.Frequency = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (4 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp2 = new global::Lime.Vector2();
 				tmp2.X = d.Reader.ReadSingle();
 				tmp2.Y = d.Reader.ReadSingle();
-				result.Point = tmp2;
+				result.Frequency = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.IsClamped = d.Reader.ReadBoolean();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (5 == fd.OurIndex) {
-				result.Time = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (6 == fd.OurIndex) {
 				dg.EnsureClassDef(typeof(global::Lime.Vector2));
 				var tmp3 = new global::Lime.Vector2();
 				tmp3.X = d.Reader.ReadSingle();
 				tmp3.Y = d.Reader.ReadSingle();
-				result.TimeSpeed = tmp3;
+				result.Phase = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp4 = new global::Lime.Vector2();
+				tmp4.X = d.Reader.ReadSingle();
+				tmp4.Y = d.Reader.ReadSingle();
+				result.Pivot = tmp4;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.WaveType = (global::Lime.WaveType)d.Reader.ReadInt32();
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
@@ -10047,6 +10818,82 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.WaveComponent();
 			Read_Lime__WaveComponent(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__WaveMaterial(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.WaveMaterial)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp1 = new global::Lime.Vector2();
+				tmp1.X = d.Reader.ReadSingle();
+				tmp1.Y = d.Reader.ReadSingle();
+				result.Amplitude = tmp1;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.Blending = (global::Lime.Blending)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp2 = new global::Lime.Vector2();
+				tmp2.X = d.Reader.ReadSingle();
+				tmp2.Y = d.Reader.ReadSingle();
+				result.Frequency = tmp2;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (4 == fd.OurIndex) {
+				result.IsClamped = d.Reader.ReadBoolean();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (5 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp3 = new global::Lime.Vector2();
+				tmp3.X = d.Reader.ReadSingle();
+				tmp3.Y = d.Reader.ReadSingle();
+				result.Phase = tmp3;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (6 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp4 = new global::Lime.Vector2();
+				tmp4.X = d.Reader.ReadSingle();
+				tmp4.Y = d.Reader.ReadSingle();
+				result.Pivot = tmp4;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (7 == fd.OurIndex) {
+				result.Type = (global::Lime.WaveType)d.Reader.ReadInt32();
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (8 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp5 = new global::Lime.Vector2();
+				tmp5.X = d.Reader.ReadSingle();
+				tmp5.Y = d.Reader.ReadSingle();
+				result.UV0 = tmp5;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (9 == fd.OurIndex) {
+				dg.EnsureClassDef(typeof(global::Lime.Vector2));
+				var tmp6 = new global::Lime.Vector2();
+				tmp6.X = d.Reader.ReadSingle();
+				tmp6.Y = d.Reader.ReadSingle();
+				result.UV1 = tmp6;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__WaveMaterial(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.WaveMaterial();
+			Read_Lime__WaveMaterial(d, def, result);
 			return result;
 		}
 
@@ -10347,6 +11194,7 @@ namespace YuzuGenerated
 		static LimeDeserializer()
 		{
 			readCache[typeof(global::Lime.AlphaIntensityComponent)] = Read_Lime__AlphaIntensityComponent;
+			readCache[typeof(global::Lime.AlphaIntensityMaterial)] = Read_Lime__AlphaIntensityMaterial;
 			readCache[typeof(global::Lime.Animation)] = Read_Lime__Animation;
 			readCache[typeof(global::Lime.Animation.AnimationData)] = Read_Lime__Animation__AnimationData;
 			readCache[typeof(global::Lime.AnimationBlender)] = Read_Lime__AnimationBlender;
@@ -10390,21 +11238,28 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.Audio)] = Read_Lime__Audio;
 			readCache[typeof(global::Lime.AudioRandomizerComponent)] = Read_Lime__AudioRandomizerComponent;
 			readCache[typeof(global::Lime.BlendingOption)] = Read_Lime__BlendingOption;
+			readCache[typeof(global::Lime.BloomMaterial)] = Read_Lime__BloomMaterial;
+			readCache[typeof(global::Lime.BlurMaterial)] = Read_Lime__BlurMaterial;
 			readCache[typeof(global::Lime.Bone)] = Read_Lime__Bone;
 			readCache[typeof(global::Lime.Button)] = Read_Lime__Button;
 			readCache[typeof(global::Lime.Camera3D)] = Read_Lime__Camera3D;
 			readCache[typeof(global::Lime.Color4Animator)] = Read_Lime__Color4Animator;
+			readCache[typeof(global::Lime.ColorCorrectionMaterial)] = Read_Lime__ColorCorrectionMaterial;
 			readCache[typeof(global::Lime.CommonMaterial)] = Read_Lime__CommonMaterial;
 			readCache[typeof(global::Lime.DefaultLayoutCell)] = Read_Lime__DefaultLayoutCell;
 			readCache[typeof(global::Lime.DissolveComponent)] = Read_Lime__DissolveComponent;
+			readCache[typeof(global::Lime.DissolveMaterial)] = Read_Lime__DissolveMaterial;
+			readCache[typeof(global::Lime.DistortionMaterial)] = Read_Lime__DistortionMaterial;
 			readCache[typeof(global::Lime.DistortionMesh)] = Read_Lime__DistortionMesh;
 			readCache[typeof(global::Lime.DistortionMeshPoint)] = Read_Lime__DistortionMeshPoint;
 			readCache[typeof(global::Lime.EmitterShapePoint)] = Read_Lime__EmitterShapePoint;
 			readCache[typeof(global::Lime.Font)] = Read_Lime__Font;
 			readCache[typeof(global::Lime.FontChar)] = Read_Lime__FontChar;
 			readCache[typeof(global::Lime.Frame)] = Read_Lime__Frame;
+			readCache[typeof(global::Lime.FXAAMaterial)] = Read_Lime__FXAAMaterial;
 			readCache[typeof(global::Lime.GradientComponent)] = Read_Lime__GradientComponent;
 			readCache[typeof(global::Lime.GradientControlPoint)] = Read_Lime__GradientControlPoint;
+			readCache[typeof(global::Lime.GradientMaterial)] = Read_Lime__GradientMaterial;
 			readCache[typeof(global::Lime.HBoxLayout)] = Read_Lime__HBoxLayout;
 			readCache[typeof(global::Lime.HSLComponent)] = Read_Lime__HSLComponent;
 			readCache[typeof(global::Lime.Image)] = Read_Lime__Image;
@@ -10462,10 +11317,12 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.Model3DAttachmentParser.UVAnimationFormat)] = Read_Lime__Model3DAttachmentParser__UVAnimationFormat;
 			readCache[typeof(global::Lime.Movie)] = Read_Lime__Movie;
 			readCache[typeof(global::Lime.NineGrid)] = Read_Lime__NineGrid;
+			readCache[typeof(global::Lime.Node.AssetBundlePathComponent)] = Read_Lime__Node__AssetBundlePathComponent;
 			readCache[typeof(global::Lime.Node3D)] = Read_Lime__Node3D;
 			readCache[typeof(global::Lime.NodeReference<global::Lime.Camera3D>)] = Read_Lime__NodeReference_Camera3D;
 			readCache[typeof(global::Lime.NodeReference<global::Lime.Spline>)] = Read_Lime__NodeReference_Spline;
 			readCache[typeof(global::Lime.NodeReference<global::Lime.Widget>)] = Read_Lime__NodeReference_Widget;
+			readCache[typeof(global::Lime.NoiseMaterial)] = Read_Lime__NoiseMaterial;
 			readCache[typeof(global::Lime.NumericAnimator)] = Read_Lime__NumericAnimator;
 			readCache[typeof(global::Lime.NumericRangeAnimator)] = Read_Lime__NumericRangeAnimator;
 			readCache[typeof(global::Lime.ParticleEmitter)] = Read_Lime__ParticleEmitter;
@@ -10486,6 +11343,10 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
 			readCache[typeof(global::Lime.SerializableTexture)] = Read_Lime__SerializableTexture;
 			readCache[typeof(global::Lime.ShadowParams)] = Read_Lime__ShadowParams;
+			readCache[typeof(global::Lime.SharpenMaterial)] = Read_Lime__SharpenMaterial;
+			readCache[typeof(global::Lime.SignedDistanceField.SDFInnerShadowMaterial)] = Read_Lime_SignedDistanceField__SDFInnerShadowMaterial;
+			readCache[typeof(global::Lime.SignedDistanceField.SDFShadowMaterial)] = Read_Lime_SignedDistanceField__SDFShadowMaterial;
+			readCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldMaterial)] = Read_Lime_SignedDistanceField__SignedDistanceFieldMaterial;
 			readCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Read_Lime__SignedDistanceFieldComponent;
 			readCache[typeof(global::Lime.SimpleText)] = Read_Lime__SimpleText;
 			readCache[typeof(global::Lime.SkinningWeights)] = Read_Lime__SkinningWeights;
@@ -10504,16 +11365,21 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.ThicknessAnimator)] = Read_Lime__ThicknessAnimator;
 			readCache[typeof(global::Lime.TiledImage)] = Read_Lime__TiledImage;
 			readCache[typeof(global::Lime.TwistComponent)] = Read_Lime__TwistComponent;
+			readCache[typeof(global::Lime.TwistMaterial)] = Read_Lime__TwistMaterial;
 			readCache[typeof(global::Lime.VBoxLayout)] = Read_Lime__VBoxLayout;
 			readCache[typeof(global::Lime.Vector2Animator)] = Read_Lime__Vector2Animator;
 			readCache[typeof(global::Lime.Vector3Animator)] = Read_Lime__Vector3Animator;
+			readCache[typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial)] = Read_Lime__VideoDecoder__YUVtoRGBMaterial;
 			readCache[typeof(global::Lime.VideoPlayer)] = Read_Lime__VideoPlayer;
 			readCache[typeof(global::Lime.Viewport3D)] = Read_Lime__Viewport3D;
+			readCache[typeof(global::Lime.VignetteMaterial)] = Read_Lime__VignetteMaterial;
 			readCache[typeof(global::Lime.WaveComponent)] = Read_Lime__WaveComponent;
+			readCache[typeof(global::Lime.WaveMaterial)] = Read_Lime__WaveMaterial;
 			readCache[typeof(global::Lime.Widget)] = Read_Lime__Widget;
 			readCache[typeof(global::Lime.WidgetAdapter3D)] = Read_Lime__WidgetAdapter3D;
 			makeCache[typeof(global::Lime.Alignment)] = Make_Lime__Alignment;
 			makeCache[typeof(global::Lime.AlphaIntensityComponent)] = Make_Lime__AlphaIntensityComponent;
+			makeCache[typeof(global::Lime.AlphaIntensityMaterial)] = Make_Lime__AlphaIntensityMaterial;
 			makeCache[typeof(global::Lime.Animation)] = Make_Lime__Animation;
 			makeCache[typeof(global::Lime.Animation.AnimationData)] = Make_Lime__Animation__AnimationData;
 			makeCache[typeof(global::Lime.AnimationBlender)] = Make_Lime__AnimationBlender;
@@ -10559,6 +11425,8 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.BezierEasing)] = Make_Lime__BezierEasing;
 			makeCache[typeof(global::Lime.BitSet32)] = Make_Lime__BitSet32;
 			makeCache[typeof(global::Lime.BlendingOption)] = Make_Lime__BlendingOption;
+			makeCache[typeof(global::Lime.BloomMaterial)] = Make_Lime__BloomMaterial;
+			makeCache[typeof(global::Lime.BlurMaterial)] = Make_Lime__BlurMaterial;
 			makeCache[typeof(global::Lime.Bone)] = Make_Lime__Bone;
 			makeCache[typeof(global::Lime.BoneArray)] = Make_Lime__BoneArray;
 			makeCache[typeof(global::Lime.BoneWeight)] = Make_Lime__BoneWeight;
@@ -10568,17 +11436,22 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Camera3D)] = Make_Lime__Camera3D;
 			makeCache[typeof(global::Lime.Color4)] = Make_Lime__Color4;
 			makeCache[typeof(global::Lime.Color4Animator)] = Make_Lime__Color4Animator;
+			makeCache[typeof(global::Lime.ColorCorrectionMaterial)] = Make_Lime__ColorCorrectionMaterial;
 			makeCache[typeof(global::Lime.CommonMaterial)] = Make_Lime__CommonMaterial;
 			makeCache[typeof(global::Lime.DefaultLayoutCell)] = Make_Lime__DefaultLayoutCell;
 			makeCache[typeof(global::Lime.DissolveComponent)] = Make_Lime__DissolveComponent;
+			makeCache[typeof(global::Lime.DissolveMaterial)] = Make_Lime__DissolveMaterial;
+			makeCache[typeof(global::Lime.DistortionMaterial)] = Make_Lime__DistortionMaterial;
 			makeCache[typeof(global::Lime.DistortionMesh)] = Make_Lime__DistortionMesh;
 			makeCache[typeof(global::Lime.DistortionMeshPoint)] = Make_Lime__DistortionMeshPoint;
 			makeCache[typeof(global::Lime.EmitterShapePoint)] = Make_Lime__EmitterShapePoint;
 			makeCache[typeof(global::Lime.Font)] = Make_Lime__Font;
 			makeCache[typeof(global::Lime.FontChar)] = Make_Lime__FontChar;
 			makeCache[typeof(global::Lime.Frame)] = Make_Lime__Frame;
+			makeCache[typeof(global::Lime.FXAAMaterial)] = Make_Lime__FXAAMaterial;
 			makeCache[typeof(global::Lime.GradientComponent)] = Make_Lime__GradientComponent;
 			makeCache[typeof(global::Lime.GradientControlPoint)] = Make_Lime__GradientControlPoint;
+			makeCache[typeof(global::Lime.GradientMaterial)] = Make_Lime__GradientMaterial;
 			makeCache[typeof(global::Lime.HBoxLayout)] = Make_Lime__HBoxLayout;
 			makeCache[typeof(global::Lime.HSLComponent)] = Make_Lime__HSLComponent;
 			makeCache[typeof(global::Lime.Image)] = Make_Lime__Image;
@@ -10644,10 +11517,12 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Model3DAttachmentParser.UVAnimationFormat)] = Make_Lime__Model3DAttachmentParser__UVAnimationFormat;
 			makeCache[typeof(global::Lime.Movie)] = Make_Lime__Movie;
 			makeCache[typeof(global::Lime.NineGrid)] = Make_Lime__NineGrid;
+			makeCache[typeof(global::Lime.Node.AssetBundlePathComponent)] = Make_Lime__Node__AssetBundlePathComponent;
 			makeCache[typeof(global::Lime.Node3D)] = Make_Lime__Node3D;
 			makeCache[typeof(global::Lime.NodeReference<global::Lime.Camera3D>)] = Make_Lime__NodeReference_Camera3D;
 			makeCache[typeof(global::Lime.NodeReference<global::Lime.Spline>)] = Make_Lime__NodeReference_Spline;
 			makeCache[typeof(global::Lime.NodeReference<global::Lime.Widget>)] = Make_Lime__NodeReference_Widget;
+			makeCache[typeof(global::Lime.NoiseMaterial)] = Make_Lime__NoiseMaterial;
 			makeCache[typeof(global::Lime.NumericAnimator)] = Make_Lime__NumericAnimator;
 			makeCache[typeof(global::Lime.NumericRange)] = Make_Lime__NumericRange;
 			makeCache[typeof(global::Lime.NumericRangeAnimator)] = Make_Lime__NumericRangeAnimator;
@@ -10673,6 +11548,10 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;
 			makeCache[typeof(global::Lime.SerializableTexture)] = Make_Lime__SerializableTexture;
 			makeCache[typeof(global::Lime.ShadowParams)] = Make_Lime__ShadowParams;
+			makeCache[typeof(global::Lime.SharpenMaterial)] = Make_Lime__SharpenMaterial;
+			makeCache[typeof(global::Lime.SignedDistanceField.SDFInnerShadowMaterial)] = Make_Lime_SignedDistanceField__SDFInnerShadowMaterial;
+			makeCache[typeof(global::Lime.SignedDistanceField.SDFShadowMaterial)] = Make_Lime_SignedDistanceField__SDFShadowMaterial;
+			makeCache[typeof(global::Lime.SignedDistanceField.SignedDistanceFieldMaterial)] = Make_Lime_SignedDistanceField__SignedDistanceFieldMaterial;
 			makeCache[typeof(global::Lime.SignedDistanceFieldComponent)] = Make_Lime__SignedDistanceFieldComponent;
 			makeCache[typeof(global::Lime.SimpleText)] = Make_Lime__SimpleText;
 			makeCache[typeof(global::Lime.Size)] = Make_Lime__Size;
@@ -10694,15 +11573,19 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.ThicknessAnimator)] = Make_Lime__ThicknessAnimator;
 			makeCache[typeof(global::Lime.TiledImage)] = Make_Lime__TiledImage;
 			makeCache[typeof(global::Lime.TwistComponent)] = Make_Lime__TwistComponent;
+			makeCache[typeof(global::Lime.TwistMaterial)] = Make_Lime__TwistMaterial;
 			makeCache[typeof(global::Lime.VBoxLayout)] = Make_Lime__VBoxLayout;
 			makeCache[typeof(global::Lime.Vector2)] = Make_Lime__Vector2;
 			makeCache[typeof(global::Lime.Vector2Animator)] = Make_Lime__Vector2Animator;
 			makeCache[typeof(global::Lime.Vector3)] = Make_Lime__Vector3;
 			makeCache[typeof(global::Lime.Vector3Animator)] = Make_Lime__Vector3Animator;
 			makeCache[typeof(global::Lime.Vector4)] = Make_Lime__Vector4;
+			makeCache[typeof(global::Lime.VideoDecoder.YUVtoRGBMaterial)] = Make_Lime__VideoDecoder__YUVtoRGBMaterial;
 			makeCache[typeof(global::Lime.VideoPlayer)] = Make_Lime__VideoPlayer;
 			makeCache[typeof(global::Lime.Viewport3D)] = Make_Lime__Viewport3D;
+			makeCache[typeof(global::Lime.VignetteMaterial)] = Make_Lime__VignetteMaterial;
 			makeCache[typeof(global::Lime.WaveComponent)] = Make_Lime__WaveComponent;
+			makeCache[typeof(global::Lime.WaveMaterial)] = Make_Lime__WaveMaterial;
 			makeCache[typeof(global::Lime.Widget)] = Make_Lime__Widget;
 			makeCache[typeof(global::Lime.WidgetAdapter3D)] = Make_Lime__WidgetAdapter3D;
 		}
