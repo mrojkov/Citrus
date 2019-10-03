@@ -30,7 +30,7 @@ namespace Tangerine.Core.Operations
 			to.Components.Remove(typeof(Node.AssetBundlePathComponent));
 			var assetBundlePathComponent = from.Components.Get<Node.AssetBundlePathComponent>();
 			if (assetBundlePathComponent != null) {
-				to.Components.Add(Serialization.Clone(assetBundlePathComponent));
+				to.Components.Add(Cloner.Clone(assetBundlePathComponent));
 			}
 			to.Animations.Clear();
 			var animations = from.Animations.ToList();

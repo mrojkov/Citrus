@@ -594,14 +594,6 @@ namespace Lime
 			return this;
 		}
 
-		/// <summary>
-		/// Returns a clone of the node hierarchy.
-		/// </summary>
-		public Node Clone()
-		{
-			return Serialization.Clone(this);
-		}
-
 		[YuzuBeforeSerialization]
 		public void OnBeforeSerialization()
 		{
@@ -616,14 +608,6 @@ namespace Lime
 			foreach (var c in Components) {
 				c.OnAfterNodeSerialization();
 			}
-		}
-
-		/// <summary>
-		/// Returns a clone of the node hierarchy.
-		/// </summary>
-		public T Clone<T>() where T : Node
-		{
-			return (T)Clone();
 		}
 
 		/// <summary>
@@ -1182,7 +1166,7 @@ namespace Lime
 					Components.Remove(typeof(AssetBundlePathComponent));
 					var assetBundlePathComponent = content.Components.Get<AssetBundlePathComponent>();
 					if (assetBundlePathComponent != null) {
-						Components.Add(Serialization.Clone(assetBundlePathComponent));
+						Components.Add(Cloner.Clone(assetBundlePathComponent));
 					}
 					Components.Remove(typeof(AnimationComponent));
 				} else {
@@ -1192,7 +1176,7 @@ namespace Lime
 				Components.Clear();
 				foreach (var c in content.Components) {
 					if (NodeComponent.IsSerializable(c.GetType())) {
-						Components.Add(Serialization.Clone(c));
+						Components.Add(Cloner.Clone(c));
 					}
 				}
 			}
@@ -1200,7 +1184,7 @@ namespace Lime
 			if (animationComponent != null) {
 				var newAnimationComponent = new AnimationComponent();
 				foreach (var a in animationComponent.Animations) {
-					newAnimationComponent.Animations.Add(Serialization.Clone(a));
+					newAnimationComponent.Animations.Add(Cloner.Clone(a));
 				}
 				Components.Add(newAnimationComponent);
 			}
@@ -1381,6 +1365,22 @@ namespace Lime
 
 	public static class NodeCompatibilityExtensions
 	{
+		/// <summary>
+		/// Returns a clone of the node hierarchy.
+		/// </summary>
+		public static T Clone<T>(this Node node) where T : Node
+		{
+			return (T)Clone(node);
+		}
+
+		/// <summary>
+		/// Returns a clone of the node hierarchy.
+		/// </summary>
+		public static Node Clone(this Node node)
+		{
+			return Cloner.Clone(node);
+		}
+
 		public static void AdvanceAnimationsRecursive(this Node node, float delta)
 		{
 			var c = node.Components.Get<AnimationComponent>();

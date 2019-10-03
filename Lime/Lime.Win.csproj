@@ -216,6 +216,7 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\Cloner.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />

@@ -16,6 +16,7 @@ namespace YuzuGenerated
 				return (global::Lime.AlphaIntensityComponent)cl.DeepObject(src);
 			var s = (global::Lime.AlphaIntensityComponent)src;
 			var result = new global::Lime.AlphaIntensityComponent();
+			result.Blending = s.Blending;
 			result.Brightness = s.Brightness;
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
@@ -30,6 +31,7 @@ namespace YuzuGenerated
 				return (global::Lime.AlphaIntensityMaterial)cl.DeepObject(src);
 			var s = (global::Lime.AlphaIntensityMaterial)src;
 			var result = new global::Lime.AlphaIntensityMaterial();
+			result.Blending = s.Blending;
 			result.Brightness = s.Brightness;
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
@@ -1050,6 +1052,7 @@ namespace YuzuGenerated
 				return (global::Lime.DissolveComponent)cl.DeepObject(src);
 			var s = (global::Lime.DissolveComponent)src;
 			var result = new global::Lime.DissolveComponent();
+			result.Blending = s.Blending;
 			result.Brightness = s.Brightness;
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
@@ -1064,6 +1067,7 @@ namespace YuzuGenerated
 				return (global::Lime.DissolveMaterial)cl.DeepObject(src);
 			var s = (global::Lime.DissolveMaterial)src;
 			var result = new global::Lime.DissolveMaterial();
+			result.Blending = s.Blending;
 			result.Brightness = s.Brightness;
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
@@ -1393,6 +1397,7 @@ namespace YuzuGenerated
 			var result = new global::Lime.GradientComponent();
 			result.Angle = s.Angle;
 			result.BlendMode = s.BlendMode;
+			result.Blending = s.Blending;
 			if (s.Gradient != null) {
 				result.Gradient = new global::Lime.ColorGradient();
 				foreach (var tmp1 in s.Gradient)
@@ -4095,6 +4100,7 @@ namespace YuzuGenerated
 			var s = (global::Lime.TwistComponent)src;
 			var result = new global::Lime.TwistComponent();
 			result.Angle = s.Angle;
+			result.Blending = s.Blending;
 			return result;
 		}
 
@@ -4106,6 +4112,9 @@ namespace YuzuGenerated
 			var s = (global::Lime.TwistMaterial)src;
 			var result = new global::Lime.TwistMaterial();
 			result.Angle = s.Angle;
+			result.Blending = s.Blending;
+			result.UV0 = s.UV0;
+			result.UV1 = s.UV1;
 			return result;
 		}
 
@@ -4338,11 +4347,12 @@ namespace YuzuGenerated
 			var s = (global::Lime.WaveComponent)src;
 			var result = new global::Lime.WaveComponent();
 			result.Amplitude = s.Amplitude;
-			result.AutoLoopEnabled = s.AutoLoopEnabled;
+			result.Blending = s.Blending;
 			result.Frequency = s.Frequency;
-			result.Point = s.Point;
-			result.Time = s.Time;
-			result.TimeSpeed = s.TimeSpeed;
+			result.IsClamped = s.IsClamped;
+			result.Phase = s.Phase;
+			result.Pivot = s.Pivot;
+			result.WaveType = s.WaveType;
 			return result;
 		}
 
@@ -4354,11 +4364,14 @@ namespace YuzuGenerated
 			var s = (global::Lime.WaveMaterial)src;
 			var result = new global::Lime.WaveMaterial();
 			result.Amplitude = s.Amplitude;
-			result.AutoLoopEnabled = s.AutoLoopEnabled;
+			result.Blending = s.Blending;
 			result.Frequency = s.Frequency;
-			result.Point = s.Point;
-			result.Time = s.Time;
-			result.TimeSpeed = s.TimeSpeed;
+			result.IsClamped = s.IsClamped;
+			result.Phase = s.Phase;
+			result.Pivot = s.Pivot;
+			result.Type = s.Type;
+			result.UV0 = s.UV0;
+			result.UV1 = s.UV1;
 			return result;
 		}
 

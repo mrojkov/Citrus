@@ -408,7 +408,7 @@ namespace Tangerine.UI.Inspector
 								using (Document.Current.History.BeginTransaction()) {
 									foreach (var node in nodes) {
 										if (!node.Components.Contains(type)) {
-											SetComponent.Perform(node, Serialization.Clone(component));
+											SetComponent.Perform(node, Cloner.Clone(component));
 										}
 									}
 									Document.Current.History.CommitTransaction();
@@ -478,7 +478,7 @@ namespace Tangerine.UI.Inspector
 					if (componentsCount == 1) {
 						menu.Add(new Command("Copy to clipboard", () => {
 							var stream = new System.IO.MemoryStream();
-							TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, Serialization.Clone(components.First()), Serialization.Format.JSON);
+							TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, Cloner.Clone(components.First()), Serialization.Format.JSON);
 							Clipboard.Text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
 						}));
 					}

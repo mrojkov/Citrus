@@ -280,6 +280,7 @@ namespace Lime
 		public static int CalcObjectCheckSum<T>(string path, T obj) => Yuzu.Instance.Value.CalcObjectCheckSum(path, obj);
 		public static string GetCurrentSerializationPath() => Yuzu.Instance.Value.GetCurrentSerializationPath();
 		public static bool CheckBinarySignature(Stream s) => Yuzu.Instance.Value.CheckBinarySignature(s);
-		public static T Clone<T>(T obj) => (T)Yuzu.Instance.Value.Clone(obj);
+		public static T Clone<T>(T obj) => (T)Clone((object)obj);
+		public static object Clone(object obj) => Yuzu.Instance.Value.Clone(obj);
 	}
 }

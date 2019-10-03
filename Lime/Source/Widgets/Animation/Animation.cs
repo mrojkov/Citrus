@@ -217,7 +217,7 @@ namespace Lime
 			}
 			var d = AnimationData.Load(ContentsPath);
 			foreach (var animator in d.Animators) {
-				var clone = Serialization.Clone(animator);
+				var clone = Cloner.Clone(animator);
 				var (host, index) = AnimationUtils.GetPropertyHost(OwnerNode, clone.TargetPropertyPath);
 				if (host == null) {
 					continue;
@@ -240,7 +240,7 @@ namespace Lime
 					node = node.Parent;
 					propertyPath = $"{node.Id}/{propertyPath}";
 				}
-				var clone = Serialization.Clone(animator);
+				var clone = Cloner.Clone(animator);
 				clone.TargetPropertyPath = propertyPath;
 				d.Animators.Add(clone);
 			}

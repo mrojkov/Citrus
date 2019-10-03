@@ -36,7 +36,7 @@ namespace Tangerine.Core.Operations
 			var animation = new Animation { IsCompound = true };
 			foreach (var row in Document.Current.TopLevelSelectedRows()) {
 				if (row.Components.Get<AnimationTrackRow>()?.Track is AnimationTrack track) {
-					animation.Tracks.Add(Serialization.Clone(track));
+					animation.Tracks.Add(Cloner.Clone(track));
 				}
 			}
 			TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, animation, Serialization.Format.JSON);
@@ -71,7 +71,7 @@ namespace Tangerine.Core.Operations
 				if (folder != null) {
 					frame.RootFolder().Items.Add(CloneFolder(folder));
 				}
-				var animator = Serialization.Clone(row.Components.Get<PropertyRow>()?.Animator);
+				var animator = Cloner.Clone(row.Components.Get<PropertyRow>()?.Animator);
 				if (animator != null) {
 					frame.Animators.Add(animator);
 				}

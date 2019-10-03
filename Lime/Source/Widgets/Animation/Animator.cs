@@ -197,7 +197,7 @@ namespace Lime
 		private void EnsureKeysAreNotShared()
 		{
 			if (ReadonlyKeys.RefCount > 1) {
-				ReadonlyKeys = Serialization.Clone(ReadonlyKeys);
+				ReadonlyKeys = Cloner.Clone(ReadonlyKeys);
 			}
 		}
 
