@@ -20,12 +20,6 @@ namespace Orange
 			LoadFont();
 			UserInterface.Instance = Interface = new OrangeInterface();
 			The.Workspace.Load();
-			Yuzu.OnBeforeReadObject += path => {
-				var fullPath = Path.IsPathRooted(path) ? path : AssetPath.Combine(The.Workspace.AssetsDirectory, path);
-				if (File.Exists(fullPath) && Git.HasConflicts(fullPath)) {
-					throw new InvalidOperationException($"{path} has git conflicts.");
-				}
-			};
 			CreateActionMenuItems();
 		}
 
