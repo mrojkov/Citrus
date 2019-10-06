@@ -80,6 +80,9 @@ namespace Lime
 			All = ~None
 		}
 
+		/// <summary>
+		/// Gets a manager of this node.
+		/// </summary>
 		public NodeManager Manager { get; internal set; }
 
 		/// <summary>
@@ -96,8 +99,7 @@ namespace Lime
 		private string id;
 
 		/// <summary>
-		/// Name field in HotStudio.
-		/// May be non-unique.
+		/// A node identifier. May be non-unique.
 		/// </summary>
 		[YuzuMember]
 		[TangerineDefaultCharset]
@@ -132,6 +134,10 @@ namespace Lime
 			set => contentsPath = Yuzu.Current?.ExpandPath(value) ?? value;
 		}
 #if TANGERINE
+
+		/// <summary>
+		/// Occurs when ContentsPath property has been changed in Tangerine inspector.
+		/// </summary>
 		protected void OnContentsPathChange()
 		{
 			if (string.IsNullOrEmpty(ContentsPath)) {
@@ -161,6 +167,10 @@ namespace Lime
 		IAnimable IAnimable.Owner { get => null; set => throw new NotSupportedException(); }
 
 		private Node parent;
+
+		/// <summary>
+		/// Gets the parent node.
+		/// </summary>
 		public Node Parent
 		{
 			get => parent;
@@ -183,6 +193,9 @@ namespace Lime
 
 		private TangerineFlags tangerineFlags;
 
+		/// <summary>
+		/// Flags that are used by Tangerine.
+		/// </summary>
 		[TangerineIgnore]
 		[YuzuMember]
 		public TangerineFlags TangerineFlags
@@ -198,11 +211,21 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Retrieves the value of the specified Tangerine flag.
+		/// </summary>
+		/// <param name="flag"></param>
+		/// <returns></returns>
 		public bool GetTangerineFlag(TangerineFlags flag)
 		{
 			return (tangerineFlags & flag) != 0;
 		}
 
+		/// <summary>
+		/// Sets the value for the specified Tangerine flag.
+		/// </summary>
+		/// <param name="flag">A Tangerine flag</param>
+		/// <param name="value">A value to set.</param>
 		public void SetTangerineFlag(TangerineFlags flag, bool value)
 		{
 			if (value) {
@@ -212,10 +235,20 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Occurs when Parent property changes.
+		/// </summary>
+		/// <param name="oldParent"></param>
 		protected virtual void OnParentChanged(Node oldParent) { }
 
+		/// <summary>
+		/// Cached result of cast to widget.
+		/// </summary>
 		public Widget AsWidget { get; internal set; }
 
+		/// <summary>
+		/// Cached result of cast to Node3D.
+		/// </summary>
 		public Node3D AsNode3D { get; internal set; }
 
 		/// <summary>
@@ -224,6 +257,9 @@ namespace Lime
 		/// </summary>
 		public IPresenter Presenter { get; set; }
 
+		/// <summary>
+		/// Makes the presenter compound and returns it.
+		/// </summary>
 		public CompoundPresenter CompoundPresenter =>
 			(Presenter as CompoundPresenter) ?? (CompoundPresenter)(Presenter = new CompoundPresenter(Presenter));
 
@@ -232,6 +268,9 @@ namespace Lime
 		/// </summary>
 		public IPresenter PostPresenter { get; set; }
 
+		/// <summary>
+		/// Makes the post presenter compound and returns it.
+		/// </summary>
 		public CompoundPresenter CompoundPostPresenter =>
 			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
@@ -247,6 +286,9 @@ namespace Lime
 		/// </summary>
 		public Node NextSibling { get; internal set; }
 
+		/// <summary>
+		/// Occurs at node first update.
+		/// </summary>
 		public event Action<Node> Awoke
 		{
 			add => Components.GetOrAdd<AwakeBehavior>().Action += value;
@@ -300,6 +342,10 @@ namespace Lime
 
 		private float effectiveAnimationSpeed;
 
+		/// <summary>
+		/// Gets absolute animation speed that's product of self animation speed multiplied by parent absolute animation speed.
+		/// EffectiveAnimationSpeed = AnimationSpeed * Parent.EffectiveAnimationSpeed.
+		/// </summary>
 		public float EffectiveAnimationSpeed
 		{
 			get {
@@ -318,6 +364,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Gets the render chain builder.
+		/// </summary>
 		public IRenderChainBuilder RenderChainBuilder { get; set; }
 
 		/// <summary>
@@ -418,6 +467,9 @@ namespace Lime
 		}
 		private string tag;
 
+		/// <summary>
+		/// Gets the animations.
+		/// </summary>
 		[YuzuMember]
 		[YuzuSerializeIf(nameof(NeedSerializeAnimations))]
 		[TangerineIgnore]
@@ -444,6 +496,9 @@ namespace Lime
 			return c != null && (c.Animations.Count > 1 || (c.Animations.Count == 1 && (!c.Animations[0].IsLegacy || c.Animations[0].Markers.Count > 0)));
 		}
 
+		/// <summary>
+		/// Gets the folder descriptors.
+		/// </summary>
 		[TangerineIgnore]
 		[YuzuMember]
 		public List<Folder.Descriptor> Folders { get; set; }
@@ -482,11 +537,17 @@ namespace Lime
 			return false;
 		}
 
+		/// <summary>
+		/// Gets or sets the value that's indicating if the node responds the mouse/touch events.
+		/// </summary>
 		public bool HitTestTarget;
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
+		/// <summary>
+		/// Initializes a new instance of node.
+		/// </summary>
 		protected Node()
 		{
 			AnimationSpeed = 1;
@@ -499,8 +560,17 @@ namespace Lime
 		}
 
 		private GestureList gestures;
+
+		/// <summary>
+		/// Gets the gesture recognizers.
+		/// </summary>
 		public GestureList Gestures => gestures ?? (gestures = new GestureList(this));
-		public bool HasGestures() => gestures != null;
+
+		/// <summary>
+		/// Checks if the node has at least one gesture recognizer.
+		/// </summary>
+		/// <returns>True is the node has at least one gesture recognizer, otherwise false.</returns>
+		public bool HasGestures() => gestures != null && gestures.Count > 0;
 
 		public virtual bool IsNotDecorated() => true;
 
@@ -509,6 +579,9 @@ namespace Lime
 			return IsNotDecorated() && Nodes.Count > 0;
 		}
 
+		/// <summary>
+		/// Disposes the node and all of it components, animations, tasks, etc...
+		/// </summary>
 		public virtual void Dispose()
 		{
 			foreach (var component in Components) {
@@ -548,6 +621,10 @@ namespace Lime
 		}
 #endif
 
+		/// <summary>
+		/// Gets the root node.
+		/// </summary>
+		/// <returns>The root node.</returns>
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -558,8 +635,10 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns true if this node is a descendant of the provided node.
+		/// Checks if this node is a descendant of the specified node.
 		/// </summary>
+		/// <param name="node">A parent node.</param>
+		/// <returns>True if this node is a descendant of the specified node, otherwise false.</returns>
 		public bool DescendantOf(Node node)
 		{
 			for (var n = Parent; n != null; n = n.Parent) {
@@ -569,6 +648,11 @@ namespace Lime
 			return false;
 		}
 
+		/// <summary>
+		/// Checks if this node is the specified node or a descendant of.
+		/// </summary>
+		/// <param name="node">A parent node.</param>
+		/// <returns>if this node is the specified node or a descendant of, otherwise false.</returns>
 		public bool SameOrDescendantOf(Node node)
 		{
 			return node == this || DescendantOf(node);
@@ -633,19 +717,26 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Removes this node from parent node.
+		/// Removes this node from children of the parent node.
 		/// </summary>
 		public void Unlink()
 		{
 			Parent?.Nodes.Remove(this);
 		}
 
+		/// <summary>
+		/// Removes this node from children of the parent node and disposes it.
+		/// </summary>
 		public void UnlinkAndDispose()
 		{
 			Unlink();
 			Dispose();
 		}
 
+		/// <summary>
+		/// TODO: Add summary.
+		/// </summary>
+		/// <returns></returns>
 		protected internal virtual RenderObject GetRenderObject() => null;
 
 		/// <summary>
@@ -655,6 +746,11 @@ namespace Lime
 		/// </summary>
 		public abstract void AddToRenderChain(RenderChain chain);
 
+		/// <summary>
+		/// Add this node and it children to the render chain.
+		/// </summary>
+		/// <param name="chain">A render chain into which should be added.</param>
+		/// <param name="layer">A node layer.</param>
 		public void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)
 		{
 			if (layer == 0) {
@@ -675,6 +771,11 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Add this node to the render chain.
+		/// </summary>
+		/// <param name="chain">A render chain into which should be added.</param>
+		/// <param name="layer">A node layer.</param>
 		protected void AddSelfToRenderChain(RenderChain chain, int layer)
 		{
 			if (layer == 0) {
@@ -693,8 +794,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Invokes when the trigger property has been changed by animation.
 		/// </summary>
+		/// <param name="property">A property name.</param>
+		/// <param name="value">A new property value.</param>
+		/// <param name="animationTimeCorrection">An animation time correction.</param>
 		public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)
 		{
 			foreach (var c in Components) {
@@ -713,6 +817,11 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO: Add summary.
+		/// </summary>
+		/// <param name="trigger"></param>
+		/// <param name="animationTimeCorrection"></param>
 		protected void TriggerMultipleAnimations(string trigger, double animationTimeCorrection = 0)
 		{
 			if (trigger.IndexOf(',') >= 0) {
@@ -743,6 +852,7 @@ namespace Lime
 		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
+		/// <param name="node">A child node.</param>
 		public void AddNode(Node node)
 		{
 			Nodes.Add(node);
@@ -753,6 +863,7 @@ namespace Lime
 		/// by other nodes). This node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
+		/// <param name="node">A parent node.</param>
 		public void AddToNode(Node node)
 		{
 			node.Nodes.Add(this);
@@ -763,6 +874,7 @@ namespace Lime
 		/// other nodes). Provided node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
+		/// <param name="node">A child node.</param>
 		public void PushNode(Node node)
 		{
 			Nodes.Push(node);
@@ -773,6 +885,7 @@ namespace Lime
 		/// other nodes). This node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
+		/// <param name="node">A parent node.</param>
 		public void PushToNode(Node node)
 		{
 			node.Nodes.Push(this);
