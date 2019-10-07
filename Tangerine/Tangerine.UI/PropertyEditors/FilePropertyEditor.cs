@@ -66,7 +66,7 @@ namespace Tangerine.UI
 				ExpandButton.Visible = show;
 			});
 			var current = CoalescedPropertyValue();
-			editor.AddChangeWatcher(current, v => editor.Text = ValueToStringConverter(v.Value) ?? "");
+			editor.AddChangeLateWatcher(current, v => editor.Text = ValueToStringConverter(v.Value) ?? "");
 			ManageManyValuesOnFocusChange(editor, current);
 		}
 

@@ -99,10 +99,7 @@ namespace Tangerine.UI
 					// We have to rebuild every list item with index greater than current item's
 					// because there is no mechanism to update dataflows (in this case --
 					// CoalescedPropertyValue with IndexedProperty underneath)
-					while (i >= p.IndexInList) {
-						ExpandableContent.Nodes[i--].UnlinkAndDispose();
-					}
-					buttons.RemoveRange(p.IndexInList, buttons.Count - p.IndexInList);
+					buttons.RemoveAt(p.IndexInList);
 				}
 			}
 			ExpandableContent.Nodes.Insert(index, elementContainer);

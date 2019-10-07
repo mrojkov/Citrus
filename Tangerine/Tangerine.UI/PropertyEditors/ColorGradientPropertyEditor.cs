@@ -53,7 +53,7 @@ namespace Tangerine.UI
 			};
 			var gradientProperty = CoalescedPropertyValue(new ColorGradient(Color4.White, Color4.Black)).DistinctUntilChanged();
 			gradientControlWidget.Gradient = gradientProperty.GetValue().Value;
-			ContainerWidget.AddChangeWatcher(gradientProperty, g => gradientControlWidget.Gradient = g.Value);
+			ContainerWidget.AddChangeLateWatcher(gradientProperty, g => gradientControlWidget.Gradient = g.Value);
 			gradientControlWidget.SelectionChanged += SelectPoint;
 			EditorContainer.AddNode(gradientControlWidget);
 			EditorContainer.AddNode(CreatePipetteButton());
@@ -141,13 +141,13 @@ namespace Tangerine.UI
 			selectedPointColorProperty = new Property<Color4>(point, nameof(GradientControlPoint.Color));
 			selectedPointPositionProperty = new Property<float>(point, nameof(GradientControlPoint.Position));
 			currentColorString = selectedPointColorProperty.DistinctUntilChanged().Select(i => i.ToString(Color4.StringPresentation.Dec));
-			colorEditor.Tasks.Add(currentColorString.Consume(v => colorEditor.Text = v));
+			colorEditor.LateTasks.Add(currentColorString.Consume(v => colorEditor.Text = v));
 			colorPanel.Color = selectedPointColorProperty.GetValue();
-			colorEditor.Tasks.Add(selectedPointColorProperty.DistinctUntilChanged().Consume(v => {
+			colorEditor.AddChangeLateWatcher(selectedPointColorProperty, v => {
 				if (colorPanel.Color != v) {
 					colorPanel.Color = v;
 				}
-			}));
+			});
 			positionEditor.Tasks.Add(selectedPointPositionProperty.DistinctUntilChanged().Consume(v => positionEditor.Text = v.ToString()));
 		}
 	}
@@ -235,11 +235,13 @@ namespace Tangerine.UI
 			Gradient = new ColorGradient(Color4.White, Color4.Black);
 			Nodes.Add(gradientPaneContainer);
 			Nodes.Add(createPointsPane);
-			this.AddChangeWatcher(() => Gradient.Count, _ => {
+			this.AddChangeLateWatcher(() => Gradient.Count, _ => {
 				var controlPoint = Gradient.Contains(SelectedControlPoint) ?
-					SelectedControlPoint : Gradient.Ordered().First();
+					SelectedControlPoint : Gradient.Ordered().FirstOrDefault();
 				Rebuild();
-				SelectPoint(controlPoint);
+				if (controlPoint != null) {
+					SelectPoint(controlPoint);
+				}
 			});
 		}
 
@@ -250,7 +252,7 @@ namespace Tangerine.UI
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (clickGesture.WasBegan()) {
 						var pos = createPointsPane.LocalMousePosition().X / createPointsPane.Size.X;
-						var point = new GradientControlPoint(Gradient.GetNearestPointTo(pos).Color, pos);
+						var point = new GradientControlPoint(Gradient.GetNearestPointTo(pos)?.Color ?? Color4.White, pos);
 						AddPoint(point);
 						CreatePoint(point, Gradient, gradientPaneContainer);
 					}
@@ -262,8 +264,8 @@ namespace Tangerine.UI
 		private void AddPoint(GradientControlPoint point)
 		{
 			using (history.BeginTransaction()) {
-				Core.Operations.InsertIntoList.Perform(gradient, 1, point);
-				ControlPointCreated?.Invoke(point, 1);
+				Core.Operations.InsertIntoList.Perform(gradient, 0, point);
+				ControlPointCreated?.Invoke(point, 0);
 				history.CommitTransaction();
 			}
 		}

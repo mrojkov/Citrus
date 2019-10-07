@@ -23,7 +23,7 @@ namespace Tangerine.UI
 			editorX.Submitted += text => SetComponent(editorParams, 0, editorX, current.GetValue().Value, q => q.ToEulerAngles().X);
 			editorY.Submitted += text => SetComponent(editorParams, 1, editorY, current.GetValue().Value, q => q.ToEulerAngles().Y);
 			editorZ.Submitted += text => SetComponent(editorParams, 2, editorZ, current.GetValue().Value, q => q.ToEulerAngles().Z);
-			editorX.AddChangeWatcher(current, v => {
+			editorX.AddChangeLateWatcher(current, v => {
 				var ea = v.Value.ToEulerAngles() * Mathf.RadToDeg;
 				editorX.Text = SameComponentValues(q => q.ToEulerAngles().X) ? RoundAngle(ea.X).ToString("0.###") : ManyValuesText;
 				editorY.Text = SameComponentValues(q => q.ToEulerAngles().Y) ? RoundAngle(ea.Y).ToString("0.###") : ManyValuesText;

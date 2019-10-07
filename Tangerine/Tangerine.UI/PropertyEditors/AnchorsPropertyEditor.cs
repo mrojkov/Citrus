@@ -31,7 +31,7 @@ namespace Tangerine.UI
 				tb.Checked = !tb.Checked;
 				SetProperty(tb.Checked ? current.GetValue().Value | anchor : current.GetValue().Value & ~anchor);
 			};
-			tb.AddChangeWatcher(current, v => tb.Checked = (v.Value & anchor) != 0);
+			tb.AddChangeLateWatcher(current, v => tb.Checked = (v.Value & anchor) != 0);
 			return tb;
 		}
 

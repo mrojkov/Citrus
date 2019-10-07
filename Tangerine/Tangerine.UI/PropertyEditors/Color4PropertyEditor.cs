@@ -38,7 +38,7 @@ namespace Tangerine.UI
 			});
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding += new Thickness(right: 12.0f);
-			panel.Widget.Tasks.Add(currentColor.Consume(v => {
+			panel.Widget.LateTasks.Add(currentColor.Consume(v => {
 				if (panel.Color != v.Value) {
 					panel.Color = v.Value;
 				}
@@ -70,12 +70,8 @@ namespace Tangerine.UI
 			editor.Submitted += text => {
 				SetComponent(text, currentColorString);
 			};
-			editor.Tasks.Add(currentColorString.Consume(v => {
-				editor.Text = SameValues() ? v : ManyValuesText;
-			}));
-			editor.AddChangeWatcher(() => editor.Text, value => {
-				CheckEditorText(value, editor);
-			});
+			editor.AddChangeLateWatcher(currentColorString, v => editor.Text = SameValues() ? v : ManyValuesText);
+			editor.AddChangeLateWatcher(() => editor.Text, value => CheckEditorText(value, editor));
 			ManageManyValuesOnFocusChange(editor, currentColor);
 		}
 

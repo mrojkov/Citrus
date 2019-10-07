@@ -46,6 +46,9 @@ namespace Lime
 		public void Rasterize(ref Color4[] pixels)
 		{
 			if (Count == 0) {
+				for (int j = 0; j < pixels.Length; j++) {
+					pixels[j] = Color4.White;
+				}
 				return;
 			}
 
