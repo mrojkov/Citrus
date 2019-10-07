@@ -52,5 +52,8 @@ namespace Tangerine.UI.FilesystemView
 
 		[YuzuOptional]
 		public List<float> SelectionPreviewSplitterStretches = new List<float>();
+
+		[YuzuOptional]
+		public SortType SortType;
 	}
 }
