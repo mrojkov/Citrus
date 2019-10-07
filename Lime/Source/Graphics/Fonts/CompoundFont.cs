@@ -10,6 +10,15 @@ namespace Lime
 	/// </summary>
 	public class CompoundFont : IFont
 	{
+		/// <summary>
+		/// Allow to render a PlaceHolderCharacter when character is missing (used in QA testing)
+		/// </summary>
+		public static bool UsePlaceholders = false;
+		/// <summary>
+		/// Character that is used as a placeholder for missing character (used in QA testing)
+		/// </summary>
+		public static char PlaceHolderCharacter = '�';
+
 		private readonly CompoundFontCharSource chars;
 		private readonly List<IFont> fonts = new List<IFont>();
 
@@ -57,9 +66,6 @@ namespace Lime
 
 		private class CompoundFontCharSource : IFontCharSource
 		{
-			public static bool UsePlaceholders = false;
-			public static char PlaceHolderCharacter = '�';
-
 			private readonly List<IFont> fonts;
 
 			public CompoundFontCharSource(List<IFont> fonts)
