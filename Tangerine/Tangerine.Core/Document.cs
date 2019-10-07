@@ -136,7 +136,15 @@ namespace Tangerine.Core
 			set => Animation.Frame = value;
 		}
 
+		/// <summary>
+		/// Starts current animation from timeline cursor position
+		/// </summary>
 		public bool PreviewAnimation { get; set; }
+		/// <summary>
+		/// PreviewScene allow you to hide Tangerine specific presenters
+		/// (e.g. FrameProgression or SelectedWidgets) in order to see
+		/// how scene will look in the game
+		/// </summary>
 		public bool PreviewScene { get; set; }
 		public int PreviewAnimationBegin { get; set; }
 		public Node PreviewAnimationContainer { get; set; }
