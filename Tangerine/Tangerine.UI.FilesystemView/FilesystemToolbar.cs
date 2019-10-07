@@ -112,11 +112,13 @@ namespace Tangerine.UI.FilesystemView
 				},
 				Index = 0
 			};
-
+			list.Value = (view.RootWidget.Components.Get<ViewNodeComponent>().ViewNode as FSViewNode)?.SortType ?? SortType.Name;
 			list.Changed += args => {
 				view.SortByType((SortType)args.Value, view.OrderType);
+				if (view.RootWidget.Components.Get<ViewNodeComponent>().ViewNode is FSViewNode fsViewNode) {
+					fsViewNode.SortType = (SortType)args.Value;
+				}
 			};
-
 			return list;
 		}
 
