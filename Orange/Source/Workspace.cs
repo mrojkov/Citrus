@@ -62,9 +62,9 @@ namespace Orange
 			if (!string.IsNullOrEmpty(citrusLocation)) {
 				result = Path.Combine(ProjectDirectory, citrusLocation, suffix);
 			} else {
-				result = Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", suffix);
+				result = Path.Combine(ProjectDirectory, "Citrus", suffix); 
 				if (!File.Exists(result)) {
-					result = Path.Combine(ProjectDirectory, "Citrus", suffix);
+					result = Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", suffix);
 				}
 			}
 			return result;
