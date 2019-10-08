@@ -36,6 +36,10 @@ namespace Orange
 				file = CsprojSynchronization.ToUnixSlashes(file);
 				files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 			}
+#if MAC
+			// Mono 6.0 breaks files order
+			files.Sort((a, b) => string.Compare(a.Path, b.Path));
+#endif
 		}
 
 		public IEnumerable<FileInfo> Enumerate(string extension = null)
@@ -91,6 +95,10 @@ namespace Orange
 					}
 				}
 			}
+#if MAC
+			// Mono 6.0 breaks files order
+			files.Sort ((a, b) => string.Compare (a.Path, b.Path));
+#endif
 		}
 
 		public IEnumerable<FileInfo> Enumerate(string extension = null)
