@@ -13,16 +13,9 @@ namespace Orange.Source
 			: base(platform, solutionPath, configuration)
 		{
 #if MAC
-			builderPath = "/Applications/Visual Studio.app/Contents/MacOS/vstool";
+			builderPath = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
 			if (!File.Exists(builderPath)) {
-				// WARNING: to fix error:
-				// "Error while trying to load the project '': The type initializer for 'Xamarin.Player.Remote.PlayerDeviceManager' threw an exception"
-				// disable Extension "Xamarine Live Player" in Visual Studio Extensions list
-				// @see https://bugzilla.xamarin.com/show_bug.cgi?id=60151
-				builderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
-				if (!File.Exists(builderPath)) {
-					throw new System.Exception(@"Please install Visual Studio or Xamarin Studio: https://www.visualstudio.com/ru/downloads/");
-				}
+				throw new System.Exception(@"Please install Visual Studio with Mono framework: https://www.visualstudio.com/ru/downloads/");
 			}
 #elif WIN
 			builderPath = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
@@ -31,7 +24,7 @@ namespace Orange.Source
 
 		protected override int Execute(StringBuilder output)
 		{
-			return Process.Start(builderPath, $"build \"{SolutionPath}\" {Args}", output: output);
+			return Process.Start(builderPath, $"\"{SolutionPath}\" {Args}", output: output);
 		}
 
 		protected override void DecorateBuild()
@@ -54,7 +47,7 @@ namespace Orange.Source
 			string platformSpecification;
 			switch (Platform) {
 				case TargetPlatform.iOS: {
-					platformSpecification = "|iPhone";
+					AddArgument ($"-p:Platform=\"iPhone\"");
 					break;
 				}
 				// Need to research strange behaviour due to this string
@@ -62,14 +55,13 @@ namespace Orange.Source
 				case TargetPlatform.Win:
 				case TargetPlatform.Mac:
 				case TargetPlatform.Android: {
-					platformSpecification = string.Empty;
 					break;
 				}
 				default: {
 					throw new NotSupportedException();
 				}
 			}
-			AddArgument($"-c:\"{Configuration}{platformSpecification}\"");
+			AddArgument($"-p:Configuration=\"{Configuration}\"");
 		}
 	}
 }
