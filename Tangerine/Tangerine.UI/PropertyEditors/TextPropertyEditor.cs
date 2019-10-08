@@ -26,14 +26,38 @@ namespace Tangerine.UI
 			editor.LayoutCell = new LayoutCell(Alignment.Center);
 			editor.Editor.EditorParams.MaxLines = maxLines;
 			editor.MinHeight += editor.TextWidget.FontHeight * (maxLines - 1);
-			editor.Submitted += text => SetProperty(text);
+			var first = true;
+			var submitted = false;
 			var current = CoalescedPropertyValue();
-			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
+			editor.AddChangeLateWatcher(current, v => editor.Text = v.IsDefined ? v.Value : ManyValuesText);
 			button.Clicked += () => {
 				var window = new TextEditorDialog(editorParams.DisplayName ?? editorParams.PropertyName, editor.Text, (s) => {
 					SetProperty(s);
 				});
 			};
+			editor.Submitted += text => Submit();
+			editor.AddChangeLateWatcher(() => editor.Text, text => {
+				if (first) {
+					first = false;
+					return;
+				}
+				if (!editor.IsFocused()) {
+					return;
+				}
+				if (submitted) {
+					Document.Current.History.Undo();
+				}
+				submitted = true;
+				Submit();
+			});
+			editor.AddChangeLateWatcher(() => editor.IsFocused(), focused => {
+				if (submitted) {
+					Document.Current.History.Undo();
+				}
+				if (!focused) {
+					submitted = false;
+				}
+			});
 			ManageManyValuesOnFocusChange(editor, current);
 		}
 
