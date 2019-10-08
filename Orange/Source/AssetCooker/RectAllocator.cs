@@ -4,10 +4,14 @@ using System.Collections.Generic;
 
 namespace Orange
 {
+
+	/// <summary>
+	/// Allocates a space for rectangular object in rectangular area
+	/// </summary>
 	public class RectAllocator
 	{
 		List<IntRectangle> rects = new List<IntRectangle>();
-		public Size Size;
+		public Size Size { get; }
 
 		int totalSquare;
 		int allocatedSquare;
@@ -29,6 +33,14 @@ namespace Orange
 			public int Bottom;
 		}
 
+		/// <summary>
+		/// Allocates a space with  for rectangular object in rectangular area with specified padding
+		/// </summary>
+		/// <param name="size">Size of space to allocate</param>
+		/// <param name="padding">Padding that object needs</param>
+		/// <param name="effectivePadding">Padding that was actually given to object</param>
+		/// <param name="rect">Allocated rectangular area</param>
+		/// <returns></returns>
 		public bool Allocate(Size size, int padding, out Padding effectivePadding, out IntRectangle rect)
 		{
 			int j = -1;
@@ -37,7 +49,7 @@ namespace Orange
 			int spareSquare = Int32.MaxValue;
 			for (int i = 0; i < rects.Count; i++) {
 				r = rects[i];
-				// We don't have to pad from borders
+				// We don't have to pad from left and top borders
 				var leftPadding = r.Left == 0 ? 0 : padding;
 				var topPadding = r.Top == 0 ? 0 : padding;
 				var availableRightPadding = r.Width - (leftPadding + size.Width);
@@ -48,6 +60,9 @@ namespace Orange
 				) {
 					continue;
 				}
+				// Besides we don't need to pad from right or bottom
+				// on specified value when free rectangle's right or bottom
+				// border is collinear to right or bottom (respectively) border of the hole container
 				var currentEffectivePadding = new Padding {
 					Left = leftPadding,
 					Top = topPadding,
