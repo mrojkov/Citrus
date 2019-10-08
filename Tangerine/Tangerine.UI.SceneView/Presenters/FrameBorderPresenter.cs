@@ -24,10 +24,7 @@ namespace Tangerine.UI.SceneView
 		void Render(Widget canvas)
 		{
 			canvas.PrepareRendererState();
-			if (!Document.Current.PreviewScene &&
-				!Document.Current.ExpositionMode &&
-				SceneUserPreferences.Instance.DrawFrameBorder
-			) {
+			if (!Document.Current.PreviewScene && SceneUserPreferences.Instance.DrawFrameBorder) {
 				var frames = Document.Current.Container.Nodes
 					.OfType<Frame>()
 					.Where(w => w.EditorState().Visibility != NodeVisibility.Hidden)

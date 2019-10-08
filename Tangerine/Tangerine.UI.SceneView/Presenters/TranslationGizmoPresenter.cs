@@ -15,11 +15,11 @@ namespace Tangerine.UI.SceneView
 
 		private void RenderSelection(Widget canvas)
 		{
-			if (Document.Current.ExpositionMode || Document.Current.PreviewScene) {
+			if (Document.Current.PreviewScene) {
 				return;
 			}
 			var vp = GetCurrentViewport3D();
-			if (vp == null || vp.Camera == null) {
+			if (vp?.Camera == null) {
 				return;
 			}
 			canvas.PrepareRendererState();

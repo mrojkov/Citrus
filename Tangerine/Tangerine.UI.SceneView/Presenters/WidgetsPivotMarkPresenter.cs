@@ -14,10 +14,7 @@ namespace Tangerine.UI.SceneView
 
 		private void RenderWidgetsPivotMark(Widget canvas)
 		{
-			if (
-				Core.Document.Current.ExpositionMode ||
-				Core.Document.Current.PreviewScene
-			) {
+			if (Document.Current.PreviewScene) {
 				return;
 			}
 			var widgets = WidgetsWithDisplayedPivot().ToList();

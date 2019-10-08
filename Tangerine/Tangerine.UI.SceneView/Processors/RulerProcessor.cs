@@ -17,7 +17,6 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				if (ProjectUserPreferences.Instance.RulerVisible &&
-					!Document.Current.ExpositionMode &&
 					!Document.Current.PreviewScene &&
 					sceneView.Frame.ParentWidget.IsMouseOverThisOrDescendant()
 				) {

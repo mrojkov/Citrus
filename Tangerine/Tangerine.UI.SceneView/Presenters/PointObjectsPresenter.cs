@@ -20,11 +20,7 @@ namespace Tangerine.UI.SceneView
 
 		void Render(Widget canvas)
 		{
-			if (
-				Document.Current.ExpositionMode ||
-				Document.Current.PreviewScene ||
-				!Document.Current.Container.Nodes.Any(i => i is PointObject)
-			) {
+			if (Document.Current.PreviewScene || !Document.Current.Container.Nodes.Any(i => i is PointObject)) {
 				return;
 			}
 			canvas.PrepareRendererState();

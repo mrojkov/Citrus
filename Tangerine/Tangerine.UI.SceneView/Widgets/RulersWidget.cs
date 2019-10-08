@@ -63,10 +63,7 @@ namespace Tangerine.UI.SceneView
 		{
 			while (true) {
 				var rect = new Rectangle(Vector2.Zero, widget.Size);
-				if (rect.Contains(widget.LocalMousePosition()) &&
-					!Document.Current.PreviewScene &&
-					!Document.Current.ExpositionMode
-				) {
+				if (rect.Contains(widget.LocalMousePosition()) && !Document.Current.PreviewScene) {
 					if (widget.Input.WasMousePressed()) {
 						SceneView.Instance.Components.Add(new CreateLineRequestComponent {
 							Orientation = lineRulerOrientation,
@@ -90,7 +87,7 @@ namespace Tangerine.UI.SceneView
 
 			protected override void InternalRender(Widget widget)
 			{
-				if (Document.Current.PreviewScene || Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
+				if (Document.Current.PreviewScene || !ProjectUserPreferences.Instance.RulerVisible)
 					return;
 
 				widget.PrepareRendererState();
