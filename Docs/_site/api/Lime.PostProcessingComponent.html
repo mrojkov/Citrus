@@ -1,0 +1,1974 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class PostProcessingComponent
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class PostProcessingComponent
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.PostProcessingComponent">
+  
+  
+  <h1 id="Lime_PostProcessingComponent" data-uid="Lime.PostProcessingComponent" class="text-break">Class PostProcessingComponent
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="Lime.Component.html">Component</a></div>
+    <div class="level2"><a class="xref" href="Lime.NodeComponent.html">NodeComponent</a></div>
+    <div class="level3"><a class="xref" href="Lime.BehaviorComponent.html">BehaviorComponent</a></div>
+    <div class="level4"><a class="xref" href="Lime.NodeBehavior.html">NodeBehavior</a></div>
+    <div class="level5"><span class="xref">PostProcessingComponent</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+    <div><a class="xref" href="Lime.IAnimable.html">IAnimable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_Order">NodeBehavior.Order</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_OnRegister">NodeBehavior.OnRegister()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_Start">NodeBehavior.Start()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_Stop_Lime_Node_">NodeBehavior.Stop(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_LateUpdate_System_Single_">NodeBehavior.LateUpdate(Single)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_OnTrigger_System_String_System_Object_System_Double_">NodeBehavior.OnTrigger(String, Object, Double)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.BehaviorComponent.html#Lime_BehaviorComponent_Suspended">BehaviorComponent.Suspended</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.BehaviorComponent.html#Lime_BehaviorComponent_OnOwnerFrozenChanged">BehaviorComponent.OnOwnerFrozenChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.BehaviorComponent.html#Lime_BehaviorComponent_Suspend">BehaviorComponent.Suspend()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.BehaviorComponent.html#Lime_BehaviorComponent_Resume">BehaviorComponent.Resume()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Lime_IAnimable_Owner">NodeComponent.IAnimable.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Owner">NodeComponent.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Dispose">NodeComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_IsSerializable_System_Type_">NodeComponent.IsSerializable(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnBeforeNodeSerialization">NodeComponent.OnBeforeNodeSerialization()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnAfterNodeSerialization">NodeComponent.OnAfterNodeSerialization()</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_PostProcessingComponent_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AllowedComponentOwnerTypes(new Type[]{typeof(Widget)})]
+public class PostProcessingComponent : NodeBehavior, IDisposable, IAnimable</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Lime_PostProcessingComponent_CustomMaterial" data-uid="Lime.PostProcessingComponent.CustomMaterial">CustomMaterial</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IMaterial CustomMaterial</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IMaterial.html">IMaterial</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Lime_PostProcessingComponent_ApplyPostProcessing_" data-uid="Lime.PostProcessingComponent.ApplyPostProcessing*"></a>
+  <h4 id="Lime_PostProcessingComponent_ApplyPostProcessing" data-uid="Lime.PostProcessingComponent.ApplyPostProcessing">ApplyPostProcessing</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineGroup(&quot;10. Source texture&quot;)]
+public bool ApplyPostProcessing { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomBrightThreshold_" data-uid="Lime.PostProcessingComponent.BloomBrightThreshold*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomBrightThreshold" data-uid="Lime.PostProcessingComponent.BloomBrightThreshold">BloomBrightThreshold</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public float BloomBrightThreshold { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomColor_" data-uid="Lime.PostProcessingComponent.BloomColor*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomColor" data-uid="Lime.PostProcessingComponent.BloomColor">BloomColor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public Color4 BloomColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Color4.html">Color4</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomEnabled_" data-uid="Lime.PostProcessingComponent.BloomEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomEnabled" data-uid="Lime.PostProcessingComponent.BloomEnabled">BloomEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public bool BloomEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomGammaCorrection_" data-uid="Lime.PostProcessingComponent.BloomGammaCorrection*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomGammaCorrection" data-uid="Lime.PostProcessingComponent.BloomGammaCorrection">BloomGammaCorrection</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public Vector3 BloomGammaCorrection { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector3.html">Vector3</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomShaderId_" data-uid="Lime.PostProcessingComponent.BloomShaderId*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomShaderId" data-uid="Lime.PostProcessingComponent.BloomShaderId">BloomShaderId</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public BlurShaderId BloomShaderId { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.BlurShaderId.html">BlurShaderId</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomStrength_" data-uid="Lime.PostProcessingComponent.BloomStrength*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomStrength" data-uid="Lime.PostProcessingComponent.BloomStrength">BloomStrength</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 30F)]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public float BloomStrength { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BloomTextureScaling_" data-uid="Lime.PostProcessingComponent.BloomTextureScaling*"></a>
+  <h4 id="Lime_PostProcessingComponent_BloomTextureScaling" data-uid="Lime.PostProcessingComponent.BloomTextureScaling">BloomTextureScaling</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(1F, 100F)]
+[TangerineGroup(&quot;03. Bloom&quot;)]
+public float BloomTextureScaling { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurAlphaCorrection_" data-uid="Lime.PostProcessingComponent.BlurAlphaCorrection*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurAlphaCorrection" data-uid="Lime.PostProcessingComponent.BlurAlphaCorrection">BlurAlphaCorrection</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public float BlurAlphaCorrection { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurBackgroundColor_" data-uid="Lime.PostProcessingComponent.BlurBackgroundColor*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurBackgroundColor" data-uid="Lime.PostProcessingComponent.BlurBackgroundColor">BlurBackgroundColor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public Color4 BlurBackgroundColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Color4.html">Color4</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurEnabled_" data-uid="Lime.PostProcessingComponent.BlurEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurEnabled" data-uid="Lime.PostProcessingComponent.BlurEnabled">BlurEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public bool BlurEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurRadius_" data-uid="Lime.PostProcessingComponent.BlurRadius*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurRadius" data-uid="Lime.PostProcessingComponent.BlurRadius">BlurRadius</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 30F)]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public float BlurRadius { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurShader_" data-uid="Lime.PostProcessingComponent.BlurShader*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurShader" data-uid="Lime.PostProcessingComponent.BlurShader">BlurShader</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public BlurShaderId BlurShader { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.BlurShaderId.html">BlurShaderId</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_BlurTextureScaling_" data-uid="Lime.PostProcessingComponent.BlurTextureScaling*"></a>
+  <h4 id="Lime_PostProcessingComponent_BlurTextureScaling" data-uid="Lime.PostProcessingComponent.BlurTextureScaling">BlurTextureScaling</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(1F, 100F)]
+[TangerineGroup(&quot;02. Blur&quot;)]
+public float BlurTextureScaling { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Brightness_" data-uid="Lime.PostProcessingComponent.Brightness*"></a>
+  <h4 id="Lime_PostProcessingComponent_Brightness" data-uid="Lime.PostProcessingComponent.Brightness">Brightness</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;01. Color correction&quot;)]
+public float Brightness { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Contrast_" data-uid="Lime.PostProcessingComponent.Contrast*"></a>
+  <h4 id="Lime_PostProcessingComponent_Contrast" data-uid="Lime.PostProcessingComponent.Contrast">Contrast</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;01. Color correction&quot;)]
+public float Contrast { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DebugViewMode_" data-uid="Lime.PostProcessingComponent.DebugViewMode*"></a>
+  <h4 id="Lime_PostProcessingComponent_DebugViewMode" data-uid="Lime.PostProcessingComponent.DebugViewMode">DebugViewMode</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineGroup(&quot;11. Debug view&quot;)]
+public PostProcessingPresenter.DebugViewMode DebugViewMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.PostProcessingPresenter.DebugViewMode.html">PostProcessingPresenter.DebugViewMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionBarrelPincushion_" data-uid="Lime.PostProcessingComponent.DistortionBarrelPincushion*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionBarrelPincushion" data-uid="Lime.PostProcessingComponent.DistortionBarrelPincushion">DistortionBarrelPincushion</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public float DistortionBarrelPincushion { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionBlue_" data-uid="Lime.PostProcessingComponent.DistortionBlue*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionBlue" data-uid="Lime.PostProcessingComponent.DistortionBlue">DistortionBlue</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public float DistortionBlue { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionChromaticAberration_" data-uid="Lime.PostProcessingComponent.DistortionChromaticAberration*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionChromaticAberration" data-uid="Lime.PostProcessingComponent.DistortionChromaticAberration">DistortionChromaticAberration</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public float DistortionChromaticAberration { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionEnabled_" data-uid="Lime.PostProcessingComponent.DistortionEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionEnabled" data-uid="Lime.PostProcessingComponent.DistortionEnabled">DistortionEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public bool DistortionEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionGreen_" data-uid="Lime.PostProcessingComponent.DistortionGreen*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionGreen" data-uid="Lime.PostProcessingComponent.DistortionGreen">DistortionGreen</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public float DistortionGreen { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_DistortionRed_" data-uid="Lime.PostProcessingComponent.DistortionRed*"></a>
+  <h4 id="Lime_PostProcessingComponent_DistortionRed" data-uid="Lime.PostProcessingComponent.DistortionRed">DistortionRed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;05. Distortion&quot;)]
+public float DistortionRed { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_FXAAEnabled_" data-uid="Lime.PostProcessingComponent.FXAAEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_FXAAEnabled" data-uid="Lime.PostProcessingComponent.FXAAEnabled">FXAAEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;06. FXAA&quot;)]
+public bool FXAAEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_FXAALumaTreshold_" data-uid="Lime.PostProcessingComponent.FXAALumaTreshold*"></a>
+  <h4 id="Lime_PostProcessingComponent_FXAALumaTreshold" data-uid="Lime.PostProcessingComponent.FXAALumaTreshold">FXAALumaTreshold</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 1F)]
+[TangerineGroup(&quot;06. FXAA&quot;)]
+public float FXAALumaTreshold { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_FXAAMaxSpan_" data-uid="Lime.PostProcessingComponent.FXAAMaxSpan*"></a>
+  <h4 id="Lime_PostProcessingComponent_FXAAMaxSpan" data-uid="Lime.PostProcessingComponent.FXAAMaxSpan">FXAAMaxSpan</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(1F, 16F)]
+[TangerineGroup(&quot;06. FXAA&quot;)]
+public float FXAAMaxSpan { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_FXAAMinReduce_" data-uid="Lime.PostProcessingComponent.FXAAMinReduce*"></a>
+  <h4 id="Lime_PostProcessingComponent_FXAAMinReduce" data-uid="Lime.PostProcessingComponent.FXAAMinReduce">FXAAMinReduce</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(1F, 512F)]
+[TangerineGroup(&quot;06. FXAA&quot;)]
+public float FXAAMinReduce { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_FXAAMulReduce_" data-uid="Lime.PostProcessingComponent.FXAAMulReduce*"></a>
+  <h4 id="Lime_PostProcessingComponent_FXAAMulReduce" data-uid="Lime.PostProcessingComponent.FXAAMulReduce">FXAAMulReduce</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(1F, 256F)]
+[TangerineGroup(&quot;06. FXAA&quot;)]
+public float FXAAMulReduce { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_HSL_" data-uid="Lime.PostProcessingComponent.HSL*"></a>
+  <h4 id="Lime_PostProcessingComponent_HSL" data-uid="Lime.PostProcessingComponent.HSL">HSL</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public Vector3 HSL { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector3.html">Vector3</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_HSLEnabled_" data-uid="Lime.PostProcessingComponent.HSLEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_HSLEnabled" data-uid="Lime.PostProcessingComponent.HSLEnabled">HSLEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;01. Color correction&quot;)]
+public bool HSLEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Hue_" data-uid="Lime.PostProcessingComponent.Hue*"></a>
+  <h4 id="Lime_PostProcessingComponent_Hue" data-uid="Lime.PostProcessingComponent.Hue">Hue</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineGroup(&quot;01. Color correction&quot;)]
+public float Hue { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Lightness_" data-uid="Lime.PostProcessingComponent.Lightness*"></a>
+  <h4 id="Lime_PostProcessingComponent_Lightness" data-uid="Lime.PostProcessingComponent.Lightness">Lightness</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;01. Color correction&quot;)]
+public float Lightness { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseBrightThreshold_" data-uid="Lime.PostProcessingComponent.NoiseBrightThreshold*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseBrightThreshold" data-uid="Lime.PostProcessingComponent.NoiseBrightThreshold">NoiseBrightThreshold</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public float NoiseBrightThreshold { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseDarkThreshold_" data-uid="Lime.PostProcessingComponent.NoiseDarkThreshold*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseDarkThreshold" data-uid="Lime.PostProcessingComponent.NoiseDarkThreshold">NoiseDarkThreshold</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public float NoiseDarkThreshold { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseEnabled_" data-uid="Lime.PostProcessingComponent.NoiseEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseEnabled" data-uid="Lime.PostProcessingComponent.NoiseEnabled">NoiseEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public bool NoiseEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseOffset_" data-uid="Lime.PostProcessingComponent.NoiseOffset*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseOffset" data-uid="Lime.PostProcessingComponent.NoiseOffset">NoiseOffset</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public Vector2 NoiseOffset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseScale_" data-uid="Lime.PostProcessingComponent.NoiseScale*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseScale" data-uid="Lime.PostProcessingComponent.NoiseScale">NoiseScale</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public Vector2 NoiseScale { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseSoftLight_" data-uid="Lime.PostProcessingComponent.NoiseSoftLight*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseSoftLight" data-uid="Lime.PostProcessingComponent.NoiseSoftLight">NoiseSoftLight</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;07. Noise&quot;)]
+public float NoiseSoftLight { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_NoiseTexture_" data-uid="Lime.PostProcessingComponent.NoiseTexture*"></a>
+  <h4 id="Lime_PostProcessingComponent_NoiseTexture" data-uid="Lime.PostProcessingComponent.NoiseTexture">NoiseTexture</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;07. Noise&quot;)]
+[YuzuSerializeIf(&quot;RequiredSerializeNoiseTexture&quot;)]
+public ITexture NoiseTexture { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.ITexture.html">ITexture</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_OpagueRendering_" data-uid="Lime.PostProcessingComponent.OpagueRendering*"></a>
+  <h4 id="Lime_PostProcessingComponent_OpagueRendering" data-uid="Lime.PostProcessingComponent.OpagueRendering">OpagueRendering</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;10. Source texture&quot;)]
+public bool OpagueRendering { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_OverallImpactColor_" data-uid="Lime.PostProcessingComponent.OverallImpactColor*"></a>
+  <h4 id="Lime_PostProcessingComponent_OverallImpactColor" data-uid="Lime.PostProcessingComponent.OverallImpactColor">OverallImpactColor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;09. Overall impact&quot;)]
+public Color4 OverallImpactColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Color4.html">Color4</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_OverallImpactEnabled_" data-uid="Lime.PostProcessingComponent.OverallImpactEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_OverallImpactEnabled" data-uid="Lime.PostProcessingComponent.OverallImpactEnabled">OverallImpactEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;09. Overall impact&quot;)]
+public bool OverallImpactEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_RefreshSourceRate_" data-uid="Lime.PostProcessingComponent.RefreshSourceRate*"></a>
+  <h4 id="Lime_PostProcessingComponent_RefreshSourceRate" data-uid="Lime.PostProcessingComponent.RefreshSourceRate">RefreshSourceRate</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;10. Source texture&quot;)]
+public int RefreshSourceRate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_RefreshSourceTexture_" data-uid="Lime.PostProcessingComponent.RefreshSourceTexture*"></a>
+  <h4 id="Lime_PostProcessingComponent_RefreshSourceTexture" data-uid="Lime.PostProcessingComponent.RefreshSourceTexture">RefreshSourceTexture</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;10. Source texture&quot;)]
+public bool RefreshSourceTexture { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_RequiredRefreshSource_" data-uid="Lime.PostProcessingComponent.RequiredRefreshSource*"></a>
+  <h4 id="Lime_PostProcessingComponent_RequiredRefreshSource" data-uid="Lime.PostProcessingComponent.RequiredRefreshSource">RequiredRefreshSource</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RequiredRefreshSource { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Saturation_" data-uid="Lime.PostProcessingComponent.Saturation*"></a>
+  <h4 id="Lime_PostProcessingComponent_Saturation" data-uid="Lime.PostProcessingComponent.Saturation">Saturation</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(-100F, 100F)]
+[TangerineGroup(&quot;01. Color correction&quot;)]
+public float Saturation { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SharpenEnabled_" data-uid="Lime.PostProcessingComponent.SharpenEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_SharpenEnabled" data-uid="Lime.PostProcessingComponent.SharpenEnabled">SharpenEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;04. Sharpen&quot;)]
+public bool SharpenEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SharpenLimit_" data-uid="Lime.PostProcessingComponent.SharpenLimit*"></a>
+  <h4 id="Lime_PostProcessingComponent_SharpenLimit" data-uid="Lime.PostProcessingComponent.SharpenLimit">SharpenLimit</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 1F)]
+[TangerineGroup(&quot;04. Sharpen&quot;)]
+public float SharpenLimit { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SharpenStep_" data-uid="Lime.PostProcessingComponent.SharpenStep*"></a>
+  <h4 id="Lime_PostProcessingComponent_SharpenStep" data-uid="Lime.PostProcessingComponent.SharpenStep">SharpenStep</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 10F)]
+[TangerineGroup(&quot;04. Sharpen&quot;)]
+public float SharpenStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SharpenStrength_" data-uid="Lime.PostProcessingComponent.SharpenStrength*"></a>
+  <h4 id="Lime_PostProcessingComponent_SharpenStrength" data-uid="Lime.PostProcessingComponent.SharpenStrength">SharpenStrength</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 10F)]
+[TangerineGroup(&quot;04. Sharpen&quot;)]
+public float SharpenStrength { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SourceTextureHeight_" data-uid="Lime.PostProcessingComponent.SourceTextureHeight*"></a>
+  <h4 id="Lime_PostProcessingComponent_SourceTextureHeight" data-uid="Lime.PostProcessingComponent.SourceTextureHeight">SourceTextureHeight</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(32, 2048)]
+[TangerineGroup(&quot;10. Source texture&quot;)]
+public int SourceTextureHeight { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_SourceTextureWidth_" data-uid="Lime.PostProcessingComponent.SourceTextureWidth*"></a>
+  <h4 id="Lime_PostProcessingComponent_SourceTextureWidth" data-uid="Lime.PostProcessingComponent.SourceTextureWidth">SourceTextureWidth</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineValidRange(32, 2048)]
+[TangerineGroup(&quot;10. Source texture&quot;)]
+public int SourceTextureWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_TextureSizeLimit_" data-uid="Lime.PostProcessingComponent.TextureSizeLimit*"></a>
+  <h4 id="Lime_PostProcessingComponent_TextureSizeLimit" data-uid="Lime.PostProcessingComponent.TextureSizeLimit">TextureSizeLimit</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public Size TextureSizeLimit { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Size.html">Size</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignetteColor_" data-uid="Lime.PostProcessingComponent.VignetteColor*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignetteColor" data-uid="Lime.PostProcessingComponent.VignetteColor">VignetteColor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public Color4 VignetteColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Color4.html">Color4</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignetteEnabled_" data-uid="Lime.PostProcessingComponent.VignetteEnabled*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignetteEnabled" data-uid="Lime.PostProcessingComponent.VignetteEnabled">VignetteEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public bool VignetteEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignettePivot_" data-uid="Lime.PostProcessingComponent.VignettePivot*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignettePivot" data-uid="Lime.PostProcessingComponent.VignettePivot">VignettePivot</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public Vector2 VignettePivot { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignetteRadius_" data-uid="Lime.PostProcessingComponent.VignetteRadius*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignetteRadius" data-uid="Lime.PostProcessingComponent.VignetteRadius">VignetteRadius</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public float VignetteRadius { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignetteScale_" data-uid="Lime.PostProcessingComponent.VignetteScale*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignetteScale" data-uid="Lime.PostProcessingComponent.VignetteScale">VignetteScale</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public Vector2 VignetteScale { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_VignetteSoftness_" data-uid="Lime.PostProcessingComponent.VignetteSoftness*"></a>
+  <h4 id="Lime_PostProcessingComponent_VignetteSoftness" data-uid="Lime.PostProcessingComponent.VignetteSoftness">VignetteSoftness</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineValidRange(0F, 100F)]
+[TangerineGroup(&quot;08. Vignette&quot;)]
+public float VignetteSoftness { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_PostProcessingComponent_GetOwnerRenderObjects_" data-uid="Lime.PostProcessingComponent.GetOwnerRenderObjects*"></a>
+  <h4 id="Lime_PostProcessingComponent_GetOwnerRenderObjects_Lime_RenderChain_Lime_RenderObjectList_" data-uid="Lime.PostProcessingComponent.GetOwnerRenderObjects(Lime.RenderChain,Lime.RenderObjectList)">GetOwnerRenderObjects(RenderChain, RenderObjectList)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void GetOwnerRenderObjects(RenderChain renderChain, RenderObjectList roObjects)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.RenderChain.html">RenderChain</a></td>
+        <td><span class="parametername">renderChain</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.RenderObjectList.html">RenderObjectList</a></td>
+        <td><span class="parametername">roObjects</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_OnOwnerChanged_" data-uid="Lime.PostProcessingComponent.OnOwnerChanged*"></a>
+  <h4 id="Lime_PostProcessingComponent_OnOwnerChanged_Lime_Node_" data-uid="Lime.PostProcessingComponent.OnOwnerChanged(Lime.Node)">OnOwnerChanged(Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnOwnerChanged(Node oldOwner)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">oldOwner</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnOwnerChanged_Lime_Node_">NodeComponent.OnOwnerChanged(Node)</a></div>
+  
+  
+  <a id="Lime_PostProcessingComponent_RequiredSerializeNoiseTexture_" data-uid="Lime.PostProcessingComponent.RequiredSerializeNoiseTexture*"></a>
+  <h4 id="Lime_PostProcessingComponent_RequiredSerializeNoiseTexture" data-uid="Lime.PostProcessingComponent.RequiredSerializeNoiseTexture">RequiredSerializeNoiseTexture()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RequiredSerializeNoiseTexture()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_PostProcessingComponent_Update_" data-uid="Lime.PostProcessingComponent.Update*"></a>
+  <h4 id="Lime_PostProcessingComponent_Update_System_Single_" data-uid="Lime.PostProcessingComponent.Update(System.Single)">Update(Single)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Update(float delta)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">delta</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Lime.NodeBehavior.html#Lime_NodeBehavior_Update_System_Single_">NodeBehavior.Update(Single)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimable.html">IAnimable</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_GetAnimationHost_Lime_IAnimable_">IAnimableExtensions.GetAnimationHost(IAnimable)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_UnbindAnimators_Lime_IAnimable_">IAnimableExtensions.UnbindAnimators(IAnimable)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

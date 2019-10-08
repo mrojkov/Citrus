@@ -1,0 +1,505 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class SignedDistanceFieldComponent
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class SignedDistanceFieldComponent
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.SignedDistanceFieldComponent">
+  
+  
+  <h1 id="Lime_SignedDistanceFieldComponent" data-uid="Lime.SignedDistanceFieldComponent" class="text-break">Class SignedDistanceFieldComponent
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="Lime.Component.html">Component</a></div>
+    <div class="level2"><a class="xref" href="Lime.NodeComponent.html">NodeComponent</a></div>
+    <div class="level3"><span class="xref">SignedDistanceFieldComponent</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+    <div><a class="xref" href="Lime.IAnimable.html">IAnimable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Lime_IAnimable_Owner">NodeComponent.IAnimable.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Owner">NodeComponent.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnOwnerChanged_Lime_Node_">NodeComponent.OnOwnerChanged(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Dispose">NodeComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_IsSerializable_System_Type_">NodeComponent.IsSerializable(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnBeforeNodeSerialization">NodeComponent.OnBeforeNodeSerialization()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnAfterNodeSerialization">NodeComponent.OnAfterNodeSerialization()</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_SignedDistanceFieldComponent_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AllowedComponentOwnerTypes(new Type[]{typeof(SimpleText), typeof(TextStyle)})]
+public class SignedDistanceFieldComponent : NodeComponent, IDisposable, IAnimable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent__ctor_" data-uid="Lime.SignedDistanceFieldComponent.#ctor*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent__ctor" data-uid="Lime.SignedDistanceFieldComponent.#ctor">SignedDistanceFieldComponent()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SignedDistanceFieldComponent()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Dilate_" data-uid="Lime.SignedDistanceFieldComponent.Dilate*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Dilate" data-uid="Lime.SignedDistanceFieldComponent.Dilate">Dilate</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;01. Face&quot;)]
+[TangerineValidRange(-30F, 30F)]
+public float Dilate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Gradient_" data-uid="Lime.SignedDistanceFieldComponent.Gradient*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Gradient" data-uid="Lime.SignedDistanceFieldComponent.Gradient">Gradient</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Gradient&quot;)]
+public ColorGradient Gradient { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.ColorGradient.html">ColorGradient</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_GradientAngle_" data-uid="Lime.SignedDistanceFieldComponent.GradientAngle*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_GradientAngle" data-uid="Lime.SignedDistanceFieldComponent.GradientAngle">GradientAngle</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Gradient&quot;)]
+public float GradientAngle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_GradientEnabled_" data-uid="Lime.SignedDistanceFieldComponent.GradientEnabled*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_GradientEnabled" data-uid="Lime.SignedDistanceFieldComponent.GradientEnabled">GradientEnabled</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;03. Gradient&quot;)]
+public bool GradientEnabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_InnerShadows_" data-uid="Lime.SignedDistanceFieldComponent.InnerShadows*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_InnerShadows" data-uid="Lime.SignedDistanceFieldComponent.InnerShadows">InnerShadows</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;04. Shadows&quot;)]
+public SignedDistanceFieldComponent.ShadowCollection InnerShadows { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.SignedDistanceFieldComponent.ShadowCollection.html">SignedDistanceFieldComponent.ShadowCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_OutlineColor_" data-uid="Lime.SignedDistanceFieldComponent.OutlineColor*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_OutlineColor" data-uid="Lime.SignedDistanceFieldComponent.OutlineColor">OutlineColor</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Outline&quot;)]
+public Color4 OutlineColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Color4.html">Color4</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Overlays_" data-uid="Lime.SignedDistanceFieldComponent.Overlays*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Overlays" data-uid="Lime.SignedDistanceFieldComponent.Overlays">Overlays</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;04. Shadows&quot;)]
+public SignedDistanceFieldComponent.ShadowCollection Overlays { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.SignedDistanceFieldComponent.ShadowCollection.html">SignedDistanceFieldComponent.ShadowCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Shadows_" data-uid="Lime.SignedDistanceFieldComponent.Shadows*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Shadows" data-uid="Lime.SignedDistanceFieldComponent.Shadows">Shadows</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;04. Shadows&quot;)]
+public SignedDistanceFieldComponent.ShadowCollection Shadows { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.SignedDistanceFieldComponent.ShadowCollection.html">SignedDistanceFieldComponent.ShadowCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Softness_" data-uid="Lime.SignedDistanceFieldComponent.Softness*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Softness" data-uid="Lime.SignedDistanceFieldComponent.Softness">Softness</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;01. Face&quot;)]
+[TangerineValidRange(0F, 40F)]
+public float Softness { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_Thickness_" data-uid="Lime.SignedDistanceFieldComponent.Thickness*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_Thickness" data-uid="Lime.SignedDistanceFieldComponent.Thickness">Thickness</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[TangerineGroup(&quot;02. Outline&quot;)]
+[TangerineValidRange(0F, 30F)]
+public float Thickness { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_SignedDistanceFieldComponent_GetRenderObject_" data-uid="Lime.SignedDistanceFieldComponent.GetRenderObject*"></a>
+  <h4 id="Lime_SignedDistanceFieldComponent_GetRenderObject" data-uid="Lime.SignedDistanceFieldComponent.GetRenderObject">GetRenderObject()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public SDFRenderObjectList GetRenderObject()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.SignedDistanceField.SDFRenderObjectList.html">SDFRenderObjectList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimable.html">IAnimable</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_GetAnimationHost_Lime_IAnimable_">IAnimableExtensions.GetAnimationHost(IAnimable)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_UnbindAnimators_Lime_IAnimable_">IAnimableExtensions.UnbindAnimators(IAnimable)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

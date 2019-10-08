@@ -1,0 +1,3406 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Node
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Node
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.Node">
+  
+  
+  <h1 id="Lime_Node" data-uid="Lime.Node" class="text-break">Class Node
+  </h1>
+  <div class="markdown level0 summary"><p>Scene tree element.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Node</span></div>
+      <div class="level2"><a class="xref" href="Lime.Audio.html">Audio</a></div>
+      <div class="level2"><a class="xref" href="Lime.Bone.html">Bone</a></div>
+      <div class="level2"><a class="xref" href="Lime.ImageCombiner.html">ImageCombiner</a></div>
+      <div class="level2"><a class="xref" href="Lime.Node3D.html">Node3D</a></div>
+      <div class="level2"><a class="xref" href="Lime.ParticleModifier.html">ParticleModifier</a></div>
+      <div class="level2"><a class="xref" href="Lime.PointObject.html">PointObject</a></div>
+      <div class="level2"><a class="xref" href="Lime.SplineGear.html">SplineGear</a></div>
+      <div class="level2"><a class="xref" href="Lime.SplineGear3D.html">SplineGear3D</a></div>
+      <div class="level2"><a class="xref" href="Lime.SplinePoint3D.html">SplinePoint3D</a></div>
+      <div class="level2"><a class="xref" href="Lime.TextStyle.html">TextStyle</a></div>
+      <div class="level2"><a class="xref" href="Lime.Widget.html">Widget</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+    <div><a class="xref" href="Lime.IAnimationHost.html">IAnimationHost</a></div>
+    <div><a class="xref" href="Lime.IFolderItem.html">IFolderItem</a></div>
+    <div><a class="xref" href="Lime.IFolderContext.html">IFolderContext</a></div>
+    <div><a class="xref" href="Lime.IRenderChainBuilder.html">IRenderChainBuilder</a></div>
+    <div><a class="xref" href="Lime.IAnimable.html">IAnimable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_Node_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Lime_Node__ctor_" data-uid="Lime.Node.#ctor*"></a>
+  <h4 id="Lime_Node__ctor" data-uid="Lime.Node.#ctor">Node()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Node()</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Lime_Node_CreatedCount" data-uid="Lime.Node.CreatedCount">CreatedCount</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int CreatedCount</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_DirtyMask" data-uid="Lime.Node.DirtyMask">DirtyMask</h4>
+  <div class="markdown level1 summary"><p>TODO: Add summary</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Node.DirtyFlags DirtyMask</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.DirtyFlags.html">Node.DirtyFlags</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_FinalizedCount" data-uid="Lime.Node.FinalizedCount">FinalizedCount</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static int FinalizedCount</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_globallyFrozen" data-uid="Lime.Node.globallyFrozen">globallyFrozen</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool globallyFrozen</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_HitTestTarget" data-uid="Lime.Node.HitTestTarget">HitTestTarget</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HitTestTarget</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_SceneLoaded" data-uid="Lime.Node.SceneLoaded">SceneLoaded</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ThreadLocal&lt;Node.SceneLoadedDelegate&gt; SceneLoaded</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Threading.ThreadLocal</span>&lt;<a class="xref" href="Lime.Node.SceneLoadedDelegate.html">Node.SceneLoadedDelegate</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_SceneLoading" data-uid="Lime.Node.SceneLoading">SceneLoading</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ThreadLocal&lt;Node.SceneLoadingDelegate&gt; SceneLoading</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Threading.ThreadLocal</span>&lt;<a class="xref" href="Lime.Node.SceneLoadingDelegate.html">Node.SceneLoadingDelegate</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Lime_Node_Ancestors_" data-uid="Lime.Node.Ancestors*"></a>
+  <h4 id="Lime_Node_Ancestors" data-uid="Lime.Node.Ancestors">Ancestors</h4>
+  <div class="markdown level1 summary"><p>Enumerate all node's ancestors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Node&gt; Ancestors { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Lime.Node.html">Node</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AnimationFrame_" data-uid="Lime.Node.AnimationFrame*"></a>
+  <h4 id="Lime_Node_AnimationFrame" data-uid="Lime.Node.AnimationFrame">AnimationFrame</h4>
+  <div class="markdown level1 summary"><p>Get or sets the current animation frame.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int AnimationFrame { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Animations_" data-uid="Lime.Node.Animations*"></a>
+  <h4 id="Lime_Node_Animations" data-uid="Lime.Node.Animations">Animations</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[YuzuSerializeIf(&quot;NeedSerializeAnimations&quot;)]
+public AnimationCollection Animations { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.AnimationCollection.html">AnimationCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AnimationSpeed_" data-uid="Lime.Node.AnimationSpeed*"></a>
+  <h4 id="Lime_Node_AnimationSpeed" data-uid="Lime.Node.AnimationSpeed">AnimationSpeed</h4>
+  <div class="markdown level1 summary"><p>Animation speed multiplier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float AnimationSpeed { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AnimationTime_" data-uid="Lime.Node.AnimationTime*"></a>
+  <h4 id="Lime_Node_AnimationTime" data-uid="Lime.Node.AnimationTime">AnimationTime</h4>
+  <div class="markdown level1 summary"><p>Gets or sets time of current frame of default animation (in milliseconds).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public double AnimationTime { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Animators_" data-uid="Lime.Node.Animators*"></a>
+  <h4 id="Lime_Node_Animators" data-uid="Lime.Node.Animators">Animators</h4>
+  <div class="markdown level1 summary"><p>Collections of Animators.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public AnimatorCollection Animators { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.AnimatorCollection.html">AnimatorCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AsNode3D_" data-uid="Lime.Node.AsNode3D*"></a>
+  <h4 id="Lime_Node_AsNode3D" data-uid="Lime.Node.AsNode3D">AsNode3D</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node3D AsNode3D { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node3D.html">Node3D</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AsWidget_" data-uid="Lime.Node.AsWidget*"></a>
+  <h4 id="Lime_Node_AsWidget" data-uid="Lime.Node.AsWidget">AsWidget</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Widget AsWidget { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Widget.html">Widget</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Components_" data-uid="Lime.Node.Components*"></a>
+  <h4 id="Lime_Node_Components" data-uid="Lime.Node.Components">Components</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public NodeComponentCollection Components { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.NodeComponentCollection.html">NodeComponentCollection</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CompoundPostPresenter_" data-uid="Lime.Node.CompoundPostPresenter*"></a>
+  <h4 id="Lime_Node_CompoundPostPresenter" data-uid="Lime.Node.CompoundPostPresenter">CompoundPostPresenter</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CompoundPresenter CompoundPostPresenter { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.CompoundPresenter.html">CompoundPresenter</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CompoundPresenter_" data-uid="Lime.Node.CompoundPresenter*"></a>
+  <h4 id="Lime_Node_CompoundPresenter" data-uid="Lime.Node.CompoundPresenter">CompoundPresenter</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public CompoundPresenter CompoundPresenter { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.CompoundPresenter.html">CompoundPresenter</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_ContentsPath_" data-uid="Lime.Node.ContentsPath*"></a>
+  <h4 id="Lime_Node_ContentsPath" data-uid="Lime.Node.ContentsPath">ContentsPath</h4>
+  <div class="markdown level1 summary"><p>Denotes the path to the external scene. If this path isn't null during node loading,
+the node children are replaced by the external scene nodes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public string ContentsPath { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CurrentAnimation_" data-uid="Lime.Node.CurrentAnimation*"></a>
+  <h4 id="Lime_Node_CurrentAnimation" data-uid="Lime.Node.CurrentAnimation">CurrentAnimation</h4>
+  <div class="markdown level1 summary"><p>Name of last started marker of default animation. Is set to null by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string CurrentAnimation { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_DefaultAnimation_" data-uid="Lime.Node.DefaultAnimation*"></a>
+  <h4 id="Lime_Node_DefaultAnimation" data-uid="Lime.Node.DefaultAnimation">DefaultAnimation</h4>
+  <div class="markdown level1 summary"><p>Returns the first animation in the animation collection
+or creates an animation if the collection is empty.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Animation DefaultAnimation { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Animation.html">Animation</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Descendants_" data-uid="Lime.Node.Descendants*"></a>
+  <h4 id="Lime_Node_Descendants" data-uid="Lime.Node.Descendants">Descendants</h4>
+  <div class="markdown level1 summary"><p>Gets a DFS-enumeration of all descendant nodes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IEnumerable&lt;Node&gt; Descendants { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Lime.Node.html">Node</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_EffectiveAnimationSpeed_" data-uid="Lime.Node.EffectiveAnimationSpeed*"></a>
+  <h4 id="Lime_Node_EffectiveAnimationSpeed" data-uid="Lime.Node.EffectiveAnimationSpeed">EffectiveAnimationSpeed</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float EffectiveAnimationSpeed { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_FirstChild_" data-uid="Lime.Node.FirstChild*"></a>
+  <h4 id="Lime_Node_FirstChild" data-uid="Lime.Node.FirstChild">FirstChild</h4>
+  <div class="markdown level1 summary"><p>Gets the cached reference to the first children node.
+Use it for fast iteration through nodes collection in a performance-critical code.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node FirstChild { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Folders_" data-uid="Lime.Node.Folders*"></a>
+  <h4 id="Lime_Node_Folders" data-uid="Lime.Node.Folders">Folders</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public List&lt;Folder.Descriptor&gt; Folders { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Lime.Folder.Descriptor.html">Folder.Descriptor</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Frozen_" data-uid="Lime.Node.Frozen*"></a>
+  <h4 id="Lime_Node_Frozen" data-uid="Lime.Node.Frozen">Frozen</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Frozen { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Gestures_" data-uid="Lime.Node.Gestures*"></a>
+  <h4 id="Lime_Node_Gestures" data-uid="Lime.Node.Gestures">Gestures</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GestureList Gestures { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.GestureList.html">GestureList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_GloballyFrozen_" data-uid="Lime.Node.GloballyFrozen*"></a>
+  <h4 id="Lime_Node_GloballyFrozen" data-uid="Lime.Node.GloballyFrozen">GloballyFrozen</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool GloballyFrozen { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Id_" data-uid="Lime.Node.Id*"></a>
+  <h4 id="Lime_Node_Id" data-uid="Lime.Node.Id">Id</h4>
+  <div class="markdown level1 summary"><p>Name field in HotStudio.
+May be non-unique.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public string Id { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsRunning_" data-uid="Lime.Node.IsRunning*"></a>
+  <h4 id="Lime_Node_IsRunning" data-uid="Lime.Node.IsRunning">IsRunning</h4>
+  <div class="markdown level1 summary"><p>Returns true if this node is running animation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsRunning { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsStopped_" data-uid="Lime.Node.IsStopped*"></a>
+  <h4 id="Lime_Node_IsStopped" data-uid="Lime.Node.IsStopped">IsStopped</h4>
+  <div class="markdown level1 summary"><p>Returns true if this node isn't running animation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsStopped { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_LateTasks_" data-uid="Lime.Node.LateTasks*"></a>
+  <h4 id="Lime_Node_LateTasks" data-uid="Lime.Node.LateTasks">LateTasks</h4>
+  <div class="markdown level1 summary"><p>Tasks that are called after Update.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TaskList LateTasks { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.TaskList.html">TaskList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Layer_" data-uid="Lime.Node.Layer*"></a>
+  <h4 id="Lime_Node_Layer" data-uid="Lime.Node.Layer">Layer</h4>
+  <div class="markdown level1 summary"><p>Gets or sets Z-order (the rendering order).
+0 - inherit Z-order from the parent node. 1 - the lowest, (RenderChain.LayerCount - 1) - the topmost.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Layer { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Manager_" data-uid="Lime.Node.Manager*"></a>
+  <h4 id="Lime_Node_Manager" data-uid="Lime.Node.Manager">Manager</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NodeManager Manager { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.NodeManager.html">NodeManager</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Markers_" data-uid="Lime.Node.Markers*"></a>
+  <h4 id="Lime_Node_Markers" data-uid="Lime.Node.Markers">Markers</h4>
+  <div class="markdown level1 summary"><p>Markers of default animation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MarkerList Markers { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.MarkerList.html">MarkerList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_NextSibling_" data-uid="Lime.Node.NextSibling*"></a>
+  <h4 id="Lime_Node_NextSibling" data-uid="Lime.Node.NextSibling">NextSibling</h4>
+  <div class="markdown level1 summary"><p>Gets the cached reference to the next node in the NodeList.
+Use it for fast iteration through nodes collection in a performance-critical code.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node NextSibling { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Nodes_" data-uid="Lime.Node.Nodes*"></a>
+  <h4 id="Lime_Node_Nodes" data-uid="Lime.Node.Nodes">Nodes</h4>
+  <div class="markdown level1 summary"><p>Child nodes.
+For enumerating all descendants use Descendants.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+[YuzuSerializeIf(&quot;ShouldSerializeNodes&quot;)]
+public NodeList Nodes { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.NodeList.html">NodeList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Parent_" data-uid="Lime.Node.Parent*"></a>
+  <h4 id="Lime_Node_Parent" data-uid="Lime.Node.Parent">Parent</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node Parent { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_PostPresenter_" data-uid="Lime.Node.PostPresenter*"></a>
+  <h4 id="Lime_Node_PostPresenter" data-uid="Lime.Node.PostPresenter">PostPresenter</h4>
+  <div class="markdown level1 summary"><p>The presenter used for rendering the node after rendering its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IPresenter PostPresenter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IPresenter.html">IPresenter</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Presenter_" data-uid="Lime.Node.Presenter*"></a>
+  <h4 id="Lime_Node_Presenter" data-uid="Lime.Node.Presenter">Presenter</h4>
+  <div class="markdown level1 summary"><p>The presenter used for rendering and hit-testing the node.
+TODO: Add Add/RemovePresenter methods. Remove CompoundPresenter property and Presenter setter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IPresenter Presenter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IPresenter.html">IPresenter</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_RenderChainBuilder_" data-uid="Lime.Node.RenderChainBuilder*"></a>
+  <h4 id="Lime_Node_RenderChainBuilder" data-uid="Lime.Node.RenderChainBuilder">RenderChainBuilder</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IRenderChainBuilder RenderChainBuilder { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IRenderChainBuilder.html">IRenderChainBuilder</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Tag_" data-uid="Lime.Node.Tag*"></a>
+  <h4 id="Lime_Node_Tag" data-uid="Lime.Node.Tag">Tag</h4>
+  <div class="markdown level1 summary"><p>Custom data. Can be set via Tangerine (this way it will contain path to external scene).
+Can't use obsolete attribute because of Yuzu Generated Binary Deserializers. But its obsolete, dont use it.
+Use Node Components instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public string Tag { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TangerineFlags_" data-uid="Lime.Node.TangerineFlags*"></a>
+  <h4 id="Lime_Node_TangerineFlags" data-uid="Lime.Node.TangerineFlags">TangerineFlags</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public TangerineFlags TangerineFlags { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.TangerineFlags.html">TangerineFlags</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Tasks_" data-uid="Lime.Node.Tasks*"></a>
+  <h4 id="Lime_Node_Tasks" data-uid="Lime.Node.Tasks">Tasks</h4>
+  <div class="markdown level1 summary"><p>Tasks that are called before Update.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TaskList Tasks { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.TaskList.html">TaskList</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Trigger_" data-uid="Lime.Node.Trigger*"></a>
+  <h4 id="Lime_Node_Trigger" data-uid="Lime.Node.Trigger">Trigger</h4>
+  <div class="markdown level1 summary"><p>May contain the marker id of the default animation.  When an animation hits a trigger keyframe,
+it automatically runs the child animation from the given marker id.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[TangerineKeyframeColor(1)]
+public string Trigger { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Updated_" data-uid="Lime.Node.Updated*"></a>
+  <h4 id="Lime_Node_Updated" data-uid="Lime.Node.Updated">Updated</h4>
+  <div class="markdown level1 summary"><p>Called after Update.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UpdateHandler Updated { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.UpdateHandler.html">UpdateHandler</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Updating_" data-uid="Lime.Node.Updating*"></a>
+  <h4 id="Lime_Node_Updating" data-uid="Lime.Node.Updating">Updating</h4>
+  <div class="markdown level1 summary"><p>Called before Update.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UpdateHandler Updating { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.UpdateHandler.html">UpdateHandler</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_UserData_" data-uid="Lime.Node.UserData*"></a>
+  <h4 id="Lime_Node_UserData" data-uid="Lime.Node.UserData">UserData</h4>
+  <div class="markdown level1 summary"><p>Custom data. Can only be set programmatically.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object UserData { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_Node_AddNode_" data-uid="Lime.Node.AddNode*"></a>
+  <h4 id="Lime_Node_AddNode_Lime_Node_" data-uid="Lime.Node.AddNode(Lime.Node)">AddNode(Node)</h4>
+  <div class="markdown level1 summary"><p>Adds provided node to the lowermost layer of this node (i.e. it will be covered
+by other nodes). Provided node shouldn't belong to any node (check for Parent == null
+and use Unlink if needed).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddNode(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AddSelfAndChildrenToRenderChain_" data-uid="Lime.Node.AddSelfAndChildrenToRenderChain*"></a>
+  <h4 id="Lime_Node_AddSelfAndChildrenToRenderChain_Lime_RenderChain_System_Int32_" data-uid="Lime.Node.AddSelfAndChildrenToRenderChain(Lime.RenderChain,System.Int32)">AddSelfAndChildrenToRenderChain(RenderChain, Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddSelfAndChildrenToRenderChain(RenderChain chain, int layer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.RenderChain.html">RenderChain</a></td>
+        <td><span class="parametername">chain</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">layer</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AddSelfToRenderChain_" data-uid="Lime.Node.AddSelfToRenderChain*"></a>
+  <h4 id="Lime_Node_AddSelfToRenderChain_Lime_RenderChain_System_Int32_" data-uid="Lime.Node.AddSelfToRenderChain(Lime.RenderChain,System.Int32)">AddSelfToRenderChain(RenderChain, Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void AddSelfToRenderChain(RenderChain chain, int layer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.RenderChain.html">RenderChain</a></td>
+        <td><span class="parametername">chain</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">layer</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AddToNode_" data-uid="Lime.Node.AddToNode*"></a>
+  <h4 id="Lime_Node_AddToNode_Lime_Node_" data-uid="Lime.Node.AddToNode(Lime.Node)">AddToNode(Node)</h4>
+  <div class="markdown level1 summary"><p>Adds this node to the lowermost layer of provided node (i.e. it will be covered
+by other nodes). This node shouldn't belong to any node (check for Parent == null
+and use Unlink if needed).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddToNode(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_AddToRenderChain_" data-uid="Lime.Node.AddToRenderChain*"></a>
+  <h4 id="Lime_Node_AddToRenderChain_Lime_RenderChain_" data-uid="Lime.Node.AddToRenderChain(Lime.RenderChain)">AddToRenderChain(RenderChain)</h4>
+  <div class="markdown level1 summary"><p>Decides what descendant nodes should be added to render chain and under which conditions.
+This includes children Nodes as well as this Node itself. i.e. if you want Render()
+of this node to be called you should invoke AddSelfToRenderChain in AddToRenderChain override.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void AddToRenderChain(RenderChain chain)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.RenderChain.html">RenderChain</a></td>
+        <td><span class="parametername">chain</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CleanDirtyFlags_" data-uid="Lime.Node.CleanDirtyFlags*"></a>
+  <h4 id="Lime_Node_CleanDirtyFlags_Lime_Node_DirtyFlags_" data-uid="Lime.Node.CleanDirtyFlags(Lime.Node.DirtyFlags)">CleanDirtyFlags(Node.DirtyFlags)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool CleanDirtyFlags(Node.DirtyFlags mask)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.DirtyFlags.html">Node.DirtyFlags</a></td>
+        <td><span class="parametername">mask</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CreateFromAssetBundle_" data-uid="Lime.Node.CreateFromAssetBundle*"></a>
+  <h4 id="Lime_Node_CreateFromAssetBundle_System_String_Lime_Node_Lime_Yuzu_System_Boolean_" data-uid="Lime.Node.CreateFromAssetBundle(System.String,Lime.Node,Lime.Yuzu,System.Boolean)">CreateFromAssetBundle(String, Node, Yuzu, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null, bool ignoreExternals = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Yuzu.html">Yuzu</a></td>
+        <td><span class="parametername">yuzu</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">ignoreExternals</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CreateFromAssetBundle_" data-uid="Lime.Node.CreateFromAssetBundle*"></a>
+  <h4 id="Lime_Node_CreateFromAssetBundle__1_System_String___0_Lime_Yuzu_System_Boolean_" data-uid="Lime.Node.CreateFromAssetBundle``1(System.String,``0,Lime.Yuzu,System.Boolean)">CreateFromAssetBundle&lt;T&gt;(String, T, Yuzu, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T CreateFromAssetBundle&lt;T&gt;(string path, T instance = null, Yuzu yuzu = null, bool ignoreExternals = false)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Yuzu.html">Yuzu</a></td>
+        <td><span class="parametername">yuzu</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">ignoreExternals</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_CreateFromStream_" data-uid="Lime.Node.CreateFromStream*"></a>
+  <h4 id="Lime_Node_CreateFromStream_System_String_Lime_Node_Lime_Yuzu_System_IO_Stream_System_Boolean_" data-uid="Lime.Node.CreateFromStream(System.String,Lime.Node,Lime.Yuzu,System.IO.Stream,System.Boolean)">CreateFromStream(String, Node, Yuzu, Stream, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node CreateFromStream(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool ignoreExternals = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Yuzu.html">Yuzu</a></td>
+        <td><span class="parametername">yuzu</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.Stream</span></td>
+        <td><span class="parametername">stream</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">ignoreExternals</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_DescendantOf_" data-uid="Lime.Node.DescendantOf*"></a>
+  <h4 id="Lime_Node_DescendantOf_Lime_Node_" data-uid="Lime.Node.DescendantOf(Lime.Node)">DescendantOf(Node)</h4>
+  <div class="markdown level1 summary"><p>Returns true if this node is a descendant of the provided node.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool DescendantOf(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Dispose_" data-uid="Lime.Node.Dispose*"></a>
+  <h4 id="Lime_Node_Dispose" data-uid="Lime.Node.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void Dispose()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_Find_" data-uid="Lime.Node.Find*"></a>
+  <h4 id="Lime_Node_Find__1_System_String_" data-uid="Lime.Node.Find``1(System.String)">Find&lt;T&gt;(String)</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Throws an exception if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T Find&lt;T&gt;(string path)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>Type of sought-for node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Find_" data-uid="Lime.Node.Find*"></a>
+  <h4 id="Lime_Node_Find__1_System_String_System_Object___" data-uid="Lime.Node.Find``1(System.String,System.Object[])">Find&lt;T&gt;(String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Returns null if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T Find&lt;T&gt;(string format, params object[] args)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">format</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">args</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>Type of sought-for node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_FindNode_" data-uid="Lime.Node.FindNode*"></a>
+  <h4 id="Lime_Node_FindNode_System_String_" data-uid="Lime.Node.FindNode(System.String)">FindNode(String)</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Throws an exception if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node FindNode(string path)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_GetRenderObject_" data-uid="Lime.Node.GetRenderObject*"></a>
+  <h4 id="Lime_Node_GetRenderObject" data-uid="Lime.Node.GetRenderObject">GetRenderObject()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual RenderObject GetRenderObject()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.RenderObject.html">RenderObject</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_GetRoot_" data-uid="Lime.Node.GetRoot*"></a>
+  <h4 id="Lime_Node_GetRoot" data-uid="Lime.Node.GetRoot">GetRoot()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node GetRoot()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_GetTangerineFlag_" data-uid="Lime.Node.GetTangerineFlag*"></a>
+  <h4 id="Lime_Node_GetTangerineFlag_Lime_TangerineFlags_" data-uid="Lime.Node.GetTangerineFlag(Lime.TangerineFlags)">GetTangerineFlag(TangerineFlags)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool GetTangerineFlag(TangerineFlags flag)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.TangerineFlags.html">TangerineFlags</a></td>
+        <td><span class="parametername">flag</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_HasGestures_" data-uid="Lime.Node.HasGestures*"></a>
+  <h4 id="Lime_Node_HasGestures" data-uid="Lime.Node.HasGestures">HasGestures()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasGestures()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsDirty_" data-uid="Lime.Node.IsDirty*"></a>
+  <h4 id="Lime_Node_IsDirty_Lime_Node_DirtyFlags_" data-uid="Lime.Node.IsDirty(Lime.Node.DirtyFlags)">IsDirty(Node.DirtyFlags)</h4>
+  <div class="markdown level1 summary"><p>TODO: Add summary</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool IsDirty(Node.DirtyFlags mask)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.DirtyFlags.html">Node.DirtyFlags</a></td>
+        <td><span class="parametername">mask</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsMouseOver_" data-uid="Lime.Node.IsMouseOver*"></a>
+  <h4 id="Lime_Node_IsMouseOver" data-uid="Lime.Node.IsMouseOver">IsMouseOver()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMouseOver()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsMouseOverThisOrDescendant_" data-uid="Lime.Node.IsMouseOverThisOrDescendant*"></a>
+  <h4 id="Lime_Node_IsMouseOverThisOrDescendant" data-uid="Lime.Node.IsMouseOverThisOrDescendant">IsMouseOverThisOrDescendant()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsMouseOverThisOrDescendant()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_IsNotDecorated_" data-uid="Lime.Node.IsNotDecorated*"></a>
+  <h4 id="Lime_Node_IsNotDecorated" data-uid="Lime.Node.IsNotDecorated">IsNotDecorated()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool IsNotDecorated()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_LoadExternalScenes_" data-uid="Lime.Node.LoadExternalScenes*"></a>
+  <h4 id="Lime_Node_LoadExternalScenes_Lime_Yuzu_" data-uid="Lime.Node.LoadExternalScenes(Lime.Yuzu)">LoadExternalScenes(Yuzu)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void LoadExternalScenes(Yuzu yuzu = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Yuzu.html">Yuzu</a></td>
+        <td><span class="parametername">yuzu</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_NeedSerializeAnimations_" data-uid="Lime.Node.NeedSerializeAnimations*"></a>
+  <h4 id="Lime_Node_NeedSerializeAnimations" data-uid="Lime.Node.NeedSerializeAnimations">NeedSerializeAnimations()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool NeedSerializeAnimations()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_OnAfterSerialization_" data-uid="Lime.Node.OnAfterSerialization*"></a>
+  <h4 id="Lime_Node_OnAfterSerialization" data-uid="Lime.Node.OnAfterSerialization">OnAfterSerialization()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void OnAfterSerialization()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_OnBeforeSerialization_" data-uid="Lime.Node.OnBeforeSerialization*"></a>
+  <h4 id="Lime_Node_OnBeforeSerialization" data-uid="Lime.Node.OnBeforeSerialization">OnBeforeSerialization()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void OnBeforeSerialization()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_OnParentChanged_" data-uid="Lime.Node.OnParentChanged*"></a>
+  <h4 id="Lime_Node_OnParentChanged_Lime_Node_" data-uid="Lime.Node.OnParentChanged(Lime.Node)">OnParentChanged(Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnParentChanged(Node oldParent)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">oldParent</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_OnTrigger_" data-uid="Lime.Node.OnTrigger*"></a>
+  <h4 id="Lime_Node_OnTrigger_System_String_System_Object_System_Double_" data-uid="Lime.Node.OnTrigger(System.String,System.Object,System.Double)">OnTrigger(String, Object, Double)</h4>
+  <div class="markdown level1 summary"><p>TODO: Add summary</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnTrigger(string property, object value, double animationTimeCorrection = 0)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">property</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">animationTimeCorrection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_PartialHitTest_" data-uid="Lime.Node.PartialHitTest*"></a>
+  <h4 id="Lime_Node_PartialHitTest_Lime_HitTestArgs__" data-uid="Lime.Node.PartialHitTest(Lime.HitTestArgs@)">PartialHitTest(ref HitTestArgs)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool PartialHitTest(ref HitTestArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.HitTestArgs.html">HitTestArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_PreloadAssets_" data-uid="Lime.Node.PreloadAssets*"></a>
+  <h4 id="Lime_Node_PreloadAssets" data-uid="Lime.Node.PreloadAssets">PreloadAssets()</h4>
+  <div class="markdown level1 summary"><p>Loads all textures, fonts and animators for this node and for all its descendants.
+Forces reloading of textures if they are null.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PreloadAssets()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_PropagateDirtyFlags_" data-uid="Lime.Node.PropagateDirtyFlags*"></a>
+  <h4 id="Lime_Node_PropagateDirtyFlags_Lime_Node_DirtyFlags_" data-uid="Lime.Node.PropagateDirtyFlags(Lime.Node.DirtyFlags)">PropagateDirtyFlags(Node.DirtyFlags)</h4>
+  <div class="markdown level1 summary"><p>Propagates dirty flags to all descendants by provided mask.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void PropagateDirtyFlags(Node.DirtyFlags mask = Node.DirtyFlags.Visible | Node.DirtyFlags.Color | Node.DirtyFlags.Shader | Node.DirtyFlags.Blending | Node.DirtyFlags.LayoutManager | Node.DirtyFlags.LocalTransform | Node.DirtyFlags.GlobalTransform | Node.DirtyFlags.GlobalTransformInverse | Node.DirtyFlags.ParentBoundingRect | Node.DirtyFlags.Enabled | Node.DirtyFlags.EffectiveAnimationSpeed | Node.DirtyFlags.Frozen | Node.DirtyFlags.FreezeInvisible | Node.DirtyFlags.All)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.DirtyFlags.html">Node.DirtyFlags</a></td>
+        <td><span class="parametername">mask</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_PushNode_" data-uid="Lime.Node.PushNode*"></a>
+  <h4 id="Lime_Node_PushNode_Lime_Node_" data-uid="Lime.Node.PushNode(Lime.Node)">PushNode(Node)</h4>
+  <div class="markdown level1 summary"><p>Adds provided node to the topmost layer of this node (i.e. it will cover
+other nodes). Provided node shouldn't belong to any node (check for Parent == null
+and use Unlink if needed).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PushNode(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_PushToNode_" data-uid="Lime.Node.PushToNode*"></a>
+  <h4 id="Lime_Node_PushToNode_Lime_Node_" data-uid="Lime.Node.PushToNode(Lime.Node)">PushToNode(Node)</h4>
+  <div class="markdown level1 summary"><p>Adds this node to the topmost layer of provided node (i.e. it will cover
+other nodes). This node shouldn't belong to any node (check for Parent == null
+and use Unlink if needed).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void PushToNode(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_RecalcGloballyFrozen_" data-uid="Lime.Node.RecalcGloballyFrozen*"></a>
+  <h4 id="Lime_Node_RecalcGloballyFrozen" data-uid="Lime.Node.RecalcGloballyFrozen">RecalcGloballyFrozen()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void RecalcGloballyFrozen()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_RemoveAnimatorsForExternalAnimations_" data-uid="Lime.Node.RemoveAnimatorsForExternalAnimations*"></a>
+  <h4 id="Lime_Node_RemoveAnimatorsForExternalAnimations" data-uid="Lime.Node.RemoveAnimatorsForExternalAnimations">RemoveAnimatorsForExternalAnimations()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RemoveAnimatorsForExternalAnimations()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_ReplaceContent_" data-uid="Lime.Node.ReplaceContent*"></a>
+  <h4 id="Lime_Node_ReplaceContent_Lime_Node_" data-uid="Lime.Node.ReplaceContent(Lime.Node)">ReplaceContent(Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ReplaceContent(Node content)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">content</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_ResolveScenePath_" data-uid="Lime.Node.ResolveScenePath*"></a>
+  <h4 id="Lime_Node_ResolveScenePath_System_String_" data-uid="Lime.Node.ResolveScenePath(System.String)">ResolveScenePath(String)</h4>
+  <div class="markdown level1 summary"><p>Returns path to scene if it exists in bundle. Returns null otherwise.
+Throws exception if there is more than one scene file with such path.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static string ResolveScenePath(string path)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_RunAnimation_" data-uid="Lime.Node.RunAnimation*"></a>
+  <h4 id="Lime_Node_RunAnimation_System_String_System_String_" data-uid="Lime.Node.RunAnimation(System.String,System.String)">RunAnimation(String, String)</h4>
+  <div class="markdown level1 summary"><p>Runs animation with provided Id and provided marker.
+Throws an exception if sought-for animation or marker doesn't exist.
+Returns this (to use with yield return)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node RunAnimation(string markerId, string animationId = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">markerId</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">animationId</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_SameOrDescendantOf_" data-uid="Lime.Node.SameOrDescendantOf*"></a>
+  <h4 id="Lime_Node_SameOrDescendantOf_Lime_Node_" data-uid="Lime.Node.SameOrDescendantOf(Lime.Node)">SameOrDescendantOf(Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool SameOrDescendantOf(Node node)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_SetTangerineFlag_" data-uid="Lime.Node.SetTangerineFlag*"></a>
+  <h4 id="Lime_Node_SetTangerineFlag_Lime_TangerineFlags_System_Boolean_" data-uid="Lime.Node.SetTangerineFlag(Lime.TangerineFlags,System.Boolean)">SetTangerineFlag(TangerineFlags, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetTangerineFlag(TangerineFlags flag, bool value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.TangerineFlags.html">TangerineFlags</a></td>
+        <td><span class="parametername">flag</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_ShouldSerializeNodes_" data-uid="Lime.Node.ShouldSerializeNodes*"></a>
+  <h4 id="Lime_Node_ShouldSerializeNodes" data-uid="Lime.Node.ShouldSerializeNodes">ShouldSerializeNodes()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ShouldSerializeNodes()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_StaticScale_" data-uid="Lime.Node.StaticScale*"></a>
+  <h4 id="Lime_Node_StaticScale_System_Single_System_Boolean_" data-uid="Lime.Node.StaticScale(System.Single,System.Boolean)">StaticScale(Single, Boolean)</h4>
+  <div class="markdown level1 summary"><p>TODO: Translate
+Этот метод масштабирует позицию и размер данного нода и всех его потомков.
+Метод полезен для адаптирования сцены под экраны с нестандартным DPI.
+Если позиция или размер виджета анинимированы, то ключи анимации также подвергаются соответствующему
+преобразованию.
+Для текстовых виджетов, размер шрифта масштабируется.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void StaticScale(float ratio, bool roundCoordinates)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">ratio</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">roundCoordinates</span></td>
+        <td><p>Если true, то после масштабирования виджета, его размер округляется, а сам виджет сдвигается таким образом,
+чтобы его левый верхний угол (точка (0,0) в локальных координатах виджета) перешел в целочисленную позицию.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_ToString_" data-uid="Lime.Node.ToString*"></a>
+  <h4 id="Lime_Node_ToString" data-uid="Lime.Node.ToString">ToString()</h4>
+  <div class="markdown level1 summary"><p>Returns the <span class="xref">System.String</span> representation of this <a class="xref" href="Lime.Node.html">Node</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.Object.ToString()</span></div>
+  
+  
+  <a id="Lime_Node_TriggerMultipleAnimations_" data-uid="Lime.Node.TriggerMultipleAnimations*"></a>
+  <h4 id="Lime_Node_TriggerMultipleAnimations_System_String_System_Double_" data-uid="Lime.Node.TriggerMultipleAnimations(System.String,System.Double)">TriggerMultipleAnimations(String, Double)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void TriggerMultipleAnimations(string trigger, double animationTimeCorrection = 0)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">trigger</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">animationTimeCorrection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TryFind_" data-uid="Lime.Node.TryFind*"></a>
+  <h4 id="Lime_Node_TryFind__1_System_String_" data-uid="Lime.Node.TryFind``1(System.String)">TryFind&lt;T&gt;(String)</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Returns null if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T TryFind&lt;T&gt;(string path)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>Type of sought-for node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TryFind_" data-uid="Lime.Node.TryFind*"></a>
+  <h4 id="Lime_Node_TryFind__1_System_String___0__" data-uid="Lime.Node.TryFind``1(System.String,``0@)">TryFind&lt;T&gt;(String, out T)</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Returns null if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryFind&lt;T&gt;(string path, out T node)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td><span class="parametername">node</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>Type of sought-for node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TryFind_" data-uid="Lime.Node.TryFind*"></a>
+  <h4 id="Lime_Node_TryFind__1_System_String_System_Object___" data-uid="Lime.Node.TryFind``1(System.String,System.Object[])">TryFind&lt;T&gt;(String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Returns null if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public T TryFind&lt;T&gt;(string format, params object[] args)
+    where T : Node</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">format</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">args</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>Type of sought-for node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TryFindNode_" data-uid="Lime.Node.TryFindNode*"></a>
+  <h4 id="Lime_Node_TryFindNode_System_String_" data-uid="Lime.Node.TryFindNode(System.String)">TryFindNode(String)</h4>
+  <div class="markdown level1 summary"><p>Searches for node with provided path or id in this node's descendants.
+Returns null if sought-for node doesn't exist.</p>
+<p>This function is thread safe.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Node TryFindNode(string path)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">path</span></td>
+        <td><p>Id or path of Node. Path can be incomplete
+(i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_TryRunAnimation_" data-uid="Lime.Node.TryRunAnimation*"></a>
+  <h4 id="Lime_Node_TryRunAnimation_System_String_System_String_System_Double_" data-uid="Lime.Node.TryRunAnimation(System.String,System.String,System.Double)">TryRunAnimation(String, String, Double)</h4>
+  <div class="markdown level1 summary"><p>Runs animation with provided Id and provided marker.
+Returns false if sought-for animation or marker doesn't exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryRunAnimation(string markerId, string animationId = null, double animationTimeCorrection = 0)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">markerId</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">animationId</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">animationTimeCorrection</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Unlink_" data-uid="Lime.Node.Unlink*"></a>
+  <h4 id="Lime_Node_Unlink" data-uid="Lime.Node.Unlink">Unlink()</h4>
+  <div class="markdown level1 summary"><p>Removes this node from parent node.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Unlink()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_UnlinkAndDispose_" data-uid="Lime.Node.UnlinkAndDispose*"></a>
+  <h4 id="Lime_Node_UnlinkAndDispose" data-uid="Lime.Node.UnlinkAndDispose">UnlinkAndDispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UnlinkAndDispose()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Node_UpdateBoundingRect_" data-uid="Lime.Node.UpdateBoundingRect*"></a>
+  <h4 id="Lime_Node_UpdateBoundingRect" data-uid="Lime.Node.UpdateBoundingRect">UpdateBoundingRect()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void UpdateBoundingRect()</code></pre>
+  </div>
+  <h3 id="events">Events
+  </h3>
+  
+  
+  <h4 id="Lime_Node_AnimationStopped" data-uid="Lime.Node.AnimationStopped">AnimationStopped</h4>
+  <div class="markdown level1 summary"><p>Is invoked after default animation has been stopped (e.g. hit &quot;Stop&quot; marker).
+Note: DefaultAnimation.Stopped will be set to null after invocation or after RunAnimation call.
+The correct usage is to call RunAnimation first and then apply any required AnimationStopped handlers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action AnimationStopped</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Lime_Node_Awoke" data-uid="Lime.Node.Awoke">Awoke</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public event Action&lt;Node&gt; Awoke</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Action</span>&lt;<a class="xref" href="Lime.Node.html">Node</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="eii">Explicit Interface Implementations
+  </h3>
+  
+  
+  <a id="Lime_Node_Lime_IAnimable_Owner_" data-uid="Lime.Node.Lime#IAnimable#Owner*"></a>
+  <h4 id="Lime_Node_Lime_IAnimable_Owner" data-uid="Lime.Node.Lime#IAnimable#Owner">IAnimable.Owner</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IAnimable IAnimable.Owner { get; set; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IAnimable.html">IAnimable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Lime_IAnimationHost_GetComponent_" data-uid="Lime.Node.Lime#IAnimationHost#GetComponent*"></a>
+  <h4 id="Lime_Node_Lime_IAnimationHost_GetComponent_System_Type_" data-uid="Lime.Node.Lime#IAnimationHost#GetComponent(System.Type)">IAnimationHost.GetComponent(Type)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Component IAnimationHost.GetComponent(Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Component.html">Component</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Node_Lime_IAnimationHost_OnAnimatorCollectionChanged_" data-uid="Lime.Node.Lime#IAnimationHost#OnAnimatorCollectionChanged*"></a>
+  <h4 id="Lime_Node_Lime_IAnimationHost_OnAnimatorCollectionChanged" data-uid="Lime.Node.Lime#IAnimationHost#OnAnimatorCollectionChanged">IAnimationHost.OnAnimatorCollectionChanged()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void IAnimationHost.OnAnimatorCollectionChanged()</code></pre>
+  </div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimationHost.html">IAnimationHost</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IFolderItem.html">IFolderItem</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IFolderContext.html">IFolderContext</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IRenderChainBuilder.html">IRenderChainBuilder</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimable.html">IAnimable</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Clone__1_Lime_Node_">NodeCompatibilityExtensions.Clone&lt;T&gt;(Node)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Clone_Lime_Node_">NodeCompatibilityExtensions.Clone(Node)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_AdvanceAnimationsRecursive_Lime_Node_System_Single_">NodeCompatibilityExtensions.AdvanceAnimationsRecursive(Node, Single)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Update_Lime_Node_System_Single_">NodeCompatibilityExtensions.Update(Node, Single)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_GetAnimationHost_Lime_IAnimable_">IAnimableExtensions.GetAnimationHost(IAnimable)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_UnbindAnimators_Lime_IAnimable_">IAnimableExtensions.UnbindAnimators(IAnimable)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

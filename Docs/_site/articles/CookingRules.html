@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Cooking Rules </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Cooking Rules ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="cooking-rules">Cooking Rules</h1>
+
+<p>Asset cooking options are set and propagated using cooking rules files. Cooking rules files could be named in two ways:</p>
+<ol>
+<li><code>#CookingRules.txt</code></li>
+<li><code>&lt;asset_filename_with_extension&gt;.txt</code> e.g. <code>illuminator.png.txt</code></li>
+</ol>
+<p>In first case cooking rules are applied to all files and directories in current directory recursively until overridden with another cooking rules.</p>
+<p>In second case cooking rules are only applied to specified asset file.
+Cooking rules only override concrete rule lines specified.</p>
+<h2 id="format">Format</h2>
+<p>grammar:</p>
+<pre><code>rule_list: one of
+    rule '\n' rule_list
+    rule
+
+rule: rule_name ['(' target_name ')'] ' ' rule_value '\n'
+
+target_name: one of
+    'Win'
+    'Mac'
+    'iOS'
+    'Android'
+    &lt;user_defined_in_citproj_file&gt;
+
+rule_name: one of
+    'TextureAtlas'
+    'MipMaps'
+    'HighQualityCompression'
+    'PVRFormat'
+    'DDSFormat'
+    'Bundles'
+    'Ignore'
+    'ADPCMLimit'
+    'TextureScaleFactor'
+    'AtlasOptimization'
+    'AtlasPacker'
+    'ModelCompression'
+    'CustomRule'
+    'WrapMode'
+    'MinFilter'
+    'MagFilter'
+</code></pre>
+<p>e.g.:</p>
+<pre><code>Rule1(Target1) Value
+Rule2(Target1) Value
+Rule2(Target1) Value
+Rule3 Value
+...
+Rule1(Target2) Value
+Rule10 Value
+...
+</code></pre>
+<p>There's a list of default targets, which are Win, Mac, iOS and Android. Other targets are listed in <code>.citproj</code> project file.</p>
+<h2 id="rules">Rules</h2>
+<p>'TextureAtlas'
+'MipMaps'
+'HighQualityCompression'
+'PVRFormat'
+'DDSFormat'
+'Bundles'
+'Ignore'
+'ADPCMLimit'
+'TextureScaleFactor'
+'AtlasOptimization'
+'AtlasPacker'
+'ModelCompression'
+'CustomRule'
+'WrapMode'
+'MinFilter'
+'MagFilter'</p>
+<table>
+<thead>
+<tr>
+<th>rule</th>
+<th>values</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DDSFormat</code></td>
+<td><code>DXTi</code></td>
+<td>DXTi</td>
+</tr>
+<tr>
+<td></td>
+<td><code>ARGB8</code>, <code>RGBA8</code></td>
+<td>Uncompressed</td>
+</tr>
+<tr>
+<td><code>PVRFormat</code></td>
+<td><code>PVRTC4</code></td>
+<td>Falls back to PVRTC2 if image has no alpha</td>
+</tr>
+<tr>
+<td></td>
+<td><code>PVRTC4_Forced</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>PVRTC2</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>RGBA4</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>RGB565</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>ARGB8</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>RGBA8</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>AtlasOptimization</code></td>
+<td><code>Memory</code></td>
+<td>Default; best pack rate heuristics</td>
+</tr>
+<tr>
+<td></td>
+<td><code>DrawCalls</code></td>
+<td>try to fit as many items to atlas as possible</td>
+</tr>
+<tr>
+<td><code>ModelCompression</code></td>
+<td><code>Deflate</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>LZMA</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>TextureAtlas</code></td>
+<td><code>None</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>${DirectoryName}</code></td>
+<td>atlas name will be the same as directory name</td>
+</tr>
+<tr>
+<td></td>
+<td><code>&lt;atlas_name&gt;</code></td>
+<td>user defined atlas</td>
+</tr>
+<tr>
+<td><code>MipMaps</code></td>
+<td><code>Yes</code> or <code>No</code></td>
+<td>doesn't work</td>
+</tr>
+<tr>
+<td><code>HighQualityCompression</code></td>
+<td><code>Yes</code> or <code>No</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>Bundles</code></td>
+<td><code>&lt;default&gt;</code>, <code>data</code></td>
+<td>main bundle</td>
+</tr>
+<tr>
+<td></td>
+<td><code>&lt;bundle_name&gt;</code></td>
+<td>user defined bundle name; it's possible to specify multiple bundles; it's possible to include directory name e.g. <code>Bundles/Restaurant</code></td>
+</tr>
+<tr>
+<td><code>Ignore</code></td>
+<td><code>Yes</code>, <code>No</code></td>
+<td>if set to <code>Yes</code> applicable assets won't make it to bundle</td>
+</tr>
+<tr>
+<td><code>ADPCMLimit</code></td>
+<td>int</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TextureScaleFactor</code></td>
+<td>float</td>
+<td>designed to be texture size multiplier. however if it's not 1.0f texture size multiplied by 0.75 with a mix of some logic. see code for detail.</td>
+</tr>
+<tr>
+<td><code>AtlasPacker</code></td>
+<td>string</td>
+<td>custom packer defined via plugin</td>
+</tr>
+<tr>
+<td><code>CustomRule</code></td>
+<td>string</td>
+<td>any string</td>
+</tr>
+<tr>
+<td><code>WrapMode</code></td>
+<td><code>Clamp</code></td>
+<td>texture wrap mode, default is <code>Clamp</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>Repeat</code></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><code>MirroredRepeat</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>MinFilter</code></td>
+<td><code>Linear</code></td>
+<td>texture min filter, default is <code>Linear</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>Nearest</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>MagFilter</code></td>
+<td><code>Linear</code></td>
+<td>texture mag filter, default is <code>Linear</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>Nearest</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

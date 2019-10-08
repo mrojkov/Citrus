@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Interface IMenu
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Interface IMenu
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.IMenu">
+  
+  
+  <h1 id="Lime_IMenu" data-uid="Lime.IMenu" class="text-break">Interface IMenu
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Collections.Generic.IList&lt;Lime.ICommand&gt;.IndexOf(Lime.ICommand)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.IList&lt;Lime.ICommand&gt;.Insert(System.Int32, Lime.ICommand)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.IList&lt;Lime.ICommand&gt;.RemoveAt(System.Int32)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.IList&lt;Lime.ICommand&gt;.Item[System.Int32]</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.Add(Lime.ICommand)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.Clear()</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.Contains(Lime.ICommand)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.CopyTo(Lime.ICommand[], System.Int32)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.Remove(Lime.ICommand)</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.Count</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.ICollection&lt;Lime.ICommand&gt;.IsReadOnly</span>
+    </div>
+    <div>
+      <span class="xref">System.Collections.Generic.IEnumerable&lt;Lime.ICommand&gt;.GetEnumerator()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_IMenu_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IMenu : IList&lt;ICommand&gt;, ICollection&lt;ICommand&gt;, IEnumerable&lt;ICommand&gt;, IEnumerable</code></pre>
+  </div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_IMenu_FindCommand_" data-uid="Lime.IMenu.FindCommand*"></a>
+  <h4 id="Lime_IMenu_FindCommand_System_String_" data-uid="Lime.IMenu.FindCommand(System.String)">FindCommand(String)</h4>
+  <div class="markdown level1 summary"><p>Returns first menu item with a given text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">ICommand FindCommand(string text)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.ICommand.html">ICommand</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_IMenu_Popup_" data-uid="Lime.IMenu.Popup*"></a>
+  <h4 id="Lime_IMenu_Popup" data-uid="Lime.IMenu.Popup">Popup()</h4>
+  <div class="markdown level1 summary"><p>Shows the menu at the current position of the cursor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Popup()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_IMenu_Popup_" data-uid="Lime.IMenu.Popup*"></a>
+  <h4 id="Lime_IMenu_Popup_Lime_IWindow_Lime_Vector2_System_Single_Lime_ICommand_" data-uid="Lime.IMenu.Popup(Lime.IWindow,Lime.Vector2,System.Single,Lime.ICommand)">Popup(IWindow, Vector2, Single, ICommand)</h4>
+  <div class="markdown level1 summary"><p>Shows the menu at the given client position of the window.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.IWindow.html">IWindow</a></td>
+        <td><span class="parametername">window</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td><span class="parametername">position</span></td>
+        <td><p>The location in the window client coordinate system to display the menu item.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">minimumWidth</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.ICommand.html">ICommand</a></td>
+        <td><span class="parametername">command</span></td>
+        <td><p>The menu item to be positioned at the specified location in the window.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_IMenu_Refresh_" data-uid="Lime.IMenu.Refresh*"></a>
+  <h4 id="Lime_IMenu_Refresh" data-uid="Lime.IMenu.Refresh">Refresh()</h4>
+  <div class="markdown level1 summary"><p>Refreshes the menu according to its internal state.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Refresh()</code></pre>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.Mathf.html#Lime_Mathf_Shuffle__1_System_Collections_Generic_IEnumerable___0__System_Random_">Mathf.Shuffle&lt;T&gt;(IEnumerable&lt;T&gt;, Random)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

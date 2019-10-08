@@ -1,0 +1,592 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Layout
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Layout
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.Layout">
+  
+  
+  <h1 id="Lime_Layout" data-uid="Lime.Layout" class="text-break">Class Layout
+  </h1>
+  <div class="markdown level0 summary"><p>Base class of every layout.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="Lime.Component.html">Component</a></div>
+    <div class="level2"><a class="xref" href="Lime.NodeComponent.html">NodeComponent</a></div>
+    <div class="level3"><span class="xref">Layout</span></div>
+      <div class="level4"><a class="xref" href="Lime.FlowLayout.html">FlowLayout</a></div>
+      <div class="level4"><a class="xref" href="Lime.LinearLayout.html">LinearLayout</a></div>
+      <div class="level4"><a class="xref" href="Lime.ScrollView.Layout.html">ScrollView.Layout</a></div>
+      <div class="level4"><a class="xref" href="Lime.StackLayout.html">StackLayout</a></div>
+      <div class="level4"><a class="xref" href="Lime.TableLayout.html">TableLayout</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+    <div><a class="xref" href="Lime.IAnimable.html">IAnimable</a></div>
+    <div><a class="xref" href="Lime.ILayout.html">ILayout</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Lime_IAnimable_Owner">NodeComponent.IAnimable.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_Dispose">NodeComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_IsSerializable_System_Type_">NodeComponent.IsSerializable(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnBeforeNodeSerialization">NodeComponent.OnBeforeNodeSerialization()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnAfterNodeSerialization">NodeComponent.OnAfterNodeSerialization()</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_Layout_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[AllowedComponentOwnerTypes(new Type[]{typeof(Widget)})]
+public class Layout : NodeComponent, IDisposable, IAnimable, ILayout</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Lime_Layout__ctor_" data-uid="Lime.Layout.#ctor*"></a>
+  <h4 id="Lime_Layout__ctor" data-uid="Lime.Layout.#ctor">Layout()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Layout()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Lime_Layout_ArrangementValid_" data-uid="Lime.Layout.ArrangementValid*"></a>
+  <h4 id="Lime_Layout_ArrangementValid" data-uid="Lime.Layout.ArrangementValid">ArrangementValid</h4>
+  <div class="markdown level1 summary"><p>Returns true if children positions and sizes are valid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ArrangementValid { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_ConstraintsValid_" data-uid="Lime.Layout.ConstraintsValid*"></a>
+  <h4 id="Lime_Layout_ConstraintsValid" data-uid="Lime.Layout.ConstraintsValid">ConstraintsValid</h4>
+  <div class="markdown level1 summary"><p>Returns true if the widget MeasuredMinSize and MeasuredMaxSize are valid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ConstraintsValid { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_DebugRectangles_" data-uid="Lime.Layout.DebugRectangles*"></a>
+  <h4 id="Lime_Layout_DebugRectangles" data-uid="Lime.Layout.DebugRectangles">DebugRectangles</h4>
+  <div class="markdown level1 summary"><p>Gets child widgets outline rectangles for visual debug.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Rectangle&gt; DebugRectangles { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Lime.Rectangle.html">Rectangle</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_DefaultCell_" data-uid="Lime.Layout.DefaultCell*"></a>
+  <h4 id="Lime_Layout_DefaultCell" data-uid="Lime.Layout.DefaultCell">DefaultCell</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the lay out settings for every cell by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public DefaultLayoutCell DefaultCell { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.DefaultLayoutCell.html">DefaultLayoutCell</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_IgnoreHidden_" data-uid="Lime.Layout.IgnoreHidden*"></a>
+  <h4 id="Lime_Layout_IgnoreHidden" data-uid="Lime.Layout.IgnoreHidden">IgnoreHidden</h4>
+  <div class="markdown level1 summary"><p>Get or set whether layout should ignore invisible widgets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[YuzuMember]
+public bool IgnoreHidden { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_Owner_" data-uid="Lime.Layout.Owner*"></a>
+  <h4 id="Lime_Layout_Owner" data-uid="Lime.Layout.Owner">Owner</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the widget associated with the layout.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Widget Owner { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Widget.html">Widget</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_Layout_ArrangeChildren_" data-uid="Lime.Layout.ArrangeChildren*"></a>
+  <h4 id="Lime_Layout_ArrangeChildren" data-uid="Lime.Layout.ArrangeChildren">ArrangeChildren()</h4>
+  <div class="markdown level1 summary"><p>Set children positions and sizes based on the widget size and children effective min/max sizes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ArrangeChildren()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Layout_EffectiveLayoutCell_" data-uid="Lime.Layout.EffectiveLayoutCell*"></a>
+  <h4 id="Lime_Layout_EffectiveLayoutCell_Lime_Widget_" data-uid="Lime.Layout.EffectiveLayoutCell(Lime.Widget)">EffectiveLayoutCell(Widget)</h4>
+  <div class="markdown level1 summary"><p>Returns LayoutCell for given widget or default cell if none.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ILayoutCell EffectiveLayoutCell(Widget widget)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Widget.html">Widget</a></td>
+        <td><span class="parametername">widget</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.ILayoutCell.html">ILayoutCell</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_GetChildren_" data-uid="Lime.Layout.GetChildren*"></a>
+  <h4 id="Lime_Layout_GetChildren" data-uid="Lime.Layout.GetChildren">GetChildren()</h4>
+  <div class="markdown level1 summary"><p>Returns filtered list of child widgets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected List&lt;Widget&gt; GetChildren()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Lime.Widget.html">Widget</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_InvalidateArrangement_" data-uid="Lime.Layout.InvalidateArrangement*"></a>
+  <h4 id="Lime_Layout_InvalidateArrangement" data-uid="Lime.Layout.InvalidateArrangement">InvalidateArrangement()</h4>
+  <div class="markdown level1 summary"><p>Invalidates arrangement and adds the layout to the Owner.LayoutManager.ArrangeQueue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void InvalidateArrangement()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Layout_InvalidateConstraintsAndArrangement_" data-uid="Lime.Layout.InvalidateConstraintsAndArrangement*"></a>
+  <h4 id="Lime_Layout_InvalidateConstraintsAndArrangement" data-uid="Lime.Layout.InvalidateConstraintsAndArrangement">InvalidateConstraintsAndArrangement()</h4>
+  <div class="markdown level1 summary"><p>Invalidates constraints and arrangement and adds the layout to Owner.LayoutManager.ArrangeQueue and MeasureQueue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void InvalidateConstraintsAndArrangement()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Layout_LayoutWidgetWithinCell_" data-uid="Lime.Layout.LayoutWidgetWithinCell*"></a>
+  <h4 id="Lime_Layout_LayoutWidgetWithinCell_Lime_Widget_Lime_Vector2_Lime_Vector2_Lime_Alignment_System_Collections_Generic_List_Lime_Rectangle__" data-uid="Lime.Layout.LayoutWidgetWithinCell(Lime.Widget,Lime.Vector2,Lime.Vector2,Lime.Alignment,System.Collections.Generic.List{Lime.Rectangle})">LayoutWidgetWithinCell(Widget, Vector2, Vector2, Alignment, List&lt;Rectangle&gt;)</h4>
+  <div class="markdown level1 summary"><p>Lays out a given widget within a cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, Alignment alignment, List&lt;Rectangle&gt; debugRectangles = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Widget.html">Widget</a></td>
+        <td><span class="parametername">widget</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td><span class="parametername">position</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td><span class="parametername">size</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Alignment.html">Alignment</a></td>
+        <td><span class="parametername">alignment</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Lime.Rectangle.html">Rectangle</a>&gt;</td>
+        <td><span class="parametername">debugRectangles</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Lime_Layout_MeasureSizeConstraints_" data-uid="Lime.Layout.MeasureSizeConstraints*"></a>
+  <h4 id="Lime_Layout_MeasureSizeConstraints" data-uid="Lime.Layout.MeasureSizeConstraints">MeasureSizeConstraints()</h4>
+  <div class="markdown level1 summary"><p>Sets widget MeasuredMinSize/MeasuredMaxSize based on its own MinSize/MaxSize, padding and children EffectiveMinSize/EffectiveMaxSize.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void MeasureSizeConstraints()</code></pre>
+  </div>
+  
+  
+  <a id="Lime_Layout_OnOwnerChanged_" data-uid="Lime.Layout.OnOwnerChanged*"></a>
+  <h4 id="Lime_Layout_OnOwnerChanged_Lime_Node_" data-uid="Lime.Layout.OnOwnerChanged(Lime.Node)">OnOwnerChanged(Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnOwnerChanged(Node oldOwner)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Node.html">Node</a></td>
+        <td><span class="parametername">oldOwner</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Lime.NodeComponent.html#Lime_NodeComponent_OnOwnerChanged_Lime_Node_">NodeComponent.OnOwnerChanged(Node)</a></div>
+  
+  
+  <a id="Lime_Layout_OnSizeChanged_" data-uid="Lime.Layout.OnSizeChanged*"></a>
+  <h4 id="Lime_Layout_OnSizeChanged_Lime_Widget_Lime_Vector2_" data-uid="Lime.Layout.OnSizeChanged(Lime.Widget,Lime.Vector2)">OnSizeChanged(Widget, Vector2)</h4>
+  <div class="markdown level1 summary"><p>Handles widget's size change. Basically it should call InvalidateArrangement(), if the size change doesn't affect the widget size constraints.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnSizeChanged(Widget widget, Vector2 sizeDelta)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Lime.Widget.html">Widget</a></td>
+        <td><span class="parametername">widget</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Lime.Vector2.html">Vector2</a></td>
+        <td><span class="parametername">sizeDelta</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimable.html">IAnimable</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.ILayout.html">ILayout</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_GetAnimationHost_Lime_IAnimable_">IAnimableExtensions.GetAnimationHost(IAnimable)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_UnbindAnimators_Lime_IAnimable_">IAnimableExtensions.UnbindAnimators(IAnimable)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,646 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1048;&#1084;&#1077;&#1085;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103; </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1048;&#1084;&#1077;&#1085;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103; ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="именования">Именования</h1>
+
+<ul>
+<li><p><strong>Всегда</strong>: Используй CamelCase в названиях разныхПеременных, МетодовКлассов и т.д.</p>
+</li>
+<li><p><strong>Всегда</strong>: Используй заглавные буквы согласно договорённости:</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Сущность</th>
+<th>Написание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Namespace</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Type (class, struct)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Method (private, public)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Property (private, protected, public)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Event (private, protected, public)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Delegate (private, protected, public)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Field (private, protected)</td>
+<td>С маленькой буквы</td>
+</tr>
+<tr>
+<td>Field (public)</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Enum value</td>
+<td>С большой буквы</td>
+</tr>
+<tr>
+<td>Parameter</td>
+<td>С маленькой буквы</td>
+</tr>
+<tr>
+<td>Variable</td>
+<td>С маленькой буквы</td>
+</tr>
+<tr>
+<td>Constant (private, protected, public, in-code)</td>
+<td>С большой буквы</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><strong>Предпочтительно</strong>: Используй для bool такие названия, чтобы название представляло собой вопрос. Например: <code>IsWidgetHidden</code>, <code>AreTasksComplete</code>, <code>CanPlayerExit</code>.</p>
+</li>
+<li><p><strong>Нежелательно</strong>: Использовать Венгерскую нотацию или любой другой способ определения типа в идентификаторах.</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+int iCounter;
+string strName;
+
+// Правильно:
+int counter;
+string name;
+</code></pre>
+<ul>
+<li><strong>Никогда</strong>: Никогда не используй Screaming Caps</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+public static const string SHIPPINGTYPE = &quot;DropShip&quot;;
+
+// Правильно:
+public static const string ShippingType = &quot;DropShip&quot;;
+</code></pre>
+<ul>
+<li><p><strong>Нежелательно</strong>: Использовать сокращения, кроме общепринятых аббревиатур.</p>
+</li>
+<li><p><strong>Всегда</strong>: Капитализируй аббревиатуры так же, как и обычные слова в названиях. Исключение: аббревиатуры, состоящие из 2 букв</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// Правильные названия:
+public string Html;
+public object UI;
+private int id;
+</code></pre>
+<ul>
+<li><strong>Нежелательно</strong>: Использовать символ подчёркивания и другие неалфавитные символы</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+public DateTime client_Appointment;
+
+// Правильно:
+public DateTime clientAppointment;
+</code></pre>
+<ul>
+<li><strong>Никогда</strong>: Никогда не используй символ подчёркивания в начале имени</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+private DateTime _registrationDate;
+
+// Правильно:
+private DateTime registrationDate;
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Начинай название интерфейса с буквы <code>I</code></li>
+</ul>
+<pre><code class="lang-csharp">// Правильно:
+public interface IShape
+{
+}
+</code></pre>
+<ul>
+<li><p><strong>Предпочтительно</strong>: Использовать названия файлов, соответствующие названию главного класса в них.</p>
+</li>
+<li><p><strong>Всегда</strong>: Синхронизируй структуру файлов и структуру неймспесов</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// ProjectFolder/Main.cs:
+namespace Project
+{
+  class Main { ... }
+}
+
+// ProjectFolder/Module/ClassA.cs:
+namespace Project.Module
+{
+  class ClassA { ... }
+}
+
+// ProjectFolder/Module/Submodule/ClassB.cs:
+namespace Project.Module.Submodule
+{
+  class ClassB { ... }
+}
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Используй названия в единственном числе для <code>enum</code> и в множественном числе для <code>Flags</code></li>
+</ul>
+<pre><code class="lang-csharp">public enum Color
+{
+  Red,
+  Green,
+  Blue,
+}
+
+[Flags]
+public enum Dockings
+{
+  None = 0,
+  Top = 1,
+  Right = 2,
+  Bottom = 4,
+  Left = 8,
+}
+</code></pre>
+<ul>
+<li><strong>Никогда</strong>: Никогда не используй обрезанные слова в названиях</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно
+GetWin
+
+// Правильно:
+GetWindow
+</code></pre>
+<ul>
+<li><p><strong>Всегда</strong>: Используй следующие стандартные имена аргументов:</p>
+<ul>
+<li>Унарный оператор - <code>value</code></li>
+<li>Equals-подобный метод - <code>other</code></li>
+<li>Бинарный оператор - <code>lhs</code>, <code>rhs</code></li>
+<li>Метод с N параметрами одинакового типа: <code>value1</code>, <code>value2</code>, ..., <code>valueN</code></li>
+</ul>
+</li>
+<li><p><strong>Всегда</strong>: Называй ивенты следующим образом:</p>
+<ul>
+<li>Заканчивай название на <code>-ing</code>, если ивент вызывается до или во время главного действия.</li>
+<li>Заканчивай название на <code>-ed</code>, если ивент вызывается после главного действия.</li>
+<li>Заканчивай название метода на <code>_EventName</code>, если он присваивается ивенту с названием <code>EventName</code>.</li>
+<li>Называй метод <code>OnEventName</code>, если он вызывает ивент с названием <code>EventName</code>.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="lang-csharp">class A
+{
+  public delegate void UpdateDelegate();
+  public event UpdateDelegate Updating;
+  public event UpdateDelegate Updated;
+  
+  private void Update()
+  {
+    OnUpdating();
+    // ...
+    OnUpdated();
+  }
+
+  private void OnUpdating()
+  {
+    Updating();
+  }
+
+  private void OnUpdated()
+  {
+    Updated();
+  }
+}
+
+class MyWidget
+{
+  private void Method()
+  {
+    a.Updating += MyWidget_Updating;
+    a.Updated += MyWidget_Updated;
+  }
+}
+</code></pre>
+<ul>
+<li><p><strong>Всегда</strong>: называй переменные означающие количество чего-либо в стиле <code>&lt;something&gt;Count</code>, где <code>&lt;something&gt;</code> в единственном числе.</p>
+</li>
+<li><p><strong>Всегда</strong>: называй переменные индекса как <code>index</code> или <code>&lt;something&gt;</code>Index, если это не сокращённая форма (i, j, k, etc)</p>
+</li>
+<li><p><strong>Предпочитительно</strong>: формируй имена переменных и методов в стиле естественных языков:</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// Правильно:
+var shortName = &quot;Leo&quot;;
+var fullName = &quot;Leonardo&quot;;
+
+// Неправильно:
+var nameFull = &quot;Donatello&quot;;
+var nameShort = &quot;Don&quot;;
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: добавляй к методу префикс <code>try</code> если выполняются следующие пункты:
+<ol>
+<li>обязательно: метод возвращает <code>bool</code></li>
+<li>обязательно: если от метода ожидается возвращемое значение, то оно получается через <code>out</code></li>
+<li>обязательно: метод не бросит исключений.</li>
+<li>желательно: есть такой же метод без <code>try</code>, в случае неудачи бросающий исключение.</li>
+</ol>
+</li>
+</ul>
+<h1 id="оформление-комментариев">Оформление комментариев</h1>
+<ul>
+<li><strong>Всегда</strong>: Пиши комментарии на английском языке.</li>
+<li><strong>Предпочтительно</strong>: Располагать комментарий на предыдущей строке, а не в конце строки комментируемого кода.</li>
+<li><strong>Всегда</strong>: Начинай комментарий с заглавной буквы и заканчивай точкой.</li>
+<li><strong>Всегда</strong>: Вставляй пробел между символами комментария <code>//</code> и текстом комментария</li>
+</ul>
+<pre><code class="lang-csharp">// Правильно:
+// The following declaration creates a query. It does not run 
+// the query.
+</code></pre>
+<ul>
+<li><strong>Никогда</strong>: Никогда не создавай форматированные блоки звёздочек вокруг комментариев</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+//****************************
+//*  Very important comment  *
+//****************************
+
+// Правильно:
+// Very important comment
+</code></pre>
+<ul>
+<li><strong>Предпочтительно</strong>: Указывать автора в тексте комментари</li>
+</ul>
+<pre><code class="lang-csharp">// Правильно:
+// Linus Torvalds: this method was not implemented
+// because it would take too much time.
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Оставляй комментарий, если вкручиваешь костыль или реализуешь какую-то неочевидную логику.</li>
+<li><strong>Никогда</strong>: Никогда не используй комментарии в блоках <code>/**/</code>.</li>
+</ul>
+<h1 id="форматирование">Форматирование</h1>
+<ul>
+<li><p><strong>Всегда</strong>: Используй табуляцию вместо пробелов для отступов.</p>
+</li>
+<li><p><strong>Всегда</strong>: Используй пробелы вместо табуляции для выравнивания.</p>
+</li>
+<li><p><strong>Всегда</strong>: Используй вертикальное выравнивание скобочек вместо египетского выравнивания.
+Исключения:</p>
+<ul>
+<li>if</li>
+<li>циклы</li>
+<li>switch</li>
+<li>object and collection initializers</li>
+<li>lambda expressions</li>
+</ul>
+</li>
+<li><p><strong>Всегда</strong>: Вставляй пробелы между бинарными операторами и операндами.</p>
+</li>
+<li><p><strong>Всегда</strong>: Для однострочных лямбд, object and collection initializers отделяй внутреннюю часть от фигурных скобок одним пробелом.</p>
+</li>
+<li><p><strong>Всегда</strong>: Отделяй <code>[]</code> пробелом справа и не отделяй слева, в синтаксисе объявлений и инициализаций.</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// Правильно:
+int[] dogs = new int[] { 1, 2, 3 };
+// Не правильно:
+int [] dogs = new int [] { 1, 2, 3 };
+</code></pre>
+<ul>
+<li><strong>Предпочтительно</strong>: Использовать LINQ в виде цепочек методов, а не sql-подобные LINQ вызовы</li>
+</ul>
+<pre><code class="lang-csharp">// Нежелательно:
+var names = from item in collection
+            select item.Name;
+
+// Желательно:
+var names = collection
+            .Select(item =&gt; item.Name);
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Форматируй switch statement согласно следующим правилам:
+<ul>
+<li>однострочные <code>case</code> допустимы, если тело <code>case</code> из одной строчки считая <code>break</code></li>
+<li>вставляй отступ перед case</li>
+<li>если тело case обрамляется в фигурные скобки, то откывающая скобка должна быть расположена на одной строчке с case, а закрывающая на отдельной строчке, на уровне вложенности соответствующего case; <code>break</code> или <code>return</code> в таком случае должен оставаться внутри фигурных скобок</li>
+</ul>
+</li>
+</ul>
+<p>Примеры правильного форматирования <code>switch</code> statement:</p>
+<pre><code class="lang-csharp">public List&lt;ChestBonusConfig&gt; Config
+{
+  get
+  {
+    switch (Kind) {
+      case SlotKind.StarterPack: return The.Config.StarterPackContents;
+      case SlotKind.ProductPack: return The.Config.GetProductPackConfig(Index);
+      case SlotKind.CoinPack: case SlotKind.ButtonMore: return null;
+      default: throw new ArgumentOutOfRangeException();
+    }
+  }
+}
+
+private Widget GetBasicWidget()
+{
+  switch (ParticlesLinkage) {
+    case ParticlesLinkage.Parent:
+      return ParentWidget;
+    case ParticlesLinkage.Other: {
+      var widget = ParentWidget;
+      while (widget != null) {
+        if (widget.Id == LinkageWidgetName) {
+            return widget;
+        }
+        widget = widget.ParentWidget;
+      }
+      return null;
+    }
+    case ParticlesLinkage.Root:
+    default:
+      return (Parent != null) ? WidgetContext.Current.Root : null;
+}
+
+switch (type) {
+  case SignatureType.BinaryUnordered:
+    yd = new BinaryDeserializer {
+      Options = defaultYuzuCommonOptions,
+      BinaryOptions = new BinarySerializeOptions { Unordered = true },
+    };
+    break;
+  case SignatureType.BinaryOrdered:
+    yd = new BinaryDeserializer {
+      Options = defaultYuzuCommonOptions,
+    };
+    break;
+  case SignatureType.Json:
+    SkipBomIfPresent(ms);
+    yd = new JsonDeserializer {
+      JsonOptions = defaultYuzuJSONOptions,
+      Options = defaultYuzuCommonOptions
+    };
+    break;
+  default:
+    throw new System.Exception(&quot;Unexpected Case&quot;);
+}
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Используй кодировку UTF-8.</li>
+</ul>
+<h1 id="расположение-и-структура-кода">Расположение и структура кода</h1>
+<ul>
+<li><strong>Всегда</strong>: Пиши только одно выражение в строке</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+a = 5; b = &quot;kek&quot;; c = new Example(a, b);
+
+// Правильно:
+a = 5; 
+b = &quot;kek&quot;; 
+c = new Example(a, b);
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Пиши только одно объявление в строке</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+int a, b; string c; char d;
+
+// Правильно:
+int a; 
+int b; 
+string c; 
+char d;
+</code></pre>
+<ul>
+<li><strong>Нежелательно</strong>: Писать выражения на одной строке с if</li>
+</ul>
+<pre><code class="lang-csharp">// Нежелательно:
+if (true) return;
+
+// Желательно:
+if (true){
+  return;
+}
+</code></pre>
+<ul>
+<li><strong>Предпочтительно</strong>: Оборачивать даже однострочные выражения в фигурные скобки</li>
+</ul>
+<pre><code class="lang-csharp">// Нежелательно:
+if (true)
+  return;
+
+// Желательно:
+if (true){
+  return;
+}
+</code></pre>
+<ul>
+<li><p><strong>Всегда</strong>: Добавляй одну пустую строку между объявлениями методов и свойств.</p>
+</li>
+<li><p><strong>Нежелательно</strong>: Писать строки длиннее 100 символов.</p>
+</li>
+<li><p><strong>Никогда</strong>: Никогда не пиши строк длиннее 120 символов.</p>
+</li>
+<li><p><strong>Всегда</strong>: Оставляй перенос на новую строку в конце файла.</p>
+</li>
+<li><p><strong>Всегда</strong>: Оставляй бинарный оператор на той же строке, что и первый операнд.</p>
+</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+var a = 
+  someLongLongLongLongLongLongLongVariableName1 
+  || someLongLongLongLongLongLongLongVariableName2;
+
+// Правильно:
+var a = 
+  someLongLongLongLongLongLongLongVariableName1 ||
+  someLongLongLongLongLongLongLongVariableName2;
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Добавляй перенос строки между return и длинным выражением.</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+return someLongLongLongLongLongLongLongVariableName1 ||
+  someLongLongLongLongLongLongLongVariableName2;
+
+// Правильно:
+return 
+  someLongLongLongLongLongLongLongVariableName1 ||
+  someLongLongLongLongLongLongLongVariableName2;
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Располагай длинные выражения отдельно от if и скобочек.</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+if (someLongLongLongLongLongLongLongVariableName1 ||
+  someLongLongLongLongLongLongLongVariableName2) {
+  ...
+}
+
+// Правильно:
+if (
+  someLongLongLongLongLongLongLongVariableName1 ||
+  someLongLongLongLongLongLongLongVariableName2
+) {
+  ...
+}
+</code></pre>
+<h1 id="использование-языка">Использование языка</h1>
+<ul>
+<li><strong>Всегда</strong>: Используй обобщённые названия типов вместо системных типов, таких как <code>Int16</code>, <code>Single</code>, <code>UInt64</code> и т.д.</li>
+</ul>
+<pre><code class="lang-csharp">// Неправильно:
+String firstName;
+Int32 lastIndex;
+Boolean isSaved;
+
+// Правильно:
+string firstName;
+int lastIndex;
+bool isSaved;
+</code></pre>
+<ul>
+<li><strong>Всегда</strong>: Используй <code>var</code> для всех типов кроме простых.</li>
+<li><strong>Нежелательно</strong>: Использовать var для простых типов.</li>
+<li><strong>Всегда</strong>: Явно указывай модификатор доступа <code>private</code>.</li>
+<li><strong>Нежелательно</strong>: Использовать директиву <code>#region</code>.</li>
+<li><strong>Предпочтительно</strong>: Использовать авто-свойства (Auto-Implemented Properties) вместо public полей.</li>
+<li><strong>Всегда</strong>: дополняй окончания блочных директив препроцессора комментарием, дублирующим выражение в первой директиве данного блока в той же строке.</li>
+</ul>
+<pre><code class="lang-csharp">// Например
+#if ANDROID &amp;&amp; BFG_LIB
+      Lime.Application.DiscardOpenGLObjects();
+#endif // ANDROID &amp;&amp; BFG_LIB
+</code></pre>
+<ul>
+<li><strong>Желательно</strong>: Указывать имя параметра в месте вызова, если параметр типа <code>bool</code></li>
+</ul>
+<pre><code class="lang-csharp">// Например
+void Func(bool flag) {}
+Func(flag: true);
+</code></pre>
+<h1 id="документация">Документация</h1>
+<ul>
+<li><p><strong>Предпочтительно</strong>: Использовать следующие тэги:</p>
+<ul>
+<li><code>&lt;param&gt;</code></li>
+<li><code>&lt;see&gt;</code></li>
+<li><code>&lt;summary&gt;</code></li>
+</ul>
+</li>
+<li><p><strong>Никогда</strong>: Никогда не используй тэг <code>&lt;see&gt;</code> в комментарии более одного раза.</p>
+</li>
+</ul>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

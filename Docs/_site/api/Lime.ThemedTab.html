@@ -1,0 +1,882 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class ThemedTab
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class ThemedTab
+   ">
+    <meta name="generator" content="docfx 2.45.1.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Lime.ThemedTab">
+  
+  
+  <h1 id="Lime_ThemedTab" data-uid="Lime.ThemedTab" class="text-break">Class ThemedTab
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="Lime.Node.html">Node</a></div>
+    <div class="level2"><a class="xref" href="Lime.Widget.html">Widget</a></div>
+    <div class="level3"><a class="xref" href="Lime.Tab.html">Tab</a></div>
+    <div class="level4"><span class="xref">ThemedTab</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.IDisposable</span></div>
+    <div><a class="xref" href="Lime.IAnimationHost.html">IAnimationHost</a></div>
+    <div><a class="xref" href="Lime.IFolderItem.html">IFolderItem</a></div>
+    <div><a class="xref" href="Lime.IFolderContext.html">IFolderContext</a></div>
+    <div><a class="xref" href="Lime.IRenderChainBuilder.html">IRenderChainBuilder</a></div>
+    <div><a class="xref" href="Lime.IAnimable.html">IAnimable</a></div>
+    <div><a class="xref" href="Lime.IUpdatableNode.html">IUpdatableNode</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Lime.Tab.html#Lime_Tab_Closing">Tab.Closing</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Tab.html#Lime_Tab_Text">Tab.Text</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Tab.html#Lime_Tab_Closable">Tab.Closable</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Tab.html#Lime_Tab_Active">Tab.Active</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Tab.html#Lime_Tab_OnUpdate_System_Single_">Tab.OnUpdate(Single)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globalColor">Widget.globalColor</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globalBlending">Widget.globalBlending</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globalShader">Widget.globalShader</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globallyEnabled">Widget.globallyEnabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globallyVisible">Widget.globallyVisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_globallyFreezeInvisible">Widget.globallyFreezeInvisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Focused">Widget.Focused</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_DefaultWidgetSize">Widget.DefaultWidgetSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RenderTransparentWidgets">Widget.RenderTransparentWidgets</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_EnableViewCulling">Widget.EnableViewCulling</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LayoutManager">Widget.LayoutManager</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Layout">Widget.Layout</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LayoutCell">Widget.LayoutCell</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LayoutConstraints">Widget.LayoutConstraints</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MeasuredMinSize">Widget.MeasuredMinSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MeasuredMaxSize">Widget.MeasuredMaxSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_EffectiveMinSize">Widget.EffectiveMinSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_EffectiveMaxSize">Widget.EffectiveMaxSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinSize">Widget.MinSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MaxSize">Widget.MaxSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinWidth">Widget.MinWidth</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinHeight">Widget.MinHeight</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MaxWidth">Widget.MaxWidth</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MaxHeight">Widget.MaxHeight</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinMaxSize">Widget.MinMaxSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinMaxWidth">Widget.MinMaxWidth</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_MinMaxHeight">Widget.MinMaxHeight</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Position">Widget.Position</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_X">Widget.X</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Y">Widget.Y</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Scale">Widget.Scale</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Rotation">Widget.Rotation</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Size">Widget.Size</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_SilentSize">Widget.SilentSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Width">Widget.Width</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Height">Widget.Height</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Pivot">Widget.Pivot</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GetPivotDefaultValue">Widget.GetPivotDefaultValue()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Padding">Widget.Padding</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ContentPosition">Widget.ContentPosition</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ContentSize">Widget.ContentSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ContentWidth">Widget.ContentWidth</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ContentHeight">Widget.ContentHeight</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GlobalPosition">Widget.GlobalPosition</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GlobalCenter">Widget.GlobalCenter</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Center">Widget.Center</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ParentWidget">Widget.ParentWidget</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_TabTravesable">Widget.TabTravesable</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_FocusScope">Widget.FocusScope</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Color">Widget.Color</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Opacity">Widget.Opacity</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Anchors">Widget.Anchors</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Blending">Widget.Blending</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Shader">Widget.Shader</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Enabled">Widget.Enabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Visible">Widget.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_SkinningWeights">Widget.SkinningWeights</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_BoneArray">Widget.BoneArray</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_HitTestMethod">Widget.HitTestMethod</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Texture">Widget.Texture</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Input">Widget.Input</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_HasInput">Widget.HasInput()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LocalToWorldTransform">Widget.LocalToWorldTransform</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GlobalColor">Widget.GlobalColor</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GlobalBlending">Widget.GlobalBlending</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GlobalShader">Widget.GlobalShader</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_DiscardMaterial">Widget.DiscardMaterial()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GloballyEnabled">Widget.GloballyEnabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GloballyVisible">Widget.GloballyVisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_FreezeInvisible">Widget.FreezeInvisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GloballyFreezeInvisible">Widget.GloballyFreezeInvisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_BoundingRect">Widget.BoundingRect</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcGlobalBoundingRect">Widget.CalcGlobalBoundingRect()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Dispose">Widget.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_IsRenderedToTexture">Widget.IsRenderedToTexture()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Clicked">Widget.Clicked</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_WasClicked">Widget.WasClicked()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RefreshLayout">Widget.RefreshLayout()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_OnSizeChanged_Lime_Vector2_">Widget.OnSizeChanged(Vector2)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_IsFocused">Widget.IsFocused()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_SetFocus">Widget.SetFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RevokeFocus">Widget.RevokeFocus()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcContentSize">Widget.CalcContentSize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Item_System_String_">Widget.Item[String]</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_Item_System_String_System_Object___">Widget.Item[String, Object[]]</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_OnParentChanged_Lime_Node_">Widget.OnParentChanged(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RaiseUpdating_System_Single_">Widget.RaiseUpdating(Single)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RaiseUpdated_System_Single_">Widget.RaiseUpdated(Single)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ClipRegionTest_Lime_Rectangle_">Widget.ClipRegionTest(Rectangle)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcLocalToParentTransform">Widget.CalcLocalToParentTransform()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ExpandParentBoundingRect">Widget.ExpandParentBoundingRect()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_StaticScale_System_Single_System_Boolean_">Widget.StaticScale(Single, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_AddToRenderChain_Lime_RenderChain_">Widget.AddToRenderChain(RenderChain)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ToLocalMousePosition_Lime_Vector2_">Widget.ToLocalMousePosition(Vector2)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LocalMousePosition">Widget.LocalMousePosition()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GetEffectiveLayer">Widget.GetEffectiveLayer()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LocalHitTest_Lime_HitTestArgs__">Widget.LocalHitTest(HitTestArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_LocalHitTest_Lime_Vector2_">Widget.LocalHitTest(Vector2)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_PartialHitTest_Lime_HitTestArgs__">Widget.PartialHitTest(HitTestArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_PartialHitTestByContents_Lime_HitTestArgs__">Widget.PartialHitTestByContents(HitTestArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_BoundingRectHitTest_Lime_Vector2_">Widget.BoundingRectHitTest(Vector2)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CenterOnParent">Widget.CenterOnParent()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcTransitionToSpaceOf_Lime_Widget_">Widget.CalcTransitionToSpaceOf(Widget)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcHullInSpaceOf_Lime_Widget_">Widget.CalcHullInSpaceOf(Widget)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcAABBInSpaceOf_Lime_Widget_">Widget.CalcAABBInSpaceOf(Widget)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcAABBInViewportSpace_Lime_WindowRect_Lime_Matrix44_">Widget.CalcAABBInViewportSpace(WindowRect, Matrix44)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcAABBInWindowSpace">Widget.CalcAABBInWindowSpace()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_CalcPositionInSpaceOf_Lime_Widget_">Widget.CalcPositionInSpaceOf(Widget)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_GetVisibilityIssues">Widget.GetVisibilityIssues()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_ExpandToContainerWithAnchors">Widget.ExpandToContainerWithAnchors()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_UpdateBoundingRect">Widget.UpdateBoundingRect()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Widget.html#Lime_Widget_RecalcGloballyFrozen">Widget.RecalcGloballyFrozen()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Manager">Node.Manager</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AnimationStopped">Node.AnimationStopped</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Id">Node.Id</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_ContentsPath">Node.ContentsPath</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Trigger">Node.Trigger</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Lime_IAnimable_Owner">Node.IAnimable.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Parent">Node.Parent</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TangerineFlags">Node.TangerineFlags</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_GetTangerineFlag_Lime_TangerineFlags_">Node.GetTangerineFlag(TangerineFlags)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_SetTangerineFlag_Lime_TangerineFlags_System_Boolean_">Node.SetTangerineFlag(TangerineFlags, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AsWidget">Node.AsWidget</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AsNode3D">Node.AsNode3D</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Presenter">Node.Presenter</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CompoundPresenter">Node.CompoundPresenter</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_PostPresenter">Node.PostPresenter</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CompoundPostPresenter">Node.CompoundPostPresenter</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_FirstChild">Node.FirstChild</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_NextSibling">Node.NextSibling</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Awoke">Node.Awoke</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Updating">Node.Updating</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Updated">Node.Updated</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Tasks">Node.Tasks</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_LateTasks">Node.LateTasks</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AnimationSpeed">Node.AnimationSpeed</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_EffectiveAnimationSpeed">Node.EffectiveAnimationSpeed</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_RenderChainBuilder">Node.RenderChainBuilder</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Layer">Node.Layer</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Components">Node.Components</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Lime_IAnimationHost_GetComponent_System_Type_">Node.IAnimationHost.GetComponent(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Animators">Node.Animators</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Nodes">Node.Nodes</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Markers">Node.Markers</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_IsRunning">Node.IsRunning</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_IsStopped">Node.IsStopped</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AnimationTime">Node.AnimationTime</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AnimationFrame">Node.AnimationFrame</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_DefaultAnimation">Node.DefaultAnimation</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Tag">Node.Tag</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Animations">Node.Animations</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Lime_IAnimationHost_OnAnimatorCollectionChanged">Node.IAnimationHost.OnAnimatorCollectionChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_NeedSerializeAnimations">Node.NeedSerializeAnimations()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Folders">Node.Folders</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CurrentAnimation">Node.CurrentAnimation</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_UserData">Node.UserData</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_DirtyMask">Node.DirtyMask</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_IsDirty_Lime_Node_DirtyFlags_">Node.IsDirty(Node.DirtyFlags)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CleanDirtyFlags_Lime_Node_DirtyFlags_">Node.CleanDirtyFlags(Node.DirtyFlags)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_HitTestTarget">Node.HitTestTarget</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CreatedCount">Node.CreatedCount</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_FinalizedCount">Node.FinalizedCount</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Gestures">Node.Gestures</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_HasGestures">Node.HasGestures()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_ShouldSerializeNodes">Node.ShouldSerializeNodes()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_PropagateDirtyFlags_Lime_Node_DirtyFlags_">Node.PropagateDirtyFlags(Node.DirtyFlags)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_GetRoot">Node.GetRoot()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_DescendantOf_Lime_Node_">Node.DescendantOf(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_SameOrDescendantOf_Lime_Node_">Node.SameOrDescendantOf(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TryRunAnimation_System_String_System_String_System_Double_">Node.TryRunAnimation(String, String, Double)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_RunAnimation_System_String_System_String_">Node.RunAnimation(String, String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_OnBeforeSerialization">Node.OnBeforeSerialization()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_OnAfterSerialization">Node.OnAfterSerialization()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_ToString">Node.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Unlink">Node.Unlink()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_UnlinkAndDispose">Node.UnlinkAndDispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_GetRenderObject">Node.GetRenderObject()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AddSelfAndChildrenToRenderChain_Lime_RenderChain_System_Int32_">Node.AddSelfAndChildrenToRenderChain(RenderChain, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AddSelfToRenderChain_Lime_RenderChain_System_Int32_">Node.AddSelfToRenderChain(RenderChain, Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_OnTrigger_System_String_System_Object_System_Double_">Node.OnTrigger(String, Object, Double)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TriggerMultipleAnimations_System_String_System_Double_">Node.TriggerMultipleAnimations(String, Double)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AddNode_Lime_Node_">Node.AddNode(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_AddToNode_Lime_Node_">Node.AddToNode(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_PushNode_Lime_Node_">Node.PushNode(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_PushToNode_Lime_Node_">Node.PushToNode(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Find__1_System_String_">Node.Find&lt;T&gt;(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Find__1_System_String_System_Object___">Node.Find&lt;T&gt;(String, Object[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TryFind__1_System_String___0__">Node.TryFind&lt;T&gt;(String, T)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TryFind__1_System_String_">Node.TryFind&lt;T&gt;(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TryFind__1_System_String_System_Object___">Node.TryFind&lt;T&gt;(String, Object[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_FindNode_System_String_">Node.FindNode(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_TryFindNode_System_String_">Node.TryFindNode(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Descendants">Node.Descendants</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Ancestors">Node.Ancestors</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_PreloadAssets">Node.PreloadAssets()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_RemoveAnimatorsForExternalAnimations">Node.RemoveAnimatorsForExternalAnimations()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_SceneLoading">Node.SceneLoading</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_SceneLoaded">Node.SceneLoaded</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CreateFromAssetBundle__1_System_String___0_Lime_Yuzu_System_Boolean_">Node.CreateFromAssetBundle&lt;T&gt;(String, T, Yuzu, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CreateFromAssetBundle_System_String_Lime_Node_Lime_Yuzu_System_Boolean_">Node.CreateFromAssetBundle(String, Node, Yuzu, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_CreateFromStream_System_String_Lime_Node_Lime_Yuzu_System_IO_Stream_System_Boolean_">Node.CreateFromStream(String, Node, Yuzu, Stream, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_LoadExternalScenes_Lime_Yuzu_">Node.LoadExternalScenes(Yuzu)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_ReplaceContent_Lime_Node_">Node.ReplaceContent(Node)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_ResolveScenePath_System_String_">Node.ResolveScenePath(String)</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_IsMouseOver">Node.IsMouseOver()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_IsMouseOverThisOrDescendant">Node.IsMouseOverThisOrDescendant()</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_Frozen">Node.Frozen</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_globallyFrozen">Node.globallyFrozen</a>
+    </div>
+    <div>
+      <a class="xref" href="Lime.Node.html#Lime_Node_GloballyFrozen">Node.GloballyFrozen</a>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Lime.html">Lime</a></h6>
+  <h6><strong>Assembly</strong>: Lime.dll</h6>
+  <h5 id="Lime_ThemedTab_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class ThemedTab : Tab, IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable, IUpdatableNode</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  
+  
+  <a id="Lime_ThemedTab__ctor_" data-uid="Lime.ThemedTab.#ctor*"></a>
+  <h4 id="Lime_ThemedTab__ctor" data-uid="Lime.ThemedTab.#ctor">ThemedTab()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ThemedTab()</code></pre>
+  </div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Lime_ThemedTab_IsNotDecorated_" data-uid="Lime.ThemedTab.IsNotDecorated*"></a>
+  <h4 id="Lime_ThemedTab_IsNotDecorated" data-uid="Lime.ThemedTab.IsNotDecorated">IsNotDecorated()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool IsNotDecorated()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Lime.Node.html#Lime_Node_IsNotDecorated">Node.IsNotDecorated()</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimationHost.html">IAnimationHost</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IFolderItem.html">IFolderItem</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IFolderContext.html">IFolderContext</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IRenderChainBuilder.html">IRenderChainBuilder</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimable.html">IAnimable</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IUpdatableNode.html">IUpdatableNode</a>
+  </div>
+  <h3 id="extensionmethods">Extension Methods</h3>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Clone__1_Lime_Node_">NodeCompatibilityExtensions.Clone&lt;T&gt;(Node)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Clone_Lime_Node_">NodeCompatibilityExtensions.Clone(Node)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_AdvanceAnimationsRecursive_Lime_Node_System_Single_">NodeCompatibilityExtensions.AdvanceAnimationsRecursive(Node, Single)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.NodeCompatibilityExtensions.html#Lime_NodeCompatibilityExtensions_Update_Lime_Node_System_Single_">NodeCompatibilityExtensions.Update(Node, Single)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_GetAnimationHost_Lime_IAnimable_">IAnimableExtensions.GetAnimationHost(IAnimable)</a>
+  </div>
+  <div>
+      <a class="xref" href="Lime.IAnimableExtensions.html#Lime_IAnimableExtensions_UnbindAnimators_Lime_IAnimable_">IAnimableExtensions.UnbindAnimators(IAnimable)</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
