@@ -90,7 +90,7 @@ namespace Tangerine.UI.Timeline
 			var r = GetRectangle(Timeline.Instance.CurrentColumnEased);
 			Renderer.DrawRect(
 				r.A, r.B,
-				Document.Current.PreviewAnimation ?
+				Document.Current.PreviewScene ?
 					ColorTheme.Current.TimelineRuler.RunningCursor :
 					ColorTheme.Current.TimelineRuler.Cursor);
 		}

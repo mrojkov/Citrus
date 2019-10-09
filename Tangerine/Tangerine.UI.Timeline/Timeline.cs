@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline
 		public float CurrentColumnEased
 		{
 			get {
-				if (Document.Current.PreviewAnimation) {
+				if (Document.Current.PreviewScene) {
 					var time = Document.Current.Animation.Time;
 					time = Document.Current.Animation.BezierEasingCalculator.EaseTime(time);
 					return (float)(time * AnimationUtils.FramesPerSecond);

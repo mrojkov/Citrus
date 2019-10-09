@@ -107,10 +107,7 @@ namespace Tangerine.UI.SceneView.Presenters
 		{
 			while (true) {
 				yield return null;
-				if (
-					Document.Current.PreviewAnimation ||
-					Document.Current.ExpositionMode || !CoreUserPreferences.Instance.ShowFrameProgression
-				) {
+				if (Document.Current.PreviewScene || !CoreUserPreferences.Instance.ShowFrameProgression) {
 					if (widgets.Count != 0) {
 						for (int i = 0; i < widgets.Count; i++) {
 							widgets[i].CompoundPresenter.Remove(presenters[i]);

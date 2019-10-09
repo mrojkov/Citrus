@@ -19,6 +19,7 @@ namespace Tangerine.UI.SceneView
 				if (sv.Input.ConsumeKeyPress(MainKey) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
 					Audio.GloballyEnable = false;
 					Document.Current.ExpositionMode = true;
+					Document.Current.PreviewScene = true;
 					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
 						float t = 0;
 						float animationSpeed = CalcAnimationSpeed(exposition.ItemCount);
@@ -42,6 +43,7 @@ namespace Tangerine.UI.SceneView
 					}
 					Audio.GloballyEnable = true;
 					Document.Current.ExpositionMode = false;
+					Document.Current.PreviewScene = false;
 				}
 				yield return Lime.Task.WaitForInput();
 			}

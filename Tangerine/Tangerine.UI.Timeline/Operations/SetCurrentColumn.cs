@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void Perform(int column, Animation animation)
 		{
-			if (Document.Current.PreviewAnimation) {
+			if (Document.Current.PreviewScene) {
 				Document.Current.TogglePreviewAnimation();
 			}
 			DocumentHistory.Current.Perform(new SetCurrentColumn(column, animation));

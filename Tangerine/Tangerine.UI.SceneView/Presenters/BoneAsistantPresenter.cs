@@ -24,7 +24,7 @@ namespace Tangerine.UI.SceneView
 			var ctr = Document.Current.Container as Widget;
 			if (ctr != null) {
 				var t = ctr.CalcTransitionToSpaceOf(canvas);
-				if (!Document.Current.PreviewAnimation) {
+				if (!Document.Current.PreviewScene) {
 					var helper = SceneView.Instance.Components.Get<CreateBoneHelper>();
 					if (helper != null && helper.HitTip != default(Vector2)) {
 						var hull = new Rectangle(helper.HitTip * t, helper.HitTip * t)

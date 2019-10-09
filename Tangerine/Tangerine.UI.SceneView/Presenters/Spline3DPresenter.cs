@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 
 		protected override void InternalRender(Viewport3D viewport)
 		{
-			if (Document.Current.PreviewAnimation) {
+			if (Document.Current.PreviewScene) {
 				return;
 			}
 			var selection = Document.Current.SelectedNodes().Editable().OfType<Spline3D>().ToList();

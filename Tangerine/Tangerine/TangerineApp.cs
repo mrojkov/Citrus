@@ -232,7 +232,7 @@ namespace Tangerine
 			});
 			Animation.EasingEnabledChecker = (animation) => {
 				var doc = Document.Current;
-				return doc == null || doc.PreviewAnimation || animation != doc.Animation;
+				return doc == null || doc.PreviewScene || animation != doc.Animation;
 			};
 			if (SceneUserPreferences.Instance.VisualHintsRegistry != null) {
 				VisualHintsRegistry.Instance = SceneUserPreferences.Instance.VisualHintsRegistry;

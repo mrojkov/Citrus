@@ -18,14 +18,11 @@ namespace Tangerine.UI.SceneView
 
 		private void RenderSelection(Widget canvas)
 		{
-			if (
-				Core.Document.Current.ExpositionMode ||
-				Core.Document.Current.PreviewAnimation
-			) {
+			if (Document.Current.PreviewScene) {
 				return;
 			}
 			canvas.PrepareRendererState();
-			var widgets = Core.Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 			if (widgets.Count == 0) {
 				return;
 			}

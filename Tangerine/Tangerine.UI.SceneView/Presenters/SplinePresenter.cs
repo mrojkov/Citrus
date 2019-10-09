@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 		protected override void InternalRender(Spline spline)
 		{
 			if (
-				Document.Current.PreviewAnimation ||
+				Document.Current.PreviewScene ||
 				(
 					!(Document.Current.Container == spline) &&
 					!Document.Current.SelectedNodes().Contains(spline) &&

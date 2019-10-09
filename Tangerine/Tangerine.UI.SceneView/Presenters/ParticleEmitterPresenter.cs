@@ -9,7 +9,7 @@ namespace Tangerine.UI.SceneView
 	{
 		protected override void InternalRender(ParticleEmitter emitter)
 		{
-			if (Document.Current.PreviewAnimation) {
+			if (Document.Current.PreviewScene) {
 				return;
 			}
 			SceneView.Instance.Frame.PrepareRendererState();

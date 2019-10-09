@@ -38,7 +38,7 @@ namespace Tangerine.UI.SceneView
 					} else {
 						Renderer.DrawRect(Vector2.Zero, ctr.Size, Color1);
 					}
-					if (Document.Current.PreviewAnimation) {
+					if (Document.Current.PreviewScene) {
 						Renderer.DrawRect(
 							Vector2.Zero,
 							ctr.Size,
@@ -54,7 +54,7 @@ namespace Tangerine.UI.SceneView
 
 			sceneView.Scene.CompoundPostPresenter.Push(new SyncDelegatePresenter<Widget>(w => {
 				var frame = SceneView.Instance.Frame;
-				if (frame != null && !Core.Document.Current.PreviewAnimation && Core.Document.Current.Container is Widget) {
+				if (frame != null && !Core.Document.Current.PreviewScene && Core.Document.Current.Container is Widget) {
 					frame.PrepareRendererState();
 					var c = ColorTheme.Current.SceneView.ContainerBorder;
 					var mtx = frame.LocalToWorldTransform;
@@ -71,7 +71,7 @@ namespace Tangerine.UI.SceneView
 			sceneView.Scene.CompoundPostPresenter.Push(
 				new SyncDelegatePresenter<Widget>(
 					(w) => {
-						if (Document.Current.PreviewAnimation) {
+						if (Document.Current.PreviewScene) {
 							var ctr = SceneView.Instance.Frame;
 							if (ctr != null) {
 								ctr.PrepareRendererState();

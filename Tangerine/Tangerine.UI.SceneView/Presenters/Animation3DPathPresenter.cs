@@ -16,11 +16,7 @@ namespace Tangerine.UI.SceneView
 
 		protected override void InternalRender(Viewport3D viewport)
 		{
-			if (
-				Document.Current.PreviewAnimation ||
-				Document.Current.ExpositionMode ||
-				!AnimationPathHint.Enabled
-			) {
+			if (Document.Current.PreviewScene || !AnimationPathHint.Enabled) {
 				return;
 			}
 			foreach (var node in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
