@@ -231,12 +231,12 @@ namespace Orange
 		{
 			items.ForEach(i => i.Allocated = false);
 			// Take in account 1 pixel border for each side.
-			var a = new RectAllocator(new Size(size.Width + 2, size.Height + 2));
+			var a = new RectAllocator(new Size(size.Width, size.Height));
 			TextureTools.AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
-				var sz = new Size(item.BitmapInfo.Width + 2, item.BitmapInfo.Height + 2);
+				var sz = new Size(item.BitmapInfo.Width, item.BitmapInfo.Height);
 				if (firstAllocatedItem == null || AreAtlasItemsCompatible(items, firstAllocatedItem, item)) {
-					if (a.Allocate(sz, out item.AtlasRect)) {
+					if (a.Allocate(sz, item.CookingRules.AtlasItemPadding, out item.EffectivePadding, out item.AtlasRect)) {
 						item.Allocated = true;
 						firstAllocatedItem = firstAllocatedItem ?? item;
 					}
@@ -287,12 +287,13 @@ namespace Orange
 			var atlasPath = AssetCooker.GetAtlasPath(atlasChain, atlasId);
 			var atlasPixels = new Color4[size.Width * size.Height];
 			foreach (var item in items.Where(i => i.Allocated)) {
+				item.AtlasRect.A += new IntVector2(item.EffectivePadding.Left, item.EffectivePadding.Top);
 				using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(AssetCooker.Platform, item)) {
 					CopyPixels(bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
 				}
 				var atlasPart = new TextureAtlasElement.Params();
 				atlasPart.AtlasRect = item.AtlasRect;
-				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
+				atlasPart.AtlasRect.B -= new IntVector2(item.EffectivePadding.Right, item.EffectivePadding.Bottom);
 				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
 				var srcPath = Path.ChangeExtension(item.Path, item.SourceExtension);
 				Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, item.Path, atlasPart, Serialization.Format.Binary,
