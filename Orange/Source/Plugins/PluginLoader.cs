@@ -28,7 +28,7 @@ namespace Orange
 		int Priority { get; }
 
 		[DefaultValue(false)]
-		bool ApplicableToBundlesSubset { get; }
+		bool ApplicableToBundleSubset { get; }
 	}
 
 	public class OrangePlugin

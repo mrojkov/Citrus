@@ -11,7 +11,7 @@ namespace Orange
 		[Export(nameof(OrangePlugin.MenuItems))]
 		[ExportMetadata("Label", "Reveal Cooked Assets")]
 		[ExportMetadata("Priority", 30)]
-		[ExportMetadata("ApplicableToBundlesSubset", true)]
+		[ExportMetadata("ApplicableToBundleSubset", true)]
 		public static void RevealCookedAssetsAction()
 		{
 			var target = The.UI.GetActiveTarget();

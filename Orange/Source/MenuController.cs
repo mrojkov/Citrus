@@ -9,14 +9,14 @@ namespace Orange
 		public string Label;
 		public Func<string> Action;
 		public int Priority;
-		public bool ApplicableToBundlesSubset;
+		public bool ApplicableToBundleSubset;
 
-		public MenuItem(Func<string> action, string label, int priority, bool applicableToBundlesSubset)
+		public MenuItem(Func<string> action, string label, int priority, bool applicableToBundleSubset)
 		{
 			Label = label;
 			Action = action;
 			Priority = priority;
-			ApplicableToBundlesSubset = applicableToBundlesSubset;
+			ApplicableToBundleSubset = applicableToBundleSubset;
 		}
 
 	}
@@ -46,16 +46,16 @@ namespace Orange
 						return null;
 					}, menuItem.Metadata.Label,
 					menuItem.Metadata.Priority,
-					menuItem.Metadata.ApplicableToBundlesSubset)
+					menuItem.Metadata.ApplicableToBundleSubset)
 				);
 			}
 			foreach (Lazy<Func<string>, IMenuItemMetadata> menuItem in PluginLoader.CurrentPlugin?.MenuItemsWithErrorDetails)
 			{
 				Items.Add(new MenuItem(
-					menuItem.Value, 
+					menuItem.Value,
 					menuItem.Metadata.Label,
 					menuItem.Metadata.Priority,
-					menuItem.Metadata.ApplicableToBundlesSubset)
+					menuItem.Metadata.ApplicableToBundleSubset)
 				);
 			}
 			The.UI.RefreshMenu();

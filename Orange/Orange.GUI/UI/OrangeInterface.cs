@@ -255,7 +255,7 @@ namespace Orange
 		private void OnActionChanged(CommonDropDownList.ChangedEventArgs args)
 		{
 			var menuItem = The.MenuController.Items.Find(item => item.Label == actionPicker.Text);
-			if (menuItem.ApplicableToBundlesSubset) {
+			if (menuItem.ApplicableToBundleSubset) {
 				EnableChildren(bundlePickerWidget, true);
 				bundlePicker.Enabled = true;
 				bundlePickerWidget.SetInfoText(false);
@@ -506,13 +506,17 @@ namespace Orange
 
 				filter = new ThemedEditBox();
 				filter.Tasks.Add(FilterBundlesTask);
-				AddNode(filter);
-				AddNode(scrollView);
 
-				infoText = new ThemedSimpleText("Not applicable to bundle subset") {
-					Color = Theme.Colors.GrayText,
+				infoText = new ThemedSimpleText("Selected action uses all bundles.") {
+					Color = Theme.Colors.BlackText,
+					MinMaxHeight = Theme.Metrics.DefaultEditBoxSize.Y,
 					Visible = false,
+					VAlignment = VAlignment.Center,
 				};
+
+				AddNode(filter);
+				AddNode(infoText);
+				AddNode(scrollView);
 
 				var buttonLine = new Widget {
 					Layout = new HBoxLayout {
@@ -520,9 +524,8 @@ namespace Orange
 					}
 				};
 				AddNode(buttonLine);
-				buttonLine.AddNode(refreshButton);
-				buttonLine.AddNode(infoText);
 				buttonLine.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = float.MaxValue }, MaxHeight = 0 });
+				buttonLine.AddNode(refreshButton);
 				buttonLine.AddNode(selectButton);
 				selectButton.Tasks.Add(UpdateTextOfSelectButtonTask());
 			}
