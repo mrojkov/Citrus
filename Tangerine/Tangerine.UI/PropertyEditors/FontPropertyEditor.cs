@@ -28,7 +28,7 @@ namespace Tangerine.UI
 			selector.Changed += a => {
 				SetProperty(new SerializableFont((string)a.Value));
 			};
-			selector.AddChangeWatcher(CoalescedPropertyValue(), i => {
+			selector.AddChangeLateWatcher(CoalescedPropertyValue(), i => {
 				selector.Text = i.IsDefined ? GetFontName(i.Value): ManyValuesText;
 			});
 		}

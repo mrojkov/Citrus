@@ -74,7 +74,7 @@ namespace Lime
 
 		private bool IsTextureValidated(bool forceInvalidate = false)
 		{
-			if (Gradient == null || Gradient.Count == 0) {
+			if (Gradient == null) {
 				return false;
 			}
 

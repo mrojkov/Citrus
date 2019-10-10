@@ -21,7 +21,7 @@ namespace Tangerine.UI
 					editor.Text = currentValue.IsDefined ? currentValue.Value.ToString("0.###") : ManyValuesText;
 				}
 			};
-			editor.AddChangeWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editor.AddChangeLateWatcher(current, v => editor.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			ManageManyValuesOnFocusChange(editor, current);
 		}
 

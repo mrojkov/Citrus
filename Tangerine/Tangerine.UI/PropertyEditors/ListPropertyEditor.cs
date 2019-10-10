@@ -16,9 +16,6 @@ namespace Tangerine.UI
 		private ThemedAddButton addButton;
 		private Action removeCallback;
 		private List<Button> buttons;
-		// Terekhov Dmitry: We have to store list of PropertyEditorParams in order to
-		// Terekhov Dmitry: avoid nodes recreation (e.g. for multiple expandable contents)
-		private readonly List<PropertyEditorParams> propertyEditorParamsList = new List<PropertyEditorParams>();
 
 		public ListPropertyEditor(IPropertyEditorParams editorParams, Func<PropertyEditorParams, Widget, IList, IEnumerable<IPropertyEditor>> onAdd) : base(editorParams)
 		{
@@ -29,7 +26,6 @@ namespace Tangerine.UI
 				EditorContainer.AddNode(new Widget() {
 					Layout = new HBoxLayout(),
 					Nodes = { new ThemedSimpleText { Text = "Edit of list properties isnt supported for multiple selection.", ForceUncutText = false } },
-					// TODO: move color to theme
 					Presenter = new WidgetFlatFillPresenter(Theme.Colors.WarningBackground)
 				});
 				return;
@@ -61,24 +57,12 @@ namespace Tangerine.UI
 		private void Build(int newCount)
 		{
 			if (list != null) {
-				int prevCount = ExpandableContent.Nodes.Count;
-				for (int i = 0; i < newCount - prevCount; i++) {
-					AfterInsertNewElement(prevCount + i);
+				for (int i = ExpandableContent.Nodes.Count - 1; i >= 0; i--) {
+					ExpandableContent.Nodes[i].UnlinkAndDispose();
 				}
-			}
-		}
-
-		private void AdjustEditors(int startFrom)
-		{
-			propertyEditorParamsList.RemoveAt(startFrom);
-			for (int index = startFrom; index < propertyEditorParamsList.Count; ++index) {
-				var closureIndex = index;
-				propertyEditorParamsList[index].IndexInList = index;
-				propertyEditorParamsList[index].DisplayName = $"{index}:";
-				propertyEditorParamsList[index].PropertySetter = propertyEditorParamsList[index].IsAnimable
-				? (PropertySetterDelegate)((@object, name, value) =>
-						SetAnimableProperty.Perform(@object, name, value, CoreUserPreferences.Instance.AutoKeyframes))
-				: (@object, name, value) => SetIndexedProperty.Perform(@object, name, closureIndex, value);
+				for (int i = 0; i < newCount; i++) {
+					AfterInsertNewElement(i);
+				}
 			}
 		}
 
@@ -105,19 +89,19 @@ namespace Tangerine.UI
 			buttons.Add(removeButton = new ThemedDeleteButton {
 				Enabled = Enabled
 			});
-			propertyEditorParamsList.Insert(index, p);
 			void RemoveClicked()
 			{
 				removeCallback = null;
 				using (Document.Current.History.BeginTransaction()) {
 					RemoveFromList.Perform(list, p.IndexInList);
 					Document.Current.History.CommitTransaction();
-					ExpandableContent.Nodes[p.IndexInList].UnlinkAndDispose();
+					var i = ExpandableContent.Nodes.Count - 1;
+					// We have to rebuild every list item with index greater than current item's
+					// because there is no mechanism to update dataflows (in this case --
+					// CoalescedPropertyValue with IndexedProperty underneath)
 					buttons.RemoveAt(p.IndexInList);
-					AdjustEditors(p.IndexInList);
 				}
 			}
-
 			ExpandableContent.Nodes.Insert(index, elementContainer);
 			removeButton.Clicked += () => removeCallback = RemoveClicked;
 			editor.EditorContainer.AddNode(removeButton);

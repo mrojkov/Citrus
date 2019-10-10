@@ -39,14 +39,14 @@ namespace Tangerine.UI
 			}
 			var currentX = CoalescedPropertyComponentValue(v => v.X);
 			var currentY = CoalescedPropertyComponentValue(v => v.Y);
-			selectorH.AddChangeWatcher(currentX, v => {
+			selectorH.AddChangeLateWatcher(currentX, v => {
 				if (v.IsDefined) {
 					selectorH.Value = v.Value;
 				} else {
 					selectorH.Text = ManyValuesText;
 				}
 			});
-			selectorV.AddChangeWatcher(currentY, v => {
+			selectorV.AddChangeLateWatcher(currentY, v => {
 				if (v.IsDefined) {
 					selectorV.Value = v.Value;
 				} else {

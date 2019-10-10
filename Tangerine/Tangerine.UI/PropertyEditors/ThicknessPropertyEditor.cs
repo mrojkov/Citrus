@@ -30,10 +30,10 @@ namespace Tangerine.UI
 			editorRight.Submitted += text => SetComponent(editorParams, 1, editorRight, currentRight.GetValue());
 			editorTop.Submitted += text => SetComponent(editorParams, 2, editorTop, currentTop.GetValue());
 			editorBottom.Submitted += text => SetComponent(editorParams, 3, editorBottom, currentBottom.GetValue());
-			editorLeft.AddChangeWatcher(currentLeft, v => editorLeft.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorRight.AddChangeWatcher(currentRight, v => editorRight.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorTop.AddChangeWatcher(currentTop, v => editorTop.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
-			editorBottom.AddChangeWatcher(currentBottom, v => editorBottom.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorLeft.AddChangeLateWatcher(currentLeft, v => editorLeft.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorRight.AddChangeLateWatcher(currentRight, v => editorRight.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorTop.AddChangeLateWatcher(currentTop, v => editorTop.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
+			editorBottom.AddChangeLateWatcher(currentBottom, v => editorBottom.Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			ManageManyValuesOnFocusChange(editorLeft, currentLeft);
 			ManageManyValuesOnFocusChange(editorRight, currentRight);
 			ManageManyValuesOnFocusChange(editorTop, currentTop);

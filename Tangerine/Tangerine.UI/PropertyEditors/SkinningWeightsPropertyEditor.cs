@@ -56,9 +56,9 @@ namespace Tangerine.UI
 			var currentWeightValue = weightProvider.GetValue();
 			indexEditors[idx].Submitted += text => SetIndexValue(EditorParams, idx, indexEditors[idx], currentIndexValue);
 			weigthsEditors[idx].Submitted += text => SetWeightValue(EditorParams, idx, weigthsEditors[idx], currentWeightValue);
-			indexEditors[idx].AddChangeWatcher(indexProvider,
+			indexEditors[idx].AddChangeLateWatcher(indexProvider,
 				v => indexEditors[idx].Text = v.IsDefined ? v.Value.ToString() : ManyValuesText);
-			weigthsEditors[idx].AddChangeWatcher(weightProvider,
+			weigthsEditors[idx].AddChangeLateWatcher(weightProvider,
 				v => weigthsEditors[idx].Text = v.IsDefined ? v.Value.ToString("0.###") : ManyValuesText);
 			ManageManyValuesOnFocusChange(indexEditors[idx], indexProvider);
 			ManageManyValuesOnFocusChange(weigthsEditors[idx], weightProvider);
