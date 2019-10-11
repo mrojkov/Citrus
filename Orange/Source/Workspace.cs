@@ -20,11 +20,20 @@ namespace Orange
 
 		private string dataFolderName;
 		private string pluginName;
-		// citrus location is a location of Citrus used by currently loaded project, not *this* Citrus
+		/// <summary>
+		/// Location of Citrus used by currently loaded project. Not a location of general Citrus project
+		/// </summary>
 		private string citrusLocation;
 
+		/// <summary>
+		/// Currently used asset cache mode
+		/// </summary>
 		public AssetCacheMode AssetCacheMode;
-		public string AssetCacheLocalPath;
+
+		/// <summary>
+		/// Currently used local asset cache path
+		/// </summary>
+		public string LocalAssetCachePath;
 		public bool BenchmarkEnabled;
 
 		public Workspace()
@@ -62,7 +71,7 @@ namespace Orange
 			if (!string.IsNullOrEmpty(citrusLocation)) {
 				result = Path.Combine(ProjectDirectory, citrusLocation, suffix);
 			} else {
-				result = Path.Combine(ProjectDirectory, "Citrus", suffix); 
+				result = Path.Combine(ProjectDirectory, "Citrus", suffix);
 				if (!File.Exists(result)) {
 					result = Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", suffix);
 				}
@@ -100,9 +109,9 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			if (ProjectFile != string.Empty) {
 				AssetCacheMode = config.AssetCacheMode;
-				AssetCacheLocalPath = config.AssetCacheLocalPath;
-				if (ProjectDirectory != null && !Path.IsPathRooted(AssetCacheLocalPath)) {
-					AssetCacheLocalPath = Path.Combine(ProjectDirectory, AssetCacheLocalPath);
+				LocalAssetCachePath = config.LocalAssetCachePath;
+				if (ProjectDirectory != null && !Path.IsPathRooted(LocalAssetCachePath)) {
+					LocalAssetCachePath = Path.Combine(ProjectDirectory, LocalAssetCachePath);
 				}
 			}
 		}

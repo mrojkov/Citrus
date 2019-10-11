@@ -5,9 +5,16 @@ using FluentFTP;
 
 namespace Orange
 {
-	// This class is not thread safe. Use ThreadLocal if you want thread safety.
+	/// <summary>
+	/// Used to handle all operations with cache. Able to store data in local and remote cache and to load data from storage.
+	/// This class is not thread safe.
+	/// </summary>
 	public class AssetCache
 	{
+		/// <summary>
+		/// Downloadable data is stored at this file during loading from remote server.
+		/// It prevents data corruption on possible loading interruptions.
+		/// </summary>
 		public const string TempFileName = "cache.tmp";
 
 		private static AssetCache instance;
@@ -22,11 +29,34 @@ namespace Orange
 			}
 		}
 
+		/// <summary>
+		/// Client used to communicate with remote server.
+		/// </summary>
 		private FtpClient ftpClient;
+
+		/// <summary>
+		/// Ip address of ftp server that stores cache.
+		/// </summary>
 		private string serverAddress;
+
+		/// <summary>
+		/// Username used to login to remote ftp server
+		/// </summary>
 		private string serverUsername;
+
+		/// <summary>
+		/// Path to cache on remote server
+		/// </summary>
 		private string serverPath;
+
+		/// <summary>
+		/// Absolute path to temp file
+		/// </summary>
 		private string tempFilePath;
+
+		/// <summary>
+		/// Asset cache mode used for current operation
+		/// </summary>
 		public AssetCacheMode Mode { get; private set; }
 
 		private bool IsLocalEnabled => (Mode & AssetCacheMode.Local) != 0;
@@ -34,6 +64,9 @@ namespace Orange
 
 		private AssetCache() { }
 
+		/// <summary>
+		/// Load current cache settings using workspace config and .citproj
+		/// </summary>
 		private void GetSettings()
 		{
 			dynamic data = The.Workspace.ProjectJson.AsDynamic.AssetCache;
@@ -47,7 +80,7 @@ namespace Orange
 				Console.WriteLine("[Cache] Cache disabled via WorkspaceConfig");
 				return;
 			}
-			tempFilePath = Path.Combine(The.Workspace.AssetCacheLocalPath, TempFileName);
+			tempFilePath = Path.Combine(The.Workspace.LocalAssetCachePath, TempFileName);
 			if (Mode == AssetCacheMode.Local) {
 				Console.WriteLine("[Cache] Using LOCAL cache");
 				return;
@@ -75,6 +108,9 @@ namespace Orange
 			}
 		}
 
+		/// <summary>
+		/// Load settings, intiate connection to remote server (if needed)
+		/// </summary>
 		public void Initialize()
 		{
 			GetSettings();
@@ -107,6 +143,9 @@ namespace Orange
 			}
 		}
 
+		/// <summary>
+		/// Drop connection with remote server
+		/// </summary>
 		public void DisconnectFromRemote()
 		{
 			if (!IsRemoteEnabled) {
@@ -119,6 +158,11 @@ namespace Orange
 			Console.WriteLine($"[Cache] Disconnected from {serverUsername}@{serverAddress}");
 		}
 
+		/// <summary>
+		/// Saves file to local cache, load it to remote cache if neccessary
+		/// </summary>
+		/// <param name="srcPath">Path to file that should be saved</param>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		public void Save(string srcPath, string hashString)
 		{
 			if (Mode == AssetCacheMode.None) {
@@ -134,8 +178,11 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Uploads file to remote server if it doesn't exists there
+		/// Tries to load file from cache (local or remote). Return null if cache for this file not exists.
+		/// Copies file cache to server if it existed locally but not existed remotely.
 		/// </summary>
+		/// /// <param name="hashString">SHA256 of file's binary data</param>
+		/// <returns>Path to locally cached file or null</returns>
 		public string Load(string hashString)
 		{
 			if (ExistsLocal(hashString)) {
@@ -151,22 +198,38 @@ namespace Orange
 			return null;
 		}
 
+		/// <summary>
+		/// Returns absolute path to local cache file
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		private string GetLocalPath(string hashString)
 		{
-			return Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.AssetCacheLocalPath,
+			return Path.Combine(The.Workspace.LocalAssetCachePath,
 				hashString.Substring(0, 2), hashString.Substring(2, 2), hashString);
 		}
 
+		/// <summary>
+		/// Returns path to cache file on remote server
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		private string GetRemotePath(string hashString)
 		{
 			return Path.Combine(serverPath, hashString.Substring(0, 2), hashString.Substring(2, 2), hashString);
 		}
 
+		/// <summary>
+		/// Checks if cache for provided file exists locally
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		private bool ExistsLocal(string hashString)
 		{
 			return File.Exists(GetLocalPath(hashString));
 		}
 
+		/// <summary>
+		/// Checks if cache for provided file exists remotely
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		private bool ExistsRemote(string hashString)
 		{
 			if (IsRemoteEnabled && ftpClient.IsConnected) {
@@ -181,7 +244,11 @@ namespace Orange
 			return false;
 		}
 
-		/// <summary>Returns 'true' if uploading was successful. Returns 'false' if something went wrong.</summary>
+		/// <summary>
+		/// Uploads local cache file to remote server
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
+		/// <returns>True if upload succeded, false otherwise</returns>
 		public bool UploadFromLocal(string hashString)
 		{
 			if (Mode == (AssetCacheMode.Local | AssetCacheMode.Remote) && ftpClient.IsConnected) {
@@ -209,6 +276,11 @@ namespace Orange
 			return false;
 		}
 
+		/// <summary>
+		/// Downloads cache file from remote server
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
+		/// <returns>True if download succeded, false otherwise</returns>
 		private bool DownloadFromRemote(string hashString)
 		{
 			if (IsRemoteEnabled && ftpClient.IsConnected) {
@@ -239,6 +311,10 @@ namespace Orange
 			return false;
 		}
 
+		/// <summary>
+		/// Switch cache mode to viable on current conditions and write corresponding message to console.
+		/// Used to handle setup errors.
+		/// </summary>
 		private void HandleSetupFailure(string errorMessage)
 		{
 			string ending;
@@ -252,6 +328,11 @@ namespace Orange
 			Console.WriteLine($"[Cache] ERROR: {errorMessage}. {ending}");
 		}
 
+		/// <summary>
+		///Switch cache mode to viable on current conditions and write corresponding message to console.
+		/// Used to handle errors related to communication with remote serer
+		/// </summary>
+		/// <param name="hashString">SHA256 of file's binary data</param>
 		private void HandleRemoteCacheFailure(string hashString, string errorMessage)
 		{
 			string ending;
@@ -269,6 +350,9 @@ namespace Orange
 		}
 	}
 
+	/// <summary>
+	/// List of cache mode options
+	/// </summary>
 	[Flags]
 	public enum AssetCacheMode
 	{

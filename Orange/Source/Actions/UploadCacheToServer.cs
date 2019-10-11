@@ -16,14 +16,14 @@ namespace Orange
 				return;
 			}
 			if (!The.UI.AskConfirmation(
-				$"You are going to upload all cache from {The.Workspace.AssetCacheLocalPath} to remote server." +
+				$"You are going to upload all cache from {The.Workspace.LocalAssetCachePath} to remote server." +
 				" It will overwrite all existing files with same names on it. Are you sure?")) {
 				return;
 			}
-			if (!Directory.Exists(The.Workspace.AssetCacheLocalPath)) {
-				Console.WriteLine($"{The.Workspace.AssetCacheLocalPath} does not exist. Execution aborted");
+			if (!Directory.Exists(The.Workspace.LocalAssetCachePath)) {
+				Console.WriteLine($"{The.Workspace.LocalAssetCachePath} does not exist. Execution aborted");
 			}
-			var filePaths = Directory.GetFiles(The.Workspace.AssetCacheLocalPath, "*", SearchOption.AllDirectories);
+			var filePaths = Directory.GetFiles(The.Workspace.LocalAssetCachePath, "*", SearchOption.AllDirectories);
 			var hashStrings = filePaths.Select(path => Path.GetFileName(path)).ToList();
 			// Since we are downloading cache to temporary file, we should make sure that it won't be uploaded to server
 			hashStrings.Remove(AssetCache.TempFileName);
