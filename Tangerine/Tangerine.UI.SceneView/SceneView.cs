@@ -5,15 +5,24 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI.Docking;
+using Tangerine.UI.FilesDropHandler;
 using Tangerine.UI.SceneView.Presenters;
 
 namespace Tangerine.UI.SceneView
 {
 	public class SceneView : IDocumentView
 	{
-		private readonly FilesDropHandler filesDropHandler;
+		private readonly FilesDropManager filesDropManager;
 		private Vector2 mousePositionOnFilesDrop;
 
+		/// <summary>
+		/// A collection of IFilesDropHandler which bring functionality of
+		/// files drag and drop. Can be extended via orange plugins. This collection will
+		/// be cloned by Yuzu for each instance of Sceneview
+		/// </summary>
+		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {
+			new AudiosDropHandler(), new ImagesDropHandler(), new ScenesDropHandler()
+		};
 		// Given panel.
 		public readonly Widget Panel;
 		// Widget which is a direct child of the panel.
@@ -109,9 +118,10 @@ namespace Tangerine.UI.SceneView
 			CreateComponents();
 			CreateProcessors();
 			CreatePresenters();
-			filesDropHandler = new FilesDropHandler(InputArea);
-			filesDropHandler.Handling += FilesDropOnHandling;
-			filesDropHandler.NodeCreated += FilesDropOnNodeCreated;
+			filesDropManager = new FilesDropManager(InputArea);
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh => (IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.Handling += FilesDropOnHandling;
+			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
@@ -172,12 +182,12 @@ namespace Tangerine.UI.SceneView
 			Panel.AddNode(ZoomWidget);
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
-			DockManager.Instance.AddFilesDropHandler(filesDropHandler);
+			DockManager.Instance.AddFilesDropManager(filesDropManager);
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.RemoveFilesDropHandler(filesDropHandler);
+			DockManager.Instance.RemoveFilesDropManager(filesDropManager);
 			Instance = null;
 			Frame.Unlink();
 			ShowNodeDecorationsPanelButton.Unlink();

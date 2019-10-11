@@ -5,6 +5,7 @@ using System.Linq;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
+using Tangerine.UI.FilesDropHandler;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -22,8 +23,16 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget PanelWidget;
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
-		public readonly FilesDropHandler FilesDropHandler;
+		public readonly FilesDropManager FilesDropManager;
 		public readonly WaveformCache WaveformCache;
+		/// <summary>
+		/// A collection of IFilesDropHandler which bring functionality of
+		/// files drag and drop. Can be extended via orange plugins. This collection will
+		/// be cloned by Yuzu for each instance of Timeline
+		/// </summary>
+		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {
+			new AudiosDropHandler(), new ImagesDropHandler(), new ScenesDropHandler()
+		};
 
 		private Vector2 offset;
 		public Vector2 Offset
@@ -77,8 +86,8 @@ namespace Tangerine.UI.Timeline
 		public Timeline(Panel panel)
 		{
 			RootWidget = new Widget();
-			FilesDropHandler = new FilesDropHandler(RootWidget);
-			FilesDropHandler.Handling += FilesDropOnHandling;
+			FilesDropManager = new FilesDropManager(RootWidget);
+			FilesDropManager.Handling += FilesDropOnHandling;
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;
 			Toolbar = new Toolbar();
@@ -106,13 +115,13 @@ namespace Tangerine.UI.Timeline
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DockManager.Instance.AddFilesDropHandler(FilesDropHandler);
+			DockManager.Instance.AddFilesDropManager(FilesDropManager);
 			UpdateTitle();
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.RemoveFilesDropHandler(FilesDropHandler);
+			DockManager.Instance.RemoveFilesDropManager(FilesDropManager);
 			Instance = null;
 			RootWidget.Unlink();
 		}

@@ -12,7 +12,7 @@ namespace Tangerine.UI.Docking
 		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
 		private const float panelMinWidth = 50f;
-		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
+		private readonly List<FilesDropManager> filesDropManagers = new List<FilesDropManager>();
 
 		public static DockManager Instance { get; private set; }
 
@@ -110,23 +110,15 @@ namespace Tangerine.UI.Docking
 		{
 			window.AllowDropFiles = true;
 			window.FilesDropped += OnFilesDropped;
-			window.Updating += FilesDropHandlersUpdate;
 		}
 
 		private void OnFilesDropped(IEnumerable<string> files)
 		{
 			FilesDropped?.Invoke(files);
-			foreach (var filesDropHandler in filesDropHandlers) {
-				if (filesDropHandler.TryToHandle(files)) {
+			foreach (var filesDropManager in filesDropManagers) {
+				if (filesDropManager.TryToHandle(files)) {
 					break;
 				}
-			}
-		}
-
-		private void FilesDropHandlersUpdate(float delta)
-		{
-			foreach (var filesDropHandler in filesDropHandlers) {
-				filesDropHandler.HandleDropImage();
 			}
 		}
 
@@ -538,8 +530,8 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
-		public void AddFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Add(filesDropHandler);
-		public void RemoveFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Remove(filesDropHandler);
+		public void AddFilesDropManager(FilesDropManager filesDropManager) => filesDropManagers.Add(filesDropManager);
+		public void RemoveFilesDropManager(FilesDropManager filesDropManager) => filesDropManagers.Remove(filesDropManager);
 
 		private void CloseWindow(IWindow window)
 		{

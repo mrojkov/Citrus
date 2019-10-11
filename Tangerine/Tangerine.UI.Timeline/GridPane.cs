@@ -46,9 +46,9 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform(Document.Current.History));
 			OnPostRender += RenderSelection;
 			OnPostRender += RenderCursor;
-			timeline.FilesDropHandler.Handling += FilesDropOnHandling;
-			timeline.FilesDropHandler.NodeCreating += FilesDropOnNodeCreating;
-			timeline.FilesDropHandler.NodeCreated += FilesDropOnNodeCreated;
+			timeline.FilesDropManager.Handling += FilesDropOnHandling;
+			timeline.FilesDropManager.NodeCreating += FilesDropOnNodeCreating;
+			timeline.FilesDropManager.NodeCreated += FilesDropOnNodeCreated;
 		}
 
 		private void RenderBackgroundAndGrid(Node node)
@@ -262,7 +262,7 @@ namespace Tangerine.UI.Timeline
 			rowLocationUnderMouseOnFilesDrop = SelectAndDragRowsProcessor.MouseToRowLocation(RootWidget.Input.MousePosition);
 		}
 
-		private void FilesDropOnNodeCreating(FilesDropHandler.NodeCreatingEventArgs nodeCreatingEventArgs)
+		private void FilesDropOnNodeCreating(FilesDropManager.NodeCreatingEventArgs nodeCreatingEventArgs)
 		{
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(RootWidget)) {
@@ -314,7 +314,7 @@ namespace Tangerine.UI.Timeline
 						Value = AudioAction.Play
 					};
 					Core.Operations.SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-					timeline.FilesDropHandler.OnNodeCreated(node);
+					timeline.FilesDropManager.OnNodeCreated(node);
 					break;
 				}
 			}
