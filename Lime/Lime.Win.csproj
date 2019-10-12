@@ -216,6 +216,8 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\BucketQueue.cs" />
+    <Compile Include="Source\Charts\AreaChartsGroup.cs" />
+    <Compile Include="Source\Charts\ChartsGroup.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
@@ -300,6 +302,8 @@
     <Compile Include="Source\Widgets\Animation\AnimationClip.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationTrack.cs" />
     <Compile Include="Source\Widgets\Animation\BezierEasing.cs" />
+    <Compile Include="Source\Widgets\ColorCheckBox.cs" />
+    <Compile Include="Source\Widgets\Materials\ChartMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\DissolveComponent.cs" />
     <Compile Include="Source\Widgets\Materials\DissolveMaterial.cs" />
     <Compile Include="Source\Widgets\Materials\AlphaIntensityComponent.cs" />
@@ -371,6 +375,7 @@
     <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\GestureProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\LayoutProcessor.cs" />
+    <Compile Include="Source\Widgets\Profiler.cs" />
     <Compile Include="Source\Widgets\RendererWrapper.cs" />
     <Compile Include="Source\Widgets\RenderObject.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

@@ -54,23 +54,25 @@ namespace Lime
 
 		public void Draw(int startVertex, int vertexCount)
 		{
-			PreDraw();
+			PreDraw(false);
 			PlatformRenderer.Draw(Topology, startVertex, vertexCount);
 		}
 
 		public void DrawIndexed(int startIndex, int indexCount, int baseVertex = 0)
 		{
-			PreDraw();
+			PreDraw(true);
 			PlatformRenderer.DrawIndexed(Topology, startIndex, indexCount, baseVertex);
 		}
 
-		private void PreDraw()
+		private void PreDraw(bool useIndexBuffer = true)
 		{
 			UpdateBuffers();
 			UpdateInputLayout();
 			PlatformRenderer.SetVertexInputLayout(inputLayout);
 			PlatformRenderer.SetVertexBuffer(0, vertexBuffer, 0);
-			PlatformRenderer.SetIndexBuffer(indexBuffer, 0, IndexFormat.Index16Bits);
+			if (useIndexBuffer) {
+				PlatformRenderer.SetIndexBuffer(indexBuffer, 0, IndexFormat.Index16Bits);
+			}
 		}
 
 		private void UpdateBuffers()
