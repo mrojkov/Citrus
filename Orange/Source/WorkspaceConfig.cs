@@ -19,11 +19,17 @@ namespace Orange
 		[YuzuMember]
 		public Vector2 ClientPosition;
 
+		/// <summary>
+		/// Asset cache mode that will be used  on workspace load
+		/// </summary>
 		[YuzuOptional]
 		public AssetCacheMode AssetCacheMode = AssetCacheMode.Local | AssetCacheMode.Remote;
 
+		/// <summary>
+		/// Path to local asset cache that will be used on load
+		/// </summary>
 		[YuzuOptional]
-		public string AssetCacheLocalPath = Path.Combine(".orange", "Cache");
+		public string LocalAssetCachePath = Path.Combine(".orange", "Cache");
 
 		[YuzuOptional]
 		public bool BenchmarkEnabled;
