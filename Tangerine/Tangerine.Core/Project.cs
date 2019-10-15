@@ -50,6 +50,7 @@ namespace Tangerine.Core
 		public IReadOnlyList<Type> RegisteredComponentTypes => registeredComponentTypes;
 
 		public static event Action<Document> DocumentSaving;
+		public static event Action<Document> DocumentSaved;
 		public static event Action<string> Opening;
 
 		private Project() { }
@@ -516,6 +517,11 @@ namespace Tangerine.Core
 		public static void RaiseDocumentSaving(Document document)
 		{
 			DocumentSaving?.Invoke(document);
+		}
+
+		public static void RaiseDocumentSaved(Document document)
+		{
+			DocumentSaved?.Invoke(document);
 		}
 
 		public static IEnumerable<Type> GetNodesTypesOrdered(string assemblyName)

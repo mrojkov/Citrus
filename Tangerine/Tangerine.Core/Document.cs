@@ -448,6 +448,7 @@ namespace Tangerine.Core
 			}
 			LastWriteTime = File.GetLastWriteTime(FullPath);
 			Project.Current.AddRecentDocument(Path);
+			Project.RaiseDocumentSaved(this);
 		}
 
 		public void ExportToFile(string filePath, string assetPath, FileAttributes attributes = 0)
