@@ -41,9 +41,12 @@ namespace Tangerine.UI.FilesystemView
 			) {
 				return directoryTexture;
 			}
-			var ext = Path.GetExtension(path);
-			if (textureCache.ContainsKey(ext)) {
-				return textureCache[ext];
+			var cacheKey = Path.GetExtension(path);
+			if (string.Equals(cacheKey, ".exe", StringComparison.OrdinalIgnoreCase)) {
+				cacheKey = path;
+			}
+			if (textureCache.ContainsKey(cacheKey)) {
+				return textureCache[cacheKey];
 			}
 			var shInfo = new WinAPI.SHFILEINFO();
 			IntPtr r = WinAPI.SHGetFileInfo(path, 0, out shInfo, (uint)Marshal.SizeOf(shInfo), WinAPI.SHGFI.SHGFI_ICON | WinAPI.SHGFI.SHGFI_SMALLICON);
@@ -64,7 +67,7 @@ namespace Tangerine.UI.FilesystemView
 			if (isDirectory && !isRoot) {
 				directoryTexture = t;
 			} else {
-				textureCache.Add(ext, t);
+				textureCache.Add(cacheKey, t);
 			}
 			return t;
 		}
