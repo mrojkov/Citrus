@@ -5268,7 +5268,7 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
-			result.AfterDeserialization();
+			//result.AfterDeserialization();
 		}
 
 		private static object Make_Lime__Model3D(BinaryDeserializer d, ReaderClassDef def)

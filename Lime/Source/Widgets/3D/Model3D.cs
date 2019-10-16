@@ -7,8 +7,7 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/3D")]
 	public class Model3D : Node3D
 	{
-		[YuzuAfterDeserialization]
-		public void AfterDeserialization()
+		public override void OnAfterDeserialization()
 		{
 			RebuildSkeleton();
 		}

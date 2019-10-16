@@ -11,6 +11,8 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class RichText : Widget, IText
 	{
+		public static TextProcessor GlobalTextProcessor;
+
 		private TextParser parser = new TextParser();
 		private string text;
 		private HAlignment hAlignment;

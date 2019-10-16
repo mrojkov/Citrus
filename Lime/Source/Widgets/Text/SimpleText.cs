@@ -5,6 +5,8 @@ using Yuzu;
 
 namespace Lime
 {
+	public delegate void TextProcessor(ref string text, Widget w);
+
 	[TangerineRegisterNode(Order = 10)]
 	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class SimpleText : Widget, IText
@@ -26,6 +28,8 @@ namespace Lime
 		private TextProcessorDelegate textProcessor;
 		private int gradientMapIndex = -1;
 		private float letterSpacing;
+
+		public static TextProcessor GlobalTextProcessor;
 
 		public event TextProcessorDelegate TextProcessor
 		{

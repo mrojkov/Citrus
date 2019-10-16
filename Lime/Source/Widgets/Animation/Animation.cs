@@ -7,6 +7,8 @@ namespace Lime
 {
 	public class Animation
 	{
+		public event Action AssuredStopped;
+
 		public const string ZeroPoseId = "ZeroPose";
 		public readonly static int ZeroPoseIdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(ZeroPoseId);
 #if TANGERINE

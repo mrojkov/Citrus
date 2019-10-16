@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Yuzu;
 
 namespace Lime
 {
@@ -53,6 +54,9 @@ namespace Lime
 		protected internal virtual void OnBeforeNodeSerialization() { }
 
 		protected internal virtual void OnAfterNodeSerialization() { }
+
+		[YuzuAfterDeserialization]
+		public virtual void OnAfterDeserialization() { }
 	}
 
 	public class NodeBehavior : BehaviorComponent

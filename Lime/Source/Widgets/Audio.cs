@@ -92,7 +92,11 @@ namespace Lime
 			Priority = 0.5f;
 		}
 
-		public void Play()
+		public virtual void Update(float dt) { }
+
+		public float VolumeFactor;
+
+		public virtual void Play()
 		{
 			if (Sample != null) {
 				sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
@@ -100,7 +104,7 @@ namespace Lime
 			}
 		}
 
-		public void Stop()
+		public virtual void Stop()
 		{
 			sound.Stop(FadeTime);
 		}

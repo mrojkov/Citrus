@@ -304,5 +304,9 @@ namespace Lime
 		/// Converts desktop coordinates into local window coordinates.
 		/// </summary>
 		Vector2 DesktopToLocal(Vector2 desktopPosition);
+
+		Rectangle SafeAreaInsets { get; set; }
+
+		event Action<Rectangle> SafeAreaInsetsChanged;
 	}
 }

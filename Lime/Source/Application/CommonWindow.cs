@@ -5,6 +5,10 @@ namespace Lime
 {
 	public abstract class CommonWindow
 	{
+		public Rectangle SafeAreaInsets { get; set; }
+
+		public event Action<Rectangle> SafeAreaInsetsChanged;
+
 		public event Action Activated;
 		public event Action Deactivated;
 		public event ClosingDelegate Closing;

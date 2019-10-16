@@ -48,7 +48,8 @@ namespace Lime
 		ColorBit2 = 512,
 		ColorBit3 = 1024,
 		SceneNode = 2048,
-		SerializableMask = Hidden | Locked | Shown | ColorBit1 | ColorBit2 | ColorBit3
+		SerializableMask = Hidden | Locked | Shown | ColorBit1 | ColorBit2 | ColorBit3,
+		FastForwarding,
 	}
 
 	public delegate void UpdateHandler(float delta);
@@ -693,6 +694,9 @@ namespace Lime
 				c.OnAfterNodeSerialization();
 			}
 		}
+
+		[YuzuAfterDeserialization]
+		public virtual void OnAfterDeserialization() { }
 
 		/// <summary>
 		/// Returns the <see cref="string"/> representation of this <see cref="Node"/>.
@@ -1469,6 +1473,8 @@ namespace Lime
 				globallyFrozen |= Parent.GloballyFrozen;
 			}
 		}
+
+		public event Action AnimationAssuredStopped;
 	}
 
 	public interface IUpdatableNode

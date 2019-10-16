@@ -2300,7 +2300,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
-			result.AfterDeserialization();
+			//result.AfterDeserialization();
 			return result;
 		}
 
