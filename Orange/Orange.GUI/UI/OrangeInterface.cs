@@ -12,7 +12,9 @@ namespace Orange
 	{
 		private readonly Window window;
 		private readonly WindowWidget windowWidget;
+		private Widget hBox;
 		private Widget mainVBox;
+		private BundlePickerWidget bundlePickerWidget;
 		private FileChooser projectPicker;
 		private PlatformPicker platformPicker;
 		private PluginPanel pluginPanel;
@@ -24,10 +26,18 @@ namespace Orange
 		private ProgressBarField progressBarField;
 		private ICommand actionsCommand;
 
-		private Command CacheLocalAndRemote;
-		private Command CacheRemote;
-		private Command CacheLocal;
-		private Command CacheNone;
+		private Command cacheLocalAndRemote;
+		private Command cacheRemote;
+		private Command cacheLocal;
+		private Command cacheNone;
+		private Command bundlePickerCommand;
+
+		public override void Initialize()
+		{
+			bundlePicker = new BundlePicker();
+			bundlePickerWidget = new BundlePickerWidget(bundlePicker);
+			hBox.AddNode(bundlePickerWidget);
+		}
 
 		public OrangeInterface()
 		{
@@ -49,6 +59,11 @@ namespace Orange
 				Padding = new Thickness(6),
 				Size = windowSize
 			};
+			hBox = new Widget {
+				Layout = new HBoxLayout {
+					Spacing = 6
+				}
+			};
 			mainVBox = new Widget {
 				Layout = new VBoxLayout {
 					Spacing = 6
@@ -59,17 +74,28 @@ namespace Orange
 			progressBarField = new ProgressBarField();
 			mainVBox.AddNode(progressBarField);
 			mainVBox.AddNode(CreateFooterSection());
-			windowWidget.AddNode(mainVBox);
+			hBox.AddNode(mainVBox);
+			windowWidget.AddNode(hBox);
+			CreateMenu();
+		}
 
+		private void CreateMenu()
+		{
 			// TODO Duplicates code from Tangerine.TangerineMenu.cs. Both should be presented at one file
-			CacheLocalAndRemote = new Command("Local &and remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local | AssetCacheMode.Remote));
-			CacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
-			CacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
-			CacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
+			cacheLocalAndRemote = new Command("Local &and remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local | AssetCacheMode.Remote));
+			cacheRemote = new Command("&Remote", () => UpdateCacheModeCheckboxes(AssetCacheMode.Remote));
+			cacheLocal = new Command("&Local", () => UpdateCacheModeCheckboxes(AssetCacheMode.Local));
+			cacheNone = new Command("&None", () => UpdateCacheModeCheckboxes(AssetCacheMode.None));
+			bundlePickerCommand = new Command("&Bundle picker", () => UpdateBundlePicker(!bundlePickerWidget.Visible));
 
 			Application.MainMenu = new Menu {
 				new Command("&File", new Menu {
 					new Command("&Quit", () => { Application.Exit(); })
+				}),
+				new Command("&View", new Menu {
+					new Command("&Panels", new Menu {
+						bundlePickerCommand
+					})
 				}),
 				(actionsCommand = new Command("&Actions", new Menu { })),
 				new Command("&Cache", new Menu {
@@ -81,10 +107,10 @@ namespace Orange
 						))
 					}),
 					new Command("&Mode", new Menu {
-						CacheLocalAndRemote,
-						CacheRemote,
-						CacheLocal,
-						CacheNone
+						cacheLocalAndRemote,
+						cacheRemote,
+						cacheLocal,
+						cacheNone
 					})
 				})
 			};
@@ -93,10 +119,10 @@ namespace Orange
 		// TODO Duplicates code from Tangerine.OrangeInterface.cs. Both should be presented at one file
 		private void UpdateCacheModeCheckboxes(AssetCacheMode state)
 		{
-			CacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
-			CacheRemote.Checked = state == AssetCacheMode.Remote;
-			CacheLocal.Checked = state == AssetCacheMode.Local;
-			CacheNone.Checked = state == AssetCacheMode.None;
+			cacheLocalAndRemote.Checked = state == (AssetCacheMode.Local | AssetCacheMode.Remote);
+			cacheRemote.Checked = state == AssetCacheMode.Remote;
+			cacheLocal.Checked = state == AssetCacheMode.Local;
+			cacheNone.Checked = state == AssetCacheMode.None;
 			The.Workspace.AssetCacheMode = state;
 		}
 
@@ -183,6 +209,7 @@ namespace Orange
 				actionPicker.Items.Add(new CommonDropDownList.Item(menuItem.Label, menuItem.Action));
 			}
 			actionPicker.Index = 0;
+			actionPicker.Changed += OnActionChanged;
 			footerSection.AddNode(actionPicker);
 
 			goButton = new ThemedButton("Go");
@@ -214,6 +241,32 @@ namespace Orange
 			progressBarField.Progress(amount);
 		}
 
+		private void UpdateBundlePicker(bool value)
+		{
+			if (value) {
+				bundlePickerWidget.Refresh();
+			}
+			bundlePickerWidget.Visible = value;
+			bundlePickerCommand.Checked = value;
+			The.Workspace.BundlePickerVisible = value;
+			bundlePicker.Enabled = value;
+		}
+
+		private void OnActionChanged(CommonDropDownList.ChangedEventArgs args)
+		{
+			var menuItem = The.MenuController.Items.Find(item => item.Label == actionPicker.Text);
+			if (menuItem.ApplicableToBundleSubset) {
+				EnableChildren(bundlePickerWidget, true);
+				bundlePicker.Enabled = true;
+				bundlePickerWidget.SetInfoText(false);
+			} else {
+				bundlePickerWidget.SelectAll();
+				EnableChildren(bundlePickerWidget, false);
+				bundlePicker.Enabled = false;
+				bundlePickerWidget.SetInfoText(true);
+			}
+		}
+
 		private void Execute(Func<string> action)
 		{
 			windowWidget.Tasks.Add(ExecuteTask(action));
@@ -237,9 +290,12 @@ namespace Orange
 
 		private void EnableControls(bool value)
 		{
+			// Nested nodes can't be enabled when their parent is disabled
+			// so we have to enable top-level nodes or all UI elements will look like they are in 'disabled' state
 			goButton.Visible = value;
 			abortButton.Visible = !value;
 			EnableChildren(windowWidget, value);
+			hBox.Enabled = true;
 			mainVBox.Enabled = true;
 			EnableChildren(mainVBox, value);
 			footerSection.Enabled = true;
@@ -247,6 +303,8 @@ namespace Orange
 			abortButton.Enabled = !value;
 			textView.Enabled = true;
 			progressBarField.Enabled = true;
+			bundlePickerWidget.Enabled = true;
+			EnableChildren(bundlePickerWidget, value);
 		}
 
 		private void EnableChildren(Widget widget, bool value)
@@ -261,6 +319,14 @@ namespace Orange
 			platformPicker.Reload();
 			AssetCooker.BeginCookBundles += () => abortButton.Enabled = true;
 			AssetCooker.EndCookBundles += () => abortButton.Enabled = false;
+		}
+
+		public override void ReloadBundlePicker()
+		{
+			base.ReloadBundlePicker();
+			bundlePicker.Setup();
+			bundlePickerWidget.CreateBundlesList();
+			UpdateBundlePicker(The.Workspace.BundlePickerVisible);
 		}
 
 		public override void ClearLog()
@@ -308,6 +374,7 @@ namespace Orange
 				letterUsedCount[insertionPoints[0].Key]++;
 				actionsCommand.Menu.Add(new Command(labelWithAmpersand, () => { Execute(menuItem.Action); }));
 			}
+			OnActionChanged(null);
 		}
 
 		public override bool AskConfirmation(string text)
@@ -363,6 +430,7 @@ namespace Orange
 		public override void SaveToWorkspaceConfig(ref WorkspaceConfig config)
 		{
 			config.ActiveTargetIndex = platformPicker.Index;
+			config.BundlePickerVisible = bundlePickerWidget.Visible;
 			if (window.State != WindowState.Minimized) {
 				config.ClientPosition = window.ClientPosition;
 				config.ClientSize = window.ClientSize;
@@ -390,6 +458,201 @@ namespace Orange
 				window.ClientSize = config.ClientSize;
 			}
 			UpdateCacheModeCheckboxes(config.AssetCacheMode);
+			UpdateBundlePicker(config.BundlePickerVisible);
+		}
+
+		private class BundlePickerWidget : Widget
+		{
+			private readonly ThemedEditBox filter;
+			private readonly ThemedScrollView scrollView;
+			private readonly ThemedButton selectButton;
+			private readonly ThemedButton refreshButton;
+			private readonly Dictionary<string, ThemedCheckBox> checkboxes;
+			private readonly Dictionary<string, Widget> lines;
+			private readonly ThemedSimpleText infoText;
+			private readonly BundlePicker bundlePicker;
+
+			/// <summary>
+			/// Creates basic UI elements, but lefts bundle list empty. To fill it, call <see cref="CreateBundlesList"/>
+			/// </summary>
+			public BundlePickerWidget(BundlePicker bundlePicker)
+			{
+				this.bundlePicker = bundlePicker;
+
+				Layout = new VBoxLayout {
+					Spacing = 6
+				};
+				MaxWidth = 250f;
+
+				checkboxes = new Dictionary<string, ThemedCheckBox>();
+				lines = new Dictionary<string, Widget>();
+				scrollView = new ThemedScrollView();
+				scrollView.CompoundPostPresenter.Add(new WidgetBoundsPresenter(Lime.Theme.Colors.ControlBorder));
+				scrollView.Content.Layout = new VBoxLayout {
+					Spacing = 6
+				};
+				scrollView.Content.Padding = new Thickness(6);
+				scrollView.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.White));
+
+				selectButton = new ThemedButton {
+					Text = "Select all",
+					Clicked = SelectButtonClickHandler
+				};
+
+				refreshButton = new ThemedButton {
+					Text = "Refresh",
+					Clicked = Refresh,
+				};
+
+				filter = new ThemedEditBox();
+				filter.Tasks.Add(FilterBundlesTask);
+
+				infoText = new ThemedSimpleText("Selected action uses all bundles.") {
+					Color = Theme.Colors.BlackText,
+					MinMaxHeight = Theme.Metrics.DefaultEditBoxSize.Y,
+					Visible = false,
+					VAlignment = VAlignment.Center,
+				};
+
+				AddNode(filter);
+				AddNode(infoText);
+				AddNode(scrollView);
+
+				var buttonLine = new Widget {
+					Layout = new HBoxLayout {
+						Spacing = 6
+					}
+				};
+				AddNode(buttonLine);
+				buttonLine.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = float.MaxValue }, MaxHeight = 0 });
+				buttonLine.AddNode(refreshButton);
+				buttonLine.AddNode(selectButton);
+				selectButton.Tasks.Add(UpdateTextOfSelectButtonTask());
+			}
+
+			/// <summary>
+			/// Fills bundle list with bundles for current active project
+			/// </summary>
+			public void CreateBundlesList()
+			{
+				if (scrollView.Content.Nodes.Count > 0) {
+					scrollView.Content.Nodes.Clear();
+				}
+				foreach (var bundle in The.UI.GetSelectedBundles()) {
+					AddBundleToList(bundle);
+				}
+			}
+
+			private void AddBundleToList(string bundle)
+			{
+				checkboxes[bundle] = new ThemedCheckBox();
+				lines[bundle] = new Widget {
+					Layout = new HBoxLayout {
+						Spacing = 8
+					},
+					Nodes = {
+						checkboxes[bundle],
+						new ThemedSimpleText(bundle) {
+							HitTestTarget = true,
+							Clicked = () => {
+								if (checkboxes[bundle].GloballyEnabled) {
+									checkboxes[bundle].Toggle();
+									bundlePicker.SetBundleSelection(bundle, checkboxes[bundle].Checked);
+								}
+							}
+						}
+					}
+				};
+				scrollView.Content.AddNode(lines[bundle]);
+				checkboxes[bundle].Checked = true;
+				checkboxes[bundle].Changed += args => bundlePicker.SetBundleSelection(bundle, checkboxes[bundle].Checked);
+			}
+
+			/// <summary>
+			/// Sets info text params
+			/// </summary>
+			public void SetInfoText(bool visibility, string text = null)
+			{
+				infoText.Visible = visibility;
+				if (text != null) {
+					infoText.Text = text;
+				}
+			}
+
+			/// <summary>
+			/// Marks all bundles as selected
+			/// </summary>
+			public void SelectAll()
+			{
+				foreach (var bundle in checkboxes.Keys) {
+					checkboxes[bundle].Checked = true;
+					bundlePicker.SetBundleSelection(bundle, true);
+				}
+			}
+
+			/// <summary>
+			/// Updates bundle list
+			/// </summary>
+			public void Refresh()
+			{
+				var changed = The.UI.RefreshBundlesList();
+				foreach (var bundle in changed) {
+					if (checkboxes.ContainsKey(bundle)) {
+						scrollView.Content.Nodes.Remove(lines[bundle]);
+						checkboxes.Remove(bundle);
+					} else {
+						AddBundleToList(bundle);
+					}
+				}
+			}
+
+			private void SelectButtonClickHandler()
+			{
+				var deselect = true;
+				foreach (var bundle in checkboxes.Keys) {
+					if (!checkboxes[bundle].Checked) {
+						deselect = false;
+					}
+				}
+				foreach (var bundle in checkboxes.Keys) {
+					checkboxes[bundle].Checked = !deselect;
+					bundlePicker.SetBundleSelection(bundle, !deselect);
+				}
+			}
+
+			private IEnumerator<object> UpdateTextOfSelectButtonTask()
+			{
+				while (true) {
+					var allChecked = true;
+					foreach (var bundle in checkboxes.Keys) {
+						if (!checkboxes[bundle].Checked) {
+							allChecked = false;
+						}
+					}
+					if (allChecked) {
+						selectButton.Text = "Deselect all";
+					} else {
+						selectButton.Text = "Select all";
+					}
+					yield return null;
+				}
+			}
+
+			private IEnumerator<object> FilterBundlesTask()
+			{
+				var lastText = string.Empty;
+				while (true) {
+					var text = filter.Text;
+					if (text == lastText) {
+						yield return null;
+					}
+					lastText = text;
+					foreach (var bundle in lines.Keys) {
+						lines[bundle].Visible = bundle.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+					}
+					yield return null;
+				}
+			}
 		}
 
 		private class TextViewWriter : TextWriter

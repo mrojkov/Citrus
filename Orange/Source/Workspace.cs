@@ -35,6 +35,7 @@ namespace Orange
 		/// </summary>
 		public string LocalAssetCachePath;
 		public bool BenchmarkEnabled;
+		public bool BundlePickerVisible;
 
 		public Workspace()
 		{
@@ -98,6 +99,7 @@ namespace Orange
 				Console.WriteLine($"Welcome to Citrus. Version {citrusVersion.Version}, build number: {citrusVersion.BuildNumber}");
 			}
 			BenchmarkEnabled = config.BenchmarkEnabled;
+			BundlePickerVisible = config.BundlePickerVisible;
 #pragma warning disable CS4014
 			Orange.Updater.CheckForUpdates();
 #pragma warning restore CS4014
@@ -149,6 +151,7 @@ namespace Orange
 				LoadCacheSettings();
 				TangerineCacheBundle = GetTangerineCacheBundlePath();
 				The.UI.OnWorkspaceOpened();
+				The.UI.ReloadBundlePicker();
 			}
 			catch (System.Exception e) {
 				Console.WriteLine($"Can't open {file}:\n{e.Message}");

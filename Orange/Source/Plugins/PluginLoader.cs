@@ -26,6 +26,9 @@ namespace Orange
 
 		[DefaultValue(int.MaxValue)]
 		int Priority { get; }
+
+		[DefaultValue(false)]
+		bool ApplicableToBundleSubset { get; }
 	}
 
 	public class OrangePlugin

@@ -19,6 +19,7 @@ namespace Orange
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			LoadFont();
 			UserInterface.Instance = Interface = new OrangeInterface();
+			UserInterface.Instance.Initialize();
 			The.Workspace.Load();
 			CreateActionMenuItems();
 		}

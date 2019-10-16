@@ -19,6 +19,11 @@ namespace Tangerine
 
 		public readonly PlatformPicker PlatformPicker = new PlatformPicker();
 
+		public override void Initialize()
+		{
+			bundlePicker = new BundlePicker();
+		}
+
 		public override bool AskConfirmation(string text)
 		{
 			bool? result = null;
