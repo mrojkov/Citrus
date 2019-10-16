@@ -76,6 +76,11 @@
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />
+    <Compile Include="Utils\FilesDropHandler\AudiosDropHandler.cs" />
+    <Compile Include="Utils\FilesDropHandler\IFilesDropHandler.cs" />
+    <Compile Include="Utils\FilesDropHandler\ImagesDropHandler.cs" />
+    <Compile Include="Utils\FilesDropHandler\ScenesDropHandler.cs" />
+    <Compile Include="Utils\FilesDropManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorPicker.Mac.cs" />
@@ -138,7 +143,6 @@
     <Compile Include="ToolbarView.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\DropSceneContextMenu.cs" />
-    <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="Utils\Spacer.cs" />
