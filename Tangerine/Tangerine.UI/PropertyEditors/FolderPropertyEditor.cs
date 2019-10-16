@@ -31,10 +31,16 @@ namespace Tangerine.UI.PropertyEditors
 
 		protected override void OnSelectClicked()
 		{
+			var current = CoalescedPropertyValue().GetDataflow();
+			current.Poll();
+			var value = current.Value;
 			var dlg = new FileDialog {
 				Mode = FileDialogMode.SelectFolder,
-				InitialDirectory = Directory.Exists(LastOpenedDirectory) ?
-					LastOpenedDirectory : Path.GetDirectoryName(Document.Current.FullPath),
+				InitialDirectory =
+					current.GotValue && value.IsDefined && !string.IsNullOrEmpty(value.Value) && TryGetClosestAvailableDirectory(
+						AssetPath.Combine(Project.Current.AssetsDirectory, value.Value), out var dir) ?
+						dir : Directory.Exists(LastOpenedDirectory) ?
+							LastOpenedDirectory : Project.Current.AssetsDirectory
 			};
 			if (dlg.RunModal()) {
 				SetProperty(dlg.FileName);
