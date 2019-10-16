@@ -13,11 +13,11 @@ namespace Tangerine.UI.Timeline
 		private static GridPane Grid => Timeline.Instance.Grid;
 
 		private IntRectangle selectionRectangle;
+		private IntVector2 lastSelectedCell = IntVector2.Zero;
 
 		public IEnumerator<object> Task()
 		{
 			var input = Grid.RootWidget.Input;
-			var lastSelectedCell = IntVector2.Zero;
 			Node lastSelectionContainer = null;
 			while (true) {
 				if (input.WasMousePressed() && !Document.Current.Animation.IsCompound) {
@@ -102,7 +102,7 @@ namespace Tangerine.UI.Timeline
 			return Document.Current.Rows[cell.Y].Components.GetOrAdd<GridSpanListComponent>().Spans.IsCellSelected(cell.X);
 		}
 
-		private static IEnumerator<object> DragSelectionTask(IntVector2 initialCell)
+		private IEnumerator<object> DragSelectionTask(IntVector2 initialCell)
 		{
 			var input = Grid.RootWidget.Input;
 			var offset = IntVector2.Zero;
@@ -127,12 +127,14 @@ namespace Tangerine.UI.Timeline
 				Timeline.Ruler.MeasuredFrameDistance = 0;
 			} else {
 				// If a user has clicked with control on a keyframe, try to deselect it [CIT-125].
+				var cell = Grid.CellUnderMouse();
 				if (input.IsKeyPressed(Key.Control) && time < 0.2f) {
-					var cell = Grid.CellUnderMouse();
 					Operations.DeselectGridSpan.Perform(cell.Y, cell.X, cell.X + 1);
+				} else if (input.IsKeyPressed(Key.Shift)) {
+					Operations.ClearGridSelection.Perform();
+					SelectRange(lastSelectedCell, initialCell, input.IsKeyPressed(Key.Alt));
 				} else {
 					Operations.ClearGridSelection.Perform();
-					var cell = Grid.CellUnderMouse();
 					Operations.SelectGridSpan.Perform(
 						cell.Y,
 						cell.X,
@@ -144,7 +146,7 @@ namespace Tangerine.UI.Timeline
 			Window.Current.Invalidate();
 		}
 
-		private static IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)
+		private IEnumerator<object> DragSingleKeyframeTask(IntVector2 cell)
 		{
 			Core.Operations.ClearRowSelection.Perform();
 			Operations.ClearGridSelection.Perform();
