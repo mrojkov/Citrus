@@ -7,8 +7,6 @@ namespace Lime
 {
 	public class Animation
 	{
-		public event Action AssuredStopped;
-
 		public const string ZeroPoseId = "ZeroPose";
 		public readonly static int ZeroPoseIdComparisonCode = Toolbox.StringUniqueCodeGenerator.Generate(ZeroPoseId);
 #if TANGERINE
@@ -23,6 +21,7 @@ namespace Lime
 		internal double TimeInternal;
 		public Marker MarkerAhead;
 		public event Action Stopped;
+		private Action assuredStopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
@@ -104,7 +103,11 @@ namespace Lime
 			set
 			{
 				if (isRunning != value) {
+					bool wasRunning = isRunning;
 					isRunning = value;
+					if (wasRunning) {
+						RaiseStopped();
+					}
 					if (isRunning) {
 						Load();
 					}
@@ -169,8 +172,12 @@ namespace Lime
 
 		public bool TryRun(string markerId = null, double animationTimeCorrection = 0)
 		{
+			bool wasRunning = IsRunning;
 			if (AnimationEngine.TryRunAnimation(this, markerId, animationTimeCorrection)) {
 				Stopped = null;
+				if (wasRunning) {
+					RaiseStopped();
+				}
 				return true;
 			}
 			return false;
@@ -190,9 +197,22 @@ namespace Lime
 			AnimationEngine.ApplyAnimatorsAndExecuteTriggers(this, Time, Time, false);
 		}
 
+		public void QueueAssuredStopped(Action onStopped)
+		{
+			if (!IsRunning) {
+				onStopped();
+				return;
+			}
+			assuredStopped += onStopped;
+		}
+
 		internal void RaiseStopped()
 		{
 			Stopped?.Invoke();
+
+			var savedAction = assuredStopped;
+			assuredStopped = null;
+			savedAction?.Invoke();
 		}
 
 		public int CalcDurationInFrames()

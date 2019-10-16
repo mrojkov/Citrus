@@ -1473,8 +1473,6 @@ namespace Lime
 				globallyFrozen |= Parent.GloballyFrozen;
 			}
 		}
-
-		public event Action AnimationAssuredStopped;
 	}
 
 	public interface IUpdatableNode
