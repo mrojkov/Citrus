@@ -743,6 +743,8 @@ namespace Lime
 #endif // TANGERINE
 		}
 
+		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public bool FreezeInvisible
 		{
 			get => freezeInvisible;

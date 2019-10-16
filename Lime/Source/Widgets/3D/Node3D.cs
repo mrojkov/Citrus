@@ -54,6 +54,8 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public bool FreezeInvisible
 		{
 			get { return freezeInvisible; }
