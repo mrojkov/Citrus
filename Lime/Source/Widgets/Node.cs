@@ -404,11 +404,13 @@ namespace Lime
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.Markers")]
 		public MarkerList Markers => DefaultAnimation.Markers;
 
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.IsRunning")]
 		public bool IsRunning
 		{
 			get => DefaultAnimation.IsRunning;
@@ -418,6 +420,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
+		[Obsolete("Use !DefaultAnimation.IsRunning")]
 		public bool IsStopped {
 			get => !IsRunning;
 			set => IsRunning = !value;
@@ -426,6 +429,7 @@ namespace Lime
 		/// <summary>
 		/// Gets or sets time of current frame of default animation (in milliseconds).
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.Time")]
 		public double AnimationTime
 		{
 			get => DefaultAnimation.Time;
@@ -435,6 +439,7 @@ namespace Lime
 		/// <summary>
 		/// Get or sets the current animation frame.
 		/// </summary>
+		[Obsolete("Use AnimationUtils.SecondsToFrames(DefaultAnimation.Time)")]
 		public int AnimationFrame
 		{
 			get => AnimationUtils.SecondsToFrames(DefaultAnimation.Time);
