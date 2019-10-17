@@ -57,6 +57,8 @@ namespace Lime
 
 		[YuzuAfterDeserialization]
 		public virtual void OnAfterDeserialization() { }
+
+		protected internal virtual void OnBuilt() { }
 	}
 
 	public class NodeBehavior : BehaviorComponent

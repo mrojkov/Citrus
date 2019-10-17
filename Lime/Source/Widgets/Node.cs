@@ -59,7 +59,7 @@ namespace Lime
 	/// </summary>
 	[YuzuDontGenerateDeserializer]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable
+	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable, ICloneable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -1179,6 +1179,13 @@ namespace Lime
 			}
 		}
 
+		object ICloneable.Clone()
+		{
+			var clone = Lime.InternalPersistence.Instance.Clone(this);
+			clone.NotifyOnBuilt();
+			return clone;
+		}
+
 		public static T CreateFromAssetBundle<T>(string path, T instance = null, InternalPersistence persistence = null, bool ignoreExternals = false) where T : Node
 		{
 			persistence = persistence ?? InternalPersistence.Instance;
@@ -1223,11 +1230,34 @@ namespace Lime
 					instance.LoadExternalScenes(persistence);
 				}
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
+				if (!external) {
+					instance.NotifyOnBuilt();
+				}
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
 			}
 			SceneLoaded?.Value?.Invoke(path, instance, external);
 			return instance;
+		}
+
+		public void NotifyOnBuilt()
+		{
+			foreach (var n in Nodes) {
+				n.NotifyOnBuilt();
+			}
+			NotifyOnBuiltSuperficial();
+		}
+
+		public void NotifyOnBuiltSuperficial()
+		{
+			foreach (var c in Components) {
+				c.OnBuilt();
+			}
+			OnBuilt();
+		}
+
+		protected virtual void OnBuilt()
+		{
 		}
 
 		public virtual void LoadExternalScenes(InternalPersistence persistence = null)
@@ -1289,18 +1319,28 @@ namespace Lime
 					if (assetBundlePathComponent != null) {
 						Components.Add(Cloner.Clone(assetBundlePathComponent));
 					}
-					Components.Remove(typeof(AnimationComponent));
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
 				}
 			} else {
-				Components.Clear();
-				foreach (var c in content.Components) {
-					if (NodeComponent.IsSerializable(c.GetType())) {
-						Components.Add(Cloner.Clone(c));
-					}
+				//Components.Clear();
+				foreach (var c in Components.Where(i => NodeComponent.IsSerializable(i.GetType())).ToList()) {
+					Components.Remove(c);
 				}
+				foreach (var c in content.Components.Where(i => NodeComponent.IsSerializable(i.GetType()))) {
+					Components.Add(Cloner.Clone(c));
+				}
+				// foreach (var c in content.Components) {
+				// 	if (NodeComponent.IsSerializable(c.GetType())) {
+				// 		var c2 = Components.Get(c.GetType());
+				// 		if (c2 != null) {
+				// 			Components.Remove(c2);
+				// 		}
+				// 		Components.Add(Cloner.Clone(c));
+				// 	}
+				// }
 			}
+			Components.Remove<AnimationComponent>();
 			var animationComponent = content.Components.Get<AnimationComponent>();
 			if (animationComponent != null) {
 				var newAnimationComponent = new AnimationComponent();

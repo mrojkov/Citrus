@@ -254,7 +254,7 @@ namespace Lime
 			{
 				unchecked {
 					var r = -511344;
-					r = r * -1521134295 + Animable.GetHashCode();
+					r = r * -1521134295 + Animable?.GetHashCode() ?? 0;
 					r = r * -1521134295 + TargetPropertyPathComparisonCode;
 					return r;
 				}
