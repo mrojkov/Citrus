@@ -27,13 +27,10 @@ namespace Tangerine.UI
 		}
 
 		private readonly Widget widget;
-		private List<string> pendingImages;
 
 		public event Action Handling;
 		public event Action<NodeCreatingEventArgs> NodeCreating;
 		public event Action<Node> NodeCreated;
-
-		public bool Enabled { get; set; }
 
 		public FilesDropManager(Widget widget)
 		{
