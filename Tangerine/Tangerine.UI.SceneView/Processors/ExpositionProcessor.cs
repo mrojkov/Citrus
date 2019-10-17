@@ -304,8 +304,8 @@ namespace Tangerine.UI.SceneView
 				public void Morph(float morphKoeff)
 				{
 					var t = Transform2.Lerp(morphKoeff, originalTransform, CalcExposedTransform(exposedWidget, frame));
-					exposedWidget.Position = t.Translation;
-					exposedWidget.Scale = t.Scale;
+					exposedWidget.Position = double.IsNaN(t.Translation.X) ? new Vector2(0, 0) : t.Translation;
+					exposedWidget.Scale = double.IsNaN(t.Scale.X) ? new Vector2(0, 0) : t.Scale;
 					exposedWidget.Rotation = t.Rotation;
 					exposedWidget.Pivot = Vector2.Zero;
 					frame.ClipChildren = morphKoeff >= 0.8f ? ClipMethod.ScissorTest : ClipMethod.None;
