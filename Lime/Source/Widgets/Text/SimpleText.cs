@@ -408,7 +408,8 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, letterSpacing, spriteList, caret.Sync, -1);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length,
+						font.Spacing + letterSpacing, spriteList, caret.Sync, -1);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 					if (lastLine) {
@@ -496,12 +497,12 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Font.MeasureTextLine(line, FontHeight, start, count, letterSpacing).X <= ContentWidth;
+			return Font.MeasureTextLine(line, FontHeight, start, count, letterSpacing + font.Spacing).X <= ContentWidth;
 		}
 
 		private Vector2 MeasureTextLine(string line)
 		{
-			return Font.MeasureTextLine(line, FontHeight, letterSpacing);
+			return Font.MeasureTextLine(line, FontHeight, letterSpacing + font.Spacing);
 		}
 
 		private string ClipLineWithEllipsis(string line)

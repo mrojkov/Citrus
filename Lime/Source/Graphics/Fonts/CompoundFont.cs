@@ -47,6 +47,8 @@ namespace Lime
 			get { return string.Empty; }
 		}
 
+		public float Spacing { get; }
+
 		public IFontCharSource Chars
 		{
 			get { return chars; }
@@ -125,6 +127,8 @@ namespace Lime
 		private CompoundFont font;
 
 		public string About => (font ?? (font = CreateFont())).About;
+
+		public float Spacing => (font ?? (font = CreateFont())).Spacing;
 
 		public IFontCharSource Chars => (font ?? (font = CreateFont())).Chars;
 

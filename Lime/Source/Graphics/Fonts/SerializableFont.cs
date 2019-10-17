@@ -34,6 +34,15 @@ namespace Lime
 				return font.About;
 			}
 		}
+		
+		public float Spacing {
+			get
+			{
+				if (font == null)
+					font = FontPool.Instance[Name];
+				return font.Spacing;
+			}
+		}
 
 		public IFontCharSource Chars
 		{

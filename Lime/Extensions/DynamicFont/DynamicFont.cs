@@ -38,6 +38,11 @@ namespace Lime
 			get { return string.Empty; }
 		}
 
+		public float Spacing
+		{
+			get;
+		}
+
 		/// <summary>
 		/// Collection of <see cref="FontChar"/> available in this font.
 		/// <see cref="DynamicFont"/> implements <see cref="DynamicFontCharSource"/>.

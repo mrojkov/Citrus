@@ -9,6 +9,7 @@ namespace Lime
 	public interface IFont : IDisposable
 	{
 		string About { get; }
+		float Spacing { get; }
 		IFontCharSource Chars { get; }
 		void ClearCache();
 		bool RoundCoordinates { get; }
@@ -24,6 +25,8 @@ namespace Lime
 	{
 		[YuzuMember]
 		public string About { get; set; }
+		[YuzuMember]
+		public float Spacing { get; set; }
 		[YuzuMember]
 		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
 		public List<ITexture> Textures { get { return CharCollection.Textures; } }
