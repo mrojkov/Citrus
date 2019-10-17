@@ -21,6 +21,7 @@ namespace YuzuGenerated
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
 			result.Radius = s.Radius;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -73,6 +74,7 @@ namespace YuzuGenerated
 				foreach (var tmp1 in s.Options)
 					result.Options.Add(tmp1.Key, Clone_Lime__AnimationBlending(cl, tmp1.Value));
 			}
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -596,6 +598,7 @@ namespace YuzuGenerated
 			var s = (global::Lime.Node.AssetBundlePathComponent)src;
 			var result = new global::Lime.Node.AssetBundlePathComponent();
 			result.Path = s.Path;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -653,6 +656,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Volume = s.Volume;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -669,6 +673,7 @@ namespace YuzuGenerated
 					result.Samples.Add(Clone_Lime__SerializableSample(cl, tmp1));
 			}
 			result.Volume = s.Volume;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -780,6 +785,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -846,6 +852,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -868,6 +875,7 @@ namespace YuzuGenerated
 			result.Text = s.Text;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -909,6 +917,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			result.NearClipPlane = s.NearClipPlane;
 			if (s.ShouldSerializeNodes()) {
@@ -928,6 +937,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1027,6 +1037,7 @@ namespace YuzuGenerated
 			var s = (global::Lime.RenderOptimizer.ContentSizeComponent)src;
 			var result = new global::Lime.RenderOptimizer.ContentSizeComponent();
 			result.Size = (global::Lime.RenderOptimizer.ContentSize)cl.DeepObject(s.Size);
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1057,6 +1068,7 @@ namespace YuzuGenerated
 			result.Color = s.Color;
 			result.MaskTexture = (global::Lime.ITexture)cl.DeepObject(s.MaskTexture);
 			result.Range = s.Range;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1131,6 +1143,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -1155,6 +1168,7 @@ namespace YuzuGenerated
 			result.Texture = (global::Lime.ITexture)cl.DeepObject(s.Texture);
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1208,6 +1222,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.UV = s.UV;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1258,6 +1273,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1274,6 +1290,7 @@ namespace YuzuGenerated
 					((global::System.Collections.Generic.ICollection<global::Lime.FontChar>)result.CharCollection).Add(Clone_Lime__FontChar(cl, tmp1));
 			}
 			result.RoundCoordinates = s.RoundCoordinates;
+			result.Spacing = s.Spacing;
 			if (s.Textures != null && result.Textures != null) {
 				var tmp3 = cl.GetCloner<global::Lime.ITexture>();
 				foreach (var tmp2 in s.Textures)
@@ -1346,6 +1363,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -1368,6 +1386,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1403,6 +1422,7 @@ namespace YuzuGenerated
 				foreach (var tmp1 in s.Gradient)
 					result.Gradient.Add(Clone_Lime__GradientControlPoint(cl, tmp1));
 			}
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1446,6 +1466,7 @@ namespace YuzuGenerated
 			result.Direction = s.Direction;
 			result.IgnoreHidden = s.IgnoreHidden;
 			result.Spacing = s.Spacing;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1459,6 +1480,7 @@ namespace YuzuGenerated
 			result.Hue = s.Hue;
 			result.Lightness = s.Lightness;
 			result.Saturation = s.Saturation;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1501,6 +1523,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -1527,6 +1550,7 @@ namespace YuzuGenerated
 			result.UV1 = s.UV1;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -1579,6 +1603,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2058,6 +2083,7 @@ namespace YuzuGenerated
 			result.Ignore = s.Ignore;
 			result.RowSpan = s.RowSpan;
 			result.Stretch = s.Stretch;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2070,6 +2096,7 @@ namespace YuzuGenerated
 			var result = new global::Lime.LayoutConstraints();
 			result.MaxSize = s.MaxSize;
 			result.MinSize = s.MinSize;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2084,6 +2111,7 @@ namespace YuzuGenerated
 			result.Direction = s.Direction;
 			result.IgnoreHidden = s.IgnoreHidden;
 			result.Spacing = s.Spacing;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2210,6 +2238,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
 				if (s.Nodes != null && result.Nodes != null) {
@@ -2231,6 +2260,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2284,6 +2314,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
 				if (s.Nodes != null && result.Nodes != null) {
@@ -2300,7 +2331,6 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
-			//result.AfterDeserialization();
 			return result;
 		}
 
@@ -2458,6 +2488,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			result.Looped = s.Looped;
@@ -2481,6 +2512,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2524,6 +2556,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			result.LeftOffset = s.LeftOffset;
@@ -2549,6 +2582,7 @@ namespace YuzuGenerated
 			result.TopOffset = s.TopOffset;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2587,6 +2621,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
 				if (s.Nodes != null && result.Nodes != null) {
@@ -2603,6 +2638,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2729,6 +2765,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.GravityAmount = s.GravityAmount;
 			result.GravityDirection = s.GravityDirection;
 			result.HitTestMethod = s.HitTestMethod;
@@ -2771,6 +2808,7 @@ namespace YuzuGenerated
 			result.WindDirection = s.WindDirection;
 			result.Zoom = s.Zoom;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2833,6 +2871,7 @@ namespace YuzuGenerated
 			result.Velocity = s.Velocity;
 			result.WindAmount = s.WindAmount;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2876,6 +2915,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -2899,6 +2939,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2952,6 +2993,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -2995,6 +3037,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -3018,6 +3061,7 @@ namespace YuzuGenerated
 			result.Thickness = s.Thickness;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3068,6 +3112,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3130,6 +3175,7 @@ namespace YuzuGenerated
 			result.VignetteRadius = s.VignetteRadius;
 			result.VignetteScale = s.VignetteScale;
 			result.VignetteSoftness = s.VignetteSoftness;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3194,6 +3240,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HAlignment = s.HAlignment;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
@@ -3220,6 +3267,7 @@ namespace YuzuGenerated
 			result.Visible = s.Visible;
 			result.WordSplitAllowed = s.WordSplitAllowed;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3361,6 +3409,7 @@ namespace YuzuGenerated
 			}
 			result.Softness = s.Softness;
 			result.Thickness = s.Thickness;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3428,6 +3477,7 @@ namespace YuzuGenerated
 			result.Font = Clone_Lime__SerializableFont(cl, s.Font);
 			result.FontHeight = s.FontHeight;
 			result.ForceUncutText = s.ForceUncutText;
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.GradientMapIndex = s.GradientMapIndex;
 			result.HAlignment = s.HAlignment;
 			result.HitTestMethod = s.HitTestMethod;
@@ -3458,6 +3508,7 @@ namespace YuzuGenerated
 			result.Visible = s.Visible;
 			result.WordSplitAllowed = s.WordSplitAllowed;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3517,6 +3568,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -3542,6 +3594,7 @@ namespace YuzuGenerated
 			result.Value = s.Value;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3585,6 +3638,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -3606,6 +3660,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3645,6 +3700,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
 				if (s.Nodes != null && result.Nodes != null) {
@@ -3661,6 +3717,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3713,6 +3770,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.WidgetRef = Clone_Lime__NodeReference_Widget(cl, s.WidgetRef);
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3764,6 +3822,7 @@ namespace YuzuGenerated
 			result.Tag = s.Tag;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3817,6 +3876,7 @@ namespace YuzuGenerated
 			result.TangentWeight = s.TangentWeight;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3869,6 +3929,7 @@ namespace YuzuGenerated
 			result.TangentB = s.TangentB;
 			result.TangerineFlags = s.TangerineFlags;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3883,6 +3944,7 @@ namespace YuzuGenerated
 			result.HorizontallySizeable = s.HorizontallySizeable;
 			result.IgnoreHidden = s.IgnoreHidden;
 			result.VerticallySizeable = s.VerticallySizeable;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3929,6 +3991,7 @@ namespace YuzuGenerated
 					result.RowDefaults.Add(Clone_Lime__DefaultLayoutCell(cl, tmp2));
 			}
 			result.RowSpacing = s.RowSpacing;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -3990,6 +4053,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.TextColor = s.TextColor;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4063,6 +4127,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -4090,6 +4155,7 @@ namespace YuzuGenerated
 			result.TileSize = s.TileSize;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4102,6 +4168,7 @@ namespace YuzuGenerated
 			var result = new global::Lime.TwistComponent();
 			result.Angle = s.Angle;
 			result.Blending = s.Blending;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4150,6 +4217,7 @@ namespace YuzuGenerated
 			result.Direction = s.Direction;
 			result.IgnoreHidden = s.IgnoreHidden;
 			result.Spacing = s.Spacing;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4230,6 +4298,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -4256,6 +4325,7 @@ namespace YuzuGenerated
 			result.UV1 = s.UV1;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4300,6 +4370,7 @@ namespace YuzuGenerated
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
 			result.Frame = s.Frame;
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -4321,6 +4392,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4354,6 +4426,7 @@ namespace YuzuGenerated
 			result.Phase = s.Phase;
 			result.Pivot = s.Pivot;
 			result.WaveType = s.WaveType;
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4415,6 +4488,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.HitTestMethod = s.HitTestMethod;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
@@ -4436,6 +4510,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
@@ -4474,6 +4549,7 @@ namespace YuzuGenerated
 				foreach (var tmp7 in s.Folders)
 					result.Folders.Add((global::Lime.Folder.Descriptor)tmp8(tmp7));
 			}
+			result.FreezeInvisible = s.FreezeInvisible;
 			result.Id = s.Id;
 			if (s.ShouldSerializeNodes()) {
 				if (s.Nodes != null && result.Nodes != null) {
@@ -4490,6 +4566,7 @@ namespace YuzuGenerated
 			result.TangerineFlags = s.TangerineFlags;
 			result.Visible = s.Visible;
 			s.OnAfterSerialization();
+			result.OnAfterDeserialization();
 			return result;
 		}
 
