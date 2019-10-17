@@ -17,15 +17,17 @@ namespace Tangerine.UI.SceneView
 					yield return null;
 					continue;
 				}
-				Rectangle aabb;
-				var pobjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
-				if (
-					Utils.CalcAABB(pobjects, sv.Scene, out aabb) &&
-					sv.HitTestControlPoint(aabb.Center))
-				{
-					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
-						yield return Drag(pobjects.ToList());
+				var pointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
+				var pointsContainer = Document.Current.Container.AsWidget;
+				var t = pointsContainer.CalcTransitionToSpaceOf(sv.Scene);
+				if (Utils.CalcAABB(pointObjects, pointsContainer, out var aabb)) {
+					// Presenter shows OBB so need to calculate it
+					var q = aabb.ToQuadrangle() * t;
+					if (sv.HitTestControlPoint((q.V1 + q.V3) / 2f)) {
+						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
+							yield return Drag(pointObjects.ToList());
+						}
 					}
 				}
 				yield return null;
