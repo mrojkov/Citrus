@@ -15,10 +15,7 @@ namespace Tangerine.UI.FilesDropHandler
 		{
 			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
 			foreach (var file in handledFiles) {
-				if (
-					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
-					!Utils.AssertCurrentDocument(assetPath, assetType)
-				) {
+				if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
 					continue;
 				}
 				var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);

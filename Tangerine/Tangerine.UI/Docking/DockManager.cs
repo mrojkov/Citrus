@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.FilesDropHandler;
 using Yuzu;
 
 namespace Tangerine.UI.Docking
@@ -20,7 +21,6 @@ namespace Tangerine.UI.Docking
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public DockHierarchy Model => DockHierarchy.Instance;
-		public event Action<IEnumerable<string>> FilesDropped;
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
 		private DockManager(Vector2 windowSize)
@@ -52,6 +52,9 @@ namespace Tangerine.UI.Docking
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
+			var documentAreaFilesDropManager = new FilesDropManager(DocumentArea);
+			documentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
+			AddFilesDropManager(documentAreaFilesDropManager);
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 			var windowPlacement = new WindowPlacement {
 				Size = windowSize,
@@ -114,8 +117,8 @@ namespace Tangerine.UI.Docking
 
 		private void OnFilesDropped(IEnumerable<string> files)
 		{
-			FilesDropped?.Invoke(files);
-			foreach (var filesDropManager in filesDropManagers) {
+			for (var i = filesDropManagers.Count - 1; i >= 0; i--) {
+				var filesDropManager = filesDropManagers[i];
 				if (filesDropManager.TryToHandle(files)) {
 					break;
 				}

@@ -56,8 +56,8 @@ namespace Tangerine.UI.Timeline
 				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
 			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
 			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
-			timeline.Detaching += () => DockManager.Instance.RemoveFilesDropManager(filesDropManager);
-			timeline.Attaching += () => DockManager.Instance.AddFilesDropManager(filesDropManager);
+			timeline.Detached += () => DockManager.Instance.RemoveFilesDropManager(filesDropManager);
+			timeline.Attached += () => DockManager.Instance.AddFilesDropManager(filesDropManager);
 		}
 
 		private void RenderBackgroundAndGrid(Node node)

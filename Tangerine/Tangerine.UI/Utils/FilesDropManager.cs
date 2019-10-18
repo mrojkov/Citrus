@@ -62,12 +62,9 @@ namespace Tangerine.UI
 				return false;
 			}
 			Handling?.Invoke();
-			using (Document.Current.History.BeginTransaction()) {
-				foreach (var handlers in filesDropHandlers) {
-					handlers.Handle(files, this, out var handledFiles);
-					files = files.Except(handledFiles);
-				}
-				Document.Current.History.CommitTransaction();
+			foreach (var handlers in filesDropHandlers) {
+				handlers.Handle(files, this, out var handledFiles);
+				files = files.Except(handledFiles);
 			}
 			return true;
 		}

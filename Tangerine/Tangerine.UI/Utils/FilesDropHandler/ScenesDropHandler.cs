@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Yuzu;
 
 namespace Tangerine.UI.FilesDropHandler
 {
@@ -13,15 +12,29 @@ namespace Tangerine.UI.FilesDropHandler
 	{
 		public List<string> Extensions { get; } = new List<string> { ".scene", ".tan", ".model" };
 
+		[YuzuMember]
+		public bool ShouldCreateContextMenu { get; set; } = true;
+
 		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
 		{
 			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
 			foreach (var file in handledFiles) {
-				if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
-					!Utils.AssertCurrentDocument(assetPath, assetType)) {
+				if (
+					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
+					!Utils.AssertCurrentDocument(assetPath, assetType)
+				) {
 					continue;
 				}
-				CreateContextMenu(assetPath, assetType, callbacks);
+				if (ShouldCreateContextMenu) {
+					CreateContextMenu(assetPath, assetType, callbacks);
+				} else {
+					try {
+						Project.Current.OpenDocument(file, true);
+					}
+					catch (System.InvalidOperationException e) {
+						AlertDialog.Show(e.Message);
+					}
+				}
 			}
 		}
 

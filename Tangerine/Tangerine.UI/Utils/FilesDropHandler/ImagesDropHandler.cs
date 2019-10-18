@@ -42,10 +42,7 @@ namespace Tangerine.UI.FilesDropHandler
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				foreach (var file in files) {
-					if (
-						!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
-						!Utils.AssertCurrentDocument(assetPath, assetType)
-					) {
+					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
 						continue;
 					}
 					var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);

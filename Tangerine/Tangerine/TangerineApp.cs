@@ -10,6 +10,7 @@ using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
+using Tangerine.UI.FilesDropHandler;
 using Tangerine.UI.Timeline;
 using FileInfo = System.IO.FileInfo;
 
@@ -560,25 +561,12 @@ namespace Tangerine
 			{
 				tabBar.HitTestTarget = true;
 				this.tabBar = tabBar;
-				DockManager.Instance.FilesDropped += DropFiles;
+				var filesDropManager = new FilesDropManager(tabBar);
+				filesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
+				DockManager.Instance.AddFilesDropManager(filesDropManager);
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
-			}
-
-			private void DropFiles(IEnumerable<string> obj)
-			{
-				if (tabBar.IsMouseOverThisOrDescendant() || Document.Current == null) {
-					foreach (var path in obj) {
-						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-							try {
-								Project.Current.OpenDocument(path, true);
-							} catch (System.InvalidOperationException e) {
-								AlertDialog.Show(e.Message);
-							}
-						}
-					}
-				}
 			}
 
 			private void RebuildTabs(TabBar tabBar)
