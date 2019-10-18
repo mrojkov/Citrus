@@ -1207,6 +1207,9 @@ namespace Lime
 		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, InternalPersistence persistence = null, Stream stream = null, bool external = false, bool ignoreExternals = false)
 		{
 			if (SceneLoading?.Value?.Invoke(path, ref instance, external, ignoreExternals) ?? false) {
+				if (!external) {
+					instance.NotifyOnBuilt();
+				}
 				SceneLoaded?.Value?.Invoke(path, instance, external);
 				return instance;
 			}
@@ -1226,12 +1229,9 @@ namespace Lime
 						instance = persistence.ReadObject<Node>(fullPath, stream, instance);
 					}
 				}
-				if (!ignoreExternals) {
-					instance.LoadExternalScenes(persistence);
-				}
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
-				if (!external) {
-					instance.NotifyOnBuilt();
+				if (!ignoreExternals) {
+					instance.LoadExternalScenes(persistence, !external);
 				}
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
@@ -1260,16 +1260,20 @@ namespace Lime
 		{
 		}
 
-		public virtual void LoadExternalScenes(InternalPersistence persistence = null)
+		public virtual void LoadExternalScenes(InternalPersistence persistence = null, bool isExternalRoot = true)
 		{
 			persistence = persistence ?? InternalPersistence.Instance;
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				foreach (var child in Nodes) {
-					child.LoadExternalScenes();
+					child.LoadExternalScenes(persistence, false);
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
 				var content = CreateFromAssetBundleHelper(ContentsPath, null, persistence, external: true);
 				ReplaceContent(content);
+			}
+
+			if (isExternalRoot) {
+				NotifyOnBuilt();
 			}
 		}
 

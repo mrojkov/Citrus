@@ -222,7 +222,6 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	[UpdateStage(typeof(EarlyUpdateStage))]
 	[UpdateAfterBehavior(typeof(LegacyEarlyBehaviorContainer))]
-	[UpdateFrozen]
 	public class ButtonBehavior : BehaviorComponent
 	{
 		private Button button;
@@ -231,11 +230,6 @@ namespace Lime
 		{
 			button = (Button)Owner;
 			button.Awake();
-		}
-
-		protected internal override void Stop(Node owner)
-		{
-			base.Stop(owner);
 		}
 
 		protected internal override void Update(float delta)

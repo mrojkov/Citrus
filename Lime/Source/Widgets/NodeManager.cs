@@ -9,6 +9,8 @@ namespace Lime
 		private Dictionary<Type, List<NodeComponentProcessor>> processorsByComponentType = new Dictionary<Type, List<NodeComponentProcessor>>();
 		private HashSet<Node> frozenNodes = new HashSet<Node>(ReferenceEqualityComparer.Instance);
 
+		public event HierarchyChangedEventHandler HierarchyChanged;
+
 		public NodeManagerRootNodeCollection RootNodes { get; }
 
 		public NodeManagerProcessorCollection Processors { get; }
@@ -42,7 +44,7 @@ namespace Lime
 		{
 			foreach (var component in node.Components) {
 				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
-					processor.Add(component);
+					processor.InternalAdd(component);
 				}
 			}
 			foreach (var child in node.Nodes) {
@@ -73,7 +75,7 @@ namespace Lime
 			}
 			foreach (var component in node.Components) {
 				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
-					processor.Remove(component, node);
+					processor.InternalRemove(component, node);
 				}
 			}
 		}
@@ -93,7 +95,17 @@ namespace Lime
 			return targetProcessors;
 		}
 
-		internal void RegisterNode(Node node)
+		internal void RegisterNode(Node node, Node parent)
+		{
+			RegisterNodeHelper(node);
+			HierarchyChanged?.Invoke(new HierarchyChangedEventArgs {
+				Action = HierarchyAction.Link,
+				Child = node,
+				Parent = parent
+			});
+		}
+
+		private void RegisterNodeHelper(Node node)
 		{
 			node.Manager = this;
 			if (node.GloballyFrozen) {
@@ -103,20 +115,30 @@ namespace Lime
 				RegisterComponent(component);
 			}
 			foreach (var child in node.Nodes) {
-				RegisterNode(child);
+				RegisterNodeHelper(child);
 			}
 		}
 
-		internal void UnregisterNode(Node node)
+		internal void UnregisterNode(Node node, Node parent)
 		{
+			UnregisterNodeHelper(node);
+			HierarchyChanged?.Invoke(new HierarchyChangedEventArgs {
+				Action = HierarchyAction.Unlink,
+				Child = node,
+				Parent = parent
+			});
+		}
+
+		private void UnregisterNodeHelper(Node node)
+		{
+			node.Manager = null;
+			frozenNodes.Remove(node);
 			foreach (var child in node.Nodes) {
-				UnregisterNode(child);
+				UnregisterNodeHelper(child);
 			}
 			foreach (var component in node.Components) {
 				UnregisterComponent(component, node);
 			}
-			frozenNodes.Remove(node);
-			node.Manager = null;
 		}
 
 		internal void FilterNode(Node node)
@@ -126,7 +148,7 @@ namespace Lime
 			if (frozenChanged) {
 				foreach (var c in node.Components) {
 					foreach (var p in GetProcessorsForComponentType(c.GetType())) {
-						p.OnOwnerFrozenChanged(c);
+						p.InternalOnOwnerFrozenChanged(c);
 					}
 				}
 			}
@@ -138,14 +160,14 @@ namespace Lime
 		internal void RegisterComponent(NodeComponent component)
 		{
 			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
-				p.Add(component);
+				p.InternalAdd(component);
 			}
 		}
 
 		internal void UnregisterComponent(NodeComponent component, Node owner)
 		{
 			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
-				p.Remove(component, owner);
+				p.InternalRemove(component, owner);
 			}
 		}
 
@@ -155,5 +177,20 @@ namespace Lime
 				p.Update(delta);
 			}
 		}
+	}
+
+	public delegate void HierarchyChangedEventHandler(HierarchyChangedEventArgs e);
+
+	public struct HierarchyChangedEventArgs
+	{
+		public HierarchyAction Action;
+		public Node Parent;
+		public Node Child;
+	}
+
+	public enum HierarchyAction
+	{
+		Link,
+		Unlink
 	}
 }

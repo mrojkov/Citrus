@@ -22,7 +22,7 @@ namespace Lime
 			}
 		}
 
-		public override void LoadExternalScenes(InternalPersistence persistence = null)
+		public override void LoadExternalScenes(InternalPersistence persistence = null, bool isExternalRoot = true)
 		{
 			base.LoadExternalScenes(persistence);
 			persistence = persistence ?? InternalPersistence.Instance;

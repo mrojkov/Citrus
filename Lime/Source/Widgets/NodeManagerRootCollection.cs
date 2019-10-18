@@ -43,7 +43,7 @@ namespace Lime
 				throw new ArgumentException(nameof(item));
 			}
 			items.Insert(index, item);
-			owner.RegisterNode(item);
+			owner.RegisterNode(item, null);
 		}
 
 		public void Clear()
@@ -67,7 +67,7 @@ namespace Lime
 		{
 			var item = items[index];
 			items.RemoveAt(index);
-			owner.UnregisterNode(item);
+			owner.UnregisterNode(item, null);
 		}
 
 		public int IndexOf(Node item)
