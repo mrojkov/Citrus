@@ -128,8 +128,12 @@ namespace Tangerine.UI.Inspector
 
 		public void DropFiles(IEnumerable<string> files)
 		{
+			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			foreach (var e in editors) {
-				e.DropFiles(files);
+				if (nodeUnderMouse != null && nodeUnderMouse.SameOrDescendantOf(e.ContainerWidget)) {
+					e.DropFiles(files);
+					break;
+				}
 			}
 		}
 

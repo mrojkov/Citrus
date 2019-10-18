@@ -4,6 +4,7 @@ using Tangerine.Core;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core.Components;
+using Tangerine.UI.FilesDropHandler;
 
 namespace Tangerine.UI.Inspector
 {
@@ -17,8 +18,15 @@ namespace Tangerine.UI.Inspector
 		private readonly InspectorContent content;
 		private readonly ThemedScrollView contentWidget;
 
+		private readonly FilesDropManager filesDropManager;
 		private HashSet<Type> prevTypes = new HashSet<Type>();
 
+		/// <summary>
+		/// A collection of IFilesDropHandler which bring functionality of
+		/// files drag and drop. Can be extended via orange plugins. This collection will
+		/// be cloned by Yuzu for each instance of Sceneview
+		/// </summary>
+		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {};
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
@@ -55,7 +63,7 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			Docking.DockManager.Instance.FilesDropped += OnFilesDropped;
+			Docking.DockManager.Instance.AddFilesDropManager(filesDropManager);
 			content.LoadExpandedStates();
 			Rebuild();
 		}
@@ -64,7 +72,7 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = null;
 			content.SaveExpandedStates();
-			Docking.DockManager.Instance.FilesDropped -= OnFilesDropped;
+			Docking.DockManager.Instance.RemoveFilesDropManager(filesDropManager);
 			RootWidget.Unlink();
 		}
 
@@ -85,6 +93,10 @@ namespace Tangerine.UI.Inspector
 				Footer = new Widget { MinHeight = 300.0f },
 				History = Document.Current.History
 			};
+			filesDropManager = new FilesDropManager(RootWidget);
+			filesDropManager.AddFilesDropHandler(new InspectorFilesDropHandler(content));
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
+				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
 			CreateWatchersToRebuild();
 		}
 
