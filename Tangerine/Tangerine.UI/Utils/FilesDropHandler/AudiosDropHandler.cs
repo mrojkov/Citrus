@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
@@ -9,16 +10,22 @@ namespace Tangerine.UI.FilesDropHandler
 	public class AudiosDropHandler : IFilesDropHandler
 	{
 		public List<string> Extensions { get; } = new List<string> { ".ogg" };
-		public FilesDropManager Manager { get; set; }
-		public bool TryHandle(IEnumerable<string> files)
+
+		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
 		{
-			var result = false;
-			foreach (var file in files) {
-				if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
-					!Utils.AssertCurrentDocument(assetPath, assetType)) {
+			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
+			foreach (var file in handledFiles) {
+				if (
+					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
+					!Utils.AssertCurrentDocument(assetPath, assetType)
+				) {
 					continue;
 				}
-				result = true;
+				var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
+				callbacks.NodeCreating?.Invoke(args);
+				if (args.Cancel) {
+					continue;
+				}
 				var node = CreateNode.Perform(typeof(Audio));
 				var sample = new SerializableSample(assetPath);
 				SetProperty.Perform(node, nameof(Audio.Sample), sample);
@@ -29,9 +36,8 @@ namespace Tangerine.UI.FilesDropHandler
 					Value = AudioAction.Play
 				};
 				SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-				Manager.OnNodeCreated(node);
+				callbacks.NodeCreated?.Invoke(node);
 			}
-			return result;
 		}
 	}
 }

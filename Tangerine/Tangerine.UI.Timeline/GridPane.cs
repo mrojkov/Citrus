@@ -1,20 +1,25 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.IO;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.Docking;
+using Tangerine.UI.FilesDropHandler;
 
 namespace Tangerine.UI.Timeline
 {
 	public class GridPane
 	{
-		readonly Timeline timeline;
-		IntVector2 cellUnderMouseOnFilesDrop;
-		RowLocation? rowLocationUnderMouseOnFilesDrop;
-		int animateTextureCellOffset;
+		private readonly FilesDropManager filesDropManager;
+		private readonly Timeline timeline;
 
-		public IntVector2 CellUnderMouseOnContextMenuPopup { get; set; }
+		/// <summary>
+		/// A collection of IFilesDropHandler which bring functionality of
+		/// files drag and drop. Can be extended via orange plugins. This collection will
+		/// be cloned by Yuzu for each instance of Sceneview
+		/// </summary>
+		public static List<IFilesDropHandler> FilesDropHandlers { get; } =
+			new List<IFilesDropHandler> { new GridPaneFilesDropHandler() };
 
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
@@ -46,9 +51,13 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform(Document.Current.History));
 			OnPostRender += RenderSelection;
 			OnPostRender += RenderCursor;
-			timeline.FilesDropManager.Handling += FilesDropOnHandling;
-			timeline.FilesDropManager.NodeCreating += FilesDropOnNodeCreating;
-			timeline.FilesDropManager.NodeCreated += FilesDropOnNodeCreated;
+			filesDropManager = new FilesDropManager(RootWidget);
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
+				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
+			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
+			timeline.Detaching += () => DockManager.Instance.RemoveFilesDropManager(filesDropManager);
+			timeline.Attaching += () => DockManager.Instance.AddFilesDropManager(filesDropManager);
 		}
 
 		private void RenderBackgroundAndGrid(Node node)
@@ -255,73 +264,10 @@ namespace Tangerine.UI.Timeline
 			return new Vector2((col + (doc.Animation.IsCompound ? 0.5f : 0)) * TimelineMetrics.ColWidth, y);
 		}
 
-		private void FilesDropOnHandling()
-		{
-			animateTextureCellOffset = 0;
-			cellUnderMouseOnFilesDrop = CellUnderMouse();
-			rowLocationUnderMouseOnFilesDrop = SelectAndDragRowsProcessor.MouseToRowLocation(RootWidget.Input.MousePosition);
-		}
-
-		private void FilesDropOnNodeCreating(FilesDropManager.NodeCreatingEventArgs nodeCreatingEventArgs)
-		{
-			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
-			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(RootWidget)) {
-				return;
-			}
-
-			if (Document.Current.Animation.IsCompound) {
-				try {
-					// Dirty hack: using a file drag&drop mechanics for dropping animation clips on the grid.
-					var decodedAnimationId = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(nodeCreatingEventArgs.AssetPath));
-					Operations.CompoundAnimations.AddAnimationClip.Perform(
-						new IntVector2(
-							cellUnderMouseOnFilesDrop.X + animateTextureCellOffset,
-							cellUnderMouseOnFilesDrop.Y),
-						decodedAnimationId);
-				} catch {
-				}
-			}
-
-			switch (nodeCreatingEventArgs.AssetType) {
-				case ".png": {
-					if (Document.Current.Rows.Count == 0) {
-						return;
-					}
-					var widget = Document.Current.Rows[cellUnderMouseOnFilesDrop.Y].Components.Get<Core.Components.NodeRow>()?.Node as Widget;
-					if (widget == null) {
-						return;
-					}
-
-					nodeCreatingEventArgs.Cancel = true;
-					var key = new Keyframe<ITexture> {
-						Frame = cellUnderMouseOnFilesDrop.X + animateTextureCellOffset,
-						Value = new SerializableTexture(nodeCreatingEventArgs.AssetPath)
-					};
-					Core.Operations.SetKeyframe.Perform(widget, nameof(Widget.Texture), Document.Current.AnimationId, key);
-					animateTextureCellOffset++;
-					break;
-				}
-				case ".ogg": {
-					nodeCreatingEventArgs.Cancel = true;
-					var fileName = Path.GetFileNameWithoutExtension(nodeCreatingEventArgs.AssetPath);
-					var node = Core.Operations.CreateNode.Perform(typeof(Audio));
-					var sample = new SerializableSample(nodeCreatingEventArgs.AssetPath);
-					Core.Operations.SetProperty.Perform(node, nameof(Audio.Sample), sample);
-					Core.Operations.SetProperty.Perform(node, nameof(Node.Id), fileName);
-					Core.Operations.SetProperty.Perform(node, nameof(Audio.Volume), 1);
-					var key = new Keyframe<AudioAction> {
-						Frame = cellUnderMouseOnFilesDrop.X,
-						Value = AudioAction.Play
-					};
-					Core.Operations.SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-					timeline.FilesDropManager.OnNodeCreated(node);
-					break;
-				}
-			}
-		}
-
 		private void FilesDropOnNodeCreated(Node node)
 		{
+			var rowLocationUnderMouseOnFilesDrop =
+				SelectAndDragRowsProcessor.MouseToRowLocation(RootWidget.Input.MousePosition);
 			if (!rowLocationUnderMouseOnFilesDrop.HasValue) {
 				return;
 			}

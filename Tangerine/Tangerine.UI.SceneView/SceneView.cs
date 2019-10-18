@@ -119,7 +119,8 @@ namespace Tangerine.UI.SceneView
 			CreateProcessors();
 			CreatePresenters();
 			filesDropManager = new FilesDropManager(InputArea);
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh => (IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
+				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
 			filesDropManager.Handling += FilesDropOnHandling;
 			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());

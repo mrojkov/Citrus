@@ -60,6 +60,7 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollAnimationTrackView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="GridPaneFilesDropHandler.cs" />
     <Compile Include="Operations\CompoundAnimations\AnimationClipToolbox.cs" />
     <Compile Include="Operations\CompoundAnimations\DeleteSelectedAnimationClips.cs" />
     <Compile Include="Operations\CompoundAnimations\DragAnimationClips.cs" />

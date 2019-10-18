@@ -9,10 +9,9 @@ using Tangerine.UI.FilesDropHandler;
 
 namespace Tangerine.UI
 {
-	public class FilesDropManager
+	public class FilesDropManager : IFilesDropCallbacks
 	{
-		public Dictionary<string, IFilesDropHandler> FilesDropHandlersByExtension { get; private set; }
-			= new Dictionary<string, IFilesDropHandler>();
+		private List<IFilesDropHandler> filesDropHandlers { get; } = new List<IFilesDropHandler>();
 
 		public class NodeCreatingEventArgs : CancelEventArgs
 		{
@@ -29,8 +28,8 @@ namespace Tangerine.UI
 		private readonly Widget widget;
 
 		public event Action Handling;
-		public event Action<NodeCreatingEventArgs> NodeCreating;
-		public event Action<Node> NodeCreated;
+		public Action<NodeCreatingEventArgs> NodeCreating { get; set; }
+		public Action<Node> NodeCreated { get; set; }
 
 		public FilesDropManager(Widget widget)
 		{
@@ -39,10 +38,7 @@ namespace Tangerine.UI
 
 		public void AddFilesDropHandler(IFilesDropHandler handler)
 		{
-			handler.Manager = this;
-			foreach (var extension in handler.Extensions) {
-				FilesDropHandlersByExtension[extension] = handler;
-			}
+			filesDropHandlers.Add(handler);
 		}
 
 		public void AddFilesDropHandlers(params IFilesDropHandler[] handlers)
@@ -66,26 +62,14 @@ namespace Tangerine.UI
 				return false;
 			}
 			Handling?.Invoke();
-			var result = false;
 			using (Document.Current.History.BeginTransaction()) {
-				foreach (var extensionGroup in files.GroupBy(Path.GetExtension)) {
-					if (FilesDropHandlersByExtension.TryGetValue(extensionGroup.Key, out var handler)) {
-						result |= handler.TryHandle(extensionGroup);
-					}
+				foreach (var handlers in filesDropHandlers) {
+					handlers.Handle(files, this, out var handledFiles);
+					files = files.Except(handledFiles);
 				}
 				Document.Current.History.CommitTransaction();
 			}
-			return result;
-		}
-
-		public void OnNodeCreating(NodeCreatingEventArgs args)
-		{
-			NodeCreating?.Invoke(args);
-		}
-
-		public void OnNodeCreated(Node node)
-		{
-			NodeCreated?.Invoke(node);
+			return true;
 		}
 	}
 }

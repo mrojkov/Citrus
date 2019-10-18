@@ -12,6 +12,8 @@ namespace Tangerine.UI.Timeline
 {
 	public class Timeline : IDocumentView
 	{
+		private readonly FilesDropManager filesDropManager;
+
 		public static Timeline Instance { get; private set; }
 
 		public readonly Toolbar Toolbar;
@@ -23,7 +25,6 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget PanelWidget;
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
-		public readonly FilesDropManager FilesDropManager;
 		public readonly WaveformCache WaveformCache;
 		/// <summary>
 		/// A collection of IFilesDropHandler which bring functionality of
@@ -69,6 +70,10 @@ namespace Tangerine.UI.Timeline
 		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
 		public event Action<Vector2> OffsetChanged;
+		public event Action Attaching;
+		public event Action Detaching;
+		public event Action Attached;
+		public event Action Detached;
 
 		public static IEnumerable<Type> GetOperationProcessorTypes() => new [] {
 			typeof(EnsureRowVisibleIfSelected),
@@ -86,8 +91,6 @@ namespace Tangerine.UI.Timeline
 		public Timeline(Panel panel)
 		{
 			RootWidget = new Widget();
-			FilesDropManager = new FilesDropManager(RootWidget);
-			FilesDropManager.Handling += FilesDropOnHandling;
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;
 			Toolbar = new Toolbar();
@@ -96,10 +99,14 @@ namespace Tangerine.UI.Timeline
 			Grid = new GridPane(this);
 			CurveEditor = new CurveEditorPane(this);
 			Roll = new RollPane();
+			filesDropManager = new FilesDropManager(RootWidget);
+			filesDropManager.Handling += FilesDropOnHandling;
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
+				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
 			CreateProcessors();
 			InitializeWidgets();
 			WaveformCache = new WaveformCache(Project.Current.FileSystemWatcher);
-			RootWidget.AddChangeWatcher(() => Document.Current.Container, (container) => {
+			RootWidget.AddChangeWatcher(() => Document.Current.Container, container => {
 				Offset = container.Components.GetOrAdd<TimelineOffset>().Offset;
 			});
 			RootWidget.AddChangeWatcher(() => Offset, (value) => {
@@ -112,18 +119,22 @@ namespace Tangerine.UI.Timeline
 
 		public void Attach()
 		{
+			Attaching?.Invoke();
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DockManager.Instance.AddFilesDropManager(FilesDropManager);
+			DockManager.Instance.AddFilesDropManager(filesDropManager);
 			UpdateTitle();
+			Attached?.Invoke();
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.RemoveFilesDropManager(FilesDropManager);
+			Detaching?.Invoke();
+			DockManager.Instance.RemoveFilesDropManager(filesDropManager);
 			Instance = null;
 			RootWidget.Unlink();
+			Detached?.Invoke();
 		}
 
 		private static void FilesDropOnHandling()

@@ -114,8 +114,8 @@
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="ToolbarView.cs" />
     <Compile Include="ToolbarButton.cs" />
-    <Compile Include="Utils\DropSceneContextMenu.cs" />
     <Compile Include="Utils\FilesDropHandler\AudiosDropHandler.cs" />
+    <Compile Include="Utils\FilesDropHandler\IFilesDropCallbacks.cs" />
     <Compile Include="Utils\FilesDropHandler\IFilesDropHandler.cs" />
     <Compile Include="Utils\FilesDropHandler\ImagesDropHandler.cs" />
     <Compile Include="Utils\FilesDropHandler\ScenesDropHandler.cs" />
