@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Lime;
@@ -166,13 +167,32 @@ namespace Tangerine.UI
 			return String.Join(Separator.ToString(), directoryParts);
 		}
 
+		public bool TryGetClosestAvailableDirectory(string path, out string directory)
+		{
+			directory = path;
+			while (!Directory.Exists(directory)) {
+				directory = Path.GetDirectoryName(directory);
+				if (string.IsNullOrEmpty(directory)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
 		protected virtual void OnSelectClicked()
 		{
+			var current = CoalescedPropertyValue().GetDataflow();
+			current.Poll();
+			var value = current.Value;
+			var path = ValueToStringConverter(value.Value);
 			var dlg = new FileDialog {
 				AllowedFileTypes = allowedFileTypes,
 				Mode = FileDialogMode.Open,
-				InitialDirectory = Directory.Exists(LastOpenedDirectory) ?
-					LastOpenedDirectory : Path.GetDirectoryName(Document.Current.FullPath),
+				InitialDirectory =
+					current.GotValue && value.IsDefined && !string.IsNullOrEmpty(path) && TryGetClosestAvailableDirectory(
+						AssetPath.Combine(Project.Current.AssetsDirectory, path), out var dir) ?
+							dir : Directory.Exists(LastOpenedDirectory) ?
+								LastOpenedDirectory : Project.Current.AssetsDirectory
 			};
 			if (dlg.RunModal()) {
 				SetFilePath(dlg.FileName);
