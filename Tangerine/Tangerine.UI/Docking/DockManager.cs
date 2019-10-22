@@ -21,6 +21,7 @@ namespace Tangerine.UI.Docking
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public DockHierarchy Model => DockHierarchy.Instance;
+		public FilesDropManager DocumentAreaFilesDropManager;
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
 		private DockManager(Vector2 windowSize)
@@ -52,9 +53,9 @@ namespace Tangerine.UI.Docking
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
-			var documentAreaFilesDropManager = new FilesDropManager(DocumentArea);
-			documentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
-			AddFilesDropManager(documentAreaFilesDropManager);
+			DocumentAreaFilesDropManager = new FilesDropManager(DocumentArea);
+			DocumentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
+			AddFilesDropManager(DocumentAreaFilesDropManager);
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 			var windowPlacement = new WindowPlacement {
 				Size = windowSize,

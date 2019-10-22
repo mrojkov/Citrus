@@ -55,6 +55,11 @@ namespace Tangerine.UI
 			}
 		}
 
+		public void RemoveFilesDropHandler(IFilesDropHandler handler)
+		{
+			filesDropHandlers.Remove(handler);
+		}
+
 		public bool TryToHandle(IEnumerable<string> files)
 		{
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
