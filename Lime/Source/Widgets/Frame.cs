@@ -46,11 +46,13 @@ namespace Lime
 			set { SetRenderTarget(value); }
 		}
 
-		public Frame() { }
-
-		public Frame(Vector2 position)
+		public Frame()
 		{
 			Presenter = DefaultPresenter.Instance;
+		}
+
+		public Frame(Vector2 position) : this()
+		{
 			this.Position = position;
 		}
 
