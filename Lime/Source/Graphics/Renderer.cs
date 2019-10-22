@@ -442,8 +442,11 @@ namespace Lime
 			DrawTriangleFan(texture1, texture2, material, vertices, numVertices);
 		}
 
-		public static RenderBatch<Vertex> DrawTriangleFan(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
+			if (numVertices == 0) {
+				return;
+			}
 			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
@@ -456,7 +459,6 @@ namespace Lime
 			}
 			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
 			batch.LastVertex += numVertices;
-			return batch;
 		}
 
 		public static void DrawTriangleStrip(Vertex[] vertices, int numVertices)
@@ -475,8 +477,11 @@ namespace Lime
 			DrawTriangleStrip(texture1, texture2, material, vertices, numVertices);
 		}
 
-		public static RenderBatch<Vertex> DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
+			if (numVertices == 0) {
+				return;
+			}
 			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
@@ -490,7 +495,6 @@ namespace Lime
 			}
 			batch.LastVertex += numVertices;
 			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
-			return batch;
 		}
 
 		private static RenderBatch<Vertex> DrawTrianglesHelper(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
