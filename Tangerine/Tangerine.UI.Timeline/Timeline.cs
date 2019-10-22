@@ -70,9 +70,21 @@ namespace Tangerine.UI.Timeline
 		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
 		public event Action<Vector2> OffsetChanged;
+		/// <summary>
+		/// Called before Attach code execution.
+		/// </summary>
 		public event Action Attaching;
+		/// <summary>
+		/// Called before Detach code execution.
+		/// </summary>
 		public event Action Detaching;
+		/// <summary>
+		/// Called after Attach code execution.
+		/// </summary>
 		public event Action Attached;
+		/// <summary>
+		/// Called after Detach code execution
+		/// </summary>
 		public event Action Detached;
 
 		public static IEnumerable<Type> GetOperationProcessorTypes() => new [] {

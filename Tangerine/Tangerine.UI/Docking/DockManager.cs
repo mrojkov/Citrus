@@ -21,6 +21,9 @@ namespace Tangerine.UI.Docking
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public DockHierarchy Model => DockHierarchy.Instance;
+		/// <summary>
+		/// Manages DocumentArea files drop.
+		/// </summary>
 		public FilesDropManager DocumentAreaFilesDropManager;
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
@@ -118,6 +121,10 @@ namespace Tangerine.UI.Docking
 
 		private void OnFilesDropped(IEnumerable<string> files)
 		{
+			// Later added FilesDropManagers try to handle files drop earlier
+			// This approach is used in order to allow hierarchical files drop
+			// management (e.g. multiple files droppable areas in multiple
+			// files droppable areas and etc.).
 			for (var i = filesDropManagers.Count - 1; i >= 0; i--) {
 				var filesDropManager = filesDropManagers[i];
 				if (filesDropManager.TryToHandle(files)) {
@@ -534,7 +541,15 @@ namespace Tangerine.UI.Docking
 			}
 		}
 
+		/// <summary>
+		/// Add an instance of FilesDropManager.
+		/// </summary>
+		/// <param name="filesDropManager">Instance of FilesDropManager</param>
 		public void AddFilesDropManager(FilesDropManager filesDropManager) => filesDropManagers.Add(filesDropManager);
+		/// <summary>
+		/// Remove an instance of FilesDropManager.
+		/// </summary>
+		/// <param name="filesDropManager">Instance of FilesDropManager</param>
 		public void RemoveFilesDropManager(FilesDropManager filesDropManager) => filesDropManagers.Remove(filesDropManager);
 
 		private void CloseWindow(IWindow window)
