@@ -66,13 +66,13 @@ namespace Lime
 				return null;
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
-			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute));
+			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute), inherit: true);
 			updateFamily = updateStage.CreateFamily(behaviorType, updateFrozen);
 			updateFamilies.Add(behaviorType, updateFamily);
-			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>(inherit: true)) {
 				updateStage.AddDependency(GetUpdateFamily(i.BehaviorType), updateFamily);
 			}
-			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>()) {
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>(inherit: true)) {
 				updateStage.AddDependency(updateFamily, GetUpdateFamily(i.BehaviorType));
 			}
 			return updateFamily;
