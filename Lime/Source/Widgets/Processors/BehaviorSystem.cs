@@ -61,7 +61,7 @@ namespace Lime
 			if (updateFamilies.TryGetValue(behaviorType, out var updateFamily)) {
 				return updateFamily;
 			}
-			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
+			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>(inherit: true);
 			if (updateStageAttr == null) {
 				return null;
 			}
