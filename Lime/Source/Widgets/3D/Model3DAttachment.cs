@@ -119,7 +119,8 @@ namespace Lime
 			foreach(var mesh in meshes) {
 				if (mesh.Animators.Any() ||
 					mesh.Components.Any(c => !(c is UpdatableNodeBehavior)) ||
-					(MeshOptions.FirstOrDefault(m => m.Id == mesh.Id)?.DisableMerging ?? mesh.Nodes.Count != 0)
+					(MeshOptions.FirstOrDefault(m => m.Id == mesh.Id)?.DisableMerging ?? mesh.Nodes.Count != 0) ||
+					!IsIdentityMatrix(mesh.LocalTransform) && IsAnyBoneAffectOnMesh(mesh)
 				) {
 					continue;
 				}
@@ -133,6 +134,23 @@ namespace Lime
 			foreach (var node in model.Nodes) {
 				MergeMeshes((Node3D)node);
 			}
+		}
+
+		private static bool IsAnyBoneAffectOnMesh(Mesh3D mesh)
+		{
+			foreach (var submesh in mesh.Submeshes) {
+				if (submesh.BoneNames.Any()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private static bool IsIdentityMatrix(Matrix44 m)
+		{
+			return m.Translation.Length <= Mathf.ZeroTolerance &&
+				(m.Rotation - Quaternion.Identity).Length() <= Mathf.ZeroTolerance &&
+				(m.Scale - Vector3.One).Length <= Mathf.ZeroTolerance;
 		}
 
 		private void MergeMeshes(Dictionary<int, List<Mesh3D>> map, Node3D model)
@@ -170,9 +188,7 @@ namespace Lime
 							var submeshToMerge = meshAndSubmeshes.Value[meshIdx];
 							var meshLocalTransform = meshAndSubmeshes.Key.LocalTransform;
 							MeshUtils.TransformVertices(submeshToMerge.Mesh, (ref Mesh3D.Vertex v) => {
-								if (v.BlendWeights.Equals(default(Mesh3D.BlendWeights))) {
-									v.Pos = meshLocalTransform.TransformVector(v.Pos);
-								}
+								v.Pos = meshLocalTransform.TransformVector(v.Pos);
 							});
 							if (curSubmesh == null) {
 								curSubmesh = submeshToMerge;
