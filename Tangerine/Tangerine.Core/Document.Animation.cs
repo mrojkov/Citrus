@@ -284,6 +284,7 @@ namespace Tangerine.Core
 			internal static void FastForwardToFrame(Animation animation, int frame)
 			{
 				// Try to decrease error in node.AnimationTime by call node.Update several times
+				Node.TangerineFastForwardInProgress = true;
 				const float OptimalDelta = 10;
 				float forwardDelta;
 				do {
@@ -291,6 +292,7 @@ namespace Tangerine.Core
 					var delta = Mathf.Min(forwardDelta, OptimalDelta);
 					SafeUpdate(animation, delta);
 				} while (forwardDelta > OptimalDelta);
+				Node.TangerineFastForwardInProgress = false;
 			}
 
 			private static float CalcDeltaToFrame(Animation animation, int frame)

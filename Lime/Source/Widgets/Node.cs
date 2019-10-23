@@ -49,7 +49,6 @@ namespace Lime
 		ColorBit3 = 1024,
 		SceneNode = 2048,
 		SerializableMask = Hidden | Locked | Shown | ColorBit1 | ColorBit2 | ColorBit3,
-		FastForwarding,
 	}
 
 	public delegate void UpdateHandler(float delta);
@@ -547,6 +546,10 @@ namespace Lime
 		/// Gets or sets the value that's indicating if the node responds the mouse/touch events.
 		/// </summary>
 		public bool HitTestTarget;
+
+#if TANGERINE
+		public static bool TangerineFastForwardInProgress = false;
+#endif
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
@@ -1327,22 +1330,12 @@ namespace Lime
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
 				}
 			} else {
-				//Components.Clear();
 				foreach (var c in Components.Where(i => NodeComponent.IsSerializable(i.GetType())).ToList()) {
 					Components.Remove(c);
 				}
 				foreach (var c in content.Components.Where(i => NodeComponent.IsSerializable(i.GetType()))) {
 					Components.Add(Cloner.Clone(c));
 				}
-				// foreach (var c in content.Components) {
-				// 	if (NodeComponent.IsSerializable(c.GetType())) {
-				// 		var c2 = Components.Get(c.GetType());
-				// 		if (c2 != null) {
-				// 			Components.Remove(c2);
-				// 		}
-				// 		Components.Add(Cloner.Clone(c));
-				// 	}
-				// }
 			}
 			Components.Remove<AnimationComponent>();
 			var animationComponent = content.Components.Get<AnimationComponent>();
