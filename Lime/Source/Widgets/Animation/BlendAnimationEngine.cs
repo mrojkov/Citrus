@@ -38,6 +38,9 @@ namespace Lime
 			if (animation.Markers.TryFind(marker.JumpTo, out var gotoMarker) && gotoMarker != marker) {
 				var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 				animation.TimeInternal = gotoMarker.Time;
+				if (JumpAffectsRunningMarkerId) {
+					animation.RunningMarkerId = gotoMarker.Id;
+				}
 				if (gotoMarker.Action != MarkerAction.Stop) {
 					blender.Attach(animation, gotoMarker.Id, animation.RunningMarkerId);
 				}

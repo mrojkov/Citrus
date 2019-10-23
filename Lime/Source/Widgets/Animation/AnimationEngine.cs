@@ -5,6 +5,8 @@ namespace Lime
 {
 	public class AnimationEngine
 	{
+		public static bool JumpAffectsRunningMarkerId = false;
+
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
 		public virtual void AdvanceAnimation(Animation animation, float delta) { }
 		/// <summary>
@@ -108,6 +110,9 @@ namespace Lime
 					if (gotoMarker != null && gotoMarker != marker) {
 						var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 						animation.TimeInternal = gotoMarker.Time;
+						if (JumpAffectsRunningMarkerId) {
+							animation.RunningMarkerId = gotoMarker.Id;
+						}
 						AdvanceAnimation(animation, (float)delta);
 					}
 					break;
