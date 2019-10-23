@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using Lime;
 using Tangerine.Core;
@@ -6,11 +5,11 @@ using Tangerine.Core.ExpressionParser;
 
 namespace Tangerine.UI
 {
-	public class IntPropertyEditor : CommonPropertyEditor<int>
+	public class SBytePropertyEditor : CommonPropertyEditor<sbyte>
 	{
 		private NumericEditBox editor;
 
-		public IntPropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
+		public SBytePropertyEditor(IPropertyEditorParams editorParams) : base(editorParams)
 		{
 			editor = editorParams.NumericEditBoxFactory();
 			// TODO: move IsReadOnly to IPropertyEditor
@@ -24,11 +23,11 @@ namespace Tangerine.UI
 			ManageManyValuesOnFocusChange(editor, current);
 		}
 
-		public void SetComponent(string text, CoalescedValue<int> current)
+		public void SetComponent(string text, CoalescedValue<sbyte> current)
 		{
 			if (Parser.TryParse(text, out double newValue)) {
-				SetProperty((int)newValue);
-				editor.Text = ((int)newValue).ToString();
+				SetProperty((sbyte)newValue);
+				editor.Text = ((sbyte)newValue).ToString();
 			} else {
 				editor.Text = current.IsDefined ? current.Value.ToString() : ManyValuesText;
 			}

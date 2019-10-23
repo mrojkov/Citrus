@@ -48,6 +48,7 @@
     <Compile Include="ColorPicker.Mac.cs" />
     <Compile Include="PropertyEditors\BezierEasingPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
+    <Compile Include="PropertyEditors\SBytePropertyEditor.cs" />
     <Compile Include="UIProcessors.cs" />
   </ItemGroup>
   <ItemGroup>

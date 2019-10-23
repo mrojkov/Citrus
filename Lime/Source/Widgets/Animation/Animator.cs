@@ -433,6 +433,19 @@ namespace Lime
 		}
 	}
 
+	public class SByteAnimator : Animator<sbyte>
+	{
+		protected override sbyte InterpolateLinear(float t)
+		{
+			return (sbyte) (t * (Value3 - Value2) + Value2).Round();
+		}
+
+		protected override sbyte InterpolateSplined(float t)
+		{
+			return (sbyte) Mathf.CatmullRomSpline(t, Value1, Value2, Value3, Value4).Round();
+		}
+	}
+
 	public class Color4Animator : Animator<Color4>
 	{
 		protected override Color4 InterpolateLinear(float t)
