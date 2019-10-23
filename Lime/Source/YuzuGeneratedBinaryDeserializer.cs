@@ -1551,6 +1551,44 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__Animator_SByte(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Animator<sbyte>)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.AnimationId = d.Reader.ReadString();
+				if (result.AnimationId == "" && d.Reader.ReadBoolean()) result.AnimationId = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<sbyte>)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<sbyte>();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.Keyframe<sbyte>)dg.ReadObject<global::Lime.Keyframe<sbyte>>();
+						result.ReadonlyKeys.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__Animator_SByte(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.Animator<sbyte>();
+			Read_Lime__Animator_SByte(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Animator_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Animator<float>)obj;
@@ -4600,6 +4638,21 @@ namespace YuzuGenerated
 			return result;
 		}
 
+		private static void Read_Lime__Keyframe_SByte(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.Keyframe<sbyte>)obj;
+			result.Frame = d.Reader.ReadInt32();
+			result.PackedParams = d.Reader.ReadInt32();
+			result.Value = d.Reader.ReadSByte();
+		}
+
+		private static object Make_Lime__Keyframe_SByte(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.Keyframe<sbyte>();
+			Read_Lime__Keyframe_SByte(d, def, result);
+			return result;
+		}
+
 		private static void Read_Lime__Keyframe_Single(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::Lime.Keyframe<float>)obj;
@@ -5321,6 +5374,7 @@ namespace YuzuGenerated
 				fd = def.Fields[d.Reader.ReadInt16()];
 			}
 			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.OnAfterDeserialization();
 		}
 
 		private static object Make_Lime__Model3D(BinaryDeserializer d, ReaderClassDef def)
@@ -8084,6 +8138,44 @@ namespace YuzuGenerated
 		{
 			var result = new global::Lime.RichText();
 			Read_Lime__RichText(d, def, result);
+			return result;
+		}
+
+		private static void Read_Lime__SByteAnimator(BinaryDeserializer d, ReaderClassDef def, object obj)
+		{
+			var result = (global::Lime.SByteAnimator)obj;
+			var dg = (LimeDeserializer)d;
+			ReaderClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 == fd.OurIndex) {
+				result.AnimationId = d.Reader.ReadString();
+				if (result.AnimationId == "" && d.Reader.ReadBoolean()) result.AnimationId = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (2 == fd.OurIndex) {
+				result.ReadonlyKeys = (global::Lime.TypedKeyframeList<sbyte>)null;
+				var tmp1 = d.Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					result.ReadonlyKeys = new global::Lime.TypedKeyframeList<sbyte>();
+					while (--tmp1 >= 0) {
+						var tmp2 = (global::Lime.Keyframe<sbyte>)dg.ReadObject<global::Lime.Keyframe<sbyte>>();
+						result.ReadonlyKeys.Add(tmp2);
+					}
+				}
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (3 == fd.OurIndex) {
+				result.TargetPropertyPath = d.Reader.ReadString();
+				if (result.TargetPropertyPath == "" && d.Reader.ReadBoolean()) result.TargetPropertyPath = null;
+				fd = def.Fields[d.Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_Lime__SByteAnimator(BinaryDeserializer d, ReaderClassDef def)
+		{
+			var result = new global::Lime.SByteAnimator();
+			Read_Lime__SByteAnimator(d, def, result);
 			return result;
 		}
 
@@ -11369,6 +11461,7 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.Animator<global::Lime.Vector3>)] = Read_Lime__Animator_Vector3;
 			readCache[typeof(global::Lime.Animator<bool>)] = Read_Lime__Animator_Boolean;
 			readCache[typeof(global::Lime.Animator<int>)] = Read_Lime__Animator_Int32;
+			readCache[typeof(global::Lime.Animator<sbyte>)] = Read_Lime__Animator_SByte;
 			readCache[typeof(global::Lime.Animator<float>)] = Read_Lime__Animator_Single;
 			readCache[typeof(global::Lime.Animator<string>)] = Read_Lime__Animator_String;
 			readCache[typeof(global::Lime.Audio)] = Read_Lime__Audio;
@@ -11433,6 +11526,7 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.Keyframe<global::Lime.Vector3>)] = Read_Lime__Keyframe_Vector3;
 			readCache[typeof(global::Lime.Keyframe<bool>)] = Read_Lime__Keyframe_Boolean;
 			readCache[typeof(global::Lime.Keyframe<int>)] = Read_Lime__Keyframe_Int32;
+			readCache[typeof(global::Lime.Keyframe<sbyte>)] = Read_Lime__Keyframe_SByte;
 			readCache[typeof(global::Lime.Keyframe<float>)] = Read_Lime__Keyframe_Single;
 			readCache[typeof(global::Lime.Keyframe<string>)] = Read_Lime__Keyframe_String;
 			readCache[typeof(global::Lime.LayoutCell)] = Read_Lime__LayoutCell;
@@ -11474,6 +11568,7 @@ namespace YuzuGenerated
 			readCache[typeof(global::Lime.RenderOptimizer.ContentRectangle)] = Read_Lime_RenderOptimizer__ContentRectangle;
 			readCache[typeof(global::Lime.RenderOptimizer.ContentSizeComponent)] = Read_Lime_RenderOptimizer__ContentSizeComponent;
 			readCache[typeof(global::Lime.RichText)] = Read_Lime__RichText;
+			readCache[typeof(global::Lime.SByteAnimator)] = Read_Lime__SByteAnimator;
 			readCache[typeof(global::Lime.SerializableCompoundFont)] = Read_Lime__SerializableCompoundFont;
 			readCache[typeof(global::Lime.SerializableFont)] = Read_Lime__SerializableFont;
 			readCache[typeof(global::Lime.SerializableSample)] = Read_Lime__SerializableSample;
@@ -11553,6 +11648,7 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Animator<global::Lime.Vector3>)] = Make_Lime__Animator_Vector3;
 			makeCache[typeof(global::Lime.Animator<bool>)] = Make_Lime__Animator_Boolean;
 			makeCache[typeof(global::Lime.Animator<int>)] = Make_Lime__Animator_Int32;
+			makeCache[typeof(global::Lime.Animator<sbyte>)] = Make_Lime__Animator_SByte;
 			makeCache[typeof(global::Lime.Animator<float>)] = Make_Lime__Animator_Single;
 			makeCache[typeof(global::Lime.Animator<string>)] = Make_Lime__Animator_String;
 			makeCache[typeof(global::Lime.Audio)] = Make_Lime__Audio;
@@ -11627,6 +11723,7 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.Keyframe<global::Lime.Vector3>)] = Make_Lime__Keyframe_Vector3;
 			makeCache[typeof(global::Lime.Keyframe<bool>)] = Make_Lime__Keyframe_Boolean;
 			makeCache[typeof(global::Lime.Keyframe<int>)] = Make_Lime__Keyframe_Int32;
+			makeCache[typeof(global::Lime.Keyframe<sbyte>)] = Make_Lime__Keyframe_SByte;
 			makeCache[typeof(global::Lime.Keyframe<float>)] = Make_Lime__Keyframe_Single;
 			makeCache[typeof(global::Lime.Keyframe<string>)] = Make_Lime__Keyframe_String;
 			makeCache[typeof(global::Lime.LayoutCell)] = Make_Lime__LayoutCell;
@@ -11678,6 +11775,7 @@ namespace YuzuGenerated
 			makeCache[typeof(global::Lime.RenderOptimizer.ContentRectangle)] = Make_Lime_RenderOptimizer__ContentRectangle;
 			makeCache[typeof(global::Lime.RenderOptimizer.ContentSizeComponent)] = Make_Lime_RenderOptimizer__ContentSizeComponent;
 			makeCache[typeof(global::Lime.RichText)] = Make_Lime__RichText;
+			makeCache[typeof(global::Lime.SByteAnimator)] = Make_Lime__SByteAnimator;
 			makeCache[typeof(global::Lime.SerializableCompoundFont)] = Make_Lime__SerializableCompoundFont;
 			makeCache[typeof(global::Lime.SerializableFont)] = Make_Lime__SerializableFont;
 			makeCache[typeof(global::Lime.SerializableSample)] = Make_Lime__SerializableSample;

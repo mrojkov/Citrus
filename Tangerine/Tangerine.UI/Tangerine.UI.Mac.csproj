@@ -74,6 +74,7 @@
     <Compile Include="PropertyEditors\FolderPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\SBytePropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />
   </ItemGroup>
