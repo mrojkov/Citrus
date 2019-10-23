@@ -31,5 +31,13 @@ namespace Lime
 		{
 			Color = Color4.White;
 		}
+
+		public override void UpdateBoundingRect()
+		{
+			if (CleanDirtyFlags(DirtyFlags.ParentBoundingRect)) {
+				var p = Parent.AsWidget;
+				p.BoundingRect = p.BoundingRect.IncludingPoint(TransformedPosition);
+			}
+		}
 	}
 }
