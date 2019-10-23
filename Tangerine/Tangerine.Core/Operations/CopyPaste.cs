@@ -107,7 +107,7 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform(bool pasteAtMouse = false)
 		{
-			var row = Document.Current.SelectedRows().LastOrDefault();
+			var row = Document.Current.SelectedRows().FirstOrDefault();
 			var loc = row == null ?
 				new RowLocation(Document.Current.RowTree, 0) :
 				new RowLocation(row.Parent, row.Parent.Rows.IndexOf(row));
@@ -191,13 +191,9 @@ namespace Tangerine.Core.Operations
 				}
 				return true;
 			}
-			FolderItemLocation folderLocation;
-			if (location.ParentRow.Rows.Count > 0) {
-				folderLocation = Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]);
-				folderLocation.Index++;
-			} else {
-				folderLocation = new FolderItemLocation { Index = 0, Folder = location.ParentRow.Components.Get<FolderRow>().Folder };
-			}
+			var folderLocation = location.ParentRow.Rows.Count > 0 ?
+				Row.GetFolderItemLocation(location.ParentRow.Rows[location.Index]) :
+				new FolderItemLocation { Index = 0, Folder = location.ParentRow.Components.Get<FolderRow>().Folder };
 			if (!folderLocation.Folder.Expanded) {
 				SetProperty.Perform(folderLocation.Folder, nameof(Folder.Expanded), true);
 			}
@@ -216,8 +212,7 @@ namespace Tangerine.Core.Operations
 			ClearRowSelection.Perform();
 			while (items.Count > 0) {
 				var item = items.First();
-				var bone = item as Bone;
-				if (bone != null) {
+				if (item is Bone bone) {
 					if (bone.BaseIndex != 0) {
 						continue;
 					}
@@ -227,21 +222,18 @@ namespace Tangerine.Core.Operations
 						newIndex = bones.Max(b => b.Index) + 1;
 					}
 					var children = BoneUtils.FindBoneDescendats(bone, items.OfType<Bone>()).ToList();
-					var map = new Dictionary<int, int>();
-					map.Add(bone.Index, newIndex);
+					var map = new Dictionary<int, int> { { bone.Index, newIndex } };
 					bone.BaseIndex = location.ParentRow.Components.Get<BoneRow>()?.Bone.Index ?? 0;
 					bone.Index = newIndex;
 					InsertFolderItem.Perform(
 						Document.Current.Container,
 						folderLocation, bone);
-					folderLocation.Index++;
 					foreach (var b in children) {
 						b.BaseIndex = map[b.BaseIndex];
 						map.Add(b.Index, b.Index = ++newIndex);
 						InsertFolderItem.Perform(
 							Document.Current.Container,
 							folderLocation, b);
-						folderLocation.Index++;
 						items.Remove(b);
 					}
 					Document.Current.Container.RootFolder().SyncDescriptorsAndNodes(Document.Current.Container);
@@ -252,7 +244,6 @@ namespace Tangerine.Core.Operations
 						InsertFolderItem.Perform(
 							Document.Current.Container,
 							folderLocation, item);
-						folderLocation.Index++;
 						SelectRow.Perform(Document.Current.GetRowForObject(item));
 					}
 				}
