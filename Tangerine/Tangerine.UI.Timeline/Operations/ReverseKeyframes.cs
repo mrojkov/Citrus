@@ -1,13 +1,9 @@
 using Lime;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
-using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
@@ -28,13 +24,11 @@ namespace Tangerine.UI.Timeline.Operations
 				AlertDialog.Show("Can't invert animation in a non-rectangular selection. The selection must be a single rectangle.");
 				return;
 			}
-			for (int i = Boundaries.Value.Top; i <= Boundaries.Value.Bottom; ++i) {
-				var animable =
-					Document.Current.Rows[i].Components.Get<NodeRow>()?.Node as IAnimationHost;
-				if (animable == null) {
-					continue;
-				}
-				Document.Current.History.DoTransaction(() => {
+			using (Document.Current.History.BeginTransaction()) {
+				for (int i = Boundaries.Value.Top; i <= Boundaries.Value.Bottom; ++i) {
+					if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
+						continue;
+					}
 					foreach (var animator in animable.Animators.ToList()) {
 						var saved = animator.Keys.Where(k =>
 							Boundaries.Value.Left <= k.Frame &&
@@ -47,7 +41,8 @@ namespace Tangerine.UI.Timeline.Operations
 							SetKeyframe.Perform(animable, animator.TargetPropertyPath, animator.AnimationId, key);
 						}
 					}
-				});
+				}
+				Document.Current.History.CommitTransaction();
 			}
 		}
 
