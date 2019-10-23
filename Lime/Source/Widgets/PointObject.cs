@@ -71,24 +71,34 @@ namespace Lime
 		{
 			get
 			{
-				if (CleanDirtyFlags(DirtyFlags.LocalTransform | DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse)) {
-					RecalcTransformedPosition();
-				}
+				RecalcTransformedPositionIfNeeded();
 				return transformedPosition;
+			}
+		}
+
+		public void RecalcTransformedPositionIfNeeded()
+		{
+			if (CleanDirtyFlags(DirtyFlags.LocalTransform | DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse)) {
+				RecalcTransformedPosition();
 			}
 		}
 
 		private void RecalcTransformedPosition()
 		{
+			var parentWidget = Parent?.AsWidget;
+			var prevTransformedPosition = transformedPosition;
 			transformedPosition = Offset;
-			if (Parent?.AsWidget != null) {
-				transformedPosition = Parent.AsWidget.Size * Position + Offset;
+			if (parentWidget != null) {
+				transformedPosition = parentWidget.Size * Position + Offset;
 			}
 			if (SkinningWeights != null && Parent?.Parent != null) {
 				BoneArray a = Parent.Parent.AsWidget.BoneArray;
-				Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
+				Matrix32 m1 = parentWidget.CalcLocalToParentTransform();
 				Matrix32 m2 = m1.CalcInversed();
 				transformedPosition = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(transformedPosition), SkinningWeights));
+			}
+			if (transformedPosition != prevTransformedPosition) {
+				DirtyMask |= DirtyFlags.ParentBoundingRect;
 			}
 		}
 

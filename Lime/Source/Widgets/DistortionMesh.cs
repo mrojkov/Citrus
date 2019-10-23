@@ -40,8 +40,14 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && ClipRegionTest(chain.ClipRegion)) {
-				AddSelfAndChildrenToRenderChain(chain, Layer);
+			if (GloballyVisible) {
+				// Need to recalculate points transformed positions in order to refresh widget's BoundingRect.
+				for (var n = FirstChild; n != null; n = n.NextSibling) {
+					((DistortionMeshPoint) n).RecalcTransformedPositionIfNeeded();
+				}
+				if (ClipRegionTest(chain.ClipRegion)) {
+					AddSelfAndChildrenToRenderChain(chain, Layer);
+				}
 			}
 		}
 
