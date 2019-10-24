@@ -76,8 +76,10 @@ namespace Lime
 			get { return scale; }
 			set
 			{
-				scale = value;
-				OnTransformChanged();
+				if (scale != value) {
+					scale = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -88,8 +90,10 @@ namespace Lime
 			get { return rotation; }
 			set
 			{
-				rotation = value;
-				OnTransformChanged();
+				if (rotation != value) {
+					rotation = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -103,8 +107,10 @@ namespace Lime
 			get { return position; }
 			set
 			{
-				position = value;
-				OnTransformChanged();
+				if (position != value) {
+					position = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -115,8 +121,10 @@ namespace Lime
 			get { return color; }
 			set
 			{
-				color = value;
-				PropagateDirtyFlags(DirtyFlags.Color);
+				if (color != value) {
+					color = value;
+					PropagateDirtyFlags(DirtyFlags.Color);
+				}
 			}
 		}
 
