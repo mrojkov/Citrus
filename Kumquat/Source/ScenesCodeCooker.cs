@@ -48,7 +48,7 @@ namespace Kumquat
 		private readonly string generatedScenesPath;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
-		private readonly Dictionary<string, Node> scenesForProcessing;
+		private readonly List<string> scenesForProcessing;
 		public readonly string SceneCodeTemplate;
 		public readonly string FrameCodeTemplate;
 		public readonly string NodeCodeTemplate;
@@ -68,7 +68,7 @@ namespace Kumquat
 			string projectName,
 			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
-			Dictionary<string, Node> scenesForProcessing,
+			List<string> scenesForProcessing,
 			List<string> allScenes,
 			List<string> modifiedScenes,
 			CodeCookerCache codeCookerCache
@@ -140,22 +140,23 @@ namespace Kumquat
 				externalSceneToOriginalScenePath.Add(Path.ChangeExtension(scenePath, null), scenePath);
 			}
 			var sceneToFrameTree = new List<Tuple<string, ParsedFramesTree>>();
-			foreach (var scene in scenesForProcessing) {
-				var bundleName = sceneToBundleMap[scene.Key];
+			foreach (var scenePath in scenesForProcessing) {
+				var scene = Node.CreateFromAssetBundle(Path.ChangeExtension(scenePath, null));
+				var bundleName = sceneToBundleMap[scenePath];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				if (!Directory.Exists(bundleSourcePath)) {
 					RetryUntilSuccessCreateDirectory(bundleSourcePath);
 				}
-				currentCookingScene = scene.Key;
-				var parsedFramesTree = GenerateParsedFramesTree(scene.Key, scene.Value);
-				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scene.Key, parsedFramesTree));
+				currentCookingScene = scenePath;
+				var parsedFramesTree = GenerateParsedFramesTree(scenePath, scene);
+				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scenePath, parsedFramesTree));
 			}
 			foreach (var kv in sceneToFrameTree) {
 				var parsedFramesTree = kv.Item2;
 				currentCookingScene = kv.Item1;
 				var k = Path.ChangeExtension(kv.Item1, null);
 				k = AssetPath.CorrectSlashes(k);
-				var id = scenesForProcessing[kv.Item1].Id;
+				var id = parsedFramesTree.ParsedNode.Id;
 				var bundleName = sceneToBundleMap[kv.Item1];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				var generatedCodePath = bundleSourcePath + "/" + parsedFramesTree.ClassName + ".cs";
