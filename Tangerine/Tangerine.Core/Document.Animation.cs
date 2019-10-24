@@ -276,7 +276,7 @@ namespace Tangerine.Core
 				var remainDelta = delta;
 				do {
 					delta = Mathf.Min(remainDelta, Application.MaxDelta);
-					animation.OwnerNode.Update(delta);
+					animation.OwnerNode.AdvanceAnimationsRecursive(delta);
 					remainDelta -= delta;
 				} while (remainDelta > 0f);
 			}
@@ -292,6 +292,7 @@ namespace Tangerine.Core
 					var delta = Mathf.Min(forwardDelta, OptimalDelta);
 					SafeUpdate(animation, delta);
 				} while (forwardDelta > OptimalDelta);
+				animation.OwnerNode.Update(0);
 				Node.TangerineFastForwardInProgress = false;
 			}
 
