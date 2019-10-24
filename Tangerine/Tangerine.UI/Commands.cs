@@ -113,14 +113,6 @@ namespace Tangerine.UI
 		public static readonly ICommand ResolutionChanger = new Command("Preview Next Resolution", new Shortcut(Key.F11));
 		public static readonly ICommand ResolutionReverceChanger = new Command("Preview Previous Resolution", new Shortcut(Modifiers.Shift, Key.F11));
 		public static readonly ICommand ResolutionOrientation = new Command("Preview Next Orientation", new Shortcut(Key.F12));
-		public static readonly ICommand DragRight = new Command("Drag Right", new Shortcut(Key.D));
-		public static readonly ICommand DragLeft = new Command("Drag Left", new Shortcut(Key.A));
-		public static readonly ICommand DragUp = new Command("Drag Up", new Shortcut(Key.W));
-		public static readonly ICommand DragDown = new Command("Drag Down", new Shortcut(Key.S));
-		public static readonly ICommand DragRightFast = new Command("Drag Right Fast", new Shortcut(Modifiers.Shift, Key.D));
-		public static readonly ICommand DragLeftFast = new Command("Drag Left Fast", new Shortcut(Modifiers.Shift, Key.A));
-		public static readonly ICommand DragUpFast = new Command("Drag Up Fast", new Shortcut(Modifiers.Shift, Key.W));
-		public static readonly ICommand DragDownFast = new Command("Drag Down Fast", new Shortcut(Modifiers.Shift, Key.S));
 		public static readonly ICommand ShowBone3DVisualHint = new Command("Bone (3D)", new Shortcut(Modifiers.Command, Key.B));
 		public static readonly ICommand ShowAllVisualHints = new Command("Display All", new Shortcut(Modifiers.Command, Key.M));
 		public static readonly ICommand ShowVisualHintsForInvisibleNodes = new Command("Display Invisible", new Shortcut(Modifiers.Command | Modifiers.Alt, Key.M));
