@@ -318,4 +318,14 @@ namespace Lime
 			DisplayName = displayName;
 		}
 	}
+
+	public sealed class TangerinePropertyTooltipAttribute : Attribute
+	{
+		public readonly string Tooltip;
+
+		public TangerinePropertyTooltipAttribute(string tooltip)
+		{
+			Tooltip = tooltip;
+		}
+	}
 }

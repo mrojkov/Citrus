@@ -281,7 +281,6 @@
     <Compile Include="Source\ServiceProviderExtensions.cs" />
     <Compile Include="Source\ServiceRegistry.cs" />
     <Compile Include="Source\TangerineAttributes.cs" />
-    <Compile Include="Source\Tooltip.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Plane.cs" />

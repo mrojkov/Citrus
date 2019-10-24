@@ -14,7 +14,7 @@ namespace Lime
 		}
 	}
 
-	internal class ThemedFramePresenter : IPresenter
+	public class ThemedFramePresenter : IPresenter
 	{
 		private readonly Color4 innerColor;
 		private readonly Color4 borderColor;

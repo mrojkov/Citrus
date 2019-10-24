@@ -15,7 +15,7 @@ namespace Lime
 
 		private Tooltip()
 		{
-			tooltipWindow = new Window(new WindowOptions() {
+			tooltipWindow = new Window(new WindowOptions {
 				Style = WindowStyle.Borderless,
 				FixedSize = false,
 				Visible = false,
