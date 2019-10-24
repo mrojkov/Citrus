@@ -164,7 +164,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateApplyZeroPoseButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ApplyZeroPose")) { Tip = "Apply zero pose" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ApplyZeroPose")) { Tooltip = "Apply zero pose" };
 			button.AddTransactionClickHandler(() => {
 				Core.Operations.SetProperty.Perform(Document.Current.Animation, nameof(Animation.ApplyZeroPose), !Document.Current.Animation.ApplyZeroPose);
 			});
@@ -213,7 +213,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateResetAnimationsTimes()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tip = "Reset Animations Times" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tooltip = "Reset Animations Times" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ResetAnimationsTimes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ResetAnimationsTimes = !CoreUserPreferences.ResetAnimationsTimes;
 			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
