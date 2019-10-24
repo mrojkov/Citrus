@@ -11,8 +11,6 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class RichText : Widget, IText
 	{
-		public static TextProcessor GlobalTextProcessor;
-
 		private TextParser parser = new TextParser();
 		private string text;
 		private HAlignment hAlignment;
@@ -45,12 +43,21 @@ namespace Lime
 			{
 				if (displayText == null) {
 					displayText = Localizable ? Text.Localize() : Text;
+					GlobalTextProcessor?.Invoke(ref displayText, this);
 					textProcessor?.Invoke(ref displayText, this);
 				}
 				return displayText;
 			}
 		}
 
+		/// <summary>
+		/// Processes a text assigned to any RichText instance.
+		/// </summary>
+		public static event TextProcessorDelegate GlobalTextProcessor;
+
+		/// <summary>
+		/// Processes a text assigned to this RichText instance.
+		/// </summary>
 		public event TextProcessorDelegate TextProcessor
 		{
 			add

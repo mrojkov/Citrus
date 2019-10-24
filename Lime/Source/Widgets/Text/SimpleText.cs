@@ -5,8 +5,6 @@ using Yuzu;
 
 namespace Lime
 {
-	public delegate void TextProcessor(ref string text, Widget w);
-
 	[TangerineRegisterNode(Order = 10)]
 	[TangerineVisualHintGroup("/All/Nodes/Text")]
 	public class SimpleText : Widget, IText
@@ -29,8 +27,14 @@ namespace Lime
 		private int gradientMapIndex = -1;
 		private float letterSpacing;
 
-		public static TextProcessor GlobalTextProcessor;
+		/// <summary>
+		/// Processes a text assigned to any SimpleText instance.
+		/// </summary>
+		public static event TextProcessorDelegate GlobalTextProcessor;
 
+		/// <summary>
+		/// Processes a text assigned to this SimpleText instance.
+		/// </summary>
 		public event TextProcessorDelegate TextProcessor
 		{
 			add
@@ -79,8 +83,8 @@ namespace Lime
 			{
 				if (displayText != null) return displayText;
 				displayText = Localizable ? Text.Localize() : Text;
-				if (textProcessor != null)
-					textProcessor(ref displayText, this);
+				GlobalTextProcessor?.Invoke(ref displayText, this);
+				textProcessor?.Invoke(ref displayText, this);
 				return displayText;
 			}
 		}
