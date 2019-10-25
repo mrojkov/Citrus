@@ -90,7 +90,7 @@ namespace Lime
 			AsyncRendering = options.AsyncRendering;
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
-				WaitForRender();
+				WaitForRendering();
 				Active = false;
 				RaiseDeactivated();
 			};
@@ -212,7 +212,7 @@ namespace Lime
 			}
 		}
 
-		internal void WaitForRender()
+		public void WaitForRendering()
 		{
 			if (AsyncRendering) {
 				renderCompleted.WaitOne();

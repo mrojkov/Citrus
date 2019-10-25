@@ -145,6 +145,8 @@ namespace Lime
 			view.SwapBuffers();
 			fpsCounter.Refresh();
 		}
+
+		public void WaitForRendering() { }
 	}
 }
 #endif

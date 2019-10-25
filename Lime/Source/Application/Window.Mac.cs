@@ -513,6 +513,8 @@ namespace Lime
 			RaiseSync();
 		}
 
+		public void WaitForRendering() { }
+
 		private void RefreshMousePosition()
 		{
 			Application.Input.DesktopMousePosition = new Vector2((float) NSEvent.CurrentMouseLocation.X, (float) NSEvent.CurrentMouseLocation.Y);

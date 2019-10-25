@@ -797,7 +797,7 @@ namespace Lime
 			}
 		}
 
-		private void WaitForRendering()
+		public void WaitForRendering()
 		{
 			if (AsyncRendering) {
 				renderCompleted.WaitOne();
