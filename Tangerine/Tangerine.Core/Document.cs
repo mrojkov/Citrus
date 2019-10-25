@@ -176,7 +176,7 @@ namespace Tangerine.Core
 			Decorate(RootNode);
 			Container = RootNode;
 			History.PerformingOperation += Document_PerformingOperation;
-			History.Changed += Document_Changed;
+			History.DocumentChanged += Document_Changed;
 		}
 
 		public Document(string path, bool delayLoad = false)
@@ -261,7 +261,7 @@ namespace Tangerine.Core
 					}
 				}
 				History.PerformingOperation += Document_PerformingOperation;
-				History.Changed += Document_Changed;
+				History.DocumentChanged += Document_Changed;
 			} catch (System.Exception e) {
 				throw new System.InvalidOperationException($"Can't open '{Path}': {e.Message}");
 			}
@@ -269,7 +269,7 @@ namespace Tangerine.Core
 			OnLocaleChanged();
 		}
 
-		private void Document_Changed() => Project.Current.SceneCache.InvalidateEntryFromOpenedDocumentChanged(Path, IsModified ? (Func<Node>)(() => RootNodeUnwrapped) : null);
+		private void Document_Changed() => Project.Current.SceneCache.InvalidateEntryFromOpenedDocumentChanged(Path, () => RootNodeUnwrapped);
 
 		private void Document_PerformingOperation(IOperation operation)
 		{
