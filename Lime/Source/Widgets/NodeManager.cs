@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Lime
 {
 	public class NodeManager
 	{
+		public static event HierarchyChangedEventHandler GlobalHierarchyChanged;
+
 		private Dictionary<Type, List<NodeComponentProcessor>> processorsByComponentType = new Dictionary<Type, List<NodeComponentProcessor>>();
 		private HashSet<Node> frozenNodes = new HashSet<Node>(ReferenceEqualityComparer.Instance);
 
@@ -98,11 +99,14 @@ namespace Lime
 		internal void RegisterNode(Node node, Node parent)
 		{
 			RegisterNodeHelper(node);
-			HierarchyChanged?.Invoke(new HierarchyChangedEventArgs {
-				Action = HierarchyAction.Link,
-				Child = node,
-				Parent = parent
-			});
+			var hierarchyChangedEventArgs = new HierarchyChangedEventArgs(
+				this,
+				HierarchyAction.Link,
+				node,
+				parent
+			);
+			HierarchyChanged?.Invoke(hierarchyChangedEventArgs);
+			GlobalHierarchyChanged?.Invoke(hierarchyChangedEventArgs);
 		}
 
 		private void RegisterNodeHelper(Node node)
@@ -122,11 +126,14 @@ namespace Lime
 		internal void UnregisterNode(Node node, Node parent)
 		{
 			UnregisterNodeHelper(node);
-			HierarchyChanged?.Invoke(new HierarchyChangedEventArgs {
-				Action = HierarchyAction.Unlink,
-				Child = node,
-				Parent = parent
-			});
+			var hierarchyChangedEventArgs = new HierarchyChangedEventArgs(
+				this,
+				HierarchyAction.Unlink,
+				node,
+				parent
+			);
+			HierarchyChanged?.Invoke(hierarchyChangedEventArgs);
+			GlobalHierarchyChanged?.Invoke(hierarchyChangedEventArgs);
 		}
 
 		private void UnregisterNodeHelper(Node node)
@@ -183,9 +190,19 @@ namespace Lime
 
 	public struct HierarchyChangedEventArgs
 	{
-		public HierarchyAction Action;
-		public Node Parent;
-		public Node Child;
+		public readonly NodeManager Manager;
+		public readonly HierarchyAction Action;
+		public readonly Node Child;
+
+		public readonly Node Parent;
+
+		public HierarchyChangedEventArgs(NodeManager manager, HierarchyAction action, Node child, Node parent)
+		{
+			Manager = manager;
+			Action = action;
+			Child = child;
+			Parent = parent;
+		}
 	}
 
 	public enum HierarchyAction
