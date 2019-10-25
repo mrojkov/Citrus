@@ -76,14 +76,9 @@ namespace Lime
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
-				ProcessMarker(animation, marker);
-				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
-					animation.RaiseStopped();
-				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
-				}
+				ProcessMarker(animation, marker, previousTime, currentTime);
 			}
+
 		}
 
 		protected static Marker FindMarkerAhead(Animation animation, double time)
@@ -99,7 +94,7 @@ namespace Lime
 			return null;
 		}
 
-		protected virtual void ProcessMarker(Animation animation, Marker marker)
+		protected virtual void ProcessMarker(Animation animation, Marker marker, double previousTime, double currentTime)
 		{
 			if ((animation.OwnerNode.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
 				return;
@@ -118,7 +113,11 @@ namespace Lime
 					break;
 				case MarkerAction.Stop:
 					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.IsRunning = false;
+					break;
+				case MarkerAction.Play:
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 					break;
 			}
 			marker.CustomAction?.Invoke();
@@ -355,13 +354,7 @@ namespace Lime
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
-				ProcessMarker(animation, marker);
-				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
-					animation.RaiseStopped();
-				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
-				}
+				ProcessMarker(animation, marker, previousTime, currentTime);
 			}
 		}
 	}
