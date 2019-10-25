@@ -33,8 +33,8 @@ namespace Orange
 
 	public class OrangePlugin
 	{
-		[Import(nameof(Initialize), AllowRecomposition = true, AllowDefault = true)]
-		public Action Initialize;
+		[ImportMany(nameof(Initialize), AllowRecomposition = true)]
+		public IEnumerable<Action> Initialize;
 
 		[Import(nameof(BuildUI), AllowRecomposition = true, AllowDefault = true)]
 		public Action<IPluginUIBuilder> BuildUI;
@@ -86,6 +86,20 @@ namespace Orange
 		private static CompositionContainer compositionContainer;
 		private static readonly AggregateCatalog catalog;
 		private static readonly List<ComposablePartCatalog> registeredCatalogs = new List<ComposablePartCatalog>();
+		/// <summary>
+		/// List of already handled actions in OrangePlugin.Initialize.
+		/// It is needed to call OrangePlugin.Initialize for each loading plugin exactly after it was loaded.
+		/// Because first plugin in the list in his Initialize() can compile other plugins (dlls).
+		/// And MEF works so that in OrangePlugin.Initialize list all Actions are present -
+		/// already called and not.
+		///
+		/// Этот список нужен для того, чтобы вызывать метод OrangePlugin.Initialize для каждого
+		/// подключенного плагина точно в тот момент, когда он загрузился (а не для все сразу после всей загрузки).
+		/// Это нужно, чтобы первый плагин мог в своём Initialize() скомпиллировать остальные плагины.
+		///
+		/// Хорошо бы переделать эту множественную инициализацию с компиляцией на задачу CIT-1375.
+		/// </summary>
+		private static readonly HashSet<Action> handledInitializers = new HashSet<Action>();
 		private static readonly Regex ignoredAssemblies = new Regex(
 			"^(Lime|System.*|mscorlib.*|Microsoft.*)",
 			RegexOptions.Compiled
@@ -110,6 +124,7 @@ namespace Orange
 
 		private static void ResetPlugins()
 		{
+			handledInitializers.Clear();
 			catalog.Catalogs.Clear();
 			foreach (var additionalCatalog in registeredCatalogs) {
 				catalog.Catalogs.Add(additionalCatalog);
@@ -172,7 +187,7 @@ namespace Orange
 				The.UI.ShowError(e.Message);
 				Console.WriteLine(e.Message);
 			}
-			CurrentPlugin?.Initialize?.Invoke();
+			ProcessPluginInitializeActions();
 			var uiBuilder = The.UI.GetPluginUIBuilder();
 			try {
 				if (uiBuilder != null) {
@@ -243,7 +258,21 @@ namespace Orange
 				throw new System.Exception(msg);
 			}
 			resolvedAssemblies[assembly.GetName().Name] = assembly;
+
+			ProcessPluginInitializeActions();
+
 			return assembly;
+		}
+
+		private static void ProcessPluginInitializeActions()
+		{
+			if (CurrentPlugin != null) {
+				foreach (var initAction in CurrentPlugin.Initialize) {
+					if (handledInitializers.Add(initAction)) {
+						initAction();
+					}
+				}
+			}
 		}
 
 		public static void BeforeBundlesCooking()
