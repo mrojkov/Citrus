@@ -374,9 +374,12 @@ namespace Tangerine.Panels
 			index = index.Clamp(0, a.Count - 1);
 			EnsureRowVisible(index);
 			Window.Current.Invalidate();
-			Document.Current.History.DoTransaction(() => {
-				Core.Operations.SetProperty.Perform(Document.Current, nameof(Document.SelectedAnimation), a[index], isChangingDocument: false);
+			var document = Document.Current;
+			document.History.DoTransaction(() => {
+				SetProperty.Perform(document, nameof(Document.SelectedAnimation), a[index], isChangingDocument: false);
 			});
+			// Invalidate dependent documents for which this is an external scene.
+			Project.Current.SceneCache.InvalidateEntryFromOpenedDocumentChanged(document.Path, () => document.RootNodeUnwrapped);
 		}
 
 		private void EnsureRowVisible(int row)
