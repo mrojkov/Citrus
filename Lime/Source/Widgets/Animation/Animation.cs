@@ -197,10 +197,12 @@ namespace Lime
 			AnimationEngine.ApplyAnimatorsAndExecuteTriggers(this, Time, Time, false);
 		}
 
-		public void QueueAssuredStopped(Action onStopped)
+		public void ScheduleAssuredStopped(Action onStopped, bool immediatelyInvokeIfStopped)
 		{
 			if (!IsRunning) {
-				onStopped();
+				if (immediatelyInvokeIfStopped) {
+					onStopped();
+				}
 				return;
 			}
 			assuredStopped += onStopped;
