@@ -291,6 +291,8 @@ namespace Lime
 		/// <param name="action"></param>
 		void InvokeOnRendering(Action action);
 
+		void WaitForRendering();
+
 		bool VSync { get; set; }
 
 		/// <summary>

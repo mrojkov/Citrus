@@ -56,6 +56,11 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 
+		public void WaitForRendering()
+		{
+			throw new NotImplementedException();
+		}
+
 		public Vector2 LocalToDesktop(Vector2 localPosition)
 		{
 			throw new NotImplementedException();
