@@ -63,7 +63,7 @@ namespace Lime
 			{
 				if (freezeInvisible != value) {
 					freezeInvisible = value;
-					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					PropagateDirtyFlags(DirtyFlags.Frozen);
 					Manager?.FilterNode(this);
 				}
 			}
@@ -213,29 +213,6 @@ namespace Lime
 			}
 		}
 
-		public bool GloballyFreezeInvisible
-		{
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
-					RecalcGloballyFreezeInvisible();
-				}
-				return globallyFreezeInvisible;
-			}
-		}
-
-		private void RecalcGloballyFreezeInvisible()
-		{
-			globallyFreezeInvisible = FreezeInvisible;
-			if (Parent != null) {
-				if (Parent.AsWidget != null) {
-					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
-				} else if (Parent.AsNode3D != null) {
-					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
-				}
-			}
-		}
-
 		public Color4 GlobalColor
 		{
 			get
@@ -262,7 +239,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
+			globallyFrozen |= FreezeInvisible && !GloballyVisible;
 		}
 
 		public Node3D()

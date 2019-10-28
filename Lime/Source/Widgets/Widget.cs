@@ -72,7 +72,6 @@ namespace Lime
 		protected ShaderId globalShader;
 		protected bool globallyEnabled;
 		protected bool globallyVisible;
-		protected bool globallyFreezeInvisible;
 
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
@@ -752,32 +751,8 @@ namespace Lime
 			{
 				if (freezeInvisible != value) {
 					freezeInvisible = value;
-					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					PropagateDirtyFlags(DirtyFlags.Frozen);
 					Manager?.FilterNode(this);
-				}
-			}
-		}
-
-		public bool GloballyFreezeInvisible
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
-					RecalcGloballyFreezeInvisible();
-				}
-				return globallyFreezeInvisible;
-			}
-		}
-
-		private void RecalcGloballyFreezeInvisible()
-		{
-			globallyFreezeInvisible = FreezeInvisible;
-			if (Parent != null) {
-				if (Parent.AsWidget != null) {
-					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
-				} else if (Parent.AsNode3D != null) {
-					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
 				}
 			}
 		}
@@ -1461,7 +1436,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
+			globallyFrozen |= FreezeInvisible && !GloballyVisible;
 		}
 	}
 }

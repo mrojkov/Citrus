@@ -76,7 +76,6 @@ namespace Lime
 			Enabled = 1 << 9,
 			EffectiveAnimationSpeed = 1 << 10,
 			Frozen = 1 << 11,
-			FreezeInvisible = 1 << 12,
 			All = ~None
 		}
 
