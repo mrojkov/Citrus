@@ -102,7 +102,7 @@ namespace Lime
 				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
 			ActivityDelegate.Instance.GameView.SurfaceCreating += () => requestForRedraw = true;
-			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRender;
+			ActivityDelegate.Instance.GameView.SurfaceDestroing += WaitForRendering;
 			PixelScale = Resources.System.DisplayMetrics.Density;
 
 			if (AsyncRendering) {
