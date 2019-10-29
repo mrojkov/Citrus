@@ -36,6 +36,9 @@ namespace Orange
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(cp);
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding(cp);
 #else
+			if (workingDirectory != null) {
+				p.StartInfo.WorkingDirectory = workingDirectory;
+			}
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
 			p.StartInfo.EnvironmentVariables.Clear();
