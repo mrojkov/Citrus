@@ -32,19 +32,21 @@ namespace Lime
 
 		public static void Attach(Widget target, OnMouseWheelHandler onMouseWheel)
 		{
-			if (target.Tasks.AnyTagged(Processor.Tag)) {
-				var message = $"{nameof(target)} already contains {nameof(MouseWheelProcessor)}";
-				throw new Exception(message);
-			}
+			const string MessageAlreadyTagged =
+				nameof(target) + " already contains " + nameof(MouseWheelProcessor);
+
 			if (onMouseWheel == null) {
-				throw new NullReferenceException($"{nameof(onMouseWheel)} is null");
+				throw new NullReferenceException(nameof(onMouseWheel) + " is null");
 			}
-			target.Tasks.AddLoop(new Processor(target, onMouseWheel).Process, Processor.Tag);
+			if (target.LateTasks.AnyTagged(Processor.Tag)) {
+				throw new Exception(MessageAlreadyTagged);
+			}
+			target.LateTasks.AddLoop(new Processor(target, onMouseWheel).Process, Processor.Tag);
 		}
 
 		public static void Detach(Widget target)
 		{
-			target.Tasks.StopByTag(Processor.Tag);
+			target.LateTasks.StopByTag(Processor.Tag);
 		}
 	}
 }
