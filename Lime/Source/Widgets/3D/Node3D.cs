@@ -239,7 +239,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= FreezeInvisible && !GloballyVisible;
+			globallyFrozen |= FreezeInvisible && !Visible;
 		}
 
 		public Node3D()
