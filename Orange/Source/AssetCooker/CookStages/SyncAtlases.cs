@@ -227,22 +227,40 @@ namespace Orange
 			return atlasId;
 		}
 
-		private void PackItemsToAtlas(List<TextureTools.AtlasItem> items, Size size, out double packRate)
+		private void PackItemsToAtlas(List<TextureTools.AtlasItem> items, Size atlasSize, out double packRate)
 		{
 			items.ForEach(i => i.Allocated = false);
-			// Take in account 1 pixel border for each side.
-			var a = new RectAllocator(new Size(size.Width, size.Height));
+			// Reserve space for default one-pixel padding.
+			atlasSize.Width += 2;
+			atlasSize.Height += 2;
+			var rectAllocator = new RectAllocator(atlasSize);
 			TextureTools.AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
-				var sz = new Size(item.BitmapInfo.Width, item.BitmapInfo.Height);
+				var padding = item.CookingRules.AtlasItemPadding;
+				var paddedItemSize = new Size(item.BitmapInfo.Width + padding * 2, item.BitmapInfo.Height + padding * 2);
 				if (firstAllocatedItem == null || AreAtlasItemsCompatible(items, firstAllocatedItem, item)) {
-					if (a.Allocate(sz, item.CookingRules.AtlasItemPadding, out item.EffectivePadding, out item.AtlasRect)) {
+					if (rectAllocator.Allocate(paddedItemSize, out item.AtlasRect)) {
 						item.Allocated = true;
 						firstAllocatedItem = firstAllocatedItem ?? item;
 					}
 				}
 			}
-			packRate = a.GetPackRate();
+			packRate = rectAllocator.GetPackRate();
+			// Adjust item rects according to theirs paddings.
+			foreach (var item in items) {
+				if (!item.Allocated) {
+					continue;
+				}
+				var atlasRect = item.AtlasRect;
+				atlasRect.A += new IntVector2(item.CookingRules.AtlasItemPadding);
+				atlasRect.B -= new IntVector2(item.CookingRules.AtlasItemPadding);
+				// Don't leave space between item rectangle and texture boundaries for items with 1 pixel padding.
+				if (item.CookingRules.AtlasItemPadding == 1) {
+					atlasRect.A -= new IntVector2(1);
+					atlasRect.B -= new IntVector2(1);
+				}
+				item.AtlasRect = atlasRect;
+			}
 		}
 
 		/// <summary>
@@ -287,14 +305,14 @@ namespace Orange
 			var atlasPath = AssetCooker.GetAtlasPath(atlasChain, atlasId);
 			var atlasPixels = new Color4[size.Width * size.Height];
 			foreach (var item in items.Where(i => i.Allocated)) {
-				item.AtlasRect.A += new IntVector2(item.EffectivePadding.Left, item.EffectivePadding.Top);
+				var atlasRect = item.AtlasRect;
 				using (var bitmap = TextureTools.OpenAtlasItemBitmapAndRescaleIfNeeded(AssetCooker.Platform, item)) {
-					CopyPixels(bitmap, atlasPixels, item.AtlasRect.A.X, item.AtlasRect.A.Y, size.Width, size.Height);
+					CopyPixels(bitmap, atlasPixels, atlasRect.A.X, atlasRect.A.Y, size.Width, size.Height);
 				}
-				var atlasPart = new TextureAtlasElement.Params();
-				atlasPart.AtlasRect = item.AtlasRect;
-				atlasPart.AtlasRect.B -= new IntVector2(item.EffectivePadding.Right, item.EffectivePadding.Bottom);
-				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
+				var atlasPart = new TextureAtlasElement.Params {
+					AtlasRect = atlasRect,
+					AtlasPath = Path.ChangeExtension(atlasPath, null)
+				};
 				var srcPath = Path.ChangeExtension(item.Path, item.SourceExtension);
 				Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, item.Path, atlasPart, Serialization.Format.Binary,
 					item.SourceExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, item.CookingRules.SHA1);
