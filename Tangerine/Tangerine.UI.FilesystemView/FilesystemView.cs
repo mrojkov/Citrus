@@ -130,7 +130,7 @@ namespace Tangerine.UI.FilesystemView
 		public void SortByType(SortType sortType, OrderType orderType)
 		{
 			this.sortType = sortType;
-			this.orderType = OrderType;
+			this.orderType = orderType;
 			InvalidateView(filesystemModel.CurrentPath, sortType, orderType);
 		}
 
