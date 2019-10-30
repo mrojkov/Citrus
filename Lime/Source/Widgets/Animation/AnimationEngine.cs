@@ -97,6 +97,7 @@ namespace Lime
 		protected virtual void ProcessMarker(Animation animation, Marker marker, double previousTime, double currentTime)
 		{
 			if ((animation.OwnerNode.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+				ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: false);
 				return;
 			}
 			switch (marker.Action) {
