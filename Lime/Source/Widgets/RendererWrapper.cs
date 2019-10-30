@@ -39,6 +39,25 @@ namespace Lime
 		public abstract void DrawSprite(ITexture texture1, ITexture texture2, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2);
 		public abstract void DrawSprite(ITexture texture1, ITexture texture2, IMaterial material, Color4 color, Vector2 position, Vector2 size, Vector2 uv0t1, Vector2 uv1t1, Vector2 uv0t2, Vector2 uv1t2);
 
+		public abstract void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color);
+
+		public void DrawCircle(float x, float y, float radius, int numSegments, Color4 color)
+		{
+			DrawCircle(new Vector2(x, y), radius, numSegments, color);
+		}
+
+		public abstract void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor);
+
+		public void DrawRound(Vector2 center, float radius, int numSegments, Color4 color)
+		{
+			DrawRound(center, radius, numSegments, color, color);
+		}
+
+		public void DrawRound(float x, float y, float radius, int numSegments, Color4 color)
+		{
+			DrawRound(new Vector2(x, y), radius, numSegments, color, color);
+		}
+		
 		public void DrawTriangleFan(Vertex[] vertices, int numVertices)
 		{
 			DrawTriangleFan(null, null, vertices, numVertices);
@@ -221,6 +240,16 @@ namespace Lime
 		public override void MultiplyTransform2(Matrix32 transform)
 		{
 			Renderer.MultiplyTransform2(transform);
+		}
+
+		public override void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color)
+		{
+			Renderer.DrawCircle(center, radius, numSegments, color);
+		}
+
+		public override void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor)
+		{
+			Renderer.DrawRound(center, radius, numSegments, innerColor, outerColor);
 		}
 
 		public override void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness = 1)
@@ -447,6 +476,25 @@ namespace Lime
 		{
 			var cmd = AddCommand<MultiplyTransform2Command>();
 			cmd.Value = transform;
+		}
+
+		public override void DrawCircle(Vector2 center, float radius, int numSegments, Color4 color)
+		{
+			var cmd = AddCommand<DrawCircleCommand>();
+			cmd.Center = center;
+			cmd.Radius = radius;
+			cmd.NumSegments = numSegments;
+			cmd.Color = color;
+		}
+
+		public override void DrawRound(Vector2 center, float radius, int numSegments, Color4 innerColor, Color4 outerColor)
+		{
+			var cmd = AddCommand<DrawRoundCommand>();
+			cmd.Center = center;
+			cmd.Radius = radius;
+			cmd.NumSegments = numSegments;
+			cmd.InnerColor = innerColor;
+			cmd.OuterColor = outerColor;
 		}
 
 		public override void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness = 1)
@@ -825,6 +873,37 @@ namespace Lime
 			public override void Execute(RendererWrapper renderer)
 			{
 				renderer.MultiplyTransform2(Value);
+			}
+
+			public override void Release() => ReleaseCommand(this);
+		}
+
+		private class DrawCircleCommand : Command
+		{
+			public Vector2 Center;
+			public float Radius;
+			public int NumSegments;
+			public Color4 Color;
+
+			public override void Execute(RendererWrapper renderer)
+			{
+				renderer.DrawCircle(Center, Radius, NumSegments, Color);
+			}
+
+			public override void Release() => ReleaseCommand(this);
+		}
+
+		private class DrawRoundCommand : Command
+		{
+			public Vector2 Center;
+			public float Radius;
+			public int NumSegments;
+			public Color4 InnerColor;
+			public Color4 OuterColor;
+
+			public override void Execute(RendererWrapper renderer)
+			{
+				renderer.DrawRound(Center, Radius, NumSegments, InnerColor, OuterColor);
 			}
 
 			public override void Release() => ReleaseCommand(this);
