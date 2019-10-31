@@ -23,7 +23,7 @@ namespace Lime
 			set
 			{
 				if (position != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position = value;
 				}
 			}
@@ -34,7 +34,7 @@ namespace Lime
 			get => position.X;
 			set {
 				if (position.X != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position.X = value;
 				}
 			}
@@ -44,7 +44,7 @@ namespace Lime
 			get => position.Y;
 			set {
 				if (position.Y != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position.Y = value;
 				}
 			}
@@ -60,13 +60,13 @@ namespace Lime
 			set
 			{
 				if (offset != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					offset = value;
 				}
 			}
 
 		}
-		
+
 		public Vector2 TransformedPosition
 		{
 			get
@@ -98,7 +98,7 @@ namespace Lime
 				transformedPosition = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(transformedPosition), SkinningWeights));
 			}
 			if (transformedPosition != prevTransformedPosition) {
-				DirtyMask |= DirtyFlags.ParentBoundingRect;
+			 	parentWidget.ExpandBoundingRect(transformedPosition);
 			}
 		}
 
