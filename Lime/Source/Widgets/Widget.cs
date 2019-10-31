@@ -1436,7 +1436,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= FreezeInvisible && !(Visible && (color.A != 0 || RenderTransparentWidgets));
+			globallyFrozen |= FreezeInvisible && !((Visible && (color.A != 0 || RenderTransparentWidgets)) || GetTangerineFlag(TangerineFlags.DisplayContent));
 		}
 	}
 }
