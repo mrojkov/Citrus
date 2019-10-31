@@ -8,7 +8,7 @@ namespace Tangerine.Core
 {
 	public sealed partial class Document
 	{
-		private Dictionary<Animation, double> savedAnimationsTimes;
+		private List<(AnimationPath, double)> savedAnimationsTimes;
 
 		public bool SlowMotion { get; set; }
 
@@ -45,8 +45,9 @@ namespace Tangerine.Core
 				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
-					foreach (var (animation, time) in savedAnimationsTimes) {
-						animation.Time = CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
+					foreach (var (animationPath, time) in savedAnimationsTimes) {
+						animationPath.GetAnimation(Document.Current.RootNode).Time =
+							CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
 					}
 					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
 				}
@@ -90,10 +91,10 @@ namespace Tangerine.Core
 			void Save(Node node)
 			{
 				foreach (var animation in node.Animations) {
-					savedAnimationsTimes[animation] = animation.Time;
+					savedAnimationsTimes.Add((new AnimationPath(animation, Document.Current.RootNode), animation.Time));
 				}
 			}
-			savedAnimationsTimes = new Dictionary<Animation, double>();
+			savedAnimationsTimes = new List<(AnimationPath, double)>();
 			foreach (var node in Container.Descendants) {
 				Save(node);
 			}
@@ -365,5 +366,26 @@ namespace Tangerine.Core
 
 		}
 
+		class AnimationPath
+		{
+			private readonly List<int> indices = new List<int>();
+
+			public AnimationPath(Animation animation, Node rootNode)
+			{
+				indices.Add(animation.OwnerNode.Animations.IndexOf(animation));
+				for (var node = animation.OwnerNode; node != rootNode; node = node.Parent) {
+					indices.Add(node.Parent.Nodes.IndexOf(node));
+				}
+			}
+
+			public Animation GetAnimation(Node rootNode)
+			{
+				var node = rootNode;
+				for (int i = indices.Count - 1; i > 0; i--) {
+					node = node.Nodes[indices[i]];
+				}
+				return node.Animations[indices[0]];
+			}
+		}
 	}
 }
