@@ -74,7 +74,15 @@ namespace Lime
 
 		public bool AllowReordering { get; set; } = false;
 
-		public event Action<ReorderEventArgs> OnReorder;
+		/// <summary>
+		/// Occurs when position of a tab has changed.
+		/// </summary>
+		public event Action<ReorderEventArgs> OnReordering;
+
+		/// <summary>
+		/// Occurs when position of a tab changed and users has finished dragging.
+		/// </summary>
+		public event Action<ReorderEventArgs> OnReordered;
 
 		public void ActivateTab(Tab tab)
 		{
@@ -96,26 +104,30 @@ namespace Lime
 				if (AllowReordering) {
 					if (TryGetTabUnderMouse(out var tab) && gesture.WasRecognized()) {
 						ActivateTab(tab);
+						var indexFrom = Nodes.IndexOf(tab);
+						var indexTo = indexFrom;
 						while (!gesture.WasEnded()) {
 							if (TryGetTabUnderMouse(out var tabUnderMouse)) {
-								Reorder(Nodes.IndexOf(tab), Nodes.IndexOf(tabUnderMouse));
+								var currentIndex = Nodes.IndexOf(tab);
+								indexTo = Nodes.IndexOf(tabUnderMouse);
+								if (currentIndex != indexTo) {
+									Nodes.Move(currentIndex, indexTo);
+									OnReordering?.Invoke(new ReorderEventArgs {
+										IndexFrom = currentIndex,
+										IndexTo = indexTo
+									});
+								}
 							}
 							yield return null;
 						}
+						OnReordered?.Invoke(new ReorderEventArgs {
+							IndexFrom = indexFrom,
+							IndexTo = indexTo
+						});
 					}
 				}
 				yield return null;
 			}
-		}
-
-		private void Reorder(int indexFrom, int indexTo)
-		{
-			if (indexFrom == indexTo) return;
-			Nodes.Move(indexFrom, indexTo);
-			OnReorder?.Invoke(new ReorderEventArgs {
-				IndexFrom = indexFrom,
-				IndexTo = indexTo
-			});
 		}
 
 		private bool TryGetTabUnderMouse(out Tab tab)
