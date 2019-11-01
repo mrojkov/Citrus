@@ -541,68 +541,35 @@ namespace Tangerine
 
 		class DocumentTabsProcessor
 		{
-			private TabBar tabBar;
+			private readonly TabBar tabBar;
+
 			public DocumentTabsProcessor(TabBar tabBar)
 			{
-				tabBar.HitTestTarget = true;
 				this.tabBar = tabBar;
 				var g = new DropFilesGesture();
 				g.Recognized += new ScenesDropHandler { ShouldCreateContextMenu = false }.Handle;
 				tabBar.Gestures.Add(g);
-				RebuildTabs(tabBar);
-				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
-				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
+				tabBar.AllowReordering = true;
+				RebuildTabs();
+				tabBar.OnReordered += args => Project.Current.ReorderDocument(Document.Current, args.IndexTo);
+				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs());
+				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs());
 			}
 
-			private void RebuildTabs(TabBar tabBar)
+			private void RebuildTabs()
 			{
 				tabBar.Nodes.Clear();
 				foreach (var doc in Project.Current.Documents) {
 					var tab = new ThemedTab { Closable = true };
-					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
-					tab.Tasks.Add(currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)));
 					tab.Tasks.Add(Tooltip.Instance.ShowOnMouseOverTask(tab, () => doc.FullPath.Replace('/', '\\')));
+					tab.AddChangeWatcher(() => Document.Current, _ => {
+						if (doc == Document.Current) {
+							tabBar.ActivateTab(tab);
+						}
+					});
 					tab.AddChangeWatcher(() => doc.DisplayName, _ => tab.Text = doc.DisplayName);
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);
-					tab.Updated += (dt) => {
-						if (tab.Input.WasKeyReleased(Key.Mouse1)) {
-							DocumentTabContextMenu.Create(doc);
-						}
-					};
-
-					DragGesture dragGesture = new DragGesture();
-					tab.Gestures.Add(dragGesture);
-					dragGesture.Changed += () => {
-						int index = -1;
-						foreach (Tab tabEl in tabBar.Nodes.OfType<Tab>()) {
-							index++;
-							if (tabEl == tab) {
-								continue;
-							}
-
-							Vector2 localMousePosition = tabEl.LocalMousePosition();
-
-							if (!(localMousePosition.X >= 0 && localMousePosition.Y >= 0 &&
-								localMousePosition.X < tabEl.Width && localMousePosition.Y < tabEl.Height)) {
-								continue;
-							}
-
-							Project.Current.ReorderDocument(doc, index);
-
-							int previousIndex = tabBar.Nodes.IndexOf(tab);
-							int toIndex = tabBar.Nodes.IndexOf(tabEl);
-
-							if (previousIndex < 0 || toIndex < 0) {
-								RebuildTabs(tabBar);
-								break;
-							}
-
-							tabBar.Nodes.Remove(tab);
-							tabBar.Nodes.Insert(toIndex, tab);
-							break;
-						}
-					};
 					tabBar.AddNode(tab);
 				}
 				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 } });
