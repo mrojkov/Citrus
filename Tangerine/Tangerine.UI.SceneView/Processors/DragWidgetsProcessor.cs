@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
@@ -23,6 +22,13 @@ namespace Tangerine.UI.SceneView
 		private static SceneView SceneView => SceneView.Instance;
 		private static ProjectUserPreferences Preferences => ProjectUserPreferences.Instance;
 
+		private static readonly (Key Key, IntVector2 Direction)[] dragKeys = new[] {
+			(Key.W, new IntVector2(0, -1)),
+			(Key.A, new IntVector2(-1, 0)),
+			(Key.S, new IntVector2(0, 1)),
+			(Key.D, new IntVector2(1, 0)),
+		};
+
 		public IEnumerator<object> Task()
 		{
 			while (true) {
@@ -37,7 +43,7 @@ namespace Tangerine.UI.SceneView
 						yield return DragByMouse();
 					}
 				}
-				if (AreMoveKeysRepeated()) {
+				if (dragKeys.Any(i => SceneView.Input.WasKeyPressed(i.Key))) {
 					yield return DragByKeys();
 				}
 				yield return null;
@@ -46,36 +52,22 @@ namespace Tangerine.UI.SceneView
 
 		private static IEnumerator<object> DragByKeys()
 		{
-			var offset = new Vector2(0f, 0f);
+			var offset = Vector2.Zero;
 			using (Document.Current.History.BeginTransaction()) {
-				AreMoveKeysPressed(out var ks);
-				DrayByKeysHelper(ks);
-				yield return Application.Input.KeyRepeatDelay;
-				while (AreMoveKeysPressed(out ks)) {
+				while (dragKeys.Any(i => SceneView.Input.IsKeyPressed(i.Key))) {
 					Document.Current.History.RollbackTransaction();
-					DrayByKeysHelper(ks);
+					var isAccelerated = SceneView.Input.IsKeyPressed(Key.Shift) ? 5 : 1;
+					foreach (var (key, direction) in dragKeys) {
+						if (SceneView.Input.WasKeyRepeated(key)) {
+							offset.X += direction.X * isAccelerated;
+							offset.Y += direction.Y * isAccelerated;
+						}
+						DragNodes(offset);
+					}
 					yield return null;
 				}
 				Document.Current.History.CommitTransaction();
 			}
-			void DrayByKeysHelper((bool w, bool a, bool s, bool d) keysState)
-			{
-				var isAccelerated = SceneView.Input.IsKeyPressed(Key.Shift) ? 5 : 1;
-				offset.X += -1 * Convert.ToInt32(keysState.a) * isAccelerated + 1 * Convert.ToInt32(keysState.d) * isAccelerated;
-				offset.Y += -1 * Convert.ToInt32(keysState.w) * isAccelerated + 1 * Convert.ToInt32(keysState.s) * isAccelerated;
-				DragNodes(offset);
-			}
-		}
-
-		private static bool AreMoveKeysRepeated() =>
-			SceneView.Input.WasKeyRepeated(Key.W) || SceneView.Input.WasKeyRepeated(Key.A) ||
-			SceneView.Input.WasKeyRepeated(Key.S) || SceneView.Input.WasKeyRepeated(Key.D);
-
-		private static bool AreMoveKeysPressed(out (bool w, bool a, bool s, bool d) keysState)
-		{
-			keysState = (SceneView.Input.IsKeyPressed(Key.W), SceneView.Input.IsKeyPressed(Key.A),
-				SceneView.Input.IsKeyPressed(Key.S), SceneView.Input.IsKeyPressed(Key.D));
-			return keysState.w || keysState.a || keysState.s || keysState.d;
 		}
 
 		private static void DragNodes(Vector2 delta)
