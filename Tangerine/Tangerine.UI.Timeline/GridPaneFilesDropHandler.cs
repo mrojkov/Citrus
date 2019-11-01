@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Lime;
 using Tangerine.Core;
@@ -16,6 +17,8 @@ namespace Tangerine.UI.Timeline
 
 		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
+			var rowLocationUnderMouseOnFilesDrop =
+				SelectAndDragRowsProcessor.MouseToRowLocation(grid.RootWidget.Input.MousePosition);
 			var handled = new List<string>();
 			var cellUnderMouseOnFilesDrop = grid.CellUnderMouse();
 			var animateTextureCellOffset = 0;
@@ -54,12 +57,17 @@ namespace Tangerine.UI.Timeline
 							break;
 						}
 						case ".ogg": {
-							var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-							//callbacks.NodeCreating?.Invoke(args);
-							if (args.Cancel) {
-								continue;
-							}
 							var node = CreateNode.Perform(typeof(Audio));
+							if (rowLocationUnderMouseOnFilesDrop.HasValue) {
+								var location = rowLocationUnderMouseOnFilesDrop.Value;
+								var row = Document.Current.Rows.FirstOrDefault(r => r.Components.Get<Core.Components.NodeRow>()?.Node == node);
+								if (row != null) {
+									if (location.Index >= row.Index) {
+										location.Index++;
+									}
+									SelectAndDragRowsProcessor.Probers.Any(p => p.Probe(row, location));
+								}
+							}
 							var sample = new SerializableSample(assetPath);
 							SetProperty.Perform(node, nameof(Audio.Sample), sample);
 							SetProperty.Perform(node, nameof(Node.Id), assetPath);
@@ -69,7 +77,6 @@ namespace Tangerine.UI.Timeline
 								Value = AudioAction.Play
 							};
 							SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-							//callbacks.NodeCreated?.Invoke(node);
 							break;
 						}
 					}

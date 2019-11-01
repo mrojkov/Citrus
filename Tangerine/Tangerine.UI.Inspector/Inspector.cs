@@ -22,11 +22,9 @@ namespace Tangerine.UI.Inspector
 		private HashSet<Type> prevTypes = new HashSet<Type>();
 
 		/// <summary>
-		/// A collection of IFilesDropHandler which bring functionality of
-		/// files drag and drop. Can be extended via orange plugins. This collection will
-		/// be cloned by Yuzu for each instance of Sceneview
+		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
 		/// </summary>
-		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {};
+		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>>();
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
@@ -93,8 +91,7 @@ namespace Tangerine.UI.Inspector
 			};
 			filesDropManager = new FilesDropManager(RootWidget);
 			filesDropManager.AddFilesDropHandler(new InspectorFilesDropHandler(content));
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
-				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
 			CreateWatchersToRebuild();
 		}
 

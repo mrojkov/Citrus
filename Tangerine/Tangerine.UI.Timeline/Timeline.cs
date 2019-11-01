@@ -28,12 +28,10 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget RootWidget;
 		public readonly WaveformCache WaveformCache;
 		/// <summary>
-		/// A collection of IFilesDropHandler which bring functionality of
-		/// files drag and drop. Can be extended via orange plugins. This collection will
-		/// be cloned by Yuzu for each instance of Timeline
+		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
 		/// </summary>
-		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {
-			new AudiosDropHandler(), new ImagesDropHandler(), new ScenesDropHandler()
+		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>> {
+			() => new AudiosDropHandler(), () => new ImagesDropHandler(), () => new ScenesDropHandler()
 		};
 
 		private Vector2 offset;
@@ -114,8 +112,7 @@ namespace Tangerine.UI.Timeline
 			Roll = new RollPane();
 			filesDropManager = new FilesDropManager(RootWidget);
 			filesDropManager.Handling += FilesDropOnHandling;
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
-				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
 			CreateProcessors();
 			InitializeWidgets();
 			WaveformCache = new WaveformCache(Project.Current.FileSystemWatcher);

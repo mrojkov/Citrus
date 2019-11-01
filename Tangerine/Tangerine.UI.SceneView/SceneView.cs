@@ -17,12 +17,20 @@ namespace Tangerine.UI.SceneView
 		private Vector2 mousePositionOnFilesDrop;
 
 		/// <summary>
-		/// A collection of IFilesDropHandler which bring functionality of
-		/// files drag and drop. Can be extended via orange plugins. This collection will
-		/// be cloned by Yuzu for each instance of Sceneview
+		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
 		/// </summary>
-		public static List<IFilesDropHandler> FilesDropHandlers { get; } = new List<IFilesDropHandler> {
-			new AudiosDropHandler(), new ImagesDropHandler(), new ScenesDropHandler()
+		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>> {
+			() => new AudiosDropHandler(),
+			() => {
+				var idh = new ImagesDropHandler();
+				idh.NodeCreated += FilesDropOnNodeCreated;
+				return idh;
+			},
+			() => {
+				var sdh = new ScenesDropHandler();
+				sdh.NodeCreated += FilesDropOnNodeCreated;
+				return sdh;
+			}
 		};
 		// Given panel.
 		public readonly Widget Panel;
@@ -120,8 +128,7 @@ namespace Tangerine.UI.SceneView
 			CreateProcessors();
 			CreatePresenters();
 			filesDropManager = new FilesDropManager(InputArea);
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
-				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
+			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
 			filesDropManager.Handling += FilesDropOnHandling;
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
@@ -165,7 +172,7 @@ namespace Tangerine.UI.SceneView
 			mousePositionOnFilesDrop = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 		}
 
-		private void FilesDropOnNodeCreated(Node node)
+		private static void FilesDropOnNodeCreated(Node node)
 		{
 			if (node is Widget) {
 				SetProperty.Perform(node, nameof(Widget.Position), Instance.mousePositionOnFilesDrop);

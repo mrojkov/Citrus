@@ -18,6 +18,8 @@ namespace Tangerine.Common.FilesDropHandlers
 			typeof(TiledImage), typeof(ParticleModifier),
 		};
 
+		public event Action<Node> NodeCreated;
+
 		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
 			handledFiles = files.Where(f => Path.GetExtension(f) == ".png" );
@@ -60,7 +62,7 @@ namespace Tangerine.Common.FilesDropHandlers
 						SetProperty.Perform(node, nameof(ParticleModifier.Size), nodeSize);
 						SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
 					}
-					//NodeCreated?.Invoke(node);
+					NodeCreated?.Invoke(node);
 				}
 				Document.Current.History.CommitTransaction();
 			}

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,8 +15,8 @@ namespace Tangerine.Common.FilesDropHandlers
 	{
 		private readonly List<string> extensions = new List<string> { ".scene", ".tan", ".model" };
 
-		[YuzuMember]
 		public bool ShouldCreateContextMenu { get; set; } = true;
+		public event Action<Node> NodeCreated;
 
 		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
@@ -40,29 +41,24 @@ namespace Tangerine.Common.FilesDropHandlers
 			}
 		}
 
-		public static void CreateContextMenu(string assetPath, string assetType)
+		public void CreateContextMenu(string assetPath, string assetType)
 		{
 			var fileName = Path.GetFileNameWithoutExtension(assetPath);
 			var menu = new Menu {
 				new Command("Open in New Tab", () => Project.Current.OpenDocument(assetPath)),
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(() => {
-					var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-					//callbacks.NodeCreating?.Invoke(args);
-					if (args.Cancel) {
-						return;
-					}
 					var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
 					var node = CreateNode.Perform(scene.GetType());
 					SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
 					if (node is IPropertyLocker propertyLocker) {
-						string id = propertyLocker.IsPropertyLocked("Id", true) ? fileName : scene.Id;
+						var id = propertyLocker.IsPropertyLocked("Id", true) ? fileName : scene.Id;
 						SetProperty.Perform(node, nameof(Node.Id), id);
 					}
 					if (scene is Widget widget) {
 						SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
 						SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
 					}
-					//callbacks.NodeCreated?.Invoke(node);
+					NodeCreated?.Invoke(node);
 					node.LoadExternalScenes();
 					})),
 				new Command("Cancel")
