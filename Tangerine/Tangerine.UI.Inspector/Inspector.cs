@@ -109,7 +109,7 @@ namespace Tangerine.UI.Inspector
 
 		private void CreateWatchersToRebuild()
 		{
-			RootWidget.AddChangeLateWatcher(CalcSelectedRowsHashcode, _ => Rebuild());
+			RootWidget.AddChangeWatcher(CalcSelectedRowsHashcode, _ => Rebuild());
 			RootWidget.Tasks.Add(DisableInspectorTask());
 		}
 
