@@ -130,6 +130,7 @@ namespace Tangerine.UI.SceneView
 			filesDropManager = new FilesDropManager(InputArea);
 			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
 			filesDropManager.Handling += FilesDropOnHandling;
+			InputArea.Gestures.Add(new DropGesture(filesDropManager.Handle));
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
@@ -186,12 +187,10 @@ namespace Tangerine.UI.SceneView
 			Panel.AddNode(ZoomWidget);
 			Panel.AddNode(RulersWidget);
 			Panel.AddNode(Frame);
-			DropManager.Instance.AddFilesDropManager(filesDropManager);
 		}
 
 		public void Detach()
 		{
-			DropManager.Instance.RemoveFilesDropManager(filesDropManager);
 			Instance = null;
 			Frame.Unlink();
 			ShowNodeDecorationsPanelButton.Unlink();

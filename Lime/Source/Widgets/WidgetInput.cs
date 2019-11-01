@@ -83,35 +83,17 @@ namespace Lime
 			return focused != null && focused.SameOrDescendantOf(widget);
 		}
 
-		public bool IsMousePressed(int button = 0)
-		{
-			return IsKeyPressed(Input.GetMouseButtonByIndex(button));
-		}
+		public bool IsMousePressed(int button = 0) => IsKeyPressed(Input.GetMouseButtonByIndex(button));
 
-		public bool WasMousePressed(int button = 0)
-		{
-			return WasKeyPressed(Input.GetMouseButtonByIndex(button));
-		}
+		public bool WasMousePressed(int button = 0) => WasKeyPressed(Input.GetMouseButtonByIndex(button));
 
-		public bool WasMouseReleased(int button = 0)
-		{
-			return WasKeyReleased(Input.GetMouseButtonByIndex(button));
-		}
+		public bool WasMouseReleased(int button = 0) => WasKeyReleased(Input.GetMouseButtonByIndex(button));
 
-		public float WheelScrollAmount
-		{
-			get { return IsAcceptingKey(Key.MouseWheelUp) ? windowInput.WheelScrollAmount : 0; }
-		}
+		public float WheelScrollAmount => IsAcceptingKey(Key.MouseWheelUp) ? windowInput.WheelScrollAmount : 0;
 
-		public bool IsKeyPressed(Key key)
-		{
-			return windowInput.IsKeyPressed(key) && IsAcceptingKey(key);
-		}
+		public bool IsKeyPressed(Key key) => windowInput.IsKeyPressed(key) && IsAcceptingKey(key);
 
-		public bool WasKeyPressed(Key key)
-		{
-			return windowInput.WasKeyPressed(key) && IsAcceptingKey(key);
-		}
+		public bool WasKeyPressed(Key key) => windowInput.WasKeyPressed(key) && IsAcceptingKey(key);
 
 		public bool ConsumeKeyPress(Key key)
 		{
@@ -122,10 +104,7 @@ namespace Lime
 			return false;
 		}
 
-		public bool WasKeyReleased(Key key)
-		{
-			return windowInput.WasKeyReleased(key) && IsAcceptingKey(key);
-		}
+		public bool WasKeyReleased(Key key) => windowInput.WasKeyReleased(key) && IsAcceptingKey(key);
 
 		public bool ConsumeKeyRelease(Key key)
 		{
@@ -136,10 +115,7 @@ namespace Lime
 			return false;
 		}
 
-		public bool WasKeyRepeated(Key key)
-		{
-			return windowInput.WasKeyRepeated(key) && IsAcceptingKey(key);
-		}
+		public bool WasKeyRepeated(Key key) => windowInput.WasKeyRepeated(key) && IsAcceptingKey(key);
 
 		public bool ConsumeKeyRepeat(Key key)
 		{
@@ -182,22 +158,29 @@ namespace Lime
 		/// <summary>
 		/// Derestricts input scope from the current widget and its descendants.
 		/// </summary>
-		public void DerestrictScope()
-		{
-			InputScopeStack.Remove(widget);
-		}
+		public void DerestrictScope() => InputScopeStack.Remove(widget);
 
 		[Obsolete("Use RestrictScope() instead")]
-		public void CaptureAll()
-		{
-			RestrictScope();
-		}
+		public void CaptureAll() => RestrictScope();
 
 		[Obsolete("Use DerestrictScope() instead")]
-		public void ReleaseAll()
-		{
-			DerestrictScope();
-		}
+		public void ReleaseAll() => DerestrictScope();
+		/// <summary>
+		/// Tries to get drop data.
+		/// </summary>
+		/// <param name="dropData">Drop data.</param>
+		/// <returns></returns>
+		public bool TryGetDropData(out IEnumerable<string> dropData) => windowInput.TryGetDropData(out dropData);
+		/// <summary>
+		/// Consumes a single dropped data object.
+		/// </summary>
+		/// <param name="dataObject">Dropped data object to be consumed.</param>
+		public void ConsumeDropData(string dataObject) => windowInput.ConsumeDropData(dataObject);
+		/// <summary>
+		/// Consumes dropped data.
+		/// </summary>
+		/// <param name="dropData">Dropped data objects to be consumed.</param>
+		public void ConsumeDropData(IEnumerable<string> dropData) => windowInput.ConsumeDropData(dropData);
 
 		public class WidgetStack : IReadOnlyList<Widget>
 		{

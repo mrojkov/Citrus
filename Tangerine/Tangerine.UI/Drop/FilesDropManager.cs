@@ -76,22 +76,23 @@ namespace Tangerine.UI
 		}
 
 		/// <summary>
-		/// Tries to handle files if they were dropped on managed area.
+		/// Handle files if they were dropped on managed area.
 		/// </summary>
 		/// <param name="files">Files.</param>
-		/// <returns></returns>
-		public bool TryToHandle(IEnumerable<string> files)
+		/// <returns>Handled files.</returns>
+		public IEnumerable<string> Handle(IEnumerable<string> files)
 		{
+			IEnumerable<string> handled = new string[] { };
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			if (nodeUnderMouse == null || !nodeUnderMouse.SameOrDescendantOf(widget)) {
-				return false;
+				return handled;
 			}
 			Handling?.Invoke();
 			foreach (var handlers in filesDropHandlers) {
-				handlers.Handle(files, out var handledFiles);
-				files = files.Except(handledFiles);
+				handlers.Handle(files.Except(handled), out var handledFiles);
+				handled = handled.Concat(handledFiles);
 			}
-			return true;
+			return handled;
 		}
 	}
 }

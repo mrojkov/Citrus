@@ -61,7 +61,6 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			DropManager.Instance.AddFilesDropManager(filesDropManager);
 			content.LoadExpandedStates();
 			Rebuild();
 		}
@@ -70,7 +69,6 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = null;
 			content.SaveExpandedStates();
-			DropManager.Instance.RemoveFilesDropManager(filesDropManager);
 			RootWidget.Unlink();
 		}
 
@@ -92,6 +90,7 @@ namespace Tangerine.UI.Inspector
 			filesDropManager = new FilesDropManager(RootWidget);
 			filesDropManager.AddFilesDropHandler(new InspectorFilesDropHandler(content));
 			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
+			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
 			CreateWatchersToRebuild();
 		}
 

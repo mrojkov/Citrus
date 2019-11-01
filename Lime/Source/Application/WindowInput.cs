@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -118,6 +119,7 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value) => Application.Input.SetKeyState(key, value);
 		internal void ProcessPendingKeyEvents(float delta) => Application.Input.ProcessPendingKeyEvents(delta);
+		internal void ProcessPendingInputEvents(float delta) => Application.Input.ProcessPendingInputEvents(delta);
 		internal void CopyKeysState() => Application.Input.CopyKeysState();
 		internal void ClearKeyState(bool clearMouseButtons = true) => Application.Input.ClearKeyState(clearMouseButtons);
 		internal void SetWheelScrollAmount(float delta) => Application.Input.SetWheelScrollAmount(delta);
@@ -131,5 +133,21 @@ namespace Lime
 				? ownerWindow == Application.WindowUnderMouse
 				: ownerWindow.Active;
 		}
+		/// <summary>
+		/// Tries to get drop data.
+		/// </summary>
+		/// <param name="dropData">Drop data.</param>
+		/// <returns></returns>
+		public bool TryGetDropData(out IEnumerable<string> dropData) => Application.Input.TryGetDropData(out dropData);
+		/// <summary>
+		/// Consumes a single dropped data object.
+		/// </summary>
+		/// <param name="dataObject">Dropped data object to be consumed.</param>
+		public void ConsumeDropData(string dataObject) => Application.Input.ConsumeDropData(dataObject);
+		/// <summary>
+		/// Consumes dropped data.
+		/// </summary>
+		/// <param name="dropData">Dropped data objects to be consumed.</param>
+		public void ConsumeDropData(IEnumerable<string> dropData) => Application.Input.ConsumeDropData(dropData);
 	}
 }

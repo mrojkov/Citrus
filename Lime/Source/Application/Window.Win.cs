@@ -841,7 +841,7 @@ namespace Lime
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
 			if (active || Input.IsSimulationRunning) {
-				Input.ProcessPendingKeyEvents(delta);
+				Input.ProcessPendingInputEvents(delta);
 			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
@@ -1124,6 +1124,13 @@ namespace Lime
 			using (Context.Activate().Scoped()) {
 				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
+				Application.Input.SetDropData(files);
+				// Drag prevents key\mouse events from firing
+				// so we have to manually assign NodeCapturedByMouse and call Update
+				// in order to let gestures handle files drop.
+				WidgetContext.Current.NodeCapturedByMouse = WidgetContext.Current.NodeUnderMouse;
+				Update();
+				WidgetContext.Current.NodeCapturedByMouse = null;
 			}
 		}
 

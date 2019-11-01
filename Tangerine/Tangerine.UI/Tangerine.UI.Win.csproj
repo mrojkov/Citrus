@@ -46,7 +46,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="ColorPicker.Mac.cs" />
-    <Compile Include="Drop\DropManager.cs" />
+    <Compile Include="Drop\DropGesture.cs" />
     <Compile Include="PropertyEditors\BezierEasingPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />

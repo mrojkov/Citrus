@@ -24,7 +24,7 @@ namespace Tangerine.Common.FilesDropHandlers
 		{
 			handledFiles = files.Where(f => Path.GetExtension(f) == ".png" );
 			if (handledFiles.Any()) {
-				CreateContextMenu(handledFiles);
+				CreateContextMenu(handledFiles.ToArray());
 			}
 		}
 

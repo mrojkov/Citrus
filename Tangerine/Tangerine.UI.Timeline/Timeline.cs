@@ -125,6 +125,7 @@ namespace Tangerine.UI.Timeline
 					offset.Offset = value;
 				}
 			});
+			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
 		}
 
 		public void Attach()
@@ -133,7 +134,6 @@ namespace Tangerine.UI.Timeline
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DropManager.Instance.AddFilesDropManager(filesDropManager);
 			UpdateTitle();
 			Attached?.Invoke();
 		}
@@ -141,7 +141,6 @@ namespace Tangerine.UI.Timeline
 		public void Detach()
 		{
 			Detaching?.Invoke();
-			DropManager.Instance.RemoveFilesDropManager(filesDropManager);
 			Instance = null;
 			RootWidget.Unlink();
 			Detached?.Invoke();

@@ -56,7 +56,7 @@ namespace Tangerine.UI.Docking
 				ClipChildren = ClipMethod.ScissorTest,
 			};
 			DocumentAreaFilesDropManager = new FilesDropManager(DocumentArea);
-			DropManager.Instance.AddFilesDropManager(DocumentAreaFilesDropManager);
+			DocumentArea.Gestures.Add(new DropGesture(DocumentAreaFilesDropManager.Handle));
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 			var windowPlacement = new WindowPlacement {
 				Size = windowSize,
@@ -113,7 +113,8 @@ namespace Tangerine.UI.Docking
 
 		private void SetDropHandler(IWindow window)
 		{
-			DropManager.Instance.ManageFileDrop(window);
+			window.AllowDropFiles = true;
+
 		}
 
 		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch = 0.25f)

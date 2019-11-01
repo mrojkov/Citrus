@@ -51,8 +51,7 @@ namespace Tangerine.UI.Timeline
 			OnPostRender += RenderCursor;
 			filesDropManager = new FilesDropManager(RootWidget);
 			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
-			timeline.Detached += () => DropManager.Instance.RemoveFilesDropManager(filesDropManager);
-			timeline.Attached += () => DropManager.Instance.AddFilesDropManager(filesDropManager);
+			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
 		}
 
 		private void RenderBackgroundAndGrid(Node node)

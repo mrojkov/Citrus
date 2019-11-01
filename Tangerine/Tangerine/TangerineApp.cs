@@ -87,7 +87,6 @@ namespace Tangerine
 
 			LoadFont();
 
-			DropManager.Initialize();
 			DockManager.Initialize(new Vector2(1024, 768));
 			DockManager.Instance.DocumentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
 			TangerineMenu.Create();
@@ -99,7 +98,6 @@ namespace Tangerine
 			});
 			mainWidget.AddChangeWatcher(() => CoreUserPreferences.Instance.AnimationMode, _ => Document.Current?.ForceAnimationUpdate());
 			mainWidget.AddChangeWatcher(() => Document.Current?.Container, _ => Document.Current?.ForceAnimationUpdate());
-
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
 				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
@@ -565,7 +563,7 @@ namespace Tangerine
 				this.tabBar = tabBar;
 				var filesDropManager = new FilesDropManager(tabBar);
 				filesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
-				DropManager.Instance.AddFilesDropManager(filesDropManager);
+				tabBar.Gestures.Add(new DropGesture(filesDropManager.Handle));
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
