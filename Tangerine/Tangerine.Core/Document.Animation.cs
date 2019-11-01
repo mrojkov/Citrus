@@ -211,7 +211,7 @@ namespace Tangerine.Core
 					bool movingBack;
 					var doc = Current;
 					var node = animation.OwnerNode;
-					if (animation.IsLegacy && animationMode) {
+					if (animationMode) {
 						node.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 						var cacheFrame = node.Components.Get<AnimationsStatesComponent>()?.GetColumn(animation.Id);
 						// Terekhov Dmitry: First time cache creation that does not set IsRunning

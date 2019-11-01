@@ -48,7 +48,6 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
-			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
 			return button;
 		}
 
