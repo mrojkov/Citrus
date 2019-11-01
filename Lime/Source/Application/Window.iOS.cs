@@ -125,6 +125,7 @@ namespace Lime
 		public void ShowModal() { }
 		public void Invalidate() { }
 		public void Activate() { }
+		public void WaitForRendering() { }
 
 		private void OnUpdateFrame(float delta)
 		{
