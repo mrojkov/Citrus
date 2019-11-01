@@ -2,10 +2,11 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -135,7 +136,7 @@ namespace Tangerine.UI.Timeline
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DockManager.Instance.AddFilesDropManager(filesDropManager);
+			DropManager.Instance.AddFilesDropManager(filesDropManager);
 			UpdateTitle();
 			Attached?.Invoke();
 		}
@@ -143,7 +144,7 @@ namespace Tangerine.UI.Timeline
 		public void Detach()
 		{
 			Detaching?.Invoke();
-			DockManager.Instance.RemoveFilesDropManager(filesDropManager);
+			DropManager.Instance.RemoveFilesDropManager(filesDropManager);
 			Instance = null;
 			RootWidget.Unlink();
 			Detached?.Invoke();

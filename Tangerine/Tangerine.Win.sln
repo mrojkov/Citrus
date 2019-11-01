@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kumquat.Win", "..\Kumquat\K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.RemoteScripting.Win", "Tangerine.UI.RemoteScripting\Tangerine.UI.RemoteScripting.Win.csproj", "{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Common.Win", "Tangerine.Common.Win\Tangerine.Common.Win.csproj", "{259C5E1F-1507-4131-8B4E-DD3C51F7462A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,14 @@ Global
 		{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}.Release|x86.ActiveCfg = Release|Any CPU
 		{A60E48A9-2220-4E9D-9B22-3FB1C3DDBF43}.Release|x86.Build.0 = Release|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Debug|x86.Build.0 = Debug|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Release|x86.ActiveCfg = Release|Any CPU
+		{259C5E1F-1507-4131-8B4E-DD3C51F7462A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,8 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.Docking;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 
 namespace Tangerine.UI.Timeline
 {
@@ -54,10 +53,8 @@ namespace Tangerine.UI.Timeline
 			filesDropManager = new FilesDropManager(RootWidget);
 			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(fdh =>
 				(IFilesDropHandler)Lime.Yuzu.Instance.Value.Clone(fdh)));
-			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
-			filesDropManager.NodeCreated += FilesDropOnNodeCreated;
-			timeline.Detached += () => DockManager.Instance.RemoveFilesDropManager(filesDropManager);
-			timeline.Attached += () => DockManager.Instance.AddFilesDropManager(filesDropManager);
+			timeline.Detached += () => DropManager.Instance.RemoveFilesDropManager(filesDropManager);
+			timeline.Attached += () => DropManager.Instance.AddFilesDropManager(filesDropManager);
 		}
 
 		private void RenderBackgroundAndGrid(Node node)

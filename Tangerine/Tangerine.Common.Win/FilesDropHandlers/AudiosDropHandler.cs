@@ -4,22 +4,22 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI;
+using Tangerine.UI.Drop;
 
-namespace Tangerine.UI.FilesDropHandler
+namespace Tangerine.Common.FilesDropHandlers
 {
 	public class AudiosDropHandler : IFilesDropHandler
 	{
-		public List<string> Extensions { get; } = new List<string> { ".ogg" };
-
-		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
+		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
-			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
+			handledFiles = files.Where(f => Path.GetExtension(f) == ".ogg");
 			foreach (var file in handledFiles) {
 				if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
 					continue;
 				}
 				var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-				callbacks.NodeCreating?.Invoke(args);
+				//callbacks.NodeCreating?.Invoke(args);
 				if (args.Cancel) {
 					continue;
 				}
@@ -33,7 +33,7 @@ namespace Tangerine.UI.FilesDropHandler
 					Value = AudioAction.Play
 				};
 				SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-				callbacks.NodeCreated?.Invoke(node);
+				//callbacks.NodeCreated?.Invoke(node);
 			}
 		}
 	}

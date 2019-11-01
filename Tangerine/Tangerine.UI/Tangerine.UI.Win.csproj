@@ -46,6 +46,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="ColorPicker.Mac.cs" />
+    <Compile Include="Drop\DropManager.cs" />
     <Compile Include="PropertyEditors\BezierEasingPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />
@@ -114,12 +115,8 @@
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="ToolbarView.cs" />
     <Compile Include="ToolbarButton.cs" />
-    <Compile Include="Utils\FilesDropHandler\AudiosDropHandler.cs" />
-    <Compile Include="Utils\FilesDropHandler\IFilesDropCallbacks.cs" />
-    <Compile Include="Utils\FilesDropHandler\IFilesDropHandler.cs" />
-    <Compile Include="Utils\FilesDropHandler\ImagesDropHandler.cs" />
-    <Compile Include="Utils\FilesDropHandler\ScenesDropHandler.cs" />
-    <Compile Include="Utils\FilesDropManager.cs" />
+    <Compile Include="Drop\IFilesDropHandler.cs" />
+    <Compile Include="Drop\FilesDropManager.cs" />
     <Compile Include="Utils\Spacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />

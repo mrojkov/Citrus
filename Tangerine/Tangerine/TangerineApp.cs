@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Lime;
-using Orange;
+using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline;
 using FileInfo = System.IO.FileInfo;
 
@@ -87,7 +87,9 @@ namespace Tangerine
 
 			LoadFont();
 
+			DropManager.Initialize();
 			DockManager.Initialize(new Vector2(1024, 768));
+			DockManager.Instance.DocumentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
 			mainWidget.Window.AllowDropFiles = true;
@@ -563,7 +565,7 @@ namespace Tangerine
 				this.tabBar = tabBar;
 				var filesDropManager = new FilesDropManager(tabBar);
 				filesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
-				DockManager.Instance.AddFilesDropManager(filesDropManager);
+				DropManager.Instance.AddFilesDropManager(filesDropManager);
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));

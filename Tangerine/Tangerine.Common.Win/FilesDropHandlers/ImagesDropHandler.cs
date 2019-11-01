@@ -5,8 +5,11 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI;
+using Tangerine.UI.Drop;
+using Yuzu;
 
-namespace Tangerine.UI.FilesDropHandler
+namespace Tangerine.Common.FilesDropHandlers
 {
 	public class ImagesDropHandler : IFilesDropHandler
 	{
@@ -15,39 +18,32 @@ namespace Tangerine.UI.FilesDropHandler
 			typeof(TiledImage), typeof(ParticleModifier),
 		};
 
-		public List<string> Extensions { get; } = new List<string> { ".png" };
-
-		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
+		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
-			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
+			handledFiles = files.Where(f => Path.GetExtension(f) == ".png" );
 			if (handledFiles.Any()) {
-				CreateContextMenu(handledFiles, callbacks);
+				CreateContextMenu(handledFiles);
 			}
 		}
 
-		private void CreateContextMenu(IEnumerable<string> files, IFilesDropCallbacks callbacks)
+		private void CreateContextMenu(IEnumerable<string> files)
 		{
 			var menu = new Menu();
 			foreach (var imageType in imageTypes) {
 				if (NodeCompositionValidator.Validate(Document.Current.Container.GetType(), imageType)) {
 					menu.Add(new Command($"Create {imageType.Name}",
-						() => CreateImageTypeInstance(imageType, files, callbacks)));
+						() => CreateImageTypeInstance(imageType, files)));
 				}
 			}
 			menu.Popup();
 		}
 
 
-		private void CreateImageTypeInstance(Type type, IEnumerable<string> files, IFilesDropCallbacks callbacks)
+		private void CreateImageTypeInstance(Type type, IEnumerable<string> files)
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				foreach (var file in files) {
 					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
-						continue;
-					}
-					var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-					callbacks.NodeCreating?.Invoke(args);
-					if (args.Cancel) {
 						continue;
 					}
 					var node = CreateNode.Perform(type);
@@ -64,7 +60,7 @@ namespace Tangerine.UI.FilesDropHandler
 						SetProperty.Perform(node, nameof(ParticleModifier.Size), nodeSize);
 						SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
 					}
-					callbacks.NodeCreated?.Invoke(node);
+					//NodeCreated?.Invoke(node);
 				}
 				Document.Current.History.CommitTransaction();
 			}

@@ -4,20 +4,22 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI;
+using Tangerine.UI.Drop;
 using Yuzu;
 
-namespace Tangerine.UI.FilesDropHandler
+namespace Tangerine.Common.FilesDropHandlers
 {
 	public class ScenesDropHandler : IFilesDropHandler
 	{
-		public List<string> Extensions { get; } = new List<string> { ".scene", ".tan", ".model" };
+		private readonly List<string> extensions = new List<string> { ".scene", ".tan", ".model" };
 
 		[YuzuMember]
 		public bool ShouldCreateContextMenu { get; set; } = true;
 
-		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
+		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
-			handledFiles = files.Where(f => Extensions.Contains(Path.GetExtension(f)));
+			handledFiles = files.Where(f => extensions.Contains(Path.GetExtension(f)));
 			foreach (var file in handledFiles) {
 				if (
 					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
@@ -26,7 +28,7 @@ namespace Tangerine.UI.FilesDropHandler
 					continue;
 				}
 				if (ShouldCreateContextMenu) {
-					CreateContextMenu(assetPath, assetType, callbacks);
+					CreateContextMenu(assetPath, assetType);
 				} else {
 					try {
 						Project.Current.OpenDocument(file, true);
@@ -38,14 +40,14 @@ namespace Tangerine.UI.FilesDropHandler
 			}
 		}
 
-		public static void CreateContextMenu(string assetPath, string assetType, IFilesDropCallbacks callbacks)
+		public static void CreateContextMenu(string assetPath, string assetType)
 		{
 			var fileName = Path.GetFileNameWithoutExtension(assetPath);
 			var menu = new Menu {
 				new Command("Open in New Tab", () => Project.Current.OpenDocument(assetPath)),
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(() => {
 					var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-					callbacks.NodeCreating?.Invoke(args);
+					//callbacks.NodeCreating?.Invoke(args);
 					if (args.Cancel) {
 						return;
 					}
@@ -60,7 +62,7 @@ namespace Tangerine.UI.FilesDropHandler
 						SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
 						SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
 					}
-					callbacks.NodeCreated?.Invoke(node);
+					//callbacks.NodeCreated?.Invoke(node);
 					node.LoadExternalScenes();
 					})),
 				new Command("Cancel")

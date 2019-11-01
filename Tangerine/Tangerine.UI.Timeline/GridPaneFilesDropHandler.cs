@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline.Operations.CompoundAnimations;
 
 namespace Tangerine.UI.Timeline
@@ -14,8 +13,8 @@ namespace Tangerine.UI.Timeline
 	internal class GridPaneFilesDropHandler : IFilesDropHandler
 	{
 		private GridPane grid => Timeline.Instance.Grid;
-		public List<string> Extensions { get; } = new List<string>();
-		public void Handle(IEnumerable<string> files, IFilesDropCallbacks callbacks, out IEnumerable<string> handledFiles)
+
+		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
 		{
 			var handled = new List<string>();
 			var cellUnderMouseOnFilesDrop = grid.CellUnderMouse();
@@ -56,7 +55,7 @@ namespace Tangerine.UI.Timeline
 						}
 						case ".ogg": {
 							var args = new FilesDropManager.NodeCreatingEventArgs(assetPath, assetType);
-							callbacks.NodeCreating?.Invoke(args);
+							//callbacks.NodeCreating?.Invoke(args);
 							if (args.Cancel) {
 								continue;
 							}
@@ -70,7 +69,7 @@ namespace Tangerine.UI.Timeline
 								Value = AudioAction.Play
 							};
 							SetKeyframe.Perform(node, nameof(Audio.Action), Document.Current.AnimationId, key);
-							callbacks.NodeCreated?.Invoke(node);
+							//callbacks.NodeCreated?.Invoke(node);
 							break;
 						}
 					}

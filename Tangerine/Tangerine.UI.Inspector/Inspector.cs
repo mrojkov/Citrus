@@ -4,7 +4,7 @@ using Tangerine.Core;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core.Components;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 
 namespace Tangerine.UI.Inspector
 {
@@ -63,7 +63,7 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			Docking.DockManager.Instance.AddFilesDropManager(filesDropManager);
+			DropManager.Instance.AddFilesDropManager(filesDropManager);
 			content.LoadExpandedStates();
 			Rebuild();
 		}
@@ -72,11 +72,9 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = null;
 			content.SaveExpandedStates();
-			Docking.DockManager.Instance.RemoveFilesDropManager(filesDropManager);
+			DropManager.Instance.RemoveFilesDropManager(filesDropManager);
 			RootWidget.Unlink();
 		}
-
-		private void OnFilesDropped(IEnumerable<string> files) => content.DropFiles(files);
 
 		public Inspector(Widget panelWidget)
 		{

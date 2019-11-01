@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Lime;
-using Tangerine.UI.FilesDropHandler;
+using Tangerine.UI.Drop;
 
 namespace Tangerine.UI
 {
 	/// <summary>
 	/// Manages a collection of IFilesDropHandlers
 	/// </summary>
-	public class FilesDropManager : IFilesDropCallbacks
+	public class FilesDropManager
 	{
 		private List<IFilesDropHandler> filesDropHandlers { get; } = new List<IFilesDropHandler>();
 
@@ -32,14 +32,6 @@ namespace Tangerine.UI
 		/// Called when manager starts handling dropped files.
 		/// </summary>
 		public event Action Handling;
-		/// <summary>
-		/// Should be called before node creation.
-		/// </summary>
-		public Action<NodeCreatingEventArgs> NodeCreating { get; set; }
-		/// <summary>
-		/// Called when node is created.
-		/// </summary>
-		public Action<Node> NodeCreated { get; set; }
 
 		/// <param name="widget">Managed area.</param>
 		public FilesDropManager(Widget widget)
@@ -96,7 +88,7 @@ namespace Tangerine.UI
 			}
 			Handling?.Invoke();
 			foreach (var handlers in filesDropHandlers) {
-				handlers.Handle(files, this, out var handledFiles);
+				handlers.Handle(files, out var handledFiles);
 				files = files.Except(handledFiles);
 			}
 			return true;
