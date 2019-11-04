@@ -161,13 +161,7 @@ namespace Tangerine.Core.Operations
 				frame = TangerinePersistence.Instance.Value.ReadObject<Frame>(Document.Current.Path, stream);
 			} catch (System.Exception e) {
 				Debug.Write(e);
-				try {
-					var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
-					frame = (Frame)new HotSceneImporter(isTangerine: true).Import(stream, new Frame(), null);
-				} catch (System.Exception e2) {
-					Debug.Write(e2);
-					return false;
-				}
+				return false;
 			}
 			var animators = frame.Animators;
 			var items = frame.RootFolder().Items.Where(item => NodeCompositionValidator.IsCopyPasteAllowed(item.GetType())).ToList();

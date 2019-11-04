@@ -106,7 +106,6 @@ namespace Tangerine
 #endif
 				new Command("File", new Menu {
 					new Command("New", new Menu {
-						GenericCommands.NewScene,
 						GenericCommands.NewTan,
 						GenericCommands.NewTanWithCustomRoot,
 					}),

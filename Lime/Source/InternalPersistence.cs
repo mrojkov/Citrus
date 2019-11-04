@@ -15,7 +15,7 @@ namespace Lime
 {
 	public class InternalPersistence : Persistence
 	{
-		public static InternalPersistence Current => stackOfCurrent.Value.Count > 0 ? stackOfCurrent.Value.Peek() : null;
+		internal static InternalPersistence Current => stackOfCurrent.Value.Count > 0 ? stackOfCurrent.Value.Peek() : null;
 		private static void PushCurrent(InternalPersistence persistence) => stackOfCurrent.Value.Push(persistence);
 		private static InternalPersistence PopCurrent() => stackOfCurrent.Value.Pop();
 
@@ -47,7 +47,7 @@ namespace Lime
 			return path.StartsWith(d) ? path.Substring(d.Length) : '/' + path;
 		}
 
-		public string ExpandPath(string path)
+		internal string ExpandPath(string path)
 		{
 			if (pathStack.Count == 0 || string.IsNullOrEmpty(path)) {
 				return path;
@@ -55,7 +55,7 @@ namespace Lime
 			return (path[0] == '/') ? path.Substring(1) : GetCurrentSerializationDirectory() + '/' + path;
 		}
 
-		public string GetCurrentSerializationPath()
+		internal string GetCurrentSerializationPath()
 		{
 			return pathStack.Peek();
 		}

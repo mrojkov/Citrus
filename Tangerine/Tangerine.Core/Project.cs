@@ -242,7 +242,7 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public Document NewDocument(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
+		public Document NewDocument(DocumentFormat format = DocumentFormat.Tan, Type rootType = null)
 		{
 			var doc = new Document(format, rootType);
 			documents.Add(doc);

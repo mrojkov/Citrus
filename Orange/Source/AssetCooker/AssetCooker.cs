@@ -329,13 +329,11 @@ namespace Orange
 			AddStage(new DeleteOrphanedMasks(this), CookingProfile.Total);
 			AddStage(new DeleteOrphanedTextureParams(this), CookingProfile.Total);
 			AddStage(new SyncFonts(this));
-			AddStage(new SyncHotFonts(this));
 			AddStage(new SyncCompoundFonts(this));
 			AddStage(new SyncRawAssets(this, ".ttf"));
 			AddStage(new SyncRawAssets(this, ".otf"));
 			AddStage(new SyncRawAssets(this, ".ogv"));
 			AddStage(new SyncScenes(this));
-			AddStage(new SyncHotScenes(this));
 			AddStage(new SyncSounds(this));
 			AddStage(new SyncRawAssets(this, ".shader"));
 			AddStage(new SyncRawAssets(this, ".xml"));

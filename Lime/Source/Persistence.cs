@@ -22,7 +22,7 @@ namespace Lime
 
 		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
 
-		public static Action<List<DeserializerBuilder>> ExtendDeserializers;
+		private static Action<List<DeserializerBuilder>> ExtendDeserializers;
 
 		private readonly List<DeserializerBuilder> deserializerBuilders = new List<DeserializerBuilder>();
 
