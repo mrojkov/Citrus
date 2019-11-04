@@ -82,6 +82,10 @@ namespace Tangerine.Panels
 			editor.SetFocus();
 			editor.AddChangeWatcher(() => editor.IsFocused(), focused => {
 				if (!focused) {
+					var newId = editor.Text.Trim();
+					if (!animation.Owner.Animations.Any(a => a.Id == newId)) {
+						RenameAnimationHelper(newId);
+					}
 					editor.Unlink();
 					label.Visible = true;
 				}
