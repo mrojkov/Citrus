@@ -198,7 +198,7 @@ namespace Tangerine.Core
 				get => cacheAnimationsStates;
 				set {
 					cacheAnimationsStates = value;
-					if (!cacheAnimationsStates && AnimationsStatesComponent.Exists(Current.RootNode)) {
+					if (!cacheAnimationsStates) {
 						AnimationsStatesComponent.Remove(Current.RootNode);
 					}
 				}
