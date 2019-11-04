@@ -567,6 +567,9 @@ namespace Tangerine
 							tabBar.ActivateTab(tab);
 						}
 					});
+					tab.Gestures.Add(new ClickGesture(1, () => {
+						DocumentTabContextMenu.Create(doc);
+					}));
 					tab.AddChangeWatcher(() => doc.DisplayName, _ => tab.Text = doc.DisplayName);
 					tab.Clicked += doc.MakeCurrent;
 					tab.Closing += () => Project.Current.CloseDocument(doc);
