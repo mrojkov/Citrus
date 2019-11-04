@@ -28,27 +28,19 @@ namespace Tangerine
 
 		private class Save : DocumentCommandHandler
 		{
-			private Document doc;
+			private readonly Document doc;
 
 			public Save(Document doc)
 			{
 				this.doc = doc;
 			}
 
-			static Save()
-			{
-				Document.PathSelector += SelectPath;
-			}
-
 			public override void ExecuteTransaction()
 			{
-				if (doc.IsModified) {
-					try {
-						doc?.Save();
-					}
-					catch (System.Exception e) {
-						ShowErrorMessageBox(e);
-					}
+				try {
+					doc.Save();
+				} catch (System.Exception e) {
+					ShowErrorMessageBox(e);
 				}
 			}
 
@@ -95,7 +87,7 @@ namespace Tangerine
 
 		private class Close : DocumentCommandHandler
 		{
-			private Document doc;
+			private readonly Document doc;
 
 			public Close(Document doc)
 			{
@@ -104,9 +96,7 @@ namespace Tangerine
 
 			public override void ExecuteTransaction()
 			{
-				if (doc != null) {
-					Project.Current.CloseDocument(doc);
-				}
+				Project.Current.CloseDocument(doc);
 			}
 		}
 	}
