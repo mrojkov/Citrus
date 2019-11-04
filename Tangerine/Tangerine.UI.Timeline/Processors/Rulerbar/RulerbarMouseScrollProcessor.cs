@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
@@ -67,7 +68,7 @@ namespace Tangerine.UI.Timeline
 								Document.Current.ForceAnimationUpdate();
 							}
 							previousColumn = newColumn;
-							Window.Current.Invalidate();
+							DockHierarchy.Instance.InvalidateWindows();
 							yield return null;
 						}
 						Document.Current.History.CommitTransaction();

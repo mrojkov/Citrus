@@ -103,7 +103,7 @@ namespace Tangerine.UI.Docking
 					requestedPlacement = null;
 				}
 				if (cachedSite != site || requestedPlacement?.Id != placement.Id) {
-					InvalidateWindows();
+					DockHierarchy.Instance.InvalidateWindows();
 				}
 				requestedSite = site;
 				requestedDockingComponent.Bounds = rect;
@@ -111,14 +111,7 @@ namespace Tangerine.UI.Docking
 				break;
 			}
 			if (cachedSite != requestedSite) {
-				InvalidateWindows();
-			}
-		}
-
-		private static void InvalidateWindows()
-		{
-			foreach (var win in AppPlacement.VisibleWindowPlacements) {
-				win.WindowWidget.Window.Invalidate();
+				DockHierarchy.Instance.InvalidateWindows();
 			}
 		}
 
