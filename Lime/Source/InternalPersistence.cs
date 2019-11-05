@@ -100,6 +100,12 @@ namespace Lime
 			try {
 				return base.ReadObject<T>(path, stream, obj);
 			} catch {
+				if (!stream.CanSeek) {
+					var ms = new MemoryStream();
+					stream.CopyTo(ms);
+					ms.Seek(0, SeekOrigin.Begin);
+					stream = ms;
+				}
 				if (!CheckBinarySignature(stream) && HasConflicts(path, stream)) {
 					throw new InvalidOperationException($"{path} has git conflicts");
 				} else {

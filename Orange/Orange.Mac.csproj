@@ -141,7 +141,6 @@
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
-    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />

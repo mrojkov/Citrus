@@ -1303,7 +1303,7 @@ namespace Lime
 			}
 		}
 
-		private static readonly string[] sceneExtensions = { ".scene", ".t3d", ".tan" };
+		private static readonly string[] sceneExtensions = { ".t3d", ".tan" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.
@@ -1670,7 +1670,7 @@ namespace Lime
 				b.OnUpdate(delta);
 			}
 		}
-		
+
 		private void CheckActivity()
 		{
 			if (attached) {

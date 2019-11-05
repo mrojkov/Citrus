@@ -35,7 +35,7 @@ namespace Tangerine
 			if (!isOnlyInstance) {
 				if (args.Length > 0) {
 					var stream = new MemoryStream();
-					TangerinePersistence.Instance.Value.WriteObject(string.Empty, stream, args, Persistence.Format.Json);
+					TangerinePersistence.Instance.WriteObject(string.Empty, stream, args, Persistence.Format.Json);
 					var serializedArgs = Encoding.UTF8.GetString(stream.ToArray());
 					var manager = new NamedPipeManager(PipeServerName);
 					manager.Write(serializedArgs);

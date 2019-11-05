@@ -76,7 +76,6 @@
     <Compile Include="PropertyEditors\NodeIdPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />
-    <Compile Include="Utils\DropSceneContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorPicker.Mac.cs" />

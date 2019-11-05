@@ -49,7 +49,6 @@
     <Compile Include="PropertyEditors\BezierEasingPropertyEditor.cs" />
     <Compile Include="Tooltip.cs" />
     <Compile Include="UIProcessors.cs" />
-    <Compile Include="Utils\DropSceneContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorPicker.Win.cs" />

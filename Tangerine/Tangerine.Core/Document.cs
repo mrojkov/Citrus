@@ -37,7 +37,7 @@ namespace Tangerine.Core
 		private readonly MemoryStream preloadedSceneStream = null;
 		private static uint untitledCounter = 0;
 
-		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
+		public static readonly string[] AllowedFileTypes = { "tan", "t3d", "fbx" };
 		public delegate bool PathSelectorDelegate(out string path);
 
 		public DateTime LastWriteTime { get; private set; }
@@ -239,9 +239,9 @@ namespace Tangerine.Core
 		{
 			try {
 				if (preloadedSceneStream != null) {
-					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", persistence: TangerinePersistence.Instance.Value, stream: preloadedSceneStream);
+					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", persistence: TangerinePersistence.Instance, stream: preloadedSceneStream);
 				} else {
-					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, persistence: TangerinePersistence.Instance.Value);
+					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, persistence: TangerinePersistence.Instance);
 				}
 				if (Format == DocumentFormat.Fbx) {
 					Path = string.Format(untitledPathFormat, untitledCounter++);
@@ -456,7 +456,7 @@ namespace Tangerine.Core
 			var ms = new MemoryStream();
 			// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 			using (node = CreateCloneForSerialization(node)) {
-				TangerinePersistence.Instance.Value.WriteObject(assetPath, ms, node, Persistence.Format.Json);
+				TangerinePersistence.Instance.WriteObject(assetPath, ms, node, Persistence.Format.Json);
 			}
 			FileMode fileModeForHiddenFile = File.Exists(filePath) ? FileMode.Truncate : FileMode.Create;
 			using (var fs = new FileStream(filePath, fileModeForHiddenFile)) {

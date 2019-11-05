@@ -187,7 +187,7 @@ namespace Tangerine.UI.FilesystemView
 				return null;
 			}
 			var extension = Path.GetExtension(filename).ToLower();
-			if (extension == ".scene" || extension == ".tan") {
+			if (extension == ".tan") {
 				return DocumentPreview.ReadAsTexture2D(filename);
 			} else {
 				var fi = new FileInfo(filename);

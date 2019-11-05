@@ -42,7 +42,7 @@ namespace Kumquat
 
 	public class ScenesCodeCooker
 	{
-		private static readonly string[] scenesExtensions = { ".scene", ".tan", ".model" };
+		private static readonly string[] scenesExtensions = { ".tan", ".model" };
 
 		private readonly string directory;
 		private readonly string generatedScenesPath;

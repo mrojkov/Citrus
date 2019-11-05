@@ -118,7 +118,7 @@ namespace Tangerine
 		public void Load(string filepath)
 		{
 			var data =
-				TangerinePersistence.Instance.Value.ReadObjectFromFile<Dictionary<string, Dictionary<string, string>>>(filepath);
+				TangerinePersistence.Instance.ReadObjectFromFile<Dictionary<string, Dictionary<string, string>>>(filepath);
 			foreach (var i in data) {
 				var category = Categories.FirstOrDefault(j => j.Id == i.Key);
 				if (category != null) {
@@ -157,7 +157,7 @@ namespace Tangerine
 				}
 				data.Add(category.Id, bindings);
 			}
-			TangerinePersistence.Instance.Value.WriteObjectToFile(file, data, Persistence.Format.Json);
+			TangerinePersistence.Instance.WriteObjectToFile(file, data, Persistence.Format.Json);
 		}
 
 		public void Save()

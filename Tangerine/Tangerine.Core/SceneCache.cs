@@ -21,7 +21,7 @@ namespace Tangerine.Core
 					var r = nodeProvider?.Invoke() ?? node;
 					if (r != null && DoNeedReloadExternalScenes) {
 						DoNeedReloadExternalScenes = false;
-						r.LoadExternalScenes(TangerinePersistence.Instance.Value);
+						r.LoadExternalScenes(TangerinePersistence.Instance);
 					}
 					return r;
 				}

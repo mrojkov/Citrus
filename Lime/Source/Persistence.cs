@@ -122,23 +122,13 @@ namespace Lime
 			AbstractDeserializer d = null;
 			foreach (var db in deserializerBuilders) {
 				d = db(path, stream);
-				if (d != null)
+				if (d != null) {
 					break;
-			}
-			var bd = d as BinaryDeserializer;
-			if (obj == null) {
-				if (bd != null) {
-					return bd.FromReader<T>(new BinaryReader(stream));
-				} else {
-					return d.FromStream<T>(stream);
-				}
-			} else {
-				if (bd != null) {
-					return (T)bd.FromReader(obj, new BinaryReader(stream));
-				} else {
-					return (T)d.FromStream(obj, stream);
 				}
 			}
+			return obj == null
+				? d.FromStream<T>(stream)
+				: (T)d.FromStream(obj, stream);
 		}
 
 		public T ReadObject<T>(string path, object obj = null)

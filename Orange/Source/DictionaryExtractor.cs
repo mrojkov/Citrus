@@ -159,17 +159,6 @@ namespace Orange
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				var files = The.Workspace.AssetFiles.Enumerate(".scene");
-				foreach (var fileInfo in files) {
-					// First of all scan lines like this: "[]..."
-					ProcessSourceFile(fileInfo.Path);
-					// Then like this: Text "..."
-					if (!ShouldLocalizeOnlyTaggedSceneTexts()) {
-						ProcessSceneFile(fileInfo.Path);
-					}
-				}
-			}
-			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				var files = The.Workspace.AssetFiles.Enumerate(".tan");
 				foreach (var fileInfo in files) {
 					ProcessTanFile(fileInfo.Path);
@@ -198,19 +187,6 @@ namespace Orange
 						var type = prefix == "@" ? "verbatim" : "interpolated";
 						Logger.Write($"WARNING: Ignoring {type} string: {s}");
 					}
-				}
-			}
-		}
-
-		private void ProcessSceneFile(string file)
-		{
-			const string textPropertiesPattern = @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$";
-			var code = File.ReadAllText(file, Encoding.Default);
-			var context = GetContext(file);
-			foreach (var match in Regex.Matches(code, textPropertiesPattern, RegexOptions.Multiline)) {
-				var s = ((Match)match).Groups[2].Value;
-				if (HasAlphabeticCharacters(s)) {
-					AddToDictionary(s, context);
 				}
 			}
 		}

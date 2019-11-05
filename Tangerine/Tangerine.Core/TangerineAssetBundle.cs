@@ -33,7 +33,7 @@ namespace Tangerine.Core
 				}
 				try {
 					using (var stream = cacheBundle.OpenFile(VersionFile)) {
-						var cacheMeta = TangerinePersistence.Instance.Value.ReadObject<CacheMeta>(VersionFile, stream);
+						var cacheMeta = TangerinePersistence.Instance.ReadObject<CacheMeta>(VersionFile, stream);
 						if (!cacheMeta.IsActual) {
 							return false;
 						}
@@ -51,7 +51,7 @@ namespace Tangerine.Core
 				foreach (var path in cacheBundle.EnumerateFiles().ToList()) {
 					cacheBundle.DeleteFile(path);
 				}
-				TangerinePersistence.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Persistence.Format.Binary, string.Empty, DateTime.Now, AssetAttributes.None, new byte[0]);
+				TangerinePersistence.Instance.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Persistence.Format.Binary, string.Empty, DateTime.Now, AssetAttributes.None, new byte[0]);
 			}
 		}
 
@@ -137,7 +137,7 @@ namespace Tangerine.Core
 								}
 							}
 						}
-						TangerinePersistence.Instance.Value.WriteObjectToBundle(
+						TangerinePersistence.Instance.WriteObjectToBundle(
 							cacheBundle,
 							attachmentMetaPath,
 							meta, Persistence.Format.Binary, Model3DAttachmentMeta.FileExtension,
@@ -192,7 +192,7 @@ namespace Tangerine.Core
 							animator.Owner.Animators.Remove(animator);
 						}
 					}
-					TangerinePersistence.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Persistence.Format.Binary, ".t3d",
+					TangerinePersistence.Instance.WriteObjectToBundle(cacheBundle, path, model, Persistence.Format.Binary, ".t3d",
 						base.GetFileLastWriteTime(fbxPath), AssetAttributes.None, new byte[0]);
 
 				} else if (fbxCached) {
@@ -201,7 +201,7 @@ namespace Tangerine.Core
 				}
 
 				if (attachmentExists) {
-					TangerinePersistence.Instance.Value.WriteObjectToBundle(
+					TangerinePersistence.Instance.WriteObjectToBundle(
 						cacheBundle,
 						attachmentPath,
 						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Persistence.Format.Binary, ".txt",

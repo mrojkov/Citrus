@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -160,7 +160,6 @@
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
-    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
