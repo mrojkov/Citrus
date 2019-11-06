@@ -79,7 +79,7 @@ namespace Lime
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
-				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
+				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.PaddedHeight : 0.0f;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + fontChar.Width + fontChar.ACWidths.Y + letterSpacing);
 				size.X = Math.Max(size.X, width);
 				prevChar = fontChar;
@@ -220,9 +220,32 @@ namespace Lime
 		/// </summary>
 		public ITexture Texture;
 
+		/// <summary>
+		/// Padding from left and right side of glyph bounding box.
+		/// Should be used in proper character positioning
+		/// </summary>
+		[YuzuMember]
+		public float HPadding { get; set; } = 1;
+
+		/// <summary>
+		/// Padding from bottom and top side of glyph bounding box.
+		/// Should be used in proper character positioning
+		/// </summary>
+		[YuzuMember]
+		public float VPadding { get; set; }
+
+		/// <summary>
+		/// Width including padding from right and left.
+		/// </summary>
+		public float PaddedWidth => Width + 2 * HPadding;
+		/// <summary>
+		/// Height including padding from bottom and top.
+		/// </summary>
+		public float PaddedHeight => Height + 2 * VPadding;
+
 		public float Kerning(FontChar prevChar)
 		{
-			if (prevChar != null && prevChar.KerningPairs != null)
+			if (prevChar?.KerningPairs != null)
 				foreach (var pair in prevChar.KerningPairs) {
 					if (pair.Char == Char) {
 						return pair.Kerning;

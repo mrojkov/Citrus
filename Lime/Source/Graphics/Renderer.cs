@@ -409,9 +409,12 @@ namespace Lime
 					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					continue;
 				}
-				var scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing);
-				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
+				// To properly scale letter we have to take into account a vertical padding
+				var scale = fontChar.Height != 0.0f ? fontHeight / fontChar.PaddedHeight : 0.0f;
+				// Pen Position + Bearing + Kerning gives a proper letter position
+				// but we have to subtract left padding in order to avoid extra spacing
+				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing - fontChar.HPadding);
+				var size = new Vector2(scale * fontChar.PaddedWidth, fontHeight - fontChar.VerticalOffset);
 				var charPosition = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
 				if (font.RoundCoordinates) {
 					charPosition = new Vector2(charPosition.X.Round(), charPosition.Y.Round());
@@ -420,7 +423,9 @@ namespace Lime
 				chars[j].FontChar = fontChar;
 				chars[j].Position = charPosition;
 				++j;
-				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + halfLetterSpacing);
+				// We have to add left padding to get actual letter position
+				// Width + (Horizontal Advance - Bearing) will give a proper pen position for next letter
+				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + halfLetterSpacing + fontChar.HPadding);
 				prevChar = fontChar;
 			}
 			list.Add(font, color, fontHeight, chars, tag);

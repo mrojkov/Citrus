@@ -9,20 +9,24 @@ namespace Lime
 		private DynamicTexture texture;
 		private IntVector2 position;
 		private int lineAdditionalHeight; // Used for lines containing glyphs with diacritics.
-		private List<ITexture> textures;
+		private readonly List<ITexture> textures;
 		private int textureIndex;
-		private int fontHeight;
+		private readonly int fontHeight;
 		private readonly CharMap charMap = new CharMap();
 
 		public FontRenderer FontRenderer { get; internal set; }
 		public Size MinTextureSize { get; set; } = new Size(64, 64);
 		public Size MaxTextureSize { get; set; } = new Size(2048, 2048);
 
-		// We add 1px left and right padding to each char on the texture and also to the UV
-		// so that chars will be blurred correctly after stretching or drawing to float position.
-		// And we compensate this padding by ACWidth, so that the text will take the same space.
-		// See "texture bleeding"
+		/// <summary>
+		/// Padding from right and left side of glyph bounding box. Padding is needed to avoid
+		/// artifacts and Signed Distance Field font generation.
+		/// </summary>
 		public int HPadding { get; set; } = 1;
+		/// <summary>
+		/// Padding from bottom and top side of glyph bounding box. Padding is needed to avoid
+		/// artifacts and Signed Distance Field font generation.
+		/// </summary>
 		public int VPadding { get; set; }
 
 
@@ -73,6 +77,7 @@ namespace Lime
 				position = IntVector2.Zero;
 			}
 			CopyGlyphToTexture(glyph, texture, position + new IntVector2(HPadding, VPadding));
+			var isInvisible = char.IsWhiteSpace(code);
 			var fontChar = new FontChar {
 				Char = code,
 				UV0 = (Vector2)position / (Vector2)texture.ImageSize,
@@ -84,6 +89,9 @@ namespace Lime
 				KerningPairs = glyph.KerningPairs,
 				TextureIndex = textureIndex,
 				VerticalOffset = Math.Min(0, glyph.VerticalOffset),
+				// Invisible glyphs doesn't have padding
+				HPadding = isInvisible ? 0 : HPadding,
+				VPadding = isInvisible ? 0 : VPadding,
 			};
 			position.X += paddedWidth + spacing;
 			return fontChar;

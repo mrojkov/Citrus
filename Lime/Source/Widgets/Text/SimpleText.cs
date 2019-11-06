@@ -417,8 +417,8 @@ namespace Lime
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 					if (lastLine) {
-					// There is no end-of-text character, so simulate it.
-					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
+						// There is no end-of-text character, so simulate it.
+						caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
 				}
 				pos.Y += Spacing + FontHeight;
 				caret.NextLine();

@@ -67,6 +67,8 @@ namespace Lime
 						fontChar.ACWidths *= config.SdfScale;
 						fontChar.Height *= config.SdfScale;
 						fontChar.Width *= config.SdfScale;
+						fontChar.HPadding *= config.SdfScale;
+						fontChar.VPadding *= config.SdfScale;
 					}
 					fontCharCollection.Add(fontChar);
 				}

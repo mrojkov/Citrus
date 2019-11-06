@@ -46,7 +46,7 @@ namespace Lime
 		/// Padding between adjacent characters.
 		/// </summary>
 		[YuzuMember]
-		public int Padding { get; set; }
+		public int Padding { get; set; } = 1;
 		/// <summary>
 		/// User-defined kerning pairs.
 		/// </summary>
