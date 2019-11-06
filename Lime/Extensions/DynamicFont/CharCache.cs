@@ -58,9 +58,9 @@ namespace Lime
 				return null;
 			// Space between characters on the texture
 			const int spacing = 1;
-			var paddedGlyphWidth = glyph.Width + HPadding * 2;
+			var paddedWidth = glyph.Width + HPadding * 2;
 			var paddedHeight = fontHeight + VPadding * 2;
-			if (position.X + paddedGlyphWidth + spacing >= texture.ImageSize.Width) {
+			if (position.X + paddedWidth + spacing >= texture.ImageSize.Width) {
 				position.X = 0;
 				position.Y += paddedHeight + spacing + lineAdditionalHeight;
 				lineAdditionalHeight = 0;
@@ -76,16 +76,16 @@ namespace Lime
 			var fontChar = new FontChar {
 				Char = code,
 				UV0 = (Vector2)position / (Vector2)texture.ImageSize,
-				UV1 = ((Vector2)position + new Vector2(paddedGlyphWidth, paddedHeight)) / (Vector2)texture.ImageSize,
-				ACWidths = glyph.ACWidths - new Vector2(HPadding, 1),
-				Width = paddedGlyphWidth,
-				Height = paddedHeight,
+				UV1 = ((Vector2)position + new Vector2(paddedWidth, paddedHeight)) / (Vector2)texture.ImageSize,
+				ACWidths = glyph.ACWidths,
+				Width = glyph.Width,
+				Height = fontHeight,
 				RgbIntensity = glyph.RgbIntensity,
 				KerningPairs = glyph.KerningPairs,
 				TextureIndex = textureIndex,
-				VerticalOffset = Math.Min(0, glyph.VerticalOffset)
+				VerticalOffset = Math.Min(0, glyph.VerticalOffset),
 			};
-			position.X += paddedGlyphWidth + spacing;
+			position.X += paddedWidth + spacing;
 			return fontChar;
 		}
 
