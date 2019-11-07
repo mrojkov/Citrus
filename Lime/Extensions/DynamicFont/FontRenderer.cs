@@ -57,7 +57,7 @@ namespace Lime
 #endif
 		}
 
-		private static float CalcPixelSize(Face face, int height)
+		public static float CalcPixelSize(Face face, int height)
 		{
 			// See http://www.freetype.org/freetype2/docs/tutorial/step2.html
 			// Chapter: Scaling Distances to Device Space

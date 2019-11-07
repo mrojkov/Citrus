@@ -69,13 +69,20 @@ namespace Lime
 						fontChar.Width *= config.SdfScale;
 						fontChar.HPadding *= config.SdfScale;
 						fontChar.VPadding *= config.SdfScale;
+						if (fontChar.KerningPairs != null) {
+							for (int i = 0; i < fontChar.KerningPairs.Count; i++) {
+								var pair = fontChar.KerningPairs[i];
+								pair.Kerning *= config.SdfScale;
+								fontChar.KerningPairs[i] = pair;
+							}
+						}
 					}
 					fontCharCollection.Add(fontChar);
 				}
 				if (missingCharacters.Count > 0) {
 					Console.WriteLine($"Characters: {string.Join("", missingCharacters)} -- are missing in font {charSet.Font}");
 				}
-				GenerateKerningPairs(fontCharCollection, chars.FontRenderer.Face, config, charSet.Chars);
+				GenerateKerningPairs(fontCharCollection, chars.FontRenderer.Face, config);
 			}
 			if (config.IsSdf) {
 				foreach (var texture in fontCharCollection.Textures) {
@@ -90,24 +97,29 @@ namespace Lime
 		/// <summary>
 		/// Generates kerning pairs using HarfBuzz.
 		/// </summary>
-		private static void GenerateKerningPairs(FontCharCollection fontChars, Face face,
-			TftConfig config, IEnumerable<char> chars)
+		private static void GenerateKerningPairs(FontCharCollection fontChars, Face face, TftConfig config)
 		{
 			var font = SharpFont.HarfBuzz.Font.FromFTFace(face);
 			var height = (int)(config.IsSdf ? config.Height * config.SdfScale : config.Height);
 			var pixelSize = (uint)Math.Round(Math.Abs(CalcPixelSize(height, face)));
 			face.SetCharSize(0, height, pixelSize, pixelSize);
-			foreach (var lhs in chars) {
+			foreach (var fontChar in fontChars) {
+				var lhs = fontChar.Char;
 				var kerningCharset = FontRenderer.KerningPairCharsets.FirstOrDefault(c => c.Contains(lhs));
 				if (kerningCharset == null) {
 					continue;
 				}
-				var fontChar = fontChars.Get(lhs, 0f);
 				config.CustomKerningPairs.TryGetValue(lhs, out var customKernings);
 				foreach (var rhs in kerningCharset) {
-					if (customKernings != null && TryGetKerning(rhs, out var kerningPair)) {
+					if (
+						customKernings != null && TryGetKerning(rhs, out var kerningPair)
+						&& !(fontChar.KerningPairs?.Contains(kerningPair) ?? false)
+					) {
 						fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
 						fontChar.KerningPairs.Add(kerningPair);
+						continue;
+					}
+					if (!fontChars.Contains(rhs)) {
 						continue;
 					}
 					var buf = new SharpFont.HarfBuzz.Buffer {
@@ -181,7 +193,7 @@ namespace Lime
 				ExtractCharacters(dict, characters, frequency);
 			}
 			charSet.Chars = string.Join("", sortByFrequency ?
-				characters.OrderBy(c => frequency[c]) : characters.OrderBy(c => c));
+				characters.OrderByDescending(c => frequency[c]) : characters.OrderBy(c => c));
 		}
 
 		private static void ExtractCharacters(LocalizationDictionary dictionary, HashSet<char> chars,
