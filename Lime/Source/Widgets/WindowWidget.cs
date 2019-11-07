@@ -14,7 +14,7 @@ namespace Lime
 	{
 		private RenderObjectList renderObjectList1 = new RenderObjectList();
 		private RenderObjectList renderObjectList2 = new RenderObjectList();
-		
+
 		private bool windowActivated;
 		private Widget lastFocused;
 		protected readonly RenderChain renderChain;
@@ -26,7 +26,7 @@ namespace Lime
 		{
 			WidgetContext = new WidgetContext(this);
 			LayoutManager = new LayoutManager();
-			CreateManager().RootNodes.Add(this);
+			NodeManagerFactory(LayoutManager, WidgetContext).RootNodes.Add(this);
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, WidgetContext);
 			renderChain = new RenderChain();
@@ -34,12 +34,14 @@ namespace Lime
 			window.Sync += Sync;
 		}
 
-		private NodeManager CreateManager()
+		public static Func<LayoutManager, WidgetContext, NodeManager> NodeManagerFactory = CreateManager;
+
+		private static NodeManager CreateManager(LayoutManager layoutManager, WidgetContext widgetContext)
 		{
 			var services = new ServiceRegistry();
 			services.Add(new BehaviorSystem());
-			services.Add(LayoutManager);
-			services.Add(WidgetContext);
+			services.Add(layoutManager);
+			services.Add(widgetContext);
 
 			var manager = new NodeManager(services);
 			manager.Processors.Add(new GestureProcessor());
@@ -48,6 +50,7 @@ namespace Lime
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
 			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(AfterAnimationStage)));
 			manager.Processors.Add(new LayoutProcessor());
 			manager.Processors.Add(new BoundingRectProcessor());
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));

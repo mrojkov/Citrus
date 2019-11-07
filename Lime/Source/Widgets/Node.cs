@@ -1538,17 +1538,24 @@ namespace Lime
 			return Cloner.Clone(node);
 		}
 
-		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		public static Action<Node, float> AdvanceAnimationsRecursiveHook = DefaultAdvanceAnimationsRecursive;
+
+		private static void DefaultAdvanceAnimationsRecursive(Node node, float delta)
 		{
-			var c = node.Components.Get<AnimationComponent>();
+			var c = node.Components.AnimationComponent;
 			if (c != null) {
 				foreach (var a in c.Animations) {
 					a.Advance(delta);
 				}
 			}
 			foreach (var child in node.Nodes) {
-				AdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
+				DefaultAdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
 			}
+		}
+
+		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		{
+			AdvanceAnimationsRecursiveHook(node, delta);
 		}
 
 		private static void RegisterLegacyBehaviors(Node node)

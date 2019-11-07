@@ -275,6 +275,14 @@
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\InternalPersistence.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationEngines.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationProcessor.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationStoppedProcessor.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationSystem.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.Logging.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.NodeManager.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.PostAnimationProcessor.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />

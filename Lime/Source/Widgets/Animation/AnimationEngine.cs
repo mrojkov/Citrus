@@ -19,6 +19,7 @@ namespace Lime
 		public virtual void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime) { }
 		public virtual bool AreEffectiveAnimatorsValid(Animation animation) => false;
 		public virtual void BuildEffectiveAnimators(Animation animation) { }
+		public virtual void RaiseStopped(Animation animation) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
@@ -122,6 +123,15 @@ namespace Lime
 					break;
 			}
 			marker.CustomAction?.Invoke();
+		}
+
+		public override void RaiseStopped(Animation animation)
+		{
+			animation.Stopped?.Invoke();
+
+			var savedAction = animation.AssuredStopped;
+			animation.AssuredStopped = null;
+			savedAction?.Invoke();
 		}
 
 		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)

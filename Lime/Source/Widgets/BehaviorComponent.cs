@@ -43,7 +43,7 @@ namespace Lime
 		/// <summary>
 		/// Stops the Update calls.
 		/// </summary>
-		protected void Suspend()
+		public void Suspend()
 		{
 			if (!Suspended) {
 				Suspended = true;
@@ -54,7 +54,7 @@ namespace Lime
 		/// <summary>
 		/// Resumes the Update calls.
 		/// </summary>
-		protected void Resume()
+		public void Resume()
 		{
 			if (Suspended) {
 				Suspended = false;
@@ -77,6 +77,11 @@ namespace Lime
 	/// Identifier for post-early update stage.
 	/// </summary>
 	public class PostEarlyUpdateStage { }
+
+	/// <summary>
+	/// Identifier for after advance animation update stage.
+	/// </summary>
+	public class AfterAnimationStage { }
 
 	/// <summary>
 	/// Identifier for pre-late update stage.

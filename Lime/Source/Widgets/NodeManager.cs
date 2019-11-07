@@ -19,6 +19,8 @@ namespace Lime
 
 		public IServiceProvider ServiceProvider { get; }
 
+		public NodeProcessor ActiveProcessor { get; private set; }
+
 		public NodeManager(IServiceProvider serviceProvider)
 		{
 			ServiceProvider = serviceProvider;
@@ -182,8 +184,10 @@ namespace Lime
 		public void Update(float delta)
 		{
 			foreach (var p in Processors) {
+				ActiveProcessor = p;
 				p.Update(delta);
 			}
+			ActiveProcessor = null;
 		}
 	}
 

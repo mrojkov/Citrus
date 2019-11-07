@@ -20,8 +20,8 @@ namespace Lime
 		internal BucketQueueNode<Animation> QueueNode;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
-		public event Action Stopped;
-		private Action assuredStopped;
+		public Action Stopped;
+		public Action AssuredStopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
@@ -205,16 +205,12 @@ namespace Lime
 				}
 				return;
 			}
-			assuredStopped += onStopped;
+			AssuredStopped += onStopped;
 		}
 
 		internal void RaiseStopped()
 		{
-			Stopped?.Invoke();
-
-			var savedAction = assuredStopped;
-			assuredStopped = null;
-			savedAction?.Invoke();
+			AnimationEngine.RaiseStopped(this);
 		}
 
 		public int CalcDurationInFrames()

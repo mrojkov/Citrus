@@ -2,7 +2,7 @@ namespace Lime
 {
 	public class BlendAnimationEngine : DefaultAnimationEngine
 	{
-		public new static readonly BlendAnimationEngine Instance = new BlendAnimationEngine();
+		public new static BlendAnimationEngine Instance = new BlendAnimationEngine();
 
 		public override void AdvanceAnimation(Animation animation, float delta)
 		{

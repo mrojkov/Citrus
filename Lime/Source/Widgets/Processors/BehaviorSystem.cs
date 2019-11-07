@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Lime
 {
-	internal class BehaviorSystem
+	public class BehaviorSystem
 	{
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
 		private Dictionary<Type, BehaviorUpdateFamily> updateFamilies = new Dictionary<Type, BehaviorUpdateFamily>();
@@ -31,12 +31,12 @@ namespace Lime
 			}
 		}
 
-		public void Add(BehaviorComponent behavior)
+		internal void Add(BehaviorComponent behavior)
 		{
 			behavior.StartQueueNode = behaviorsToStart.AddLast(behavior);
 		}
 
-		public void Remove(BehaviorComponent behavior, Node owner)
+		internal void Remove(BehaviorComponent behavior, Node owner)
 		{
 			if (behavior.StartQueueNode != null) {
 				behaviorsToStart.Remove(behavior.StartQueueNode);
@@ -48,7 +48,7 @@ namespace Lime
 			}
 		}
 
-		public void OnOwnerFrozenChanged(BehaviorComponent behavior)
+		internal void OnOwnerFrozenChanged(BehaviorComponent behavior)
 		{
 			if (behavior.StartQueueNode == null) {
 				behavior.UpdateFamily?.Filter(behavior);
@@ -79,7 +79,7 @@ namespace Lime
 		}
 	}
 
-	internal class BehaviorUpdateStage
+	public class BehaviorUpdateStage
 	{
 		private Dictionary<BehaviorUpdateFamily, int> familyIndexMap = new Dictionary<BehaviorUpdateFamily, int>();
 		private List<BehaviorUpdateFamily> families = new List<BehaviorUpdateFamily>();
@@ -89,7 +89,7 @@ namespace Lime
 
 		public readonly Type StageType;
 
-		public BehaviorUpdateStage(Type stageType)
+		internal BehaviorUpdateStage(Type stageType)
 		{
 			StageType = stageType;
 		}

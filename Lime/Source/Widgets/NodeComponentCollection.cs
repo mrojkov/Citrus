@@ -253,8 +253,14 @@ namespace Lime
 			this.owner = owner;
 		}
 
+		private AnimationComponent animationComponent;
+
+		public AnimationComponent AnimationComponent =>
+			(animationComponent ?? (animationComponent = Get<AnimationComponent>()));
+
 		public override void Add(NodeComponent component)
 		{
+			animationComponent = null;
 			if (component.Owner != null) {
 				throw new InvalidOperationException("The component is already in a collection.");
 			}
@@ -265,6 +271,7 @@ namespace Lime
 
 		public override bool Remove(NodeComponent component)
 		{
+			animationComponent = null;
 			if (component != null && component.Owner == owner) {
 				base.Remove(component);
 				component.Owner = null;
@@ -276,6 +283,7 @@ namespace Lime
 
 		public override void Clear()
 		{
+			animationComponent = null;
 			for (int i = 0; i < buckets.Length; i++) {
 				if (buckets[i].Key > 0) {
 					buckets[i].Component.Owner = null;
