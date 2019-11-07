@@ -11,9 +11,9 @@ namespace RemoteScripting
 
 		public IReadOnlyList<PortableEntryPoint> EntryPoints => entryPoints;
 
-		public PortableAssembly(byte[] assemblyRawBytes, string entryPointsClassName)
+		public PortableAssembly(byte[] assemblyRawBytes, byte[] pdbRawBytes, string entryPointsClassName)
 		{
-			var assembly = Assembly.Load(assemblyRawBytes);
+			var assembly = Assembly.Load(assemblyRawBytes, pdbRawBytes);
 			var type = assembly.GetType(entryPointsClassName);
 			foreach (var methodInfo in type.GetMethods(BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public)) {
 				var entryPointAttribute = methodInfo.GetCustomAttributes(true)

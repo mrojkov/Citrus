@@ -7,6 +7,7 @@ namespace Tangerine.UI.RemoteScripting
 		public static CompiledAssembly Instance { get; set; }
 
 		public byte[] RawBytes;
+		public byte[] PdbRawBytes;
 		public PortableAssembly PortableAssembly;
 	}
 }

@@ -32,7 +32,7 @@ namespace Tangerine.UI.RemoteScripting
 		public IEnumerable<string> ProjectReferences { get; set; } = DefaultProjectReferences;
 		public IEnumerable<string> Namespaces { get; set; } = DefaultNamespaces;
 		public OutputKind OutputKind { get; set; } = OutputKind.DynamicallyLinkedLibrary;
-		public OptimizationLevel OptimizationLevel { get; set; } = OptimizationLevel.Release;
+		public OptimizationLevel OptimizationLevel { get; set; } = OptimizationLevel.Debug;
 
 		public async Task<Result> CompileAssemblyToRawBytesAsync(string assemblyName, IEnumerable<string> csFiles)
 		{
@@ -41,22 +41,25 @@ namespace Tangerine.UI.RemoteScripting
 
 		public Result CompileAssemblyToRawBytes(string assemblyName, IEnumerable<string> csFiles)
 		{
-			using (var memoryStream = new MemoryStream()) {
-				var emitResult = CompileAssembly(assemblyName, csFiles, memoryStream);
-				return new Result {
-					Success = emitResult.Success,
-					AssemblyRawBytes = emitResult.Success ? memoryStream.ToArray() : null,
-					Diagnostics = emitResult.Diagnostics
-				};
+			using (var memoryStreamForPdb = new MemoryStream()) {
+				using (var memoryStream = new MemoryStream()) {
+					var emitResult = CompileAssembly(assemblyName, csFiles, memoryStream, memoryStreamForPdb);
+					return new Result {
+						Success = emitResult.Success,
+						AssemblyRawBytes = emitResult.Success ? memoryStream.ToArray() : null,
+						PdbRawBytes = emitResult.Success ? memoryStreamForPdb.ToArray() : null,
+						Diagnostics = emitResult.Diagnostics
+					};
+				}
 			}
 		}
 
-		public EmitResult CompileAssembly(string assemblyName, IEnumerable<string> csFiles, Stream stream)
+		public EmitResult CompileAssembly(string assemblyName, IEnumerable<string> csFiles, Stream stream, Stream streamForPdb)
 		{
 			var syntaxTrees = new List<SyntaxTree>();
 			foreach (var csFile in csFiles) {
 				var source = File.ReadAllText(csFile);
-				var syntaxTree = SyntaxFactory.ParseSyntaxTree(source, ParseOptions, csFile);
+				var syntaxTree = SyntaxFactory.ParseSyntaxTree(source, ParseOptions, csFile, System.Text.Encoding.UTF8);
 				syntaxTrees.Add(syntaxTree);
 			}
 			var references = ProjectReferences.Select(referencePath => MetadataReference.CreateFromFile(referencePath));
@@ -65,13 +68,14 @@ namespace Tangerine.UI.RemoteScripting
 				.WithOptimizationLevel(OptimizationLevel)
 				.WithUsings(Namespaces);
 			var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, references, compilationOptions);
-			return compilation.Emit(stream);
+			return compilation.Emit(stream, streamForPdb);
 		}
 
 		public class Result
 		{
 			public bool Success;
 			public byte[] AssemblyRawBytes;
+			public byte[] PdbRawBytes;
 			public ImmutableArray<Diagnostic> Diagnostics;
 		}
 	}

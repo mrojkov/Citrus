@@ -8,6 +8,9 @@ namespace RemoteScripting
 		public byte[] AssemblyRawBytes;
 
 		[YuzuMember]
+		public byte[] PdbRawBytes;
+
+		[YuzuMember]
 		public string ClassName;
 
 		[YuzuMember]
