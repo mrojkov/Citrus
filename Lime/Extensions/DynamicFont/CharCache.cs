@@ -19,15 +19,11 @@ namespace Lime
 		public Size MaxTextureSize { get; set; } = new Size(2048, 2048);
 
 		/// <summary>
-		/// Padding from right and left side of glyph bounding box. Padding is needed to avoid
-		/// artifacts and Signed Distance Field font generation.
+		/// Padding from each side of glyph bounding box. Padding is used
+		/// to avoid artifacts and for Signed Distance Field generation.
+		/// Padding affects UVs (glyph is rendered with padding).
 		/// </summary>
-		public int HPadding { get; set; } = 1;
-		/// <summary>
-		/// Padding from bottom and top side of glyph bounding box. Padding is needed to avoid
-		/// artifacts and Signed Distance Field font generation.
-		/// </summary>
-		public int VPadding { get; set; }
+		public int Padding { get; set; } = 1;
 
 
 		public CharCache(int fontHeight, FontRenderer fontRenderer, List<ITexture> textures)
@@ -62,8 +58,8 @@ namespace Lime
 				return null;
 			// Space between characters on the texture
 			const int spacing = 1;
-			var paddedWidth = glyph.Width + HPadding * 2;
-			var paddedHeight = fontHeight + VPadding * 2;
+			var paddedWidth = glyph.Width + Padding * 2;
+			var paddedHeight = fontHeight + Padding * 2;
 			if (position.X + paddedWidth + spacing >= texture.ImageSize.Width) {
 				position.X = 0;
 				position.Y += paddedHeight + spacing + lineAdditionalHeight;
@@ -76,8 +72,7 @@ namespace Lime
 				CreateNewFontTexture();
 				position = IntVector2.Zero;
 			}
-			CopyGlyphToTexture(glyph, texture, position + new IntVector2(HPadding, VPadding));
-			var isInvisible = char.IsWhiteSpace(code);
+			CopyGlyphToTexture(glyph, texture, position + new IntVector2(Padding, Padding));
 			var fontChar = new FontChar {
 				Char = code,
 				UV0 = (Vector2)position / (Vector2)texture.ImageSize,
@@ -90,8 +85,7 @@ namespace Lime
 				TextureIndex = textureIndex,
 				VerticalOffset = Math.Min(0, glyph.VerticalOffset),
 				// Invisible glyphs doesn't have padding
-				HPadding = isInvisible ? 0 : HPadding,
-				VPadding = isInvisible ? 0 : VPadding,
+				Padding = char.IsWhiteSpace(code) ? 0 : Padding,
 			};
 			position.X += paddedWidth + spacing;
 			return fontChar;

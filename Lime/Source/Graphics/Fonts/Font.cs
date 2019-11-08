@@ -79,7 +79,7 @@ namespace Lime
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
-				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.PaddedHeight : 0.0f;
+				float scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
 				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + fontChar.Width + fontChar.ACWidths.Y + letterSpacing);
 				size.X = Math.Max(size.X, width);
 				prevChar = fontChar;
@@ -221,27 +221,21 @@ namespace Lime
 		public ITexture Texture;
 
 		/// <summary>
-		/// Padding from left and right side of glyph bounding box.
-		/// Should be used in proper character positioning
+		/// Padding from each side of glyph bounding box.
+		/// Should be used in proper character positioning because
+		/// glyph is rendered with padding.
 		/// </summary>
 		[YuzuMember]
-		public float HPadding { get; set; } = 1;
-
-		/// <summary>
-		/// Padding from bottom and top side of glyph bounding box.
-		/// Should be used in proper character positioning
-		/// </summary>
-		[YuzuMember]
-		public float VPadding { get; set; }
+		public float Padding { get; set; } = 1;
 
 		/// <summary>
 		/// Width including padding from right and left.
 		/// </summary>
-		public float PaddedWidth => Width + 2 * HPadding;
+		public float PaddedWidth => Width + 2 * Padding;
 		/// <summary>
 		/// Height including padding from bottom and top.
 		/// </summary>
-		public float PaddedHeight => Height + 2 * VPadding;
+		public float PaddedHeight => Height + 2 * Padding;
 
 		public float Kerning(FontChar prevChar)
 		{

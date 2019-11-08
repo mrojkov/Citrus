@@ -44,8 +44,7 @@ namespace Lime
 		{
 			var fontCharCollection = new FontCharCollection();
 			var chars = new CharCache(config.Height, null, fontCharCollection.Textures) {
-				VPadding = config.Padding,
-				HPadding = config.Padding,
+				Padding = config.Padding,
 				MinTextureSize = config.TextureSize,
 				MaxTextureSize = config.TextureSize,
 			};
@@ -67,8 +66,7 @@ namespace Lime
 						fontChar.ACWidths *= config.SdfScale;
 						fontChar.Height *= config.SdfScale;
 						fontChar.Width *= config.SdfScale;
-						fontChar.HPadding *= config.SdfScale;
-						fontChar.VPadding *= config.SdfScale;
+						fontChar.Padding *= config.SdfScale;
 						if (fontChar.KerningPairs != null) {
 							for (int i = 0; i < fontChar.KerningPairs.Count; i++) {
 								var pair = fontChar.KerningPairs[i];
