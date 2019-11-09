@@ -235,10 +235,12 @@
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationProcessor.cs" />
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationStoppedProcessor.cs" />
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.AnimationSystem.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.BehaviorUpdateProcessor.cs" />
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.cs" />
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.Logging.cs" />
     <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.NodeManager.cs" />
-    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.PostAnimationProcessor.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.PendingProcessor.cs" />
+    <Compile Include="Source\KGDCitronLifeCycle\CitronLifeCycle.PendingSystem.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />

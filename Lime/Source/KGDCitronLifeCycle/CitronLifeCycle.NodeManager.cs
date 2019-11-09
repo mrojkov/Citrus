@@ -10,17 +10,26 @@ namespace Lime.KGDCitronLifeCycle
 			None,
 			Gesture,
 			BehaviorSetup,
+			PendingBehaviorSetup,
 			PreEarlyUpdate,
+			PendingPreEarlyUpdate,
 			EarlyUpdate,
+			PendingEarlyUpdate,
 			PostEarlyUpdate,
+			PendingPostEarlyUpdate,
 			Animation,
+			OnAnimated,
+			PendingOnAnimated,
 			OnAnimationStopped,
-			AfterAnimation,
+			PendingOnAnimationStopped,
 			Layout,
 			BoundingRect,
 			PreLateUpdate,
+			PendingPreLateUpdate,
 			LateUpdate,
-			PostLateUpdate
+			PendingLateUpdate,
+			PostLateUpdate,
+			PendingPostLateUpdate,
 		}
 
 		private static NodeManager CreateNodeManager(LayoutManager layoutManager, WidgetContext widgetContext)
@@ -28,23 +37,33 @@ namespace Lime.KGDCitronLifeCycle
 			var services = new ServiceRegistry();
 			services.Add(new BehaviorSystem());
 			services.Add(new AnimationSystem());
+			services.Add(new PendingSystem());
 			services.Add(layoutManager);
 			services.Add(widgetContext);
 
 			var manager = new NodeManager(services);
 			manager.Processors.Add(new GestureProcessor());
 			manager.Processors.Add(new BehaviorSetupProcessor());
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingBehaviorSetup));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPreEarlyUpdate));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingEarlyUpdate));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostEarlyUpdate));
 			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(AfterAnimationStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingOnAnimated));
 			manager.Processors.Add(new AnimationStoppedProcessor());
-			manager.Processors.Add(new PostAnimationProcessor());
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingOnAnimationStopped));
 			manager.Processors.Add(new LayoutProcessor());
 			manager.Processors.Add(new BoundingRectProcessor());
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPreLateUpdate));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingLateUpdate));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostLateUpdate));
 			return manager;
 		}
 
@@ -60,7 +79,7 @@ namespace Lime.KGDCitronLifeCycle
 				return NodeManagerPhase.PostEarlyUpdate;
 			}
 			if (updateStageType == typeof(AfterAnimationStage)) {
-				return NodeManagerPhase.AfterAnimation;
+				return NodeManagerPhase.OnAnimated;
 			}
 			if (updateStageType == typeof(PreLateUpdateStage)) {
 				return NodeManagerPhase.PreLateUpdate;
@@ -81,14 +100,14 @@ namespace Lime.KGDCitronLifeCycle
 			switch (activeProcessor) {
 				case BehaviorUpdateProcessor updateProcessor:
 					return ConvertUpdateStageTypeToNodeManagerPhase(updateProcessor.UpdateStageType);
+				case PendingProcessor pendingProcessor:
+					return pendingProcessor.ManagerPhase;
 				case GestureProcessor _:
 					return NodeManagerPhase.Gesture;
 				case BehaviorSetupProcessor _:
 					return NodeManagerPhase.BehaviorSetup;
 				case AnimationProcessor _:
 					return NodeManagerPhase.Animation;
-				case PostAnimationProcessor _:
-					return NodeManagerPhase.AfterAnimation;
 				case AnimationStoppedProcessor _:
 					return NodeManagerPhase.OnAnimationStopped;
 				case LayoutProcessor _:

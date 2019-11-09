@@ -6,8 +6,9 @@ namespace Lime.KGDCitronLifeCycle
 		{
 			public override void AdvanceAnimation(Animation animation, float delta)
 			{
+				automateAdvanceAnimationActiveCount++;
 				base.AdvanceAnimation(animation, delta);
-				animation.OwnerNode?.ProcessAfterAdvanceAnimation();
+				automateAdvanceAnimationActiveCount--;
 			}
 
 			public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
@@ -30,8 +31,9 @@ namespace Lime.KGDCitronLifeCycle
 		{
 			public override void AdvanceAnimation(Animation animation, float delta)
 			{
+				automateAdvanceAnimationActiveCount++;
 				base.AdvanceAnimation(animation, delta);
-				animation.OwnerNode?.ProcessAfterAdvanceAnimation();
+				automateAdvanceAnimationActiveCount--;
 			}
 
 			public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)

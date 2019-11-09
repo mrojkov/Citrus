@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Lime.KGDCitronLifeCycle
 {
 	public static partial class CitronLifeCycle
 	{
 		private static bool initialized;
-		private static Action<Node, float> savedAdvanceAnimationsRecursive;
 		[ThreadStatic]
-		private static int afterAdvanceAnimationSuppressedCount;
+		private static int automateAdvanceAnimationActiveCount;
 
 		public static void Initialize()
 		{
@@ -20,117 +17,82 @@ namespace Lime.KGDCitronLifeCycle
 
 			Lime.DefaultAnimationEngine.Instance = new DefaultAnimationEngine();
 			Lime.BlendAnimationEngine.Instance = new BlendAnimationEngine();
-			savedAdvanceAnimationsRecursive = NodeCompatibilityExtensions.AdvanceAnimationsRecursiveHook;
-			NodeCompatibilityExtensions.AdvanceAnimationsRecursiveHook = AdvanceAnimationsRecursive;
 			WindowWidget.NodeManagerFactory = CreateNodeManager;
 		}
 
-		public static void OnStart(this Node node, Action<float> customUpdate, NodeManagerPhase customUpdatePhase)
+		public static Action OnStart(this Node node, Action<float> customUpdate, NodeManagerPhase customUpdatePhase)
 		{
 			var nodeManager = node?.Manager;
 			if (nodeManager == null) {
-				return;
+				return null;
 			}
 
 			var managerPhase = nodeManager.GetPhase();
 			if (managerPhase == NodeManagerPhase.None) {
 				managerNoneStateCase.FixLog();
-				return;
+				return null;
 			}
 
-			if (
-				managerPhase >= customUpdatePhase &&
-				customUpdatePhase <= NodeManagerPhase.EarlyUpdate
-			) {
-				updateOnStartCase.FixLog(node.ToString());
-				customUpdate?.Invoke(0);
+			var pendingSystem = nodeManager.ServiceProvider.GetService<PendingSystem>();
+
+			bool updatePended = false;
+			bool tasksPended = false;
+			bool advanceAnimationPended = false;
+
+			if (managerPhase >= customUpdatePhase && customUpdate != null) {
+				updateOnStartCase.FixLog(customUpdatePhase + " -> " + node);
+				pendingSystem.PendingCustomUpdates.AddLast(customUpdate);
+				updatePended = true;
 			}
 			if (managerPhase >= NodeManagerPhase.EarlyUpdate) {
 				tasksUpdateOnStartCase.FixLog(node.ToString());
-				node.Tasks.Update(0);
-			}
-			if (
-				managerPhase >= customUpdatePhase &&
-				customUpdatePhase > NodeManagerPhase.EarlyUpdate &&
-				customUpdatePhase < NodeManagerPhase.Animation
-			) {
-				updateOnStartCase.FixLog(node.ToString());
-				customUpdate?.Invoke(0);
+				pendingSystem.PendingTasksUpdate.AddLast(node);
+				tasksPended = true;
 			}
 			if (managerPhase >= NodeManagerPhase.Animation) {
 				advanceAnimationsRecursiveOnStartCase.FixLog(node.ToString());
-				node.AdvanceAnimationsRecursive(0);
-			}
-			if (
-				managerPhase >= customUpdatePhase &&
-				customUpdatePhase > NodeManagerPhase.Animation
-			) {
-				updateOnStartCase.FixLog(node.ToString());
-				customUpdate?.Invoke(0);
-			}
-		}
-
-		private static void AdvanceAnimationsRecursive(Node node, float delta)
-		{
-			if (afterAdvanceAnimationSuppressedCount > 0) {
-				throw new System.Exception("Nested AdvanceAnimationsRecursive call");
+				pendingSystem.PendingAdvanceAnimation.AddLast(node);
+				advanceAnimationPended = true;
 			}
 
-			afterAdvanceAnimationSuppressedCount++;
-			try {
-				savedAdvanceAnimationsRecursive(node, delta);
-			} finally {
-				afterAdvanceAnimationSuppressedCount--;
-			}
-
-			node.ProcessAfterAdvanceAnimation();
-		}
-
-		private static void ProcessAfterAdvanceAnimation(this Node ownerNode)
-		{
-			if (afterAdvanceAnimationSuppressedCount > 0) {
-				return;
-			}
-
-			var nodeManager = ownerNode?.Manager;
-			if (nodeManager != null) {
-				var managerPhase = nodeManager.GetPhase();
-
-				if (managerPhase == NodeManagerPhase.None) {
-					managerNoneStateCase.FixLog();
-					return;
+			return () => {
+				if (updatePended) {
+					pendingSystem.PendingCustomUpdates.Remove(customUpdate);
 				}
-
-				if (managerPhase >= NodeManagerPhase.OnAnimationStopped) {
-					onStoppedAfterAdvanceAnimationCase.FixLog();
-					var animationSystem = nodeManager.ServiceProvider.RequireService<AnimationSystem>();
-
-					animationSystem.ConsumePendingActions();
+				if (tasksPended) {
+					pendingSystem.PendingTasksUpdate.Remove(node);
 				}
-				if (managerPhase >= NodeManagerPhase.AfterAnimation) {
-					onAnimatedAfterAdvanceAnimationCase.FixLog();
-					var postAnimationProcessor = nodeManager.Processors.OfType<PostAnimationProcessor>().First();
-					postAnimationProcessor.UpdateManually();
+				if (advanceAnimationPended) {
+					pendingSystem.PendingAdvanceAnimation.Remove(node);
 				}
-			}
+			};
 		}
 
 		private static void ProcessAfterRunAnimation(this Animation animation)
 		{
+			if (automateAdvanceAnimationActiveCount > 0) {
+				return;
+			}
+
 			var ownerNode = animation.OwnerNode;
 			var nodeManager = ownerNode?.Manager;
-			if (nodeManager != null) {
-				var managerPhase = nodeManager.GetPhase();
 
-				if (managerPhase == NodeManagerPhase.None) {
-					managerNoneStateCase.FixLog();
-					return;
-				}
+			if (nodeManager == null) {
+				return;
+			}
 
-				if (managerPhase > NodeManagerPhase.Animation && afterAdvanceAnimationSuppressedCount == 0) {
-					advanceAnimationsRecursiveAfterRunAnimationCase.FixLog();
-					ownerNode.AdvanceAnimationsRecursive(0);
-				}
+			var managerPhase = nodeManager.GetPhase();
+
+			if (managerPhase == NodeManagerPhase.None) {
+				managerNoneStateCase.FixLog();
+				return;
+			}
+
+			if (managerPhase > NodeManagerPhase.Animation) {
+				advanceAnimationsRecursiveAfterRunAnimationCase.FixLog();
+
+				var pendingSystem = nodeManager.ServiceProvider.GetService<PendingSystem>();
+				pendingSystem.PendingAdvanceAnimation.AddLast(ownerNode);
 			}
 		}
 
@@ -139,7 +101,7 @@ namespace Lime.KGDCitronLifeCycle
 			AnimationSystem animationSystem;
 			if (animation.Stopped != null) {
 				if ((
-					animationSystem = animation.OwnerNode.Manager.ServiceProvider.GetService<AnimationSystem>()
+					animationSystem = animation.OwnerNode.Manager?.ServiceProvider.GetService<AnimationSystem>()
 				) == null) {
 					immediatelyOnStoppedCase.FixLog();
 					animation.Stopped();
@@ -152,7 +114,7 @@ namespace Lime.KGDCitronLifeCycle
 			animation.AssuredStopped = null;
 			if (savedAction != null) {
 				if ((
-					animationSystem = animation.OwnerNode.Manager.ServiceProvider.GetService<AnimationSystem>()
+					animationSystem = animation.OwnerNode.Manager?.ServiceProvider.GetService<AnimationSystem>()
 				) == null) {
 					immediatelyOnStoppedCase.FixLog();
 					savedAction();

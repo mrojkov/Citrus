@@ -19,6 +19,11 @@ namespace Lime
 			return stage;
 		}
 
+		public bool HasStartPendingBehaviors()
+		{
+			return behaviorsToStart.Count > 0;
+		}
+
 		public void StartPendingBehaviors()
 		{
 			while (behaviorsToStart.Count > 0) {

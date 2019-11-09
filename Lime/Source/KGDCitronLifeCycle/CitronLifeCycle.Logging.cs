@@ -74,8 +74,6 @@ namespace Lime.KGDCitronLifeCycle
 		private static readonly LoggedCase updateOnStartCase = new LoggedCase();
 		private static readonly LoggedCase tasksUpdateOnStartCase = new LoggedCase();
 		private static readonly LoggedCase advanceAnimationsRecursiveOnStartCase = new LoggedCase();
-		private static readonly LoggedCase onStoppedAfterAdvanceAnimationCase = new LoggedCase();
-		private static readonly LoggedCase onAnimatedAfterAdvanceAnimationCase = new LoggedCase();
 		private static readonly LoggedCase advanceAnimationsRecursiveAfterRunAnimationCase = new LoggedCase();
 		private static readonly LoggedCase immediatelyOnStoppedCase = new LoggedCase();
 
@@ -105,8 +103,6 @@ namespace Lime.KGDCitronLifeCycle
 			updateOnStartCase.OnFrameStart();
 			tasksUpdateOnStartCase.OnFrameStart();
 			advanceAnimationsRecursiveOnStartCase.OnFrameStart();
-			onStoppedAfterAdvanceAnimationCase.OnFrameStart();
-			onAnimatedAfterAdvanceAnimationCase.OnFrameStart();
 			advanceAnimationsRecursiveAfterRunAnimationCase.OnFrameStart();
 			immediatelyOnStoppedCase.OnFrameStart();
 		}
@@ -123,8 +119,6 @@ namespace Lime.KGDCitronLifeCycle
 					nameof(advanceAnimationsRecursiveAfterRunAnimationCase)
 				),
 				advanceAnimationsRecursiveOnStartCase.GetDebugInfo(nameof(advanceAnimationsRecursiveOnStartCase)),
-				onAnimatedAfterAdvanceAnimationCase.GetDebugInfo(nameof(onAnimatedAfterAdvanceAnimationCase)),
-				onStoppedAfterAdvanceAnimationCase.GetDebugInfo(nameof(onStoppedAfterAdvanceAnimationCase)),
 				updateOnStartCase.GetDebugInfo(nameof(updateOnStartCase)),
 				tasksUpdateOnStartCase.GetDebugInfo(nameof(tasksUpdateOnStartCase)),
 				managerNoneStateCase.GetDebugInfo(nameof(managerNoneStateCase))
