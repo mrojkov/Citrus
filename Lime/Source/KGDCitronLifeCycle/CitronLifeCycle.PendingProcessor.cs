@@ -1,6 +1,9 @@
 namespace Lime.KGDCitronLifeCycle {
 	public static partial class CitronLifeCycle
 	{
+		/// <summary>
+		/// Очень важен, именно он восстанавливает жизненный цикл до желаемого.
+		/// </summary>
 		public class PendingProcessor : NodeProcessor
 		{
 			public readonly NodeManagerPhase ManagerPhase;

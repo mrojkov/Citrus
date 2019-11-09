@@ -4,6 +4,10 @@ namespace Lime.KGDCitronLifeCycle
 {
 	public static partial class CitronLifeCycle
 	{
+		/// <summary>
+		/// Отличается от стандартного тем, что не дергает behaviorSystem.StartPendingBehaviors,
+		/// а этим занимется PendingProcessor.
+		/// </summary>
 		private class BehaviorUpdateProcessor : NodeProcessor
 		{
 			public readonly Type UpdateStageType;

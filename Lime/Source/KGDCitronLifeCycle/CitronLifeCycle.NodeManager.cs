@@ -41,6 +41,8 @@ namespace Lime.KGDCitronLifeCycle
 			services.Add(layoutManager);
 			services.Add(widgetContext);
 
+			// Самое главное - это свой BehaviorUpdateProcessor, и добавленный везде BehaviorUpdateProcessor,
+			// который длеает очень много работы, чтобы восстановить жизненный цикл в рамках одного кадра.
 			var manager = new NodeManager(services);
 			manager.Processors.Add(new GestureProcessor());
 			manager.Processors.Add(new BehaviorSetupProcessor());
