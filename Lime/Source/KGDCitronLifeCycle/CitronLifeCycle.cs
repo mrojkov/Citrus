@@ -6,7 +6,9 @@ namespace Lime.KGDCitronLifeCycle
 	{
 		private static bool initialized;
 		[ThreadStatic]
-		private static int automateAdvanceAnimationActiveCount;
+		private static int advanceAnimationActiveCount;
+		[ThreadStatic]
+		private static int pipelinedAdvanceAnimationActiveCount;
 
 		public static void Initialize()
 		{
@@ -41,7 +43,7 @@ namespace Lime.KGDCitronLifeCycle
 
 			if (managerPhase >= customUpdatePhase && customUpdate != null) {
 				updateOnStartCase.FixLog(customUpdatePhase + " -> " + node);
-				pendingSystem.PendingCustomUpdates.AddLast(customUpdate);
+				pendingSystem.PendingCustomUpdates[(int) customUpdatePhase].AddLast(customUpdate);
 				updatePended = true;
 			}
 			if (managerPhase >= NodeManagerPhase.EarlyUpdate) {
@@ -57,7 +59,7 @@ namespace Lime.KGDCitronLifeCycle
 
 			return () => {
 				if (updatePended) {
-					pendingSystem.PendingCustomUpdates.Remove(customUpdate);
+					pendingSystem.PendingCustomUpdates[(int) customUpdatePhase].Remove(customUpdate);
 				}
 				if (tasksPended) {
 					pendingSystem.PendingTasksUpdate.Remove(node);
@@ -70,7 +72,7 @@ namespace Lime.KGDCitronLifeCycle
 
 		private static void ProcessAfterRunAnimation(this Animation animation)
 		{
-			if (automateAdvanceAnimationActiveCount > 0) {
+			if (advanceAnimationActiveCount > 0) {
 				return;
 			}
 
@@ -106,7 +108,14 @@ namespace Lime.KGDCitronLifeCycle
 					immediatelyOnStoppedCase.FixLog();
 					animation.Stopped();
 				} else {
-					animationSystem.OnAnimationStoppedRisen(animation.Stopped);
+					if (pipelinedAdvanceAnimationActiveCount > 0) {
+						animationSystem.OnAnimationStoppedRisen(animation.Stopped);
+					} else {
+						// Пусть события, которые вызываны ручной прокруткой анимации, срабатывают сразу.
+						// В целом это не очень прозрачно, но так было всегда.
+						// Если захочется изменить, то надо выпилить полность поле pipelinedAdvanceAnimationActiveCount.
+						animation.Stopped();
+					}
 				}
 			}
 
@@ -119,7 +128,14 @@ namespace Lime.KGDCitronLifeCycle
 					immediatelyOnStoppedCase.FixLog();
 					savedAction();
 				} else {
-					animationSystem.OnAnimationStoppedRisen(savedAction);
+					if (pipelinedAdvanceAnimationActiveCount > 0) {
+						animationSystem.OnAnimationStoppedRisen(savedAction);
+					} else {
+						// Пусть события, которые вызываны ручной прокруткой анимации, срабатывают сразу.
+						// В целом это не очень прозрачно, но так было всегда.
+						// Если захочется изменить, то надо выпилить полность поле pipelinedAdvanceAnimationActiveCount.
+						savedAction();
+					}
 				}
 			}
 		}

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Lime.KGDCitronLifeCycle {
 	public static partial class CitronLifeCycle
 	{
@@ -43,12 +45,11 @@ namespace Lime.KGDCitronLifeCycle {
 					goto Repeat;
 				}
 
-				if (pendingSystem.PendingCustomUpdates.Count > 0) {
-					while (pendingSystem.PendingCustomUpdates.Count > 0) {
-						var customUpdate = pendingSystem.PendingCustomUpdates.First.Value;
-						pendingSystem.PendingCustomUpdates.RemoveFirst();
-						customUpdate(0);
-					}
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPreEarlyUpdate)) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingEarlyUpdate)) {
 					goto Repeat;
 				}
 
@@ -61,12 +62,20 @@ namespace Lime.KGDCitronLifeCycle {
 					goto Repeat;
 				}
 
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPostEarlyUpdate)) {
+					goto Repeat;
+				}
+
 				if (pendingSystem.PendingAdvanceAnimation.Count > 0) {
+					pipelinedAdvanceAnimationActiveCount++;
+
 					while (pendingSystem.PendingAdvanceAnimation.Count > 0) {
 						var node = pendingSystem.PendingAdvanceAnimation.First.Value;
 						pendingSystem.PendingAdvanceAnimation.RemoveFirst();
 						node.AdvanceAnimationsRecursive(0);
 					}
+
+					pipelinedAdvanceAnimationActiveCount--;
 
 					goto Repeat;
 				}
@@ -74,15 +83,50 @@ namespace Lime.KGDCitronLifeCycle {
 				onAnimatedUpdateStage.Update(0);
 				if (
 					behaviorSystem.HasStartPendingBehaviors() ||
-					pendingSystem.PendingCustomUpdates.Count > 0 ||
+					pendingSystem.PendingCustomUpdates[(int) NodeManagerPhase.PendingPreEarlyUpdate].Count > 0 ||
+					pendingSystem.PendingCustomUpdates[(int) NodeManagerPhase.PendingEarlyUpdate].Count > 0 ||
+					pendingSystem.PendingCustomUpdates[(int) NodeManagerPhase.PendingPostEarlyUpdate].Count > 0 ||
 					pendingSystem.PendingTasksUpdate.Count > 0 ||
 					pendingSystem.PendingAdvanceAnimation.Count > 0
 				) {
 					goto Repeat;
 				}
 
-				if (animationSystem.ConsumePendingActions()) {
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingOnAnimated)) {
 					goto Repeat;
+				}
+
+				if (animationSystem.ConsumePendingStoppedActions()) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPreLateUpdate)) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingLateUpdate)) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPostLateUpdate)) {
+					goto Repeat;
+				}
+
+				bool ProcessCustomUpdates(int updatePhase)
+				{
+					var customUpdatesList = pendingSystem.PendingCustomUpdates[updatePhase];
+
+					if (customUpdatesList.Count <= 0) {
+						return false;
+					}
+
+					while (customUpdatesList.Count > 0) {
+						var customUpdate = customUpdatesList.First.Value;
+						customUpdatesList.RemoveFirst();
+						customUpdate(0);
+					}
+
+					return true;
 				}
 			}
 		}

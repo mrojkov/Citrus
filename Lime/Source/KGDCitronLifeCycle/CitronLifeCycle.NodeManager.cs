@@ -7,7 +7,7 @@ namespace Lime.KGDCitronLifeCycle
 	{
 		public enum NodeManagerPhase
 		{
-			None,
+			None = 0,
 			Gesture,
 			BehaviorSetup,
 			PendingBehaviorSetup,
@@ -37,7 +37,7 @@ namespace Lime.KGDCitronLifeCycle
 			var services = new ServiceRegistry();
 			services.Add(new BehaviorSystem());
 			services.Add(new AnimationSystem());
-			services.Add(new PendingSystem());
+			services.Add(new PendingSystem(Enum.GetValues(typeof(NodeManagerPhase)).Length));
 			services.Add(layoutManager);
 			services.Add(widgetContext);
 

@@ -13,7 +13,7 @@ namespace Lime.KGDCitronLifeCycle
 				pendingStoppedActions += onStopped;
 			}
 
-			public bool ConsumePendingActions()
+			public bool ConsumePendingStoppedActions()
 			{
 				bool hasActions = pendingStoppedActions != null;
 				pendingStoppedActions?.Invoke();

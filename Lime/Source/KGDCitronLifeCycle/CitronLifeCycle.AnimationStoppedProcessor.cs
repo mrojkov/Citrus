@@ -21,7 +21,7 @@ namespace Lime.KGDCitronLifeCycle
 			protected internal override void Update(float delta)
 			{
 				base.Update(delta);
-				animationSystem?.ConsumePendingActions();
+				animationSystem?.ConsumePendingStoppedActions();
 			}
 		}
 	}

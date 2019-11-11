@@ -6,9 +6,11 @@ namespace Lime.KGDCitronLifeCycle
 		{
 			protected internal override void Update(float delta)
 			{
-				automateAdvanceAnimationActiveCount++;
+				advanceAnimationActiveCount++;
+				pipelinedAdvanceAnimationActiveCount++;
 				base.Update(delta);
-				automateAdvanceAnimationActiveCount--;
+				pipelinedAdvanceAnimationActiveCount--;
+				advanceAnimationActiveCount--;
 			}
 		}
 
