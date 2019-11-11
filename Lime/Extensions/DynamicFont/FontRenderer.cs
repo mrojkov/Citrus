@@ -21,10 +21,8 @@ namespace Lime
 
 		public static List<HashSet<char>> KerningPairCharsets = new List<HashSet<char>> {
 			new HashSet<char>("0123456789"),
-			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"),
-			new HashSet<char>("abcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
-			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯ"),
-			new HashSet<char>("абвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
+			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝabcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
+			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯабвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
 		};
 
 		private Library library;
