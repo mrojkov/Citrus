@@ -413,8 +413,8 @@ namespace Lime
 				// Pen Position + Bearing + Kerning gives a proper letter position
 				// but we have to subtract left padding in order to avoid extra spacing
 				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing - fontChar.Padding);
-				var size = new Vector2(scale * fontChar.PaddedWidth, fontHeight + scale * (2 * fontChar.Padding - fontChar.VerticalOffset));
-				var charPosition = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
+				var size = new Vector2(scale * fontChar.PaddedWidth, fontHeight + scale * (fontChar.PaddedHeight - fontChar.VerticalOffset));
+				var charPosition = new Vector2(position.X, position.Y + scale * (fontChar.VerticalOffset - fontChar.Padding));
 				if (font.RoundCoordinates) {
 					charPosition = new Vector2(charPosition.X.Round(), charPosition.Y.Round());
 				}
