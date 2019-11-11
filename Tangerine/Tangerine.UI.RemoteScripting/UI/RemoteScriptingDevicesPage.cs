@@ -91,7 +91,7 @@ namespace Tangerine.UI.RemoteScripting
 					void RemoteRunEntryPoint()
 					{
 						if (TryGetActiveDevice(out var device)) {
-							device.RemoteProcedureCall(assembly.RawBytes, entryPoint.ClassName, entryPoint.MethodName);
+							device.RemoteProcedureCall(assembly.RawBytes, assembly.PdbRawBytes, entryPoint.ClassName, entryPoint.MethodName);
 						}
 					}
 					var button = new ToolbarButton($"{entryPoint.Summary}") { Clicked = RemoteRunEntryPoint };
@@ -286,10 +286,11 @@ namespace Tangerine.UI.RemoteScripting
 				Updated?.Invoke();
 			}
 
-			public void RemoteProcedureCall(byte[] assemblyRawBytes, string className, string methodName)
+			public void RemoteProcedureCall(byte[] assemblyRawBytes, byte[] pdbRawBytes, string className, string methodName)
 			{
 				var remoteProcedureCall = new RemoteProcedureCall {
 					AssemblyRawBytes = assemblyRawBytes,
+					PdbRawBytes = pdbRawBytes,
 					ClassName = className,
 					MethodName = methodName
 				};

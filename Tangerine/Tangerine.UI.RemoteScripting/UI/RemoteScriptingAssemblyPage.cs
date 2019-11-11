@@ -77,9 +77,10 @@ namespace Tangerine.UI.RemoteScripting
 					if (result.Success) {
 						Log($"Assembly length in bytes: {result.AssemblyRawBytes.Length}");
 						try {
-							var portableAssembly = new PortableAssembly(result.AssemblyRawBytes, preferences.EntryPointsClass);
+							var portableAssembly = new PortableAssembly(result.AssemblyRawBytes, result.PdbRawBytes, preferences.EntryPointsClass);
 							var compiledAssembly = new CompiledAssembly {
 								RawBytes = result.AssemblyRawBytes,
+								PdbRawBytes = result.PdbRawBytes,
 								PortableAssembly = portableAssembly
 							};
 							CompiledAssembly.Instance = compiledAssembly;
