@@ -98,9 +98,6 @@ namespace Lime
 		private static void GenerateKerningPairs(FontCharCollection fontChars, Face face, TftConfig config)
 		{
 			var font = SharpFont.HarfBuzz.Font.FromFTFace(face);
-			var height = (int)(config.IsSdf ? config.Height * config.SdfScale : config.Height);
-			var pixelSize = (uint)Math.Round(Math.Abs(CalcPixelSize(height, face)));
-			face.SetCharSize(0, height, pixelSize, pixelSize);
 			foreach (var fontChar in fontChars) {
 				var lhs = fontChar.Char;
 				var kerningCharset = FontRenderer.KerningPairCharsets.FirstOrDefault(c => c.Contains(lhs));
@@ -109,35 +106,15 @@ namespace Lime
 				}
 				config.CustomKerningPairs.TryGetValue(lhs, out var customKernings);
 				foreach (var rhs in kerningCharset) {
-					if (
-						customKernings != null && TryGetKerning(rhs, out var kerningPair)
-						&& !(fontChar.KerningPairs?.Contains(kerningPair) ?? false)
-					) {
-						fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
-						fontChar.KerningPairs.Add(kerningPair);
+					if (customKernings != null && TryGetKerning(rhs, out var kerningPair)) {
+						fontChar.AddOrReplaceKerningPair(kerningPair.Char, kerningPair.Kerning);
 						continue;
 					}
-					if (!fontChars.Contains(rhs)) {
+					if (!fontChars.Contains(rhs) || fontChar.ContainsKerningFor(rhs)) {
 						continue;
 					}
-					var buf = new SharpFont.HarfBuzz.Buffer {
-						Direction = Direction.LeftToRight,
-						Script = Script.Latin
-					};
-					var bufferText = string.Concat(lhs, rhs);
-					buf.AddText(bufferText);
-					font.Shape(buf);
-					var glyphInfos = buf.GlyphInfo();
-					var glyphPositions = buf.GlyphPositions();
-					if (glyphInfos.Length != 2) {
-						continue;
-					}
-					face.LoadGlyph(glyphInfos[1].codepoint, LoadFlags.Default, LoadTarget.Normal);
-					face.Glyph.RenderGlyph(RenderMode.Normal);
-					var bufferShift = glyphPositions[1].xAdvance >> 6;
-					var simpleShift = (int)(face.Glyph.Metrics.HorizontalBearingX * 2 + face.Glyph.Metrics.Width * 2 -
-											face.Glyph.Metrics.HorizontalAdvance);
-					var kerningAmount = bufferShift - simpleShift;
+					var kerningAmount = font.GetHorizontalKerning(face.GetCharIndex(lhs), face.GetCharIndex(rhs)) / 64f;
+					kerningAmount = config.IsSdf ? kerningAmount * config.SdfScale : kerningAmount;
 					if (kerningAmount != 0) {
 						fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
 						fontChar.KerningPairs.Add(new KerningPair { Char = rhs, Kerning = kerningAmount });
@@ -157,12 +134,30 @@ namespace Lime
 			}
 		}
 
-		private static float CalcPixelSize(int height, Face face)
+		private static bool ContainsKerningFor(this FontChar fontChar, char @char)
 		{
-			var designHeight = (float)(face.BBox.Top - face.BBox.Bottom);
-			var scale = height / designHeight;
-			var pixelSize = scale * face.UnitsPerEM;
-			return pixelSize;
+			if (fontChar.KerningPairs != null) {
+				foreach (var pair in fontChar.KerningPairs) {
+					if (pair.Char == @char) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		private static void AddOrReplaceKerningPair(this FontChar fontChar, char @char, float kerning)
+		{
+			var pairs = fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
+			for (int i = 0; i < pairs.Count; i++) {
+				var pair = pairs[i];
+				if (pair.Char == @char) {
+					pair.Kerning = kerning;
+					pairs[i] = pair;
+					return;
+				}
+			}
+			pairs.Add(new KerningPair { Char = @char, Kerning = kerning });
 		}
 
 		public static void UpdateCharsets(TftConfig config, string assetDirectory)

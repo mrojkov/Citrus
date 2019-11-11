@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2014-2015 Robert Rouhani <robert.rouhani@gmail.com> and other contributors (see CONTRIBUTORS file).
+//Copyright (c) 2014-2015 Robert Rouhani <robert.rouhani@gmail.com> and other contributors (see CONTRIBUTORS file).
 //Licensed under the MIT License - https://raw.github.com/Robmaister/SharpFont.HarfBuzz/master/LICENSE
 
 using System;
@@ -23,6 +23,12 @@ namespace SharpFont.HarfBuzz
 		#endregion
 
 		#region Methods
+
+		public int GetHorizontalKerning(uint leftGlyph, uint rightGlyph)
+		{
+			return HB.hb_font_get_glyph_h_kerning(reference, leftGlyph, rightGlyph);
+		}
+
 		#endregion
 	}
 }

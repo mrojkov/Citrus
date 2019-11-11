@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2014-2015 Robert Rouhani <robert.rouhani@gmail.com> and other contributors (see CONTRIBUTORS file).
+//Copyright (c) 2014-2015 Robert Rouhani <robert.rouhani@gmail.com> and other contributors (see CONTRIBUTORS file).
 //Licensed under the MIT License - https://raw.github.com/Robmaister/SharpFont.HarfBuzz/master/LICENSE
 
 using System;
@@ -432,7 +432,7 @@ namespace SharpFont.HarfBuzz
 		internal static extern void hb_font_get_glyph_h_advance();
 
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
-		internal static extern void hb_font_get_glyph_h_kerning();
+		internal static extern int hb_font_get_glyph_h_kerning(IntPtr font, uint left_glyph, uint right_glyph);
 
 		[DllImport(HarfBuzzDll, CallingConvention = CallConvention)]
 		internal static extern void hb_font_get_glyph_h_origin();
