@@ -38,7 +38,7 @@ namespace Tangerine.UI
 			});
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding += new Thickness(right: 12.0f);
-			panel.Widget.LateTasks.Add(currentColor.Consume(v => {
+			panel.Widget.Components.GetOrAdd<LateConsumeBehaviour>().Add(currentColor.Consume(v => {
 				if (panel.Color != v.Value) {
 					panel.Color = v.Value;
 				}

@@ -47,15 +47,10 @@
     <Compile Include="AutosaveProcessor.cs" />
     <Compile Include="BackupManager.cs" />
     <Compile Include="ClassAttributes.cs" />
-    <Compile Include="Commands\OrangeCommands.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="Document.Animation.cs" />
-    <Compile Include="Document.cs" />
-    <Compile Include="DocumentHistory.cs" />
     <Compile Include="DocumentPreview.cs" />
-    <Compile Include="ExpressionParser\ExpressionParser.cs" />
-    <Compile Include="ExpressionParser\Tokenizer.cs" />
     <Compile Include="GridSelection.cs" />
     <Compile Include="GridSpanList.cs" />
     <Compile Include="IDataflow.cs" />
