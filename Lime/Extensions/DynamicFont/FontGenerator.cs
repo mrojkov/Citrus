@@ -180,6 +180,10 @@ namespace Lime
 				var loc = localization == "EN" ? string.Empty : localization;
 				var dictPath = AssetPath.Combine(assetDirectory, Localization.DictionariesPath,
 					$"Dictionary.{loc}.txt".Replace("..", "."));
+				if (!File.Exists(dictPath)) {
+					Console.WriteLine($"Dictionary of {localization} localization is missing!: {dictPath}");
+					continue;
+				}
 				using (var stream = File.Open(dictPath, FileMode.Open)) {
 					dict.ReadFromStream(stream);
 				}
