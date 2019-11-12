@@ -50,7 +50,12 @@ namespace Lime
 			};
 			var missingCharacters = new List<char>();
 			foreach (var charSet in config.CharSets) {
-				var fontData = File.ReadAllBytes(AssetPath.Combine(assetDirectory, charSet.Font));
+				var fontPath = AssetPath.Combine(assetDirectory, charSet.Font);
+				if (!File.Exists(fontPath)) {
+					Console.WriteLine($"Missing font: {fontPath}\n Please ensure font existence!!!");
+					return;
+				}
+				var fontData = File.ReadAllBytes(fontPath);
 				chars.FontRenderer = new FontRenderer(fontData) { LcdSupported = false };
 				missingCharacters.Clear();
 				foreach (var c in charSet.Chars) {
