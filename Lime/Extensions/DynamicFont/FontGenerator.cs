@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using SharpFont;
 using SharpFont.HarfBuzz;
 
@@ -110,6 +111,7 @@ namespace Lime
 					continue;
 				}
 				config.CustomKerningPairs.TryGetValue(lhs, out var customKernings);
+				var leftGlyphId = face.GetCharIndex(lhs);
 				foreach (var rhs in kerningCharset) {
 					if (customKernings != null && TryGetKerning(rhs, out var kerningPair)) {
 						fontChar.AddOrReplaceKerningPair(kerningPair.Char, kerningPair.Kerning);
@@ -118,7 +120,12 @@ namespace Lime
 					if (!fontChars.Contains(rhs) || fontChar.ContainsKerningFor(rhs)) {
 						continue;
 					}
-					var kerningAmount = font.GetHorizontalKerning(face.GetCharIndex(lhs), face.GetCharIndex(rhs)) / 64f;
+					var rightGlyphId = face.GetCharIndex(rhs);
+					// 0 is undefined character
+					if (rightGlyphId == 0) {
+						continue;
+					}
+					var kerningAmount = font.GetHorizontalKerning(leftGlyphId, rightGlyphId) / 64f;
 					kerningAmount = config.IsSdf ? kerningAmount * config.SdfScale : kerningAmount;
 					if (kerningAmount != 0) {
 						fontChar.KerningPairs = fontChar.KerningPairs ?? new List<KerningPair>();
