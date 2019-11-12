@@ -399,7 +399,7 @@ namespace Tangerine.Core
 
 		public bool Close()
 		{
-			if (!IsModified && !Project.Current.IsDocumentUntitled(Path)) {
+			if (!IsModified) {
 				return true;
 			}
 			if (CloseConfirmation != null) {
