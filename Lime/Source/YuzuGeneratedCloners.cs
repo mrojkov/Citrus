@@ -1300,7 +1300,7 @@ namespace YuzuGenerated
 			result.About = s.About;
 			if (s.CharCollection != null && result.CharCollection != null) {
 				foreach (var tmp1 in s.CharCollection)
-					((global::System.Collections.Generic.ICollection<global::Lime.FontChar>)result.CharCollection).Add(Clone_Lime__FontChar(cl, tmp1));
+					result.CharCollection.Add(Clone_Lime__FontChar(cl, tmp1));
 			}
 			result.RoundCoordinates = s.RoundCoordinates;
 			result.Spacing = s.Spacing;
@@ -1327,6 +1327,7 @@ namespace YuzuGenerated
 				foreach (var tmp1 in s.KerningPairs)
 					result.KerningPairs.Add(tmp1);
 			}
+			result.Padding = s.Padding;
 			result.RgbIntensity = s.RgbIntensity;
 			result.TextureIndex = s.TextureIndex;
 			result.UV0 = s.UV0;
