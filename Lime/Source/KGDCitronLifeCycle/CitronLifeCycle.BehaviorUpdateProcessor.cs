@@ -26,7 +26,7 @@ namespace Lime.KGDCitronLifeCycle
 				updateStage = behaviorSystem.GetUpdateStage(UpdateStageType);
 			}
 
-			protected internal override void Stop()
+			protected internal override void Stop(NodeManager manager)
 			{
 				updateStage = null;
 				behaviorSystem = null;

@@ -30,58 +30,48 @@ namespace Lime
 
 		internal void RegisterNodeProcessor(NodeProcessor processor)
 		{
-			processor.Manager = this;
-			processor.Start();
-			if (processor is NodeComponentProcessor componentProcessor) {
-				foreach (var (componentType, componentProcessors) in processorsByComponentType) {
-					if (componentProcessor.TargetComponentType.IsAssignableFrom(componentType)) {
-						componentProcessors.Add(componentProcessor);
+			var componentsToRegister = new List<(NodeComponent, Node)>();
+			var componentProcessor = processor as NodeComponentProcessor;
+			if (componentProcessor != null) {
+				foreach (var (type, componentProcessorsForType) in processorsByComponentType) {
+					if (componentProcessor.TargetComponentType.IsAssignableFrom(type)) {
+						componentProcessorsForType.Add(componentProcessor);
 					}
 				}
 				foreach (var node in RootNodes) {
-					RegisterHierarchyComponentsWithinProcessor(node, componentProcessor);
+					GetComponentsForProcessor(node, componentProcessor, componentsToRegister);
 				}
+			}
+			processor.Manager = this;
+			processor.Start();
+			foreach (var (component, owner) in componentsToRegister) {
+				componentProcessor.InternalAdd(component, owner);
 			}
 		}
 
-		private void RegisterHierarchyComponentsWithinProcessor(Node node, NodeComponentProcessor processor)
+		private void GetComponentsForProcessor(Node node, NodeComponentProcessor processor, List<(NodeComponent, Node)> result)
 		{
 			foreach (var component in node.Components) {
 				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
-					processor.InternalAdd(component);
+					result.Add((component, node));
 				}
 			}
 			foreach (var child in node.Nodes) {
-				RegisterHierarchyComponentsWithinProcessor(child, processor);
+				GetComponentsForProcessor(node, processor, result);
 			}
 		}
 
 		internal void UnregisterNodeProcessor(NodeProcessor processor)
 		{
-			processor.Manager = null;
 			if (processor is NodeComponentProcessor componentProcessor) {
 				foreach (var (componentType, componentProcessors) in processorsByComponentType) {
 					if (componentProcessor.TargetComponentType.IsAssignableFrom(componentType)) {
 						componentProcessors.Remove(componentProcessor);
 					}
 				}
-				foreach (var rootNode in RootNodes) {
-					UnregisterHierarchyComponentsWithinProcessor(rootNode, componentProcessor);
 			}
-			}
-			processor.Stop();
-		}
-
-		private void UnregisterHierarchyComponentsWithinProcessor(Node node, NodeComponentProcessor processor)
-		{
-			foreach (var child in node.Nodes) {
-				UnregisterHierarchyComponentsWithinProcessor(child, processor);
-			}
-			foreach (var component in node.Components) {
-				if (processor.TargetComponentType.IsAssignableFrom(component.GetType())) {
-					processor.InternalRemove(component, node);
-				}
-			}
+			processor.Manager = null;
+			processor.Stop(this);
 		}
 
 		private List<NodeComponentProcessor> GetProcessorsForComponentType(Type type)
@@ -101,54 +91,54 @@ namespace Lime
 
 		internal void RegisterNode(Node node, Node parent)
 		{
-			RegisterNodeHelper(node);
-			var hierarchyChangedEventArgs = new HierarchyChangedEventArgs(
-				this,
-				HierarchyAction.Link,
-				node,
-				parent
-			);
-			HierarchyChanged?.Invoke(hierarchyChangedEventArgs);
-			GlobalHierarchyChanged?.Invoke(hierarchyChangedEventArgs);
+			var componentsToRegister = new List<(NodeComponent, Node)>();
+			RegisterNodeHelper(node, componentsToRegister);
+			foreach (var (component, owner) in componentsToRegister) {
+				RegisterComponent(component, owner);
+			}
+			RaiseHierarchyChanged(new HierarchyChangedEventArgs(this, HierarchyAction.Link, node, parent));
 		}
 
-		private void RegisterNodeHelper(Node node)
+		private void RegisterNodeHelper(Node node, List<(NodeComponent, Node)> componentsToRegister)
 		{
 			node.Manager = this;
 			if (node.GloballyFrozen) {
 				frozenNodes.Add(node);
 			}
 			foreach (var component in node.Components) {
-				RegisterComponent(component);
+				componentsToRegister.Add((component, node));
 			}
 			foreach (var child in node.Nodes) {
-				RegisterNodeHelper(child);
+				RegisterNodeHelper(child, componentsToRegister);
 			}
 		}
 
 		internal void UnregisterNode(Node node, Node parent)
 		{
-			UnregisterNodeHelper(node);
-			var hierarchyChangedEventArgs = new HierarchyChangedEventArgs(
-				this,
-				HierarchyAction.Unlink,
-				node,
-				parent
-			);
-			HierarchyChanged?.Invoke(hierarchyChangedEventArgs);
-			GlobalHierarchyChanged?.Invoke(hierarchyChangedEventArgs);
+			var componentsToUnregister = new List<(NodeComponent, Node)>();
+			UnregisterNodeHelper(node, componentsToUnregister);
+			foreach (var (component, owner) in componentsToUnregister) {
+				UnregisterComponent(component, owner);
+			}
+			RaiseHierarchyChanged(new HierarchyChangedEventArgs(this, HierarchyAction.Unlink, node, parent));
 		}
 
-		private void UnregisterNodeHelper(Node node)
+		private void UnregisterNodeHelper(Node node, List<(NodeComponent, Node)> componentsToUnregister)
 		{
 			node.Manager = null;
 			frozenNodes.Remove(node);
 			foreach (var child in node.Nodes) {
-				UnregisterNodeHelper(child);
+				UnregisterNodeHelper(child, componentsToUnregister);
 			}
 			foreach (var component in node.Components) {
-				UnregisterComponent(component, node);
+				componentsToUnregister.Add((component, node));
 			}
+		}
+
+		private void RaiseHierarchyChanged(HierarchyChangedEventArgs e)
+		{
+			HierarchyChanged?.Invoke(e);
+			GlobalHierarchyChanged?.Invoke(e);
 		}
 
 		internal void FilterNode(Node node)
@@ -158,7 +148,7 @@ namespace Lime
 			if (frozenChanged) {
 				foreach (var c in node.Components) {
 					foreach (var p in GetProcessorsForComponentType(c.GetType())) {
-						p.InternalOnOwnerFrozenChanged(c);
+						p.InternalOnOwnerFrozenChanged(c, node);
 					}
 				}
 			}
@@ -167,10 +157,10 @@ namespace Lime
 			}
 		}
 
-		internal void RegisterComponent(NodeComponent component)
+		internal void RegisterComponent(NodeComponent component, Node owner)
 		{
 			foreach (var p in GetProcessorsForComponentType(component.GetType())) {
-				p.InternalAdd(component);
+				p.InternalAdd(component, owner);
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace Lime
 
 		protected internal virtual void Start() { }
 
-		protected internal virtual void Stop() { }
+		protected internal virtual void Stop(NodeManager manager) { }
 
 		protected internal virtual void Update(float delta) { }
 	}
@@ -22,36 +22,36 @@ namespace Lime
 			TargetComponentType = targetComponentType;
 		}
 
-		protected internal virtual void InternalAdd(NodeComponent component) { }
+		protected internal virtual void InternalAdd(NodeComponent component, Node owner) { }
 
 		protected internal virtual void InternalRemove(NodeComponent component, Node owner) { }
 
-		protected internal virtual void InternalOnOwnerFrozenChanged(NodeComponent component) { }
+		protected internal virtual void InternalOnOwnerFrozenChanged(NodeComponent component, Node owner) { }
 	}
 
-	public class NodeComponentProcessor<TComponent> : NodeComponentProcessor where TComponent : NodeComponent
+	public class NodeComponentProcessor<TComponent> : NodeComponentProcessor where TComponent : class
 	{
 		protected NodeComponentProcessor() : base(typeof(TComponent)) { }
 
-		protected internal sealed override void InternalAdd(NodeComponent component)
+		protected internal sealed override void InternalAdd(NodeComponent component, Node owner)
 		{
-			Add((TComponent)component);
+			Add(component as TComponent, owner);
 		}
 
 		protected internal sealed override void InternalRemove(NodeComponent component, Node owner)
 		{
-			Remove((TComponent)component, owner);
+			Remove(component as TComponent, owner);
 		}
 
-		protected internal sealed override void InternalOnOwnerFrozenChanged(NodeComponent component)
+		protected internal sealed override void InternalOnOwnerFrozenChanged(NodeComponent component, Node owner)
 		{
-			OnOwnerFrozenChanged((TComponent)component);
+			OnOwnerFrozenChanged(component as TComponent, owner);
 		}
 
-		protected virtual void Add(TComponent component) { }
+		protected virtual void Add(TComponent component, Node owner) { }
 
 		protected virtual void Remove(TComponent component, Node owner) { }
 
-		protected virtual void OnOwnerFrozenChanged(TComponent component) { }
+		protected virtual void OnOwnerFrozenChanged(TComponent component, Node owner) { }
 	}
 }

@@ -9,7 +9,7 @@ namespace Lime
 			widgetContext = Manager.ServiceProvider.RequireService<WidgetContext>();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(NodeManager manager)
 		{
 			widgetContext = null;
 		}

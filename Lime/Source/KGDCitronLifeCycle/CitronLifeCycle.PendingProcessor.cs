@@ -28,7 +28,7 @@ namespace Lime.KGDCitronLifeCycle {
 				onAnimatedUpdateStage = behaviorSystem.GetUpdateStage(typeof(AfterAnimationStage));
 			}
 
-			protected internal override void Stop()
+			protected internal override void Stop(NodeManager manager)
 			{
 				behaviorSystem = null;
 				animationSystem = null;

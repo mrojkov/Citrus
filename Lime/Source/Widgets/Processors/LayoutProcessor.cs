@@ -9,7 +9,7 @@ namespace Lime
 			layoutManager = Manager.ServiceProvider.RequireService<LayoutManager>();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(NodeManager manager)
 		{
 			layoutManager = null;
 		}

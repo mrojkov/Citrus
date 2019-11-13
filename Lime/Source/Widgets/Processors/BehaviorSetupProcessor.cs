@@ -11,12 +11,12 @@ namespace Lime
 			behaviorSystem = Manager.ServiceProvider.RequireService<BehaviorSystem>();
 		}
 
-		protected internal override void Stop()
+		protected internal override void Stop(NodeManager manager)
 		{
 			behaviorSystem = null;
 		}
 
-		protected override void Add(BehaviorComponent component)
+		protected override void Add(BehaviorComponent component, Node owner)
 		{
 			behaviorSystem.Add(component);
 		}
@@ -26,7 +26,7 @@ namespace Lime
 			behaviorSystem.Remove(component, owner);
 		}
 
-		protected override void OnOwnerFrozenChanged(BehaviorComponent component)
+		protected override void OnOwnerFrozenChanged(BehaviorComponent component, Node owner)
 		{
 			behaviorSystem.OnOwnerFrozenChanged(component);
 		}

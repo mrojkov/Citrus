@@ -12,9 +12,9 @@ namespace Lime.KGDCitronLifeCycle
 				animationSystem = Manager.ServiceProvider.GetService<AnimationSystem>();
 			}
 
-			protected internal override void Stop()
+			protected internal override void Stop(NodeManager manager)
 			{
-				base.Stop();
+				base.Stop(manager);
 				animationSystem = null;
 			}
 

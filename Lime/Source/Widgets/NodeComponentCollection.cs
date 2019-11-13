@@ -266,7 +266,7 @@ namespace Lime
 			}
 			base.Add(component);
 			component.Owner = owner;
-			owner?.Manager?.RegisterComponent(component);
+			owner?.Manager?.RegisterComponent(component, owner);
 		}
 
 		public override bool Remove(NodeComponent component)

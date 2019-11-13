@@ -22,15 +22,15 @@ namespace Lime
 			freeQueueNodes.Push(node);
 		}
 
-		protected override void Add(AnimationComponent component)
+		protected override void Add(AnimationComponent component, Node owner)
 		{
 			component.Processor = this;
-			component.Depth = GetNodeDepth(component.Owner);
+			component.Depth = GetNodeDepth(owner);
 			if (component.Depth >= currQueue.BucketCount) {
 				BucketQueue<Animation>.Resize(ref currQueue, component.Depth + 1);
 				BucketQueue<Animation>.Resize(ref nextQueue, component.Depth + 1);
 			}
-			if (component.Owner.GloballyFrozen) {
+			if (owner.GloballyFrozen) {
 				return;
 			}
 			foreach (var a in component.Animations) {
@@ -61,9 +61,9 @@ namespace Lime
 			Deactivate(animation);
 		}
 
-		protected override void OnOwnerFrozenChanged(AnimationComponent component)
+		protected override void OnOwnerFrozenChanged(AnimationComponent component, Node owner)
 		{
-			if (component.Owner.GloballyFrozen) {
+			if (owner.GloballyFrozen) {
 				foreach (var a in component.Animations) {
 					Deactivate(a);
 				}
