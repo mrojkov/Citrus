@@ -7,7 +7,6 @@ using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI;
 using Tangerine.UI.Drop;
-using Yuzu;
 
 namespace Tangerine.Common.FilesDropHandlers
 {

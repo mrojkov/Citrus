@@ -215,9 +215,13 @@ namespace Lime
 
 		public void DragFiles(string[] filenames)
 		{
-			foreach (var filename in filenames) {
-				View.DragFile(filename, new CGRect(), false, NSApplication.SharedApplication.CurrentEvent);
-			}
+			// See Dragging File Paths:
+			// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/DragandDrop/Tasks/DraggingFiles.html
+			var pboard = NSPasteboard.CreateWithUniqueName();
+			pboard.DeclareTypes (new string [] { NSPasteboard.NSFilenamesType }, null);
+			pboard.SetPropertyListForType (NSArray.FromObjects(filenames), NSPasteboard.NSFilenamesType);
+			var dragImage = NSWorkspace.SharedWorkspace.IconForFiles(filenames);
+			View.DragImage(dragImage, new CGPoint (), new CGSize (), new NSEvent(), pboard, View, false);
 		}
 
 		public float UnclampedDelta { get; private set; }
@@ -501,7 +505,7 @@ namespace Lime
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
 			if (Active || Input.IsSimulationRunning) {
-				Input.ProcessPendingKeyEvents(delta);
+				Input.ProcessPendingInputEvents(delta);
 			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
@@ -526,7 +530,18 @@ namespace Lime
 		private void RaiseFilesDropped(IEnumerable<string> files)
 		{
 			using (Context.Activate().Scoped()) {
+				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
+				// Have to call update in order to update NodeUnderMouse
+				// because Mac stops updating loop during drag
+				Update();
+				Application.Input.SetDropData(files);
+				// Drag prevents key\mouse events from firing
+				// so we have to manually assign NodeCapturedByMouse and call Update
+				// in order to let gestures handle files drop.
+				WidgetContext.Current.NodeCapturedByMouse = WidgetContext.Current.NodeUnderMouse;
+				Update();
+				WidgetContext.Current.NodeCapturedByMouse = null;
 			}
 		}
 	}

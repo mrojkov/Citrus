@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderCompilerBinding.Mac",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.RemoteScripting.Mac", "Tangerine.UI.RemoteScripting\Tangerine.UI.RemoteScripting.Mac.csproj", "{F93DA48E-2A86-4DC4-A392-102B1E567B3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Common.Mac", "Tangerine.Common\Tangerine.Common.Mac.csproj", "{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,14 @@ Global
 		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|x86.ActiveCfg = Release|Any CPU
 		{F93DA48E-2A86-4DC4-A392-102B1E567B3A}.Release|x86.Build.0 = Release|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

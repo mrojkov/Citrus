@@ -163,6 +163,10 @@
       <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
       <Name>Yuzu.Mac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Common\Tangerine.Common.Mac.csproj">
+      <Project>{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}</Project>
+      <Name>Tangerine.Common.Mac</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Tangerine.UI.Timeline.Mac.csproj" />

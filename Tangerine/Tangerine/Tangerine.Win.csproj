@@ -111,7 +111,7 @@
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tangerine.Common.Win\Tangerine.Common.Win.csproj">
+    <ProjectReference Include="..\Tangerine.Common\Tangerine.Common.Win.csproj">
       <Project>{259c5e1f-1507-4131-8b4e-dd3c51f7462a}</Project>
       <Name>Tangerine.Common.Win</Name>
     </ProjectReference>
