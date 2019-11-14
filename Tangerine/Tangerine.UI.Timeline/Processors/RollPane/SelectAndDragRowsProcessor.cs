@@ -347,7 +347,8 @@ namespace Tangerine.UI.Timeline
 			Probers.Add(new AnimationTrackRowProber());
 			var roll = Timeline.Instance.Roll;
 			var input = roll.RootWidget.Input;
-			roll.RootWidget.Gestures.Add(new ClickGesture(0, () => {
+
+			var cg = new ClickGesture(0, () => {
 				var row = RowUnderMouse(input.MousePosition);
 				if (row == null) {
 					return;
@@ -376,10 +377,11 @@ namespace Tangerine.UI.Timeline
 					});
 					input.ConsumeKey(Key.Mouse0);
 				}
-			}));
+			});
+
 			var dg = new DragGesture(0);
 			dg.Recognized += () => {
-				var row = RowUnderMouse(input.MousePosition);
+				var row = RowUnderMouse(dg.MousePressPosition);
 				if (!row?.Selected ?? false) {
 					Document.Current.History.DoTransaction(() => {
 						ClearRowSelection.Perform();
@@ -402,7 +404,9 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			};
+
 			roll.RootWidget.Gestures.Add(dg);
+			roll.RootWidget.Gestures.Add(cg);
 			yield break;
 		}
 	}
