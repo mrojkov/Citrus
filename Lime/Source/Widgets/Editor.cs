@@ -490,12 +490,6 @@ namespace Lime
 			if (s == null) return;
 			// Layout has not been done yet.
 			if (s.Frame.Size == Vector2.Zero) return;
-			// ScrollView limits scrolling by Content.Size.
-			// Container.Size must be large enough to satistfy scissor test,
-			// but not less than Frame.Size to support alignment.
-			s.Content.Size = DisplayWidget.Size = Vector2.Max(
-				Text.MeasureText().ExpandedBy(DisplayWidget.Padding).Size,
-				s.Frame.Size);
 			if (!CaretPos.IsVisible) return;
 			s.ScrollTo(
 				s.PositionToView(s.ProjectToScrollAxis(CaretPos.WorldPos),
