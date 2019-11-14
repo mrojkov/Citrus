@@ -27,12 +27,17 @@ namespace Tangerine.UI.Timeline
 					if (Document.Current.Animation.IsCompound) {
 						try {
 							// Dirty hack: using a file drag&drop mechanics for dropping animation clips on the grid.
+							// Drop data will be cleaned before we leave modal window so there is no need
+							// to return handled files
+							handled.Clear();
+							handledFiles = handled;
 							var decodedAnimationId = Encoding.UTF8.GetString(Convert.FromBase64String(file));
 							AddAnimationClip.Perform(
 								new IntVector2(
 									cellUnderMouseOnFilesDrop.X + animateTextureCellOffset,
 									cellUnderMouseOnFilesDrop.Y),
 								decodedAnimationId);
+							return;
 						} catch { }
 					}
 					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
