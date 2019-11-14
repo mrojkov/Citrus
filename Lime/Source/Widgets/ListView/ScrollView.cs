@@ -136,8 +136,7 @@ namespace Lime
 		{
 			if (ScrollDirection == ScrollDirection.Vertical) {
 				w.Y = position;
-			}
-			else {
+			} else {
 				w.X = position;
 			}
 		}
@@ -146,8 +145,7 @@ namespace Lime
 		{
 			if (ScrollDirection == ScrollDirection.Vertical) {
 				w.Height = position;
-			}
-			else {
+			} else {
 				w.Width = position;
 			}
 		}
@@ -186,8 +184,7 @@ namespace Lime
 			var p = position.Clamp(MinScrollPosition, MaxScrollPosition);
 			if (instantly) {
 				ScrollPosition = p;
-			}
-			else {
+			} else {
 				StartScrolling(ScrollToTask(p));
 			}
 		}
