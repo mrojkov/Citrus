@@ -96,6 +96,10 @@ namespace Lime.KGDCitronLifeCycle
 				var pendingSystem = nodeManager.ServiceProvider.GetService<PendingSystem>();
 				pendingSystem.PendingAdvanceAnimation.AddLast(ownerNode);
 			}
+
+			if (managerPhase >= NodeManagerPhase.Layout) {
+				runAnimationDuringUpdatedPhaseCase.FixLog();
+			}
 		}
 
 		private static void RaiseStopped(Animation animation)

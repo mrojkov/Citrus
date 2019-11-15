@@ -75,6 +75,9 @@ namespace Lime.KGDCitronLifeCycle
 		private static readonly LoggedCase tasksUpdateOnStartCase = new LoggedCase();
 		private static readonly LoggedCase advanceAnimationsRecursiveOnStartCase = new LoggedCase();
 		private static readonly LoggedCase advanceAnimationsRecursiveAfterRunAnimationCase = new LoggedCase();
+		private static readonly LoggedCase hierarchyChangedDuringAnimationCase = new LoggedCase();
+		private static readonly LoggedCase hierarchyChangedDuringUpdatedPhaseCase = new LoggedCase();
+		private static readonly LoggedCase runAnimationDuringUpdatedPhaseCase = new LoggedCase();
 		private static readonly LoggedCase immediatelyOnStoppedCase = new LoggedCase();
 
 		public static void ActivateLogging(ref Action onFrameStarting)
@@ -85,6 +88,9 @@ namespace Lime.KGDCitronLifeCycle
 			IsLoggingActive = true;
 
 			onFrameStarting += OnFrameStarting;
+#pragma warning disable 618
+			NodeManager.GlobalHierarchyChanged += OnHierarchyChanged;
+#pragma warning restore 618
 		}
 
 		public static void DeactivateLogging(ref Action onFrameStarting)
@@ -94,7 +100,21 @@ namespace Lime.KGDCitronLifeCycle
 			}
 			IsLoggingActive = false;
 
+			// ReSharper disable once DelegateSubtraction
 			onFrameStarting -= OnFrameStarting;
+#pragma warning disable 618
+			NodeManager.GlobalHierarchyChanged -= OnHierarchyChanged;
+#pragma warning restore 618
+		}
+
+		private static void OnHierarchyChanged(HierarchyChangedEventArgs e)
+		{
+			if (pipelinedAdvanceAnimationActiveCount > 0) {
+				hierarchyChangedDuringAnimationCase.FixLog(e.Action + " " + e.Child);
+			}
+			if (e.Manager.GetPhase() >= NodeManagerPhase.Layout) {
+				hierarchyChangedDuringUpdatedPhaseCase.FixLog(e.Action + " " + e.Child);
+			}
 		}
 
 		private static void OnFrameStarting()
@@ -104,6 +124,9 @@ namespace Lime.KGDCitronLifeCycle
 			tasksUpdateOnStartCase.OnFrameStart();
 			advanceAnimationsRecursiveOnStartCase.OnFrameStart();
 			advanceAnimationsRecursiveAfterRunAnimationCase.OnFrameStart();
+			hierarchyChangedDuringAnimationCase.OnFrameStart();
+			hierarchyChangedDuringUpdatedPhaseCase.OnFrameStart();
+			runAnimationDuringUpdatedPhaseCase.OnFrameStart();
 			immediatelyOnStoppedCase.OnFrameStart();
 		}
 
@@ -114,6 +137,9 @@ namespace Lime.KGDCitronLifeCycle
 			}
 
 			return new[] {
+				hierarchyChangedDuringAnimationCase.GetDebugInfo(nameof(hierarchyChangedDuringAnimationCase)),
+				hierarchyChangedDuringUpdatedPhaseCase.GetDebugInfo(nameof(hierarchyChangedDuringUpdatedPhaseCase)),
+				runAnimationDuringUpdatedPhaseCase.GetDebugInfo(nameof(runAnimationDuringUpdatedPhaseCase)),
 				immediatelyOnStoppedCase.GetDebugInfo(nameof(immediatelyOnStoppedCase)),
 				advanceAnimationsRecursiveAfterRunAnimationCase.GetDebugInfo(
 					nameof(advanceAnimationsRecursiveAfterRunAnimationCase)
