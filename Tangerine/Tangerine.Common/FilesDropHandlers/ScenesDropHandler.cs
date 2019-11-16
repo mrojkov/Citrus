@@ -6,21 +6,28 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI;
-using Tangerine.UI.Drop;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
-	public class ScenesDropHandler : IFilesDropHandler
+	public class ScenesDropHandler
 	{
-		private readonly List<string> extensions = new List<string> { ".scene", ".tan", ".model" };
+		private readonly string[] extensions = { ".tan", ".model" };
+		private readonly Action onBeforeDrop;
+		private readonly Action<Node> nodePostprocessor;
 
 		public bool ShouldCreateContextMenu { get; set; } = true;
-		public event Action<Node> NodeCreated;
 
-		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
+		public ScenesDropHandler(Action onBeforeDrop = null, Action<Node> nodePostprocessor = null)
 		{
-			handledFiles = files.Where(f => extensions.Contains(Path.GetExtension(f)));
-			foreach (var file in handledFiles) {
+			this.onBeforeDrop = onBeforeDrop;
+			this.nodePostprocessor = nodePostprocessor;
+		}
+
+		public void Handle(List<string> files)
+		{
+			onBeforeDrop?.Invoke();
+			foreach (var file in files.Where(f => extensions.Contains(Path.GetExtension(f))).ToList()) {
+				files.Remove(file);
 				if (
 					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
 					!Utils.AssertCurrentDocument(assetPath, assetType)
@@ -32,8 +39,7 @@ namespace Tangerine.Common.FilesDropHandlers
 				} else {
 					try {
 						Project.Current.OpenDocument(file, true);
-					}
-					catch (System.InvalidOperationException e) {
+					} catch (InvalidOperationException e) {
 						AlertDialog.Show(e.Message);
 					}
 				}
@@ -57,9 +63,9 @@ namespace Tangerine.Common.FilesDropHandlers
 						SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
 						SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
 					}
-					NodeCreated?.Invoke(node);
+					nodePostprocessor?.Invoke(node);
 					node.LoadExternalScenes();
-					})),
+				})),
 				new Command("Cancel")
 			};
 			menu[0].Enabled = assetType != ".model";

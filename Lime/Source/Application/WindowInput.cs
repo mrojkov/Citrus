@@ -133,21 +133,11 @@ namespace Lime
 				? ownerWindow == Application.WindowUnderMouse
 				: ownerWindow.Active;
 		}
+
 		/// <summary>
-		/// Tries to get drop data.
+		/// Returns list of files dropped on the window.
+		/// This list automatically being cleaned up after window update.
 		/// </summary>
-		/// <param name="dropData">Drop data.</param>
-		/// <returns></returns>
-		public bool TryGetDropData(out IEnumerable<string> dropData) => Application.Input.TryGetDropData(out dropData);
-		/// <summary>
-		/// Consumes a single dropped data object.
-		/// </summary>
-		/// <param name="dataObject">Dropped data object to be consumed.</param>
-		public void ConsumeDropData(string dataObject) => Application.Input.ConsumeDropData(dataObject);
-		/// <summary>
-		/// Consumes dropped data.
-		/// </summary>
-		/// <param name="dropData">Dropped data objects to be consumed.</param>
-		public void ConsumeDropData(IEnumerable<string> dropData) => Application.Input.ConsumeDropData(dropData);
+		public List<string> DroppedFiles { get; } = new List<string>();
 	}
 }

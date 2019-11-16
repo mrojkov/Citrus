@@ -6,31 +6,25 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.Core.Operations;
-using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline.Operations.CompoundAnimations;
 
 namespace Tangerine.UI.Timeline
 {
-	internal class GridPaneFilesDropHandler : IFilesDropHandler
+	internal class GridPaneFilesDropHandler
 	{
-		private GridPane grid => Timeline.Instance.Grid;
-
-		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
+		public void Handle(List<string> files)
 		{
+			var grid = Timeline.Instance.Grid;
 			var rowLocationUnderMouseOnFilesDrop =
 				SelectAndDragRowsProcessor.MouseToRowLocation(grid.RootWidget.Input.MousePosition);
 			var handled = new List<string>();
 			var cellUnderMouseOnFilesDrop = grid.CellUnderMouse();
 			var animateTextureCellOffset = 0;
 			using (Document.Current.History.BeginTransaction()) {
-				foreach (var file in files) {
+				foreach (var file in files.ToList()) {
 					if (Document.Current.Animation.IsCompound) {
 						try {
 							// Dirty hack: using a file drag&drop mechanics for dropping animation clips on the grid.
-							// Drop data will be cleaned before we leave modal window so there is no need
-							// to return handled files
-							handled.Clear();
-							handledFiles = handled;
 							var decodedAnimationId = Encoding.UTF8.GetString(Convert.FromBase64String(file));
 							AddAnimationClip.Perform(
 								new IntVector2(
@@ -85,11 +79,10 @@ namespace Tangerine.UI.Timeline
 							break;
 						}
 					}
-					handled.Add(file);
+					files.Remove(file);
 				}
 				Document.Current.History.CommitTransaction();
 			}
-			handledFiles = handled;
 		}
 	}
 }

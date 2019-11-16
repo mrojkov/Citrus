@@ -126,12 +126,13 @@ namespace Tangerine.UI.Inspector
 			editors.Clear();
 		}
 
-		public void DropFiles(IEnumerable<string> files)
+		public void DropFiles(List<string> files)
 		{
 			var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
 			foreach (var e in editors) {
 				if (nodeUnderMouse != null && nodeUnderMouse.SameOrDescendantOf(e.ContainerWidget)) {
 					e.DropFiles(files);
+					files.Clear();
 					break;
 				}
 			}

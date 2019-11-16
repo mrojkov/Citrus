@@ -4,7 +4,6 @@ using Tangerine.Core;
 using System.Collections.Generic;
 using System.Linq;
 using Tangerine.Core.Components;
-using Tangerine.UI.Drop;
 
 namespace Tangerine.UI.Inspector
 {
@@ -18,19 +17,15 @@ namespace Tangerine.UI.Inspector
 		private readonly InspectorContent content;
 		private readonly ThemedScrollView contentWidget;
 
-		private readonly FilesDropManager filesDropManager;
 		private HashSet<Type> prevTypes = new HashSet<Type>();
 
-		/// <summary>
-		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
-		/// </summary>
-		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>>();
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
 		public readonly Widget RootWidget;
 		public readonly ToolbarView Toolbar;
 		public readonly List<object> Objects;
+		public readonly DropFilesGesture DropFilesGesture;
 
 		static Inspector()
 		{
@@ -80,23 +75,23 @@ namespace Tangerine.UI.Inspector
 			contentWidget = new ThemedScrollView();
 			RootWidget.AddNode(toolbarArea);
 			RootWidget.AddNode(contentWidget);
+			RootWidget.Gestures.Add(DropFilesGesture = new DropFilesGesture());
 			contentWidget.Content.Layout = new VBoxLayout();
 			Toolbar = new ToolbarView(toolbarArea, GetToolbarLayout());
 			Objects = new List<object>();
-			content = new InspectorContent(contentWidget.Content) {
+			content = new InspectorContent(contentWidget.Content)
+			{
 				Footer = new Widget { MinHeight = 300.0f },
 				History = Document.Current.History
 			};
-			filesDropManager = new FilesDropManager(RootWidget);
-			filesDropManager.AddFilesDropHandler(new InspectorFilesDropHandler(content));
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
-			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
+			DropFilesGesture.Recognized += content.DropFiles;
 			CreateWatchersToRebuild();
 		}
 
 		private static ToolbarModel GetToolbarLayout()
 		{
-			return new ToolbarModel {
+			return new ToolbarModel
+			{
 				Rows = {
 					new ToolbarModel.ToolbarRow {
 						Index = 0,

@@ -68,7 +68,6 @@
     <Compile Include="EasingIcon.cs" />
     <Compile Include="Inspector.cs" />
     <Compile Include="InspectorContent.cs" />
-    <Compile Include="InspectorFilesDropHandler.cs" />
     <Compile Include="InspectorPropertyRegistry.cs" />
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />

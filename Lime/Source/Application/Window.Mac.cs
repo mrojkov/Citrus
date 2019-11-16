@@ -221,7 +221,7 @@ namespace Lime
 			pboard.DeclareTypes (new string [] { NSPasteboard.NSFilenamesType }, null);
 			pboard.SetPropertyListForType (NSArray.FromObjects(filenames), NSPasteboard.NSFilenamesType);
 			var dragImage = NSWorkspace.SharedWorkspace.IconForFiles(filenames);
-			View.DragImage(dragImage, new CGPoint (), new CGSize (), new NSEvent(), pboard, View, false);
+			View.DragImage(dragImage, new CGPoint(), new CGSize(), new NSEvent(), pboard, View, false);
 		}
 
 		public float UnclampedDelta { get; private set; }
@@ -513,6 +513,9 @@ namespace Lime
 				Input.CopyKeysState();
 				Input.TextInput = null;
 			}
+			if (Input.DroppedFiles.Count > 0) {
+				Input.DroppedFiles.Clear();
+			}
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
@@ -535,10 +538,11 @@ namespace Lime
 				// Have to call update in order to update NodeUnderMouse
 				// because Mac stops updating loop during drag
 				Update();
-				Application.Input.SetDropData(files);
-				// Drag prevents key\mouse events from firing
-				// so we have to manually assign NodeCapturedByMouse and call Update
-				// in order to let gestures handle files drop.
+				Input.DroppedFiles.AddRange(files);
+				// Have to call update in order to update NodeUnderMouse
+				// because Mac stops updating loop during drag
+				// Manually assign NodeCapturedByMouse in order to handle DropFilesGesture.
+				// TODO: This code must be refactored since Window should know anything about Widgets.
 				WidgetContext.Current.NodeCapturedByMouse = WidgetContext.Current.NodeUnderMouse;
 				Update();
 				WidgetContext.Current.NodeCapturedByMouse = null;

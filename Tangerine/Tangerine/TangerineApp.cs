@@ -10,7 +10,6 @@ using Tangerine.MainMenu;
 using Tangerine.UI;
 using Tangerine.UI.SceneView;
 using Tangerine.UI.Docking;
-using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline;
 using FileInfo = System.IO.FileInfo;
 
@@ -88,7 +87,7 @@ namespace Tangerine
 			LoadFont();
 
 			DockManager.Initialize(new Vector2(1024, 768));
-			DockManager.Instance.DocumentAreaFilesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
+			DockManager.Instance.DocumentAreaDropFilesGesture.Recognized += new ScenesDropHandler { ShouldCreateContextMenu = false }.Handle;
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
 			mainWidget.Window.AllowDropFiles = true;
@@ -561,9 +560,9 @@ namespace Tangerine
 			{
 				tabBar.HitTestTarget = true;
 				this.tabBar = tabBar;
-				var filesDropManager = new FilesDropManager(tabBar);
-				filesDropManager.AddFilesDropHandler(new ScenesDropHandler { ShouldCreateContextMenu = false });
-				tabBar.Gestures.Add(new DropGesture(filesDropManager.Handle));
+				var g = new DropFilesGesture();
+				g.Recognized += new ScenesDropHandler { ShouldCreateContextMenu = false }.Handle;
+				tabBar.Gestures.Add(g);
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));

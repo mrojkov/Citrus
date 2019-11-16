@@ -5,33 +5,14 @@ using Lime;
 using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
-using Tangerine.UI.Docking;
-using Tangerine.UI.Drop;
 using Tangerine.UI.SceneView.Presenters;
 
 namespace Tangerine.UI.SceneView
 {
 	public class SceneView : IDocumentView
 	{
-		private readonly FilesDropManager filesDropManager;
 		private Vector2 mousePositionOnFilesDrop;
 
-		/// <summary>
-		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
-		/// </summary>
-		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>> {
-			() => new AudiosDropHandler(),
-			() => {
-				var idh = new ImagesDropHandler();
-				idh.NodeCreated += FilesDropOnNodeCreated;
-				return idh;
-			},
-			() => {
-				var sdh = new ScenesDropHandler();
-				sdh.NodeCreated += FilesDropOnNodeCreated;
-				return sdh;
-			}
-		};
 		// Given panel.
 		public readonly Widget Panel;
 		// Widget which is a direct child of the panel.
@@ -41,6 +22,7 @@ namespace Tangerine.UI.SceneView
 		public WidgetInput Input => InputArea.Input;
 		// Container for the document root node.
 		public readonly Widget Scene;
+		public readonly DropFilesGesture DropFilesGesture;
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
 		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
@@ -117,6 +99,7 @@ namespace Tangerine.UI.SceneView
 			this.Panel = panelWidget;
 			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
+			InputArea.Gestures.Add(DropFilesGesture = new DropFilesGesture());
 			Scene = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
@@ -127,13 +110,17 @@ namespace Tangerine.UI.SceneView
 			CreateComponents();
 			CreateProcessors();
 			CreatePresenters();
-			filesDropManager = new FilesDropManager(InputArea);
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
-			filesDropManager.Handling += FilesDropOnHandling;
-			InputArea.Gestures.Add(new DropGesture(filesDropManager.Handle));
+			CreateFilesDropHandlers();
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
+		}
+
+		private void CreateFilesDropHandlers()
+		{
+			DropFilesGesture.Recognized += new ImagesDropHandler(OnBeforeFilesDrop, FilesDropNodePostProcessor).Handle;
+			DropFilesGesture.Recognized += new AudiosDropHandler().Handle;
+			DropFilesGesture.Recognized += new ScenesDropHandler(OnBeforeFilesDrop, FilesDropNodePostProcessor).Handle;
 		}
 
 		private void AdjustSceneAnimationSpeed()
@@ -164,7 +151,7 @@ namespace Tangerine.UI.SceneView
 			Scene.Position = -(widget.Position + widget.Size * widget.Scale * 0.5f) * Scene.Scale + new Vector2(frameWidth * 0.5f, frameHeight * 0.5f) + Vector2.One * rulerSize;
 		}
 
-		private void FilesDropOnHandling()
+		private void OnBeforeFilesDrop()
 		{
 			if (!Window.Current.Active) {
 				Window.Current.Activate();
@@ -173,7 +160,7 @@ namespace Tangerine.UI.SceneView
 			mousePositionOnFilesDrop = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 		}
 
-		private static void FilesDropOnNodeCreated(Node node)
+		private static void FilesDropNodePostProcessor(Node node)
 		{
 			if (node is Widget) {
 				SetProperty.Perform(node, nameof(Widget.Position), Instance.mousePositionOnFilesDrop);

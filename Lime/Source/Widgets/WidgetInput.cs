@@ -165,22 +165,6 @@ namespace Lime
 
 		[Obsolete("Use DerestrictScope() instead")]
 		public void ReleaseAll() => DerestrictScope();
-		/// <summary>
-		/// Tries to get drop data.
-		/// </summary>
-		/// <param name="dropData">Drop data.</param>
-		/// <returns></returns>
-		public bool TryGetDropData(out IEnumerable<string> dropData) => windowInput.TryGetDropData(out dropData);
-		/// <summary>
-		/// Consumes a single dropped data object.
-		/// </summary>
-		/// <param name="dataObject">Dropped data object to be consumed.</param>
-		public void ConsumeDropData(string dataObject) => windowInput.ConsumeDropData(dataObject);
-		/// <summary>
-		/// Consumes dropped data.
-		/// </summary>
-		/// <param name="dropData">Dropped data objects to be consumed.</param>
-		public void ConsumeDropData(IEnumerable<string> dropData) => windowInput.ConsumeDropData(dropData);
 
 		public class WidgetStack : IReadOnlyList<Widget>
 		{

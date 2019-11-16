@@ -1,21 +1,21 @@
 using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI;
-using Tangerine.UI.Drop;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
-	public class AudiosDropHandler : IFilesDropHandler
+	public class AudiosDropHandler
 	{
-		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
+		public void Handle(List<string> files)
 		{
-			handledFiles = files.Where(f => Path.GetExtension(f) == ".ogg");
 			using (Document.Current.History.BeginTransaction()) {
-				foreach (var file in handledFiles) {
+				foreach (var file in files.Where(f => Path.GetExtension(f) == ".ogg").ToList()) {
+					files.Remove(file);
 					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
 						continue;
 					}

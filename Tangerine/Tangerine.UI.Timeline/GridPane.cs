@@ -3,25 +3,16 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.Drop;
 
 namespace Tangerine.UI.Timeline
 {
 	public class GridPane
 	{
-		private readonly FilesDropManager filesDropManager;
 		private readonly Timeline timeline;
-
-		/// <summary>
-		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
-		/// </summary>
-		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>> {
-			() => new GridPaneFilesDropHandler(),
-		};
-
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
 		public event Action<Widget> OnPostRender;
+		public readonly DropFilesGesture DropFilesGesture;
 
 		public Vector2 Size => RootWidget.Size;
 		public Vector2 ContentSize => ContentWidget.Size;
@@ -49,9 +40,9 @@ namespace Tangerine.UI.Timeline
 				_ => Core.Operations.Dummy.Perform(Document.Current.History));
 			OnPostRender += RenderSelection;
 			OnPostRender += RenderCursor;
-			filesDropManager = new FilesDropManager(RootWidget);
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
-			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
+			DropFilesGesture = new DropFilesGesture();
+			DropFilesGesture.Recognized += new GridPaneFilesDropHandler().Handle;
+			RootWidget.Gestures.Add(DropFilesGesture);
 		}
 
 		private void RenderBackgroundAndGrid(Node node)

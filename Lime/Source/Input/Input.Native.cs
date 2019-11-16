@@ -22,9 +22,6 @@ namespace Lime
 
 		private readonly Vector2[] desktopTouchPositions = new Vector2[MaxTouches];
 		private readonly List<KeyEvent> keyEventQueue = new List<KeyEvent>();
-		private readonly List<string> dropData = new List<string>();
-		private readonly BitArray handledDropDataObjects = new BitArray(0);
-		private bool shouldCleanDropDataOnNextUpdate;
 
 		private struct KeyState
 		{
@@ -114,36 +111,6 @@ namespace Lime
 		public bool WasMousePressed(int button) => WasKeyPressed(GetMouseButtonByIndex(button));
 		public bool WasMouseReleased(int button) => WasKeyReleased(GetMouseButtonByIndex(button));
 		public bool IsMousePressed(int button) => IsKeyPressed(GetMouseButtonByIndex(button));
-		/// <summary>
-		/// Tries to get drop data.
-		/// </summary>
-		/// <param name="dropData">Drop data.</param>
-		/// <returns></returns>
-		public bool TryGetDropData(out IEnumerable<string> dropData)
-		{
-			dropData = UnhandledDropData();
-			return this.dropData.Count > 0;
-		}
-		/// <summary>
-		/// Consumes a single dropped data object.
-		/// </summary>
-		/// <param name="dataObject">Dropped data object to be consumed.</param>
-		public void ConsumeDropData(string dataObject)
-		{
-			var index = dropData.BinarySearch(dataObject);
-			System.Diagnostics.Debug.Assert(index >= 0);
-			handledDropDataObjects[index] = true;
-		}
-		/// <summary>
-		/// Consumes dropped data.
-		/// </summary>
-		/// <param name="dropData">Dropped data objects to be consumed.</param>
-		public void ConsumeDropData(IEnumerable<string> dropData)
-		{
-			foreach (var dataObject in dropData) {
-				ConsumeDropData(dataObject);
-			}
-		}
 
 		public static Key GetMouseButtonByIndex(int button)
 		{
@@ -209,7 +176,6 @@ namespace Lime
 		internal void ProcessPendingInputEvents(float delta)
 		{
 			ProcessPendingKeyEvents(delta);
-			ProcessDropEvent();
 		}
 
 		internal void ProcessPendingKeyEvents(float delta)
@@ -240,39 +206,6 @@ namespace Lime
 					}
 				}
 				keyEventQueue.RemoveAll(i => i.Key == Key.Unknown);
-			}
-		}
-
-		internal void ProcessDropEvent()
-		{
-			if (shouldCleanDropDataOnNextUpdate) {
-				dropData.Clear();
-				shouldCleanDropDataOnNextUpdate = false;
-			}
-			if (dropData.Count > 0) {
-				shouldCleanDropDataOnNextUpdate = true;
-			}
-		}
-
-		internal void SetDropData(IEnumerable<string> dropData)
-		{
-			System.Diagnostics.Debug.Assert(this.dropData.Count == 0);
-			foreach (var dataObject in dropData) {
-				this.dropData.Add(dataObject);
-			}
-			this.dropData.Sort();
-			if (this.dropData.Count > handledDropDataObjects.Count) {
-				handledDropDataObjects.Length = this.dropData.Count;
-			}
-			handledDropDataObjects.SetAll(false);
-		}
-
-		private IEnumerable<string> UnhandledDropData()
-		{
-			for (int i = 0; i < dropData.Count; i++) {
-				if (!handledDropDataObjects[i]) {
-					yield return dropData[i];
-				}
 			}
 		}
 

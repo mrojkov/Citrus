@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using Tangerine.UI.Drop;
 using Yuzu;
 
 namespace Tangerine.UI.Docking
@@ -23,7 +22,7 @@ namespace Tangerine.UI.Docking
 		/// <summary>
 		/// Manages DocumentArea files drop.
 		/// </summary>
-		public FilesDropManager DocumentAreaFilesDropManager { get; private set; }
+		public DropFilesGesture DocumentAreaDropFilesGesture { get; private set; }
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
 		private DockManager(Vector2 windowSize)
@@ -55,8 +54,8 @@ namespace Tangerine.UI.Docking
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
-			DocumentAreaFilesDropManager = new FilesDropManager(DocumentArea);
-			DocumentArea.Gestures.Add(new DropGesture(DocumentAreaFilesDropManager.Handle));
+			DocumentAreaDropFilesGesture = new DropFilesGesture();
+			DocumentArea.Gestures.Add(DocumentAreaDropFilesGesture);
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 			var windowPlacement = new WindowPlacement {
 				Size = windowSize,

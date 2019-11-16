@@ -6,28 +6,35 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
 using Tangerine.UI;
-using Tangerine.UI.Drop;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
-	public class ImagesDropHandler : IFilesDropHandler
+	public class ImagesDropHandler
 	{
-		private readonly List<Type> imageTypes = new List<Type> {
+		private static readonly Type[] imageTypes = {
 			typeof(Image), typeof(DistortionMesh), typeof(NineGrid),
 			typeof(TiledImage), typeof(ParticleModifier),
 		};
 
-		public event Action<Node> NodeCreated;
+		private readonly Action onBeforeDrop;
+		private readonly Action<Node> postProcessNode;
 
-		public void Handle(IEnumerable<string> files, out IEnumerable<string> handledFiles)
+		public ImagesDropHandler(Action onBeforeDrop = null, Action<Node> postProcessNode = null)
 		{
-			handledFiles = files.Where(f => Path.GetExtension(f) == ".png" );
-			if (handledFiles.Any()) {
-				CreateContextMenu(handledFiles.ToArray());
+			this.onBeforeDrop = onBeforeDrop;
+			this.postProcessNode = postProcessNode;
+		}
+
+		public void Handle(List<string> files)
+		{
+			var supportedFiles = files.Where(f => Path.GetExtension(f) == ".png" ).ToList();
+			if (supportedFiles.Any()) {
+				supportedFiles.ForEach(f => files.Remove(f));
+				CreateContextMenu(supportedFiles);
 			}
 		}
 
-		private void CreateContextMenu(IEnumerable<string> files)
+		private void CreateContextMenu(List<string> files)
 		{
 			var menu = new Menu();
 			foreach (var imageType in imageTypes) {
@@ -39,9 +46,9 @@ namespace Tangerine.Common.FilesDropHandlers
 			menu.Popup();
 		}
 
-
 		private void CreateImageTypeInstance(Type type, IEnumerable<string> files)
 		{
+			onBeforeDrop?.Invoke();
 			using (Document.Current.History.BeginTransaction()) {
 				foreach (var file in files) {
 					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
@@ -61,7 +68,7 @@ namespace Tangerine.Common.FilesDropHandlers
 						SetProperty.Perform(node, nameof(ParticleModifier.Size), nodeSize);
 						SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
 					}
-					NodeCreated?.Invoke(node);
+					postProcessNode?.Invoke(node);
 				}
 				Document.Current.History.CommitTransaction();
 			}

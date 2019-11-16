@@ -6,15 +6,12 @@ using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
-using Tangerine.UI.Drop;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
 	public class Timeline : IDocumentView
 	{
-		private readonly FilesDropManager filesDropManager;
-
 		public static Timeline Instance { get; private set; }
 
 		public readonly Toolbar Toolbar;
@@ -27,12 +24,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
 		public readonly WaveformCache WaveformCache;
-		/// <summary>
-		/// A collection fabrics. Each fabric returns instance of IFilesDropHandler.
-		/// </summary>
-		public static List<Func<IFilesDropHandler>> FilesDropHandlers { get; } = new List<Func<IFilesDropHandler>> {
-			() => new AudiosDropHandler(), () => new ImagesDropHandler(), () => new ScenesDropHandler()
-		};
+		public readonly DropFilesGesture DropFilesGesture;
 
 		private Vector2 offset;
 		public Vector2 Offset
@@ -86,7 +78,7 @@ namespace Tangerine.UI.Timeline
 		/// </summary>
 		public event Action Detached;
 
-		public static IEnumerable<Type> GetOperationProcessorTypes() => new [] {
+		public static IEnumerable<Type> GetOperationProcessorTypes() => new[] {
 			typeof(EnsureRowVisibleIfSelected),
 			typeof(EnsureCurrentColumnVisibleIfContainerChanged),
 			typeof(ColumnCountUpdater),
@@ -110,9 +102,6 @@ namespace Tangerine.UI.Timeline
 			Grid = new GridPane(this);
 			CurveEditor = new CurveEditorPane(this);
 			Roll = new RollPane();
-			filesDropManager = new FilesDropManager(RootWidget);
-			filesDropManager.Handling += FilesDropOnHandling;
-			filesDropManager.AddFilesDropHandlers(FilesDropHandlers.Select(f => f()));
 			CreateProcessors();
 			InitializeWidgets();
 			WaveformCache = new WaveformCache(Project.Current.FileSystemWatcher);
@@ -125,8 +114,17 @@ namespace Tangerine.UI.Timeline
 					offset.Offset = value;
 				}
 			});
-			RootWidget.Gestures.Add(new DropGesture(filesDropManager.Handle));
+			RootWidget.Gestures.Add(DropFilesGesture = new DropFilesGesture());
+			CreateFilesDropHandlers();
 		}
+
+		private void CreateFilesDropHandlers()
+		{
+			DropFilesGesture.Recognized += new ImagesDropHandler().Handle;
+			DropFilesGesture.Recognized += new AudiosDropHandler().Handle;
+			DropFilesGesture.Recognized += new ScenesDropHandler().Handle;
+		}
+
 
 		public void Attach()
 		{
