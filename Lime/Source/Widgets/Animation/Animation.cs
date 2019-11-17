@@ -133,7 +133,7 @@ namespace Lime
 		{
 			if (OwnerNode != null) {
 				foreach (var node in OwnerNode.Nodes) {
-					FindAnimators(OwnerNode, animators);
+					FindAnimators(node, animators);
 				}
 			}
 		}
