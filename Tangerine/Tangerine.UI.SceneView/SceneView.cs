@@ -48,14 +48,6 @@ namespace Tangerine.UI.SceneView
 			ConnectCommand(SceneViewCommands.ResolutionChanger, new ResolutionChangerHandler());
 			ConnectCommand(SceneViewCommands.ResolutionReverceChanger, new ResolutionChangerHandler(isReverse: true));
 			ConnectCommand(SceneViewCommands.ResolutionOrientation, new ResolutionOrientationHandler());
-			ConnectCommand(SceneViewCommands.DragUp, () => DragNodes(new Vector2(0, -1)));
-			ConnectCommand(SceneViewCommands.DragDown, () => DragNodes(new Vector2(0, 1)));
-			ConnectCommand(SceneViewCommands.DragLeft, () => DragNodes(new Vector2(-1, 0)));
-			ConnectCommand(SceneViewCommands.DragRight, () => DragNodes(new Vector2(1, 0)));
-			ConnectCommand(SceneViewCommands.DragUpFast, () => DragNodes(new Vector2(0, -5)));
-			ConnectCommand(SceneViewCommands.DragDownFast, () => DragNodes(new Vector2(0, 5)));
-			ConnectCommand(SceneViewCommands.DragLeftFast, () => DragNodes(new Vector2(-5, 0)));
-			ConnectCommand(SceneViewCommands.DragRightFast, () => DragNodes(new Vector2(5, 0)));
 			ConnectCommand(SceneViewCommands.Duplicate, DuplicateNodes,
 				() => Document.Current?.TopLevelSelectedRows().Any(row => row.IsCopyPasteAllowed()) ?? false);
 			ConnectCommand(SceneViewCommands.TieWidgetsWithBones, TieWidgetsWithBones);
@@ -100,39 +92,6 @@ namespace Tangerine.UI.SceneView
 			var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>();
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 			Core.Operations.UntieWidgetsFromBones.Perform(bones, widgets);
-		}
-
-		static void DragNodes(Vector2 delta)
-		{
-			DragWidgets(delta);
-			DragNodes3D(delta);
-			DragSplinePoints3D(delta);
-		}
-
-		static void DragWidgets(Vector2 delta)
-		{
-			var containerWidget = Document.Current.Container as Widget;
-			if (containerWidget != null) {
-				var transform = containerWidget.CalcTransitionToSpaceOf(Instance.Scene).CalcInversed();
-				var dragDelta = transform * delta - transform * Vector2.Zero;
-				foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
-					Core.Operations.SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta, CoreUserPreferences.Instance.AutoKeyframes);
-				}
-			}
-		}
-
-		static void DragNodes3D(Vector2 delta)
-		{
-			foreach (var node3D in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
-				Core.Operations.SetAnimableProperty.Perform(node3D, nameof(Widget.Position), node3D.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
-			}
-		}
-
-		static void DragSplinePoints3D(Vector2 delta)
-		{
-			foreach (var point in Document.Current.SelectedNodes().Editable().OfType<SplinePoint3D>()) {
-				Core.Operations.SetAnimableProperty.Perform(point, nameof(Widget.Position), point.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
-			}
 		}
 
 		public SceneView(Widget panelWidget)

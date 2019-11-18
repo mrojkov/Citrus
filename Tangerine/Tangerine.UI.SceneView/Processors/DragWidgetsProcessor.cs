@@ -1,7 +1,9 @@
-using System.Linq;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 using Tangerine.UI.SceneView.WidgetTransforms;
 
 namespace Tangerine.UI.SceneView
@@ -20,6 +22,13 @@ namespace Tangerine.UI.SceneView
 		private static SceneView SceneView => SceneView.Instance;
 		private static ProjectUserPreferences Preferences => ProjectUserPreferences.Instance;
 
+		private static readonly (Key Key, IntVector2 Direction)[] dragKeys = new[] {
+			(Key.W, new IntVector2(0, -1)),
+			(Key.A, new IntVector2(-1, 0)),
+			(Key.S, new IntVector2(0, 1)),
+			(Key.D, new IntVector2(1, 0)),
+		};
+
 		public IEnumerator<object> Task()
 		{
 			while (true) {
@@ -31,14 +40,69 @@ namespace Tangerine.UI.SceneView
 				if (Utils.CalcHullAndPivot(widgets, SceneView.Scene, out _, out var pivot) && SceneView.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (SceneView.Input.ConsumeKeyPress(Key.Mouse0)) {
-						yield return Drag();
+						yield return DragByMouse();
 					}
+				}
+				if (dragKeys.Any(i => SceneView.Input.WasKeyPressed(i.Key))) {
+					yield return DragByKeys();
 				}
 				yield return null;
 			}
 		}
 
-		private static IEnumerator<object> Drag()
+		private static IEnumerator<object> DragByKeys()
+		{
+			var offset = Vector2.Zero;
+			using (Document.Current.History.BeginTransaction()) {
+				while (dragKeys.Any(i => SceneView.Input.IsKeyPressed(i.Key))) {
+					Document.Current.History.RollbackTransaction();
+					var isAccelerated = SceneView.Input.IsKeyPressed(Key.Shift) ? 5 : 1;
+					foreach (var (key, direction) in dragKeys) {
+						if (SceneView.Input.WasKeyRepeated(key)) {
+							offset.X += direction.X * isAccelerated;
+							offset.Y += direction.Y * isAccelerated;
+						}
+						DragNodes(offset);
+					}
+					yield return null;
+				}
+				Document.Current.History.CommitTransaction();
+			}
+		}
+
+		private static void DragNodes(Vector2 delta)
+		{
+			DragWidgets(delta);
+			DragNodes3D(delta);
+			DragSplinePoints3D(delta);
+		}
+
+		private static void DragWidgets(Vector2 delta)
+		{
+			if (Document.Current.Container is Widget containerWidget) {
+				var transform = containerWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene).CalcInversed();
+				var dragDelta = transform * delta - transform * Vector2.Zero;
+				foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
+					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta, CoreUserPreferences.Instance.AutoKeyframes);
+				}
+			}
+		}
+
+		private static void DragNodes3D(Vector2 delta)
+		{
+			foreach (var node3D in Document.Current.SelectedNodes().Editable().OfType<Node3D>()) {
+				SetAnimableProperty.Perform(node3D, nameof(Widget.Position), node3D.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
+			}
+		}
+
+		static void DragSplinePoints3D(Vector2 delta)
+		{
+			foreach (var point in Document.Current.SelectedNodes().Editable().OfType<SplinePoint3D>()) {
+				SetAnimableProperty.Perform(point, nameof(Widget.Position), point.Position + (Vector3)delta / 100, CoreUserPreferences.Instance.AutoKeyframes);
+			}
+		}
+
+		private static IEnumerator<object> DragByMouse()
 		{
 			var initialMousePos = SceneView.MousePosition;
 			while (
