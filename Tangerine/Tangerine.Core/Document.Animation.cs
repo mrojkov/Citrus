@@ -45,11 +45,8 @@ namespace Tangerine.Core
 				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
-					foreach (var (animationPath, time) in savedAnimationsTimes) {
-						animationPath.GetAnimation(Document.Current.RootNode).Time =
-							CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
-					}
 					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
+					Container.Components.Add(new RestoreAnimationsTimesComponent(savedAnimationsTimes));
 				}
 				AudioSystem.StopAll();
 				CurrentFrameSetter.CacheAnimationsStates = true;
@@ -84,6 +81,26 @@ namespace Tangerine.Core
 		public void ForceAnimationUpdate()
 		{
 			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
+		}
+
+		[UpdateStage(typeof(PostLateUpdateStage))]
+		private class RestoreAnimationsTimesComponent : BehaviorComponent
+		{
+			private readonly List<(AnimationPath, double)> savedAnimationsTimes;
+
+			public RestoreAnimationsTimesComponent(List<(AnimationPath, double)> savedAnimationsTimes)
+			{
+				this.savedAnimationsTimes = savedAnimationsTimes;
+			}
+
+			protected override void Update(float delta)
+			{
+				foreach (var (animationPath, time) in savedAnimationsTimes) {
+					animationPath.GetAnimation(Document.Current.RootNode).Time =
+						CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
+				}
+				Owner.Components.Remove(this);
+			}
 		}
 
 		private void SaveAnimationsTimes()
