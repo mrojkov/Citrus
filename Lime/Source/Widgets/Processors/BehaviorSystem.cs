@@ -10,10 +10,17 @@ namespace Lime
 		private Dictionary<Type, BehaviorUpdateFamily> updateFamilies = new Dictionary<Type, BehaviorUpdateFamily>();
 		private LinkedList<BehaviorComponent> behaviorsToStart = new LinkedList<BehaviorComponent>();
 
+		public readonly bool DebugMode;
+
+		public BehaviorSystem(bool debugMode = false)
+		{
+			DebugMode = debugMode;
+		}
+
 		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
 			if (!updateStages.TryGetValue(stageType, out var stage)) {
-				stage = new BehaviorUpdateStage(stageType);
+				stage = new BehaviorUpdateStage(this, stageType);
 				updateStages.Add(stageType, stage);
 			}
 			return stage;
@@ -91,11 +98,14 @@ namespace Lime
 		private List<List<int>> afterFamilyIndices = new List<List<int>>();
 		private List<BehaviorUpdateFamily> sortedFamilies = new List<BehaviorUpdateFamily>();
 		private bool shouldSortFamilies;
+		private Random shuffleRandom;
 
+		public readonly BehaviorSystem BehaviorSystem;
 		public readonly Type StageType;
 
-		internal BehaviorUpdateStage(Type stageType)
+		internal BehaviorUpdateStage(BehaviorSystem behaviorSystem, Type stageType)
 		{
+			BehaviorSystem = behaviorSystem;
 			StageType = stageType;
 		}
 
@@ -125,6 +135,14 @@ namespace Lime
 			if (shouldSortFamilies) {
 				SortFamilies();
 				shouldSortFamilies = false;
+			}
+			if (BehaviorSystem.DebugMode) {
+				if (shuffleRandom == null) {
+					shuffleRandom = new Random();
+				}
+				foreach (var f in sortedFamilies) {
+					f.Shuffle(shuffleRandom, 10);
+				}
 			}
 			foreach (var f in sortedFamilies) {
 				f.Update(delta);
@@ -196,6 +214,28 @@ namespace Lime
 			if (b.IndexInUpdateFamily >= 0) {
 				behaviors[b.IndexInUpdateFamily] = null;
 				b.IndexInUpdateFamily = -1;
+			}
+		}
+
+		private int shuffleFirst;
+
+		internal void Shuffle(Random rnd, int maxIterationCount)
+		{
+			for (var i = 0; i < behaviors.Count && maxIterationCount > 0; i++, maxIterationCount--) {
+				shuffleFirst++;
+				shuffleFirst %= behaviors.Count;
+				if (behaviors[shuffleFirst] == null) {
+					continue;
+				}
+				var shuffleNext = shuffleFirst + (rnd.Next() % (behaviors.Count - shuffleFirst));
+				if (behaviors[shuffleNext] == null) {
+					continue;
+				}
+				var tmp = behaviors[shuffleFirst];
+				behaviors[shuffleFirst] = behaviors[shuffleNext];
+				behaviors[shuffleFirst].IndexInUpdateFamily = shuffleFirst;
+				behaviors[shuffleNext] = tmp;
+				behaviors[shuffleNext].IndexInUpdateFamily = shuffleNext;
 			}
 		}
 

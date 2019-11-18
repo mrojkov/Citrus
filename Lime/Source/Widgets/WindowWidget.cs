@@ -38,8 +38,14 @@ namespace Lime
 
 		private static NodeManager CreateManager(LayoutManager layoutManager, WidgetContext widgetContext)
 		{
+#if DEBUG
+			var debugMode = true;
+#else
+			var debugMode = false;
+#endif
+
 			var services = new ServiceRegistry();
-			services.Add(new BehaviorSystem());
+			services.Add(new BehaviorSystem(debugMode));
 			services.Add(layoutManager);
 			services.Add(widgetContext);
 
