@@ -85,13 +85,14 @@ namespace Lime
 
 			// Assign NodeCapturedByMouse if any mouse button was pressed.
 			var anyCaptureKeyPressed = IsAnyCaptureKeyPressed();
-			if (!prevAnyCaptureKeyPressed && anyCaptureKeyPressed) {
+			if (!prevAnyCaptureKeyPressed && anyCaptureKeyPressed || Window.Input.DroppedFiles.Count > 0) {
 				context.NodeCapturedByMouse = context.NodeUnderMouse;
-			}
-			// Set NodeCapturedByMouse to null if all mouse buttons were released.
-			if (prevAnyCaptureKeyPressed && !anyCaptureKeyPressed) {
+			} else if (!anyCaptureKeyPressed) {
+				// Set NodeCapturedByMouse to null if all mouse buttons are released.
 				context.NodeCapturedByMouse = null;
 			}
+
+			
 			prevAnyCaptureKeyPressed = anyCaptureKeyPressed;
 
 			// Update the widget hierarchy.

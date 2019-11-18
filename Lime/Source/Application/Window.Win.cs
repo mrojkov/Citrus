@@ -38,6 +38,7 @@ namespace Lime
 		private Point lastMousePosition;
 		private bool isInvalidated;
 		private bool vSync;
+		private bool shouldCleanDroppedFiles;
 
 		public WindowInput Input { get; private set; }
 
@@ -852,6 +853,12 @@ namespace Lime
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
 				renderControl.Invalidate();
 			}
+			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
+				if (shouldCleanDroppedFiles) {
+					Input.DroppedFiles.Clear();
+				}
+				shouldCleanDroppedFiles = !shouldCleanDroppedFiles;
+			}
 			renderingState = renderControl.CanRender ? RenderingState.Updated : RenderingState.Rendered;
 			WaitForRendering();
 			if (renderControl.CanRender) {
@@ -1124,13 +1131,7 @@ namespace Lime
 			using (Context.Activate().Scoped()) {
 				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
-				Application.Input.SetDropData(files);
-				// Drag prevents key\mouse events from firing
-				// so we have to manually assign NodeCapturedByMouse and call Update
-				// in order to let gestures handle files drop.
-				WidgetContext.Current.NodeCapturedByMouse = WidgetContext.Current.NodeUnderMouse;
-				Update();
-				WidgetContext.Current.NodeCapturedByMouse = null;
+				Input.DroppedFiles.AddRange(files);
 			}
 		}
 
