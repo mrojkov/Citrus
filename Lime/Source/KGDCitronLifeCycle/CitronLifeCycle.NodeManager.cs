@@ -5,6 +5,11 @@ namespace Lime.KGDCitronLifeCycle
 {
 	public static partial class CitronLifeCycle
 	{
+		/// <summary>
+		/// Identifier for post-post-late update stage.
+		/// </summary>
+		public class PostPostLateUpdateStage { }
+
 		public enum NodeManagerPhase
 		{
 			None = 0,
@@ -30,6 +35,7 @@ namespace Lime.KGDCitronLifeCycle
 			PendingLateUpdate,
 			PostLateUpdate,
 			PendingPostLateUpdate,
+			PendingPostPostLateUpdate,
 		}
 
 		private static NodeManager CreateNodeManager(LayoutManager layoutManager, WidgetContext widgetContext)
@@ -72,6 +78,8 @@ namespace Lime.KGDCitronLifeCycle
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingLateUpdate));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostLateUpdate));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostPostLateUpdateStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostPostLateUpdate));
 			return manager;
 		}
 

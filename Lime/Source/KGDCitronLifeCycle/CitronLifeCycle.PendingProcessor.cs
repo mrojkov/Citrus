@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Lime.KGDCitronLifeCycle {
 	public static partial class CitronLifeCycle
 	{
@@ -109,6 +107,10 @@ namespace Lime.KGDCitronLifeCycle {
 				}
 
 				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPostLateUpdate)) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPostPostLateUpdate)) {
 					goto Repeat;
 				}
 
