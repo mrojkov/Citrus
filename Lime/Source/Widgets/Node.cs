@@ -1678,7 +1678,7 @@ namespace Lime
 	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
 	public class BoneArrayUpdaterBehavior : BehaviorComponent
 	{
-		private bool attached;
+		private bool active = true;
 		private List<Bone> bones = new List<Bone>();
 		private bool needResort = false;
 
@@ -1700,17 +1700,6 @@ namespace Lime
 			CheckActivity();
 		}
 
-		protected internal override void Start()
-		{
-			attached = true;
-			CheckActivity();
-		}
-
-		protected internal override void Stop(Node owner)
-		{
-			attached = false;
-		}
-
 		protected internal override void Update(float delta)
 		{
 			if (needResort) {
@@ -1724,8 +1713,10 @@ namespace Lime
 
 		private void CheckActivity()
 		{
-			if (attached) {
-				if (bones.Count > 0) {
+			var activeNow = bones.Count > 0;
+			if (active != activeNow) {
+				active = activeNow;
+				if (active) {
 					Resume();
 				} else {
 					Suspend();

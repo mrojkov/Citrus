@@ -178,7 +178,6 @@ namespace Lime
 
 	public abstract class LegacyBehaviorContainer : BehaviorComponent
 	{
-		private bool attached;
 		private List<NodeBehavior> behaviors = new List<NodeBehavior>();
 
 		public bool IsEmpty => behaviors.Count == 0;
@@ -204,13 +203,7 @@ namespace Lime
 
 		protected internal override void Start()
 		{
-			attached = true;
 			CheckActivity();
-		}
-
-		protected internal override void Stop(Node owner)
-		{
-			attached = false;
 		}
 
 		protected internal override void OnOwnerFrozenChanged()
@@ -218,13 +211,17 @@ namespace Lime
 			CheckActivity();
 		}
 
+		private bool active = true;
+
 		private void CheckActivity()
 		{
-			if (attached) {
-				if ((Owner.Parent?.GloballyFrozen ?? false) || behaviors.Count == 0) {
-					Suspend();
-				} else {
+			var activeNow = !(Owner?.Parent?.GloballyFrozen ?? false) && behaviors.Count > 0;
+			if (active != activeNow) {
+				active = activeNow;
+				if (active) {
 					Resume();
+				} else {
+					Suspend();
 				}
 			}
 		}

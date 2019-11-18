@@ -8,6 +8,8 @@ namespace Lime
 	/// </summary>
 	public class BehaviorComponent : NodeComponent
 	{
+		private int suspendCounter;
+
 		internal LinkedListNode<BehaviorComponent> StartQueueNode;
 		internal BehaviorUpdateFamily UpdateFamily;
 		internal int IndexInUpdateFamily = -1;
@@ -15,7 +17,7 @@ namespace Lime
 		/// <summary>
 		/// Determines if behavior is suspended.
 		/// </summary>
-		protected internal bool Suspended { get; private set; }
+		public bool Suspended => suspendCounter > 0;
 
 		/// <summary>
 		/// Start is called on the frame in which the component had added just before Update method is called first time.
@@ -43,23 +45,29 @@ namespace Lime
 		/// <summary>
 		/// Stops the Update calls.
 		/// </summary>
-		public void Suspend()
+		public bool Suspend()
 		{
-			if (!Suspended) {
-				Suspended = true;
-				UpdateFamily.Filter(this);
+			suspendCounter++;
+			if (suspendCounter == 1) {
+				UpdateFamily?.Filter(this);
+				return true;
 			}
+			return false;
 		}
 
 		/// <summary>
 		/// Resumes the Update calls.
 		/// </summary>
-		public void Resume()
+		public bool Resume()
 		{
-			if (Suspended) {
-				Suspended = false;
-				UpdateFamily.Filter(this);
+			if (suspendCounter > 0) {
+				suspendCounter--;
+				if (suspendCounter == 0) {
+					UpdateFamily?.Filter(this);
+					return true;
+				}
 			}
+			return false;
 		}
 	}
 
