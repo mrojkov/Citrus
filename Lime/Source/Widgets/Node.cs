@@ -1519,7 +1519,7 @@ namespace Lime
 		public static void Update(this Node node, float delta)
 		{
 			var boneBehavior = node.Components.Get<BoneBehavior>();
-			if (boneBehavior != null) {
+			if (boneBehavior != null && boneBehavior.Owner.Parent != null) {
 				boneBehavior.Register();
 			}
 			RegisterLegacyBehaviors(node);
