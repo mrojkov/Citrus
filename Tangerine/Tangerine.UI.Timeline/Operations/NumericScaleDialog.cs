@@ -60,9 +60,7 @@ namespace Tangerine.UI.Timeline
 					window.Close();
 					return;
 				}
-				Document.Current.History.DoTransaction(() => {
-					ScaleKeyframes();
-				});
+				Document.Current.History.DoTransaction(ScaleKeyframes);
 				window.Close();
 			};
 			cancelButton.SetFocus();
@@ -71,7 +69,7 @@ namespace Tangerine.UI.Timeline
 
 		private void ScaleKeyframes()
 		{
-			if (GridSelection.GetSelectionBoundaries(out var boundaries) && Scale < Mathf.ZeroTolerance) {
+			if (GridSelection.GetSelectionBoundaries(out var boundaries) && Scale > Mathf.ZeroTolerance) {
 				var saved = new List<IKeyframe>();
 				for (int i = boundaries.Top; i <= boundaries.Bottom; ++i) {
 					if (!(Document.Current.Rows[i].Components.Get<NodeRow>()?.Node is IAnimationHost animable)) {
