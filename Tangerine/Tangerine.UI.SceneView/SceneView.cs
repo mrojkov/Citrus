@@ -26,7 +26,7 @@ namespace Tangerine.UI.SceneView
 		public static readonly RulersWidget RulersWidget = new RulersWidget();
 		public static readonly ZoomWidget ZoomWidget = new ZoomWidget();
 		public static readonly ToolbarButton ShowNodeDecorationsPanelButton = new ToolbarButton {
-			Tip = "Node decorations",
+			Tooltip = "Node decorations",
 			Texture = IconPool.GetTexture("SceneView.ShowPanel"),
 			MinMaxSize = new Vector2(24),
 			LayoutCell = new LayoutCell(new Alignment { X = HAlignment.Left, Y = VAlignment.Bottom } )

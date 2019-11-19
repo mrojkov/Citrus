@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateAnimationModeButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tooltip = "Animation mode" };
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
@@ -54,7 +54,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateCurveEditorButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Curve")) { Tip = "Edit curves" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Curve")) { Tooltip = "Edit curves" };
 			button.AddChangeWatcher(() => UserPreferences.EditCurves, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.EditCurves = !UserPreferences.EditCurves;
 			button.Components.Add(new DocumentationComponent("EditCurves"));
@@ -78,7 +78,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateAutoKeyframesButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tooltip = "Automatic keyframes" };
 			button.AddChangeWatcher(() => CoreUserPreferences.AutoKeyframes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AutoKeyframes = !CoreUserPreferences.AutoKeyframes;
 			button.Components.Add(new DocumentationComponent("AutomaticKeyframes"));
@@ -88,7 +88,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateFolderButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tip = "Create folder" };
+			var button = new ToolbarButton(IconPool.GetTexture("Tools.NewFolder")) { Tooltip = "Create folder" };
 			button.AddTransactionClickHandler(() => {
 				var folder = new Folder { Id = "Folder" };
 				Core.Operations.InsertFolderItem.Perform(folder);
@@ -102,7 +102,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateExitButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tip = "Exit current container (backspace)" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tooltip = "Exit current container (backspace)" };
 			button.AddTransactionClickHandler(Core.Operations.LeaveNode.Perform);
 			button.Updating += _ => button.Enabled = Core.Operations.LeaveNode.IsAllowed();
 			button.Components.Add(new DocumentationComponent("ExitContainer"));
@@ -112,7 +112,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateEyeButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) { Tip = "Show widgets" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) { Tooltip = "Show widgets" };
 			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var visibility = NodeVisibility.Hidden;
@@ -132,7 +132,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateLockButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) { Tip = "Lock widgets" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) { Tooltip = "Lock widgets" };
 			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var locked = nodes.All(i => !i.EditorState().Locked);
@@ -147,7 +147,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateLockAnimationButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationEnabled")) { Tip = "Lock animation" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationEnabled")) { Tooltip = "Lock animation" };
 			button.AddTransactionClickHandler(() => {
 				var nodes = !RootWidget.Input.IsKeyPressed(Key.Shift) ? Document.Current.Container.Nodes.ToList() : Document.Current.SelectedNodes().ToList();
 				var enable = !nodes.All(IsAnimationEnabled);
@@ -164,7 +164,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateApplyZeroPoseButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ApplyZeroPose")) { Tip = "Apply zero pose" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ApplyZeroPose")) { Tooltip = "Apply zero pose" };
 			button.AddTransactionClickHandler(() => {
 				Core.Operations.SetProperty.Perform(Document.Current.Animation, nameof(Animation.ApplyZeroPose), !Document.Current.Animation.ApplyZeroPose);
 			});
@@ -176,7 +176,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateAnimationStretchButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationStretch")) { Tip = "Animation stretch mode" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationStretch")) { Tooltip = "Animation stretch mode" };
 			button.AddChangeWatcher(() => UserPreferences.AnimationStretchMode, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.AnimationStretchMode = !UserPreferences.AnimationStretchMode;
 			button.Components.Add(new DocumentationComponent("AnimationStretch.md"));
@@ -186,7 +186,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateSlowMotionButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.SlowMotionMode")) { Tip = "Slow motion mode (~)" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.SlowMotionMode")) { Tooltip = "Slow motion mode (~)" };
 			button.AddChangeWatcher(() => UserPreferences.SlowMotionMode, i => button.Checked = i);
 			button.Clicked += () => UserPreferences.SlowMotionMode = !UserPreferences.SlowMotionMode;
 			button.Components.Add(new DocumentationComponent("SlowMotionMode.md"));
@@ -195,7 +195,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateFrameProgressionButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.FrameProgression")) { Tip = "Frame progression mode" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.FrameProgression")) { Tooltip = "Frame progression mode" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ShowFrameProgression, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ShowFrameProgression = !CoreUserPreferences.ShowFrameProgression;
 			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
@@ -204,7 +204,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateTimelineCursorLockButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tip = "Lock timeline cursor" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tooltip = "Lock timeline cursor" };
 			button.AddChangeWatcher(() => CoreUserPreferences.LockTimelineCursor, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.LockTimelineCursor = !CoreUserPreferences.LockTimelineCursor;
 			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
@@ -213,7 +213,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateResetAnimationsTimes()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tip = "Reset Animations Times" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tooltip = "Reset Animations Times" };
 			button.AddChangeWatcher(() => CoreUserPreferences.ResetAnimationsTimes, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.ResetAnimationsTimes = !CoreUserPreferences.ResetAnimationsTimes;
 			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);

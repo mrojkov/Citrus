@@ -46,6 +46,8 @@ namespace Lime
 				if (value) {
 					View.Run(60, false);
 					window.MakeKeyAndOrderFront(window);
+				} else {
+					window.OrderOut(window);
 				}
 			}
 		}

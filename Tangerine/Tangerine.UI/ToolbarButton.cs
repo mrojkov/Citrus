@@ -72,7 +72,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		public string Tip { get; set; }
+		public string Tooltip { get; set; }
 
 		public ToolbarButton()
 		{
@@ -117,7 +117,7 @@ namespace Tangerine.UI
 		private static void Awake(Node owner)
 		{
 			var tb = (ToolbarButton)owner;
-			tb.Tasks.Add(UI.Tip.ShowTipOnMouseOverTask(tb, () => tb.Tip));
+			tb.Tasks.Add(Lime.Tooltip.Instance.ShowOnMouseOverTask(tb, () => tb.Tooltip));
 			tb.AddChangeWatcher(() => tb.Enabled, _ => Window.Current.Invalidate());
 		}
 
