@@ -55,7 +55,37 @@ namespace Tangerine.Common.FilesDropHandlers
 						() => CreateImageTypeInstance(imageType, files)));
 				}
 			}
+			menu.Add(new Command("Create sprite animated Image", () => CreateSpriteAnimatedImage(files)));
 			menu.Popup();
+		}
+
+		private void CreateSpriteAnimatedImage(List<string> files)
+		{
+			onBeforeDrop?.Invoke();
+			using (Document.Current.History.BeginTransaction()) {
+				var node = CreateNode.Perform(typeof(Image));
+				SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+				SetProperty.Perform(node, nameof(Widget.Id), "Temp");
+				postProcessNode?.Invoke(node);
+				var i = 0;
+				ITexture first = null;
+				foreach (var file in files) {
+					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
+						continue;
+					}
+					var text = new SerializableTexture(assetPath);
+					first = first ?? text;
+					SetKeyframe.Perform(node, nameof(Widget.Texture), Document.Current.AnimationId,
+						new Keyframe<ITexture> {
+							Value = text,
+							Frame = i++,
+							Function = KeyFunction.Steep,
+					});
+				}
+				SetProperty.Perform(node, nameof(Widget.Size), (Vector2)first.ImageSize);
+				Document.Current.History.CommitTransaction();
+			}
+
 		}
 
 		private void CreateImageTypeInstance(Type type, IEnumerable<string> files)
