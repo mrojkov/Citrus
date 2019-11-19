@@ -20,7 +20,7 @@ namespace Lime
 			ro.SourceTextureBuffer.Texture.SetAsRenderTarget();
 			try {
 				Renderer.Viewport = new Viewport(0, 0, ro.ViewportSize.Width, ro.ViewportSize.Height);
-				Renderer.Clear(Color4.Zero);
+				Renderer.Clear(ro.TextureClearingColor);
 				Renderer.Transform2 = ro.LocalToWorldTransform.CalcInversed();
 				ro.Objects.Render();
 			} finally {

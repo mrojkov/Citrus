@@ -20,8 +20,7 @@ namespace Lime
 			ro.FXAAMaterial.MulReduce = ro.FXAAMulReduce;
 			ro.FXAAMaterial.MinReduce = ro.FXAAMinReduce;
 			ro.FXAAMaterial.MaxSpan = ro.FXAAMaxSpan;
-			ro.FXAAMaterial.Opaque = ro.OpagueRendering;
-			ro.RenderToTexture(ro.FXAABuffer.Texture, ro.ProcessedTexture, ro.FXAAMaterial, Color4.White, Color4.Zero);
+			ro.RenderToTexture(ro.FXAABuffer.Texture, ro.ProcessedTexture, ro.FXAAMaterial, Color4.White, ro.TextureClearingColor);
 			ro.CurrentBufferSize = (Vector2)ro.FXAABuffer.Size;
 			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 
@@ -36,7 +35,7 @@ namespace Lime
 			private float mulReduce;
 			private float minReduce;
 			private float maxSpan;
-			private bool opaque;
+			private Color4 textureClearingColor;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -46,7 +45,7 @@ namespace Lime
 				mulReduce == ro.FXAAMulReduce &&
 				minReduce == ro.FXAAMinReduce &&
 				maxSpan == ro.FXAAMaxSpan &&
-				opaque == ro.OpagueRendering;
+				textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -55,7 +54,7 @@ namespace Lime
 				mulReduce = ro.FXAAMulReduce;
 				minReduce = ro.FXAAMinReduce;
 				maxSpan = ro.FXAAMaxSpan;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 	}

@@ -18,8 +18,7 @@ namespace Lime
 			ro.SharpenMaterial.Strength = ro.SharpenStrength;
 			ro.SharpenMaterial.Limit = ro.SharpenLimit;
 			ro.SharpenMaterial.Step = ro.SharpenStep * (ro.ProcessedUV1 / ro.CurrentBufferSize);
-			ro.SharpenMaterial.Opaque = ro.OpagueRendering;
-			ro.RenderToTexture(ro.SharpenBuffer.Texture, ro.ProcessedTexture, ro.SharpenMaterial, Color4.White, Color4.Zero);
+			ro.RenderToTexture(ro.SharpenBuffer.Texture, ro.ProcessedTexture, ro.SharpenMaterial, Color4.White, ro.TextureClearingColor);
 			ro.CurrentBufferSize = (Vector2)ro.SharpenBuffer.Size;
 			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 
@@ -32,7 +31,7 @@ namespace Lime
 		{
 			private float strength;
 			private float limit;
-			private bool opaque;
+			private Color4 textureClearingColor;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -40,14 +39,14 @@ namespace Lime
 				!IsDirty &&
 				strength == ro.SharpenStrength &&
 				limit == ro.SharpenLimit &&
-				opaque == ro.OpagueRendering;
+				textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
 				IsDirty = false;
 				strength = ro.SharpenStrength;
 				limit = ro.SharpenLimit;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 	}
