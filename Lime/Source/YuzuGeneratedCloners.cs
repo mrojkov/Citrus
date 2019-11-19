@@ -3122,6 +3122,7 @@ namespace YuzuGenerated
 			result.SharpenLimit = s.SharpenLimit;
 			result.SharpenStep = s.SharpenStep;
 			result.SharpenStrength = s.SharpenStrength;
+			result.TextureClearingColor = s.TextureClearingColor;
 			result.TextureSizeLimit = s.TextureSizeLimit;
 			result.VignetteColor = s.VignetteColor;
 			result.VignetteEnabled = s.VignetteEnabled;
