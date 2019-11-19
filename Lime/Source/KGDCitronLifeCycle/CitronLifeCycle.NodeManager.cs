@@ -35,6 +35,7 @@ namespace Lime.KGDCitronLifeCycle
 			PendingLateUpdate,
 			PostLateUpdate,
 			PendingPostLateUpdate,
+			PostPostLateUpdate,
 			PendingPostPostLateUpdate,
 		}
 
@@ -99,6 +100,9 @@ namespace Lime.KGDCitronLifeCycle
 			}
 			if (updateStageType == typeof(PostLateUpdateStage)) {
 				return NodeManagerPhase.PostLateUpdate;
+			}
+			if (updateStageType == typeof(PostPostLateUpdateStage)) {
+				return NodeManagerPhase.PostPostLateUpdate;
 			}
 			return NodeManagerPhase.None;
 		}
