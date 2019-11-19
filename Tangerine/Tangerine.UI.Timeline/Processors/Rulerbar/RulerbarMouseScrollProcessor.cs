@@ -1,15 +1,16 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Operations;
 using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
 {
 	public class RulerbarMouseScrollProcessor : ITaskProvider
 	{
-		static Timeline timeline => Timeline.Instance;
+		private static Timeline timeline => Timeline.Instance;
 
 		public IEnumerator<object> Task()
 		{
@@ -18,11 +19,11 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					yield return null;
-					Operations.SetCurrentColumn.Processor.CacheAnimationsStates = true;
+					SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCurrentColumn = CalcColumn(rulerWidget.LocalMousePosition().X);
 						Document.Current.AnimationFrame = initialCurrentColumn;
-						Operations.SetCurrentColumn.Perform(initialCurrentColumn);
+						SetCurrentColumn.Perform(initialCurrentColumn);
 						int previousColumn = -1;
 						var marker = Document.Current.Animation.Markers.GetByFrame(initialCurrentColumn);
 						bool isShifting = false;
@@ -60,7 +61,7 @@ namespace Tangerine.UI.Timeline
 							}
 							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
 							Document.Current.AnimationFrame = initialCurrentColumn;
-							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
+							SetCurrentColumn.Perform(CalcColumn(mp));
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCurrentColumn;
 							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
 								Document.Current.ForceAnimationUpdate();
@@ -69,9 +70,9 @@ namespace Tangerine.UI.Timeline
 							Window.Current.Invalidate();
 							yield return null;
 						}
-						timeline.Ruler.MeasuredFrameDistance = 0;
-						Operations.SetCurrentColumn.Processor.CacheAnimationsStates = false;
 						Document.Current.History.CommitTransaction();
+						timeline.Ruler.MeasuredFrameDistance = 0;
+						SetCurrentColumn.Processor.CacheAnimationsStates = false;
 					}
 				}
 				yield return null;
@@ -82,30 +83,30 @@ namespace Tangerine.UI.Timeline
 		{
 			var delta = destColumn - timeline.CurrentColumn;
 			if (delta > 0) {
-				Core.Operations.TimelineHorizontalShift.Perform(timeline.CurrentColumn, delta);
+				TimelineHorizontalShift.Perform(timeline.CurrentColumn, delta);
 			} else if (delta < 0) {
 				foreach (var node in Document.Current.Container.Nodes) {
 					foreach (var animator in node.Animators.Where(i => i.AnimationId == Document.Current.AnimationId).ToList()) {
-						Core.Operations.RemoveKeyframeRange.Perform(animator, destColumn, timeline.CurrentColumn - 1);
+						RemoveKeyframeRange.Perform(animator, destColumn, timeline.CurrentColumn - 1);
 					}
 				}
 				foreach (var marker in Document.Current.Animation.Markers.Where(m => m.Frame >= destColumn && m.Frame < timeline.CurrentColumn).ToList()) {
-					Core.Operations.DeleteMarker.Perform(marker, removeDependencies: false);
+					DeleteMarker.Perform(marker, removeDependencies: false);
 				}
-				Core.Operations.TimelineHorizontalShift.Perform(destColumn, delta);
+				TimelineHorizontalShift.Perform(destColumn, delta);
 			}
 		}
 
 		void DragMarker(Marker marker, int destColumn)
 		{
-			if (Document.Current.Animation.Markers.Any(m => m.Frame == destColumn)) {
-				// The place is taken by another marker.
-				return;
+			var markerToRemove = Document.Current.Animation.Markers.FirstOrDefault(m => m.Frame == destColumn);
+			if (marker.Frame != destColumn && markerToRemove != null) {
+				DeleteMarker.Perform(markerToRemove, false);
 			}
 			// Delete and add marker again, because we want to maintain the markers order.
-			Core.Operations.DeleteMarker.Perform(marker, false);
-			Core.Operations.SetProperty.Perform(marker, "Frame", destColumn);
-			Core.Operations.SetMarker.Perform(marker, true);
+			DeleteMarker.Perform(marker, false);
+			SetProperty.Perform(marker, "Frame", destColumn);
+			SetMarker.Perform(marker, true);
 		}
 
 		public static int CalcColumn(float mouseX)
