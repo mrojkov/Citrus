@@ -40,14 +40,8 @@ namespace Lime.KGDCitronLifeCycle
 
 		private static NodeManager CreateNodeManager(LayoutManager layoutManager, WidgetContext widgetContext)
 		{
-#if DEBUG
-			var debugMode = true;
-#else
-			var debugMode = false;
-#endif
-
 			var services = new ServiceRegistry();
-			services.Add(new BehaviorSystem(debugMode));
+			services.Add(new BehaviorSystem());
 			services.Add(new AnimationSystem());
 			services.Add(new PendingSystem(Enum.GetValues(typeof(NodeManagerPhase)).Length));
 			services.Add(layoutManager);

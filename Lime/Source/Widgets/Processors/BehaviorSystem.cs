@@ -10,13 +10,6 @@ namespace Lime
 		private Dictionary<Type, BehaviorUpdateFamily> updateFamilies = new Dictionary<Type, BehaviorUpdateFamily>();
 		private LinkedList<BehaviorComponent> behaviorsToStart = new LinkedList<BehaviorComponent>();
 
-		public readonly bool DebugMode;
-
-		public BehaviorSystem(bool debugMode = false)
-		{
-			DebugMode = debugMode;
-		}
-
 		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
 			if (!updateStages.TryGetValue(stageType, out var stage)) {
@@ -135,11 +128,6 @@ namespace Lime
 				SortFamilies();
 				shouldSortFamilies = false;
 			}
-			if (BehaviorSystem.DebugMode) {
-				foreach (var f in sortedFamilies) {
-					f.ReverseOrder();
-				}
-			}
 			foreach (var f in sortedFamilies) {
 				f.Update(delta);
 			}
@@ -213,41 +201,40 @@ namespace Lime
 			}
 		}
 
-		internal void ReverseOrder()
-		{
-			var i = 0;
-			var j = behaviors.Count - 1;
-			while (i < j) {
-				var ib = behaviors[i];
-				if (ib != null) {
-					ib.IndexInUpdateFamily = j;
-				}
-				var jb = behaviors[j];
-				if (jb != null) {
-					jb.IndexInUpdateFamily = i;
-				}
-				behaviors[i] = jb;
-				behaviors[j] = ib;
-				i++;
-				j--;
-			}
-		}
+		private bool forward;
 
 		public void Update(float delta)
 		{
-			for (var i = behaviors.Count - 1; i >= 0; i--) {
-				var b = behaviors[i];
-				if (b != null) {
-					b.Update(delta * b.Owner.EffectiveAnimationSpeed);
-				} else {
-					b = behaviors[behaviors.Count - 1];
-					if (b != null) {
-						b.IndexInUpdateFamily = i;
+			if (forward) {
+				var count = behaviors.Count;
+				var i = 0;
+				while (count-- > 0) {
+					if (UpdateBehavior(i, delta)) {
+						i++;
 					}
-					behaviors[i] = b;
-					behaviors.RemoveAt(behaviors.Count - 1);
+				}
+			} else {
+				for (var i = behaviors.Count - 1; i >= 0; i--) {
+					UpdateBehavior(i, delta);
 				}
 			}
+			forward = !forward;
+		}
+
+		private bool UpdateBehavior(int index, float delta)
+		{
+			var b = behaviors[index];
+			if (b != null) {
+				b.Update(delta * b.Owner.EffectiveAnimationSpeed);
+				return true;
+			}
+			b = behaviors[behaviors.Count - 1];
+			if (b != null) {
+				b.IndexInUpdateFamily = index;
+			}
+			behaviors[index] = b;
+			behaviors.RemoveAt(behaviors.Count - 1);
+			return false;
 		}
 	}
 }
