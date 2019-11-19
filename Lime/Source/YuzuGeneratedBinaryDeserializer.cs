@@ -3232,7 +3232,7 @@ namespace YuzuGenerated
 				if (tmp1 >= 0) {
 					while (--tmp1 >= 0) {
 						var tmp2 = (global::Lime.FontChar)dg.ReadObject<global::Lime.FontChar>();
-						((global::System.Collections.Generic.ICollection<global::Lime.FontChar>)result.CharCollection).Add(tmp2);
+						result.CharCollection.Add(tmp2);
 					}
 				}
 				fd = def.Fields[d.Reader.ReadInt16()];
@@ -4085,18 +4085,8 @@ namespace YuzuGenerated
 		private static object Make_Lime__KerningPair(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::Lime.KerningPair();
-			var dg = (LimeDeserializer)d;
-			ReaderClassDef.FieldDef fd;
-			fd = def.Fields[d.Reader.ReadInt16()];
-			if (1 == fd.OurIndex) {
-				result.Char = d.Reader.ReadChar();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (2 == fd.OurIndex) {
-				result.Kerning = d.Reader.ReadSingle();
-				fd = def.Fields[d.Reader.ReadInt16()];
-			}
-			if (fd.OurIndex != ReaderClassDef.EOF) throw dg.Error("Unfinished object");
+			result.Char = d.Reader.ReadChar();
+			result.Kerning = d.Reader.ReadSingle();
 			return result;
 		}
 
