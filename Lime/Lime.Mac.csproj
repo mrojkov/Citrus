@@ -132,6 +132,8 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
