@@ -514,6 +514,8 @@ namespace Lime
 				Input.CopyKeysState();
 				Input.TextInput = null;
 			}
+			// We give one update cycle to handle files drop
+			// (files dropped event may be fired inside update)
 			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
 				if (shouldCleanDroppedFiles) {
 					Input.DroppedFiles.Clear ();

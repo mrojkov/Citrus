@@ -9,20 +9,32 @@ using Tangerine.UI;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
+	/// <summary>
+	/// Handles scenes drop.
+	/// </summary>
 	public class ScenesDropHandler
 	{
 		private readonly string[] extensions = { ".tan", ".model" };
 		private readonly Action onBeforeDrop;
-		private readonly Action<Node> nodePostprocessor;
+		private readonly Action<Node> postProcessNode;
 
 		public bool ShouldCreateContextMenu { get; set; } = true;
 
-		public ScenesDropHandler(Action onBeforeDrop = null, Action<Node> nodePostprocessor = null)
+		/// <summary>
+		/// Constructs ScenesDropHandler.
+		/// </summary>
+		/// <param name="onBeforeDrop">Called before dropped files processing.</param>
+		/// <param name="postProcessNode">Called after node creation.</param>
+		public ScenesDropHandler(Action onBeforeDrop = null, Action<Node> postProcessNode = null)
 		{
 			this.onBeforeDrop = onBeforeDrop;
-			this.nodePostprocessor = nodePostprocessor;
+			this.postProcessNode = postProcessNode;
 		}
 
+		/// <summary>
+		/// Handles files drop.
+		/// </summary>
+		/// <param name="files">Dropped files.</param>
 		public void Handle(List<string> files)
 		{
 			onBeforeDrop?.Invoke();
@@ -46,7 +58,7 @@ namespace Tangerine.Common.FilesDropHandlers
 			}
 		}
 
-		public void CreateContextMenu(string assetPath, string assetType)
+		private void CreateContextMenu(string assetPath, string assetType)
 		{
 			var fileName = Path.GetFileNameWithoutExtension(assetPath);
 			var menu = new Menu {
@@ -63,7 +75,7 @@ namespace Tangerine.Common.FilesDropHandlers
 						SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
 						SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
 					}
-					nodePostprocessor?.Invoke(node);
+					postProcessNode?.Invoke(node);
 					node.LoadExternalScenes();
 				})),
 				new Command("Cancel")

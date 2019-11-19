@@ -9,8 +9,15 @@ using Tangerine.UI;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
+	/// <summary>
+	/// Handles audios drop.
+	/// </summary>
 	public class AudiosDropHandler
 	{
+		/// <summary>
+		/// Handles files drop.
+		/// </summary>
+		/// <param name="files">Dropped files.</param>
 		public void Handle(List<string> files)
 		{
 			using (Document.Current.History.BeginTransaction()) {

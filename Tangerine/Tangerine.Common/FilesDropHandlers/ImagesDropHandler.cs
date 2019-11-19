@@ -9,6 +9,9 @@ using Tangerine.UI;
 
 namespace Tangerine.Common.FilesDropHandlers
 {
+	/// <summary>
+	/// Handles images drop.
+	/// </summary>
 	public class ImagesDropHandler
 	{
 		private static readonly Type[] imageTypes = {
@@ -19,12 +22,21 @@ namespace Tangerine.Common.FilesDropHandlers
 		private readonly Action onBeforeDrop;
 		private readonly Action<Node> postProcessNode;
 
+		/// <summary>
+		/// Constructs ImagesDropHandler.
+		/// </summary>
+		/// <param name="onBeforeDrop">Called before dropped files processing.</param>
+		/// <param name="postProcessNode">Called after node creation.</param>
 		public ImagesDropHandler(Action onBeforeDrop = null, Action<Node> postProcessNode = null)
 		{
 			this.onBeforeDrop = onBeforeDrop;
 			this.postProcessNode = postProcessNode;
 		}
 
+		/// <summary>
+		/// Handles files drop.
+		/// </summary>
+		/// <param name="files">Dropped files.</param>
 		public void Handle(List<string> files)
 		{
 			var supportedFiles = files.Where(f => Path.GetExtension(f) == ".png" ).ToList();

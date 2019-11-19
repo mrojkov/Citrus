@@ -853,6 +853,8 @@ namespace Lime
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
 				renderControl.Invalidate();
 			}
+			// We give one update cycle to handle files drop
+			// (files dropped event may be fired inside update)
 			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
 				if (shouldCleanDroppedFiles) {
 					Input.DroppedFiles.Clear();
