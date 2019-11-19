@@ -20,6 +20,7 @@ namespace Lime
 		private bool modal;
 		private Display display;
 		private bool closed;
+		private bool shouldCleanDroppedFiles;
 
 		public bool AsyncRendering { get; set; }
 
@@ -513,9 +514,13 @@ namespace Lime
 				Input.CopyKeysState();
 				Input.TextInput = null;
 			}
-			if (Input.DroppedFiles.Count > 0) {
-				Input.DroppedFiles.Clear();
+			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
+				if (shouldCleanDroppedFiles) {
+					Input.DroppedFiles.Clear ();
+				}
+				shouldCleanDroppedFiles = !shouldCleanDroppedFiles;
 			}
+
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
@@ -535,17 +540,7 @@ namespace Lime
 			using (Context.Activate().Scoped()) {
 				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
-				// Have to call update in order to update NodeUnderMouse
-				// because Mac stops updating loop during drag
-				Update();
 				Input.DroppedFiles.AddRange(files);
-				// Have to call update in order to update NodeUnderMouse
-				// because Mac stops updating loop during drag
-				// Manually assign NodeCapturedByMouse in order to handle DropFilesGesture.
-				// TODO: This code must be refactored since Window should know anything about Widgets.
-				WidgetContext.Current.NodeCapturedByMouse = WidgetContext.Current.NodeUnderMouse;
-				Update();
-				WidgetContext.Current.NodeCapturedByMouse = null;
 			}
 		}
 	}
