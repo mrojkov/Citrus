@@ -38,49 +38,56 @@ namespace Tangerine.Common.FilesDropHandlers
 		public void Handle(List<string> files)
 		{
 			onBeforeDrop?.Invoke();
+			var assets = new List<(string assetPath, string assetType)>();
 			foreach (var file in files.Where(f => extensions.Contains(Path.GetExtension(f))).ToList()) {
-				files.Remove(file);
 				if (
-					!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) ||
-					!Utils.AssertCurrentDocument(assetPath, assetType)
+					Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType) &&
+					Utils.AssertCurrentDocument(assetPath, assetType)
 				) {
-					continue;
+					files.Remove(file);
+					assets.Add((assetPath, assetType));
 				}
+			}
+			if (assets.Count > 0) {
 				if (ShouldCreateContextMenu) {
-					CreateContextMenu(assetPath, assetType);
+					CreateContextMenu(assets);
 				} else {
-					try {
-						Project.Current.OpenDocument(file, true);
-					} catch (InvalidOperationException e) {
-						AlertDialog.Show(e.Message);
+					foreach (var (path, _) in assets) {
+						try {
+							Project.Current.OpenDocument(path);
+						}
+						catch (InvalidOperationException e) {
+							AlertDialog.Show(e.Message);
+						}
 					}
 				}
 			}
 		}
 
-		private void CreateContextMenu(string assetPath, string assetType)
+		public void CreateContextMenu(List<(string assetPath, string assetType)> assets)
 		{
-			var fileName = Path.GetFileNameWithoutExtension(assetPath);
 			var menu = new Menu {
-				new Command("Open in New Tab", () => Project.Current.OpenDocument(assetPath)),
+				new Command("Open in New Tab", () => assets.ForEach(asset => Project.Current.OpenDocument(asset.assetPath))),
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(() => {
-					var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
-					var node = CreateNode.Perform(scene.GetType());
-					SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
-					if (node is IPropertyLocker propertyLocker) {
-						var id = propertyLocker.IsPropertyLocked("Id", true) ? fileName : scene.Id;
-						SetProperty.Perform(node, nameof(Node.Id), id);
+					foreach (var (assetPath, _) in assets) {
+						var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
+						var node = CreateNode.Perform(scene.GetType());
+						SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
+						if (node is IPropertyLocker propertyLocker) {
+							var id = propertyLocker.IsPropertyLocked("Id", true) ? Path.GetFileName(assetPath) : scene.Id;
+							SetProperty.Perform(node, nameof(Node.Id), id);
+						}
+						if (scene is Widget widget) {
+							SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
+							SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
+						}
+						postProcessNode?.Invoke(node);
+						node.LoadExternalScenes();
 					}
-					if (scene is Widget widget) {
-						SetProperty.Perform(node, nameof(Widget.Pivot), Vector2.Half);
-						SetProperty.Perform(node, nameof(Widget.Size), widget.Size);
-					}
-					postProcessNode?.Invoke(node);
-					node.LoadExternalScenes();
 				})),
 				new Command("Cancel")
 			};
-			menu[0].Enabled = assetType != ".model";
+			menu[0].Enabled = assets.All(asset => asset.assetType != ".model");
 			menu.Popup();
 		}
 	}
