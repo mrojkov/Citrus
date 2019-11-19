@@ -214,11 +214,27 @@ namespace Tangerine.UI.Timeline
 		public static void DeleteMarkers()
 		{
 			Document.Current.History.DoTransaction(() => {
-				var timeline = Timeline.Instance;
 				foreach (var marker in Document.Current.Animation.Markers.ToList()) {
 					Core.Operations.DeleteMarker.Perform(marker, true);
 				}
 			});
+		}
+
+		public static void DeleteMarkersInRange()
+		{
+			using (Document.Current.History.BeginTransaction()) {
+				if (!GridSelection.GetSelectionBoundaries(out var gs)) {
+					new AlertDialog("Select a range on the timeline", "Ok").Show();
+					return;
+				}
+				foreach (
+					var marker in Document.Current.Animation.Markers.Where(m =>
+						m.Frame >= gs.Left && m.Frame <= gs.Right).ToList()
+				) {
+					Core.Operations.DeleteMarker.Perform(marker, true);
+				}
+				Document.Current.History.CommitTransaction();
+			}
 		}
 
 		class ContextMenu
@@ -247,6 +263,9 @@ namespace Tangerine.UI.Timeline
 				});
 				menu.Add(new Command(TimelineCommands.DeleteMarkers.Text, DeleteMarkers) {
 					Enabled = Document.Current.Animation.Markers.Count > 0
+				});
+				menu.Add(new Command(TimelineCommands.DeleteMarkersInRange.Text, DeleteMarkersInRange) {
+					Enabled = GridSelection.GetSelectionBoundaries(out _) && Document.Current.Animation.Markers.Count > 0
 				});
 				menu.Popup();
 			}
