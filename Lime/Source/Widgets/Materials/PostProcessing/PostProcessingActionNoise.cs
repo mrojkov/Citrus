@@ -20,13 +20,12 @@ namespace Lime
 			}
 			ro.NoiseBuffer.Texture.SetAsRenderTarget();
 			try {
-				Renderer.Clear(Color4.Zero);
+				Renderer.Clear(ro.TextureClearingColor);
 				var noiseUV0 = ro.NoiseOffset;
 				var noiseUV1 = ro.Size / ((Vector2)ro.NoiseTexture.ImageSize * ro.NoiseScale) + ro.NoiseOffset;
 				ro.NoiseMaterial.BrightThreshold = ro.NoiseBrightThreshold;
 				ro.NoiseMaterial.DarkThreshold = ro.NoiseDarkThreshold;
 				ro.NoiseMaterial.SoftLight = ro.NoiseSoftLight;
-				ro.NoiseMaterial.Opaque = ro.OpagueRendering;
 				Renderer.DrawSprite(
 					ro.ProcessedTexture,
 					ro.NoiseTexture,
@@ -55,7 +54,7 @@ namespace Lime
 			private float brightThreshold = float.NaN;
 			private float darkThreshold = float.NaN;
 			private float softLight = float.NaN;
-			private bool opaque;
+			private Color4 textureClearingColor;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -64,7 +63,7 @@ namespace Lime
 				brightThreshold == ro.NoiseBrightThreshold &&
 				darkThreshold == ro.NoiseDarkThreshold &&
 				softLight == ro.NoiseSoftLight &&
-				opaque == ro.OpagueRendering;
+				textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -72,7 +71,7 @@ namespace Lime
 				brightThreshold = ro.NoiseBrightThreshold;
 				darkThreshold = ro.NoiseDarkThreshold;
 				softLight = ro.NoiseSoftLight;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 	}

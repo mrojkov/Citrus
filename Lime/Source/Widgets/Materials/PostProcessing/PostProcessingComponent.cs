@@ -173,8 +173,9 @@ namespace Lime
 			set => blurAlphaCorrection = Mathf.Clamp(value, 1f, MaximumGammaCorrection);
 		}
 
+		// Deprecated property. Waiting for migrations
 		[YuzuMember]
-		[TangerineGroup(GroupBlur)]
+		[TangerineIgnore]
 		public Color4 BlurBackgroundColor { get; set; } = new Color4(127, 127, 127, 0);
 
 		[YuzuMember]
@@ -505,6 +506,11 @@ namespace Lime
 
 		[YuzuMember]
 		[TangerineGroup(GroupSourceTexture)]
+		public Color4 TextureClearingColor { get; set; } = Color4.Zero;
+
+		// Deprecated property. Waiting for migrations
+		[YuzuMember]
+		[TangerineIgnore]
 		public bool OpagueRendering { get; set; }
 
 		[YuzuMember]

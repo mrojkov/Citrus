@@ -21,12 +21,11 @@ namespace Lime
 			ro.BlurMaterial.Step = ro.ProcessedUV1 * ro.BlurTextureScaling / ro.CurrentBufferSize;
 			ro.BlurMaterial.Dir = Vector2.Down;
 			ro.BlurMaterial.AlphaCorrection = ro.BlurAlphaCorrection;
-			ro.BlurMaterial.Opaque = ro.OpagueRendering;
-			ro.RenderToTexture(ro.FirstTemporaryBuffer.Texture, ro.ProcessedTexture, ro.BlurMaterial, Color4.White, ro.BlurBackgroundColor);
+			ro.RenderToTexture(ro.FirstTemporaryBuffer.Texture, ro.ProcessedTexture, ro.BlurMaterial, Color4.White, ro.TextureClearingColor);
 			ro.CurrentBufferSize = (Vector2)ro.BlurBuffer.Size;
 			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 			ro.BlurMaterial.Dir = Vector2.Right;
-			ro.RenderToTexture(ro.BlurBuffer.Texture, ro.FirstTemporaryBuffer.Texture, ro.BlurMaterial, Color4.White, ro.BlurBackgroundColor);
+			ro.RenderToTexture(ro.BlurBuffer.Texture, ro.FirstTemporaryBuffer.Texture, ro.BlurMaterial, Color4.White, ro.TextureClearingColor);
 
 			ro.BlurBuffer.SetRenderParameters(ro);
 			ro.MarkBuffersAsDirty = true;
@@ -38,8 +37,7 @@ namespace Lime
 			private float radius = float.NaN;
 			private float textureScaling = float.NaN;
 			private float alphaCorrection = float.NaN;
-			private Color4 backgroundColor = Color4.Zero;
-			private bool opaque;
+			private Color4 textureClearingColor = Color4.Zero;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -48,8 +46,7 @@ namespace Lime
 				radius == ro.BlurRadius &&
 				textureScaling == ro.BlurTextureScaling &&
 				alphaCorrection == ro.BlurAlphaCorrection &&
-				backgroundColor == ro.BlurBackgroundColor &&
-				opaque == ro.OpagueRendering;
+				textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -57,8 +54,7 @@ namespace Lime
 				radius = ro.BlurRadius;
 				textureScaling = ro.BlurTextureScaling;
 				alphaCorrection = ro.BlurAlphaCorrection;
-				backgroundColor = ro.BlurBackgroundColor;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 	}

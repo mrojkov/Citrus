@@ -20,8 +20,7 @@ namespace Lime
 			ro.DistortionMaterial.Red = ro.DistortionRed;
 			ro.DistortionMaterial.Green = ro.DistortionGreen;
 			ro.DistortionMaterial.Blue = ro.DistortionBlue;
-			ro.DistortionMaterial.Opaque = ro.OpagueRendering;
-			ro.RenderToTexture(ro.DistortionBuffer.Texture, ro.ProcessedTexture, ro.DistortionMaterial, Color4.White, Color4.Zero);
+			ro.RenderToTexture(ro.DistortionBuffer.Texture, ro.ProcessedTexture, ro.DistortionMaterial, Color4.White, ro.TextureClearingColor);
 			ro.CurrentBufferSize = (Vector2)ro.DistortionBuffer.Size;
 			ro.ProcessedUV1 = (Vector2)ro.ViewportSize / ro.CurrentBufferSize;
 
@@ -37,7 +36,7 @@ namespace Lime
 			private float red;
 			private float green;
 			private float blue;
-			private bool opaque;
+			private Color4 textureClearingColor;
 
 			public Buffer(Size size) : base(size) { }
 
@@ -48,7 +47,7 @@ namespace Lime
 				red == ro.DistortionRed &&
 				green == ro.DistortionGreen &&
 				blue == ro.DistortionBlue &&
-				opaque == ro.OpagueRendering;
+				textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -58,7 +57,7 @@ namespace Lime
 				red = ro.DistortionRed;
 				green = ro.DistortionGreen;
 				blue = ro.DistortionBlue;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 	}

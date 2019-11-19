@@ -69,11 +69,11 @@ namespace Lime
 			void main() {
 				lowp vec3 luminanceVector = vec3(0.2125, 0.7154, 0.0721);
 				lowp vec4 c = texture2D(tex1, texCoords1) * color;
-				lowp float luminance = dot(luminanceVector, c.xyz);
+				lowp float luminance = dot(luminanceVector, c.rgb);
 				luminance = max(0.0, luminance - brightThreshold);
-				c.xyz *= sign(luminance);
-				c.xyz = pow(c.xyz, inversedGammaCorrection);
-				c.a = 1.0;
+				c.rgb *= sign(luminance);
+				c.rgb = pow(c.rgb, inversedGammaCorrection);
+				c.a = max(c.r, max(c.g, c.b));
 				gl_FragColor = c;
 			}
 			";

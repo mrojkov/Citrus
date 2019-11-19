@@ -18,8 +18,7 @@ namespace Lime
 			ro.ColorCorrectionMaterial.HSL = WrappedHSL(ro.HSL);
 			ro.ColorCorrectionMaterial.Brightness = ro.Brightness;
 			ro.ColorCorrectionMaterial.Contrast = ro.Contrast;
-			ro.ColorCorrectionMaterial.Opaque = ro.OpagueRendering;
-			ro.RenderToTexture(ro.ColorCorrectionBuffer.Texture, ro.ProcessedTexture, ro.ColorCorrectionMaterial, Color4.White, Color4.Zero);
+			ro.RenderToTexture(ro.ColorCorrectionBuffer.Texture, ro.ProcessedTexture, ro.ColorCorrectionMaterial, Color4.White, ro.TextureClearingColor);
 
 			ro.ColorCorrectionBuffer.SetRenderParameters(ro);
 			ro.MarkBuffersAsDirty = true;
@@ -33,12 +32,12 @@ namespace Lime
 			private Vector3 hsl = new Vector3(float.NaN, float.NaN, float.NaN);
 			private float brightness;
 			private float contrast;
-			private bool opaque;
+			private Color4 textureClearingColor;
 
 			public Buffer(Size size) : base(size) { }
 
 			public bool EqualRenderParameters(PostProcessingRenderObject ro) =>
-				!IsDirty && hsl == WrappedHSL(ro.HSL) && brightness == ro.Brightness && contrast == ro.Contrast && opaque == ro.OpagueRendering;
+				!IsDirty && hsl == WrappedHSL(ro.HSL) && brightness == ro.Brightness && contrast == ro.Contrast && textureClearingColor == ro.TextureClearingColor;
 
 			public void SetRenderParameters(PostProcessingRenderObject ro)
 			{
@@ -46,7 +45,7 @@ namespace Lime
 				hsl = WrappedHSL(ro.HSL);
 				brightness = ro.Brightness;
 				contrast = ro.Contrast;
-				opaque = ro.OpagueRendering;
+				textureClearingColor = ro.TextureClearingColor;
 			}
 		}
 

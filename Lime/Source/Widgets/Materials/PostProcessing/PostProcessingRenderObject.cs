@@ -24,7 +24,6 @@ namespace Lime
 		public bool MarkBuffersAsDirty;
 		public PostProcessingAction.Buffer SourceTextureBuffer;
 		public float SourceTextureScaling;
-		public bool OpagueRendering;
 		public PostProcessingAction.Buffer FirstTemporaryBuffer;
 		public PostProcessingAction.Buffer SecondTemporaryBuffer;
 		public PostProcessingActionColorCorrection.Buffer ColorCorrectionBuffer;
@@ -40,7 +39,6 @@ namespace Lime
 		public BlurShaderId BlurShader;
 		public float BlurTextureScaling;
 		public float BlurAlphaCorrection;
-		public Color4 BlurBackgroundColor;
 		public PostProcessingActionBloom.Buffer BloomBuffer;
 		public BloomMaterial BloomMaterial;
 		public bool BloomEnabled;
@@ -93,6 +91,7 @@ namespace Lime
 		public IMaterial AlphaDiffuseMaterial;
 		public IMaterial AddDiffuseMaterial;
 		public IMaterial OpaqueDiffuseMaterial;
+		public Color4 TextureClearingColor;
 
 		public bool IsNotDebugViewMode => DebugViewMode == PostProcessingPresenter.DebugViewMode.None;
 

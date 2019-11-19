@@ -13,7 +13,6 @@ namespace Lime
 		private IMaterial material;
 		private Blending blending;
 		private ShaderId shader;
-		private bool opaque;
 		private PostProcessingAction.Buffer sourceTextureBuffer;
 		private PostProcessingAction.Buffer firstTemporaryBuffer;
 		private PostProcessingAction.Buffer secondTemporaryBuffer;
@@ -107,7 +106,6 @@ namespace Lime
 			ro.MarkBuffersAsDirty = false;
 			ro.SourceTextureBuffer = sourceTextureBuffer;
 			ro.SourceTextureScaling = sourceTextureScaling;
-			ro.OpagueRendering = component.OpagueRendering;
 			ro.FirstTemporaryBuffer = firstTemporaryBuffer;
 			ro.SecondTemporaryBuffer = secondTemporaryBuffer;
 			ro.ColorCorrectionBuffer = colorCorrectionBuffer;
@@ -123,7 +121,6 @@ namespace Lime
 			ro.BlurShader = component.BlurShader;
 			ro.BlurTextureScaling = component.BlurTextureScaling * 0.01f;
 			ro.BlurAlphaCorrection = component.BlurAlphaCorrection;
-			ro.BlurBackgroundColor = component.BlurBackgroundColor;
 			ro.BloomBuffer = bloomBuffer;
 			ro.BloomMaterial = component.BloomMaterial;
 			ro.BloomEnabled = component.BloomEnabled;
@@ -176,6 +173,7 @@ namespace Lime
 			ro.AlphaDiffuseMaterial = alphaDiffuseMaterial;
 			ro.AddDiffuseMaterial = addDiffuseMaterial;
 			ro.OpaqueDiffuseMaterial = opaqueDiffuseMaterial;
+			ro.TextureClearingColor = component.TextureClearingColor;
 			return ro;
 		}
 
@@ -184,14 +182,12 @@ namespace Lime
 			if (component.CustomMaterial != null) {
 				return component.CustomMaterial;
 			}
-			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader && opaque == component.OpagueRendering) {
+			if (material != null && blending == widget.GlobalBlending && shader == widget.GlobalShader) {
 				return material;
 			}
 			blending = widget.GlobalBlending;
 			shader = widget.GlobalShader;
-			opaque = component.OpagueRendering;
-			var isOpaqueRendering = opaque && blending == Blending.Inherited;
-			return material = WidgetMaterial.GetInstance(!isOpaqueRendering ? blending : Blending.Opaque, shader, 1);
+			return material = WidgetMaterial.GetInstance(blending, shader, 1);
 		}
 
 		public bool PartialHitTest(Node node, ref HitTestArgs args)
