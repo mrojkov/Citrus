@@ -98,7 +98,6 @@ namespace Lime
 		private List<List<int>> afterFamilyIndices = new List<List<int>>();
 		private List<BehaviorUpdateFamily> sortedFamilies = new List<BehaviorUpdateFamily>();
 		private bool shouldSortFamilies;
-		private Random shuffleRandom;
 
 		public readonly BehaviorSystem BehaviorSystem;
 		public readonly Type StageType;
@@ -137,11 +136,8 @@ namespace Lime
 				shouldSortFamilies = false;
 			}
 			if (BehaviorSystem.DebugMode) {
-				if (shuffleRandom == null) {
-					shuffleRandom = new Random();
-				}
 				foreach (var f in sortedFamilies) {
-					f.Shuffle(shuffleRandom, 10);
+					f.ReverseOrder();
 				}
 			}
 			foreach (var f in sortedFamilies) {
@@ -217,25 +213,23 @@ namespace Lime
 			}
 		}
 
-		private int shuffleFirst;
-
-		internal void Shuffle(Random rnd, int maxIterationCount)
+		internal void ReverseOrder()
 		{
-			for (var i = 0; i < behaviors.Count && maxIterationCount > 0; i++, maxIterationCount--) {
-				shuffleFirst++;
-				shuffleFirst %= behaviors.Count;
-				if (behaviors[shuffleFirst] == null) {
-					continue;
+			var i = 0;
+			var j = behaviors.Count - 1;
+			while (i < j) {
+				var ib = behaviors[i];
+				if (ib != null) {
+					ib.IndexInUpdateFamily = j;
 				}
-				var shuffleNext = shuffleFirst + (rnd.Next() % (behaviors.Count - shuffleFirst));
-				if (behaviors[shuffleNext] == null) {
-					continue;
+				var jb = behaviors[j];
+				if (jb != null) {
+					jb.IndexInUpdateFamily = i;
 				}
-				var tmp = behaviors[shuffleFirst];
-				behaviors[shuffleFirst] = behaviors[shuffleNext];
-				behaviors[shuffleFirst].IndexInUpdateFamily = shuffleFirst;
-				behaviors[shuffleNext] = tmp;
-				behaviors[shuffleNext].IndexInUpdateFamily = shuffleNext;
+				behaviors[i] = jb;
+				behaviors[j] = ib;
+				i++;
+				j--;
 			}
 		}
 
