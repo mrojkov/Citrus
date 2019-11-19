@@ -88,15 +88,17 @@ namespace Tangerine.Common.FilesDropHandlers
 
 		}
 
-		private void CreateImageTypeInstance(Type type, IEnumerable<string> files)
+		private void CreateImageTypeInstance(Type type, List<string> files)
 		{
 			onBeforeDrop?.Invoke();
 			using (Document.Current.History.BeginTransaction()) {
+				var nodes = new List<Node>(files.Count);
 				foreach (var file in files) {
 					if (!Utils.ExtractAssetPathOrShowAlert(file, out var assetPath, out var assetType)) {
 						continue;
 					}
 					var node = CreateNode.Perform(type);
+					nodes.Add(node);
 					var texture = new SerializableTexture(assetPath);
 					var nodeSize = (Vector2)texture.ImageSize;
 					var nodeId = Path.GetFileNameWithoutExtension(assetPath);
@@ -111,6 +113,9 @@ namespace Tangerine.Common.FilesDropHandlers
 						SetProperty.Perform(node, nameof(ParticleModifier.Id), nodeId);
 					}
 					postProcessNode?.Invoke(node);
+				}
+				foreach (var node in nodes) {
+					SelectNode.Perform(node);
 				}
 				Document.Current.History.CommitTransaction();
 			}
