@@ -23,6 +23,7 @@ namespace Tangerine.UI.Timeline
 			ConnectCommand(TimelineCommands.EnterNodeAlias, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.EnterNodeMouse, enter, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.Expand, Expand, Document.HasCurrent);
+			ConnectCommand(TimelineCommands.ExpandRecursively, ExpandRecursively, Document.HasCurrent);
 			ConnectCommand(TimelineCommands.RenameRow, RenameCurrentRow);
 			ConnectCommand(TimelineCommands.ExitNode, LeaveNode.Perform);
 			ConnectCommand(TimelineCommands.ExitNodeAlias, LeaveNode.Perform);
@@ -81,30 +82,121 @@ namespace Tangerine.UI.Timeline
 
 		private static void Expand()
 		{
-			var triggered = new HashSet<NodeRow>();
-			void ExpandRow(Row row, NodeRow nodeRow) {
-				if (triggered.Contains(nodeRow)) {
+			InternalExpand(recursive: false);
+		}
+
+		private static void ExpandRecursively()
+		{
+			InternalExpand(recursive: true);
+		}
+
+		private static void InternalExpand(bool recursive = false)
+		{
+			void ExpandOrCollapseRow(Row row, object component, string property, bool expanded, int level)
+			{
+				if (!recursive) {
+					SetProperty.Perform(component, property, expanded, isChangingDocument: false);
+				} else if (expanded) {
+					SetProperty.Perform(component, property, expanded, isChangingDocument: false);
+					foreach (var child in row.Rows.ToList()) {
+						SetExpanded(child, expanded, level);
+					}
+				} else {
+					foreach (var child in row.Rows.ToList()) {
+						SetExpanded(child, expanded, level);
+					}
+					SetProperty.Perform(component, property, expanded, isChangingDocument: false);
+				}
+			}
+
+			var processedRows = new HashSet<Row>();
+			void SetExpanded(Row row, bool expanded = false, int level = 0)
+			{
+				if (processedRows.Contains(row)) {
 					return;
 				}
 
-				triggered.Add(nodeRow);
-				SetProperty.Perform(nodeRow, nameof(NodeRow.Expanded), !nodeRow.Expanded, isChangingDocument: false);
-				if (nodeRow.Expanded && row.Rows.Count > 0) {
-					Timeline.Instance.EnsureRowChildsVisible(row);
-				}
-			}
+				processedRows.Add(row);
+				foreach (var component in row.Components) {
+					switch (component) {
+						case NodeRow nodeRow:
+							ExpandOrCollapseRow(row, nodeRow, nameof(NodeRow.Expanded), expanded, level + 1);
+							if (nodeRow.Expanded && row.Rows.Count > 0) {
+								Timeline.Instance.EnsureRowChildsVisible(row);
+							}
+							break;
 
-			foreach (var row in Document.Current.SelectedRows().ToList()) {
-				if (row.Components.Get<NodeRow>() is NodeRow nodeRow) {
-					ExpandRow(row, nodeRow);
-				} else if (row.Components.Get<PropertyRow>() is PropertyRow propertyRow) {
-					Core.Operations.SelectRow.Perform(row, select: false);
-					if (row.Parent.Components.Get<NodeRow>() is NodeRow parentNodeRow) {
-						ExpandRow(row.Parent, parentNodeRow);
-						Core.Operations.SelectRow.Perform(row.Parent, select: true);
+						case BoneRow boneRow:
+							if (boneRow.HaveChildren) {
+								ExpandOrCollapseRow(row, boneRow, nameof(BoneRow.ChildrenExpanded), expanded, level + 1);
+								if (boneRow.ChildrenExpanded) {
+									Timeline.Instance.EnsureRowChildsVisible(row);
+								}
+							} else if (row.Parent.Parent != null) {
+								SetExpanded(row.Parent, expanded, level);
+								if (level == 0) {
+									Core.Operations.SelectRow.Perform(row, select: false);
+									Core.Operations.SelectRow.Perform(row.Parent, select: true);
+								}
+							}
+							return;
+
+						case FolderRow folderRow:
+							var folder = folderRow.Folder;
+							if (folder.Items.Count > 0) {
+								ExpandOrCollapseRow(row, folder, nameof(Folder.Expanded), expanded, level + 1);
+								if (folder.Expanded) {
+									Timeline.Instance.EnsureRowChildsVisible(row);
+								}
+							}
+							return;
+
+						case PropertyRow propertyRow:
+							SetExpanded(row.Parent, expanded, level);
+							if (level == 0) {
+								Core.Operations.SelectRow.Perform(row, select: false);
+								Core.Operations.SelectRow.Perform(row.Parent, select: true);
+							}
+							return;
 					}
 				}
 			}
+
+			var topMostRows = new HashSet<Row>(Document.Current.SelectedRows());
+			foreach (var row in Document.Current.SelectedRows()) {
+				for (var p = row.Parent; p != null; p = p.Parent) {
+					if (topMostRows.Contains(p)) {
+						topMostRows.Remove(row);
+						break;
+					}
+				}
+			}
+
+			ClearRowSelection.Perform();
+			foreach (var row in topMostRows) {
+				Core.Operations.SelectRow.Perform(row);
+				SetExpanded(row, expanded: !IsRowExpanded(row));
+			}
+		}
+
+		private static bool IsRowExpanded(Row row)
+		{
+			foreach (var component in row.Components) {
+				switch (component) {
+					case NodeRow nodeRow:
+						return nodeRow.Expanded;
+
+					case BoneRow boneRow:
+						return boneRow.ChildrenExpanded;
+
+					case FolderRow folderRow:
+						return folderRow.Folder.Expanded;
+
+					case PropertyRow propertyRow:
+						return true;
+				}
+			}
+			return false;
 		}
 
 		private static void RenameCurrentRow()
