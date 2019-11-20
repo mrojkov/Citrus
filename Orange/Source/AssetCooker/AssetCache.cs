@@ -325,7 +325,7 @@ namespace Orange
 				Mode = AssetCacheMode.None;
 				ending = "Cache disabled";
 			}
-			Console.WriteLine($"[Cache] ERROR: {errorMessage}. {ending}");
+			Console.WriteLine($"[Cache] WARNING: {errorMessage}. {ending}");
 		}
 
 		/// <summary>
@@ -343,7 +343,7 @@ namespace Orange
 				Mode = AssetCacheMode.None;
 				ending = "Cache disabled";
 			}
-			Console.WriteLine($"[Cache] ERROR {serverUsername}@{serverAddress}: {errorMessage} ({hashString}). {ending}");
+			Console.WriteLine($"[Cache] WARNING {serverUsername}@{serverAddress}: {errorMessage} ({hashString}). {ending}");
 			if (File.Exists(tempFilePath)) {
 				File.Delete(tempFilePath);
 			}
