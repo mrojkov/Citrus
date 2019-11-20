@@ -31,7 +31,9 @@ namespace Tangerine.UI.Timeline
 			Document.Current.History.DoTransaction(() => {
 				foreach (var elem in rows) {
 					Probers.Any(p => p.Probe(elem.Key, dragLocation));
-					if (elem.Value >= dragLocation.Index) dragLocation.Index++;
+					if (elem.Value == -1 || elem.Value >= dragLocation.Index) {
+						++dragLocation.Index;
+					}
 				}
 			});
 		}
