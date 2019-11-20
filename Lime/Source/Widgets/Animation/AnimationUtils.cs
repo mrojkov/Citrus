@@ -62,8 +62,11 @@ namespace Lime
 			(host, prevIndex) = GetPropertyHost(host, propertyPath);
 			object o = host;
 			if (propertyPath[prevIndex] == '[') {
-				int index = propertyPath.IndexOf(']', prevIndex + 1);
-				var componentTypeName = propertyPath.Substring(prevIndex + 1, index - prevIndex - 1);
+				var index = IndexOfClosedBracket(prevIndex + 1, propertyPath);
+				if (index < 0) {
+					return (result, null, -1);
+				}
+				var	componentTypeName = propertyPath.Substring(prevIndex + 1, index - prevIndex - 1);
 				var type = global::Yuzu.Metadata.Meta.GetTypeByReadAlias(componentTypeName, InternalPersistence.Instance.YuzuCommonOptions)
 				           ?? global::Yuzu.Util.TypeSerializer.Deserialize(componentTypeName);
 				o = host.GetComponent(type);
@@ -105,6 +108,21 @@ namespace Lime
 					}
 				}
 				prevIndex = periodIndex + 1;
+			}
+
+			int IndexOfClosedBracket(int startIndex, string value)
+			{
+				var c = 1;
+				for (var i = startIndex; i < value.Length; i++) {
+					if (value[i] == '[') {
+						c++;
+					} else if (value[i] == ']') {
+						if (--c == 0) {
+							return i;
+						}
+					}
+				}
+				return -1;
 			}
 		}
 
