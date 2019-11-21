@@ -355,8 +355,6 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DropFilesGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
-    <Compile Include="Source\Widgets\Gestures\Gesture.PollableEvent.cs" />
-    <Compile Include="Source\Widgets\Gestures\Gesture.PollableEvent.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
@@ -448,7 +446,6 @@
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\Widgets\NodeList.cs" />
     <Compile Include="Source\Widgets\NodeManager.cs" />
-
     <Compile Include="Source\Widgets\NodeManagerProcessorCollection.cs" />
     <Compile Include="Source\Widgets\NodeManagerProcessorCollection.cs" />
     <Compile Include="Source\Widgets\NodeManagerRootCollection.cs" />
@@ -464,7 +461,6 @@
     <Compile Include="Source\Widgets\PointObject.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\Widgets\Processors\AnimationProcessor.cs" />
-
     <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\BehaviorSetupProcessor.cs" />
     <Compile Include="Source\Widgets\Processors\BehaviorSystem.cs" />

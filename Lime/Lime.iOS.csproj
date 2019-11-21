@@ -359,8 +359,6 @@
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DropFilesGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
-    <Compile Include="Source\Widgets\Gestures\Gesture.PollableEvent.cs" />
-    <Compile Include="Source\Widgets\Gestures\Gesture.PollableEvent.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />

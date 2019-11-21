@@ -2,7 +2,7 @@ using System;
 
 namespace Lime
 {
-	public abstract partial class Gesture
+	public abstract class Gesture
 	{
 		private PollableEvent began;
 		private PollableEvent canceled;
@@ -43,8 +43,7 @@ namespace Lime
 		protected WindowInput Input => CommonWindow.Current.Input;
 
 		public Gesture()
-		{
-		}
+		{ }
 
 		public Gesture(Action onRecognized)
 		{
@@ -57,12 +56,24 @@ namespace Lime
 		public virtual bool WasCanceled() => canceled.HasOccurred;
 		public virtual bool WasRecognized() => recognized.HasOccurred;
 		public bool WasRecognizedOrCanceled() => WasCanceled() || WasRecognized();
-
 		protected void RaiseBegan() => began.Raise();
 		protected void RaiseCanceled() => canceled.Raise();
 		protected void RaiseRecognized() => recognized.Raise();
-
 		protected internal abstract bool Cancel(Gesture sender);
 		protected internal abstract void Update(float delta);
+
+		protected struct PollableEvent
+		{
+			private int? occurredOnIteration;
+			public event Action Handler;
+			private int CurrentIteration => WidgetContext.Current.GestureManager.CurrentIteration;
+			public bool HasOccurred => occurredOnIteration == CurrentIteration;
+			public void Raise()
+			{
+				CommonWindow.Current.Invalidate();
+				occurredOnIteration = CurrentIteration;
+				Handler?.Invoke();
+			}
+		}
 	}
 }
