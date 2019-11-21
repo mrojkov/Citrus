@@ -13,6 +13,7 @@ namespace Tangerine.UI.Timeline
 	public class Timeline : IDocumentView
 	{
 		public static Timeline Instance { get; private set; }
+		public static Action<Timeline> OnCreate;
 
 		public readonly Toolbar Toolbar;
 		public readonly Rulerbar Ruler;
@@ -116,6 +117,7 @@ namespace Tangerine.UI.Timeline
 			});
 			RootWidget.Gestures.Add(DropFilesGesture = new DropFilesGesture());
 			CreateFilesDropHandlers();
+			OnCreate?.Invoke(this);
 		}
 
 		private void CreateFilesDropHandlers()

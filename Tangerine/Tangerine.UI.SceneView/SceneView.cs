@@ -31,6 +31,7 @@ namespace Tangerine.UI.SceneView
 			MinMaxSize = new Vector2(24),
 			LayoutCell = new LayoutCell(new Alignment { X = HAlignment.Left, Y = VAlignment.Bottom } )
 		};
+		public static Action<SceneView> OnCreate;
 
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
@@ -114,6 +115,7 @@ namespace Tangerine.UI.SceneView
 			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
 			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
+			OnCreate?.Invoke(this);
 		}
 
 		private void CreateFilesDropHandlers()
