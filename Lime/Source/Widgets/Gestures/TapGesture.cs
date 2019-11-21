@@ -5,7 +5,7 @@ namespace Lime
 	public struct TapGestureOptions
 	{
 		public int ButtonIndex;
-		public float MinTapDurationSec;
+		public float MinTapDuration;
 		public bool CanRecognizeByTapDuration;
 	}
 
@@ -67,7 +67,7 @@ namespace Lime
 			}
 
 			if (state == State.Began) {
-				bool isTapTooShort = tapDuration < options.MinTapDurationSec;
+				bool isTapTooShort = tapDuration < options.MinTapDuration;
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					if (isTapTooShort) {
 						RaiseCanceled();

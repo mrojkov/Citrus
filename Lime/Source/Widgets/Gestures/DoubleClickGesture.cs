@@ -11,11 +11,11 @@ namespace Lime
 			WaitSecondPress,
 		};
 
-		private readonly TimeSpan MaxDelayBetweenClicksSec =
+		private readonly float MaxDelayBetweenClicks =
 #if WIN
-			TimeSpan.FromMilliseconds(System.Windows.Forms.SystemInformation.DoubleClickTime);
+			(float)TimeSpan.FromMilliseconds(System.Windows.Forms.SystemInformation.DoubleClickTime).TotalSeconds;
 #else // WIN
-			TimeSpan.FromSeconds(0.3);
+			0.3f;
 #endif // WIN
 
 		private readonly Vector2 DoubleClickThreshold =
@@ -30,7 +30,7 @@ namespace Lime
 
 
 		private State state;
-		private DateTime firstClickTime;
+		private float timeSinceFirstClick;
 		private Vector2 firstClickPosition;
 
 		public override bool IsActive => state != State.Idle;
@@ -70,10 +70,9 @@ namespace Lime
 
 		protected internal override void Update(float delta)
 		{
-			var now = DateTime.Now;
-			var elapsedTime = now - firstClickTime;
+			timeSinceFirstClick += delta;
 
-			if (state != State.Idle && elapsedTime > MaxDelayBetweenClicksSec) {
+			if (state != State.Idle && timeSinceFirstClick > MaxDelayBetweenClicks) {
 				state = State.Idle;
 				if (state == State.WaitSecondPress) {
 					RaiseCanceled();
@@ -87,7 +86,7 @@ namespace Lime
 					// Prevent a spurious call on the same frame as the recognition.
 					return;
 				}
-				firstClickTime = now;
+				timeSinceFirstClick = 0.0f;
 				firstClickPosition = Input.MousePosition;
 				state = State.FirstPress;
 			}
