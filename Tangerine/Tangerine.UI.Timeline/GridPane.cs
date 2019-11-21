@@ -8,6 +8,8 @@ namespace Tangerine.UI.Timeline
 {
 	public class GridPane
 	{
+		public static Action<GridPane> OnCreate;
+
 		private readonly Timeline timeline;
 		public readonly Widget RootWidget;
 		public readonly Widget ContentWidget;
@@ -43,6 +45,7 @@ namespace Tangerine.UI.Timeline
 			DropFilesGesture = new DropFilesGesture();
 			DropFilesGesture.Recognized += new GridPaneFilesDropHandler().Handle;
 			RootWidget.Gestures.Add(DropFilesGesture);
+			OnCreate?.Invoke(this);
 		}
 
 		private void RenderBackgroundAndGrid(Node node)

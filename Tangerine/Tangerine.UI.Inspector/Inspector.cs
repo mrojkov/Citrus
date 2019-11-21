@@ -20,6 +20,7 @@ namespace Tangerine.UI.Inspector
 		private HashSet<Type> prevTypes = new HashSet<Type>();
 
 		public static Inspector Instance { get; private set; }
+		public static Action<Inspector> OnCreate;
 
 		public readonly Widget PanelWidget;
 		public readonly Widget RootWidget;
@@ -86,6 +87,7 @@ namespace Tangerine.UI.Inspector
 			};
 			DropFilesGesture.Recognized += content.DropFiles;
 			CreateWatchersToRebuild();
+			OnCreate?.Invoke(this);
 		}
 
 		private static ToolbarModel GetToolbarLayout()
