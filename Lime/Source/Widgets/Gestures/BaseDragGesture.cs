@@ -91,7 +91,7 @@ namespace Lime
 			if (state == State.Recognizing) {
 				if (!IsDragging()) {
 					state = State.Idle;
-					RaiseEnded();
+					RaiseCanceled();
 				} else if (CanStartDrag()) {
 					state = State.Changing;
 					if (TryGetDragPosition(out var mousePosition)) {
