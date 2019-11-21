@@ -18,7 +18,7 @@ namespace Lime
 			Began
 		}
 
-		public static float ThresholdSqr = 3 * 3;
+		public static float Threshold = 3;
 
 		private readonly TapGestureOptions options;
 
@@ -83,7 +83,7 @@ namespace Lime
 			{
 				state = State.Idle;
 				if (
-					(Input.MousePosition - MousePressPosition).SqrLength < ThresholdSqr ||
+					(Input.MousePosition - MousePressPosition).SqrLength < Threshold.Sqr() ||
 					Owner.IsMouseOverThisOrDescendant()
 				) {
 					InternalRecognized?.Invoke();
