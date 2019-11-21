@@ -73,6 +73,7 @@ namespace Lime
 						fontChar.Height *= config.SdfScale;
 						fontChar.Width *= config.SdfScale;
 						fontChar.Padding *= config.SdfScale;
+						fontChar.VerticalOffset *= config.SdfScale;
 						if (fontChar.KerningPairs != null) {
 							for (int i = 0; i < fontChar.KerningPairs.Count; i++) {
 								var pair = fontChar.KerningPairs[i];

@@ -209,7 +209,7 @@ namespace Lime
 		/// Mostly stores only negative offset which is useful for chars with diacritics.
 		/// </summary>
 		[YuzuMember]
-		public int VerticalOffset;
+		public float VerticalOffset;
 		/// <summary>
 		/// The null-character which denotes any missing character in a font
 		/// </summary>
