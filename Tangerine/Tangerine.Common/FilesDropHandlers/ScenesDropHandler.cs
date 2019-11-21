@@ -69,6 +69,7 @@ namespace Tangerine.Common.FilesDropHandlers
 			var menu = new Menu {
 				new Command("Open in New Tab", () => assets.ForEach(asset => Project.Current.OpenDocument(asset.assetPath))),
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(() => {
+					var nodes = new List<Node>(assets.Count);
 					foreach (var (assetPath, _) in assets) {
 						var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
 						var node = CreateNode.Perform(scene.GetType());
@@ -83,7 +84,9 @@ namespace Tangerine.Common.FilesDropHandlers
 						}
 						postProcessNode?.Invoke(node);
 						node.LoadExternalScenes();
+						nodes.Add(node);
 					}
+					nodes.ForEach(n => SelectNode.Perform(n));
 				})),
 				new Command("Cancel")
 			};
