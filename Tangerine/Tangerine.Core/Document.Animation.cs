@@ -183,7 +183,12 @@ namespace Tangerine.Core
 					foreach (var animation in node.Animations) {
 						var state = component.animationsStates[i];
 						animation.IsRunning = state.IsRunning;
-						animation.Time = state.Time;
+						// First: there is no need to reapply animators.
+						// Second: if few animations operate with the same properties
+						// they can conflict (one can erase changes of another).
+						if (animation.Time != state.Time) {
+							animation.Time = state.Time;
+						}
 						i++;
 					}
 					var result = true;
