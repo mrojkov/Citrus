@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Lime;
-using Lime.KGDCitronLifeCycle;
 
 namespace Tangerine
 {
@@ -16,8 +15,6 @@ namespace Tangerine
 			Lime.Application.Initialize(new ApplicationOptions {
 				RenderingBackend = RenderingBackend.Vulkan
 			});
-			// TODO Remove it after KGD will be migrated
-			CitronLifeCycle.Initialize();
 			TangerineApp.Initialize(args);
 			Lime.Application.Run();
 		}
