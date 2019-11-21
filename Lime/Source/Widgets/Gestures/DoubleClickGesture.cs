@@ -30,8 +30,8 @@ namespace Lime
 
 
 		private State state;
-		private float timeSinceFirstClick;
-		private Vector2 firstClickPosition;
+		private float timeSinceFirstPress;
+		private Vector2 firstPressPosition;
 
 		public override bool IsActive => state != State.Idle;
 
@@ -70,9 +70,9 @@ namespace Lime
 
 		protected internal override void Update(float delta)
 		{
-			timeSinceFirstClick += delta;
+			timeSinceFirstPress += delta;
 
-			if (state != State.Idle && timeSinceFirstClick > MaxDelayBetweenClicks) {
+			if (state != State.Idle && timeSinceFirstPress > MaxDelayBetweenClicks) {
 				state = State.Idle;
 				if (state == State.WaitSecondPress) {
 					RaiseCanceled();
@@ -86,8 +86,8 @@ namespace Lime
 					// Prevent a spurious call on the same frame as the recognition.
 					return;
 				}
-				timeSinceFirstClick = 0.0f;
-				firstClickPosition = Input.MousePosition;
+				timeSinceFirstPress = 0.0f;
+				firstPressPosition = Input.MousePosition;
 				state = State.FirstPress;
 			}
 
@@ -98,21 +98,21 @@ namespace Lime
 
 			if (state == State.WaitSecondPress && Input.WasMousePressed(ButtonIndex)) {
 				state = State.Idle;
-				if (Input.GetNumTouches() == 1 && IsNearFirstClick(Input.MousePosition)) {
+				if (Input.GetNumTouches() == 1 && IsCloseToFirstPressPosition(Input.MousePosition)) {
 					RaiseRecognized();
 				} else {
 					RaiseCanceled();
 				}
 				RaiseEnded();
 			}
-		}
 
-		private bool IsNearFirstClick(in Vector2 mousePosition)
-		{
-			return new Rectangle(
-				firstClickPosition - DoubleClickThreshold,
-				firstClickPosition + DoubleClickThreshold
-			).Contains(mousePosition);
+			bool IsCloseToFirstPressPosition(Vector2 mousePosition)
+			{
+				return new Rectangle(
+					firstPressPosition - DoubleClickThreshold,
+					firstPressPosition + DoubleClickThreshold
+				).Contains(mousePosition);
+			}
 		}
 	}
 }
