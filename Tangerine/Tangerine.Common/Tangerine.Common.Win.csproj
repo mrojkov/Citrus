@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{259C5E1F-1507-4131-8B4E-DD3C51F7462A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tangerine.Common</RootNamespace>
+    <AssemblyName>Tangerine.Common.Win</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Win.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
+      <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
+      <Name>Tangerine.Core.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Win.csproj">
+      <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
+      <Name>Tangerine.UI.Win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FilesDropHandlers\AudiosDropHandler.cs" />
+    <Compile Include="FilesDropHandlers\ImagesDropHandler.cs" />
+    <Compile Include="FilesDropHandlers\ScenesDropHandler.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

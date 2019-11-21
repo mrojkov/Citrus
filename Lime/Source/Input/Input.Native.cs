@@ -173,6 +173,11 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value) => keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 
+		internal void ProcessPendingInputEvents(float delta)
+		{
+			ProcessPendingKeyEvents(delta);
+		}
+
 		internal void ProcessPendingKeyEvents(float delta)
 		{
 			Changed = false;
@@ -316,7 +321,7 @@ namespace Lime
 			public void OnBetweenFrames(float delta)
 			{
 				input.CopyKeysState();
-				input.ProcessPendingKeyEvents(delta);
+				input.ProcessPendingInputEvents(delta);
 				input.TextInput = null;
 			}
 		}

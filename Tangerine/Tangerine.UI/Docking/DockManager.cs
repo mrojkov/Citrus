@@ -12,7 +12,6 @@ namespace Tangerine.UI.Docking
 		private const string AppIconPath = @"Tangerine.Resources.Icons.icon.ico";
 		public const string DocumentAreaId = "DocumentArea";
 		private const float panelMinWidth = 50f;
-		private readonly List<FilesDropHandler> filesDropHandlers = new List<FilesDropHandler>();
 
 		public static DockManager Instance { get; private set; }
 
@@ -20,7 +19,10 @@ namespace Tangerine.UI.Docking
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public DockHierarchy Model => DockHierarchy.Instance;
-		public event Action<IEnumerable<string>> FilesDropped;
+		/// <summary>
+		/// Manages DocumentArea files drop.
+		/// </summary>
+		public DropFilesGesture DocumentAreaDropFilesGesture { get; private set; }
 		public event Action<System.Exception> UnhandledExceptionOccurred;
 
 		private DockManager(Vector2 windowSize)
@@ -52,6 +54,8 @@ namespace Tangerine.UI.Docking
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
 			};
+			DocumentAreaDropFilesGesture = new DropFilesGesture();
+			DocumentArea.Gestures.Add(DocumentAreaDropFilesGesture);
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 			var windowPlacement = new WindowPlacement {
 				Size = windowSize,
@@ -109,25 +113,7 @@ namespace Tangerine.UI.Docking
 		private void SetDropHandler(IWindow window)
 		{
 			window.AllowDropFiles = true;
-			window.FilesDropped += OnFilesDropped;
-			window.Updating += FilesDropHandlersUpdate;
-		}
 
-		private void OnFilesDropped(IEnumerable<string> files)
-		{
-			FilesDropped?.Invoke(files);
-			foreach (var filesDropHandler in filesDropHandlers) {
-				if (filesDropHandler.TryToHandle(files)) {
-					break;
-				}
-			}
-		}
-
-		private void FilesDropHandlersUpdate(float delta)
-		{
-			foreach (var filesDropHandler in filesDropHandlers) {
-				filesDropHandler.HandleDropImage();
-			}
 		}
 
 		public PanelPlacement AddPanel(Panel panel, Placement targetPlacement, DockSite site, float stretch = 0.25f)
@@ -537,9 +523,6 @@ namespace Tangerine.UI.Docking
 				RefreshWindow(placement);
 			}
 		}
-
-		public void AddFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Add(filesDropHandler);
-		public void RemoveFilesDropHandler(FilesDropHandler filesDropHandler) => filesDropHandlers.Remove(filesDropHandler);
 
 		private void CloseWindow(IWindow window)
 		{

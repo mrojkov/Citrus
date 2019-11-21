@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -118,6 +119,7 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value) => Application.Input.SetKeyState(key, value);
 		internal void ProcessPendingKeyEvents(float delta) => Application.Input.ProcessPendingKeyEvents(delta);
+		internal void ProcessPendingInputEvents(float delta) => Application.Input.ProcessPendingInputEvents(delta);
 		internal void CopyKeysState() => Application.Input.CopyKeysState();
 		internal void ClearKeyState(bool clearMouseButtons = true) => Application.Input.ClearKeyState(clearMouseButtons);
 		internal void SetWheelScrollAmount(float delta) => Application.Input.SetWheelScrollAmount(delta);
@@ -131,5 +133,11 @@ namespace Lime
 				? ownerWindow == Application.WindowUnderMouse
 				: ownerWindow.Active;
 		}
+
+		/// <summary>
+		/// Returns list of files dropped on the window.
+		/// This list automatically being cleaned up after window update.
+		/// </summary>
+		public List<string> DroppedFiles { get; } = new List<string>();
 	}
 }

@@ -1,11 +1,13 @@
 using System;
-using System.Linq;
-using System.IO;
 using System.Collections.Generic;
-using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Lime;
 using Orange;
+using Exception = System.Exception;
+using FileSystemWatcher = Lime.FileSystemWatcher;
 
 namespace Tangerine.Core
 {
@@ -21,7 +23,7 @@ namespace Tangerine.Core
 		private readonly List<Type> registeredNodeTypes = new List<Type>();
 		private readonly List<Type> registeredComponentTypes = new List<Type>();
 
-		public Lime.FileSystemWatcher FileSystemWatcher { get; private set; }
+		public FileSystemWatcher FileSystemWatcher { get; private set; }
 
 		public static readonly Project Null = new Project();
 		public static Project Current { get; private set; } = Null;
@@ -30,6 +32,7 @@ namespace Tangerine.Core
 		public readonly string CitprojPath;
 		public readonly string UserprefsPath;
 		public readonly string AssetsDirectory;
+		internal readonly string UntitledPath;
 
 		public delegate bool DocumentReloadConfirmationDelegate(Document document);
 		public static DocumentReloadConfirmationDelegate DocumentReloadConfirmation;
@@ -47,6 +50,7 @@ namespace Tangerine.Core
 		public IReadOnlyList<Type> RegisteredComponentTypes => registeredComponentTypes;
 
 		public static event Action<Document> DocumentSaving;
+		public static event Action<Document> DocumentSaved;
 		public static event Action<string> Opening;
 
 		private Project() { }
@@ -56,10 +60,19 @@ namespace Tangerine.Core
 			CitprojPath = citprojPath;
 			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
 			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
+			UntitledPath = Path.Combine(AssetsDirectory, ".untitled");
 			if (!Directory.Exists(AssetsDirectory)) {
 				throw new InvalidOperationException($"Assets directory {AssetsDirectory} doesn't exist.");
 			}
-			Orange.The.Workspace.Open(citprojPath);
+			var di = Directory.CreateDirectory(UntitledPath);
+			di.Attributes |= FileAttributes.Hidden;
+			var untitledCookingRulePath = Path.Combine(UntitledPath, "#CookingRules.txt");
+			if (!File.Exists(untitledCookingRulePath)) {
+				using (var writer = File.CreateText(untitledCookingRulePath)) {
+					writer.WriteLine("Ignore Yes");
+				}
+			}
+			The.Workspace.Open(citprojPath);
 			UpdateTextureParams();
 		}
 
@@ -70,14 +83,14 @@ namespace Tangerine.Core
 				throw new InvalidOperationException();
 			}
 			Current = this;
-			TangerineAssetBundle tangerineAssetBundle;
-			AssetBundle.Current = tangerineAssetBundle = new TangerineAssetBundle(AssetsDirectory);
+			TangerineAssetBundle tangerineAssetBundle = new TangerineAssetBundle(AssetsDirectory);
 			if (!tangerineAssetBundle.IsActual()) {
 				tangerineAssetBundle.CleanupBundle();
 			}
+			AssetBundle.Current = tangerineAssetBundle;
 			Preferences = new ProjectPreferences();
 			Preferences.Initialize();
-			FileSystemWatcher = new Lime.FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
+			FileSystemWatcher = new FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			if (File.Exists(UserprefsPath)) {
 				try {
 					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
@@ -86,26 +99,26 @@ namespace Tangerine.Core
 							if (GetFullPath(path, out string fullPath)) {
 								OpenDocument(path, delayLoad: true);
 							}
-						} catch (System.Exception e) {
+						} catch (Exception e) {
 							Debug.Write($"Failed to open document '{path}': {e.Message}");
 						}
 					}
 					var currentDoc = documents.FirstOrDefault(d => d.Path == UserPreferences.CurrentDocument) ?? documents.FirstOrDefault();
 					try {
 						Document.SetCurrent(currentDoc);
-					} catch (System.Exception e) {
+					} catch (Exception e) {
 						if (currentDoc != null) {
 							CloseDocument(currentDoc);
 						}
 						throw;
 					}
-				} catch (System.Exception e) {
+				} catch (Exception e) {
 					Debug.Write($"Failed to load the project user preferences: {e}");
 				}
 			}
 			SetLocale(Locale);
-			FileSystemWatcher.Changed += (path) => HandleFileSystemWatcherEvent(path);
-			FileSystemWatcher.Created += (path) => HandleFileSystemWatcherEvent(path);
+			FileSystemWatcher.Changed += HandleFileSystemWatcherEvent;
+			FileSystemWatcher.Created += HandleFileSystemWatcherEvent;
 			FileSystemWatcher.Deleted += HandleFileSystemWatcherEvent;
 			FileSystemWatcher.Renamed += (previousPath, path) => {
 				// simulating rename as pairs of deleted / created events
@@ -120,7 +133,7 @@ namespace Tangerine.Core
 					}
 				}
 			};
-			var overlaysPath = Path.Combine(Project.Current.AssetsDirectory, "Overlays");
+			var overlaysPath = Path.Combine(Current.AssetsDirectory, "Overlays");
 			if (Directory.Exists(overlaysPath)) {
 				var files = Directory.EnumerateFiles(overlaysPath)
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
@@ -132,7 +145,7 @@ namespace Tangerine.Core
 
 			registeredNodeTypes.AddRange(GetNodesTypesOrdered("Lime"));
 			registeredComponentTypes.AddRange(GetComponentsTypes("Lime"));
-			foreach (var type in Orange.PluginLoader.EnumerateTangerineExportedTypes()) {
+			foreach (var type in PluginLoader.EnumerateTangerineExportedTypes()) {
 				if (typeof(Node).IsAssignableFrom(type)) {
 					registeredNodeTypes.Add(type);
 				} else if (typeof(NodeComponent).IsAssignableFrom(type)) {
@@ -184,7 +197,7 @@ namespace Tangerine.Core
 			}
 			try {
 				TangerineYuzu.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
-			} catch (System.Exception) { }
+			} catch (Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
 			return true;
@@ -206,13 +219,13 @@ namespace Tangerine.Core
 					Console.WriteLine($"Using legacy dictionary path: \"{legacyDictionaryPath}\". Consider moving dictionary to \"{dictionaryPath}\".");
 					dictionaryPath = legacyDictionaryPath;
 				}
-				Lime.Localization.Dictionary.Clear();
+				Localization.Dictionary.Clear();
 				try {
 					using (var stream = new FileStream(dictionaryPath, FileMode.Open)) {
-						Lime.Localization.Dictionary.ReadFromStream(stream);
+						Localization.Dictionary.ReadFromStream(stream);
 					}
 					Console.WriteLine($"Dictionary was successfully loaded from \"{dictionaryPath}\"");
-				} catch (System.Exception exception) {
+				} catch (Exception exception) {
 					Console.WriteLine($"Can not read dictionary from \"{dictionaryPath}\": {exception.Message}");
 				}
 			}
@@ -234,6 +247,7 @@ namespace Tangerine.Core
 			var doc = new Document(format, rootType);
 			documents.Add(doc);
 			doc.MakeCurrent();
+			doc.SaveAs(doc.Path);
 			return doc;
 		}
 
@@ -448,7 +462,7 @@ namespace Tangerine.Core
 			}
 			localPath = AssetPath.CorrectSlashes(localPath);
 			modifiedAssets.Add(localPath);
-			Project.Current.SceneCache.InvalidateEntryFromFilesystem(localPath);
+			Current.SceneCache.InvalidateEntryFromFilesystem(localPath);
 			Tasks.StopByTag(aggregateModifiedAssetsTaskTag);
 			Tasks.Add(AggregateModifiedAssetsTask, aggregateModifiedAssetsTaskTag);
 		}
@@ -463,13 +477,13 @@ namespace Tangerine.Core
 
 		private void UpdateTextureParams()
 		{
-			var rules = Orange.CookingRulesBuilder.Build(Orange.The.Workspace.AssetFiles, null);
+			var rules = CookingRulesBuilder.Build(The.Workspace.AssetFiles, null);
 			foreach (var kv in rules) {
 				var path = kv.Key;
 				var rule = kv.Value;
 				if (path.EndsWith(".png")) {
-					var textureParamsPath = Path.Combine(Orange.The.Workspace.AssetsDirectory, Path.ChangeExtension(path, ".texture"));
-					if (!Orange.AssetCooker.AreTextureParamsDefault(rule)) {
+					var textureParamsPath = Path.Combine(The.Workspace.AssetsDirectory, Path.ChangeExtension(path, ".texture"));
+					if (!AssetCooker.AreTextureParamsDefault(rule)) {
 						var textureParams = new TextureParams {
 							WrapMode = rule.WrapMode,
 							MinFilter = rule.MinFilter,
@@ -485,7 +499,7 @@ namespace Tangerine.Core
 								if (existingParams.Equals(textureParams)) {
 									continue;
 								}
-							} catch (System.Exception) {
+							} catch (Exception) {
 								// Подавляем исключения сериализации, потому что я не хочу, чтобы
 								// этот костыль ещё и валил Танжерин по хз какому поводу.
 							}
@@ -503,6 +517,11 @@ namespace Tangerine.Core
 		public static void RaiseDocumentSaving(Document document)
 		{
 			DocumentSaving?.Invoke(document);
+		}
+
+		public static void RaiseDocumentSaved(Document document)
+		{
+			DocumentSaved?.Invoke(document);
 		}
 
 		public static IEnumerable<Type> GetNodesTypesOrdered(string assemblyName)
@@ -530,10 +549,8 @@ namespace Tangerine.Core
 				.Where(t => typeof(NodeComponent).IsAssignableFrom(t) && t.IsDefined(typeof(TangerineRegisterComponentAttribute)));
 		}
 
-		public string GetFullPath(string assetPath, string extension)
-		{
-			return Path.Combine(AssetsDirectory, assetPath) + $".{extension}";
-		}
+		public string GetFullPath(string assetPath, string extension) =>
+			Path.Combine(AssetsDirectory, assetPath) + $".{extension}";
 
 		public bool GetFullPath(string localPath, out string fullPath)
 		{
@@ -567,5 +584,7 @@ namespace Tangerine.Core
 			}
 			return GetFullPath(AssetPath.CorrectSlashes(path), out var fullPath) && File.Exists(fullPath);
 		}
+
+		public bool IsDocumentUntitled(string path) => path.StartsWith(".untitled");
 	}
 }

@@ -60,6 +60,7 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollAnimationTrackView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="GridPaneFilesDropHandler.cs" />
     <Compile Include="Operations\CompoundAnimations\AnimationClipToolbox.cs" />
     <Compile Include="Operations\CompoundAnimations\DeleteSelectedAnimationClips.cs" />
     <Compile Include="Operations\CompoundAnimations\DragAnimationClips.cs" />
@@ -135,6 +136,10 @@
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Common\Tangerine.Common.Win.csproj">
+      <Project>{259c5e1f-1507-4131-8b4e-dd3c51f7462a}</Project>
+      <Name>Tangerine.Common.Win</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>

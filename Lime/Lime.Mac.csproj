@@ -484,6 +484,7 @@
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\YuzuGeneratedBinaryDeserializer.cs" />
     <Compile Include="Source\YuzuGeneratedCloners.cs" />
+    <Compile Include="Source\Widgets\Gestures\DropFilesGesture.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />

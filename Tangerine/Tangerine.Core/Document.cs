@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 using Lime;
 using Tangerine.Core.Components;
 
@@ -30,18 +31,16 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
-		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
-
-		private readonly string defaultPath = "Untitled";
+		private readonly string untitledPathFormat = ".untitled/{0:D2}/Untitled{0:D2}";
 		private readonly Vector2 defaultSceneSize = new Vector2(1024, 768);
+		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
+		private readonly Dictionary<Node, Animation> selectedAnimationPerContainer = new Dictionary<Node, Animation>();
+		private readonly MemoryStream preloadedSceneStream = null;
+		private static uint untitledCounter = 0;
 
+		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
 		public delegate bool PathSelectorDelegate(out string path);
 
-		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
-
-		private readonly Dictionary<Node, Animation> selectedAnimationPerContainer = new Dictionary<Node, Animation>();
-
-		private readonly MemoryStream preloadedSceneStream = null;
 		public DateTime LastWriteTime { get; private set; }
 
 		public bool Loaded { get; private set; } = true;
@@ -161,7 +160,7 @@ namespace Tangerine.Core
 		public Document(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
 		{
 			Format = format;
-			Path = defaultPath;
+			Path = string.Format(untitledPathFormat, untitledCounter++);
 			if (rootType == null) {
 				Container = RootNodeUnwrapped = RootNode = new Frame { Size = defaultSceneSize };
 			} else {
@@ -246,7 +245,7 @@ namespace Tangerine.Core
 					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
 				}
 				if (Format == DocumentFormat.Fbx) {
-					Path = defaultPath;
+					Path = string.Format(untitledPathFormat, untitledCounter++);
 				}
 				RootNode = RootNodeUnwrapped;
 				if (RootNode is Node3D) {
@@ -419,9 +418,12 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
-			if (Path == defaultPath) {
+			if (Project.Current.IsDocumentUntitled(Path)) {
 				if (PathSelector(out var path)) {
+					var directoryInfo = new DirectoryInfo(System.IO.Path.GetDirectoryName(FullPath));
 					SaveAs(path);
+					// Delete Untitled directory and it's content
+					directoryInfo.Delete(true);
 				}
 			} else {
 				SaveAs(Path);
@@ -446,6 +448,7 @@ namespace Tangerine.Core
 			}
 			LastWriteTime = File.GetLastWriteTime(FullPath);
 			Project.Current.AddRecentDocument(Path);
+			Project.RaiseDocumentSaved(this);
 		}
 
 		public void ExportToFile(string filePath, string assetPath, FileAttributes attributes = 0)

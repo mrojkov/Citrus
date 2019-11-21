@@ -114,8 +114,6 @@
     <Compile Include="TabbedWidget.cs" />
     <Compile Include="ToolbarView.cs" />
     <Compile Include="ToolbarButton.cs" />
-    <Compile Include="Utils\DropSceneContextMenu.cs" />
-    <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="Utils\Spacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
@@ -140,5 +138,6 @@
       <Name>Tangerine.Core.Win</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

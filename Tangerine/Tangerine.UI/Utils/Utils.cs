@@ -108,7 +108,7 @@ namespace Tangerine.UI
 
 		public static bool AssertCurrentDocument(string assetPath, string assetType)
 		{
-			if (assetPath.Equals(Document.Current.Path)) {
+			if (assetPath.Equals(Document.Current?.Path)) {
 				AlertDialog.Show($"Сycle dependency is not allowed: {assetPath}{assetType}");
 				return false;
 			}
@@ -129,9 +129,22 @@ namespace Tangerine.UI
 					path = path.Substring(assetsPath.Length + 1);
 				}
 			}
-			assetPath = System.IO.Path.ChangeExtension(path, null);
-			assetType = System.IO.Path.GetExtension(path).ToLower();
+			assetPath = Path.ChangeExtension(path, null);
+			assetType = Path.GetExtension(path).ToLower();
 			return true;
+		}
+
+		public static IEnumerable<string> GetAssetPaths(IEnumerable<string> filePaths)
+		{
+			foreach (var filePath in filePaths) {
+				if (
+					!ExtractAssetPathOrShowAlert(filePath, out var assetPath, out var assetType) ||
+					!AssertCurrentDocument(assetPath, assetType)
+				) {
+					continue;
+				}
+				yield return assetPath;
+			}
 		}
 	}
 }

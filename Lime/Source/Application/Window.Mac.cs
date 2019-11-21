@@ -20,6 +20,7 @@ namespace Lime
 		private bool modal;
 		private Display display;
 		private bool closed;
+		private bool shouldCleanDroppedFiles;
 
 		public bool AsyncRendering { get; set; }
 
@@ -215,9 +216,13 @@ namespace Lime
 
 		public void DragFiles(string[] filenames)
 		{
-			foreach (var filename in filenames) {
-				View.DragFile(filename, new CGRect(), false, NSApplication.SharedApplication.CurrentEvent);
-			}
+			// See Dragging File Paths:
+			// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/DragandDrop/Tasks/DraggingFiles.html
+			var pboard = NSPasteboard.CreateWithUniqueName();
+			pboard.DeclareTypes (new string [] { NSPasteboard.NSFilenamesType }, null);
+			pboard.SetPropertyListForType (NSArray.FromObjects(filenames), NSPasteboard.NSFilenamesType);
+			var dragImage = NSWorkspace.SharedWorkspace.IconForFiles(filenames);
+			View.DragImage(dragImage, new CGPoint(), new CGSize(), new NSEvent(), pboard, View, false);
 		}
 
 		public float UnclampedDelta { get; private set; }
@@ -501,7 +506,7 @@ namespace Lime
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
 			if (Active || Input.IsSimulationRunning) {
-				Input.ProcessPendingKeyEvents(delta);
+				Input.ProcessPendingInputEvents(delta);
 			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
@@ -509,6 +514,15 @@ namespace Lime
 				Input.CopyKeysState();
 				Input.TextInput = null;
 			}
+			// We give one update cycle to handle files drop
+			// (files dropped event may be fired inside update)
+			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
+				if (shouldCleanDroppedFiles) {
+					Input.DroppedFiles.Clear ();
+				}
+				shouldCleanDroppedFiles = !shouldCleanDroppedFiles;
+			}
+
 			if (Application.AreAllWindowsInactive()) {
 				Input.ClearKeyState();
 			}
@@ -526,7 +540,9 @@ namespace Lime
 		private void RaiseFilesDropped(IEnumerable<string> files)
 		{
 			using (Context.Activate().Scoped()) {
+				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
+				Input.DroppedFiles.AddRange(files);
 			}
 		}
 	}

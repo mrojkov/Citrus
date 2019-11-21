@@ -139,6 +139,10 @@
       <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Common\Tangerine.Common.Win.csproj">
+      <Project>{259c5e1f-1507-4131-8b4e-dd3c51f7462a}</Project>
+      <Name>Tangerine.Common.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
       <Name>Tangerine.Core.Win</Name>

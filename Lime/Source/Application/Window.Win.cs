@@ -38,6 +38,7 @@ namespace Lime
 		private Point lastMousePosition;
 		private bool isInvalidated;
 		private bool vSync;
+		private bool shouldCleanDroppedFiles;
 
 		public WindowInput Input { get; private set; }
 
@@ -841,7 +842,7 @@ namespace Lime
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
 			if (active || Input.IsSimulationRunning) {
-				Input.ProcessPendingKeyEvents(delta);
+				Input.ProcessPendingInputEvents(delta);
 			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
@@ -851,6 +852,14 @@ namespace Lime
 			}
 			if (wasInvalidated || renderingState == RenderingState.RenderDeferred) {
 				renderControl.Invalidate();
+			}
+			// We give one update cycle to handle files drop
+			// (files dropped event may be fired inside update)
+			if (Input.DroppedFiles.Count > 0 || shouldCleanDroppedFiles) {
+				if (shouldCleanDroppedFiles) {
+					Input.DroppedFiles.Clear();
+				}
+				shouldCleanDroppedFiles = !shouldCleanDroppedFiles;
 			}
 			renderingState = renderControl.CanRender ? RenderingState.Updated : RenderingState.Rendered;
 			WaitForRendering();
@@ -1124,6 +1133,7 @@ namespace Lime
 			using (Context.Activate().Scoped()) {
 				Application.WindowUnderMouse = this;
 				FilesDropped?.Invoke(files);
+				Input.DroppedFiles.AddRange(files);
 			}
 		}
 

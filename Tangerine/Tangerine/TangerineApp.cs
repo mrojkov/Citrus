@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Lime;
-using Orange;
+using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.MainMenu;
 using Tangerine.UI;
@@ -87,6 +87,7 @@ namespace Tangerine
 			LoadFont();
 
 			DockManager.Initialize(new Vector2(1024, 768));
+			DockManager.Instance.DocumentAreaDropFilesGesture.Recognized += new ScenesDropHandler { ShouldCreateContextMenu = false }.Handle;
 			TangerineMenu.Create();
 			var mainWidget = DockManager.Instance.MainWindowWidget;
 			mainWidget.Window.AllowDropFiles = true;
@@ -96,7 +97,6 @@ namespace Tangerine
 			});
 			mainWidget.AddChangeWatcher(() => CoreUserPreferences.Instance.AnimationMode, _ => Document.Current?.ForceAnimationUpdate());
 			mainWidget.AddChangeWatcher(() => Document.Current?.Container, _ => Document.Current?.ForceAnimationUpdate());
-
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
 				AppUserPreferences.Instance.DockState = DockManager.Instance.ExportState();
@@ -560,25 +560,12 @@ namespace Tangerine
 			{
 				tabBar.HitTestTarget = true;
 				this.tabBar = tabBar;
-				DockManager.Instance.FilesDropped += DropFiles;
+				var g = new DropFilesGesture();
+				g.Recognized += new ScenesDropHandler { ShouldCreateContextMenu = false }.Handle;
+				tabBar.Gestures.Add(g);
 				RebuildTabs(tabBar);
 				tabBar.AddChangeWatcher(() => Project.Current.Documents.Version, _ => RebuildTabs(tabBar));
 				tabBar.AddChangeWatcher(() => Project.Current, _ => RebuildTabs(tabBar));
-			}
-
-			private void DropFiles(IEnumerable<string> obj)
-			{
-				if (tabBar.IsMouseOverThisOrDescendant() || Document.Current == null) {
-					foreach (var path in obj) {
-						if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
-							try {
-								Project.Current.OpenDocument(path, true);
-							} catch (System.InvalidOperationException e) {
-								AlertDialog.Show(e.Message);
-							}
-						}
-					}
-				}
 			}
 
 			private void RebuildTabs(TabBar tabBar)

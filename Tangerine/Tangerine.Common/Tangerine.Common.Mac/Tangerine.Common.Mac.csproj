@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D6B543CB-0223-4210-BB0F-7D8250760895}</ProjectGuid>
+    <ProjectGuid>{17DCD218-2ED0-4E5E-B0F1-50970A5287AB}</ProjectGuid>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>Tangerine.UI.Inspector</RootNamespace>
-    <AssemblyName>Tangerine.UI.Inspector</AssemblyName>
+    <RootNamespace>Tangerine.Common.Mac</RootNamespace>
+    <AssemblyName>Tangerine.Common.Mac</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
@@ -20,43 +20,29 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements>
-    </CodeSignEntitlements>
-    <CodeSignResourceRules>
-    </CodeSignResourceRules>
-    <XamMacArch>
-    </XamMacArch>
-    <Profiling>true</Profiling>
-    <AOTMode>None</AOTMode>
-    <LangVersion>7.3</LangVersion>
+    <HttpClientHandler></HttpClientHandler>
+    <LinkMode></LinkMode>
+    <XamMacArch></XamMacArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
-    <CodeSignEntitlements>
-    </CodeSignEntitlements>
-    <CodeSignResourceRules>
-    </CodeSignResourceRules>
-    <XamMacArch>
-    </XamMacArch>
-    <AOTMode>None</AOTMode>
-    <LangVersion>7.3</LangVersion>
+    <HttpClientHandler></HttpClientHandler>
+    <LinkMode></LinkMode>
+    <XamMacArch></XamMacArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -64,32 +50,7 @@
     <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EasingButton.cs" />
-    <Compile Include="EasingIcon.cs" />
-    <Compile Include="Inspector.cs" />
-    <Compile Include="InspectorContent.cs" />
-    <Compile Include="InspectorPropertyRegistry.cs" />
-    <Compile Include="KeyframeButton.cs" />
-    <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Mac.csproj">
-      <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
-      <Name>Tangerine.UI.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Mac.csproj">
-      <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
-      <Name>Tangerine.Core.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
-      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
-      <Name>Lime.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
-      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
-      <Name>Yuzu.Mac</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

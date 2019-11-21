@@ -2,6 +2,7 @@ using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tangerine.Common.FilesDropHandlers;
 using Tangerine.Core;
 using Tangerine.Core.Components;
 using Tangerine.UI.Docking;
@@ -22,8 +23,8 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget PanelWidget;
 		public readonly Panel Panel;
 		public readonly Widget RootWidget;
-		public readonly FilesDropHandler FilesDropHandler;
 		public readonly WaveformCache WaveformCache;
+		public readonly DropFilesGesture DropFilesGesture;
 
 		private Vector2 offset;
 		public Vector2 Offset
@@ -60,8 +61,24 @@ namespace Tangerine.UI.Timeline
 		public readonly ComponentCollection<Component> Globals = new ComponentCollection<Component>();
 
 		public event Action<Vector2> OffsetChanged;
+		/// <summary>
+		/// Called before Attach code execution.
+		/// </summary>
+		public event Action Attaching;
+		/// <summary>
+		/// Called before Detach code execution.
+		/// </summary>
+		public event Action Detaching;
+		/// <summary>
+		/// Called after Attach code execution.
+		/// </summary>
+		public event Action Attached;
+		/// <summary>
+		/// Called after Detach code execution
+		/// </summary>
+		public event Action Detached;
 
-		public static IEnumerable<Type> GetOperationProcessorTypes() => new [] {
+		public static IEnumerable<Type> GetOperationProcessorTypes() => new[] {
 			typeof(EnsureRowVisibleIfSelected),
 			typeof(EnsureCurrentColumnVisibleIfContainerChanged),
 			typeof(ColumnCountUpdater),
@@ -77,8 +94,6 @@ namespace Tangerine.UI.Timeline
 		public Timeline(Panel panel)
 		{
 			RootWidget = new Widget();
-			FilesDropHandler = new FilesDropHandler(RootWidget);
-			FilesDropHandler.Handling += FilesDropOnHandling;
 			Panel = panel;
 			PanelWidget = panel.ContentWidget;
 			Toolbar = new Toolbar();
@@ -90,7 +105,7 @@ namespace Tangerine.UI.Timeline
 			CreateProcessors();
 			InitializeWidgets();
 			WaveformCache = new WaveformCache(Project.Current.FileSystemWatcher);
-			RootWidget.AddChangeWatcher(() => Document.Current.Container, (container) => {
+			RootWidget.AddChangeWatcher(() => Document.Current.Container, container => {
 				Offset = container.Components.GetOrAdd<TimelineOffset>().Offset;
 			});
 			RootWidget.AddChangeWatcher(() => Offset, (value) => {
@@ -99,22 +114,34 @@ namespace Tangerine.UI.Timeline
 					offset.Offset = value;
 				}
 			});
+			RootWidget.Gestures.Add(DropFilesGesture = new DropFilesGesture());
+			CreateFilesDropHandlers();
 		}
+
+		private void CreateFilesDropHandlers()
+		{
+			DropFilesGesture.Recognized += new ImagesDropHandler().Handle;
+			DropFilesGesture.Recognized += new AudiosDropHandler().Handle;
+			DropFilesGesture.Recognized += new ScenesDropHandler().Handle;
+		}
+
 
 		public void Attach()
 		{
+			Attaching?.Invoke();
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
 			RootWidget.SetFocus();
-			DockManager.Instance.AddFilesDropHandler(FilesDropHandler);
 			UpdateTitle();
+			Attached?.Invoke();
 		}
 
 		public void Detach()
 		{
-			DockManager.Instance.RemoveFilesDropHandler(FilesDropHandler);
+			Detaching?.Invoke();
 			Instance = null;
 			RootWidget.Unlink();
+			Detached?.Invoke();
 		}
 
 		private static void FilesDropOnHandling()

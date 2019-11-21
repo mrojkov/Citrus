@@ -25,6 +25,7 @@ namespace Tangerine.UI.Inspector
 		public readonly Widget RootWidget;
 		public readonly ToolbarView Toolbar;
 		public readonly List<object> Objects;
+		public readonly DropFilesGesture DropFilesGesture;
 
 		static Inspector()
 		{
@@ -55,7 +56,6 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
-			Docking.DockManager.Instance.FilesDropped += OnFilesDropped;
 			content.LoadExpandedStates();
 			Rebuild();
 		}
@@ -64,11 +64,8 @@ namespace Tangerine.UI.Inspector
 		{
 			Instance = null;
 			content.SaveExpandedStates();
-			Docking.DockManager.Instance.FilesDropped -= OnFilesDropped;
 			RootWidget.Unlink();
 		}
-
-		private void OnFilesDropped(IEnumerable<string> files) => content.DropFiles(files);
 
 		public Inspector(Widget panelWidget)
 		{
@@ -78,19 +75,23 @@ namespace Tangerine.UI.Inspector
 			contentWidget = new ThemedScrollView();
 			RootWidget.AddNode(toolbarArea);
 			RootWidget.AddNode(contentWidget);
+			RootWidget.Gestures.Add(DropFilesGesture = new DropFilesGesture());
 			contentWidget.Content.Layout = new VBoxLayout();
 			Toolbar = new ToolbarView(toolbarArea, GetToolbarLayout());
 			Objects = new List<object>();
-			content = new InspectorContent(contentWidget.Content) {
+			content = new InspectorContent(contentWidget.Content)
+			{
 				Footer = new Widget { MinHeight = 300.0f },
 				History = Document.Current.History
 			};
+			DropFilesGesture.Recognized += content.DropFiles;
 			CreateWatchersToRebuild();
 		}
 
 		private static ToolbarModel GetToolbarLayout()
 		{
-			return new ToolbarModel {
+			return new ToolbarModel
+			{
 				Rows = {
 					new ToolbarModel.ToolbarRow {
 						Index = 0,

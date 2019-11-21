@@ -137,8 +137,6 @@
     <Compile Include="ToolbarModel.cs" />
     <Compile Include="ToolbarView.cs" />
     <Compile Include="Utils\Colors.cs" />
-    <Compile Include="Utils\DropSceneContextMenu.cs" />
-    <Compile Include="Utils\FilesDropHandler.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\Metrics.cs" />
     <Compile Include="Utils\Spacer.cs" />
