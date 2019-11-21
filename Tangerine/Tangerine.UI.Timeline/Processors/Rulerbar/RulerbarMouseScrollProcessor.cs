@@ -24,7 +24,12 @@ namespace Tangerine.UI.Timeline
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCurrentColumn = CalcColumn(rulerWidget.LocalMousePosition().X);
 						Document.Current.AnimationFrame = initialCurrentColumn;
+						var saved = CoreUserPreferences.Instance.StopAnimationOnCurrentFrame;
+						// Dirty hack: prevent creating RestoreAnimationsTimesComponent
+						// in order to stop running animation on clicked frame (RBT-2887)
+						CoreUserPreferences.Instance.StopAnimationOnCurrentFrame = true;
 						SetCurrentColumn.Perform(initialCurrentColumn);
+						CoreUserPreferences.Instance.StopAnimationOnCurrentFrame = saved;
 						int previousColumn = -1;
 						var marker = Document.Current.Animation.Markers.GetByFrame(initialCurrentColumn);
 						bool isShifting = false;
