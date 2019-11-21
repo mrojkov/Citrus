@@ -7,8 +7,11 @@ namespace Tangerine.UI.SceneView
 {
 	public class WidgetsPivotMarkPresenter
 	{
+		private SceneView sceneView;
+
 		public WidgetsPivotMarkPresenter(SceneView sceneView)
 		{
+			this.sceneView = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderWidgetsPivotMark));
 		}
 
@@ -25,7 +28,7 @@ namespace Tangerine.UI.SceneView
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
-				var p = widget.CalcPositionInSpaceOf(canvas);
+				var p = widget.CalcPositionInSpaceOf(sceneView.CalcViewportToSceneTransition());
 				var position = p - iconSize / 2;
 				position.X = (float)System.Math.Truncate(position.X);
 				position.Y = (float)System.Math.Truncate(position.Y);

@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, SceneView.Scene, out var hull, out var pivot)) {
+				if (Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var pivot)) {
 					for (var i = 0; i < 4; i++) {
 						var a = hull[i];
 						if (SceneView.HitTestResizeControlPoint(a)) {

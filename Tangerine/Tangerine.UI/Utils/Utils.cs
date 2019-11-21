@@ -40,6 +40,11 @@ namespace Tangerine.UI
 
 		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
 		{
+			return CalcHullAndPivot(widgets, canvas.LocalToWorldTransform, out hull, out pivot);
+		}
+
+		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Matrix32 canvasWorldMatrix, out Quadrangle hull, out Vector2 pivot)
+		{
 			Widget first = null;
 			var pivotsEqual = true;
 			var aabb = Rectangle.Empty;
@@ -48,19 +53,19 @@ namespace Tangerine.UI
 			float pivotTolerance = 1e-1f;
 			foreach (var widget in widgets) {
 				if (first == null) {
-					hull = widget.CalcHullInSpaceOf(canvas);
-					pivot = widget.CalcPositionInSpaceOf(canvas);
-					aabb = widget.CalcAABBInSpaceOf(canvas);
+					hull = widget.CalcHullInSpaceOf(canvasWorldMatrix);
+					pivot = widget.CalcPositionInSpaceOf(canvasWorldMatrix);
+					aabb = widget.CalcAABBInSpaceOf(canvasWorldMatrix);
 					first = widget;
 				} else {
-					var t = widget.CalcAABBInSpaceOf(canvas);
+					var t = widget.CalcAABBInSpaceOf(canvasWorldMatrix);
 					aabb = aabb
 						.IncludingPoint(t.A)
 						.IncludingPoint(new Vector2(t.Right, t.Top))
 						.IncludingPoint(t.B)
 						.IncludingPoint(new Vector2(t.Left, t.Bottom));
 					hull = aabb.ToQuadrangle();
-					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvas), pivot) <= pivotTolerance;
+					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvasWorldMatrix), pivot) <= pivotTolerance;
 				}
 			}
 			if (first == null) {

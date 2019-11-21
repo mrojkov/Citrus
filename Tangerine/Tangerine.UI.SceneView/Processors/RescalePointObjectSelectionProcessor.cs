@@ -28,7 +28,7 @@ namespace Tangerine.UI.SceneView
 					var hull = aabb.ToQuadrangle();
 					var hullSize = hull.V3 - hull.V1;
 					hullNormalized = hull * Matrix32.Scaling(Vector2.One / Document.Current.Container.AsWidget.Size);
-					var expandedHullInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv.Frame) *
+					var expandedHullInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv) *
 						sv.Frame.CalcTransitionToSpaceOf(sv.Scene);
 					for (int i = 0; i < 4; i++) {
 						if (Mathf.Abs(hullSize.X) > Mathf.ZeroTolerance && Mathf.Abs(hullSize.Y) > Mathf.ZeroTolerance) {
@@ -70,7 +70,7 @@ namespace Tangerine.UI.SceneView
 
 		IEnumerator<object> Rescale(int controlPointIndex, MouseCursor cursor, List<PointObject> points)
 		{
-			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			var t = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 			using (Document.Current.History.BeginTransaction()) {
 				Utils.ChangeCursorIfDefault(cursor);
 				initialMousePosition = sv.MousePosition;
@@ -91,7 +91,7 @@ namespace Tangerine.UI.SceneView
 
 		void RescaleHelper(List<PointObject> points, int controlPointIndex, bool proportional, bool centerProportional)
 		{
-			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			var t = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 			t.T = Vector2.Zero;
 			var transformedMouseDelta = (sv.MousePosition - initialMousePosition) * t / Document.Current.Container.AsWidget.Size;
 			Vector2 origin;

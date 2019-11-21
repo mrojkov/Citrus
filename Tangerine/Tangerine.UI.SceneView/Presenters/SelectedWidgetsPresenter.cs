@@ -8,11 +8,14 @@ namespace Tangerine.UI.SceneView
 {
 	class SelectedWidgetsPresenter
 	{
+		private SceneView sceneView;
+
 		private readonly VisualHint selectedWidgetPivotVisualHint =
 			VisualHintsRegistry.Instance.Register("/All/Selected Widget Pivot", hideRule: VisualHintsRegistry.HideRules.VisibleIfProjectOpened);
 
 		public SelectedWidgetsPresenter(SceneView sceneView)
 		{
+			this.sceneView = sceneView;
 			sceneView.Frame.CompoundPostPresenter.Add(new SyncDelegatePresenter<Widget>(RenderSelection));
 		}
 
@@ -21,14 +24,17 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewScene) {
 				return;
 			}
+
 			canvas.PrepareRendererState();
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 			if (widgets.Count == 0) {
 				return;
 			}
+
+			var viewportToSceneTransition = sceneView.CalcViewportToSceneTransition();
 			Quadrangle hull;
 			Vector2 pivot;
-			Utils.CalcHullAndPivot(widgets, canvas, out hull, out pivot);
+			Utils.CalcHullAndPivot(widgets, viewportToSceneTransition, out hull, out pivot);
 			// Render rectangles.
 			var locked = widgets.Any(w => w.GetTangerineFlag(TangerineFlags.Locked));
 			var color = locked ? ColorTheme.Current.SceneView.LockedWidgetBorder : ColorTheme.Current.SceneView.Selection;
@@ -52,13 +58,13 @@ namespace Tangerine.UI.SceneView
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
-				var h = widget.CalcHullInSpaceOf(canvas);
+				var h = widget.CalcHullInSpaceOf(viewportToSceneTransition);
 				for (int i = 0; i < 4; i++) {
 					var a = h[i];
 					var b = h[(i + 1) % 4];
 					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
 				}
-				var p = widget.CalcPositionInSpaceOf(canvas);
+				var p = widget.CalcPositionInSpaceOf(viewportToSceneTransition);
 				Renderer.DrawSprite(t, ColorTheme.Current.SceneView.SelectedWidgetPivotOutline, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 				if (selectedWidgetPivotVisualHint.Enabled) {
 					Renderer.DrawRectOutline(

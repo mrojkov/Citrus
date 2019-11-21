@@ -1161,7 +1161,8 @@ namespace Lime
 		ColorFactor = 1 << 10,
 		World = 1 << 11,
 		View = 1 << 12,
-		Projection = 1 << 13
+		Projection = 1 << 13,
+		All = ~0
 	}
 
 	[YuzuCopyable]

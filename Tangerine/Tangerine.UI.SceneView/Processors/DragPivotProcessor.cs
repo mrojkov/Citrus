@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 				if (
 					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() &&
 					sv.Input.IsKeyPressed(Key.Control) &&
-					Utils.CalcHullAndPivot(widgets, sv.Scene, out var hull, out var pivot) &&
+					Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var pivot) &&
 					sv.HitTestControlPoint(pivot))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -42,11 +42,11 @@ namespace Tangerine.UI.SceneView
 					Document.Current.History.RollbackTransaction();
 					var curMousePos = SnapMousePosToSpecialPoints(hull, sv.MousePosition, Vector2.Zero);
 					foreach (var widget in widgets) {
-						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+						var transform = widget.LocalToWorldTransform.CalcInversed();
 						var newPivot = curMousePos * transform / widget.Size;
 						Core.Operations.SetAnimableProperty.Perform(
 							widget, nameof(Widget.Position),
-							curMousePos * sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget),
+							curMousePos * widget.ParentWidget.LocalToWorldTransform.CalcInversed(),
 							CoreUserPreferences.Instance.AutoKeyframes
 						);
 						Core.Operations.SetAnimableProperty.Perform(
@@ -67,7 +67,7 @@ namespace Tangerine.UI.SceneView
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 			using (Document.Current.History.BeginTransaction()) {
 				var dragDirection = DragDirection.Any;
-				Utils.CalcHullAndPivot(widgets, sv.Scene, out var hull, out var iniPivot);
+				Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var iniPivot);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -93,7 +93,7 @@ namespace Tangerine.UI.SceneView
 							DragDirection.Vertical;
 					}
 					foreach (var widget in widgets) {
-						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+						var transform = widget.LocalToWorldTransform.CalcInversed();
 						var dragDelta = curMousePos * transform - iniMousePos * transform;
 						var deltaPivot = dragDelta / widget.Size;
 						var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);

@@ -104,8 +104,13 @@ namespace Lime
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
-			var matrix = Parent.AsWidget.CalcTransitionToSpaceOf(container);
-			return matrix.TransformVector(TransformedPosition);
+			return CalcPositionInSpaceOf(container.LocalToWorldTransform);
+		}
+
+		public Vector2 CalcPositionInSpaceOf(Matrix32 matrix)
+		{
+			var t = Parent.AsWidget.CalcTransitionToSpaceOf(matrix);
+			return t.TransformVector(TransformedPosition);
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

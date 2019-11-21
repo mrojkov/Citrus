@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 				var pointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>();
 				var pointsContainer = Document.Current.Container.AsWidget;
 				if (Utils.CalcAABB(pointObjects, pointsContainer, out var aabb)) {
-					var t = pointsContainer.CalcTransitionToSpaceOf(sv.Scene);
+					var t = pointsContainer.LocalToWorldTransform;
 					// Presenter shows OBB so need to calculate it
 					var q = aabb.ToQuadrangle() * t;
 					if (sv.HitTestControlPoint((q.V1 + q.V3) / 2f)) {
@@ -43,7 +43,7 @@ namespace Tangerine.UI.SceneView
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
-				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var transform = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 				var dragDirection = DragDirection.Any;
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();

@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 					Rectangle aabb;
 					Utils.CalcAABB(selectedPointObjects, Document.Current.Container.AsWidget, out aabb);
 					var hull = aabb.ToQuadrangle();
-					var expandedBoundsInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv.Frame) *
+					var expandedBoundsInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv) *
 						sv.Frame.CalcTransitionToSpaceOf(sv.Scene);
 					for (var i = 0; i < 4; i++) {
 						if (sv.HitTestControlPoint(expandedBoundsInSceneCoords[i])) {
@@ -40,7 +40,7 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Rotate(Quadrangle hull, List<PointObject> points)
 		{
 			using (Document.Current.History.BeginTransaction()) {
-				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var t = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 				hull *= Matrix32.Scaling(Vector2.One/ Document.Current.Container.AsWidget.Size);
 				var center = (hull.V1 + hull.V3) / 2;
 				var size = Document.Current.Container.AsWidget.Size;

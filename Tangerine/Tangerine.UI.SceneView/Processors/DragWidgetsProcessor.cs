@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, SceneView.Scene, out _, out var pivot) && SceneView.HitTestControlPoint(pivot)) {
+				if (Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out _, out var pivot) && SceneView.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (SceneView.Input.ConsumeKeyPress(Key.Mouse0)) {
 						yield return DragByMouse();
@@ -80,7 +80,7 @@ namespace Tangerine.UI.SceneView
 		private static void DragWidgets(Vector2 delta)
 		{
 			if (Document.Current.Container is Widget containerWidget) {
-				var transform = containerWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene).CalcInversed();
+				var transform = containerWidget.LocalToWorldTransform.CalcInversed();
 				var dragDelta = transform * delta - transform * Vector2.Zero;
 				foreach (var widget in Document.Current.SelectedNodes().Editable().OfType<Widget>()) {
 					SetAnimableProperty.Perform(widget, nameof(Widget.Position), widget.Position + dragDelta, CoreUserPreferences.Instance.AutoKeyframes);
@@ -156,10 +156,10 @@ namespace Tangerine.UI.SceneView
 						foreach (var widget in widgets) {
 							var points = new List<Vector2>();
 							if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
-								points.Add(widget.CalcPositionInSpaceOf(SceneView.Scene));
+								points.Add(widget.CalcPositionInSpaceOf(Matrix32.Identity));
 							}
 							if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
-								points.AddRange(widget.CalcHullInSpaceOf(SceneView.Scene));
+								points.AddRange(widget.CalcHullInSpaceOf(Matrix32.Identity));
 							}
 							foreach (var point in points) {
 								var pointMoved = point + mouseDelta;
@@ -217,7 +217,7 @@ namespace Tangerine.UI.SceneView
 		private static Vector2 SnapPointToRulers(Vector2 point, List<Ruler> rulers, RulerOrientation orientationFilter)
 		{
 			if (TrySnapPoint(point, rulers, orientationFilter, out var snappedPoint)) {
-				return snappedPoint * Document.Current.RootNode.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
+				return snappedPoint * Document.Current.RootNode.AsWidget.LocalToWorldTransform;
 			}
 			return point;
 		}
@@ -231,7 +231,7 @@ namespace Tangerine.UI.SceneView
 						continue;
 					}
 					var mask = orientationFilter == RulerOrientation.Vertical ? Vector2.Right : Vector2.Down;
-					var transformedPosition = pos * SceneView.Instance.Scene.CalcTransitionToSpaceOf(Document.Current.RootNode.AsWidget);
+					var transformedPosition = pos * Document.Current.RootNode.AsWidget.LocalToWorldTransform.CalcInversed();
 					var lineVector = LineToVector(line, ruler.AnchorToRoot);
 					if ((transformedPosition * mask - lineVector).Length < Threshold / sceneZoom) {
 						snappedPoint = transformedPosition * (Vector2.One - mask) + lineVector;

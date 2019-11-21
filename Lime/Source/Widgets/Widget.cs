@@ -1289,19 +1289,44 @@ namespace Lime
 			Pivot = Vector2.Half;
 		}
 
-		public Matrix32 CalcTransitionToSpaceOf(Widget container)
+		/// <summary>
+		/// Calculates the widget's transition to the space of another widget.
+		/// </summary>
+		public Matrix32 CalcTransitionToSpaceOf(Widget widget)
 		{
-			var mtx1 = container.LocalToWorldTransform.CalcInversed();
-			var mtx2 = LocalToWorldTransform;
-			return mtx2 * mtx1;
+			return CalcTransitionToSpaceOf(widget.LocalToWorldTransform);
 		}
 
 		/// <summary>
 		/// Calculates the widget's convex hull in the space of another widget.
 		/// </summary>
-		public Quadrangle CalcHullInSpaceOf(Widget container)
+		public Quadrangle CalcHullInSpaceOf(Widget widget)
 		{
-			var t = CalcTransitionToSpaceOf(container);
+			return CalcHullInSpaceOf(widget.LocalToWorldTransform);
+		}
+
+		/// <summary>
+		/// Calculates the widget's AABB in the space of another widget.
+		/// </summary>
+		public Rectangle CalcAABBInSpaceOf(Widget widget)
+		{
+			return CalcAABBInSpaceOf(widget.LocalToWorldTransform);
+		}
+
+		/// <summary>
+		/// Calculates the widget's transition to the space defined by matrix.
+		/// </summary>
+		public Matrix32 CalcTransitionToSpaceOf(Matrix32 matrix)
+		{
+			return LocalToWorldTransform * matrix.CalcInversed();
+		}
+
+		/// <summary>
+		/// Calculates the widget's convex hull in the space defined by matrix.
+		/// </summary>
+		public Quadrangle CalcHullInSpaceOf(Matrix32 matrix)
+		{
+			var t = CalcTransitionToSpaceOf(matrix);
 			return new Quadrangle {
 				V1 = t * Vector2.Zero,
 				V2 = t * new Vector2(Width, 0),
@@ -1311,11 +1336,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Calculates the widget's AABB in the space of another widget.
+		/// Calculates the widget's AABB in the space defined by matrix.
 		/// </summary>
-		public Rectangle CalcAABBInSpaceOf(Widget container)
+		public Rectangle CalcAABBInSpaceOf(Matrix32 matrix)
 		{
-			var hull = CalcHullInSpaceOf(container);
+			var hull = CalcHullInSpaceOf(matrix);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue)
 				.IncludingPoint(hull.V1)
 				.IncludingPoint(hull.V2)
@@ -1369,10 +1394,15 @@ namespace Lime
 			};
 		}
 
-		public Vector2 CalcPositionInSpaceOf(Widget container)
+		public Vector2 CalcPositionInSpaceOf(Widget widget)
 		{
-			Matrix32 matrix = CalcTransitionToSpaceOf(container);
-			return matrix.TransformVector(Pivot * Size);
+			return CalcPositionInSpaceOf(widget.LocalToWorldTransform);
+		}
+
+		public Vector2 CalcPositionInSpaceOf(Matrix32 matrix)
+		{
+			var t = CalcTransitionToSpaceOf(matrix);
+			return t.TransformVector(Pivot * Size);
 		}
 
 		public virtual IEnumerable<string> GetVisibilityIssues()
