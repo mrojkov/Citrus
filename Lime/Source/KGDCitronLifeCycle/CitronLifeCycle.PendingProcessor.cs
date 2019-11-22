@@ -90,7 +90,15 @@ namespace Lime.KGDCitronLifeCycle {
 					goto Repeat;
 				}
 
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPreOnAnimated)) {
+					goto Repeat;
+				}
+
 				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingOnAnimated)) {
+					goto Repeat;
+				}
+
+				if (ProcessCustomUpdates((int) NodeManagerPhase.PendingPostOnAnimated)) {
 					goto Repeat;
 				}
 

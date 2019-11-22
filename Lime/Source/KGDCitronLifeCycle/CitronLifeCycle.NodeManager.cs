@@ -8,6 +8,9 @@ namespace Lime.KGDCitronLifeCycle
 		/// <summary>
 		/// Identifier for post-post-late update stage.
 		/// </summary>
+
+		public class PreAfterAnimationStage { }
+		public class PostAfterAnimationStage { }
 		public class PostPostLateUpdateStage { }
 
 		public enum NodeManagerPhase
@@ -23,8 +26,12 @@ namespace Lime.KGDCitronLifeCycle
 			PostEarlyUpdate,
 			PendingPostEarlyUpdate,
 			Animation,
+			PreOnAnimated,
+			PendingPreOnAnimated,
 			OnAnimated,
 			PendingOnAnimated,
+			PostOnAnimated,
+			PendingPostOnAnimated,
 			OnAnimationStopped,
 			PendingOnAnimationStopped,
 			Layout,
@@ -61,8 +68,12 @@ namespace Lime.KGDCitronLifeCycle
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostEarlyUpdate));
 			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreAfterAnimationStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPreOnAnimated));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(AfterAnimationStage)));
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingOnAnimated));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostAfterAnimationStage)));
+			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingPostOnAnimated));
 			manager.Processors.Add(new AnimationStoppedProcessor());
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingOnAnimationStopped));
 			manager.Processors.Add(new LayoutProcessor());
@@ -89,8 +100,14 @@ namespace Lime.KGDCitronLifeCycle
 			if (updateStageType == typeof(PostEarlyUpdateStage)) {
 				return NodeManagerPhase.PostEarlyUpdate;
 			}
+			if (updateStageType == typeof(PreAfterAnimationStage)) {
+				return NodeManagerPhase.PreOnAnimated;
+			}
 			if (updateStageType == typeof(AfterAnimationStage)) {
 				return NodeManagerPhase.OnAnimated;
+			}
+			if (updateStageType == typeof(PostAfterAnimationStage)) {
+				return NodeManagerPhase.PostOnAnimated;
 			}
 			if (updateStageType == typeof(PreLateUpdateStage)) {
 				return NodeManagerPhase.PreLateUpdate;
