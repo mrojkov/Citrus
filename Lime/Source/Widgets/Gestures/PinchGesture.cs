@@ -56,14 +56,11 @@ namespace Lime
 		protected override bool TryGetDragPosition(out Vector2 position)
 		{
 			if (IsDragging()) {
-				position = Midpoint(Touch0, Touch1);
+				position = (Touch0 + Touch1) * 0.5f;
 				return true;
 			}
 			position = Vector2.NaN;
 			return false;
-
-			Vector2 Midpoint(in Vector2 point1, in Vector2 point2) =>
-				new Vector2((point1.X + point2.X) / 2.0f, (point1.Y + point2.Y) / 2.0f);
 		}
 
 		protected override bool IsDragging()
