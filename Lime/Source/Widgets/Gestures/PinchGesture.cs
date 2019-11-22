@@ -41,9 +41,9 @@ namespace Lime
 				float previousTouchDistance = TouchDistance;
 				TouchDistance = Vector2.Distance(Touch0, Touch1);
 				LastPinchScale = TouchDistance / previousTouchDistance;
-				if (!LastPinchScale.Equals(1)) {
+				if (LastPinchScale != 1.0f) {
 					RaiseChanged();
-					LastPinchScale = 1;
+					LastPinchScale = 1.0f;
 				}
 			}
 		}
@@ -72,7 +72,7 @@ namespace Lime
 		{
 			return
 				(MousePosition - MousePressPosition).SqrLength > DragThresholdSqr ||
-				!TouchDistance.Equals(Vector2.Distance(Touch0, Touch1));
+				TouchDistance != Vector2.Distance(Touch0, Touch1);
 		}
 	}
 }
