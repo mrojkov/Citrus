@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class NodeManager
 	{
-		[Obsolete("For extreme cases")]
+		[Obsolete("A temporary solution to access global hierarchy changes. Will be removed later when work on Orange plugins will be finished.")]
 		public static event HierarchyChangedEventHandler GlobalHierarchyChanged;
 
 		private Dictionary<Type, List<NodeComponentProcessor>> processorsByComponentType = new Dictionary<Type, List<NodeComponentProcessor>>();
