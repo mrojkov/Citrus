@@ -406,7 +406,7 @@ namespace Tangerine.Core
 				for (int i = indices.Count - 1; i > 0; i--) {
 					node = node.Nodes[indices[i]];
 				}
-				return node.Animations[indices[0]];
+				return node.Animations[indices[0].Clamp(0, node.Animations.Count - 1)];
 			}
 		}
 	}
