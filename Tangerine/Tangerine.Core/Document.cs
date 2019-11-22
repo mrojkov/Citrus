@@ -276,6 +276,7 @@ namespace Tangerine.Core
 			if (PreviewAnimation) {
 				TogglePreviewAnimation();
 			}
+			Application.InvalidateWindows();
 		}
 
 		private static Viewport3D WrapNodeWithViewport3D(Node node)
