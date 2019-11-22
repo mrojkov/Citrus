@@ -8,7 +8,7 @@ namespace Lime
 	{
 		private const int MaxTouchHistorySize = 3;
 
-		private readonly LinkedList<(Vector2 distance, float duration)> touchHistory;
+		private readonly Queue<(Vector2 distance, float duration)> touchHistory;
 		private readonly IKineticMotionStrategy kineticMotion;
 		private PollableEvent kineticEnded;
 
@@ -64,7 +64,7 @@ namespace Lime
 			float dragThreshold) : base(buttonIndex, direction, exclusive, dragThreshold)
 		{
 			kineticMotion = motionStrategy;
-			touchHistory = new LinkedList<(Vector2 distance, float duration)>();
+			touchHistory = new Queue<(Vector2 distance, float duration)>();
 		}
 
 		public virtual bool WasEnding() => base.WasEnded();
@@ -104,9 +104,9 @@ namespace Lime
 				touchHistory.Clear();
 			} else {
 				lastDragDelta = base.MousePosition - previousMousePosition;
-				touchHistory.AddLast((lastDragDelta, delta));
+				touchHistory.Enqueue((lastDragDelta, delta));
 				if (touchHistory.Count > MaxTouchHistorySize) {
-					touchHistory.RemoveFirst();
+					touchHistory.Dequeue();
 				}
 			}
 		}
