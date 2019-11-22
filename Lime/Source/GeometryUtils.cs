@@ -32,31 +32,22 @@ namespace Lime
 		}
 
 		public static bool CalcLinesIntersection(
-			in Vector2 a1, in Vector2 b1, in Vector2 a2, in Vector2 b2, out Vector2 intersection)
-		{
-			return CalcLinesIntersection(
-				a1.X, a1.Y, b1.X, b1.Y, a2.X, a2.Y, b2.X, b2.Y, out intersection);
-		}
-
-		public static bool CalcLinesIntersection(
-			float a1x, float a1y,
-			float b1x, float b1y,
-			float a2x, float a2y,
-			float b2x, float b2y,
-			out Vector2 intersection)
-		{
+			Vector2 a1, Vector2 b1,
+			Vector2 a2, Vector2 b2,
+			out Vector2 intersection
+		) {
 			intersection = Vector2.NaN;
-			float d = (b2y - a2y) * (b1x - a1x) - (b2x - a2x) * (b1y - a1y);
-			float nA = (b2x - a2x) * (a1y - a2y) - (b2y - a2y) * (a1x - a2x);
-			float nB = (b1x - a1x) * (a1y - a2y) - (b1y - a1y) * (a1x - a2x);
+			float d = (b2.Y - a2.Y) * (b1.X - a1.X) - (b2.X - a2.X) * (b1.Y - a1.Y);
+			float nA = (b2.X - a2.X) * (a1.Y - a2.Y) - (b2.Y - a2.Y) * (a1.X - a2.X);
+			float nB = (b1.X - a1.X) * (a1.Y - a2.Y) - (b1.Y - a1.Y) * (a1.X - a2.X);
 			if (d == 0) {
 				return false;
 			}
 			float ua = nA / d;
 			float ub = nB / d;
 			if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
-				intersection.X = a1x + (ua * (b1x - a1x));
-				intersection.Y = a1y + (ua * (b1y - a1y));
+				intersection.X = a1.X + (ua * (b1.X - a1.X));
+				intersection.Y = a1.Y + (ua * (b1.Y - a1.Y));
 				return true;
 			}
 			return false;
