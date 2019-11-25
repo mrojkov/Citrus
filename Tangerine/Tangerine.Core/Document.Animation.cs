@@ -83,6 +83,7 @@ namespace Tangerine.Core
 			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
 		}
 
+		[NodeComponentDontSerialize]
 		[UpdateStage(typeof(PostLateUpdateStage))]
 		private class RestoreAnimationsTimesComponent : BehaviorComponent
 		{
