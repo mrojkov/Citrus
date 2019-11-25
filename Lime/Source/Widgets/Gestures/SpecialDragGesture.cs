@@ -8,7 +8,7 @@ namespace Lime
 		private const int MaxTouchHistorySize = 3;
 
 		private readonly Queue<(Vector2 distance, float duration)> touchHistory;
-		private readonly IMotion motion;
+		private readonly IMotionStrategy motionStrategy;
 		private PollableEvent specialEnded;
 
 		private Vector2 previousSpecialPosition;
@@ -32,37 +32,37 @@ namespace Lime
 			remove => specialEnded.Handler -= value;
 		}
 
-		public override bool IsActive => base.IsActive || motion.InProgress;
+		public override bool IsActive => base.IsActive || motionStrategy.InProgress;
 
 		public override Vector2 MousePosition =>
-			motion.InProgress ? motion.Position : base.MousePosition;
+			motionStrategy.InProgress ? motionStrategy.Position : base.MousePosition;
 
 		protected override Vector2 PreviousMousePosition =>
-			motion.InProgress ? previousSpecialPosition : base.PreviousMousePosition;
+			motionStrategy.InProgress ? previousSpecialPosition : base.PreviousMousePosition;
 
-		public SpecialDragGesture(IMotion motion)
-			: this(motion, buttonIndex: 0, exclusive: false, DragDirection.Any, DefaultDragThreshold)
+		public SpecialDragGesture(IMotionStrategy motionStrategy)
+			: this(motionStrategy, buttonIndex: 0, exclusive: false, DragDirection.Any, DefaultDragThreshold)
 		{
 		}
 
-		public SpecialDragGesture(IMotion motion, int buttonIndex)
-			: this(motion, buttonIndex, exclusive: false, DragDirection.Any, DefaultDragThreshold)
+		public SpecialDragGesture(IMotionStrategy motionStrategy, int buttonIndex)
+			: this(motionStrategy, buttonIndex, exclusive: false, DragDirection.Any, DefaultDragThreshold)
 		{
 		}
 
-		public SpecialDragGesture(IMotion motion, int buttonIndex, bool exclusive)
-			: this(motion, buttonIndex, exclusive, DragDirection.Any, DefaultDragThreshold)
+		public SpecialDragGesture(IMotionStrategy motionStrategy, int buttonIndex, bool exclusive)
+			: this(motionStrategy, buttonIndex, exclusive, DragDirection.Any, DefaultDragThreshold)
 		{
 		}
 
 		public SpecialDragGesture(
-			IMotion motion,
+			IMotionStrategy motionStrategy,
 			int buttonIndex,
 			bool exclusive,
 			DragDirection direction,
 			float dragThreshold) : base(buttonIndex, direction, exclusive, dragThreshold)
 		{
-			this.motion = motion;
+			this.motionStrategy = motionStrategy;
 			touchHistory = new Queue<(Vector2 distance, float duration)>();
 		}
 
@@ -73,15 +73,15 @@ namespace Lime
 
 		protected internal override void Update(float delta)
 		{
-			if (motion.InProgress) {
+			if (motionStrategy.InProgress) {
 				if (Input.WasMousePressed(ButtonIndex)) {
 					StopSpecialMotion();
 					RaiseSpecialEnded();
 				} else {
-					previousSpecialPosition = motion.Position;
-					motion.Update(delta);
+					previousSpecialPosition = motionStrategy.Position;
+					motionStrategy.Update(delta);
 
-					if (motion.InProgress) {
+					if (motionStrategy.InProgress) {
 						RaiseChanged();
 					} else {
 						RaiseSpecialEnded();
@@ -112,7 +112,7 @@ namespace Lime
 
 		protected internal override bool Cancel(Gesture sender)
 		{
-			if (motion.InProgress) {
+			if (motionStrategy.InProgress) {
 				if (sender == null) {
 					return false;
 				}
@@ -132,19 +132,19 @@ namespace Lime
 
 			if (totalDuration > 0.0f) {
 				float speed = direction.Length / totalDuration;
-				motion.Start(base.MousePosition, direction, speed);
+				motionStrategy.Start(base.MousePosition, direction, speed);
 			}
 		}
 
 		private void StopSpecialMotion()
 		{
-			motion.Stop();
+			motionStrategy.Stop();
 		}
 
 		/// <summary>
 		/// Defines a motion strategy.
 		/// </summary>
-		public interface IMotion
+		public interface IMotionStrategy
 		{
 			Vector2 Position { get; }
 			bool InProgress { get; }
@@ -172,7 +172,7 @@ namespace Lime
 		/// <summary>
 		/// Non-uniformly slow motion, occurring to a full stop.
 		/// </summary>
-		public class DampingMotion : IMotion
+		public class DampingMotionStrategy : IMotionStrategy
 		{
 			private readonly float initialDamping;
 			private readonly float dampingDamping;
@@ -190,7 +190,7 @@ namespace Lime
 			/// <param name="dampingDamping">Increase of the deceleration factor.</param>
 			/// <param name="minSpeed">The minimum speed that is considered a full stop.</param>
 			/// <param name="maxStartSpeed">Maximum initial speed of movement.</param>
-			public DampingMotion(
+			public DampingMotionStrategy(
 				float initialDamping,
 				float dampingDamping,
 				float minSpeed = 5.0f,
@@ -231,7 +231,7 @@ namespace Lime
 		/// <summary>
 		/// Uniformly slow motion, occurring within a specified time.
 		/// </summary>
-		public class FixedTimeMotion : IMotion
+		public class FixedTimeMotionStrategy : IMotionStrategy
 		{
 			private readonly float duration;
 
@@ -245,7 +245,7 @@ namespace Lime
 			public bool InProgress { get; private set; }
 
 			/// <param name="specialDuration">The time during which the movement slows down.</param>
-			public FixedTimeMotion(float specialDuration)
+			public FixedTimeMotionStrategy(float specialDuration)
 			{
 				duration = specialDuration;
 			}
