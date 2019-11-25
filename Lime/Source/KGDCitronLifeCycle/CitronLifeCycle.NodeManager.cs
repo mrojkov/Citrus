@@ -46,19 +46,23 @@ namespace Lime.KGDCitronLifeCycle
 			PendingPostPostLateUpdate,
 		}
 
-		private static NodeManager CreateNodeManager(LayoutManager layoutManager, WidgetContext widgetContext)
+		public static NodeManager CreateNodeManager(LayoutManager layoutManager, WidgetContext widgetContext, bool editor)
 		{
 			var services = new ServiceRegistry();
 			services.Add(new BehaviorSystem());
 			services.Add(new AnimationSystem());
 			services.Add(new PendingSystem(Enum.GetValues(typeof(NodeManagerPhase)).Length));
 			services.Add(layoutManager);
-			services.Add(widgetContext);
+			if (!editor) {
+				services.Add(widgetContext);
+			}
 
 			// Самое главное - это свой BehaviorUpdateProcessor, и добавленный везде BehaviorUpdateProcessor,
 			// который длеает очень много работы, чтобы восстановить жизненный цикл в рамках одного кадра.
 			var manager = new NodeManager(services);
-			manager.Processors.Add(new GestureProcessor());
+			if (!editor) {
+				manager.Processors.Add(new GestureProcessor());
+			}
 			manager.Processors.Add(new BehaviorSetupProcessor());
 			manager.Processors.Add(new PendingProcessor(NodeManagerPhase.PendingBehaviorSetup));
 			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));

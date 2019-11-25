@@ -26,7 +26,7 @@ namespace Lime
 		{
 			WidgetContext = new WidgetContext(this);
 			LayoutManager = new LayoutManager();
-			NodeManagerFactory(LayoutManager, WidgetContext).RootNodes.Add(this);
+			CreateManager(LayoutManager, WidgetContext).RootNodes.Add(this);
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, WidgetContext);
 			renderChain = new RenderChain();
@@ -34,9 +34,7 @@ namespace Lime
 			window.Sync += Sync;
 		}
 
-		public static Func<LayoutManager, WidgetContext, NodeManager> NodeManagerFactory = CreateManager;
-
-		private static NodeManager CreateManager(LayoutManager layoutManager, WidgetContext widgetContext)
+		protected virtual NodeManager CreateManager(LayoutManager layoutManager, WidgetContext widgetContext)
 		{
 			var services = new ServiceRegistry();
 			services.Add(new BehaviorSystem());

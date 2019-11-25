@@ -12,12 +12,7 @@ namespace Lime.KGDCitronLifeCycle
 
 		public static void Initialize()
 		{
-			if (initialized) {
-				return;
-			}
 			initialized = true;
-
-			WindowWidget.NodeManagerFactory = CreateNodeManager;
 		}
 
 		public static Action OnStart(this Node node, Action<float> customUpdate, NodeManagerPhase customUpdatePhase)
