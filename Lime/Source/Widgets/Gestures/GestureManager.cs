@@ -71,7 +71,7 @@ namespace Lime
 
 		private static void CleanupGestures(List<Gesture> gestures)
 		{
-			gestures.RemoveAll(gesture => (gesture as SelfEndingGesture)?.WasEnded() == true);
+			gestures.RemoveAll(gesture => gesture?.WasEnded() == true);
 		}
 
 		private static void CancelGestures(List<Gesture> gestures, Gesture sender = null)

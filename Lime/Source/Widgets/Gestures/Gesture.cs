@@ -7,6 +7,7 @@ namespace Lime
 		private PollableEvent began;
 		private PollableEvent canceled;
 		private PollableEvent recognized;
+		private PollableEvent ended;
 
 		/// <summary>
 		/// Occurs when gesture recognition began.
@@ -37,6 +38,15 @@ namespace Lime
 			remove => recognized.Handler -= value;
 		}
 
+		/// <summary>
+		/// Occurs when gesture is ended.
+		/// </summary>
+		public virtual event Action Ended
+		{
+			add => ended.Handler += value;
+			remove => ended.Handler -= value;
+		}
+
 		public Node Owner { get; internal set; }
 		public abstract bool IsActive { get; }
 
@@ -56,9 +66,11 @@ namespace Lime
 		public virtual bool WasCanceled() => canceled.HasOccurred;
 		public virtual bool WasRecognized() => recognized.HasOccurred;
 		public bool WasRecognizedOrCanceled() => WasCanceled() || WasRecognized();
+		public virtual bool WasEnded() => ended.HasOccurred;
 		protected void RaiseBegan() => began.Raise();
 		protected void RaiseCanceled() => canceled.Raise();
 		protected void RaiseRecognized() => recognized.Raise();
+		protected virtual void RaiseEnded() => ended.Raise();
 		protected internal abstract bool Cancel(Gesture sender);
 		protected internal abstract void Update(float delta);
 

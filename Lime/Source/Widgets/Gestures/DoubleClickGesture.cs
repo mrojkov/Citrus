@@ -2,7 +2,7 @@ using System;
 
 namespace Lime
 {
-	public class DoubleClickGesture : SelfEndingGesture
+	public class DoubleClickGesture : Gesture
 	{
 		private enum State
 		{

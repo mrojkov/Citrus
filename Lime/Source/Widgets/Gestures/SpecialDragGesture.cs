@@ -125,7 +125,7 @@ namespace Lime
 		{
 			var direction = Vector2.Zero;
 			float totalDuration = 0.0f;
-			foreach ((var distance, float duration) in touchHistory) {
+			foreach (var (distance, duration) in touchHistory) {
 				direction += distance;
 				totalDuration += duration;
 			}

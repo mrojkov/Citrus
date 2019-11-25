@@ -41,6 +41,7 @@ namespace Lime
 		{
 			if (state == State.Began) {
 				RaiseCanceled();
+				RaiseEnded();
 			}
 			state = State.Idle;
 			return true;
@@ -71,6 +72,7 @@ namespace Lime
 				if (!Input.IsMousePressed(ButtonIndex)) {
 					if (isTapTooShort) {
 						RaiseCanceled();
+						RaiseEnded();
 					} else {
 						Finish();
 					}
@@ -91,6 +93,7 @@ namespace Lime
 				} else {
 					RaiseCanceled();
 				}
+				RaiseEnded();
 			}
 		}
 	}

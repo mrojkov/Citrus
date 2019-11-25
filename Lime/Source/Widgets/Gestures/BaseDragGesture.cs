@@ -2,7 +2,7 @@ using System;
 
 namespace Lime
 {
-	public abstract class BaseDragGesture : SelfEndingGesture
+	public abstract class BaseDragGesture : Gesture
 	{
 		private enum State
 		{
