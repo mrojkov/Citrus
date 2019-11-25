@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,8 +42,8 @@ namespace Orange
 				ExcludeMissingItems(doc, ref changed);
 				IncludeNewItems(doc, ref changed);
 			}
+			SortCompileElementsAndRemoveDuplicates(doc, ref changed);
 			if (changed) {
-				SortCompileElements(doc);
 				// disble BOM
 				using (var writer = new XmlTextWriter(projectFileName, new UTF8Encoding(false)))
 				{
@@ -95,13 +96,31 @@ namespace Orange
 			return false;
 		}
 
-		private static bool SortCompileElements(XmlDocument doc)
+		private static bool SortCompileElementsAndRemoveDuplicates(XmlDocument doc, ref bool changed)
 		{
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup");
 			foreach (var group in itemGroups) {
-				var compileElements = group.EnumerateElements("Compile").OrderBy(e => e.Attributes["Include"].Value).ToList();
+				var compileElements = group.EnumerateElements("Compile")
+					.OrderBy(e => e.Attributes["Include"].Value, StringComparer.OrdinalIgnoreCase).ToList();
+				XmlNode previousElement = null;
+				var duplicates = new List<XmlNode>();
+				foreach (var e in compileElements) {
+					if (previousElement != null) {
+						if (previousElement.Attributes["Include"].Value.Equals(
+							e.Attributes["Include"].Value,
+							StringComparison.CurrentCultureIgnoreCase)
+						) {
+							changed = true;
+							duplicates.Add(e);
+						}
+					}
+					previousElement = e;
+				}
 				foreach (var ce in compileElements) {
 					group.RemoveChild(ce);
+				}
+				foreach (var d in duplicates) {
+					compileElements.Remove(d);
 				}
 				foreach (var ce in compileElements) {
 					group.AppendChild(ce);
