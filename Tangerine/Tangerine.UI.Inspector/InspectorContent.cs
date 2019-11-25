@@ -165,7 +165,7 @@ namespace Tangerine.UI.Inspector
 				// we dont inspect indexers (they have "Item" name by default
 				return false;
 			}
-			var yuzuItem = Yuzu.Metadata.Meta.Get(type, Serialization.YuzuCommonOptions).Items.Find(i => i.PropInfo == property);
+			var yuzuItem = Yuzu.Metadata.Meta.Get(type, InternalPersistence.Instance.YuzuCommonOptions).Items.Find(i => i.PropInfo == property);
 			var tang = PropertyAttributes<TangerineKeyframeColorAttribute>.Get(type, property.Name);
 			var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
 			var tangInspect = PropertyAttributes<TangerineInspectAttribute>.Get(type, property.Name);
@@ -400,7 +400,7 @@ namespace Tangerine.UI.Inspector
 								var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(Clipboard.Text));
 								NodeComponent component;
 								try {
-									component = TangerineYuzu.Instance.Value.ReadObject<NodeComponent>(Document.Current.Path, stream);
+									component = TangerinePersistence.Instance.Value.ReadObject<NodeComponent>(Document.Current.Path, stream);
 								} catch {
 									new AlertDialog("Clipboard does not contain a component.", "Ok").Show();
 									return;
@@ -483,7 +483,7 @@ namespace Tangerine.UI.Inspector
 					if (componentsCount == 1) {
 						menu.Add(new Command("Copy to clipboard", () => {
 							var stream = new System.IO.MemoryStream();
-							TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, Cloner.Clone(components.First()), Serialization.Format.JSON);
+							TangerinePersistence.Instance.Value.WriteObject(Document.Current.Path, stream, Cloner.Clone(components.First()), Persistence.Format.Json);
 							Clipboard.Text = System.Text.Encoding.UTF8.GetString(stream.ToArray());
 						}));
 					}

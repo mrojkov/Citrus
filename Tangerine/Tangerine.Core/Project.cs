@@ -93,7 +93,7 @@ namespace Tangerine.Core
 			FileSystemWatcher = new FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			if (File.Exists(UserprefsPath)) {
 				try {
-					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
+					UserPreferences = TangerinePersistence.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
 					foreach (var path in UserPreferences.Documents) {
 						try {
 							if (GetFullPath(path, out string fullPath)) {
@@ -139,7 +139,7 @@ namespace Tangerine.Core
 					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
 				foreach (var file in files) {
 					Current.Overlays.Add(Path.GetFileNameWithoutExtension(file),
-						(Widget)Node.CreateFromAssetBundle(Path.ChangeExtension(file, null), null, TangerineYuzu.Instance.Value));
+						(Widget)Node.CreateFromAssetBundle(Path.ChangeExtension(file, null), null, TangerinePersistence.Instance.Value));
 				}
 			}
 
@@ -196,8 +196,8 @@ namespace Tangerine.Core
 				}
 			}
 			try {
-				TangerineYuzu.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
-			} catch (Exception) { }
+				TangerinePersistence.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Persistence.Format.Json);
+			} catch (System.Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
 			return true;
@@ -495,7 +495,7 @@ namespace Tangerine.Core
 						// и мешает работать.
 						if (File.Exists(textureParamsPath)) {
 							try {
-								var existingParams = TangerineYuzu.Instance.Value.ReadObjectFromFile<TextureParams>(textureParamsPath);
+								var existingParams = TangerinePersistence.Instance.Value.ReadObjectFromFile<TextureParams>(textureParamsPath);
 								if (existingParams.Equals(textureParams)) {
 									continue;
 								}
@@ -504,7 +504,7 @@ namespace Tangerine.Core
 								// этот костыль ещё и валил Танжерин по хз какому поводу.
 							}
 						}
-						TangerineYuzu.Instance.Value.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
+						TangerinePersistence.Instance.Value.WriteObjectToFile(textureParamsPath, textureParams, Persistence.Format.Json);
 					} else if (File.Exists(textureParamsPath)) {
 						File.Delete(textureParamsPath);
 					}

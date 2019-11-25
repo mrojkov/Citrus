@@ -23,11 +23,11 @@ namespace Orange
 					path: Path.ChangeExtension(file.Path, null),
 					ignoreExternals: true
 				);
-				Serialization.WriteObjectToBundle(
+				InternalPersistence.Instance.WriteObjectToBundle(
 					bundle: AssetBundle.Current,
 					path: file.Path,
 					instance: node,
-					format: Serialization.Format.JSON,
+					format: Persistence.Format.Json,
 					sourceExtension: "tan",
 					time: File.GetLastWriteTime(file.Path),
 					attributes: AssetAttributes.None,

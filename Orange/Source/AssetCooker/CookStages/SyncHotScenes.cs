@@ -21,7 +21,7 @@ namespace Orange
 		{
 			using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 				var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
-				Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Serialization.Format.Binary, hotSceneExtension,
+				InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Persistence.Format.Binary, hotSceneExtension,
 					File.GetLastWriteTime(srcPath), AssetAttributes.None, AssetCooker.CookingRulesMap[srcPath].SHA1);
 			}
 			return true;

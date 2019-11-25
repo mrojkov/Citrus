@@ -92,7 +92,7 @@
     <Compile Include="SceneCache.cs" />
     <Compile Include="SyncPresenters.cs" />
     <Compile Include="TangerineAssetBundle.cs" />
-    <Compile Include="TangerineYuzu.cs" />
+    <Compile Include="TangerinePersistence.cs" />
     <Compile Include="TriggersValidation.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="VersionedCollection.cs" />

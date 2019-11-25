@@ -21,7 +21,7 @@ namespace Orange
 		{
 			var importer = new HotFontImporter(false);
 			var font = importer.ParseFont(srcPath, dstPath);
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Serialization.Format.Binary, hotFontExtension, File.GetLastWriteTime(srcPath),
+			InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Persistence.Format.Binary, hotFontExtension, File.GetLastWriteTime(srcPath),
 				AssetAttributes.None, AssetCooker.CookingRulesMap[srcPath].SHA1);
 			return true;
 		}

@@ -281,7 +281,7 @@ namespace Lime
 					Loaded?.Value?.Invoke(path, instance);
 					return instance;
 				}
-				instance = Serialization.ReadObject<AnimationData>(path);
+				instance = InternalPersistence.Instance.ReadObject<AnimationData>(path);
 				Loaded?.Value?.Invoke(path, instance);
 				return instance;
 			}

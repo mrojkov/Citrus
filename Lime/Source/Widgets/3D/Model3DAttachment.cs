@@ -776,28 +776,20 @@ namespace Lime
 			return File.Exists(GetAttachmentPath(modelPath));
 		}
 
-		public static ModelAttachmentFormat ReadModelAttachmentFormat(string modelPath)
-		{
-			return Serialization.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath));
-		}
-
-		public static ModelAttachmentFormat ReadModelAttachmentFromFile(string modelPath)
-		{
-			return Serialization.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath));
-		}
-
 		public static Model3DAttachment GetModel3DAttachment(string modelPath)
 		{
-			return GetModel3DAttachment(ReadModelAttachmentFormat(modelPath), modelPath);
+			return GetModel3DAttachment(
+				InternalPersistence.Instance.ReadObjectFromFile<ModelAttachmentFormat>(GetAttachmentPath(modelPath)),
+				modelPath);
 		}
 
 		public static Model3DAttachment GetModel3DAttachment(ModelAttachmentFormat modelAttachmentFormat, string modelPath)
 		{
 			try {
 				var attachment = new Model3DAttachment {
-					ScaleFactor = modelAttachmentFormat.ScaleFactor
+					ScaleFactor = modelAttachmentFormat.ScaleFactor,
+					EntryTrigger = modelAttachmentFormat.EntryTrigger,
 				};
-				attachment.EntryTrigger = modelAttachmentFormat.EntryTrigger;
 				if (modelAttachmentFormat.MeshOptions != null) {
 					foreach (var meshOptionFormat in modelAttachmentFormat.MeshOptions) {
 						var meshOption = new Model3DAttachment.MeshOption {
@@ -926,7 +918,7 @@ namespace Lime
 		public static void Save(Model3DAttachment attachment, string path)
 		{
 			var attachmentPath = path + ".Attachment.txt";
-			Serialization.WriteObjectToFile(attachmentPath, ConvertToModelAttachmentFormat(attachment), Serialization.Format.JSON);
+			InternalPersistence.Instance.WriteObjectToFile(attachmentPath, ConvertToModelAttachmentFormat(attachment), Persistence.Format.Json);
 		}
 
 		public static ModelAttachmentFormat ConvertToModelAttachmentFormat(Model3DAttachment attachment)

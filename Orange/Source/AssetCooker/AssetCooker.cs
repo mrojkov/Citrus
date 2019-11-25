@@ -377,11 +377,11 @@ namespace Orange
 				TextureTools.UpscaleTextureIfNeeded(ref texture, rules, false);
 				var isNeedToRewriteTexParams = true;
 				if (AssetBundle.FileExists(textureParamsPath)) {
-					var oldTexParams = Serialization.ReadObject<TextureParams>(textureParamsPath, AssetBundle.OpenFile(textureParamsPath));
+					var oldTexParams = InternalPersistence.Instance.ReadObject<TextureParams>(textureParamsPath, AssetBundle.OpenFile(textureParamsPath));
 					isNeedToRewriteTexParams = !oldTexParams.Equals(textureParams);
 				}
 				if (isNeedToRewriteTexParams) {
-					Serialization.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Serialization.Format.Binary, ".texture",
+					InternalPersistence.Instance.WriteObjectToBundle(AssetBundle, textureParamsPath, textureParams, Persistence.Format.Binary, ".texture",
 						File.GetLastWriteTime(textureParamsPath), AssetAttributes.None, null);
 				}
 			} else {
@@ -440,7 +440,7 @@ namespace Orange
 				var path = pathWithoutExt + ".ant";
 				var data = animation.GetData();
 				animation.ContentsPath = pathWithoutExt;
-				Serialization.WriteObjectToBundle(AssetBundle, path, data, Serialization.Format.Binary, ".ant", File.GetLastWriteTime(path), assetAttributes, cookingRulesSHA1);
+				InternalPersistence.Instance.WriteObjectToBundle(AssetBundle, path, data, Persistence.Format.Binary, ".ant", File.GetLastWriteTime(path), assetAttributes, cookingRulesSHA1);
 				Console.WriteLine("+ " + path);
 			}
 		}

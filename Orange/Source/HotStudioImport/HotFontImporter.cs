@@ -140,7 +140,7 @@ namespace Orange
 
 		public Font ParseFont(Stream stream, Font font = null)
 		{
-			var path = Serialization.GetCurrentSerializationPath();
+			var path = InternalPersistence.Instance.GetCurrentSerializationPath();
 			this.textureSize = GetTextureSize(path);
 			using(var reader = new StreamReader(stream)) {
 				string text = reader.ReadToEnd();

@@ -19,8 +19,8 @@ namespace Orange
 
 		private bool Converter(string srcPath, string dstPath)
 		{
-			var font = Serialization.ReadObjectFromFile<SerializableCompoundFont>(srcPath);
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Serialization.Format.Binary, fontExtension,
+			var font = InternalPersistence.Instance.ReadObjectFromFile<SerializableCompoundFont>(srcPath);
+			InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, font, Persistence.Format.Binary, fontExtension,
 				File.GetLastWriteTime(srcPath), AssetAttributes.None, AssetCooker.CookingRulesMap[srcPath].SHA1);
 			return true;
 		}

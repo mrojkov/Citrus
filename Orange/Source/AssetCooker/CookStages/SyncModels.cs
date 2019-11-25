@@ -51,7 +51,7 @@ namespace Orange
 			AssetCooker.DeleteModelExternalAnimations(animationPathPrefix);
 			AssetCooker.ExportModelAnimations(model, animationPathPrefix, assetAttributes, cookingRules.SHA1);
 			model.RemoveAnimatorsForExternalAnimations();
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Serialization.Format.Binary, t3dExtension,
+			InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, model, Persistence.Format.Binary, t3dExtension,
 				File.GetLastWriteTime(srcPath), assetAttributes, cookingRules.SHA1);
 			return true;
 		}

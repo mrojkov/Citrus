@@ -43,13 +43,13 @@ namespace Orange
 				generatedDeserializersPath = Path.Combine(generatedDeserializersPath, token.ToString());
 			}
 			Generate(Path.Combine(generatedDeserializersPath, "YuzuGeneratedBinaryDeserializer.cs"),
-				new BinaryDeserializerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, $"{The.Workspace.Title}Deserializer", "LimeDeserializer") {
+				new BinaryDeserializerGenerator("YuzuGenerated", InternalPersistence.Instance.YuzuCommonOptions, $"{The.Workspace.Title}Deserializer", "LimeDeserializer") {
 					LineSeparator = "\n",
 				},
 				GenerateForAssemblies(PluginLoader.EnumerateOrangeAndTangerinePluginAssemblies())
 			);
 			Generate(Path.Combine(generatedDeserializersPath, "YuzuGeneratedCloners.cs"),
-				new ClonerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, $"{The.Workspace.Title}Cloner", "LimeCloner") {
+				new ClonerGenerator("YuzuGenerated", InternalPersistence.Instance.YuzuCommonOptions, $"{The.Workspace.Title}Cloner", "LimeCloner") {
 					LineSeparator = "\n",
 				},
 				GenerateForAssemblies(PluginLoader.EnumerateOrangeAndTangerinePluginAssemblies())
@@ -60,13 +60,13 @@ namespace Orange
 		{
 			var assembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.StartsWith("Lime", StringComparison.OrdinalIgnoreCase)).First();
 			Generate(Path.Combine(Toolbox.CalcCitrusDirectory(), "Lime", "Source", "YuzuGeneratedBinaryDeserializer.cs"),
-				new BinaryDeserializerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, "LimeDeserializer") {
+				new BinaryDeserializerGenerator("YuzuGenerated", InternalPersistence.Instance.YuzuCommonOptions, "LimeDeserializer") {
 					LineSeparator = "\n",
 				},
 				GenerateForAssemblies(new[] { assembly })
 			);
 			Generate(Path.Combine(Toolbox.CalcCitrusDirectory(), "Lime", "Source", "YuzuGeneratedCloners.cs"),
-				new ClonerGenerator("YuzuGenerated", Serialization.YuzuCommonOptions, "LimeCloner") {
+				new ClonerGenerator("YuzuGenerated", InternalPersistence.Instance.YuzuCommonOptions, "LimeCloner") {
 					LineSeparator = "\n",
 				},
 				GenerateForAssemblies(new[] { assembly })
@@ -101,7 +101,7 @@ namespace Orange
 								}
 							}
 						} else {
-							var meta = Yuzu.Metadata.Meta.Get(t, Serialization.YuzuCommonOptions);
+							var meta = Yuzu.Metadata.Meta.Get(t, InternalPersistence.Instance.YuzuCommonOptions);
 							if (meta.Items.Count != 0) {
 								types.Add(t);
 							}

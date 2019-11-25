@@ -33,7 +33,7 @@ namespace Tangerine.Core
 				}
 				try {
 					using (var stream = cacheBundle.OpenFile(VersionFile)) {
-						var cacheMeta = TangerineYuzu.Instance.Value.ReadObject<CacheMeta>(VersionFile, stream);
+						var cacheMeta = TangerinePersistence.Instance.Value.ReadObject<CacheMeta>(VersionFile, stream);
 						if (!cacheMeta.IsActual) {
 							return false;
 						}
@@ -51,7 +51,7 @@ namespace Tangerine.Core
 				foreach (var path in cacheBundle.EnumerateFiles().ToList()) {
 					cacheBundle.DeleteFile(path);
 				}
-				TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Serialization.Format.Binary, string.Empty, DateTime.Now, AssetAttributes.None, new byte[0]);
+				TangerinePersistence.Instance.Value.WriteObjectToBundle(cacheBundle, VersionFile, new CacheMeta(), Persistence.Format.Binary, string.Empty, DateTime.Now, AssetAttributes.None, new byte[0]);
 			}
 		}
 
@@ -137,10 +137,10 @@ namespace Tangerine.Core
 								}
 							}
 						}
-						TangerineYuzu.Instance.Value.WriteObjectToBundle(
+						TangerinePersistence.Instance.Value.WriteObjectToBundle(
 							cacheBundle,
 							attachmentMetaPath,
-							meta, Serialization.Format.Binary, Model3DAttachmentMeta.FileExtension,
+							meta, Persistence.Format.Binary, Model3DAttachmentMeta.FileExtension,
 							base.GetFileLastWriteTime(fbxPath),
 							AssetAttributes.None, new byte[0]);
 					}
@@ -184,7 +184,7 @@ namespace Tangerine.Core
 						animationPathWithoutExt = Animation.FixAntPath(animationPathWithoutExt);
 						var animationPath = animationPathWithoutExt + ".ant";
 						animation.ContentsPath = animationPathWithoutExt;
-						Serialization.WriteObjectToBundle(cacheBundle, animationPath, animation.GetData(), Serialization.Format.Binary, ".ant",
+						InternalPersistence.Instance.WriteObjectToBundle(cacheBundle, animationPath, animation.GetData(), Persistence.Format.Binary, ".ant",
 							base.GetFileLastWriteTime(fbxPath), AssetAttributes.None, new byte[0]);
 						var animators = new List<IAnimator>();
 						animation.FindAnimators(animators);
@@ -192,7 +192,7 @@ namespace Tangerine.Core
 							animator.Owner.Animators.Remove(animator);
 						}
 					}
-					TangerineYuzu.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Serialization.Format.Binary, ".t3d",
+					TangerinePersistence.Instance.Value.WriteObjectToBundle(cacheBundle, path, model, Persistence.Format.Binary, ".t3d",
 						base.GetFileLastWriteTime(fbxPath), AssetAttributes.None, new byte[0]);
 
 				} else if (fbxCached) {
@@ -201,10 +201,10 @@ namespace Tangerine.Core
 				}
 
 				if (attachmentExists) {
-					TangerineYuzu.Instance.Value.WriteObjectToBundle(
+					TangerinePersistence.Instance.Value.WriteObjectToBundle(
 						cacheBundle,
 						attachmentPath,
-						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Serialization.Format.Binary, ".txt",
+						Model3DAttachmentParser.ConvertToModelAttachmentFormat(attachment), Persistence.Format.Binary, ".txt",
 						base.GetFileLastWriteTime(attachmentPath),
 						AssetAttributes.None, new byte[0]);
 				} else if (attachmentCached) {

@@ -29,14 +29,14 @@ namespace Orange
 						using (Stream stream = new FileStream(srcPath, FileMode.Open)) {
 							var node = new HotSceneImporter(false, srcPath).Import(stream, null, null);
 							dstPath = Path.ChangeExtension(dstPath, "tan");
-							Serialization.WriteObjectToFile(dstPath, node, Serialization.Format.JSON);
+							InternalPersistence.Instance.WriteObjectToFile(dstPath, node, Persistence.Format.Json);
 						}
 					} else if (path.EndsWith(".fnt", StringComparison.OrdinalIgnoreCase)) {
 						dstPath = Path.ChangeExtension(dstPath, "tft");
 						var importer = new HotFontImporter(false);
 						var dstRelativePath = Path.ChangeExtension(srcPath, "tft");
 						var font = importer.ParseFont(srcPath, dstRelativePath);
-						Serialization.WriteObjectToFile(dstPath, font, Serialization.Format.JSON);
+						InternalPersistence.Instance.WriteObjectToFile(dstPath, font, Persistence.Format.Json);
 					} else {
 						File.Copy(srcPath, dstPath, true);
 					}

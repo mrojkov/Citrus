@@ -240,9 +240,9 @@ namespace Tangerine.Core
 		{
 			try {
 				if (preloadedSceneStream != null) {
-					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
+					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", persistence: TangerinePersistence.Instance.Value, stream: preloadedSceneStream);
 				} else {
-					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, persistence: TangerinePersistence.Instance.Value);
 				}
 				if (Format == DocumentFormat.Fbx) {
 					Path = string.Format(untitledPathFormat, untitledCounter++);
@@ -464,9 +464,9 @@ namespace Tangerine.Core
 			using (node = CreateCloneForSerialization(node)) {
 				if (format == DocumentFormat.Scene) {
 					var serializer = new HotSceneSerializer();
-					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, serializer);
+					TangerinePersistence.Instance.Value.WriteObject(assetPath, ms, node, serializer);
 				} else {
-					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, Serialization.Format.JSON);
+					TangerinePersistence.Instance.Value.WriteObject(assetPath, ms, node, Persistence.Format.Json);
 				}
 			}
 			FileMode fileModeForHiddenFile = File.Exists(filePath) ? FileMode.Truncate : FileMode.Create;

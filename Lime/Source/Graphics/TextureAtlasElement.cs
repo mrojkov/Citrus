@@ -13,33 +13,12 @@ namespace Lime
 			[YuzuMember]
 			public string AtlasPath
 			{
-				get
-				{
-					return atlasPath;
-				}
-				set
-				{
-					atlasPath = string.Intern(value);
-				}
+				get => atlasPath;
+				set => atlasPath = string.Intern(value);
 			}
 
 			[YuzuMember]
 			public IntRectangle AtlasRect;
-
-			public static Params ReadFromBundle(string path)
-			{
-				return Serialization.ReadObject<Params>(path);
-			}
-
-			public static Params ReadFromFile(string path)
-			{
-				return Serialization.ReadObjectFromFile<Params>(path);
-			}
-
-			public static void WriteToFile(Params texParams, string path)
-			{
-				Serialization.WriteObjectToFile<Params>(path, texParams, Serialization.Format.Binary);
-			}
 		}
 
 		private ITexture atlasTexture;
@@ -68,10 +47,7 @@ namespace Lime
 			ImageSize = (Size)@params.AtlasRect.Size;
 		}
 
-		public Size SurfaceSize
-		{
-			get { return AtlasTexture.SurfaceSize; }
-		}
+		public Size SurfaceSize => AtlasTexture.SurfaceSize;
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
@@ -115,15 +91,12 @@ namespace Lime
 			throw new NotSupportedException();
 		}
 
-		public bool IsStubTexture
-		{
-			get { return AtlasTexture.IsStubTexture; }
-		}
+		public bool IsStubTexture => AtlasTexture.IsStubTexture;
 
 		public TextureParams TextureParams
 		{
-			get { return AtlasTexture.TextureParams;}
-			set { AtlasTexture.TextureParams = value; }
+			get => AtlasTexture.TextureParams;
+			set => AtlasTexture.TextureParams = value;
 		}
 	}
 }

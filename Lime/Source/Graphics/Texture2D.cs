@@ -59,7 +59,7 @@ namespace Lime
 			var textureParamsPath = path + ".texture";
 			if (AssetBundle.Current.FileExists(textureParamsPath)) {
 				using (var stream = AssetBundle.Current.OpenFile(textureParamsPath)) {
-					TextureParams = Serialization.ReadObject<TextureParams>(textureParamsPath, stream);
+					TextureParams = InternalPersistence.Instance.ReadObject<TextureParams>(textureParamsPath, stream);
 				}
 			} else {
 				TextureParams = TextureParams.Default;

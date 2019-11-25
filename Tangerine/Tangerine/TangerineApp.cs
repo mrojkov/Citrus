@@ -33,7 +33,7 @@ namespace Tangerine
 			Orange.UserInterface.Instance.Initialize();
 			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
-			Lime.Yuzu.ExtendDeserializers += (deserializerBuilders) => {
+			Lime.Persistence.ExtendDeserializers += (deserializerBuilders) => {
 				deserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			};
 

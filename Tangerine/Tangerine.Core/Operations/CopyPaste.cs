@@ -39,7 +39,7 @@ namespace Tangerine.Core.Operations
 					animation.Tracks.Add(Cloner.Clone(track));
 				}
 			}
-			TangerineYuzu.Instance.Value.WriteObject(Document.Current.Path, stream, animation, Serialization.Format.JSON);
+			TangerinePersistence.Instance.Value.WriteObject(Document.Current.Path, stream, animation, Persistence.Format.Json);
 		}
 
 		private static void CopyNodes(System.IO.MemoryStream stream)
@@ -77,7 +77,7 @@ namespace Tangerine.Core.Operations
 				}
 			}
 			frame.SyncFolderDescriptorsAndNodes();
-			TangerineYuzu.Instance.Value.WriteObject(null, stream, frame, Serialization.Format.JSON);
+			TangerinePersistence.Instance.Value.WriteObject(null, stream, frame, Persistence.Format.Json);
 		}
 
 		static Folder CloneFolder(Folder folder)
@@ -128,7 +128,7 @@ namespace Tangerine.Core.Operations
 		{
 			try {
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
-				var animation = TangerineYuzu.Instance.Value.ReadObject<Animation>(string.Empty, stream);
+				var animation = TangerinePersistence.Instance.Value.ReadObject<Animation>(string.Empty, stream);
 				ClearRowSelection.Perform();
 				var tracks = animation.Tracks.ToList();
 				animation.Tracks.Clear();
@@ -158,7 +158,7 @@ namespace Tangerine.Core.Operations
 			Frame frame;
 			try {
 				var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(data));
-				frame = TangerineYuzu.Instance.Value.ReadObject<Frame>(Document.Current.Path, stream);
+				frame = TangerinePersistence.Instance.Value.ReadObject<Frame>(Document.Current.Path, stream);
 			} catch (System.Exception e) {
 				Debug.Write(e);
 				try {
