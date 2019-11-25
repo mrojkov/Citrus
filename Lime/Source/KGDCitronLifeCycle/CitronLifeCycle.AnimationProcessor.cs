@@ -27,17 +27,17 @@ namespace Lime.KGDCitronLifeCycle
 			private void ReplaceAnimationEngine(Animation animation)
 			{
 				if (animation.AnimationEngine == Lime.DefaultAnimationEngine.Instance) {
-					animation.AnimationEngine = Lime.KGDCitronLifeCycle.CitronLifeCycle.DefaultAnimationEngine.Instance;
+					animation.AnimationEngine = new DefaultAnimationEngine();
 				} else if (animation.AnimationEngine == Lime.BlendAnimationEngine.Instance) {
-					animation.AnimationEngine = Lime.KGDCitronLifeCycle.CitronLifeCycle.BlendAnimationEngine.Instance;
+					animation.AnimationEngine = new BlendAnimationEngine();
 				}
 			}
 
 			private void RevertAnimationEngine(Animation animation)
 			{
-				if (animation.AnimationEngine == Lime.KGDCitronLifeCycle.CitronLifeCycle.DefaultAnimationEngine.Instance) {
+				if (animation.AnimationEngine is DefaultAnimationEngine) {
 					animation.AnimationEngine = Lime.DefaultAnimationEngine.Instance;
-				} else if (animation.AnimationEngine == Lime.KGDCitronLifeCycle.CitronLifeCycle.BlendAnimationEngine.Instance) {
+				} else if (animation.AnimationEngine is BlendAnimationEngine) {
 					animation.AnimationEngine = Lime.BlendAnimationEngine.Instance;
 				}
 			}

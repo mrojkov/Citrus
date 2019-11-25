@@ -4,16 +4,10 @@ namespace Lime.KGDCitronLifeCycle
 {
 	public static partial class CitronLifeCycle
 	{
-		private static bool initialized;
 		[ThreadStatic]
 		private static int advanceAnimationActiveCount;
 		[ThreadStatic]
 		private static int pipelinedAdvanceAnimationActiveCount;
-
-		public static void Initialize()
-		{
-			initialized = true;
-		}
 
 		public static Action OnStart(this Node node, Action<float> customUpdate, NodeManagerPhase customUpdatePhase)
 		{
