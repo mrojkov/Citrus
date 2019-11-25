@@ -17,8 +17,6 @@ namespace Lime.KGDCitronLifeCycle
 			}
 			initialized = true;
 
-			Lime.DefaultAnimationEngine.Instance = new DefaultAnimationEngine();
-			Lime.BlendAnimationEngine.Instance = new BlendAnimationEngine();
 			WindowWidget.NodeManagerFactory = CreateNodeManager;
 		}
 

@@ -1638,7 +1638,6 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class AnimationComponent : NodeComponent
 	{
-		internal AnimationProcessor Processor;
 		internal int Depth = -1;
 
 		public AnimationCollection Animations { get; private set; }
@@ -1657,14 +1656,32 @@ namespace Lime
 			}
 		}
 
+		public event Action<AnimationComponent, Animation> AnimationAdded;
+
+		public event Action<AnimationComponent, Animation> AnimationRemoved;
+
+		public event Action<AnimationComponent, Animation> AnimationRun;
+
+		public event Action<AnimationComponent, Animation> AnimationStopped;
+
+		internal void OnAnimationAdded(Animation animation)
+		{
+			AnimationAdded?.Invoke(this, animation);
+		}
+
+		internal void OnAnimationRemoved(Animation animation)
+		{
+			AnimationRemoved?.Invoke(this, animation);
+		}
+
 		internal void OnAnimationRun(Animation animation)
 		{
-			Processor?.OnAnimationRun(animation);
+			AnimationRun?.Invoke(this, animation);
 		}
 
 		internal void OnAnimationStopped(Animation animation)
 		{
-			Processor?.OnAnimationStopped(animation);
+			AnimationStopped?.Invoke(this, animation);
 		}
 
 		public AnimationComponent()

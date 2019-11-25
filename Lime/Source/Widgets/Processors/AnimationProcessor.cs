@@ -24,7 +24,10 @@ namespace Lime
 
 		protected override void Add(AnimationComponent component, Node owner)
 		{
-			component.Processor = this;
+			component.AnimationAdded += OnAnimationAdded;
+			component.AnimationRemoved += OnAnimationRemoved;
+			component.AnimationRun += OnAnimationRun;
+			component.AnimationStopped += OnAnimationStopped;
 			component.Depth = GetNodeDepth(owner);
 			if (component.Depth >= currQueue.BucketCount) {
 				BucketQueue<Animation>.Resize(ref currQueue, component.Depth + 1);
@@ -42,21 +45,36 @@ namespace Lime
 
 		protected override void Remove(AnimationComponent component, Node owner)
 		{
-			component.Processor = null;
+			component.AnimationAdded -= OnAnimationAdded;
+			component.AnimationRemoved -= OnAnimationRemoved;
+			component.AnimationRun -= OnAnimationRun;
+			component.AnimationStopped -= OnAnimationStopped;
 			component.Depth = -1;
 			foreach (var a in component.Animations) {
 				Deactivate(a);
 			}
 		}
 
-		internal void OnAnimationRun(Animation animation)
+		internal void OnAnimationAdded(AnimationComponent component, Animation animation)
+		{
+			if (animation.IsRunning) {
+				OnAnimationRun(component, animation);
+			}
+		}
+
+		internal void OnAnimationRemoved(AnimationComponent component, Animation animation)
+		{
+			OnAnimationStopped(component, animation);
+		}
+
+		internal void OnAnimationRun(AnimationComponent component, Animation animation)
 		{
 			if (!animation.OwnerNode.GloballyFrozen) {
 				Activate(animation);
 			}
 		}
 
-		internal void OnAnimationStopped(Animation animation)
+		internal void OnAnimationStopped(AnimationComponent component, Animation animation)
 		{
 			Deactivate(animation);
 		}

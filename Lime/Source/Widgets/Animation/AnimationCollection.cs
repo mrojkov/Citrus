@@ -161,9 +161,7 @@ namespace Lime
 			}
 			items.Insert(index, item);
 			item.Owner = owner;
-			if (item.IsRunning) {
-				owner.OnAnimationRun(item);
-			}
+			owner.OnAnimationAdded(item);
 		}
 
 		public void RemoveAt(int index)
@@ -171,9 +169,7 @@ namespace Lime
 			var item = items[index];
 			items.RemoveAt(index);
 			item.Owner = null;
-			if (item.IsRunning) {
-				owner.OnAnimationStopped(item);
-			}
+			owner.OnAnimationRemoved(item);
 		}
 
 		int IList.Add(object value)
