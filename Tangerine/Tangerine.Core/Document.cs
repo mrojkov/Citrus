@@ -103,6 +103,8 @@ namespace Tangerine.Core
 			}
 		}
 
+		public NodeManager Manager { get; private set; }
+
 		/// <summary>
 		/// Gets or sets the scene we are navigated from. Need for getting back into the main scene from the external one.
 		/// </summary>
@@ -156,7 +158,35 @@ namespace Tangerine.Core
 
 		public string AnimationId => Animation.Id;
 
-		public Document(DocumentFormat format = DocumentFormat.Tan, Type rootType = null)
+		private static NodeManager CreateDefaultManager()
+		{
+			var services = new ServiceRegistry();
+			services.Add(new BehaviorSystem());
+			services.Add(new LayoutManager());
+
+			var manager = new NodeManager(services);
+			manager.Processors.Add(new BehaviorSetupProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
+			manager.Processors.Add(new AnimationProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(AfterAnimationStage)));
+			manager.Processors.Add(new LayoutProcessor());
+			manager.Processors.Add(new BoundingRectProcessor());
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
+			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
+			return manager;
+		}
+
+		public static Func<NodeManager> ManagerFactory;
+
+		private Document()
+		{
+			Manager = ManagerFactory?.Invoke() ?? CreateDefaultManager();
+		}
+
+		public Document(DocumentFormat format = DocumentFormat.Tan, Type rootType = null) : this()
 		{
 			Format = format;
 			Path = string.Format(untitledPathFormat, untitledCounter++);
@@ -173,13 +203,15 @@ namespace Tangerine.Core
 			if (RootNode is Node3D) {
 				RootNode = WrapNodeWithViewport3D(RootNode);
 			}
+			Manager.RootNodes.Clear();
+			Manager.RootNodes.Add(RootNode);
 			Decorate(RootNode);
 			Container = RootNode;
 			History.PerformingOperation += Document_PerformingOperation;
 			History.DocumentChanged += Document_Changed;
 		}
 
-		public Document(string path, bool delayLoad = false)
+		public Document(string path, bool delayLoad = false) : this()
 		{
 			Path = path;
 			Loaded = false;
@@ -250,6 +282,8 @@ namespace Tangerine.Core
 				if (RootNode is Node3D) {
 					RootNode = WrapNodeWithViewport3D(RootNode);
 				}
+				Manager.RootNodes.Clear();
+				Manager.RootNodes.Add(RootNode);
 				Decorate(RootNode);
 				Container = RootNode;
 				if (Format == DocumentFormat.Tan) {

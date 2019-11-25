@@ -12,7 +12,6 @@ namespace Tangerine.UI.SceneView
 	public class SceneView : IDocumentView
 	{
 		private Vector2 mousePositionOnFilesDrop;
-		private NodeManager manager;
 
 		// Given panel.
 		public readonly Widget Panel;
@@ -165,42 +164,19 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		private static NodeManager CreateManager()
-		{
-			var services = new ServiceRegistry();
-			services.Add(new BehaviorSystem());
-			services.Add(new LayoutManager());
-
-			var manager = new NodeManager(services);
-			manager.Processors.Add(new BehaviorSetupProcessor());
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreEarlyUpdateStage)));
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(EarlyUpdateStage)));
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostEarlyUpdateStage)));
-			manager.Processors.Add(new AnimationProcessor());
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(AfterAnimationStage)));
-			manager.Processors.Add(new LayoutProcessor());
-			manager.Processors.Add(new BoundingRectProcessor());
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PreLateUpdateStage)));
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(LateUpdateStage)));
-			manager.Processors.Add(new BehaviorUpdateProcessor(typeof(PostLateUpdateStage)));
-			return manager;
-		}
-
 		public SceneView(Widget panelWidget)
 		{
 			this.Panel = panelWidget;
 			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
 			InputArea.Gestures.Add(DropFilesGesture = new DropFilesGesture());
-			manager = CreateManager();
-			manager.RootNodes.Add(Document.Current.RootNode);
 			Scene = new Widget();
 			Scene.Updating += delta => {
 				if (Document.Current.PreviewAnimation) {
 					if (Document.Current.SlowMotion) {
 						delta *= 0.1f;
 					}
-					manager.Update(delta);
+					Document.Current.Manager.Update(delta);
 				}
 			};
 			Scene.PostPresenter = new ScenePresenter(Document.Current.RootNode);
