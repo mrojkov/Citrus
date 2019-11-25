@@ -87,8 +87,6 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
-    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
-    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
@@ -180,6 +178,7 @@
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
+    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformBuffer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderContext.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderTexture2D.cs" />
@@ -217,7 +216,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanHelper.cs" />
-    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
