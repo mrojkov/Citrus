@@ -1,10 +1,13 @@
 using System.IO;
+using System.Threading;
 using Lime;
 
 namespace RemoteScripting
 {
 	public abstract class NetworkYuzuObject<T> : NetworkMessage where T : class, new()
 	{
+		private static readonly ThreadLocal<Persistence> persistence = new ThreadLocal<Persistence>(() => new Persistence());
+
 		public readonly T Data;
 
 		protected NetworkYuzuObject(T data)
@@ -15,14 +18,14 @@ namespace RemoteScripting
 		protected NetworkYuzuObject(byte[] body)
 		{
 			using (var memoryStream = new MemoryStream(body)) {
-				Data = Serialization.ReadObject<T>(string.Empty, memoryStream);
+				Data = persistence.Value.ReadObject<T>(string.Empty, memoryStream);
 			}
 		}
 
 		public override byte[] Serialize()
 		{
 			using (var memoryStream = new MemoryStream()) {
-				Serialization.WriteObject(string.Empty, memoryStream, Data, Serialization.Format.Binary);
+				persistence.Value.WriteObject(string.Empty, memoryStream, Data, Persistence.Format.Binary);
 				return memoryStream.ToArray();
 			}
 		}
