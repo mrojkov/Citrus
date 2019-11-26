@@ -71,7 +71,7 @@ namespace Tangerine.Common.FilesDropHandlers
 				new Command("Add As External Scene", () => Document.Current.History.DoTransaction(() => {
 					var nodes = new List<Node>(assets.Count);
 					foreach (var (assetPath, _) in assets) {
-						var scene = Node.CreateFromAssetBundle(assetPath, yuzu: TangerineYuzu.Instance.Value);
+						var scene = Node.CreateFromAssetBundle(assetPath, persistence: TangerinePersistence.Instance);
 						var node = CreateNode.Perform(scene.GetType());
 						SetProperty.Perform(node, nameof(Widget.ContentsPath), assetPath);
 						if (node is IPropertyLocker propertyLocker) {

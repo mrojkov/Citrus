@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -51,22 +51,27 @@
     <Compile Include="UIProcessors.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandRegistry.cs" />
-    <Compile Include="Documentation\CrosslinkExtension.cs" />
-    <Compile Include="Documentation\Documentation.cs" />
-    <Compile Include="Documentation\DocumentationComponent.cs" />
-    <Compile Include="Documentation\HelpModeGestureManager.cs" />
     <Compile Include="ColorPicker.Win.cs" />
     <Compile Include="ColorPickerPanel.cs" />
+    <Compile Include="CommandRegistry.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Cursors.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
-    <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
+    <Compile Include="Dialogs\TriggerSelectionDialog.cs" />
     <Compile Include="Docking\DockHierarchy.cs" />
+    <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Docking\DragBehaviours.cs" />
+    <Compile Include="Documentation\CrosslinkExtension.cs" />
+    <Compile Include="Documentation\Documentation.cs" />
+    <Compile Include="Documentation\DocumentationComponent.cs" />
+    <Compile Include="Documentation\HelpModeGestureManager.cs" />
+    <Compile Include="DocumentCommandHandler.cs" />
+    <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
+    <Compile Include="EmbeddedResources\ThemedIconResource.cs" />
     <Compile Include="IconPool.cs" />
     <Compile Include="NodeIconPool.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\AlignmentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AnchorsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\AudioSamplePropertyEditor.cs" />
@@ -106,21 +111,16 @@
     <Compile Include="PropertyEditors\TriggerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\Vector3PropertyEditor.cs" />
-    <Compile Include="ToolbarModel.cs" />
-    <Compile Include="TextEditorWindow.cs" />
-    <Compile Include="Dialogs\TriggerSelectionDialog.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmbeddedResources\EmbeddedResource.cs" />
     <Compile Include="TabbedWidget.cs" />
-    <Compile Include="ToolbarView.cs" />
+    <Compile Include="TextEditorWindow.cs" />
     <Compile Include="ToolbarButton.cs" />
-    <Compile Include="Utils\Spacer.cs" />
+    <Compile Include="ToolbarModel.cs" />
+    <Compile Include="ToolbarView.cs" />
     <Compile Include="Utils\Colors.cs" />
-    <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\Metrics.cs" />
+    <Compile Include="Utils\Spacer.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="DocumentCommandHandler.cs" />
     <Compile Include="WidgetFactoryComponent.cs" />
     <Compile Include="Widgets\ThemedButtons.cs" />
   </ItemGroup>

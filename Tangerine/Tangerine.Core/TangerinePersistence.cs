@@ -4,9 +4,10 @@ using Yuzu.Json;
 
 namespace Tangerine.Core
 {
-	public class TangerineYuzu
+	public class TangerinePersistence
 	{
-		public static ThreadLocal<Lime.Yuzu> Instance = new ThreadLocal<Lime.Yuzu>(() => new Lime.Yuzu(
+		public static Lime.InternalPersistence Instance => threadLocalInstance.Value;
+		private static readonly ThreadLocal<Lime.InternalPersistence> threadLocalInstance = new ThreadLocal<Lime.InternalPersistence>(() => new Lime.InternalPersistence(
 			new CommonOptions {
 				TagMode = TagMode.Aliases,
 				AllowEmptyTypes = true,

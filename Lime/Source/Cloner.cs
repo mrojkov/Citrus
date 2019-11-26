@@ -24,7 +24,7 @@ namespace Lime
 		/// <returns></returns>
 		public static object Clone(object obj)
 		{
-			return obj is ICloneable cloneable ? cloneable.Clone() : Serialization.Clone(obj);
+			return obj is ICloneable cloneable ? cloneable.Clone() : InternalPersistence.Instance.Clone(obj);
 		}
 	}
 }

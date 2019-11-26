@@ -33,9 +33,6 @@ namespace Tangerine
 			Orange.UserInterface.Instance.Initialize();
 			Widget.EnableViewCulling = false;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
-			Lime.Yuzu.ExtendDeserializers += (deserializerBuilders) => {
-				deserializerBuilders.Insert(0, DeserializeHotStudioAssets);
-			};
 
 			if (!UserPreferences.Initialize()) {
 				UserPreferences.Instance.Clear();
@@ -526,17 +523,7 @@ namespace Tangerine
 			}
 		}
 
-		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
-		{
-			if (path.EndsWith(".scene", StringComparison.CurrentCultureIgnoreCase)) {
-				return new HotSceneDeserializer(stream);
-			} else if (path.EndsWith(".fnt", StringComparison.CurrentCultureIgnoreCase)) {
-				return new HotFontDeserializer(stream);
-			}
-			return null;
-		}
-
-		static Frame InitializeDocumentArea(DockManager dockManager)
+		private static Frame InitializeDocumentArea(DockManager dockManager)
 		{
 			var tabBar = new ThemedTabBar { LayoutCell = new LayoutCell { StretchY = 0 } };
 			var documentViewContainer = new Frame {
@@ -649,8 +636,7 @@ namespace Tangerine
 
 			var h = CommandHandlerList.Global;
 			h.Connect(GenericCommands.NewProject, new ProjectNew());
-			h.Connect(GenericCommands.NewScene, new FileNew());
-			h.Connect(GenericCommands.NewTan, new FileNew(DocumentFormat.Tan));
+			h.Connect(GenericCommands.NewTan, new FileNew());
 			h.Connect(GenericCommands.Open, new FileOpen());
 			h.Connect(GenericCommands.OpenProject, new FileOpenProject());
 			h.Connect(GenericCommands.Save, new FileSave());
@@ -658,7 +644,6 @@ namespace Tangerine
 			h.Connect(GenericCommands.SaveAs, new FileSaveAs());
 			h.Connect(GenericCommands.SaveAll, new FileSaveAll());
 			h.Connect(GenericCommands.Revert, new FileRevert());
-			h.Connect(GenericCommands.UpgradeDocumentFormat, new UpgradeDocumentFormat());
 			h.Connect(GenericCommands.Close, new FileClose());
 			h.Connect(GenericCommands.CloseAll, new FileCloseAll());
 			h.Connect(GenericCommands.CloseAllButCurrent, new FileCloseAllButCurrent());

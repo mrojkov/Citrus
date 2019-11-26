@@ -32,7 +32,6 @@ namespace Orange
 					}
 					if (
 						(
-							scenePath.EndsWith(".scene", StringComparison.OrdinalIgnoreCase) ||
 							scenePath.EndsWith(".tan", StringComparison.OrdinalIgnoreCase) ||
 							scenePath.EndsWith(".model", StringComparison.OrdinalIgnoreCase)
 						) &&

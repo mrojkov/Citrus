@@ -18,7 +18,7 @@ namespace Tangerine.UI
 			Selector = editorParams.DropDownListFactory();
 			Selector.LayoutCell = new LayoutCell(Alignment.Center);
 			var propertyType = typeof(T);
-			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, Serialization.YuzuCommonOptions);
+			var meta = Yuzu.Metadata.Meta.Get(editorParams.Type, InternalPersistence.Instance.YuzuCommonOptions);
 			if (!propertyType.IsInterface) {
 				Selector.Items.Add(new CommonDropDownList.Item(propertyType.Name, propertyType));
 			}
@@ -42,7 +42,6 @@ namespace Tangerine.UI
 					}
 				}
 			);
-
 			var propertyMetaItem = meta.Items.FirstOrDefault(i => i.Name == editorParams.PropertyName);
 			object defaultValue = null;
 			if (propertyMetaItem != null) {

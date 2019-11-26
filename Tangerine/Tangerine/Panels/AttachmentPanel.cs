@@ -549,7 +549,7 @@ namespace Tangerine
 				metaCached = cacheBundle.FileExists(metaPath);
 				if (metaCached) {
 					using (var assetStream = cacheBundle.OpenFile(metaPath)) {
-						meta = TangerineYuzu.Instance.Value.ReadObject<Model3DAttachmentMeta>(metaPath, assetStream);
+						meta = TangerinePersistence.Instance.ReadObject<Model3DAttachmentMeta>(metaPath, assetStream);
 					}
 				}
 			}
@@ -577,7 +577,7 @@ namespace Tangerine
 				attachmentCached = cacheBundle.FileExists(path);
 				if (attachmentCached) {
 					using (var assetStream = cacheBundle.OpenFile(path)){
-						var attachmentFormat = TangerineYuzu.Instance.Value.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(path, assetStream);
+						var attachmentFormat = TangerinePersistence.Instance.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(path, assetStream);
 						attachment = Model3DAttachmentParser.GetModel3DAttachment(attachmentFormat, path);
 					}
 				}

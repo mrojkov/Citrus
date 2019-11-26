@@ -19,8 +19,8 @@ namespace Orange
 
 		private bool Converter(string srcPath, string dstPath)
 		{
-			var node = Serialization.ReadObjectFromFile<Node>(srcPath);
-			Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Serialization.Format.Binary, sceneExtension,
+			var node = InternalPersistence.Instance.ReadObjectFromFile<Node>(srcPath);
+			InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, dstPath, node, Persistence.Format.Binary, sceneExtension,
 				File.GetLastWriteTime(srcPath), AssetAttributes.None, AssetCooker.CookingRulesMap[srcPath].SHA1);
 			return true;
 		}

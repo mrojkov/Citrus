@@ -74,7 +74,7 @@ namespace Tangerine
 		private readonly DocumentFormat format;
 		private readonly Type rootType;
 
-		public FileNew(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
+		public FileNew(DocumentFormat format = DocumentFormat.Tan, Type rootType = null)
 		{
 			this.format = format;
 			this.rootType = rootType;
@@ -237,39 +237,6 @@ namespace Tangerine
 		{
 			if (Project.Current.Documents.Count != 0) {
 				Project.Current.CloseAllDocumentsButThis(Document.Current);
-			}
-		}
-	}
-
-	public class UpgradeDocumentFormat : DocumentCommandHandler
-	{
-		public override bool GetEnabled()
-		{
-			return Document.Current.Format == DocumentFormat.Scene;
-		}
-
-		public override void ExecuteTransaction()
-		{
-			try {
-				AssetBundle.Current.DeleteFile(Path.ChangeExtension(Document.Current.Path, "scene"));
-				Document.Current.Format = DocumentFormat.Tan;
-				RestoreDefaultAnimationEngine(Document.Current.RootNode);
-				new UpsampleAnimationTwiceEntireScene().Execute();
-				Document.Current.Save();
-				var path = Document.Current.FullPath;
-				Project.Current.CloseDocument(Document.Current);
-				Project.Current.OpenDocument(path, true);
-			}
-			catch (System.Exception e) {
-				AlertDialog.Show($"Upgrade document format error: '{e.Message}'");
-			}
-		}
-
-		private void RestoreDefaultAnimationEngine(Node node)
-		{
-			node.DefaultAnimation.AnimationEngine = DefaultAnimationEngine.Instance;
-			foreach (var child in node.Nodes) {
-				RestoreDefaultAnimationEngine(child);
 			}
 		}
 	}

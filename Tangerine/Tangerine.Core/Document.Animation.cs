@@ -42,7 +42,7 @@ namespace Tangerine.Core
 				Animation.IsRunning = false;
 				CurrentFrameSetter.StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
-					foreach ((var animation, var time) in savedAnimationsTimes) {
+					foreach (var (animation, time) in savedAnimationsTimes) {
 						animation.Time = CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
 					}
 					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
@@ -186,12 +186,12 @@ namespace Tangerine.Core
 				}
 			}
 
-			const int OptimalRollbackForCacheAnimationsStates = 150;
-			static bool cacheAnimationsStates;
+			private const int OptimalRollbackForCacheAnimationsStates = 150;
+			private static bool cacheAnimationsStates;
 
 			internal static bool CacheAnimationsStates
 			{
-				get { return cacheAnimationsStates; }
+				get => cacheAnimationsStates;
 				set {
 					cacheAnimationsStates = value;
 					if (!cacheAnimationsStates && AnimationsStatesComponent.Exists(Current.Container)) {
@@ -290,19 +290,15 @@ namespace Tangerine.Core
 				} while (forwardDelta > OptimalDelta);
 			}
 
-			static float CalcDeltaToFrame(Animation animation, int frame)
+			private static float CalcDeltaToFrame(Animation animation, int frame)
 			{
 				var forwardDelta = AnimationUtils.SecondsPerFrame * frame - animation.Time;
 				// Make sure that animation engine will invoke triggers on last frame
 				forwardDelta += 0.00001;
-				// Hack: CompatibilityAnimationEngine workaround
-				if (Current.Format == DocumentFormat.Scene) {
-					forwardDelta *= 2f;
-				}
 				return (float) forwardDelta;
 			}
 
-			internal static void SetTimeRecursive(Node node, double time)
+			private static void SetTimeRecursive(Node node, double time)
 			{
 				void SetTime(Node n, double t)
 				{
@@ -330,7 +326,7 @@ namespace Tangerine.Core
 				}
 			}
 
-			internal static void SetTime(Node node, string animationId, double time)
+			private static void SetTime(Node node, string animationId, double time)
 			{
 				if (node.Animations.TryFind(animationId, out var animation)) {
 					animation.Time = time;
@@ -351,10 +347,9 @@ namespace Tangerine.Core
 				}
 			}
 
-			static void ClearParticlesRecursive(Node node)
+			private static void ClearParticlesRecursive(Node node)
 			{
-				if (node is ParticleEmitter) {
-					var e = (ParticleEmitter)node;
+				if (node is ParticleEmitter e) {
 					e.ClearParticles();
 				}
 				foreach (var child in node.Nodes) {

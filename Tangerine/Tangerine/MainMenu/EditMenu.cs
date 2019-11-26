@@ -398,18 +398,6 @@ namespace Tangerine
 		}
 	}
 
-	public class UpsampleAnimationTwiceEntireScene : UpsampleAnimationTwice
-	{
-		public override void ExecuteTransaction()
-		{
-			var root = Document.Current.RootNode;
-			UpsampleNodeAnimation(root);
-			foreach (var node in root.Descendants) {
-				node.Animators.Invalidate();
-			}
-		}
-	}
-
 	public class UpsampleAnimationTwice : DocumentCommandHandler
 	{
 		public override void ExecuteTransaction()
@@ -478,8 +466,8 @@ namespace Tangerine
 	{
 		public override void ExecuteTransaction()
 		{
-			if (Document.Current.Format == DocumentFormat.Scene || Document.Current.Format == DocumentFormat.Tan) {
-				DocumentPreview.Generate(Document.Current.Format == DocumentFormat.Scene ? CompressionFormat.Jpeg : CompressionFormat.Png);
+			if (Document.Current.Format == DocumentFormat.Tan) {
+				DocumentPreview.Generate(CompressionFormat.Png);
 			}
 		}
 	}

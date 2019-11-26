@@ -25,7 +25,7 @@ namespace Tangerine.Core
 			if (System.IO.File.Exists(path)) {
 				try {
 					Clear();
-					TangerineYuzu.Instance.Value.ReadObjectFromFile<UserPreferences>(path, this);
+					TangerinePersistence.Instance.ReadObjectFromFile<UserPreferences>(path, this);
 					return true;
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the user preferences ({path}): {e}");
@@ -44,7 +44,7 @@ namespace Tangerine.Core
 				sortedComponents.Add(c);
 			}
 			sortedComponents.Sort((a, b) => String.Compare(a.GetType().FullName, b.GetType().FullName, StringComparison.Ordinal));
-			TangerineYuzu.Instance.Value.WriteObjectToFile(GetPath(), sortedComponents, Serialization.Format.JSON);
+			TangerinePersistence.Instance.WriteObjectToFile(GetPath(), sortedComponents, Persistence.Format.Json);
 		}
 
 		public static string GetPath()

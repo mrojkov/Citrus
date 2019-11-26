@@ -42,7 +42,7 @@ namespace Orange
 					(!AssetCooker.CookingRulesMap[srcTexturePath].SHA1.SequenceEqual(bundleSHA1))
 				) {
 					srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
-					var part = TextureAtlasElement.Params.ReadFromBundle(atlasPartPath);
+					var part = InternalPersistence.Instance.ReadObject<TextureAtlasElement.Params>(atlasPartPath);
 					var atlasChain = Path.GetFileNameWithoutExtension(part.AtlasPath);
 					atlasChainsToRebuild.Add(atlasChain);
 					if (!textures.ContainsKey(srcTexturePath)) {
@@ -314,7 +314,7 @@ namespace Orange
 					AtlasPath = Path.ChangeExtension(atlasPath, null)
 				};
 				var srcPath = Path.ChangeExtension(item.Path, item.SourceExtension);
-				Serialization.WriteObjectToBundle(AssetCooker.AssetBundle, item.Path, atlasPart, Serialization.Format.Binary,
+				InternalPersistence.Instance.WriteObjectToBundle(AssetCooker.AssetBundle, item.Path, atlasPart, Persistence.Format.Binary,
 					item.SourceExtension, File.GetLastWriteTime(srcPath), AssetAttributes.None, item.CookingRules.SHA1);
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, AssetCooker.GetPlatformTextureExtension());

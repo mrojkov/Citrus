@@ -22,8 +22,8 @@ namespace Lime
 		[TangerineFileProperty(new [] { "ogv" })]
 		public string Path
 		{
-			get { return Yuzu.Current?.ShrinkPath(movieTexture.Path) ?? movieTexture.Path; }
-			set { movieTexture.Path = Yuzu.Current?.ExpandPath(value) ?? value; }
+			get => InternalPersistence.Current?.ShrinkPath(movieTexture.Path) ?? movieTexture.Path;
+			set => movieTexture.Path = InternalPersistence.Current?.ExpandPath(value) ?? value;
 		}
 
 		[YuzuMember]

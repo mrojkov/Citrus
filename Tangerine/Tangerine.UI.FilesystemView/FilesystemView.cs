@@ -295,7 +295,7 @@ namespace Tangerine.UI.FilesystemView
 				if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
 					GoTo(path);
 				} else {
-					if (path.EndsWith(".scene") || path.EndsWith(".tan")) {
+					if (path.EndsWith(".tan", StringComparison.OrdinalIgnoreCase)) {
 						Project.Current.OpenDocument(path, true);
 					}
 				}

@@ -61,7 +61,7 @@ namespace Orange.Source.Actions
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				var files = The.Workspace.AssetFiles.Enumerate(".scene");
+				var files = The.Workspace.AssetFiles.Enumerate(".tan");
 				foreach (var fileInfo in files) {
 					Console.WriteLine("* " + fileInfo.Path);
 					ProcessSourceFile(fileInfo.Path);

@@ -23,15 +23,15 @@ namespace Lime
 			}
 		}
 
-		public override void LoadExternalScenes(Yuzu yuzu = null)
+		public override void LoadExternalScenes(InternalPersistence persistence = null)
 		{
-			base.LoadExternalScenes(yuzu);
-			yuzu = yuzu ?? Yuzu.Instance.Value;
+			base.LoadExternalScenes(persistence);
+			persistence = persistence ?? InternalPersistence.Instance;
 			if (ContentsPath != null) {
 				var attachmentPath = System.IO.Path.ChangeExtension(ContentsPath, ".Attachment.txt");
 				if (AssetBundle.Current.FileExists(attachmentPath)) {
 					using (var stream = AssetBundle.Current.OpenFileLocalized(attachmentPath)) {
-						var attachment = yuzu.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
+						var attachment = persistence.ReadObject<Model3DAttachmentParser.ModelAttachmentFormat>(attachmentPath, stream);
 						if (string.IsNullOrEmpty(attachment.EntryTrigger)) {
 							return;
 						}

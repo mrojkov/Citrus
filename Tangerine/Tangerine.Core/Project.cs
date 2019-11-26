@@ -93,7 +93,7 @@ namespace Tangerine.Core
 			FileSystemWatcher = new FileSystemWatcher(AssetsDirectory, includeSubdirectories: true);
 			if (File.Exists(UserprefsPath)) {
 				try {
-					UserPreferences = TangerineYuzu.Instance.Value.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
+					UserPreferences = TangerinePersistence.Instance.ReadObjectFromFile<ProjectUserPreferences>(UserprefsPath);
 					foreach (var path in UserPreferences.Documents) {
 						try {
 							if (GetFullPath(path, out string fullPath)) {
@@ -136,10 +136,10 @@ namespace Tangerine.Core
 			var overlaysPath = Path.Combine(Current.AssetsDirectory, "Overlays");
 			if (Directory.Exists(overlaysPath)) {
 				var files = Directory.EnumerateFiles(overlaysPath)
-					.Where(file => Path.GetExtension(file) == ".tan" || Path.GetExtension(file) == ".scene");
+					.Where(file => file.EndsWith(".tan", StringComparison.OrdinalIgnoreCase));
 				foreach (var file in files) {
 					Current.Overlays.Add(Path.GetFileNameWithoutExtension(file),
-						(Widget)Node.CreateFromAssetBundle(Path.ChangeExtension(file, null), null, TangerineYuzu.Instance.Value));
+						(Widget)Node.CreateFromAssetBundle(Path.ChangeExtension(file, null), null, TangerinePersistence.Instance));
 				}
 			}
 
@@ -196,8 +196,8 @@ namespace Tangerine.Core
 				}
 			}
 			try {
-				TangerineYuzu.Instance.Value.WriteObjectToFile(UserprefsPath, UserPreferences, Serialization.Format.JSON);
-			} catch (Exception) { }
+				TangerinePersistence.Instance.WriteObjectToFile(UserprefsPath, UserPreferences, Persistence.Format.Json);
+			} catch (System.Exception) { }
 			AssetBundle.Current = null;
 			Current = Null;
 			return true;
@@ -242,7 +242,7 @@ namespace Tangerine.Core
 			return false;
 		}
 
-		public Document NewDocument(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
+		public Document NewDocument(DocumentFormat format = DocumentFormat.Tan, Type rootType = null)
 		{
 			var doc = new Document(format, rootType);
 			documents.Add(doc);
@@ -495,7 +495,7 @@ namespace Tangerine.Core
 						// и мешает работать.
 						if (File.Exists(textureParamsPath)) {
 							try {
-								var existingParams = TangerineYuzu.Instance.Value.ReadObjectFromFile<TextureParams>(textureParamsPath);
+								var existingParams = TangerinePersistence.Instance.ReadObjectFromFile<TextureParams>(textureParamsPath);
 								if (existingParams.Equals(textureParams)) {
 									continue;
 								}
@@ -504,7 +504,7 @@ namespace Tangerine.Core
 								// этот костыль ещё и валил Танжерин по хз какому поводу.
 							}
 						}
-						TangerineYuzu.Instance.Value.WriteObjectToFile(textureParamsPath, textureParams, Serialization.Format.JSON);
+						TangerinePersistence.Instance.WriteObjectToFile(textureParamsPath, textureParams, Persistence.Format.Json);
 					} else if (File.Exists(textureParamsPath)) {
 						File.Delete(textureParamsPath);
 					}

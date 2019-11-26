@@ -25,8 +25,8 @@ namespace Lime
 
 		[YuzuMember]
 		public string SerializationPath {
-			get { return GetSerializationPath(); }
-			set { SetSerializationPath(value); }
+			get => GetSerializationPath();
+			set => SetSerializationPath(value);
 		}
 
 		private string GetSerializationPath()
@@ -34,7 +34,7 @@ namespace Lime
 			if (!string.IsNullOrEmpty(path) && path[0] == '#') {
 				return path;
 			} else {
-				return Yuzu.Current?.ShrinkPath(path) ?? path;
+				return InternalPersistence.Current?.ShrinkPath(path) ?? path;
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Lime
 		{
 			path = value;
 			if (!string.IsNullOrEmpty(value) && value[0] != '#') {
-				path = Yuzu.Current?.ExpandPath(value) ?? path;
+				path = InternalPersistence.Current?.ExpandPath(value) ?? path;
 			}
 			texture = null;
 		}

@@ -69,7 +69,7 @@ namespace Orange
 			};
 			var usedImages = new HashSet<string>();
 			var usedSounds = new HashSet<string>();
-			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".scene").Concat(The.Workspace.AssetFiles.Enumerate(".tan"))) {
+			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".tan")) {
 				var srcPath = srcFileInfo.Path;
 				using (var scene = (Frame)Node.CreateFromAssetBundle(srcPath)) {
 					foreach (var j in scene.Descendants) {

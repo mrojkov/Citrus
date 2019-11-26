@@ -237,6 +237,7 @@
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\InternalPersistence.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
@@ -249,13 +250,13 @@
     <Compile Include="Source\Optimizations\RenderOptimizer.cs" />
     <Compile Include="Source\Optimizations\RenderOptimizerHelpers.cs" />
     <Compile Include="Source\Optimizations\ViewProjector.cs" />
+    <Compile Include="Source\Persistence.cs" />
     <Compile Include="Source\Profilers\NodeProfiler.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\ResultExporter.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageData.cs" />
     <Compile Include="Source\Profilers\NodeProfilerHelpers\UsageSummary.cs" />
     <Compile Include="Source\Profilers\TasksProfiler.cs" />
     <Compile Include="Source\ReferenceEqualityComparer.cs" />
-    <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\ServiceProviderExtensions.cs" />
     <Compile Include="Source\ServiceRegistry.cs" />
     <Compile Include="Source\StringExtensions.cs" />

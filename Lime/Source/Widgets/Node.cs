@@ -130,8 +130,8 @@ namespace Lime
 #endif // TANGERINE
 		public string ContentsPath
 		{
-			get => Yuzu.Current?.ShrinkPath(contentsPath) ?? contentsPath;
-			set => contentsPath = Yuzu.Current?.ExpandPath(value) ?? value;
+			get => InternalPersistence.Current?.ShrinkPath(contentsPath) ?? contentsPath;
+			set => contentsPath = InternalPersistence.Current?.ExpandPath(value) ?? value;
 		}
 #if TANGERINE
 
@@ -1170,25 +1170,25 @@ namespace Lime
 			}
 		}
 
-		public static T CreateFromAssetBundle<T>(string path, T instance = null, Yuzu yuzu = null, bool ignoreExternals = false) where T : Node
+		public static T CreateFromAssetBundle<T>(string path, T instance = null, InternalPersistence persistence = null, bool ignoreExternals = false) where T : Node
 		{
-			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return (T) CreateFromAssetBundleHelper(path, instance, yuzu, external: false, ignoreExternals: ignoreExternals);
+			persistence = persistence ?? InternalPersistence.Instance;
+			return (T) CreateFromAssetBundleHelper(path, instance, persistence, external: false, ignoreExternals: ignoreExternals);
 		}
 
-		public static Node CreateFromAssetBundle(string path, Node instance = null, Yuzu yuzu = null, bool ignoreExternals = false)
+		public static Node CreateFromAssetBundle(string path, Node instance = null, InternalPersistence persistence = null, bool ignoreExternals = false)
 		{
-			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return CreateFromAssetBundleHelper(path, instance, yuzu, external: false, ignoreExternals: ignoreExternals);
+			persistence = persistence ?? InternalPersistence.Instance;
+			return CreateFromAssetBundleHelper(path, instance, persistence, external: false, ignoreExternals: ignoreExternals);
 		}
 
-		public static Node CreateFromStream(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool ignoreExternals = false)
+		public static Node CreateFromStream(string path, Node instance = null, InternalPersistence persistence = null, Stream stream = null, bool ignoreExternals = false)
 		{
-			yuzu = yuzu ?? Yuzu.Instance.Value;
-			return CreateFromAssetBundleHelper(path, instance, yuzu, stream, external: false, ignoreExternals);
+			persistence = persistence ?? InternalPersistence.Instance;
+			return CreateFromAssetBundleHelper(path, instance, persistence, stream, external: false, ignoreExternals);
 		}
 
-		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, Yuzu yuzu = null, Stream stream = null, bool external = false, bool ignoreExternals = false)
+		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, InternalPersistence persistence = null, Stream stream = null, bool external = false, bool ignoreExternals = false)
 		{
 			if (SceneLoading?.Value?.Invoke(path, ref instance, external, ignoreExternals) ?? false) {
 				SceneLoaded?.Value?.Invoke(path, instance, external);
@@ -1204,14 +1204,14 @@ namespace Lime
 			scenesBeingLoaded.Value.Add(fullPath);
 			try {
 				if (stream != null) {
-					instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
+					instance = persistence.ReadObject<Node>(fullPath, stream, instance);
 				} else {
 					using (stream = AssetBundle.Current.OpenFileLocalized(fullPath)) {
-						instance = yuzu.ReadObject<Node>(fullPath, stream, instance);
+						instance = persistence.ReadObject<Node>(fullPath, stream, instance);
 					}
 				}
 				if (!ignoreExternals) {
-					instance.LoadExternalScenes(yuzu);
+					instance.LoadExternalScenes(persistence);
 				}
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
 			} finally {
@@ -1221,15 +1221,15 @@ namespace Lime
 			return instance;
 		}
 
-		public virtual void LoadExternalScenes(Yuzu yuzu = null)
+		public virtual void LoadExternalScenes(InternalPersistence persistence = null)
 		{
-			yuzu = yuzu ?? Yuzu.Instance.Value;
+			persistence = persistence ?? InternalPersistence.Instance;
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				foreach (var child in Nodes) {
 					child.LoadExternalScenes();
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
-				var content = CreateFromAssetBundleHelper(ContentsPath, null, yuzu, external: true);
+				var content = CreateFromAssetBundleHelper(ContentsPath, null, persistence, external: true);
 				ReplaceContent(content);
 			}
 		}
@@ -1303,7 +1303,7 @@ namespace Lime
 			}
 		}
 
-		private static readonly string[] sceneExtensions = { ".scene", ".t3d", ".tan" };
+		private static readonly string[] sceneExtensions = { ".t3d", ".tan" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.
@@ -1347,7 +1347,7 @@ namespace Lime
 			return context.NodeCapturedByMouse?.SameOrDescendantOf(this) ?? true;
 		}
 
-		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
+		protected internal virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;
 		}
@@ -1670,7 +1670,7 @@ namespace Lime
 				b.OnUpdate(delta);
 			}
 		}
-		
+
 		private void CheckActivity()
 		{
 			if (attached) {

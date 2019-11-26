@@ -16,7 +16,6 @@ namespace Tangerine.Core
 
 	public enum DocumentFormat
 	{
-		Scene,
 		Tan,
 		T3D,
 		Fbx
@@ -38,7 +37,7 @@ namespace Tangerine.Core
 		private readonly MemoryStream preloadedSceneStream = null;
 		private static uint untitledCounter = 0;
 
-		public static readonly string[] AllowedFileTypes = { "scene", "tan", "t3d", "fbx" };
+		public static readonly string[] AllowedFileTypes = { "tan", "t3d", "fbx" };
 		public delegate bool PathSelectorDelegate(out string path);
 
 		public DateTime LastWriteTime { get; private set; }
@@ -157,7 +156,7 @@ namespace Tangerine.Core
 
 		public string AnimationId => Animation.Id;
 
-		public Document(DocumentFormat format = DocumentFormat.Scene, Type rootType = null)
+		public Document(DocumentFormat format = DocumentFormat.Tan, Type rootType = null)
 		{
 			Format = format;
 			Path = string.Format(untitledPathFormat, untitledCounter++);
@@ -240,9 +239,9 @@ namespace Tangerine.Core
 		{
 			try {
 				if (preloadedSceneStream != null) {
-					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", yuzu: TangerineYuzu.Instance.Value, stream: preloadedSceneStream);
+					RootNodeUnwrapped = Node.CreateFromStream(Path + $".{GetFileExtension(Format)}", persistence: TangerinePersistence.Instance, stream: preloadedSceneStream);
 				} else {
-					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, yuzu: TangerineYuzu.Instance.Value);
+					RootNodeUnwrapped = Node.CreateFromAssetBundle(Path, persistence: TangerinePersistence.Instance);
 				}
 				if (Format == DocumentFormat.Fbx) {
 					Path = string.Format(untitledPathFormat, untitledCounter++);
@@ -253,7 +252,7 @@ namespace Tangerine.Core
 				}
 				Decorate(RootNode);
 				Container = RootNode;
-				if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
+				if (Format == DocumentFormat.Tan) {
 					if (preloadedSceneStream != null) {
 						preloadedSceneStream.Seek(0, SeekOrigin.Begin);
 						Preview = DocumentPreview.ReadAsBase64(preloadedSceneStream);
@@ -302,9 +301,6 @@ namespace Tangerine.Core
 
 		public static DocumentFormat ResolveFormat(string path)
 		{
-			if (AssetExists(path, "scene")) {
-				return DocumentFormat.Scene;
-			}
 			if (AssetExists(path, "tan")) {
 				return DocumentFormat.Tan;
 			}
@@ -320,8 +316,6 @@ namespace Tangerine.Core
 		public static string GetFileExtension(DocumentFormat format)
 		{
 			switch (format) {
-				case DocumentFormat.Scene:
-					return "scene";
 				case DocumentFormat.Tan:
 					return "tan";
 				case DocumentFormat.T3D:
@@ -443,7 +437,7 @@ namespace Tangerine.Core
 			Path = path;
 			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FullPath));
 			ExportNodeToFile(FullPath, Path, Format, RootNodeUnwrapped);
-			if (Format == DocumentFormat.Scene || Format == DocumentFormat.Tan) {
+			if (Format == DocumentFormat.Tan) {
 				DocumentPreview.AppendToFile(FullPath, Preview);
 			}
 			LastWriteTime = File.GetLastWriteTime(FullPath);
@@ -462,12 +456,7 @@ namespace Tangerine.Core
 			var ms = new MemoryStream();
 			// Dispose cloned object to preserve keyframes identity in the original node. See Animator.Dispose().
 			using (node = CreateCloneForSerialization(node)) {
-				if (format == DocumentFormat.Scene) {
-					var serializer = new HotSceneSerializer();
-					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, serializer);
-				} else {
-					TangerineYuzu.Instance.Value.WriteObject(assetPath, ms, node, Serialization.Format.JSON);
-				}
+				TangerinePersistence.Instance.WriteObject(assetPath, ms, node, Persistence.Format.Json);
 			}
 			FileMode fileModeForHiddenFile = File.Exists(filePath) ? FileMode.Truncate : FileMode.Create;
 			using (var fs = new FileStream(filePath, fileModeForHiddenFile)) {
@@ -567,9 +556,6 @@ namespace Tangerine.Core
 
 		public void Decorate(Node node)
 		{
-			if (Format == DocumentFormat.Scene) {
-				node.DefaultAnimation.AnimationEngine = new Orange.CompatibilityAnimationEngine();
-			}
 			foreach (var decorator in NodeDecorators) {
 				decorator(node);
 			}
