@@ -314,6 +314,9 @@ namespace Lime
 				}
 			}
 
+			public delegate void ProcessingPendingInputEventsDelegate();
+			public event ProcessingPendingInputEventsDelegate ProcessingPendingInputEvents;
+
 			public void SetDesktopMousePosition(Vector2 position) => input.DesktopMousePosition = position;
 			public void SetKeyState(Key key, bool value) => input.SetKeyState(key, value);
 			public void SetWindowUnderMouse(IWindow window) => Application.WindowUnderMouse = window;
@@ -322,7 +325,13 @@ namespace Lime
 			{
 				input.CopyKeysState();
 				input.ProcessPendingInputEvents(delta);
+				OnProcessingPendingInputEvents();
 				input.TextInput = null;
+			}
+
+			public void OnProcessingPendingInputEvents()
+			{
+				ProcessingPendingInputEvents?.Invoke();
 			}
 		}
 	}
