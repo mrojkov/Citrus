@@ -844,6 +844,9 @@ namespace Lime
 			if (active || Input.IsSimulationRunning) {
 				Input.ProcessPendingInputEvents(delta);
 			}
+			if (Input.IsSimulationRunning) {
+				Application.Input.Simulator.OnProcessingPendingInputEvents();
+			}
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			if (active || Input.IsSimulationRunning) {
