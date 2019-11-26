@@ -94,14 +94,16 @@ namespace Tangerine.UI.SceneView
 
 		public void Render(Widget canvas)
 		{
-			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
+			var sv = SceneView.Instance;
+			var matrix = Owner.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(canvas);
 			CalcGeometry(matrix, out var a, out var b);
 			Renderer.DrawLine(a, b, Color4.Red, 2);
 		}
 
 		public bool HitTest(Vector2 point, Widget canvas, float radius = 20)
 		{
-			var matrix = Owner.CalcTransitionToSpaceOf(canvas);
+			var sv = SceneView.Instance;
+			var matrix = Owner.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(canvas);
 			CalcGeometry(matrix, out var a, out var b);
 			var length = (a - b).Length;
 			return

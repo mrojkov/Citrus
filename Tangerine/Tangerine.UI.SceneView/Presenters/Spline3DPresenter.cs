@@ -50,7 +50,8 @@ namespace Tangerine.UI.SceneView
 		void DrawSplinePoint(SplinePoint3D point, Viewport3D viewport, Matrix44 splineWorldMatrix, bool selected)
 		{
 			var color = selected ? Color4.Green : Color4.Red;
-			var viewportToSceneFrame = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+			var sv = SceneView.Instance;
+			var viewportToSceneFrame = viewport.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 			var a = (Vector2)viewport.WorldToViewportPoint(point.Position * splineWorldMatrix) * viewportToSceneFrame;
 			Renderer.DrawRect(a - Vector2.One * 3, a + Vector2.One * 3, color);
 			for (int i = 0; i < 2; i++) {
@@ -72,7 +73,8 @@ namespace Tangerine.UI.SceneView
 		void DrawSpline(Spline3D spline, Viewport3D viewport)
 		{
 			var splineWorldMatrix = spline.GlobalTransform;
-			var viewportToSceneFrame = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+			var sv = SceneView.Instance;
+			var viewportToSceneFrame = viewport.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 			for (var i = 0; i < spline.Nodes.Count - 1; i++) {
 				var n1 = (SplinePoint3D)spline.Nodes[i];
 				var n2 = (SplinePoint3D)spline.Nodes[i + 1];

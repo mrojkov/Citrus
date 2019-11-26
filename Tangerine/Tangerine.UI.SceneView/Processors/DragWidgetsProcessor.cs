@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out _, out var pivot) && SceneView.HitTestControlPoint(pivot)) {
+				if (Utils.CalcHullAndPivot(widgets, out _, out var pivot) && SceneView.HitTestControlPoint(pivot)) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (SceneView.Input.ConsumeKeyPress(Key.Mouse0)) {
 						yield return DragByMouse();
@@ -122,7 +122,8 @@ namespace Tangerine.UI.SceneView
 			using (Document.Current.History.BeginTransaction()) {
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				var dragDirection = DragDirection.Any;
-				Utils.CalcHullAndPivot(widgets, Document.Current.Container.AsWidget, out _, out var pivot);
+				Utils.CalcHullAndPivot(widgets, out _, out var pivot);
+				pivot = pivot * Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 				while (SceneView.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -156,10 +157,10 @@ namespace Tangerine.UI.SceneView
 						foreach (var widget in widgets) {
 							var points = new List<Vector2>();
 							if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
-								points.Add(widget.CalcPositionInSpaceOf(Matrix32.Identity));
+								points.Add(widget.GlobalPivot);
 							}
 							if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
-								points.AddRange(widget.CalcHullInSpaceOf(Matrix32.Identity));
+								points.AddRange(widget.CalcHull());
 							}
 							foreach (var point in points) {
 								var pointMoved = point + mouseDelta;

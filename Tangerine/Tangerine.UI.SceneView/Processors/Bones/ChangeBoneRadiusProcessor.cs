@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 				}
 				var bones = Document.Current.SelectedNodes().Editable().OfType<Bone>().ToList();
 				if (bones.Count == 1) {
-					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+					var t = Document.Current.Container.AsWidget.LocalToWorldTransform;
 					var hull = BonePresenter.CalcHull(bones.First());
 					for (int i = 0; i < 4; i++) {
 						hull[i] = t * hull[i];

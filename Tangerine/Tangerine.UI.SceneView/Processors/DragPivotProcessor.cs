@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 				if (
 					SceneView.Instance.InputArea.IsMouseOverThisOrDescendant() &&
 					sv.Input.IsKeyPressed(Key.Control) &&
-					Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var pivot) &&
+					Utils.CalcHullAndPivot(widgets, out var hull, out var pivot) &&
 					sv.HitTestControlPoint(pivot))
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -67,7 +67,7 @@ namespace Tangerine.UI.SceneView
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 			using (Document.Current.History.BeginTransaction()) {
 				var dragDirection = DragDirection.Any;
-				Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var iniPivot);
+				Utils.CalcHullAndPivot(widgets, out var hull, out var iniPivot);
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);

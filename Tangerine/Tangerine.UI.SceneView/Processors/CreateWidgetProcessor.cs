@@ -44,7 +44,7 @@ namespace Tangerine.UI.SceneView
 					var rect = new Rectangle(sv.MousePosition * t, sv.MousePosition * t);
 					var presenter = new SyncDelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
-						var t2 = container.CalcTransitionToSpaceOf(sv.CalcViewportToSceneTransition());
+						var t2 = container.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 						DrawCreateWidgetGizmo(rect.A, rect.B, t2);
 					});
 					sv.Frame.CompoundPostPresenter.Add(presenter);

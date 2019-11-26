@@ -28,7 +28,7 @@ namespace Tangerine.UI.SceneView
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
-				var p = widget.CalcPositionInSpaceOf(sceneView.CalcViewportToSceneTransition());
+				var p = sceneView.CalcTransitionFromSceneSpace(sceneView.Frame).TransformVector(widget.GlobalPivot);
 				var position = p - iconSize / 2;
 				position.X = (float)System.Math.Truncate(position.X);
 				position.Y = (float)System.Math.Truncate(position.Y);

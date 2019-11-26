@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				Bone bone = null;
 
-				var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+				var transform = Document.Current.Container.AsWidget.LocalToWorldTransform;
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
@@ -57,7 +57,7 @@ namespace Tangerine.UI.SceneView
 					} else {
 						boneIndex = 1;
 					}
-					Matrix32 t = sv.Scene.CalcTransitionToSpaceOf(container);
+					Matrix32 t = container.LocalToWorldTransform.CalcInversed();
 					Vector2 initPosition = sv.MousePosition * t;
 
 					Vector2 pos = Vector2.Zero;

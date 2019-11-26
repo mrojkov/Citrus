@@ -167,8 +167,9 @@ namespace Tangerine
 				return;
 			}
 			var nodes = Core.Document.Current.SelectedNodes();
-			Rectangle aabb;
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
+			if (Utils.CalcHullAndPivot(nodes, out var hull, out _)) {
+				hull = hull.Transform(container.LocalToWorldTransform.CalcInversed());
+				var aabb = hull.ToAABB();
 				HandleWidgets(container, nodes, aabb);
 				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
 			}
@@ -225,8 +226,9 @@ namespace Tangerine
 				return;
 			}
 			var nodes = Core.Document.Current.SelectedNodes();
-			Rectangle aabb;
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
+			if (Utils.CalcHullAndPivot(nodes, out var hull, out _)) {
+				hull = hull.Transform(container.LocalToWorldTransform.CalcInversed());
+				var aabb = hull.ToAABB();
 				HandleWidgets(container, nodes, aabb);
 				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
 			}
@@ -239,8 +241,9 @@ namespace Tangerine
 				return;
 			}
 			var nodes = Core.Document.Current.SelectedNodes();
-			Rectangle aabb;
-			if (Utils.CalcAABB(nodes, container, out aabb)) {
+			if (Utils.CalcHullAndPivot(nodes, out var hull, out _)) {
+				hull = hull.Transform(container.LocalToWorldTransform.CalcInversed());
+				var aabb = hull.ToAABB();
 				HandleWidgets(container, nodes, aabb);
 				HandlePointObjects(container, nodes, NormalizedAABB(aabb, container));
 			}

@@ -31,10 +31,11 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 
-			var viewportToSceneTransition = sceneView.CalcViewportToSceneTransition();
 			Quadrangle hull;
 			Vector2 pivot;
-			Utils.CalcHullAndPivot(widgets, viewportToSceneTransition, out hull, out pivot);
+			Utils.CalcHullAndPivot(widgets, out hull, out pivot);
+			hull = hull.Transform(sceneView.CalcTransitionFromSceneSpace(canvas));
+			pivot = pivot * sceneView.CalcTransitionFromSceneSpace(canvas);
 			// Render rectangles.
 			var locked = widgets.Any(w => w.GetTangerineFlag(TangerineFlags.Locked));
 			var color = locked ? ColorTheme.Current.SceneView.LockedWidgetBorder : ColorTheme.Current.SceneView.Selection;
@@ -58,13 +59,13 @@ namespace Tangerine.UI.SceneView
 			var iconSize = new Vector2(16, 16);
 			foreach (var widget in widgets) {
 				var t = NodeIconPool.GetTexture(widget.GetType());
-				var h = widget.CalcHullInSpaceOf(viewportToSceneTransition);
+				var h = widget.CalcHull().Transform(sceneView.CalcTransitionFromSceneSpace(canvas));
 				for (int i = 0; i < 4; i++) {
 					var a = h[i];
 					var b = h[(i + 1) % 4];
 					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
 				}
-				var p = widget.CalcPositionInSpaceOf(viewportToSceneTransition);
+				var p = widget.GlobalPosition * sceneView.CalcTransitionFromSceneSpace(canvas);
 				Renderer.DrawSprite(t, ColorTheme.Current.SceneView.SelectedWidgetPivotOutline, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 				if (selectedWidgetPivotVisualHint.Enabled) {
 					Renderer.DrawRectOutline(

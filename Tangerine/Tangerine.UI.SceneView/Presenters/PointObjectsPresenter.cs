@@ -24,7 +24,7 @@ namespace Tangerine.UI.SceneView
 				return;
 			}
 			canvas.PrepareRendererState();
-			var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.CalcViewportToSceneTransition());
+			var t = Document.Current.Container.AsWidget.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(canvas);
 
 			var selectedPointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
 			var pointObjects = Document.Current.Container.Nodes.OfType<PointObject>().Except(selectedPointObjects).ToList();
@@ -61,14 +61,14 @@ namespace Tangerine.UI.SceneView
 
 		public static Quadrangle CalcExpandedHullInSpaceOf(IEnumerable<PointObject> points, SceneView sceneView)
 		{
-			Rectangle aabb;
-			Utils.CalcAABB(points, Document.Current.Container.AsWidget, out aabb);
+			Utils.CalcHullAndPivot(points, out var hull, out _);
+			var aabb = hull.Transform(Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed()).ToAABB();
 			return ExpandAndTranslateToSpaceOf(aabb.ToQuadrangle(), Document.Current.Container.AsWidget, sceneView);
 		}
 
 		public static Quadrangle ExpandAndTranslateToSpaceOf(Quadrangle hull, Widget sourceWidget, SceneView sceneView)
 		{
-			var t = sourceWidget.CalcTransitionToSpaceOf(sceneView.CalcViewportToSceneTransition());
+			var t = sourceWidget.LocalToWorldTransform * sceneView.CalcTransitionFromSceneSpace(sceneView.Frame);
 			var size = sourceWidget.Size;
 			var corners = new Quadrangle();
 			for (var i = 0; i < 4; i++) {

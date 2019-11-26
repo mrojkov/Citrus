@@ -58,7 +58,7 @@ namespace Tangerine.UI.SceneView.Presenters
 						animator.Apply(AnimationUtils.FramesToSeconds(i));
 					}
 				}
-				hulls.Add(widget.CalcHullInSpaceOf(sceneView.Frame));
+				hulls.Add(widget.CalcHull().Transform(sceneView.CalcTransitionFromSceneSpace(sceneView.Frame)));
 			}
 			cache[widget] = (Hulls: hulls, HashCode: hash);
 			foreach (var animator in host.Animators) {

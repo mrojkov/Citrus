@@ -96,8 +96,9 @@ namespace Tangerine
 			var container = (Widget)Core.Document.Current.Container;
 			var nodes = Core.Document.Current.SelectedNodes().Editable();
 			foreach (var widget in nodes.OfType<Widget>()) {
-				Rectangle aabb;
-				if (Utils.CalcAABB(widget.Nodes, widget, out aabb)) {
+				if (Utils.CalcHullAndPivot(widget.Nodes, out var hull, out _)) {
+					hull = hull.Transform(widget.LocalToWorldTransform.CalcInversed());
+					var aabb = hull.ToAABB();
 					foreach (var n in widget.Nodes) {
 						// either Position of PointObject or of Widget
 						foreach (var animator in n.Animators.Where(a => a.TargetPropertyPath == "Position")) {
@@ -130,7 +131,8 @@ namespace Tangerine
 			var sv = SceneView.Instance;
 			var scene = sv.Scene;
 			var frame = sv.Frame;
-			if (Utils.CalcAABB(Core.Document.Current.SelectedNodes().Editable(), scene, out Rectangle aabb)) {
+			if (Utils.CalcHullAndPivot(Core.Document.Current.SelectedNodes().Editable(), out var hull, out _)) {
+				var aabb = hull.ToAABB();
 				scene.Position = -aabb.Center * scene.Scale + new Vector2(frame.Width / 2, frame.Height / 2);
 			}
 

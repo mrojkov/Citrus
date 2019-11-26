@@ -36,7 +36,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, Matrix32.Identity, out var hull, out var pivot)) {
+				if (Utils.CalcHullAndPivot(widgets, out var hull, out var pivot)) {
 					for (var i = 0; i < 4; i++) {
 						var a = hull[i];
 						if (SceneView.HitTestResizeControlPoint(a)) {
@@ -94,7 +94,7 @@ namespace Tangerine.UI.SceneView
 						!isChangingScale
 					);
 					if (areChildrenFreezed) {
-						transform *= widgets[0].CalcTransitionToSpaceOf(Document.Current.Container.AsWidget).CalcInversed();
+						transform *= Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(widgets[0]);
 						RestoreChildrenPositions(widgets[0], transform);
 					}
 					yield return null;

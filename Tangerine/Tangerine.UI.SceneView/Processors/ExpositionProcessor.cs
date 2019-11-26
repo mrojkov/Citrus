@@ -179,7 +179,7 @@ namespace Tangerine.UI.SceneView
 					originalWidget = widget;
 					exposedWidget = (Widget)widget.Clone();
 					exposedWidget.Animations.Clear();
-					originalTransform = widget.CalcTransitionToSpaceOf(frame).ToTransform2();
+					originalTransform = (widget.LocalToWorldTransform * SceneView.Instance.CalcTransitionFromSceneSpace(frame)).ToTransform2();
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
 					frame.HitTestTarget = true;
 					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };

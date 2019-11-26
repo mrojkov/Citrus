@@ -104,12 +104,7 @@ namespace Lime
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
-			return CalcPositionInSpaceOf(container.LocalToWorldTransform);
-		}
-
-		public Vector2 CalcPositionInSpaceOf(Matrix32 matrix)
-		{
-			var t = Parent.AsWidget.CalcTransitionToSpaceOf(matrix);
+			var t = Parent.AsWidget.CalcTransitionToSpaceOf(container);
 			return t.TransformVector(TransformedPosition);
 		}
 

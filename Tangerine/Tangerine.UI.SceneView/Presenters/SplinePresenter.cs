@@ -28,7 +28,8 @@ namespace Tangerine.UI.SceneView
 		void DrawSpline(Spline spline)
 		{
 			float step = 7.0f / SceneView.Instance.Scene.Scale.X;
-			var xform = spline.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+			var sv = SceneView.Instance;
+			var xform = spline.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 			Vector2? p = null;
 			foreach (var v in spline.CalcPoints(step)) {
 				if (p.HasValue) {

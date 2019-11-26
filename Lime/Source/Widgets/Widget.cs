@@ -436,6 +436,7 @@ namespace Lime
 		/// </summary>
 		public Vector2 GlobalPosition => LocalToWorldTransform.T;
 
+		public Vector2 GlobalPivot => LocalToWorldTransform * (Pivot * Size);
 		/// <summary>
 		/// Gets position of this widget's center in the root widget space.
 		/// </summary>
@@ -1294,7 +1295,7 @@ namespace Lime
 		/// </summary>
 		public Matrix32 CalcTransitionToSpaceOf(Widget widget)
 		{
-			return CalcTransitionToSpaceOf(widget.LocalToWorldTransform);
+			return LocalToWorldTransform * widget.LocalToWorldTransform.CalcInversed();
 		}
 
 		/// <summary>
@@ -1302,31 +1303,7 @@ namespace Lime
 		/// </summary>
 		public Quadrangle CalcHullInSpaceOf(Widget widget)
 		{
-			return CalcHullInSpaceOf(widget.LocalToWorldTransform);
-		}
-
-		/// <summary>
-		/// Calculates the widget's AABB in the space of another widget.
-		/// </summary>
-		public Rectangle CalcAABBInSpaceOf(Widget widget)
-		{
-			return CalcAABBInSpaceOf(widget.LocalToWorldTransform);
-		}
-
-		/// <summary>
-		/// Calculates the widget's transition to the space defined by matrix.
-		/// </summary>
-		public Matrix32 CalcTransitionToSpaceOf(Matrix32 matrix)
-		{
-			return LocalToWorldTransform * matrix.CalcInversed();
-		}
-
-		/// <summary>
-		/// Calculates the widget's convex hull in the space defined by matrix.
-		/// </summary>
-		public Quadrangle CalcHullInSpaceOf(Matrix32 matrix)
-		{
-			var t = CalcTransitionToSpaceOf(matrix);
+			var t = CalcTransitionToSpaceOf(widget);
 			return new Quadrangle {
 				V1 = t * Vector2.Zero,
 				V2 = t * new Vector2(Width, 0),
@@ -1336,11 +1313,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Calculates the widget's AABB in the space defined by matrix.
+		/// Calculates the widget's AABB in the space of another widget.
 		/// </summary>
-		public Rectangle CalcAABBInSpaceOf(Matrix32 matrix)
+		public Rectangle CalcAABBInSpaceOf(Widget widget)
 		{
-			var hull = CalcHullInSpaceOf(matrix);
+			var hull = CalcHullInSpaceOf(widget);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue)
 				.IncludingPoint(hull.V1)
 				.IncludingPoint(hull.V2)
@@ -1349,6 +1326,16 @@ namespace Lime
 			return aabb;
 		}
 
+		public Quadrangle CalcHull()
+		{
+			var t = LocalToWorldTransform;
+			return new Quadrangle {
+				V1 = t * Vector2.Zero,
+				V2 = t * new Vector2(Width, 0),
+				V3 = t * Size,
+				V4 = t * new Vector2(0, Height)
+			};
+		}
 
 		public IntRectangle CalcAABBInViewportSpace(WindowRect viewport, Matrix44 worldViewProjection)
 		{
@@ -1396,12 +1383,7 @@ namespace Lime
 
 		public Vector2 CalcPositionInSpaceOf(Widget widget)
 		{
-			return CalcPositionInSpaceOf(widget.LocalToWorldTransform);
-		}
-
-		public Vector2 CalcPositionInSpaceOf(Matrix32 matrix)
-		{
-			var t = CalcTransitionToSpaceOf(matrix);
+			var t = CalcTransitionToSpaceOf(widget);
 			return t.TransformVector(Pivot * Size);
 		}
 

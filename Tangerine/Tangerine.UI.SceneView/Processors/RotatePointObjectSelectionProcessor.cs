@@ -19,9 +19,8 @@ namespace Tangerine.UI.SceneView
 				}
 				var selectedPointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
 				if (selectedPointObjects.Count() > 1) {
-					Rectangle aabb;
-					Utils.CalcAABB(selectedPointObjects, Document.Current.Container.AsWidget, out aabb);
-					var hull = aabb.ToQuadrangle();
+					Utils.CalcHullAndPivot(selectedPointObjects, out var hull, out _);
+					hull = hull.Transform(Document.Current.Container.AsWidget.LocalToWorldTransform);
 					var expandedBoundsInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv) *
 						sv.Frame.CalcTransitionToSpaceOf(sv.Scene);
 					for (var i = 0; i < 4; i++) {

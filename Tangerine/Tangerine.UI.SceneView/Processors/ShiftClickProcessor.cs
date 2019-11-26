@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
@@ -30,16 +30,16 @@ namespace Tangerine.UI.SceneView
 		static void HandleClick(SceneView sv)
 		{
 			var node = Core.Document.Current.SelectedNodes().OfType<Widget>().FirstOrDefault();
-			if (node?.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition) ?? false) {
+			if (node?.CalcHull().Contains(sv.MousePosition) ?? false) {
 				if (Core.Operations.EnterNode.Perform(node))
 					return;
 			}
 			var ctr = Core.Document.Current.Container as Widget;
 			if (ctr == null)
 				return;
-			if (ctr.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
+			if (ctr.CalcHull().Contains(sv.MousePosition)) {
 				foreach (var widget in ctr.Nodes.Editable().OfType<Widget>()) {
-					if (widget.GloballyVisible && widget.CalcHullInSpaceOf(sv.Scene).Contains(sv.MousePosition)) {
+					if (widget.GloballyVisible && widget.CalcHull().Contains(sv.MousePosition)) {
 						Core.Operations.EnterNode.Perform(widget);
 						break;
 					}

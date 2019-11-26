@@ -45,9 +45,10 @@ namespace Tangerine.UI.SceneView
 		bool HitTestControlPoint(Spline3D spline, Vector3 pointInSplineCoordinates)
 		{
 			var viewport = spline.Viewport;
-			var viewportToScene = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Scene);
+			var sv = SceneView.Instance;
+			var viewportToScene = viewport.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 			var screenPoint = (Vector2)viewport.WorldToViewportPoint(pointInSplineCoordinates * spline.GlobalTransform) * viewportToScene;
-			return SceneView.Instance.HitTestControlPoint(screenPoint);
+			return sv.HitTestControlPoint(screenPoint);
 		}
 
 		IEnumerator<object> DragPoints(IEnumerable<SplinePoint3D> points)

@@ -76,14 +76,9 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		public Matrix32 CalcSceneToViewportTransition()
+		public Matrix32 CalcTransitionFromSceneSpace(Widget targetSpace)
 		{
-			return Scene.LocalToWorldTransform * Frame.LocalToWorldTransform.CalcInversed();
-		}
-
-		public Matrix32 CalcViewportToSceneTransition()
-		{
-			return Frame.LocalToWorldTransform * Scene.LocalToWorldTransform.CalcInversed();
+			return Scene.LocalToWorldTransform * targetSpace.LocalToWorldTransform.CalcInversed();
 		}
 
 		private static void TieWidgetsWithBones()
@@ -220,7 +215,7 @@ namespace Tangerine.UI.SceneView
 				Window.Current.Activate();
 				InputArea.SetFocus();
 			}
-			mousePositionOnFilesDrop = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			mousePositionOnFilesDrop = MousePosition * Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 		}
 
 		private static void FilesDropNodePostProcessor(Node node)

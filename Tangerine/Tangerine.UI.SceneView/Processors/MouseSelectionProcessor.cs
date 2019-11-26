@@ -52,7 +52,7 @@ namespace Tangerine.UI.SceneView
 								Core.Operations.ClearRowSelection.Perform();
 							Node selectedNode = null;
 							foreach (var widget in WidgetsPivotMarkPresenter.WidgetsWithDisplayedPivot()) {
-								var pos = widget.CalcPositionInSpaceOf(Matrix32.Identity);
+								var pos = widget.GlobalPivot;
 								if (widget.GloballyVisible && SceneView.Instance.HitTestControlPoint(pos)) {
 									selectedNode = widget;
 									break;
@@ -119,7 +119,7 @@ namespace Tangerine.UI.SceneView
 				if (!widget.GloballyVisible) {
 					return false;
 				}
-				var hull = widget.CalcHullInSpaceOf(Matrix32.Identity);
+				var hull = widget.CalcHull();
 				return hull.Contains(point);
 			}
 
@@ -128,13 +128,13 @@ namespace Tangerine.UI.SceneView
 				if (!widget.GloballyVisible) {
 					return false;
 				}
-				var hull = widget.CalcHullInSpaceOf(Matrix32.Identity);
+				var hull = widget.CalcHull();
 				for (int i = 0; i < 4; i++) {
 					if (rectangle.Contains(hull[i])) {
 						return true;
 					}
 				}
-				var pivot = widget.CalcPositionInSpaceOf(Matrix32.Identity);
+				var pivot = widget.GlobalPivot;
 				return rectangle.Contains(pivot);
 			}
 		}
@@ -166,14 +166,14 @@ namespace Tangerine.UI.SceneView
 		{
 			protected override bool ProbeInternal(PointObject pobject, Vector2 point)
 			{
-				var pos = pobject.CalcPositionInSpaceOf(Matrix32.Identity);
+				var pos = pobject.TransformedPosition * pobject.Parent.AsWidget.LocalToWorldTransform;
 				return SceneView.Instance.HitTestControlPoint(pos, 5);
 			}
 
 			protected override bool ProbeInternal(PointObject pobject, Rectangle rectangle)
 			{
 				var p = pobject.TransformedPosition;
-				var t = ((Widget)pobject.Parent).CalcTransitionToSpaceOf(Matrix32.Identity);
+				var t = pobject.Parent.AsWidget.LocalToWorldTransform;
 				return rectangle.Contains(t * p);
 			}
 		}
@@ -194,7 +194,7 @@ namespace Tangerine.UI.SceneView
 			{
 				var spline = (Spline3D)splinePoint.Parent;
 				var viewport = spline.Viewport;
-				var viewportToScene = viewport.CalcTransitionToSpaceOf(Matrix32.Identity);
+				var viewportToScene = viewport.LocalToWorldTransform;
 				return (Vector2)viewport.WorldToViewportPoint(splinePoint.Position * spline.GlobalTransform) * viewportToScene;
 			}
 		}
