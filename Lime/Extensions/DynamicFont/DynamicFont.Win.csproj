@@ -344,6 +344,30 @@
       <Link>zlib1.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libbz2-1.dll">
+      <Link>libbz2-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libgcc_s_sjlj-1.dll">
+      <Link>libgcc_s_sjlj-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libintl-8.dll">
+      <Link>libintl-8.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libpixman-1-0.dll">
+      <Link>libpixman-1-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libpng16-16.dll">
+      <Link>libpng16-16.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\iconv.dll">
+      <Link>iconv.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
