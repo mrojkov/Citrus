@@ -26,7 +26,6 @@ namespace EmptyProject.Application
 			AssetBundle.Current = CreateAssetBundle();
 			Profile.Instance = new Profile();
 
-			LoadFonts();
 			LoadDictionary();
 			SetWindowSize();
 
@@ -51,14 +50,7 @@ namespace EmptyProject.Application
 #elif MAC
 			return new PackedAssetBundle("Data.Mac");
 #endif
-		}
-
-		private static void LoadFonts()
-		{
-			FontPool.Instance.AddFont("regular", new DynamicFont("Dynamic/Roboto-Regular.ttf"));
-			FontPool.Instance.AddFont("bold", new DynamicFont("Dynamic/Roboto-Bold.ttf"));
-			FontPool.Instance.AddFont("italic", new DynamicFont("Dynamic/Roboto-Italic.ttf"));
-			FontPool.Instance.AddFont("bolditalic", new DynamicFont("Dynamic/Roboto-BoldItalic.ttf"));
+			throw new System.InvalidOperationException("Invalid Platform.");
 		}
 
 		private void LoadDictionary()

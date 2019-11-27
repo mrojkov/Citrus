@@ -25,7 +25,7 @@
     <MtouchDebug>true</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchProfiling>true</MtouchProfiling>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <Optimize>true</Optimize>
@@ -41,7 +41,7 @@
     <DefineConstants>iOS</DefineConstants>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
   </PropertyGroup>
@@ -55,7 +55,7 @@
     <MtouchArch>i386</MtouchArch>
     <MtouchLink>None</MtouchLink>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -72,7 +72,8 @@
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchProfiling>true</MtouchProfiling>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -104,10 +105,6 @@
     <ProjectReference Include="..\..\..\Yuzu\Yuzu.iOS.csproj">
       <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
       <Name>Yuzu.iOS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj">
-      <Project>{B956A746-3D0C-4378-926B-8A776846FFFA}</Project>
-      <Name>DynamicFont.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

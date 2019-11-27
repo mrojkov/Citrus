@@ -31,6 +31,7 @@ namespace EmptyProject.Dialogs
 			);
 			pinchGesture = new PinchGesture();
 			thumb.Gestures.Add(dragGesture);
+			thumb.Gestures.Add(pinchGesture);
 			dragGesture.Changed += OnDragged;
 			pinchGesture.Changed += OnPinched;
 		}
