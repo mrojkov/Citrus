@@ -52,7 +52,7 @@ namespace Tangerine.UI.SceneView
 								Core.Operations.ClearRowSelection.Perform();
 							Node selectedNode = null;
 							foreach (var widget in WidgetsPivotMarkPresenter.WidgetsWithDisplayedPivot()) {
-								var pos = widget.GlobalPivot;
+								var pos = widget.GlobalPivotPosition;
 								if (widget.GloballyVisible && SceneView.Instance.HitTestControlPoint(pos)) {
 									selectedNode = widget;
 									break;
@@ -134,7 +134,7 @@ namespace Tangerine.UI.SceneView
 						return true;
 					}
 				}
-				var pivot = widget.GlobalPivot;
+				var pivot = widget.GlobalPivotPosition;
 				return rectangle.Contains(pivot);
 			}
 		}

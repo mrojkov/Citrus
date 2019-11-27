@@ -157,7 +157,7 @@ namespace Tangerine.UI.SceneView
 						foreach (var widget in widgets) {
 							var points = new List<Vector2>();
 							if (SceneViewCommands.SnapWidgetPivotToRuler.Checked) {
-								points.Add(widget.GlobalPivot);
+								points.Add(widget.GlobalPivotPosition);
 							}
 							if (SceneViewCommands.SnapWidgetBorderToRuler.Checked) {
 								points.AddRange(widget.CalcHull());

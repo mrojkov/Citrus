@@ -436,7 +436,7 @@ namespace Lime
 		/// </summary>
 		public Vector2 GlobalPosition => LocalToWorldTransform.T;
 
-		public Vector2 GlobalPivot => LocalToWorldTransform * (Pivot * Size);
+		public Vector2 GlobalPivotPosition => LocalToWorldTransform * (Pivot * Size);
 		/// <summary>
 		/// Gets position of this widget's center in the root widget space.
 		/// </summary>

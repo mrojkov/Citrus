@@ -78,7 +78,7 @@ namespace Tangerine.UI
 		{
 			if (node is Widget w) {
 				hull = w.CalcHull();
-				pivot = w.GlobalPivot;
+				pivot = w.GlobalPivotPosition;
 				return true;
 			}
 			if (node is PointObject p) {
