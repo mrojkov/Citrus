@@ -29,6 +29,7 @@ namespace EmptyProject.Dialogs
 				new SpecialDragGesture.DampingMotionStrategy(0.97f, 0.998f)
 			//new SpecialDragGesture.FixedTimeMotionStrategy(0.5f)
 			);
+			pinchGesture = new PinchGesture();
 			thumb.Gestures.Add(dragGesture);
 			dragGesture.Changed += OnDragged;
 			pinchGesture.Changed += OnPinched;
