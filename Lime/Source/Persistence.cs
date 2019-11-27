@@ -59,7 +59,7 @@ namespace Lime
 
 		// TODO: this should be private; it's public though so KGD team can override AllowUnknownFields = true
 		// it's possible to make it private back when we'll have migrations
-		public static readonly CommonOptions DefaultYuzuCommonOptions = new CommonOptions {
+		public static CommonOptions DefaultYuzuCommonOptions = new CommonOptions {
 			TagMode = TagMode.Aliases,
 			AllowEmptyTypes = true,
 			CheckForEmptyCollections = true,
