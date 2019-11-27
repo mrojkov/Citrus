@@ -1,6 +1,6 @@
 namespace Lime
 {
-	public class PinchGesture : BaseDragGesture
+	public class PinchGesture : DragGesture
 	{
 		public float TouchDistance { get; private set; }
 		public float TouchPressDistance { get; private set; }
@@ -26,7 +26,7 @@ namespace Lime
 		}
 
 		public PinchGesture(DragDirection direction, bool exclusive, float dragThreshold)
-			: base(direction, exclusive, dragThreshold)
+			: base(0, direction, exclusive, dragThreshold)
 		{
 		}
 

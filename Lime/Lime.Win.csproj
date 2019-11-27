@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -447,7 +447,6 @@
     <Compile Include="Source\Widgets\EditorUtils.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Widgets\Frame.cs" />
-    <Compile Include="Source\Widgets\Gestures\BaseDragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\ClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DoubleClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DragDirection.cs" />

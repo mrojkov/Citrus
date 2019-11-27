@@ -306,7 +306,6 @@
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Widgets\EditorUtils.cs" />
     <Compile Include="Source\Widgets\Folder.cs" />
-    <Compile Include="Source\Widgets\Gestures\BaseDragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\ClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DoubleClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DragDirection.cs" />
