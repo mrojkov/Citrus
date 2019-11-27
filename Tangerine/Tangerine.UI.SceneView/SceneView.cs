@@ -159,6 +159,21 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
+		[UpdateStage(typeof(PostLateUpdateStage))]
+		[NodeComponentDontSerialize]
+		private class SceneBehavior : BehaviorComponent
+		{
+			protected override void Update(float delta)
+			{
+				if (!Document.Current.PreviewAnimation) {
+					delta = 0.0f;
+				} else if (Document.Current.SlowMotion) {
+					delta *= 0.1f;
+				}
+				Document.Current.Manager.Update(delta);
+			}
+		}
+
 		public SceneView(Widget panelWidget)
 		{
 			this.Panel = panelWidget;
@@ -166,14 +181,7 @@ namespace Tangerine.UI.SceneView
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
 			InputArea.Gestures.Add(DropFilesGesture = new DropFilesGesture());
 			Scene = new Widget();
-			Scene.Updating += delta => {
-				if (Document.Current.PreviewAnimation) {
-					if (Document.Current.SlowMotion) {
-						delta *= 0.1f;
-					}
-					Document.Current.Manager.Update(delta);
-				}
-			};
+			Scene.Components.Add(new SceneBehavior());
 			Scene.PostPresenter = new ScenePresenter(Document.Current.RootNode);
 			Frame = new Widget {
 				Id = "SceneView",
