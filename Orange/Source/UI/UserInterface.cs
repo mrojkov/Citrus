@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Orange.Source;
 
 namespace Orange
 {
@@ -30,6 +31,8 @@ namespace Orange
 		public abstract void ShowError(string message);
 
 		public abstract Target GetActiveTarget();
+
+		public abstract EnvironmentType GetEnvironmentType();
 
 		public abstract void StopProgressBar();
 		public abstract void SetupProgressBar(int maxPosition);

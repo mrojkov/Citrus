@@ -190,6 +190,7 @@
     <Compile Include="Source\CitrusVersion.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\EnvironmentType.cs" />
     <Compile Include="Source\Git.cs" />
     <Compile Include="Source\MenuController.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\FbxCameraAttribute.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Lime;
 using Orange;
+using Orange.Source;
 using Tangerine.UI;
 
 namespace Tangerine
@@ -47,6 +48,11 @@ namespace Tangerine
 		public override Target GetActiveTarget()
 		{
 			return PlatformPicker.SelectedTarget;
+		}
+
+		public override EnvironmentType GetEnvironmentType()
+		{
+			return EnvironmentType.Tangerine;
 		}
 
 		public override IPluginUIBuilder GetPluginUIBuilder()
