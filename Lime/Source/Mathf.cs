@@ -105,6 +105,26 @@ namespace Lime
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
 #endif
+		/// <summary>
+		/// Gauss error function. The maximum error is below 1.5 × 10-7.
+		/// </summary>
+		public static float Erf(float x)
+		{
+			// https://en.wikipedia.org/wiki/Error_function
+			// https://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
+			// formula 7.1.26 from A&S (https://amzn.to/2ES26NK).
+			const double a1 = 0.254829592;
+			const double a2 = -0.284496736;
+			const double a3 = 1.421413741;
+			const double a4 = -1.453152027;
+			const double a5 = 1.061405429;
+			const double p = 0.3275911;
+			var sign = Sign(x);
+			x = Abs(x);
+			var t = 1.0 / (1.0 + p * x);
+			var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
+			return (float)(sign * y);
+		}
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
