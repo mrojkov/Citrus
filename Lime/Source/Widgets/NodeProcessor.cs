@@ -6,11 +6,11 @@ namespace Lime
 	{
 		public NodeManager Manager { get; internal set; }
 
-		protected internal virtual void Start() { }
+		public virtual void Start() { }
 
-		protected internal virtual void Stop(NodeManager manager) { }
+		public virtual void Stop(NodeManager manager) { }
 
-		protected internal virtual void Update(float delta) { }
+		public virtual void Update(float delta) { }
 	}
 
 	public abstract class NodeComponentProcessor : NodeProcessor

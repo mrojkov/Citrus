@@ -112,7 +112,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void Update(float delta)
+		public override void Update(float delta)
 		{
 			while (currQueue.Count > 0) {
 				var animation = currQueue.Dequeue().Value;

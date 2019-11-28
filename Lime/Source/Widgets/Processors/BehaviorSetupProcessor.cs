@@ -6,12 +6,12 @@ namespace Lime
 	{
 		private BehaviorSystem behaviorSystem;
 
-		protected internal override void Start()
+		public override void Start()
 		{
 			behaviorSystem = Manager.ServiceProvider.RequireService<BehaviorSystem>();
 		}
 
-		protected internal override void Stop(NodeManager manager)
+		public override void Stop(NodeManager manager)
 		{
 			behaviorSystem = null;
 		}
