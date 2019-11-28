@@ -399,7 +399,7 @@ namespace Lime
 
 		public override bool PrefersHomeIndicatorAutoHidden => false;
 
-		public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+		public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.All;
 
 		private class SoftKeyboard : ISoftKeyboard
 		{
