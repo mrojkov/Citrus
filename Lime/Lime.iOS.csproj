@@ -348,7 +348,6 @@
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
     <Compile Include="Source\Widgets\Gestures\LongTapGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\PinchGesture.cs" />
-    <Compile Include="Source\Widgets\Gestures\SpecialDragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\TapGesture.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\Image.cs" />

@@ -25,8 +25,8 @@ namespace EmptyProject.Dialogs
 			thumb.Gestures.Add(new DoubleClickGesture(() => {
 				thumb.Parent.RunAnimation("Tap");
 			}));
-			dragGesture = new SpecialDragGesture(
-				new SpecialDragGesture.DampingMotionStrategy(0.97f, 0.998f)
+			dragGesture = new DragGesture(
+				new DragGesture.DampingMotionStrategy(0.97f, 0.998f)
 			//new SpecialDragGesture.FixedTimeMotionStrategy(0.5f)
 			);
 			pinchGesture = new PinchGesture();

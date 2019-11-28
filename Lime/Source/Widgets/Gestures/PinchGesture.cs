@@ -1,6 +1,6 @@
 namespace Lime
 {
-	public class PinchGesture : DragGesture
+	public sealed class PinchGesture : DragGesture
 	{
 		public float TouchDistance { get; private set; }
 		public float TouchPressDistance { get; private set; }

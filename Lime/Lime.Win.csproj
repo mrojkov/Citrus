@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -287,6 +287,7 @@
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
+    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformBuffer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderContext.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderTexture2D.cs" />
@@ -324,7 +325,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanHelper.cs" />
-    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -457,7 +457,6 @@
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
     <Compile Include="Source\Widgets\Gestures\LongTapGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\PinchGesture.cs" />
-    <Compile Include="Source\Widgets\Gestures\SpecialDragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\TapGesture.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
