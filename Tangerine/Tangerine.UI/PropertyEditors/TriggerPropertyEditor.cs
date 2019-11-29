@@ -124,7 +124,6 @@ namespace Tangerine.UI
 			if (!string.IsNullOrEmpty(text)) {
 				var triggersToSet = text.Split(',').ToList();
 				var triggers = GetAvailableTriggers();
-				var newTriggers = new Dictionary<string, string>();
 				foreach (var key in triggers.Keys) {
 					foreach (var trigger in triggersToSet) {
 						if (triggers[key].Contains(trigger.Trim(' '))) {

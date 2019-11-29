@@ -14,7 +14,8 @@ namespace Tangerine.UI
 		private readonly Window window;
 		private readonly Action<string> onSave;
 		private readonly Dictionary<string, HashSet<string>> triggers;
-		private readonly Dictionary<string, Queue<ThemedCheckBox>> groupSelection;
+		private readonly Dictionary<string, Dictionary<string, ThemedCheckBox>> checkBoxes;
+		private readonly Dictionary<string, Queue<string>> groupSelection;
 		private readonly Widget rootWidget;
 		private HashSet<string> selected;
 		private ThemedScrollView scrollView;
@@ -26,7 +27,8 @@ namespace Tangerine.UI
 			this.onSave = onSave;
 			this.triggers = triggers;
 			this.selected = selected;
-			groupSelection = new Dictionary<string, Queue<ThemedCheckBox>>();
+			groupSelection = new Dictionary<string, Queue<string>>();
+			checkBoxes = new Dictionary<string, Dictionary<string, ThemedCheckBox>>();
 			window = new Window(new WindowOptions {
 				Title = "Trigger Selection",
 				ClientSize = new Vector2(300, 400),
@@ -93,7 +95,8 @@ namespace Tangerine.UI
 				Renderer.DrawRectOutline(rect.A, rect.B, Theme.Colors.ControlBorder);
 			}));
 			foreach (var key in triggers.Keys) {
-				groupSelection[key] = new Queue<ThemedCheckBox>();
+				groupSelection[key] = new Queue<string>();
+				checkBoxes[key] = new Dictionary<string, ThemedCheckBox>();
 				var expandButton = new ThemedExpandButton {
 					MinMaxSize = Vector2.One * 20f,
 					LayoutCell = new LayoutCell(Alignment.LeftCenter),
@@ -150,35 +153,10 @@ namespace Tangerine.UI
 				Checked = isChecked
 			};
 			if (isChecked) {
-				groupSelection[key].Enqueue(checkBox);
+				groupSelection[key].Enqueue(trigger);
 			}
-			var firstCall = true;
-			checkBox.AddChangeWatcher(
-				() => checkBox.Checked,
-				_ => {
-					if (firstCall) {
-						firstCall = false;
-					} else {
-						var currentGroup = groupSelection[key];
-						if (currentGroup.Count > 0) {
-							var last = currentGroup.Peek();
-							if (last == checkBox) {
-								currentGroup.Dequeue();
-							} else {
-								last.Checked = !last.Checked;
-								currentGroup.Enqueue(checkBox);
-							}
-						} else {
-							currentGroup.Enqueue(checkBox);
-						}
-					}
-					if (_) {
-						selected.Add(trigger);
-					} else {
-						selected.Remove(trigger);
-					}
-				}
-			);
+			checkBoxes[key].Add(trigger, checkBox);
+
 			var widget = new Widget {
 				Layout = new HBoxLayout(),
 				LayoutCell = new LayoutCell(Alignment.Center),
@@ -202,7 +180,8 @@ namespace Tangerine.UI
 				}
 			}));
 			widget.LateTasks.Add(Theme.MouseHoverInvalidationTask(widget));
-			widget.Clicked += () => checkBox.Checked = !checkBox.Checked;
+			widget.Clicked += checkBox.Toggle;
+			checkBox.Changed += e => ToggleTriggerCheckbox(trigger, key);
 			return widget;
 		}
 
@@ -234,6 +213,30 @@ namespace Tangerine.UI
 					cancelButton
 				},
 			};
+		}
+
+		private void ToggleTriggerCheckbox(string trigger, string key)
+		{
+			var currentBoxes = checkBoxes[key];
+			var checkBox = currentBoxes[trigger];
+			if (checkBox.Checked) {
+				selected.Add(trigger);
+			} else {
+				selected.Remove(trigger);
+			}
+
+			var currentGroup = groupSelection[key];
+			if (currentGroup.Count > 0) {
+				var last = currentGroup.Peek();
+				if (last == trigger) {
+					currentGroup.Dequeue();
+				} else {
+					currentBoxes[last].Toggle();
+					currentGroup.Enqueue(trigger);
+				}
+			} else {
+				currentGroup.Enqueue(trigger);
+			}
 		}
 
 		private void ApplyFilter(string filter)
