@@ -20,14 +20,15 @@ namespace Tangerine.UI.SceneView
 			if (MeshHint.Enabled && !Document.Current.PreviewScene && Document.Current.Container is DistortionMesh) {
 				var mesh = Document.Current.Container as DistortionMesh;
 				canvas.PrepareRendererState();
+				var transform = mesh.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 				for (int i = 0; i <= mesh.NumRows; i++) {
 					for (int j = 0; j <= mesh.NumCols; j++) {
-						var p = mesh.GetPoint(i, j).CalcPositionInSpaceOf(canvas);
+						var p = mesh.GetPoint(i, j).TransformedPosition * transform;
 						if (i + 1 <= mesh.NumRows) {
-							Renderer.DrawLine(p, mesh.GetPoint(i + 1, j).CalcPositionInSpaceOf(canvas), ColorTheme.Current.SceneView.DistortionMeshOutline);
+							Renderer.DrawLine(p, mesh.GetPoint(i + 1, j).TransformedPosition * transform, ColorTheme.Current.SceneView.DistortionMeshOutline);
 						}
 						if (j + 1 <= mesh.NumCols) {
-							Renderer.DrawLine(p, mesh.GetPoint(i, j + 1).CalcPositionInSpaceOf(canvas), ColorTheme.Current.SceneView.DistortionMeshOutline);
+							Renderer.DrawLine(p, mesh.GetPoint(i, j + 1).TransformedPosition * transform, ColorTheme.Current.SceneView.DistortionMeshOutline);
 						}
 					}
 				}
