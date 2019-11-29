@@ -149,7 +149,7 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		[TangerineKeyframeColor(12)]
-		public string LinkageWidgetName;
+		public string LinkageWidgetName { get; set; }
 		/// <summary>
 		/// Number of particles generated per second.
 		/// </summary>
