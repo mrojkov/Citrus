@@ -65,7 +65,7 @@ namespace Tangerine.UI.SceneView
 					var b = h[(i + 1) % 4];
 					Renderer.DrawLine(a, b, ColorTheme.Current.SceneView.SelectedWidget, 1);
 				}
-				var p = widget.GlobalPosition * sceneView.CalcTransitionFromSceneSpace(canvas);
+				var p = widget.GlobalPivotPosition * sceneView.CalcTransitionFromSceneSpace(canvas);
 				Renderer.DrawSprite(t, ColorTheme.Current.SceneView.SelectedWidgetPivotOutline, p - iconSize / 2, iconSize, Vector2.Zero, Vector2.One);
 				if (selectedWidgetPivotVisualHint.Enabled) {
 					Renderer.DrawRectOutline(
