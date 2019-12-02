@@ -4,7 +4,7 @@ namespace Lime
 	{
 		public new static BlendAnimationEngine Instance = new BlendAnimationEngine();
 
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			base.AdvanceAnimation(animation, delta);
 			Blending(animation, delta);
@@ -49,7 +49,7 @@ namespace Lime
 			marker.CustomAction?.Invoke();
 		}
 
-		private static void Blending(Animation animation, float delta = 0f)
+		private static void Blending(Animation animation, double delta = 0f)
 		{
 			var blender = animation.OwnerNode.Components.Get<AnimationBlender>();
 			if (blender == null) {

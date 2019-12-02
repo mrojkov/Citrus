@@ -8,7 +8,7 @@ namespace Lime
 		public static bool JumpAffectsRunningMarkerId = false;
 
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
-		public virtual void AdvanceAnimation(Animation animation, float delta) { }
+		public virtual void AdvanceAnimation(Animation animation, double delta) { }
 		/// <summary>
 		/// 1. Refreshes animation.EffectiveAnimators;
 		/// 2. Applies each animator at currentTime;
@@ -25,7 +25,7 @@ namespace Lime
 	public class AnimationEngineDelegate : AnimationEngine
 	{
 		public Func<Animation, string, double, bool> OnRunAnimation;
-		public Action<Animation, float> OnAdvanceAnimation;
+		public Action<Animation, double> OnAdvanceAnimation;
 		public Action<Animation, double, double, bool> OnApplyEffectiveAnimatorsAndBuildTriggersList;
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
@@ -33,7 +33,7 @@ namespace Lime
 			return (OnRunAnimation != null) && OnRunAnimation(animation, markerId, animationTimeCorrection);
 		}
 
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
@@ -59,14 +59,14 @@ namespace Lime
 				frame = marker.Frame;
 			}
 			// Easings may give huge animationTimeCorrection values, clamp it.
-			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame, 0);
+			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame + AnimationUtils.Threshold, 0);
 			animation.Time = AnimationUtils.FramesToSeconds(frame) + animationTimeCorrection;
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
 			return true;
 		}
 
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
@@ -79,7 +79,6 @@ namespace Lime
 				animation.MarkerAhead = null;
 				ProcessMarker(animation, marker, previousTime, currentTime);
 			}
-
 		}
 
 		protected static Marker FindMarkerAhead(Animation animation, double time)
@@ -110,7 +109,7 @@ namespace Lime
 						if (JumpAffectsRunningMarkerId) {
 							animation.RunningMarkerId = gotoMarker.Id;
 						}
-						AdvanceAnimation(animation, (float)delta);
+						AdvanceAnimation(animation, delta);
 					}
 					break;
 				case MarkerAction.Stop:
@@ -354,7 +353,7 @@ namespace Lime
 
 	public class FastForwardAnimationEngine : DefaultAnimationEngine
 	{
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
