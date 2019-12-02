@@ -213,7 +213,7 @@ namespace Tangerine.UI.Timeline
 
 		private ToolbarButton CreateSwitchAnimationPositioner()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.RockNRoll")) { Tooltip = "Switch animation positioner" };
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.TimelineCursorLock")) { Tooltip = "Switch animation positioner" };
 			button.AddChangeWatcher(() => CoreUserPreferences.UseBetterAnimationPositioner, i => button.Checked = i);
 			button.Clicked += () => {
 				CoreUserPreferences.UseBetterAnimationPositioner = !CoreUserPreferences.UseBetterAnimationPositioner;

@@ -32,12 +32,11 @@ namespace Tangerine.Core
 						if (animation.IsRunning) {
 							var markerAhead = FindMarkerAhead(animation, animation.Time);
 							if (markerAhead != null) {
-								clampedDelta = Math.Min(markerAhead.Time - animation.Time + AnimationUtils.Threshold, clampedDelta);
+								clampedDelta = Math.Min(clampedDelta, CalcDelta(animation.Time, markerAhead.Time));
 							}
 							var triggerAhead = FindTriggerAhead(animation, animation.Time);
 							if (triggerAhead != null) {
-								clampedDelta = Math.Min(
-									AnimationUtils.FramesToSeconds(triggerAhead.Frame) - animation.Time + AnimationUtils.Threshold, clampedDelta);
+								clampedDelta = Math.Min(clampedDelta, CalcDelta(animation.Time, AnimationUtils.FramesToSeconds(triggerAhead.Frame)));
 							}
 						}
 					}
@@ -51,6 +50,15 @@ namespace Tangerine.Core
 					AdvanceAnimation(child, clampedDelta);
 				}
 				delta -= clampedDelta;
+			}
+		}
+
+		private static double CalcDelta(double currentTime, double triggerTime)
+		{
+			if (triggerTime - currentTime > AnimationUtils.SecondsPerFrame - AnimationUtils.Threshold) {
+				return triggerTime - currentTime - AnimationUtils.Threshold;
+			} else {
+				return triggerTime - currentTime + AnimationUtils.Threshold;
 			}
 		}
 
@@ -101,7 +109,6 @@ namespace Tangerine.Core
 		{
 			foreach (var animation in node.Animations) {
 				animation.IsRunning = false;
-				animation.ApplyAnimators();
 			}
 			foreach (var n in node.Nodes) {
 				StopAnimations(n);
