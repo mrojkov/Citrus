@@ -23,20 +23,15 @@ namespace Tangerine.Core
 
 		private void AdvanceAnimation(Node node, double delta)
 		{
-			var animations = node.Components.AnimationComponent?.Animations;
+			var animations = node.Components.Get<AnimationComponent>()?.Animations;
 			while (delta > 0) {
 				var clampedDelta = delta;
 				if (animations != null) {
 					// Clamp delta to make sure we aren't going to skip any marker or trigger.
 					foreach (var animation in animations) {
 						if (animation.IsRunning) {
-							var markerAhead = FindMarkerAhead(animation, animation.Time);
-							if (markerAhead != null) {
-								clampedDelta = Math.Min(clampedDelta, CalcDelta(animation.Time, markerAhead.Time));
-							}
-							var triggerAhead = FindTriggerAhead(animation, animation.Time);
-							if (triggerAhead != null) {
-								clampedDelta = Math.Min(clampedDelta, CalcDelta(animation.Time, AnimationUtils.FramesToSeconds(triggerAhead.Frame)));
+							if (FindClosestFrameWithMarkerOrTrigger(animation, out var frame)) {
+								clampedDelta = Math.Min(clampedDelta, CalcDelta(animation.Time, AnimationUtils.FramesToSeconds(frame)));
 							}
 						}
 					}
@@ -62,38 +57,32 @@ namespace Tangerine.Core
 			}
 		}
 
-		private static Marker FindMarkerAhead(Animation animation, double time)
+		private bool FindClosestFrameWithMarkerOrTrigger(Animation animation, out int frame)
 		{
+			var animationFrame = AnimationUtils.SecondsToFramesCeiling(animation.Time);
+			frame = int.MaxValue;
 			if (animation.Markers.Count > 0) {
-				var frame = AnimationUtils.SecondsToFramesCeiling(time);
 				foreach (var marker in animation.Markers) {
-					if (marker.Frame >= frame) {
-						return marker;
+					if (marker.Frame >= animationFrame) {
+						frame = marker.Frame;
+						break;
 					}
 				}
 			}
-			return null;
-		}
-
-		private IKeyframe FindTriggerAhead(Animation animation, double time)
-		{
-			IKeyframe result = null;
 			foreach (var abstractAnimator in animation.EffectiveTriggerableAnimators) {
 				if (abstractAnimator is IAnimator animator) {
-					var frame = AnimationUtils.SecondsToFramesCeiling(time);
 					foreach (var k in animator.ReadonlyKeys) {
-						if (k.Frame >= frame) {
-							if (result == null || k.Frame < result.Frame) {
-								result = k;
+						if (k.Frame >= animationFrame) {
+							if (k.Frame < frame) {
+								frame = k.Frame;
 							}
 							break;
 						}
 					}
 				}
 			}
-			return result;
+			return frame != int.MaxValue;
 		}
-
 
 		private void ResetAnimations(Node node)
 		{
