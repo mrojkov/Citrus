@@ -14,8 +14,9 @@ namespace Tangerine.Core
 			Audio.GloballyEnable = false;
 			ResetAnimations(animation.OwnerNode);
 			animation.IsRunning = true;
+			animation.Time = 0;
 			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-			AdvanceAnimation(animation.OwnerNode, AnimationUtils.FramesToSeconds(frame));
+			AdvanceAnimation(animation.OwnerNode, AnimationUtils.FramesToSeconds(frame) + AnimationUtils.Threshold);
 			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
 			StopAnimations(animation.OwnerNode);
 			Audio.GloballyEnable = true;
@@ -86,9 +87,6 @@ namespace Tangerine.Core
 
 		private void ResetAnimations(Node node)
 		{
-			foreach (var animation in node.Animations) {
-				animation.Time = 0;
-			}
 			foreach (var n in node.Nodes) {
 				ResetAnimations(n);
 			}
