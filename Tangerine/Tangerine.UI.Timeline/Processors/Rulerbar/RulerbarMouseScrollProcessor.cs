@@ -67,11 +67,8 @@ namespace Tangerine.UI.Timeline
 							}
 							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
 							Document.Current.AnimationFrame = initialCurrentColumn;
-							SetCurrentColumn.Perform(CalcColumn(mp));
+							SetCurrentColumn.Perform(newColumn);
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCurrentColumn;
-							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
-								Document.Current.ForceAnimationUpdate();
-							}
 							previousColumn = newColumn;
 							DockHierarchy.Instance.InvalidateWindows();
 							yield return null;
