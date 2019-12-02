@@ -62,8 +62,8 @@ namespace Tangerine.UI.SceneView
 							offset.X += direction.X * isAccelerated;
 							offset.Y += direction.Y * isAccelerated;
 						}
-						DragNodes(offset);
 					}
+					DragNodes(offset);
 					yield return null;
 				}
 				Document.Current.History.CommitTransaction();
