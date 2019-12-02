@@ -44,8 +44,7 @@ namespace Tangerine.UI.SceneView
 
 		public static void RegisterGlobalCommands()
 		{
-			ConnectCommand(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
-			ConnectCommand(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
+			ConnectCommand(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
 			ConnectCommand(SceneViewCommands.ResolutionChanger, new ResolutionChangerHandler());
 			ConnectCommand(SceneViewCommands.ResolutionReverceChanger, new ResolutionChangerHandler(isReverse: true));
 			ConnectCommand(SceneViewCommands.ResolutionOrientation, new ResolutionOrientationHandler());

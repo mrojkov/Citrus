@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -42,6 +42,9 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationPositioner\BetterAnimationPositioner.cs" />
+    <Compile Include="AnimationPositioner\CompatibilityAnimationPositioner.cs" />
+    <Compile Include="AnimationPositioner\IAnimationPositioner.cs" />
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="AutosaveProcessor.cs" />

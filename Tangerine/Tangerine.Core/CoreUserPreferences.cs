@@ -46,6 +46,9 @@ namespace Tangerine.Core
 		public bool LockTimelineCursor { get; set; }
 
 		[YuzuOptional]
+		public bool UseBetterAnimationPositioner { get; set; } = true;
+
+		[YuzuOptional]
 		public Dictionary<string, bool> InspectorExpandableEditorsState { get; set; }
 
 		public CoreUserPreferences()
