@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -75,18 +76,19 @@ namespace Lime
 			if (widget.Animators.Count <= 0) {
 				return;
 			}
-			Animator<Vector2> animator;
-			if (widget.Animators.TryFind("Position", out animator)) {
-				foreach (var key in animator.Keys) {
-					key.Value += positionDelta;
+			foreach (var animator in widget.Animators.OfType<Animator<Vector2>>()) {
+				if (animator.TargetPropertyPath == nameof(Widget.Position)) {
+					foreach (var key in animator.Keys) {
+						key.Value += positionDelta;
+					}
+					animator.ResetCache();
 				}
-				animator.ResetCache();
-			}
-			if (widget.Animators.TryFind("Size", out animator)) {
-				foreach (var key in animator.Keys) {
-					key.Value += sizeDelta;
+				if (animator.TargetPropertyPath == nameof(Widget.Size)) {
+					foreach (var key in animator.Keys) {
+						key.Value += sizeDelta;
+					}
+					animator.ResetCache();
 				}
-				animator.ResetCache();
 			}
 		}
 
