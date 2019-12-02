@@ -69,17 +69,21 @@ namespace Tangerine.Core
 
 		private IKeyframe FindTriggerAhead(Animation animation, double time)
 		{
+			IKeyframe result = null;
 			foreach (var abstractAnimator in animation.EffectiveTriggerableAnimators) {
 				if (abstractAnimator is IAnimator animator) {
 					var frame = AnimationUtils.SecondsToFramesCeiling(time);
 					foreach (var k in animator.ReadonlyKeys) {
 						if (k.Frame >= frame) {
-							return k;
+							if (result == null || k.Frame < result.Frame) {
+								result = k;
+							}
+							break;
 						}
 					}
 				}
 			}
-			return null;
+			return result;
 		}
 
 
