@@ -13,9 +13,6 @@ namespace Tangerine.Core
 		public bool AnimationMode { get; set; }
 
 		[YuzuOptional]
-		public bool ResetAnimationsTimes { get; set; }
-
-		[YuzuOptional]
 		public bool InspectEasing { get; set; }
 
 		[YuzuOptional]

@@ -413,7 +413,6 @@ namespace Tangerine.Core
 		public void RefreshExternalScenes()
 		{
 			RootNode.LoadExternalScenes();
-			savedAnimationsTimes?.Clear();
 		}
 
 		private static void DetachViews()

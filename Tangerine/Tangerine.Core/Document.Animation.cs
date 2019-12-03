@@ -7,7 +7,6 @@ namespace Tangerine.Core
 {
 	public sealed partial class Document
 	{
-		private List<(AnimationPath, double)> savedAnimationsTimes;
 		private IAnimationPositioner compatAnimationPositioner = new CompatibilityAnimationPositioner();
 		private IAnimationPositioner betterAnimationPositioner = new BetterAnimationPositioner();
 		public IAnimationPositioner AnimationPositioner =>
@@ -35,14 +34,12 @@ namespace Tangerine.Core
 				StopAnimationRecursive(PreviewAnimationContainer);
 				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
 					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
-					Container.Components.Add(new RestoreAnimationsTimesComponent(savedAnimationsTimes));
 				}
 				AudioSystem.StopAll();
 				AnimationPositioner.CacheAnimationsStates = true;
 				ForceAnimationUpdate();
 				AnimationPositioner.CacheAnimationsStates = false;
 			} else {
-				SaveAnimationsTimes();
 				foreach (var node in RootNode.Descendants) {
 					if (node is ITangerinePreviewAnimationListener t) {
 						t.OnStart();
@@ -76,46 +73,6 @@ namespace Tangerine.Core
 		public void ForceAnimationUpdate()
 		{
 			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
-		}
-
-		[NodeComponentDontSerialize]
-		[UpdateStage(typeof(PostLateUpdateStage))]
-		private class RestoreAnimationsTimesComponent : BehaviorComponent
-		{
-			private readonly List<(AnimationPath, double)> savedAnimationsTimes;
-
-			public RestoreAnimationsTimesComponent(List<(AnimationPath, double)> savedAnimationsTimes)
-			{
-				this.savedAnimationsTimes = savedAnimationsTimes;
-			}
-
-			protected override void Update(float delta)
-			{
-				foreach (var (animationPath, time) in savedAnimationsTimes) {
-					animationPath.GetAnimation(Document.Current.RootNode).Time =
-						CoreUserPreferences.Instance.AnimationMode && CoreUserPreferences.Instance.ResetAnimationsTimes ? 0 : time;
-				}
-				Owner.Components.Remove(this);
-			}
-		}
-
-		private void SaveAnimationsTimes()
-		{
-			void Save(Node node)
-			{
-				foreach (var animation in node.Animations) {
-					savedAnimationsTimes.Add((new AnimationPath(animation, Document.Current.RootNode), animation.Time));
-				}
-			}
-			savedAnimationsTimes = new List<(AnimationPath, double)>();
-			foreach (var node in Container.Descendants) {
-				Save(node);
-			}
-			var currentNode = Container;
-			do {
-				Save(currentNode);
-				currentNode = currentNode.Parent;
-			} while (currentNode != RootNode.Parent);
 		}
 	}
 }

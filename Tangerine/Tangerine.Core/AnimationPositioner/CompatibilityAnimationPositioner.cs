@@ -20,22 +20,14 @@ namespace Tangerine.Core
 					// Terekhov Dmitry: First time cache creation that does not set IsRunning
 					// Terekhov Dmitry: In order not to not reset other animations
 					if (CacheAnimationsStates && !cacheFrame.HasValue) {
-						if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
-							SetTimeRecursive(node, 0);
-						} else {
-							SetTime(node, animation.Id, 0);
-						}
+						SetTime(node, animation.Id, 0);
 						animation.IsRunning = true;
 						FastForwardToFrame(animation, frameIndex);
 						AnimationsStatesComponent.Create(node, true);
 						cacheFrame = frameIndex;
 					}
 					if (!cacheFrame.HasValue) {
-						if (CoreUserPreferences.Instance.ResetAnimationsTimes) {
-							SetTimeRecursive(node, 0);
-						} else {
-							SetTime(node, animation.Id, 0);
-						}
+						SetTime(node, animation.Id, 0);
 					} else {
 						// Terekhov Dmitry: In case we've created a new container that doesn't have a
 						// cache component
