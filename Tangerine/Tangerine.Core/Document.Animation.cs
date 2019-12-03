@@ -21,9 +21,9 @@ namespace Tangerine.Core
 			set => Current.AnimationPositioner.CacheAnimationsStates = value;
 		}
 
-		public static void SetCurrentFrameToNode(Animation animation, int frameIndex)
+		public static void SetCurrentFrameToNode(Animation animation, int frameIndex, bool stopAnimations = true)
 		{
-			Current.AnimationPositioner.SetAnimationFrame(animation, frameIndex, CoreUserPreferences.Instance.AnimationMode);
+			Current.AnimationPositioner.SetAnimationFrame(animation, frameIndex, CoreUserPreferences.Instance.AnimationMode, stopAnimations);
 		}
 
 		public void TogglePreviewAnimation()
@@ -49,6 +49,7 @@ namespace Tangerine.Core
 					}
 				}
 				int savedAnimationFrame = AnimationFrame;
+				SetCurrentFrameToNode(Animation, AnimationFrame, stopAnimations: false);
 				PreviewScene = true;
 				PreviewAnimation = true;
 				Animation.IsRunning = PreviewAnimation;

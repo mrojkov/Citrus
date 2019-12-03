@@ -9,7 +9,7 @@ namespace Tangerine.Core
 	{
 		public bool CacheAnimationsStates { get; set; }
 
-		public void SetAnimationFrame(Animation animation, int frame, bool animationMode)
+		public void SetAnimationFrame(Animation animation, int frame, bool animationMode, bool stopAnimations)
 		{
 			Audio.GloballyEnable = false;
 			ResetAnimations(animation.OwnerNode);
@@ -18,7 +18,9 @@ namespace Tangerine.Core
 			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
 			AdvanceAnimation(animation.OwnerNode, AnimationUtils.FramesToSeconds(frame) + AnimationUtils.Threshold);
 			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
-			StopAnimations(animation.OwnerNode);
+			if (stopAnimations) {
+				StopAnimations(animation.OwnerNode);
+			}
 			Audio.GloballyEnable = true;
 		}
 

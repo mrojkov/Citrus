@@ -7,7 +7,7 @@ namespace Tangerine.Core
 {
 	public class CompatibilityAnimationPositioner : IAnimationPositioner
 	{
-		public void SetAnimationFrame(Animation animation, int frameIndex, bool animationMode)
+		public void SetAnimationFrame(Animation animation, int frameIndex, bool animationMode, bool stopAnimations)
 		{
 			Audio.GloballyEnable = false;
 			try {
@@ -98,7 +98,7 @@ namespace Tangerine.Core
 				remainDelta -= delta;
 			} while (remainDelta > 0f);
 		}
-			
+
 		internal void FastForwardToFrame(Animation animation, int frame)
 		{
 			// Try to decrease error in node.AnimationTime by call node.Update several times
