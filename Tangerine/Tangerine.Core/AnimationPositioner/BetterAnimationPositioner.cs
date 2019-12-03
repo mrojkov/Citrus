@@ -12,19 +12,22 @@ namespace Tangerine.Core
 		public void SetAnimationFrame(Animation animation, int frame, bool animationMode, bool stopAnimations)
 		{
 			Audio.GloballyEnable = false;
-			ResetAnimations(animation.OwnerNode);
-			animation.IsRunning = true;
-			animation.Time = 0;
-			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
-			// Advance animation on Threshold more than needed to ensure the last trigger will be processed.
-			AdvanceAnimation(animation.OwnerNode, AnimationUtils.FramesToSeconds(frame) + AnimationUtils.Threshold);
-			// Set animation exactly on the given frame.
-			animation.Frame = frame;
-			animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
-			if (stopAnimations) {
-				StopAnimations(animation.OwnerNode);
+			try {
+				ResetAnimations(animation.OwnerNode);
+				animation.IsRunning = true;
+				animation.Time = 0;
+				animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, true);
+				// Advance animation on Threshold more than needed to ensure the last trigger will be processed.
+				AdvanceAnimation(animation.OwnerNode, AnimationUtils.FramesToSeconds(frame) + AnimationUtils.Threshold);
+				// Set animation exactly on the given frame.
+				animation.Frame = frame;
+				animation.OwnerNode.SetTangerineFlag(TangerineFlags.IgnoreMarkers, false);
+				if (stopAnimations) {
+					StopAnimations(animation.OwnerNode);
+				}
+			} finally {
+				Audio.GloballyEnable = true;
 			}
-			Audio.GloballyEnable = true;
 		}
 
 		private void AdvanceAnimation(Node node, double delta)

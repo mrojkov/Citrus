@@ -38,6 +38,7 @@ namespace Tangerine.Core
 				AudioSystem.StopAll();
 				AnimationPositioner.CacheAnimationsStates = true;
 				ForceAnimationUpdate();
+				ClearParticlesRecursive(Animation.OwnerNode);
 				AnimationPositioner.CacheAnimationsStates = false;
 			} else {
 				foreach (var node in RootNode.Descendants) {
@@ -54,6 +55,16 @@ namespace Tangerine.Core
 				PreviewAnimationContainer = Container;
 			}
 			Application.InvalidateWindows();
+		}
+
+		private static void ClearParticlesRecursive(Node node)
+		{
+			if (node is ParticleEmitter emitter) {
+				emitter.ClearParticles();
+			}
+			foreach (var child in node.Nodes) {
+				ClearParticlesRecursive(child);
+			}
 		}
 
 		private static void StopAnimationRecursive(Node node)
