@@ -35,7 +35,7 @@ namespace Lime
 		public DragDirection Direction { get; private set; }
 
 		protected virtual Vector2 PreviousMousePosition { get; private set; }
-		protected float DragThresholdSqr { get; }
+		public float DragThresholdSqr { get; set; }
 
 		/// <summary>
 		/// Occurs when dragged.
