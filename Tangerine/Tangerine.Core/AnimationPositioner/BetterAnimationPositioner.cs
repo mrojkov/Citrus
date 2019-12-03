@@ -48,7 +48,7 @@ namespace Tangerine.Core
 					}
 				}
 				foreach (var child in node.Nodes) {
-					AdvanceAnimation(child, clampedDelta);
+					AdvanceAnimation(child, clampedDelta * child.AnimationSpeed);
 				}
 				delta -= clampedDelta;
 			}
