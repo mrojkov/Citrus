@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using static Lime.Mathf;
 
 namespace Lime
 {
@@ -13,18 +14,16 @@ namespace Lime
 		}
 
 		protected const float DefaultDragThreshold = 5;
-
 		private PollableEvent changed;
 		private State state;
 		private readonly IMotionStrategy motionStrategy;
 		private const int MaxTouchHistorySize = 3;
-
-		private readonly Queue<(Vector2 distance, float duration)> touchHistory;
+		private readonly Queue<(Vector2 Distance, float Duration)> touchHistory;
 		private PollableEvent ending;
-
-		private Vector2 previousSpecialPosition;
+		private Vector2 previousMotionStrategyPosition;
+		private float motionStrategyTime;
+		private bool isMotionStrategyActive;
 		private Vector2 lastDragDelta;
-
 
 		/// <summary>
 		/// Will cancel any other drag gestures.
@@ -36,9 +35,9 @@ namespace Lime
 		/// will always be zero if DragDirection is Vertical or Horizontal respectively.
 		/// This fact is used when checking for threshold.
 		/// </summary>
-		public override bool IsActive => state != State.Idle || (motionStrategy?.InProgress ?? false);
+		public override bool IsActive => state != State.Idle || IsMotionInProgress();
 
-		public virtual Vector2 MousePosition => (motionStrategy?.InProgress ?? false) ? motionStrategy.Position : ClampMousePositionByDirection(Direction);
+		public virtual Vector2 MousePosition => IsMotionInProgress() ? motionStrategy.Position : ClampMousePositionByDirection(Direction);
 		public Vector2 MousePressPosition { get; private set; }
 		public Vector2 TotalDragDistance => MousePosition - MousePressPosition;
 		public Vector2 LastDragDistance => MousePosition - PreviousMousePosition;
@@ -46,7 +45,7 @@ namespace Lime
 		public int ButtonIndex { get; }
 
 		private Vector2 previousMousePosition;
-		protected virtual Vector2 PreviousMousePosition => (motionStrategy?.InProgress ?? false) ? previousSpecialPosition : previousMousePosition;
+		protected virtual Vector2 PreviousMousePosition => IsMotionInProgress() ? previousMotionStrategyPosition : previousMousePosition;
 		protected float DragThresholdSqr { get; }
 
 		/// <summary>
@@ -71,7 +70,10 @@ namespace Lime
 			int buttonIndex = 0,
 			DragDirection direction = DragDirection.Any,
 			bool exclusive = false,
-			float dragThreshold = DefaultDragThreshold)
+			float dragThreshold = DefaultDragThreshold,
+			IMotionStrategy motionStrategy = null
+		)
+			: this(motionStrategy)
 		{
 			ButtonIndex = buttonIndex;
 			Direction = direction;
@@ -93,7 +95,6 @@ namespace Lime
 		public bool IsChanging() => state == State.Changing;
 		public void RaiseEnding() => ending.Raise();
 		protected void RaiseChanged() => changed.Raise();
-
 		protected virtual bool TryGetStartDragPosition(out Vector2 position)
 		{
 			if (Input.WasMousePressed(ButtonIndex)) {
@@ -107,22 +108,16 @@ namespace Lime
 			position = Input.MousePosition;
 			return true;
 		}
-		protected virtual bool IsDragging()
-		{
-			return Input.IsMousePressed(ButtonIndex);
-		}
-		protected virtual bool CanStartDrag()
-		{
-			return (MousePosition - MousePressPosition).SqrLength > DragThresholdSqr;
-		}
+		protected virtual bool IsDragging() => Input.IsMousePressed(ButtonIndex);
+		protected virtual bool CanStartDrag() => (MousePosition - MousePressPosition).SqrLength > DragThresholdSqr;
 
 		protected internal override bool Cancel(Gesture sender = null)
 		{
-			if (motionStrategy != null && motionStrategy.InProgress) {
+			if (motionStrategy != null && IsMotionInProgress()) {
 				if (sender == null) {
 					return false;
 				}
-				StopSpecialMotion();
+				isMotionStrategyActive = false;
 			}
 			if (sender != null && (sender as DragGesture)?.Exclusive != true) {
 				return false;
@@ -136,15 +131,18 @@ namespace Lime
 
 		protected internal override void Update(float delta)
 		{
-			if (motionStrategy != null && motionStrategy.InProgress) {
+			if (motionStrategy != null && IsMotionInProgress()) {
 				if (Input.WasMousePressed(ButtonIndex)) {
-					StopSpecialMotion();
+					isMotionStrategyActive = false;
 					RaiseEnded();
 				} else {
-					previousSpecialPosition = motionStrategy.Position;
-					motionStrategy.Update(delta);
-
-					if (motionStrategy.InProgress) {
+					previousMotionStrategyPosition = motionStrategy.Position;
+					motionStrategyTime += delta;
+					motionStrategy.Update(Min(motionStrategyTime, motionStrategy.Duration));
+					if (motionStrategyTime > motionStrategy.Duration) {
+						isMotionStrategyActive = false;
+					}
+					if (IsMotionInProgress()) {
 						RaiseChanged();
 					} else {
 						RaiseEnded();
@@ -152,16 +150,13 @@ namespace Lime
 				}
 				return;
 			}
-
 			var savedPreviousMousePosition = previousMousePosition;
 			bool wasChanging = IsChanging();
-
 			if (state == State.Idle && TryGetStartDragPosition(out var startPosition)) {
 				state = State.Recognizing;
 				MousePressPosition = startPosition;
 				RaiseBegan();
 			}
-
 			if (state == State.Recognizing) {
 				if (!IsDragging()) {
 					state = State.Idle;
@@ -174,7 +169,6 @@ namespace Lime
 					RaiseRecognized();
 				}
 			}
-
 			if (state == State.Changing) {
 				if (
 					TryGetDragPosition(out var mousePosition) &&
@@ -195,8 +189,10 @@ namespace Lime
 			}
 			if (motionStrategy != null && wasChanging) {
 				if (WasEnding()) {
-					StartSpecialMotion();
+					motionStrategy.Start(ClampMousePositionByDirection(Direction), touchHistory);
 					touchHistory.Clear();
+					motionStrategyTime = 0.0f;
+					isMotionStrategyActive = true;
 				} else {
 					lastDragDelta = ClampMousePositionByDirection(Direction) - savedPreviousMousePosition;
 					touchHistory.Enqueue((lastDragDelta, delta));
@@ -225,25 +221,7 @@ namespace Lime
 			}
 		}
 
-		private void StartSpecialMotion()
-		{
-			var direction = Vector2.Zero;
-			float totalDuration = 0.0f;
-			foreach (var (distance, duration) in touchHistory) {
-				direction += distance;
-				totalDuration += duration;
-			}
-
-			if (totalDuration > 0.0f) {
-				float speed = direction.Length / totalDuration;
-				motionStrategy.Start(ClampMousePositionByDirection(Direction), direction, speed);
-			}
-		}
-
-		private void StopSpecialMotion()
-		{
-			motionStrategy.Stop();
-		}
+		private bool IsMotionInProgress() => motionStrategy == null ? false : isMotionStrategyActive;
 
 		/// <summary>
 		/// Defines a motion strategy.
@@ -251,133 +229,104 @@ namespace Lime
 		public interface IMotionStrategy
 		{
 			Vector2 Position { get; }
-			bool InProgress { get; }
-
+			float Duration { get; }
 			/// <summary>
 			/// Start position calculation.
 			/// </summary>
-			/// <param name="startPosition">The position in which the movement began.</param>
-			/// <param name="startDirection">The direction in which the movement began.</param>
-			/// <param name="startSpeed">The initial speed of movement.</param>
-			void Start(Vector2 startPosition, Vector2 startDirection, float startSpeed);
+			/// <param name="startPosition">The position motion should begin at.</param>
+			/// <param name="touchHistory">Sequence of distance and duration pairs for a couple of last frames.</param>
+			void Start(Vector2 startPosition, IEnumerable<(Vector2 Distance, float Duration)> touchHistory);
 
 			/// <summary>
 			/// Recalculates position.
 			/// </summary>
-			/// <param name="delta">Elapsed time.</param>
-			void Update(float delta);
-
-			/// <summary>
-			/// Stops position calculation.
-			/// </summary>
-			void Stop();
+			/// <param name="time">Time elapsed from the start.</param>
+			void Update(float time);
 		}
+
 		/// <summary>
-		/// Non-uniformly slow motion, occurring to a full stop.
+		/// Motion damping based on Gauss error function. Duration is calculated so motion lasts until min speed reached.
 		/// </summary>
 		public class DampingMotionStrategy : IMotionStrategy
 		{
-			private readonly float initialDamping;
-			private readonly float dampingDamping;
 			private readonly float minSpeed;
 			private readonly float maxSpeed;
-
 			private Vector2 direction;
 			private float speed;
-			private float damping;
-
+			private float initialSpeed;
+			private Vector2 initialPosition;
+			private float k1;
+			private float k2;
+			private float k3;
+			private float p0;
+			private readonly float dampingFactor1;
+			private readonly float dampingFactor2;
 			public Vector2 Position { get; private set; }
-			public bool InProgress { get; private set; }
+			public float Duration { get; private set; }
 
-			/// <param name="initialDamping">Initial deceleration factor.</param>
-			/// <param name="dampingDamping">Increase of the deceleration factor.</param>
+			/// <param name="dampingFactor1">Initial speed damping factor. Should be in range (0; 1].
+			/// The lower the dampingFactor2, the lower damingFactor1 can be. Otherwise it may result in overflow.</param>
+			/// <param name="dampingFactor2">Damping factor applied to speed damping factor each frame. Valid range is (0; 1).</param>
 			/// <param name="minSpeed">The minimum speed that is considered a full stop.</param>
 			/// <param name="maxStartSpeed">Maximum initial speed of movement.</param>
 			public DampingMotionStrategy(
-				float initialDamping,
-				float dampingDamping,
-				float minSpeed = 5.0f,
+				float dampingFactor1,
+				float dampingFactor2,
+				float minSpeed = 25.0f,
 				float maxStartSpeed = float.PositiveInfinity)
 			{
-				this.initialDamping = initialDamping;
-				this.dampingDamping = dampingDamping;
+				this.dampingFactor1 = dampingFactor1;
+				this.dampingFactor2 = dampingFactor2;
 				this.minSpeed = minSpeed;
 				maxSpeed = maxStartSpeed;
 			}
 
-			public void Start(Vector2 startPosition, Vector2 startDirection, float startSpeed)
+			public void Start(Vector2 startPosition, IEnumerable<(Vector2 Distance, float Duration)> touchHistory)
 			{
-				direction = startDirection.Normalized;
-				speed = Mathf.Min(startSpeed, maxSpeed);
-				damping = initialDamping;
-				Position = startPosition;
-				InProgress = true;
-			}
-
-			public void Update(float delta)
-			{
-				if (!InProgress) {
-					return;
+				direction = Vector2.Zero;
+				float totalDuration = 0.0f;
+				foreach (var (distance, duration) in touchHistory) {
+					direction += distance;
+					totalDuration += duration;
 				}
-				Position += delta * speed * direction;
-				speed *= damping;
-				damping *= dampingDamping;
-				InProgress = speed > minSpeed;
-			}
-
-			public void Stop()
-			{
-				InProgress = false;
-			}
-		}
-
-		/// <summary>
-		/// Uniformly slow motion, occurring within a specified time.
-		/// </summary>
-		public class FixedTimeMotionStrategy : IMotionStrategy
-		{
-			private readonly float duration;
-
-			private Vector2 fromPosition;
-			private Vector2 direction;
-			private float speed;
-			private float deceleration;
-			private float timeElapsed;
-
-			public Vector2 Position { get; private set; }
-			public bool InProgress { get; private set; }
-
-			/// <param name="specialDuration">The time during which the movement slows down.</param>
-			public FixedTimeMotionStrategy(float specialDuration)
-			{
-				duration = specialDuration;
-			}
-
-			public virtual void Start(Vector2 startPosition, Vector2 startDirection, float startSpeed)
-			{
-				fromPosition = startPosition;
-				direction = startDirection.Normalized;
-				speed = startSpeed;
-				deceleration = -startSpeed / duration;
-				timeElapsed = 0.0f;
-				Position = startPosition;
-				InProgress = true;
-			}
-
-			public void Update(float delta)
-			{
-				if (!InProgress) {
-					return;
+				if (totalDuration > 0.0f) {
+					speed = direction.Length / totalDuration;
+					direction = direction.Normalized;
+					speed = Min(speed, maxSpeed);
+					Position = initialPosition = startPosition;
+					initialSpeed = speed;
+					(k1, k2, k3) = CalculateErfFactors(dampingFactor1, dampingFactor2);
+					// check if max possible speed is lower than min speed. -k3/k2 is the root of V'
+					Duration = SpeedOverTime(-k3 / k2, k1 * initialSpeed, k2, k3) < minSpeed
+						? 0.0f
+						: CalcDurationUntilMinSpeedReached(minSpeed, k1 * initialSpeed, k2, k3);
+					p0 = PositionOverTime(0, k1 * initialSpeed, k2, k3);
 				}
-				timeElapsed += delta;
-				Position = fromPosition + direction *
-						   (speed * timeElapsed + deceleration * timeElapsed.Sqr() / 2.0f);
-				InProgress = timeElapsed < duration;
 			}
 
-			public void Stop()
+			public void Update(float time) =>
+				Position = initialPosition + direction * (PositionOverTime(time, initialSpeed * k1, k2, k3) - p0);
+
+			// See https://www.desmos.com/calculator/imdpwcwylb for graphs with sliders
+			private static float PositionOverTime(float t, float a1, float a2, float a3) => a1 * Erf(a2 * t + a3);
+
+			private static float SpeedOverTime(float t, float a1, float a2, float a3) => 2 * a1 * a2 * Exp(-(a2 * t + a3).Sqr()) / Sqrt(Pi);
+
+			// Solves SpeedOverTime = targetSpeed for time
+			private static float CalcDurationUntilMinSpeedReached(float targetSpeed, float a1, float a2, float a3) =>
+				(Sqrt(-Log(Sqrt(Pi) * targetSpeed/(2.0f * a1 * a2))) - a3) / a2;
+
+			private static (float k1, float k2, float k3) CalculateErfFactors(float d1, float d2)
 			{
-				InProgress = false;
+				var ld1 = Log(d1);
+				var ld2 = Log(d2);
+				var is2 = 1.0f / Sqrt(2.0f);
+				var fps = 60.0f;
+				var smld2 = Sqrt(-ld2);
+				var k1 = is2 * Sqrt(Pi) * Exp(-(2.0f * ld1 - ld2).Sqr() / (8.0f * ld2)) / (smld2 * fps);
+				var k2 = fps * is2 * smld2;
+				var k3 = -(2.0f * ld1 - ld2) / (Pow(2.0f, 3.0f / 2.0f) * smld2);
+				return (k1, k2, k3);
 			}
 		}
 	}
