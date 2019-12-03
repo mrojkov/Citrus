@@ -11,9 +11,10 @@ namespace Lime
 
 		public const float ZeroTolerance = 1e-6f; // Value a 8x higher than 1.19209290E-07F
 
-		public const float Pi = 3.141592653f;
-		public const float TwoPi = 2 * 3.141592653f;
-		public const float HalfPi = 3.141592653f / 2;
+		public const float E = (float)Math.E;
+		public const float Pi = (float)Math.PI;
+		public const float TwoPi = 2 * Pi;
+		public const float HalfPi = Pi / 2;
 		public const float DegToRad = Pi / 180;
 		public const float RadToDeg = 180 / Pi;
 
