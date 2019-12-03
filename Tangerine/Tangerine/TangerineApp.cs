@@ -536,7 +536,6 @@ namespace Tangerine
 			docArea.Layout = new VBoxLayout();
 			docArea.AddNode(tabBar);
 			docArea.AddNode(documentViewContainer);
-			docArea.FocusScope = new KeyboardFocusScope(docArea);
 			return documentViewContainer;
 		}
 
