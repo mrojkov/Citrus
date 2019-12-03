@@ -108,7 +108,7 @@ namespace Lime
 		/// <summary>
 		/// Gauss error function. The maximum error is below 1.5 × 10-7.
 		/// </summary>
-		public static float Erf(float x)
+		public static double Erf(double x)
 		{
 			// https://en.wikipedia.org/wiki/Error_function
 			// https://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
@@ -119,12 +119,14 @@ namespace Lime
 			const double a4 = -1.453152027;
 			const double a5 = 1.061405429;
 			const double p = 0.3275911;
-			var sign = Sign(x);
-			x = Abs(x);
+			var sign = Math.Sign(x);
+			x = Math.Abs(x);
 			var t = 1.0 / (1.0 + p * x);
 			var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
-			return (float)(sign * y);
+			return sign * y;
 		}
+
+		public static float Erf(float x) => (float)Erf((double)x);
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
