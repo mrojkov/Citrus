@@ -39,14 +39,14 @@ namespace EmptyProject.Dialogs
 		private void OnDragged()
 		{
 			if (dragGesture.IsActive) {
-				thumb.Position += dragGesture.LastDragDistance / thumb.Scale;
+				thumb.Position += dragGesture.LastDragDistance;
 			}
 		}
 
 		private void OnPinched()
 		{
 			if (pinchGesture.IsActive) {
-				thumb.Position -= pinchGesture.LastDragDistance / thumb.Scale;
+				thumb.Position += pinchGesture.LastDragDistance;
 				var zoom = Mathf.Clamp(thumb.Scale * pinchGesture.LastPinchScale, Vector2.One * 0.2f, Vector2.One * 3.0f);
 				thumb.Scale = zoom;
 			}
