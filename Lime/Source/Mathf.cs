@@ -73,6 +73,9 @@ namespace Lime
 		public static float Sqrt(float x) => MathF.Sqrt(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Exp(float x) => MathF.Exp(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Log(float x) => MathF.Log(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,6 +101,9 @@ namespace Lime
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Sqrt(float x) => (float)Math.Sqrt(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Exp(float x) => (float)Math.Exp(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Log(float x) => (float)Math.Log(x);
