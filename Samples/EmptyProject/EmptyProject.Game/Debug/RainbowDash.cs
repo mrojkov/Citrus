@@ -422,6 +422,8 @@ namespace RainbowDash
 			}
 		}
 
+		private static SerializableFont Font => new SerializableFont(null);
+
 		private static IEnumerator<object> RefreshTask()
 		{
 			while (true) {
@@ -449,7 +451,7 @@ namespace RainbowDash
 				Id = "TextPresenter",
 				Nodes = {
 					new TextStyle {
-						Font = new SerializableFont("Text"),
+						Font = Font,
 						Size = FontSize,
 						Tag = "1",
 						SpaceAfter = SpaceAfter
@@ -470,7 +472,7 @@ namespace RainbowDash
 				Id = "arrow",
 				Nodes = {
 					new TextStyle {
-						Font = new SerializableFont("Text"),
+						Font = Font,
 						Tag = "1",
 						Size = FontSize,
 					}
@@ -519,7 +521,7 @@ namespace RainbowDash
 				WordSplitAllowed = false,
 				Nodes = {
 					new TextStyle {
-						Font = new SerializableFont("Text"),
+						Font = Font,
 						Tag = "1",
 						Size = FontSize,
 						SpaceAfter = SpaceAfter
