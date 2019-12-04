@@ -49,7 +49,7 @@ namespace Tangerine.MainMenu
 					bitmap.Dispose();
 				});
 				yield return null;
-				animation.OwnerNode.AdvanceAnimationsRecursive(delta);
+				animation.OwnerNode.Update(delta);
 				start += delta;
 				Application.InvalidateWindows();
 				i += 1;
