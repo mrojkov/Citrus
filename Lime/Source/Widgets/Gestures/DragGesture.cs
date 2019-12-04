@@ -132,7 +132,7 @@ namespace Lime
 		protected internal override void Update(float delta)
 		{
 			if (motionStrategy != null && IsMotionInProgress()) {
-				if (Input.WasMousePressed(ButtonIndex)) {
+				if (Input.WasMousePressed(ButtonIndex) && Owner.IsMouseOverThisOrDescendant()) {
 					isMotionStrategyActive = false;
 					RaiseEnded();
 				} else {
