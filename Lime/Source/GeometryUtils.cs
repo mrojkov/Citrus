@@ -31,9 +31,12 @@ namespace Lime
 			return h2 <= (radius * radius);
 		}
 
-		public static bool CalcLinesIntersection(Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, out Vector2 intersection)
-		{
-			intersection = new Vector2(float.NaN, float.NaN);
+		public static bool CalcLinesIntersection(
+			Vector2 a1, Vector2 b1,
+			Vector2 a2, Vector2 b2,
+			out Vector2 intersection
+		) {
+			intersection = Vector2.NaN;
 			float d = (b2.Y - a2.Y) * (b1.X - a1.X) - (b2.X - a2.X) * (b1.Y - a1.Y);
 			float nA = (b2.X - a2.X) * (a1.Y - a2.Y) - (b2.Y - a2.Y) * (a1.X - a2.X);
 			float nB = (b1.X - a1.X) * (a1.Y - a2.Y) - (b1.Y - a1.Y) * (a1.X - a2.X);

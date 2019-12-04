@@ -72,7 +72,6 @@ namespace Lime
 		protected ShaderId globalShader;
 		protected bool globallyEnabled;
 		protected bool globallyVisible;
-		protected bool globallyFreezeInvisible;
 
 		public static Widget Focused { get; private set; }
 		public static readonly Vector2 DefaultWidgetSize = new Vector2(100);
@@ -437,6 +436,7 @@ namespace Lime
 		/// </summary>
 		public Vector2 GlobalPosition => LocalToWorldTransform.T;
 
+		public Vector2 GlobalPivotPosition => LocalToWorldTransform * (Pivot * Size);
 		/// <summary>
 		/// Gets position of this widget's center in the root widget space.
 		/// </summary>
@@ -743,6 +743,8 @@ namespace Lime
 #endif // TANGERINE
 		}
 
+		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public bool FreezeInvisible
 		{
 			get => freezeInvisible;
@@ -750,32 +752,8 @@ namespace Lime
 			{
 				if (freezeInvisible != value) {
 					freezeInvisible = value;
-					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					PropagateDirtyFlags(DirtyFlags.Frozen);
 					Manager?.FilterNode(this);
-				}
-			}
-		}
-
-		public bool GloballyFreezeInvisible
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
-					RecalcGloballyFreezeInvisible();
-				}
-				return globallyFreezeInvisible;
-			}
-		}
-
-		private void RecalcGloballyFreezeInvisible()
-		{
-			globallyFreezeInvisible = FreezeInvisible;
-			if (Parent != null) {
-				if (Parent.AsWidget != null) {
-					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
-				} else if (Parent.AsNode3D != null) {
-					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
 				}
 			}
 		}
@@ -1312,19 +1290,20 @@ namespace Lime
 			Pivot = Vector2.Half;
 		}
 
-		public Matrix32 CalcTransitionToSpaceOf(Widget container)
+		/// <summary>
+		/// Calculates the widget's transition to the space of another widget.
+		/// </summary>
+		public Matrix32 CalcTransitionToSpaceOf(Widget widget)
 		{
-			var mtx1 = container.LocalToWorldTransform.CalcInversed();
-			var mtx2 = LocalToWorldTransform;
-			return mtx2 * mtx1;
+			return LocalToWorldTransform * widget.LocalToWorldTransform.CalcInversed();
 		}
 
 		/// <summary>
 		/// Calculates the widget's convex hull in the space of another widget.
 		/// </summary>
-		public Quadrangle CalcHullInSpaceOf(Widget container)
+		public Quadrangle CalcHullInSpaceOf(Widget widget)
 		{
-			var t = CalcTransitionToSpaceOf(container);
+			var t = CalcTransitionToSpaceOf(widget);
 			return new Quadrangle {
 				V1 = t * Vector2.Zero,
 				V2 = t * new Vector2(Width, 0),
@@ -1336,9 +1315,9 @@ namespace Lime
 		/// <summary>
 		/// Calculates the widget's AABB in the space of another widget.
 		/// </summary>
-		public Rectangle CalcAABBInSpaceOf(Widget container)
+		public Rectangle CalcAABBInSpaceOf(Widget widget)
 		{
-			var hull = CalcHullInSpaceOf(container);
+			var hull = CalcHullInSpaceOf(widget);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue)
 				.IncludingPoint(hull.V1)
 				.IncludingPoint(hull.V2)
@@ -1347,6 +1326,16 @@ namespace Lime
 			return aabb;
 		}
 
+		public Quadrangle CalcHull()
+		{
+			var t = LocalToWorldTransform;
+			return new Quadrangle {
+				V1 = t * Vector2.Zero,
+				V2 = t * new Vector2(Width, 0),
+				V3 = t * Size,
+				V4 = t * new Vector2(0, Height)
+			};
+		}
 
 		public IntRectangle CalcAABBInViewportSpace(WindowRect viewport, Matrix44 worldViewProjection)
 		{
@@ -1392,10 +1381,10 @@ namespace Lime
 			};
 		}
 
-		public Vector2 CalcPositionInSpaceOf(Widget container)
+		public Vector2 CalcPositionInSpaceOf(Widget widget)
 		{
-			Matrix32 matrix = CalcTransitionToSpaceOf(container);
-			return matrix.TransformVector(Pivot * Size);
+			var t = CalcTransitionToSpaceOf(widget);
+			return t.TransformVector(Pivot * Size);
 		}
 
 		public virtual IEnumerable<string> GetVisibilityIssues()
@@ -1459,7 +1448,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
+			globallyFrozen |= FreezeInvisible && !((Visible && (color.A != 0 || RenderTransparentWidgets)) || GetTangerineFlag(TangerineFlags.DisplayContent));
 		}
 	}
 }

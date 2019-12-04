@@ -27,8 +27,9 @@ namespace Tangerine.UI.SceneView
 					var color = GetSelectedPoints().Contains(point) ?
 					ColorTheme.Current.SceneView.Selection :
 					ColorTheme.Current.SceneView.PointObject;
-					SceneView.Instance.Frame.PrepareRendererState();
-					var t = point.Parent.AsWidget.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+					var sv = SceneView.Instance;
+					sv.Frame.PrepareRendererState();
+					var t = point.Parent.AsWidget.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 					var a = Vector2.CosSin(point.TangentAngle * Mathf.DegToRad) * TangentWeightRatio * point.TangentWeight;
 					var p1 = t * (point.TransformedPosition + a);
 					var p2 = t * (point.TransformedPosition - a);

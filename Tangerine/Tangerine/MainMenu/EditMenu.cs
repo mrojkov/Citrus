@@ -18,11 +18,12 @@ namespace Tangerine
 		public override void ExecuteTransaction()
 		{
 			var selectedNodes = Document.Current.SelectedNodes().Where(IsValidNode).ToList();
-			Rectangle aabb;
-			if (!UI.Utils.CalcAABB(selectedNodes, (Widget)Document.Current.Container, out aabb)) {
+			if (!Utils.CalcHullAndPivot(selectedNodes, out var hull, out _)) {
 				return;
 			}
 
+			hull = hull.Transform(Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed());
+			var aabb = hull.ToAABB();
 			var container = Document.Current.Container;
 			foreach (var row in Document.Current.SelectedRows()) {
 				if (row.Components.Contains<BoneRow>()) {

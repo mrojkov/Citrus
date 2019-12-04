@@ -87,6 +87,7 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
+    <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Dummy.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Mac.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\FileSystemWatcher.Win.cs" />
     <Compile Include="Source\Application\FileSystemWatcher\IFileSystemWatcher.cs" />
@@ -168,6 +169,7 @@
     <Compile Include="Source\Graphics\MeshUtils.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
+    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformBuffer.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderContext.cs" />
     <Compile Include="Source\Graphics\Platform\IPlatformRenderTexture2D.cs" />
@@ -205,7 +207,6 @@
     <Compile Include="Source\Graphics\Platform\Vulkan\UploadBufferAllocator.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanExt.cs" />
     <Compile Include="Source\Graphics\Platform\Vulkan\VulkanHelper.cs" />
-    <Compile Include="Source\Graphics\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -307,10 +308,15 @@
     <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Widgets\Gestures\ClickGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DoubleClickGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\DragDirection.cs" />
     <Compile Include="Source\Widgets\Gestures\DragGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\DropFilesGesture.cs" />
     <Compile Include="Source\Widgets\Gestures\Gesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\GestureList.cs" />
     <Compile Include="Source\Widgets\Gestures\GestureManager.cs" />
+    <Compile Include="Source\Widgets\Gestures\LongTapGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\PinchGesture.cs" />
+    <Compile Include="Source\Widgets\Gestures\TapGesture.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
     <Compile Include="Source\Widgets\IPropertyLocker.cs" />

@@ -13,6 +13,7 @@ namespace Kumquat
 		public string FieldName;
 		public string ScenePath;
 		public string BaseClassName;
+		public bool IsInExternalScene;
 		public readonly List<ParsedFramesTree> InnerClasses = new List<ParsedFramesTree>();
 		public readonly List<ParsedNode> ParsedNodes = new List<ParsedNode>();
 
@@ -24,11 +25,10 @@ namespace Kumquat
 			FieldName = parsedFramesTree.FieldName;
 			ScenePath = parsedFramesTree.ScenePath;
 			BaseClassName = parsedFramesTree.BaseClassName;
+			IsInExternalScene = parsedFramesTree.IsInExternalScene;
 		}
 
-		public ParsedFramesTree()
-		{
-		}
+		public ParsedFramesTree() { }
 
 		public string GenerateCode(ScenesCodeCooker scenesCodeCooker, bool isRootNode = true)
 		{
@@ -42,6 +42,7 @@ namespace Kumquat
 			result = result.Replace("<%ANIMATIONS%>", ParsedNode.GenerateAnimations(isRootNode ? "T" : null));
 			result = result.Replace("<%IT%>", ParsedNode.GenerateIt());
 			result = result.Replace("<%COMMON_BASE%>", GenerateCommonBase());
+			result = result.Replace("<%USING%>", GenerateUsingLibraries(result));
 			return result;
 		}
 
@@ -53,12 +54,26 @@ namespace Kumquat
 		private string GenerateInnerClasses(ScenesCodeCooker scenesCodeCooker)
 		{
 			var result = "";
-			foreach (var pft in InnerClasses.Where(c => !c.ParsedNode.IsExternalScene)) {
-				result += pft.GenerateCode(scenesCodeCooker, isRootNode: false);
-			}
+
+			var checkedNodes = new List<ParsedNode>();
+			var checkedClasses = new List<ParsedFramesTree>();
+
 			foreach (var pn in ParsedNodes.Where(c => !c.IsExternalScene)) {
-				result += pn.GenerateCode(scenesCodeCooker.NodeCodeTemplate);
+				if (!checkedNodes.Exists(f => f.FieldName == pn.FieldName)) {
+					checkedNodes.Add(pn);
+
+					result += pn.GenerateCode(scenesCodeCooker.NodeCodeTemplate) + "\n";
+				}
 			}
+
+			foreach (var pft in InnerClasses.Where(c => !c.ParsedNode.IsExternalScene)) {
+				if (!checkedClasses.Exists(f => f.FieldName == pft.FieldName)) {
+					checkedClasses.Add(pft);
+
+					result += pft.GenerateCode(scenesCodeCooker, isRootNode: false) + "\n";
+				}
+			}
+
 			return result;
 		}
 
@@ -68,38 +83,120 @@ namespace Kumquat
 			if (!BaseClassName.IsNullOrWhiteSpace()) {
 				result += $"{BaseClassName} = new Common.{BaseClassName}(Node);\n";
 			}
+
+			var multiNodes = new List<ParsedNode>();
+			var multiClasses = new List<ParsedFramesTree>();
+
 			foreach (var node in ParsedNodes) {
-				result += string.Format(
-					"@{2} = new {0}(Node.Find<Node>(\"{1}\"));",
-					scenesCodeCooker.GetFullTypeOf(node),
-					node.Id,
-					node.FieldName
-				);
-				result += "\n";
+				bool haveSameFields = ParsedNodes.Count(f => f.FieldName == node.FieldName) > 1;
+
+				if (haveSameFields) {
+					if (multiNodes.Exists(n => n.FieldName == node.FieldName)) {
+						continue;
+					}
+
+					multiNodes.Add(node);
+
+					result += string.Format(
+						"@{2} = Node.Descendants.Where(nodeEl => nodeEl.Id == \"{1}\")" +
+						".Select(nodeEl => new {0} (nodeEl)).ToList();"  + "\n",
+						scenesCodeCooker.GetFullTypeOf(node),
+						node.Id,
+						node.FieldName
+					);
+
+				} else {
+					result += string.Format(
+						"@{2} = new {0}(Node.Find<Node>(\"{1}\"));" + "\n",
+						scenesCodeCooker.GetFullTypeOf(node),
+						node.Id,
+						node.FieldName
+					);
+				}
 			}
+
 			foreach (var pft in InnerClasses) {
-				result += string.Format(
-					"@{2} = new {0}(Node.Find<Node>(\"{1}\"));",
-					scenesCodeCooker.GetFullTypeOf(pft),
-					pft.ParsedNode.Id,
-					pft.FieldName
-				);
-				result += "\n";
+				bool haveSameFields = InnerClasses.Count(f => f.FieldName == pft.FieldName) > 1;
+
+				if (haveSameFields) {
+					if (multiClasses.Exists(n => n.FieldName == pft.FieldName)) {
+						continue;
+					}
+
+					multiClasses.Add(pft);
+
+					result += string.Format(
+						"@{2} = Node.Descendants.Where(nodeEl => nodeEl.Id == \"{1}\")" +
+						".Select(nodeEl => new {0} (nodeEl)).ToList();"  + "\n",
+						scenesCodeCooker.GetFullTypeOf(pft),
+						pft.ParsedNode.Id,
+						pft.FieldName
+					);
+				} else {
+					result += string.Format(
+						"@{2} = new {0}(Node.Find<Node>(\"{1}\"));" + "\n",
+						scenesCodeCooker.GetFullTypeOf(pft),
+						pft.ParsedNode.Id,
+						pft.FieldName
+					);
+				}
 			}
+
 			return result;
 		}
 
 		private string GenerateFields(ScenesCodeCooker scenesCodeCooker)
 		{
 			var result = "";
+			var multiFields = new List<ParsedNode>();
+			var multiClasses = new List<ParsedFramesTree>();
+
 			foreach (var node in ParsedNodes) {
-				result += string.Format("public readonly {0} @{1};", scenesCodeCooker.GetFullTypeOf(node), node.FieldName);
-				result += "\n";
+				bool haveSameFields = ParsedNodes.Count(f => f.FieldName == node.FieldName) > 1;
+
+				if (haveSameFields) {
+					if (multiFields.Exists(n => n.FieldName == node.FieldName)) {
+						continue;
+					}
+
+					multiFields.Add(node);
+
+					result += $"public readonly List<{scenesCodeCooker.GetFullTypeOf(node)}> @{node.FieldName};" + "\n";
+				} else {
+					result += $"public readonly {scenesCodeCooker.GetFullTypeOf(node)} @{node.FieldName};" + "\n";
+				}
 			}
+
 			foreach (var pft in InnerClasses) {
-				result += string.Format("public readonly {0} @{1};", scenesCodeCooker.GetFullTypeOf(pft), pft.FieldName);
-				result += "\n";
+				bool haveSameClasses = InnerClasses.Count(f => f.FieldName == pft.FieldName) > 1;
+
+				if (haveSameClasses) {
+					if (multiClasses.Exists(n => n.FieldName == pft.FieldName)) {
+						continue;
+					}
+
+					multiClasses.Add(pft);
+					result += $"public readonly List<{scenesCodeCooker.GetFullTypeOf(pft)}> @{pft.FieldName};" + "\n";
+				} else {
+					result += $"public readonly {scenesCodeCooker.GetFullTypeOf(pft)} @{pft.FieldName};" + "\n";
+				}
 			}
+
+			return result;
+		}
+
+		private string GenerateUsingLibraries(string scene)
+		{
+			string result = "using Lime;" + "\n";
+
+			if (scene.Contains("List<")) {
+				result += "using System.Collections.Generic;"+ "\n";
+			}
+
+			if (scene.Contains(".Where") || scene.Contains(".Select")) {
+				result += "using System.Linq;" + "\n";
+			}
+
 			return result;
 		}
 	}

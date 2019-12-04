@@ -54,6 +54,8 @@ namespace Lime
 			}
 		}
 
+		[YuzuMember]
+		[TangerineKeyframeColor(19)]
 		public bool FreezeInvisible
 		{
 			get { return freezeInvisible; }
@@ -61,7 +63,7 @@ namespace Lime
 			{
 				if (freezeInvisible != value) {
 					freezeInvisible = value;
-					PropagateDirtyFlags(DirtyFlags.FreezeInvisible);
+					PropagateDirtyFlags(DirtyFlags.Frozen);
 					Manager?.FilterNode(this);
 				}
 			}
@@ -74,8 +76,10 @@ namespace Lime
 			get { return scale; }
 			set
 			{
-				scale = value;
-				OnTransformChanged();
+				if (scale != value) {
+					scale = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -86,8 +90,10 @@ namespace Lime
 			get { return rotation; }
 			set
 			{
-				rotation = value;
-				OnTransformChanged();
+				if (rotation != value) {
+					rotation = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -101,8 +107,10 @@ namespace Lime
 			get { return position; }
 			set
 			{
-				position = value;
-				OnTransformChanged();
+				if (position != value) {
+					position = value;
+					OnTransformChanged();
+				}
 			}
 		}
 
@@ -113,8 +121,10 @@ namespace Lime
 			get { return color; }
 			set
 			{
-				color = value;
-				PropagateDirtyFlags(DirtyFlags.Color);
+				if (color != value) {
+					color = value;
+					PropagateDirtyFlags(DirtyFlags.Color);
+				}
 			}
 		}
 
@@ -203,29 +213,6 @@ namespace Lime
 			}
 		}
 
-		public bool GloballyFreezeInvisible
-		{
-			get
-			{
-				if (CleanDirtyFlags(DirtyFlags.FreezeInvisible)) {
-					RecalcGloballyFreezeInvisible();
-				}
-				return globallyFreezeInvisible;
-			}
-		}
-
-		private void RecalcGloballyFreezeInvisible()
-		{
-			globallyFreezeInvisible = FreezeInvisible;
-			if (Parent != null) {
-				if (Parent.AsWidget != null) {
-					globallyFreezeInvisible |= Parent.AsWidget.GloballyFreezeInvisible;
-				} else if (Parent.AsNode3D != null) {
-					globallyFreezeInvisible |= Parent.AsNode3D.GloballyFreezeInvisible;
-				}
-			}
-		}
-
 		public Color4 GlobalColor
 		{
 			get
@@ -252,7 +239,7 @@ namespace Lime
 		protected override void RecalcGloballyFrozen()
 		{
 			base.RecalcGloballyFrozen();
-			globallyFrozen |= GloballyFreezeInvisible && !GloballyVisible;
+			globallyFrozen |= FreezeInvisible && !Visible;
 		}
 
 		public Node3D()

@@ -112,6 +112,14 @@ namespace Lime
 		}
 	}
 
+	internal class SByteBlendedAnimator : BlendedAnimator<sbyte>
+	{
+		protected override void Blend(ref sbyte value1, sbyte value2, float blendFactor)
+		{
+			value1 = (sbyte)Mathf.Lerp(blendFactor, value1, value2).Round();
+		}
+	}
+
 	internal class Color4BlendedAnimator : BlendedAnimator<Color4>
 	{
 		protected override void Blend(ref Color4 value1, Color4 value2, float blendFactor)

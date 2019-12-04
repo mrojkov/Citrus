@@ -5,8 +5,10 @@ namespace Lime
 {
 	public class AnimationEngine
 	{
+		public static bool JumpAffectsRunningMarkerId = false;
+
 		public virtual bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0) { return false; }
-		public virtual void AdvanceAnimation(Animation animation, float delta) { }
+		public virtual void AdvanceAnimation(Animation animation, double delta) { }
 		/// <summary>
 		/// 1. Refreshes animation.EffectiveAnimators;
 		/// 2. Applies each animator at currentTime;
@@ -17,12 +19,13 @@ namespace Lime
 		public virtual void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime) { }
 		public virtual bool AreEffectiveAnimatorsValid(Animation animation) => false;
 		public virtual void BuildEffectiveAnimators(Animation animation) { }
+		public virtual void RaiseStopped(Animation animation) { }
 	}
 
 	public class AnimationEngineDelegate : AnimationEngine
 	{
 		public Func<Animation, string, double, bool> OnRunAnimation;
-		public Action<Animation, float> OnAdvanceAnimation;
+		public Action<Animation, double> OnAdvanceAnimation;
 		public Action<Animation, double, double, bool> OnApplyEffectiveAnimatorsAndBuildTriggersList;
 
 		public override bool TryRunAnimation(Animation animation, string markerId, double animationTimeCorrection = 0)
@@ -30,7 +33,7 @@ namespace Lime
 			return (OnRunAnimation != null) && OnRunAnimation(animation, markerId, animationTimeCorrection);
 		}
 
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			OnAdvanceAnimation?.Invoke(animation, delta);
 		}
@@ -56,14 +59,14 @@ namespace Lime
 				frame = marker.Frame;
 			}
 			// Easings may give huge animationTimeCorrection values, clamp it.
-			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame, 0);
+			animationTimeCorrection = Mathf.Clamp(animationTimeCorrection, -AnimationUtils.SecondsPerFrame + AnimationUtils.Threshold, 0);
 			animation.Time = AnimationUtils.FramesToSeconds(frame) + animationTimeCorrection;
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
 			return true;
 		}
 
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
@@ -74,13 +77,7 @@ namespace Lime
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
-				ProcessMarker(animation, marker);
-				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
-					animation.RaiseStopped();
-				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
-				}
+				ProcessMarker(animation, marker, previousTime, currentTime);
 			}
 		}
 
@@ -97,9 +94,10 @@ namespace Lime
 			return null;
 		}
 
-		protected virtual void ProcessMarker(Animation animation, Marker marker)
+		protected virtual void ProcessMarker(Animation animation, Marker marker, double previousTime, double currentTime)
 		{
 			if ((animation.OwnerNode.TangerineFlags & TangerineFlags.IgnoreMarkers) != 0) {
+				ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: false);
 				return;
 			}
 			switch (marker.Action) {
@@ -108,15 +106,31 @@ namespace Lime
 					if (gotoMarker != null && gotoMarker != marker) {
 						var delta = animation.Time - AnimationUtils.FramesToSeconds(animation.Frame);
 						animation.TimeInternal = gotoMarker.Time;
-						AdvanceAnimation(animation, (float)delta);
+						if (JumpAffectsRunningMarkerId) {
+							animation.RunningMarkerId = gotoMarker.Id;
+						}
+						AdvanceAnimation(animation, delta);
 					}
 					break;
 				case MarkerAction.Stop:
 					animation.TimeInternal = AnimationUtils.FramesToSeconds(marker.Frame);
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
 					animation.IsRunning = false;
+					break;
+				case MarkerAction.Play:
+					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
 					break;
 			}
 			marker.CustomAction?.Invoke();
+		}
+
+		public override void RaiseStopped(Animation animation)
+		{
+			animation.Stopped?.Invoke();
+
+			var savedAction = animation.AssuredStopped;
+			animation.AssuredStopped = null;
+			savedAction?.Invoke();
 		}
 
 		public override void ApplyAnimatorsAndExecuteTriggers(Animation animation, double previousTime, double currentTime, bool executeTriggersAtCurrentTime)
@@ -254,7 +268,7 @@ namespace Lime
 			{
 				unchecked {
 					var r = -511344;
-					r = r * -1521134295 + Animable.GetHashCode();
+					r = r * -1521134295 + Animable?.GetHashCode() ?? 0;
 					r = r * -1521134295 + TargetPropertyPathComparisonCode;
 					return r;
 				}
@@ -339,7 +353,7 @@ namespace Lime
 
 	public class FastForwardAnimationEngine : DefaultAnimationEngine
 	{
-		public override void AdvanceAnimation(Animation animation, float delta)
+		public override void AdvanceAnimation(Animation animation, double delta)
 		{
 			var previousTime = animation.Time;
 			var currentTime = previousTime + delta;
@@ -350,13 +364,7 @@ namespace Lime
 			} else {
 				var marker = animation.MarkerAhead;
 				animation.MarkerAhead = null;
-				ProcessMarker(animation, marker);
-				if (marker.Action == MarkerAction.Stop) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, animation.Time, executeTriggersAtCurrentTime: true);
-					animation.RaiseStopped();
-				} else if (marker.Action == MarkerAction.Play) {
-					ApplyAnimatorsAndExecuteTriggers(animation, previousTime, currentTime, executeTriggersAtCurrentTime: false);
-				}
+				ProcessMarker(animation, marker, previousTime, currentTime);
 			}
 		}
 	}

@@ -116,7 +116,7 @@ namespace Lime
 		public abstract void Clear(ClearOptions options, Color4 color);
 		public abstract void PushState(RenderState mask);
 		public abstract void PopState();
-		
+
 		public void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
 		{
 			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);

@@ -35,7 +35,7 @@ namespace Tangerine.UI.SceneView
 
 		Vector2 CalcTangentKnobPosition(SplinePoint point, int index)
 		{
-			var matrix = (Document.Current.Container as Widget).CalcTransitionToSpaceOf(sv.Scene);
+			var matrix = (Document.Current.Container as Widget).LocalToWorldTransform;
 			var delta = (index == 0 ? -1 : 1) * SplinePointPresenter.TangentWeightRatio * point.TangentWeight * Vector2.CosSin(point.TangentAngle * Mathf.DegToRad);
 			return matrix * (point.TransformedPosition + delta);
 		}
@@ -44,7 +44,7 @@ namespace Tangerine.UI.SceneView
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
-				var matrix = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container as Widget);
+				var matrix = (Document.Current.Container as Widget).LocalToWorldTransform.CalcInversed();
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);

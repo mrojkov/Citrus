@@ -20,11 +20,11 @@ namespace Tangerine.UI.Timeline
 				Layout = new HBoxLayout { DefaultCell = new DefaultLayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
-					CreateResetAnimationsTimes(),
 					CreateAutoKeyframesButton(),
 					CreateFolderButton(),
 					CreateCurveEditorButton(),
 					CreateTimelineCursorLockButton(),
+					CreateSwitchAnimationPositioner(),
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
 					CreateFrameProgressionButton(),
@@ -48,7 +48,6 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.AnimationMode, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.AnimationMode = !CoreUserPreferences.AnimationMode;
 			button.Components.Add(new DocumentationComponent("AnimationMode"));
-			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
 			return button;
 		}
 
@@ -211,12 +210,13 @@ namespace Tangerine.UI.Timeline
 			return button;
 		}
 
-		private ToolbarButton CreateResetAnimationsTimes()
+		private ToolbarButton CreateSwitchAnimationPositioner()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ResetAnimationsTimes")) { Tooltip = "Reset Animations Times" };
-			button.AddChangeWatcher(() => CoreUserPreferences.ResetAnimationsTimes, i => button.Checked = i);
-			button.Clicked += () => CoreUserPreferences.ResetAnimationsTimes = !CoreUserPreferences.ResetAnimationsTimes;
-			button.AddChangeWatcher(() => Document.Current.Animation.IsLegacy, v => button.Visible = v);
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.RockNRoll")) { Tooltip = "Switch animation positioner" };
+			button.AddChangeWatcher(() => CoreUserPreferences.UseBetterAnimationPositioner, i => button.Checked = i);
+			button.Clicked += () => {
+				CoreUserPreferences.UseBetterAnimationPositioner = !CoreUserPreferences.UseBetterAnimationPositioner;
+			};
 			return button;
 		}
 

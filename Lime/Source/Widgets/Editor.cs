@@ -49,6 +49,7 @@ namespace Lime
 			Text.TrimWhitespaces = false;
 			Text.Localizable = false;
 			if (editorParams is EditorParams ep) {
+				displayWidget.Components.Remove(ep.GetType());
 				displayWidget.Components.Add(ep);
 			}
 			EditorParams = editorParams;

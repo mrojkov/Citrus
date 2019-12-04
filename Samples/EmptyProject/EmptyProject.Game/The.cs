@@ -1,4 +1,5 @@
-﻿using EmptyProject.Application;
+using System.Threading;
+using EmptyProject.Application;
 using EmptyProject.Dialogs;
 using Lime;
 
@@ -14,5 +15,7 @@ namespace EmptyProject
 		public static Profile Profile => Profile.Instance;
 		public static DialogManager DialogManager => DialogManager.Instance;
 		public static Logger Log => Logger.Instance;
+		public static Persistence Persistence => persistence.Value;
+		private static readonly ThreadLocal<Persistence> persistence = new ThreadLocal<Persistence>(() => new Persistence());
 	}
 }

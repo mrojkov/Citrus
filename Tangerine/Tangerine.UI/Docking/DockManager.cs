@@ -366,7 +366,7 @@ namespace Tangerine.UI.Docking
 			};
 			Widget rootWidget = tabbedWidget;
 			tabbedWidget.FocusScope = new KeyboardFocusScope(tabbedWidget);
-			tabbedWidget.TabBar.OnReorder += args => placement.Placements.Move(args.IndexFrom, args.IndexTo);
+			tabbedWidget.TabBar.OnReordering += args => placement.Placements.Move(args.IndexFrom, args.IndexTo);
 			if (requestTitle) {
 				rootWidget = WrapWithTitle(tabbedWidget, out var closeButton, out var titleLabel);
 				titleLabel.AddChangeWatcher(

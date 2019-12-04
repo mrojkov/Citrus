@@ -97,7 +97,7 @@ namespace Lime
 
 		public virtual void Add(TComponent component)
 		{
-			if (Contains(component)) {
+			if (Contains(component.GetType())) {
 				throw new InvalidOperationException("Attempt to add a component twice.");
 			}
 			if (buckets.Length == 0) {

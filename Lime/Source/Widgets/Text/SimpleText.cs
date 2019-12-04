@@ -27,6 +27,14 @@ namespace Lime
 		private int gradientMapIndex = -1;
 		private float letterSpacing;
 
+		/// <summary>
+		/// Processes a text assigned to any SimpleText instance.
+		/// </summary>
+		public static event TextProcessorDelegate GlobalTextProcessor;
+
+		/// <summary>
+		/// Processes a text assigned to this SimpleText instance.
+		/// </summary>
 		public event TextProcessorDelegate TextProcessor
 		{
 			add
@@ -75,8 +83,8 @@ namespace Lime
 			{
 				if (displayText != null) return displayText;
 				displayText = Localizable ? Text.Localize() : Text;
-				if (textProcessor != null)
-					textProcessor(ref displayText, this);
+				GlobalTextProcessor?.Invoke(ref displayText, this);
+				textProcessor?.Invoke(ref displayText, this);
 				return displayText;
 			}
 		}
@@ -250,7 +258,7 @@ namespace Lime
 
 		public bool CanDisplay(char ch)
 		{
-			return Font.Chars.Get(ch, fontHeight) != FontChar.Null;
+			return Font.CharSource.Get(ch, fontHeight) != FontChar.Null;
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -404,12 +412,13 @@ namespace Lime
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
 					Renderer.DrawTextLine(
-						Font, pos, line, Color4.White, FontHeight, 0, line.Length, letterSpacing, spriteList, caret.Sync, -1);
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length,
+						font.Spacing + letterSpacing, spriteList, caret.Sync, -1);
 				}
 				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 					if (lastLine) {
-					// There is no end-of-text character, so simulate it.
-					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
+						// There is no end-of-text character, so simulate it.
+						caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
 				}
 				pos.Y += Spacing + FontHeight;
 				caret.NextLine();
@@ -492,12 +501,12 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Font.MeasureTextLine(line, FontHeight, start, count, letterSpacing).X <= ContentWidth;
+			return Font.MeasureTextLine(line, FontHeight, start, count, letterSpacing + font.Spacing).X <= ContentWidth;
 		}
 
 		private Vector2 MeasureTextLine(string line)
 		{
-			return Font.MeasureTextLine(line, FontHeight, letterSpacing);
+			return Font.MeasureTextLine(line, FontHeight, letterSpacing + font.Spacing);
 		}
 
 		private string ClipLineWithEllipsis(string line)

@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 		{
 			var ctr = Document.Current.Container as Widget;
 			if (ctr != null) {
-				var t = ctr.CalcTransitionToSpaceOf(canvas);
+				var t = ctr.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(canvas);
 				if (!Document.Current.PreviewScene) {
 					var helper = SceneView.Instance.Components.Get<CreateBoneHelper>();
 					if (helper != null && helper.HitTip != default(Vector2)) {

@@ -4,17 +4,17 @@ namespace Lime
 	{
 		private LayoutManager layoutManager;
 
-		protected internal override void Start()
+		public override void Start()
 		{
 			layoutManager = Manager.ServiceProvider.RequireService<LayoutManager>();
 		}
 
-		protected internal override void Stop()
+		public override void Stop(NodeManager manager)
 		{
 			layoutManager = null;
 		}
 
-		protected internal override void Update(float delta)
+		public override void Update(float delta)
 		{
 			layoutManager.Layout();
 		}

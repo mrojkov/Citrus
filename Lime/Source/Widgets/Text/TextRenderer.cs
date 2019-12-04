@@ -129,7 +129,7 @@ namespace Lime.Text
 		{
 			var style = Styles[word.Style];
 			Vector2 size = style.Font.MeasureTextLine(
-				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing);
+				texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length, style.LetterSpacing + style.Font.Spacing);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
 		}
 
@@ -201,7 +201,7 @@ namespace Lime.Text
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
 								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, ScaleSize(style.Size),
-								word.Start, word.Length, style.LetterSpacing, spriteLists[word.Style], tag: word.Style
+								word.Start, word.Length, font.Spacing + style.LetterSpacing, spriteLists[word.Style], tag: word.Style
 							);
 						}
 					}
@@ -215,7 +215,7 @@ namespace Lime.Text
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
 							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
-							word.Start, wordLength, style.LetterSpacing, spriteLists[word.Style], tag: word.Style
+							word.Start, wordLength, font.Spacing + style.LetterSpacing, spriteLists[word.Style], tag: word.Style
 						);
 					}
 					c += wordLength;
@@ -233,7 +233,7 @@ namespace Lime.Text
 						k -= 1;
 						var font = Styles[word.Style].Font;
 						var fontHeight = Styles[word.Style].Size;
-						var fontChar = font.Chars.Get(texts[word.TextIndex][word.Start], fontHeight);
+						var fontChar = font.CharSource.Get(texts[word.TextIndex][word.Start], fontHeight);
 						if (fontChar == FontChar.Null) {
 							continue;
 						}
@@ -358,12 +358,12 @@ namespace Lime.Text
 				var style = Styles[word.Style];
 				var font = style.Font;
 				var t = texts[word.TextIndex];
-				float dotsWidth = font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing).X;
+				float dotsWidth = font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing + font.Spacing).X;
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex
 					&& (
 						word.X + font.MeasureTextLine(
-							word.Length > 0 ? t.Substring(word.Start, 1) : string.Empty, ScaleSize(style.Size), style.LetterSpacing).X + dotsWidth > maxWidth
+							word.Length > 0 ? t.Substring(word.Start, 1) : string.Empty, ScaleSize(style.Size), style.LetterSpacing + font.Spacing).X + dotsWidth > maxWidth
 						|| (word.Length == 1 && t[word.Start] == ' ')
 					)
 				) {
@@ -462,7 +462,7 @@ namespace Lime.Text
 			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
-				var w = font.MeasureTextLine(t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing).X + (IsBullet(word) ? style.ImageSize.X : 0);
+				var w = font.MeasureTextLine(t, ScaleSize(style.Size), word.Start, mid, style.LetterSpacing + font.Spacing).X + (IsBullet(word) ? style.ImageSize.X : 0);
 				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
@@ -478,7 +478,7 @@ namespace Lime.Text
 		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
 			var style = Styles[word.Style];
-			float dotsWidth = style.Font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing).X;
+			float dotsWidth = style.Font.MeasureTextLine("...", ScaleSize(style.Size), style.LetterSpacing + style.Font.Spacing).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;
 				word.Width = CalcWordWidth(word);

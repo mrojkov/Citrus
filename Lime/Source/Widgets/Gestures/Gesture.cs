@@ -1,103 +1,91 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 
 namespace Lime
 {
 	public abstract class Gesture
 	{
+		private PollableEvent began;
+		private PollableEvent canceled;
+		private PollableEvent recognized;
+		private PollableEvent ended;
+
+		/// <summary>
+		/// Occurs when gesture recognition began.
+		/// If the owner has other gestures, the began event
+		/// might be deferred to resolve priority of another gestures.
+		/// </summary>
+		public virtual event Action Began
+		{
+			add => began.Handler += value;
+			remove => began.Handler -= value;
+		}
+
+		/// <summary>
+		/// Occurs if the gesture has been canceled.
+		/// </summary>
+		public virtual event Action Canceled
+		{
+			add => canceled.Handler += value;
+			remove => canceled.Handler -= value;
+		}
+
+		/// <summary>
+		/// Occurs when the gesture is fully recognized.
+		/// </summary>
+		public virtual event Action Recognized
+		{
+			add => recognized.Handler += value;
+			remove => recognized.Handler -= value;
+		}
+
+		/// <summary>
+		/// Occurs when gesture is ended.
+		/// </summary>
+		public virtual event Action Ended
+		{
+			add => ended.Handler += value;
+			remove => ended.Handler -= value;
+		}
+
 		public Node Owner { get; internal set; }
+		public abstract bool IsActive { get; }
+
 		protected WindowInput Input => CommonWindow.Current.Input;
 
-		internal protected abstract void Cancel();
-		internal protected abstract void Update(IEnumerable<Gesture> gestures);
+		public Gesture()
+		{ }
 
-		internal protected virtual bool ShouldDeferClicks(int buttonIndex) => false;
+		public Gesture(Action onRecognized)
+		{
+			if (onRecognized != null) {
+				Recognized += onRecognized;
+			}
+		}
+
+		public virtual bool WasBegan() => began.HasOccurred;
+		public virtual bool WasCanceled() => canceled.HasOccurred;
+		public virtual bool WasRecognized() => recognized.HasOccurred;
+		public bool WasRecognizedOrCanceled() => WasCanceled() || WasRecognized();
+		public virtual bool WasEnded() => ended.HasOccurred;
+		protected void RaiseBegan() => began.Raise();
+		protected void RaiseCanceled() => canceled.Raise();
+		protected void RaiseRecognized() => recognized.Raise();
+		protected virtual void RaiseEnded() => ended.Raise();
+		protected internal abstract bool Cancel(Gesture sender);
+		protected internal abstract void Update(float delta);
 
 		protected struct PollableEvent
 		{
-			private int occurredOnIteration;
-
+			private int? occurredOnIteration;
 			public event Action Handler;
-
-			public bool HasOccurred() => occurredOnIteration == WidgetContext.Current.GestureManager.CurrentIteration;
-
+			private int CurrentIteration => WidgetContext.Current.GestureManager.CurrentIteration;
+			public bool HasOccurred => occurredOnIteration == CurrentIteration;
 			public void Raise()
 			{
 				CommonWindow.Current.Invalidate();
-				occurredOnIteration = WidgetContext.Current.GestureManager.CurrentIteration;
+				occurredOnIteration = CurrentIteration;
 				Handler?.Invoke();
 			}
 		}
 	}
-
-	public class GestureList : IList<Gesture>
-	{
-		private readonly List<Gesture> gestures = new List<Gesture>();
-
-		public int Count => gestures.Count;
-		public bool IsReadOnly => false;
-		private Node owner;
-
-		public GestureList(Node owner)
-		{
-			this.owner = owner;
-		}
-
-		public void Add(Gesture item)
-		{
-			if (item.Owner != null) {
-				throw new InvalidOperationException();
-			}
-			item.Owner = owner;
-			gestures.Add(item);
-		}
-
-		public void Clear() => gestures.Clear();
-		public bool Contains (Gesture item) => gestures.Contains(item);
-		public void CopyTo(Gesture [] array, int arrayIndex) => gestures.CopyTo(array, arrayIndex);
-		public List<Gesture>.Enumerator GetEnumerator() => gestures.GetEnumerator();
-
-		IEnumerator<Gesture> IEnumerable<Gesture>.GetEnumerator() => gestures.GetEnumerator();
-		IEnumerator IEnumerable.GetEnumerator() => gestures.GetEnumerator();
-
-		public bool Remove(Gesture item)
-		{
-			if (gestures.Remove(item)) {
-				item.Owner = null;
-				return true;
-			}
-			return false;
-		}
-
-		public int IndexOf(Gesture item) { return gestures.IndexOf(item); }
-
-		public void Insert(int index, Gesture item)
-		{
-			if (item.Owner != null) {
-				throw new InvalidOperationException();
-			}
-			item.Owner = owner;
-			gestures.Insert(index, item);
-		}
-
-		public void RemoveAt(int index)
-		{
-			gestures[index].Owner = null;
-			gestures.RemoveAt(index);
-		}
-
-		public Gesture this[int index]
-		{
-			get { return gestures[index]; }
-			set
-			{
-				gestures[index].Owner = null;
-				gestures[index] = value;
-				value.Owner = owner;
-			}
-		}
-	}
-
 }

@@ -48,7 +48,7 @@ namespace Kumquat
 		private readonly string generatedScenesPath;
 		private readonly string projectName;
 		private readonly Dictionary<string, string> sceneToBundleMap;
-		private readonly Dictionary<string, Node> scenesForProcessing;
+		private readonly List<string> scenesForProcessing;
 		public readonly string SceneCodeTemplate;
 		public readonly string FrameCodeTemplate;
 		public readonly string NodeCodeTemplate;
@@ -68,7 +68,7 @@ namespace Kumquat
 			string projectName,
 			string mainBundleName,
 			Dictionary<string, string> sceneToBundleMap,
-			Dictionary<string, Node> scenesForProcessing,
+			List<string> scenesForProcessing,
 			List<string> allScenes,
 			List<string> modifiedScenes,
 			CodeCookerCache codeCookerCache
@@ -140,28 +140,29 @@ namespace Kumquat
 				externalSceneToOriginalScenePath.Add(Path.ChangeExtension(scenePath, null), scenePath);
 			}
 			var sceneToFrameTree = new List<Tuple<string, ParsedFramesTree>>();
-			foreach (var scene in scenesForProcessing) {
-				var bundleName = sceneToBundleMap[scene.Key];
+			foreach (var scenePath in scenesForProcessing) {
+				var scene = Node.CreateFromAssetBundle(Path.ChangeExtension(scenePath, null));
+				var bundleName = sceneToBundleMap[scenePath];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				if (!Directory.Exists(bundleSourcePath)) {
 					RetryUntilSuccessCreateDirectory(bundleSourcePath);
 				}
-				currentCookingScene = scene.Key;
-				var parsedFramesTree = GenerateParsedFramesTree(scene.Key, scene.Value);
-				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scene.Key, parsedFramesTree));
+				currentCookingScene = scenePath;
+				var parsedFramesTree = GenerateParsedFramesTree(scenePath, scene);
+				sceneToFrameTree.Add(new Tuple<string, ParsedFramesTree>(scenePath, parsedFramesTree));
 			}
 			foreach (var kv in sceneToFrameTree) {
 				var parsedFramesTree = kv.Item2;
 				currentCookingScene = kv.Item1;
 				var k = Path.ChangeExtension(kv.Item1, null);
 				k = AssetPath.CorrectSlashes(k);
-				var id = scenesForProcessing[kv.Item1].Id;
+				var id = parsedFramesTree.ParsedNode.Id;
 				var bundleName = sceneToBundleMap[kv.Item1];
 				var bundleSourcePath = $"{scenesPath}/{bundleName}";
 				var generatedCodePath = bundleSourcePath + "/" + parsedFramesTree.ClassName + ".cs";
 				var useful =
-					parsedFramesTree.ParsedNodes.Count > 0 ||
-					parsedFramesTree.InnerClasses.Count > 0 ||
+					parsedFramesTree.ParsedNodes.Any(node => !node.IsInExternalScene) ||
+					parsedFramesTree.InnerClasses.Any(tree => !tree.IsInExternalScene) ||
 					(id != null && (id.StartsWith("@") || id.StartsWith(">")));
 				if (!useful) {
 					if (File.Exists(generatedCodePath)) {
@@ -495,7 +496,7 @@ namespace Kumquat
 			string name;
 			var filename = Path.GetFileNameWithoutExtension(scenePath);
 			ParseCommonName(filename, out name, out baseClassName);
-			var parsedFramesTree = GenerateParsedFramesTreeHelper(frame, name, baseClassName);
+			var parsedFramesTree = GenerateParsedFramesTreeHelper(frame, name, baseClassName, false);
 			parsedFramesTree.ScenePath = scenePath;
 			return parsedFramesTree;
 		}
@@ -512,14 +513,15 @@ namespace Kumquat
 			referringScenes[externalScene].Add(referringScene);
 		}
 
-		private ParsedFramesTree GenerateParsedFramesTreeHelper(Node node, string name, string baseName)
+		private ParsedFramesTree GenerateParsedFramesTreeHelper(Node node, string name, string baseName, bool isInExternalScene)
 		{
 			var parsedFramesTree = new ParsedFramesTree {
-				ParsedNode = new ParsedNode(node, name),
+				ParsedNode = new ParsedNode(node, name, isInExternalScene),
 				ClassName = name,
 				Name = name,
 				FieldName = "_" + name,
 				BaseClassName = baseName,
+				IsInExternalScene = isInExternalScene,
 			};
 			if (parsedFramesTree.ParsedNode.IsExternalScene) {
 				AddReferringSceneSafe(parsedFramesTree.ParsedNode.ContentsPath, currentCookingScene);
@@ -528,7 +530,6 @@ namespace Kumquat
 				ParseCommonName(Path.GetFileNameWithoutExtension(parsedFramesTree.ParsedNode.ContentsPath), out externalName, out externalBaseName);
 				parsedFramesTree.ClassName = externalName;
 				parsedFramesTree.BaseClassName = externalBaseName;
-
 			}
 			if (!baseName.IsNullOrWhiteSpace()) {
 				if (!commonParts.ContainsKey(baseName)) {
@@ -545,37 +546,42 @@ namespace Kumquat
 				commonPartsScenes[baseName].Add(path.ToString());
 			}
 
-			var nodesToParse = new List<Node>();
+			var nodesToParse = new List<(Node node, bool isInExternalScene)>();
 			if (!parsedFramesTree.ParsedNode.IsExternalScene) {
-				nodesToParse.Add(node);
+				nodesToParse.Add((node, isInExternalScene));
 			}
 
 			while (nodesToParse.Count > 0) {
 				var current = nodesToParse[0];
 				nodesToParse.RemoveAt(0);
 
-				foreach (var n in current.Nodes) {
+				foreach (var n in current.node.Nodes) {
 					if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith(">")) {
 						string nextName;
 						string nextBaseName;
 						ParsedFramesTree innerClass;
 						if (ParseCommonName(n.Id.Substring(1), out nextName, out nextBaseName)) {
-							innerClass = GenerateParsedFramesTreeHelper(n, nextName, nextBaseName);
+							innerClass = GenerateParsedFramesTreeHelper(n, nextName, nextBaseName, current.isInExternalScene);
 						} else {
-							innerClass = GenerateParsedFramesTreeHelper(n, nextName, null);
+							innerClass = GenerateParsedFramesTreeHelper(n, nextName, null, current.isInExternalScene);
 						}
 						parsedFramesTree.InnerClasses.Add(innerClass);
 					} else {
 						ParsedNode parsedNode = null;
 						if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith("@")) {
-							parsedNode = new ParsedNode(n, n.Id.Substring(1));
+							parsedNode = new ParsedNode(
+								n, n.Id.Substring(1),
+								!string.IsNullOrEmpty(current.node.ContentsPath) || current.isInExternalScene
+							);
 							parsedFramesTree.ParsedNodes.Add(parsedNode);
 						}
 						if (parsedNode != null && parsedNode.IsExternalScene) {
 							AddReferringSceneSafe(parsedNode.ContentsPath, currentCookingScene);
 						}
 						if (n.Nodes.Count > 0 && (parsedNode == null || !parsedNode.IsExternalScene)) {
-							nodesToParse.Add(n);
+							nodesToParse.Add((
+								n, !string.IsNullOrEmpty(current.node.ContentsPath) || current.isInExternalScene
+							));
 						}
 					}
 				}

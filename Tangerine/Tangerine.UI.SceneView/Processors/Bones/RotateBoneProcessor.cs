@@ -21,7 +21,7 @@ namespace Tangerine.UI.SceneView
 				var bone = Document.Current.SelectedNodes().Editable().OfType<Bone>().FirstOrDefault();
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
-					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+					var t = Document.Current.Container.AsWidget.LocalToWorldTransform;
 					var hull = BonePresenter.CalcRect(bone) * t;
 					if (hull.Contains(sv.MousePosition) && !sv.Input.IsKeyPressed(Key.Control)) {
 						Utils.ChangeCursorIfDefault(Cursors.Rotate);
@@ -44,7 +44,7 @@ namespace Tangerine.UI.SceneView
 				while (sv.Input.IsMousePressed()) {
 					Document.Current.History.RollbackTransaction();
 
-					var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+					var t = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 					Utils.ChangeCursorIfDefault(Cursors.Rotate);
 					var a = mousePos * t - entry.Joint;
 					var b = sv.MousePosition * t - entry.Joint;

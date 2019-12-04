@@ -24,8 +24,8 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 		{
 			if (widgetsInParentSpace.Count == 0) return;
 
-			Matrix32d fromSceneToParentSpace = widgetsInParentSpace[0].ParentWidget
-				.CalcEffectiveTransformToTopWidgetDouble(sceneWidget).CalcInversed();
+			Matrix32d fromSceneToParentSpace = widgetsInParentSpace[0]
+				.ParentWidget?.CalcLocalToWorldTransformDouble().CalcInversed() ?? Matrix32d.Identity;
 
 			ApplyTransformationToWidgetsGroupObb(
 				widgetsInParentSpace,
@@ -229,15 +229,15 @@ namespace Tangerine.UI.SceneView.WidgetTransforms
 			return localToParentTransform;
 		}
 
-		private static Matrix32d CalcEffectiveTransformToTopWidgetDouble(this Widget widget, Widget untilWidget)
+		private static Matrix32d CalcLocalToWorldTransformDouble(this Widget widget)
 		{
 			// Copy of double-precision code of Widget.RecalcGlobalTransformDouble.
 			Matrix32d localToParentTransform = widget.CalcLocalToParentTransformDouble();
 			var parentWidget = widget.Parent?.AsWidget;
-			if (parentWidget == null || parentWidget == untilWidget) {
+			if (parentWidget == null) {
 				return localToParentTransform;
 			}
-			return localToParentTransform * parentWidget.CalcEffectiveTransformToTopWidgetDouble(untilWidget);
+			return localToParentTransform * parentWidget.CalcLocalToWorldTransformDouble();
 		}
 
 		private static Transform2d ExtractTransform2Double(this Widget widget, Matrix32d localToParentTransform,

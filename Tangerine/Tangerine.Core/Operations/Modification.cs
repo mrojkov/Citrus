@@ -133,6 +133,11 @@ namespace Tangerine.Core.Operations
 			if (animationHost != null) {
 				(propertyData, owner, index) = AnimationUtils.GetPropertyByPath(animationHost, propertyPath);
 			}
+			// Discard further work if the property is not editable and subject for inspection.
+			var tangerineIgnoreIf = PropertyAttributes<TangerineIgnoreIfAttribute>.Get(propertyData.OwnerType, propertyData.Info.Name);
+			if (tangerineIgnoreIf?.Check(owner) ?? false) {
+				return;
+			}
 			if (animationHost is Node && animationHost.Animators.TryFind(propertyPath, out var zeroPoseAnimator, Animation.ZeroPoseId)) {
 				// Force create a property animator if there is a zero pose animator
 				createAnimatorIfNeeded = true;

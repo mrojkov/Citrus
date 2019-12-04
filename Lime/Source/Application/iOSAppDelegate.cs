@@ -35,6 +35,7 @@ namespace Lime
 		public event Action WillTerminateEvent;
 		public event Action Activated;
 		public event Action Deactivated;
+		public event Action LowMemory;
 		// This is a mandatory property. See https://developer.xamarin.com/api/type/MonoTouch.UIKit.UIApplicationDelegate/
 		public override UIWindow Window { get; set; }
 
@@ -75,6 +76,7 @@ namespace Lime
 			lastMemoryWarningTime = DateTime.UtcNow;
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
 			Lime.TexturePool.Instance.DiscardTexturesUnderPressure();
+			LowMemory?.Invoke();
 			System.GC.Collect();
 		}
 

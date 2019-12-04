@@ -140,6 +140,8 @@ namespace Orange
 				System.Environment.NewLine
 			);
 
+			PluginLoader.BeforeBundlesCooking();
+
 			bool skipCodeCooking = The.Workspace.ProjectJson.GetValue<bool>("SkipCodeCooking");
 			if (skipCodeCooking) {
 				requiredCookCode = false;

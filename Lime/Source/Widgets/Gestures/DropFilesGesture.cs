@@ -11,9 +11,10 @@ namespace Lime
 		/// </summary>
 		public event Action<List<string>> Recognized;
 
-		internal protected override void Cancel() { }
+		public override bool IsActive { get; }
+		protected internal override bool Cancel(Gesture sender) => false;
 
-		internal protected override void Update(IEnumerable<Gesture> gestures)
+		internal protected override void Update(float delta)
 		{
 			if (Input.DroppedFiles.Count > 0) {
 				Recognized?.Invoke(Input.DroppedFiles);

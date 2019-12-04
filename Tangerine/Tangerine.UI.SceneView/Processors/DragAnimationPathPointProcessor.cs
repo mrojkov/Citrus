@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 								animator.TargetPropertyPath == nameof(Widget.Position)
 							) {
 								var keys = animator.ReadonlyKeys.ToList();
-								var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(sv.Frame);
+								var transform = node.Parent.AsWidget.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 								foreach (var key in keys) {
 									if ((mousePosition - (Vector2)key.Value * transform).Length < 20) {
 										Utils.ChangeCursorIfDefault(MouseCursor.Hand);
@@ -58,7 +58,7 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Drag(Widget widget, IAnimator animator, IKeyframe key)
 		{
-			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.Parent.AsWidget);
+			var transform = widget.Parent.AsWidget.LocalToWorldTransform.CalcInversed();
 			var initMousePos = sv.MousePosition * transform;
 			using (Document.Current.History.BeginTransaction()) {
 				while (sv.Input.IsMousePressed()) {

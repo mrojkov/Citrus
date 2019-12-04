@@ -47,7 +47,9 @@ namespace Lime
 			get { return string.Empty; }
 		}
 
-		public IFontCharSource Chars
+		public float Spacing { get; }
+
+		public IFontCharSource CharSource
 		{
 			get { return chars; }
 		}
@@ -82,7 +84,7 @@ namespace Lime
 			private FontChar TryGet(char code, float heightHint)
 			{
 				foreach (var font in fonts) {
-					var c = font.Chars.Get(code, heightHint);
+					var c = font.CharSource.Get(code, heightHint);
 					if (c != FontChar.Null) {
 						return c;
 					}
@@ -93,7 +95,7 @@ namespace Lime
 			public bool Contains(char code)
 			{
 				foreach (var font in fonts) {
-					if (font.Chars.Contains(code)) {
+					if (font.CharSource.Contains(code)) {
 						return true;
 					}
 				}
@@ -126,7 +128,9 @@ namespace Lime
 
 		public string About => (font ?? (font = CreateFont())).About;
 
-		public IFontCharSource Chars => (font ?? (font = CreateFont())).Chars;
+		public float Spacing => (font ?? (font = CreateFont())).Spacing;
+
+		public IFontCharSource CharSource => (font ?? (font = CreateFont())).CharSource;
 
 		public bool RoundCoordinates => (font ?? (font = CreateFont())).RoundCoordinates;
 

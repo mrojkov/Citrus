@@ -144,7 +144,7 @@ namespace Lime
 			RefreshFirstChild();
 			node.PropagateDirtyFlags();
 			Node.InvalidateNodeReferenceCache();
-			owner.Manager?.RegisterNode(node);
+			owner.Manager?.RegisterNode(node, owner);
 #if TANGERINE
 			Version++;
 #endif // TANGERINE
@@ -226,7 +226,7 @@ namespace Lime
 			node.Parent = null;
 			node.NextSibling = null;
 			node.PropagateDirtyFlags();
-			owner.Manager?.UnregisterNode(node);
+			owner.Manager?.UnregisterNode(node, owner);
 		}
 
 		public void RemoveRange(int index, int count)
@@ -292,9 +292,8 @@ namespace Lime
 				}
 				RefreshFirstChild();
 				value.PropagateDirtyFlags();
-				value.Manager = owner.Manager;
 				Node.InvalidateNodeReferenceCache();
-				owner.Manager?.RegisterNode(value);
+				owner.Manager?.RegisterNode(value, owner);
 #if TANGERINE
 				Version++;
 #endif // TANGERINE

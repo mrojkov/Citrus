@@ -97,7 +97,7 @@ namespace Lime
 			blending?.SaveWantedState();
 		}
 
-		public void Update(Animation animation, float delta)
+		public void Update(Animation animation, double delta)
 		{
 			blendings.TryGetValue(animation.Id ?? "", out var blending);
 			if (blending == null) {
@@ -114,7 +114,7 @@ namespace Lime
 		{
 			private readonly double duration;
 			private readonly List<NodeState> nodeStates = new List<NodeState>();
-			private float time;
+			private double time;
 
 			public bool HasNodes => nodeStates.Count > 0;
 			public bool WasFinished => time >= duration;
@@ -142,7 +142,7 @@ namespace Lime
 				}
 			}
 
-			public void Update(float delta)
+			public void Update(double delta)
 			{
 				time += delta;
 				if (WasFinished) {

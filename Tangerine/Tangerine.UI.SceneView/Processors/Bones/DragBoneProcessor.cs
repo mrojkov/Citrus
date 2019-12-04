@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 				var bone = Document.Current.SelectedNodes().Editable().OfType<Bone>().FirstOrDefault();
 				if (bone != null) {
 					var entry = bone.Parent.AsWidget.BoneArray[bone.Index];
-					var t = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
+					var t = Document.Current.Container.AsWidget.LocalToWorldTransform;
 					if (sv.HitTestControlPoint(t * entry.Joint, 20)) {
 						Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 						if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
@@ -41,7 +41,7 @@ namespace Tangerine.UI.SceneView
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
-				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var transform = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 				var transformInversed = transform.CalcInversed();
 				int index = 0;
 				var dragDelta = Vector2.Zero;
@@ -97,7 +97,7 @@ namespace Tangerine.UI.SceneView
 		{
 			using (Document.Current.History.BeginTransaction()) {
 				var iniMousePos = sv.MousePosition;
-				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var transform = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 
 				var accumulativeRotationsHelpersByBones = new Dictionary<Bone, AccumulativeRotationHelper>();
 

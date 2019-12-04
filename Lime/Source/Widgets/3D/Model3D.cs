@@ -7,8 +7,7 @@ namespace Lime
 	[TangerineVisualHintGroup("/All/Nodes/3D")]
 	public class Model3D : Node3D
 	{
-		[YuzuAfterDeserialization]
-		public void AfterDeserialization()
+		public override void OnAfterDeserialization()
 		{
 			RebuildSkeleton();
 		}
@@ -23,7 +22,7 @@ namespace Lime
 			}
 		}
 
-		public override void LoadExternalScenes(InternalPersistence persistence = null)
+		public override void LoadExternalScenes(InternalPersistence persistence = null, bool isExternalRoot = true)
 		{
 			base.LoadExternalScenes(persistence);
 			persistence = persistence ?? InternalPersistence.Instance;

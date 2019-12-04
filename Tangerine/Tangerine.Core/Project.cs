@@ -174,12 +174,12 @@ namespace Tangerine.Core
 			}
 			var modifiedDocuments = documents.Where(d => d.IsModified).ToList();
 			foreach (var d in modifiedDocuments) {
+				// Call Document.Close() instead of CloseDocument, since latter invokes Document.SetCurrent() and forces document loading.
+				// All this stuff for the sake of performance.
 				if (!d.Close()) {
 					return false;
 				}
 			}
-			FileSystemWatcher?.Dispose();
-			FileSystemWatcher = null;
 			UserPreferences.Documents.Clear();
 			foreach (var d in documents) {
 				UserPreferences.Documents.Add(d.Path);
@@ -199,6 +199,8 @@ namespace Tangerine.Core
 				TangerinePersistence.Instance.WriteObjectToFile(UserprefsPath, UserPreferences, Persistence.Format.Json);
 			} catch (System.Exception) { }
 			AssetBundle.Current = null;
+			FileSystemWatcher?.Dispose();
+			FileSystemWatcher = null;
 			Current = Null;
 			return true;
 		}

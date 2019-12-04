@@ -17,7 +17,7 @@ namespace Lime
 		/// <param name="fontData">Font file data.</param>
 		public DynamicFont(byte[] fontData)
 		{
-			Chars = new DynamicFontCharSource(fontData);
+			CharSource = new DynamicFontCharSource(fontData);
 		}
 
 		/// <summary>
@@ -38,12 +38,17 @@ namespace Lime
 			get { return string.Empty; }
 		}
 
+		public float Spacing
+		{
+			get;
+		}
+
 		/// <summary>
 		/// Collection of <see cref="FontChar"/> available in this font.
 		/// <see cref="DynamicFont"/> implements <see cref="DynamicFontCharSource"/>.
 		/// </summary>
 		[CLSCompliant(false)]
-		public IFontCharSource Chars
+		public IFontCharSource CharSource
 		{
 			get; private set;
 		}
@@ -53,15 +58,15 @@ namespace Lime
 		/// </summary>
 		public void ClearCache()
 		{
-			(Chars as DynamicFontCharSource).ClearCache();
+			(CharSource as DynamicFontCharSource).ClearCache();
 		}
 
 		public bool RoundCoordinates { get; set; } = true;
 
 		public void Dispose()
 		{
-			if (Chars != null) {
-				Chars.Dispose();
+			if (CharSource != null) {
+				CharSource.Dispose();
 			}
 		}
 

@@ -49,6 +49,7 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(double), c => new DoublePropertyEditor(c));
 			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
 			AddEditor(typeof(int), c => new IntPropertyEditor(c));
+			AddEditor(typeof(sbyte), c => new SBytePropertyEditor(c));
 			AddEditor(typeof(Color4), c => new Color4PropertyEditor(c));
 			AddEditor(typeof(ColorGradient), c => new ColorGradientPropertyEditor(c));
 			AddEditor(typeof(Anchors), c => new AnchorsPropertyEditor(c));

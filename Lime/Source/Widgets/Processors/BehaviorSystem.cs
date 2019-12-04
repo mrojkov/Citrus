@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Lime
 {
-	internal class BehaviorSystem
+	public class BehaviorSystem
 	{
 		private Dictionary<Type, BehaviorUpdateStage> updateStages = new Dictionary<Type, BehaviorUpdateStage>();
 		private Dictionary<Type, BehaviorUpdateFamily> updateFamilies = new Dictionary<Type, BehaviorUpdateFamily>();
@@ -13,10 +13,15 @@ namespace Lime
 		public BehaviorUpdateStage GetUpdateStage(Type stageType)
 		{
 			if (!updateStages.TryGetValue(stageType, out var stage)) {
-				stage = new BehaviorUpdateStage(stageType);
+				stage = new BehaviorUpdateStage(this, stageType);
 				updateStages.Add(stageType, stage);
 			}
 			return stage;
+		}
+
+		public bool HasStartPendingBehaviors()
+		{
+			return behaviorsToStart.Count > 0;
 		}
 
 		public void StartPendingBehaviors()
@@ -31,12 +36,12 @@ namespace Lime
 			}
 		}
 
-		public void Add(BehaviorComponent behavior)
+		internal void Add(BehaviorComponent behavior)
 		{
 			behavior.StartQueueNode = behaviorsToStart.AddLast(behavior);
 		}
 
-		public void Remove(BehaviorComponent behavior, Node owner)
+		internal void Remove(BehaviorComponent behavior, Node owner)
 		{
 			if (behavior.StartQueueNode != null) {
 				behaviorsToStart.Remove(behavior.StartQueueNode);
@@ -48,7 +53,7 @@ namespace Lime
 			}
 		}
 
-		public void OnOwnerFrozenChanged(BehaviorComponent behavior)
+		internal void OnOwnerFrozenChanged(BehaviorComponent behavior)
 		{
 			if (behavior.StartQueueNode == null) {
 				behavior.UpdateFamily?.Filter(behavior);
@@ -61,25 +66,25 @@ namespace Lime
 			if (updateFamilies.TryGetValue(behaviorType, out var updateFamily)) {
 				return updateFamily;
 			}
-			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>();
+			var updateStageAttr = behaviorType.GetCustomAttribute<UpdateStageAttribute>(inherit: true);
 			if (updateStageAttr == null) {
 				return null;
 			}
 			var updateStage = GetUpdateStage(updateStageAttr.StageType);
-			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute));
+			var updateFrozen = behaviorType.IsDefined(typeof(UpdateFrozenAttribute), inherit: true);
 			updateFamily = updateStage.CreateFamily(behaviorType, updateFrozen);
 			updateFamilies.Add(behaviorType, updateFamily);
-			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>()) {
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateAfterBehaviorAttribute>(inherit: true)) {
 				updateStage.AddDependency(GetUpdateFamily(i.BehaviorType), updateFamily);
 			}
-			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>()) {
+			foreach (var i in behaviorType.GetCustomAttributes<UpdateBeforeBehaviorAttribute>(inherit: true)) {
 				updateStage.AddDependency(updateFamily, GetUpdateFamily(i.BehaviorType));
 			}
 			return updateFamily;
 		}
 	}
 
-	internal class BehaviorUpdateStage
+	public class BehaviorUpdateStage
 	{
 		private Dictionary<BehaviorUpdateFamily, int> familyIndexMap = new Dictionary<BehaviorUpdateFamily, int>();
 		private List<BehaviorUpdateFamily> families = new List<BehaviorUpdateFamily>();
@@ -87,10 +92,12 @@ namespace Lime
 		private List<BehaviorUpdateFamily> sortedFamilies = new List<BehaviorUpdateFamily>();
 		private bool shouldSortFamilies;
 
+		public readonly BehaviorSystem BehaviorSystem;
 		public readonly Type StageType;
 
-		public BehaviorUpdateStage(Type stageType)
+		internal BehaviorUpdateStage(BehaviorSystem behaviorSystem, Type stageType)
 		{
+			BehaviorSystem = behaviorSystem;
 			StageType = stageType;
 		}
 
@@ -194,21 +201,40 @@ namespace Lime
 			}
 		}
 
+		private bool forward;
+
 		public void Update(float delta)
 		{
-			for (var i = behaviors.Count - 1; i >= 0; i--) {
-				var b = behaviors[i];
-				if (b != null) {
-					b.Update(delta * b.Owner.EffectiveAnimationSpeed);
-				} else {
-					b = behaviors[behaviors.Count - 1];
-					if (b != null) {
-						b.IndexInUpdateFamily = i;
+			if (forward) {
+				var count = behaviors.Count;
+				var i = 0;
+				while (count-- > 0) {
+					if (UpdateBehavior(i, delta)) {
+						i++;
 					}
-					behaviors[i] = b;
-					behaviors.RemoveAt(behaviors.Count - 1);
+				}
+			} else {
+				for (var i = behaviors.Count - 1; i >= 0; i--) {
+					UpdateBehavior(i, delta);
 				}
 			}
+			forward = !forward;
+		}
+
+		private bool UpdateBehavior(int index, float delta)
+		{
+			var b = behaviors[index];
+			if (b != null) {
+				b.Update(delta * b.Owner.EffectiveAnimationSpeed);
+				return true;
+			}
+			b = behaviors[behaviors.Count - 1];
+			if (b != null) {
+				b.IndexInUpdateFamily = index;
+			}
+			behaviors[index] = b;
+			behaviors.RemoveAt(behaviors.Count - 1);
+			return false;
 		}
 	}
 }

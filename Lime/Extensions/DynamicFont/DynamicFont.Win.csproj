@@ -107,10 +107,20 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FontGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CharCache.cs" />
     <Compile Include="DynamicFont.cs" />
     <Compile Include="FontRenderer.cs" />
+    <Compile Include="SdfConverter.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Buffer.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Direction.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Font.cs" />
+    <Compile Include="SharpFont.HarfBuzz\GlyphInfo.cs" />
+    <Compile Include="SharpFont.HarfBuzz\GlyphPosition.cs" />
+    <Compile Include="SharpFont.HarfBuzz\HB.cs" />
+    <Compile Include="SharpFont.HarfBuzz\HB.Internal.cs" />
+    <Compile Include="SharpFont.HarfBuzz\Script.cs" />
     <Compile Include="SharpFont\AutoHinterScript.cs" />
     <Compile Include="SharpFont\BBox.cs" />
     <Compile Include="SharpFont\Bdf\Internal\PropertyRec.cs" />
@@ -283,24 +293,81 @@
     <Compile Include="SharpFont\TrueType\SfntName.cs" />
     <Compile Include="SharpFont\TrueType\SfntTag.cs" />
     <Compile Include="SharpFont\TrueType\VertHeader.cs" />
+    <Compile Include="TftConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Yuzu\Yuzu.Win.csproj">
+      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
+      <Name>Yuzu.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\3rdParty\FreeType\freetype6.dll">
-      <Link>freetype6.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Folder Include="SharpFont\Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="SharpFont\Properties\" />
+    <Content Include="..\..\..\3rdParty\FreeType\libfreetype-6.dll">
+      <Link>libfreetype-6.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libcairo-2.dll">
+      <Link>libcairo-2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libglib-2.0-0.dll">
+      <Link>libglib-2.0-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libharfbuzz-0.dll">
+      <Link>libharfbuzz-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libharfbuzz-subset-0.dll">
+      <Link>libharfbuzz-subset-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libpcre-1.dll">
+      <Link>libpcre-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libwinpthread-1.dll">
+      <Link>libwinpthread-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\zlib1.dll">
+      <Link>zlib1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libbz2-1.dll">
+      <Link>libbz2-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libgcc_s_sjlj-1.dll">
+      <Link>libgcc_s_sjlj-1.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libintl-8.dll">
+      <Link>libintl-8.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libpixman-1-0.dll">
+      <Link>libpixman-1-0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\libpng16-16.dll">
+      <Link>libpng16-16.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\3rdParty\HarfBuzz\Win32\iconv.dll">
+      <Link>iconv.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -146,5 +146,15 @@ namespace Lime
 			}
 			return aabb;
 		}
+
+		public Quadrangle Transform(Matrix32 matrix)
+		{
+			return new Quadrangle {
+				V1 = matrix.TransformVector(V1),
+				V2 = matrix.TransformVector(V2),
+				V3 = matrix.TransformVector(V3),
+				V4 = matrix.TransformVector(V4)
+			};
+		}
 	}
 }

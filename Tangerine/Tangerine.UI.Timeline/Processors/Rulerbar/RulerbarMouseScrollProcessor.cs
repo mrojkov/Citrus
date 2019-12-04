@@ -4,6 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 using Tangerine.Core.Operations;
+using Tangerine.UI.Docking;
 using Tangerine.UI.Timeline.Operations;
 
 namespace Tangerine.UI.Timeline
@@ -23,7 +24,12 @@ namespace Tangerine.UI.Timeline
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCurrentColumn = CalcColumn(rulerWidget.LocalMousePosition().X);
 						Document.Current.AnimationFrame = initialCurrentColumn;
+						var saved = CoreUserPreferences.Instance.StopAnimationOnCurrentFrame;
+						// Dirty hack: prevent creating RestoreAnimationsTimesComponent
+						// in order to stop running animation on clicked frame (RBT-2887)
+						CoreUserPreferences.Instance.StopAnimationOnCurrentFrame = true;
 						SetCurrentColumn.Perform(initialCurrentColumn);
+						CoreUserPreferences.Instance.StopAnimationOnCurrentFrame = saved;
 						int previousColumn = -1;
 						var marker = Document.Current.Animation.Markers.GetByFrame(initialCurrentColumn);
 						bool isShifting = false;
@@ -61,13 +67,10 @@ namespace Tangerine.UI.Timeline
 							}
 							// Evgenii Polikutin: we need operation to backup the value we need, not the previous one
 							Document.Current.AnimationFrame = initialCurrentColumn;
-							SetCurrentColumn.Perform(CalcColumn(mp));
+							SetCurrentColumn.Perform(newColumn);
 							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCurrentColumn;
-							if (newColumn == initialCurrentColumn && previousColumn != initialCurrentColumn) {
-								Document.Current.ForceAnimationUpdate();
-							}
 							previousColumn = newColumn;
-							Window.Current.Invalidate();
+							DockHierarchy.Instance.InvalidateWindows();
 							yield return null;
 						}
 						Document.Current.History.CommitTransaction();

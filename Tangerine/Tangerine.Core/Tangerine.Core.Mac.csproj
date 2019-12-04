@@ -59,6 +59,9 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
+    <Compile Include="AnimationPositioner\BetterAnimationPositioner.cs" />
+    <Compile Include="AnimationPositioner\CompatibilityAnimationPositioner.cs" />
+    <Compile Include="AnimationPositioner\IAnimationPositioner.cs" />
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="Commands\OrangeCommands.cs" />
     <Compile Include="GridSelection.cs" />

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -161,6 +161,7 @@
     <Compile Include="Source\Actions\CookMainBundle.cs" />
     <Compile Include="Source\Actions\DeleteUnpackedBundles.cs" />
     <Compile Include="Source\Actions\GenerateDeserializers.cs" />
+    <Compile Include="Source\Actions\InvalidateFonts.cs" />
     <Compile Include="Source\Actions\NewProject.cs" />
     <Compile Include="Source\Actions\OptimizePNG.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Source\CitrusVersion.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\EnvironmentType.cs" />
     <Compile Include="Source\Git.cs" />
     <Compile Include="Source\MenuController.cs" />
     <Compile Include="Source\ModelImport\FbxImporter\Attributes\FbxCameraAttribute.cs" />
@@ -295,6 +297,10 @@
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
       <Name>Lemon.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Win.csproj">
+      <Project>{fe8512bc-7a55-425c-8bc1-ad4d9785cf12}</Project>
+      <Name>DynamicFont.Win</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
       <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>

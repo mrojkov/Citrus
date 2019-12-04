@@ -38,7 +38,7 @@ namespace Lime
 			set
 			{
 				volume = value;
-				sound.Volume = volume;
+				sound.Volume = volume * auxiliaryVolume;
 			}
 		}
 
@@ -86,21 +86,33 @@ namespace Lime
 		[TangerineKeyframeColor(27)]
 		public bool Continuous { get; set; }
 
+		private float auxiliaryVolume = 1f;
+
+		public float AuxiliaryVolume
+		{
+			get => auxiliaryVolume;
+			set
+			{
+				auxiliaryVolume = value;
+				sound.Volume = volume * auxiliaryVolume;
+			}
+		}
+
 		public Audio()
 		{
 			RenderChainBuilder = null;
 			Priority = 0.5f;
 		}
 
-		public void Play()
+		public virtual void Play()
 		{
 			if (Sample != null) {
-				sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
+				sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume * AuxiliaryVolume, Pan, Pitch);
 				sound.StopChecker = ShouldStop;
 			}
 		}
 
-		public void Stop()
+		public virtual void Stop()
 		{
 			sound.Stop(FadeTime);
 		}

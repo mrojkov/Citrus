@@ -47,7 +47,7 @@ namespace Tangerine.UI.SceneView
 								continue;
 							}
 							points.Clear();
-							var transform = node.Parent.AsWidget.CalcTransitionToSpaceOf(canvas);
+							var transform = node.Parent.AsWidget.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(canvas);
 							if (node is Widget) {
 								for (int i = 0; i < keys.Count; ++i) {
 									points.Add((Vector2)keys[i].Value * transform);

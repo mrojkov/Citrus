@@ -47,8 +47,9 @@ namespace Tangerine.UI.SceneView
 						if (node.Parent.AsNode3D != null) {
 							worldTransform = node.Parent.AsNode3D.GlobalTransform;
 						}
-						var viewportToSceneFrame = viewport.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
-						SceneView.Instance.Frame.PrepareRendererState();
+						var sv = SceneView.Instance;
+						var viewportToSceneFrame = viewport.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
+						sv.Frame.PrepareRendererState();
 						for (int i = 0; i < points.Count - 1; ++i) {
 							Approximate(i, i + 1, keys[i].Function, 10);
 							var start = (Vector2)viewport.WorldToViewportPoint(approximation[0] * worldTransform) * viewportToSceneFrame;

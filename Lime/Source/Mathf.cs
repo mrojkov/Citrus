@@ -11,9 +11,10 @@ namespace Lime
 
 		public const float ZeroTolerance = 1e-6f; // Value a 8x higher than 1.19209290E-07F
 
-		public const float Pi = 3.141592653f;
-		public const float TwoPi = 2 * 3.141592653f;
-		public const float HalfPi = 3.141592653f / 2;
+		public const float E = (float)Math.E;
+		public const float Pi = (float)Math.PI;
+		public const float TwoPi = 2 * Pi;
+		public const float HalfPi = Pi / 2;
 		public const float DegToRad = Pi / 180;
 		public const float RadToDeg = 180 / Pi;
 
@@ -73,6 +74,9 @@ namespace Lime
 		public static float Sqrt(float x) => MathF.Sqrt(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Exp(float x) => MathF.Exp(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Log(float x) => MathF.Log(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,11 +104,36 @@ namespace Lime
 		public static float Sqrt(float x) => (float)Math.Sqrt(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static float Exp(float x) => (float)Math.Exp(x);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Log(float x) => (float)Math.Log(x);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Pow(float x, float y) => (float)Math.Pow(x, y);
 #endif
+		/// <summary>
+		/// Gauss error function. The maximum error is below 1.5 × 10-7.
+		/// </summary>
+		public static double Erf(double x)
+		{
+			// https://en.wikipedia.org/wiki/Error_function
+			// https://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
+			// formula 7.1.26 from A&S (https://amzn.to/2ES26NK).
+			const double a1 = 0.254829592;
+			const double a2 = -0.284496736;
+			const double a3 = 1.421413741;
+			const double a4 = -1.453152027;
+			const double a5 = 1.061405429;
+			const double p = 0.3275911;
+			var sign = Math.Sign(x);
+			x = Math.Abs(x);
+			var t = 1.0 / (1.0 + p * x);
+			var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
+			return sign * y;
+		}
+
+		public static float Erf(float x) => (float)Erf((double)x);
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
@@ -227,6 +256,16 @@ namespace Lime
 		public static T RandomOf<T>(this System.Random rng, params T[] objects) => objects[rng.RandomInt(objects.Length)];
 
 		public static T RandomOf<T>(params T[] objects) => RandomGenerator.RandomOf(objects);
+
+		public static T RandomOf<T>(this System.Random rng, ICollection<T> objects)
+		{
+			return objects.ElementAt(rng.Next(objects.Count));
+		}
+
+		public static T RandomItem<T>(this ICollection<T> objects)
+		{
+			return RandomOf(RandomGenerator, objects);
+		}
 
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng = null)
 		{

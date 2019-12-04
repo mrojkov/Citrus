@@ -28,7 +28,7 @@ namespace Tangerine.UI
 		{
 			if (Parser.TryParse(text, out double newValue)) {
 				SetProperty((int)newValue);
-				editor.Text = ((int) newValue).ToString();
+				editor.Text = ((int)newValue).ToString();
 			} else {
 				editor.Text = current.IsDefined ? current.Value.ToString() : ManyValuesText;
 			}

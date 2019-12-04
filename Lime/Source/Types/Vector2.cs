@@ -64,6 +64,11 @@ namespace Lime
 		public static readonly Vector2 NegativeInfinity = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
 
 		/// <summary>
+		/// Returns a vector with components NaN, NaN.
+		/// </summary>
+		public static readonly Vector2 NaN = new Vector2(float.NaN, float.NaN);
+
+		/// <summary>
 		/// Returns a vector with components 0, -1.
 		/// </summary>
 		public static readonly Vector2 Up = new Vector2(0, -1);

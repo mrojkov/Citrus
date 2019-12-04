@@ -31,7 +31,7 @@ namespace Tangerine.UI.SceneView
 					.Except(Document.Current.SelectedNodes().OfType<Frame>());
 				Quadrangle hull;
 				foreach (var frame in frames) {
-					hull = frame.CalcHullInSpaceOf(canvas);
+					hull = frame.CalcHull().Transform(sv.CalcTransitionFromSceneSpace(canvas));
 					for (var i = 0; i < 4; i++) {
 						var a = hull[i];
 						var b = hull[(i + 1) % 4];

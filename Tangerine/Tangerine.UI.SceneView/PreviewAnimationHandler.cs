@@ -5,16 +5,9 @@ namespace Tangerine.UI.SceneView
 {
 	public class PreviewAnimationHandler : DocumentCommandHandler
 	{
-		private readonly bool triggerMarkersBeforeCurrentFrame;
-
-		public PreviewAnimationHandler(bool triggerMarkersBeforeCurrentFrame)
-		{
-			this.triggerMarkersBeforeCurrentFrame = triggerMarkersBeforeCurrentFrame;
-		}
-
 		public override void ExecuteTransaction()
 		{
-			Document.Current.TogglePreviewAnimation(triggerMarkersBeforeCurrentFrame);
+			Document.Current.TogglePreviewAnimation();
 		}
 	}
 }

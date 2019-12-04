@@ -88,9 +88,19 @@ namespace Orange
 		{
 			var config = WorkspaceConfig.Load();
 			var citrusDirectory = Toolbox.CalcCitrusDirectory();
-			var citprojFiles = (new DirectoryInfo(Path.Combine(citrusDirectory, ".."))).EnumerateFiles("*.citproj");
-			if (citprojFiles.Any()) {
-				config.CitrusProject = citprojFiles.First().FullName;
+			{
+				// heuristic behavior: always try to go up and search for a citproj file
+				// if found, ignore the one saved in app data, since we're opening citrus directory
+				// related to found game project as a submodule
+				var directoryInfo = (new DirectoryInfo(citrusDirectory)).Parent;
+				while (directoryInfo != null) {
+					var citprojFiles = directoryInfo.EnumerateFiles("*.citproj");
+					if (citprojFiles.Any()) {
+						config.CitrusProject = citprojFiles.First().FullName;
+						break;
+					}
+					directoryInfo = directoryInfo.Parent;
+				}
 			}
 			Open(config.CitrusProject);
 			The.UI.LoadFromWorkspaceConfig(config);

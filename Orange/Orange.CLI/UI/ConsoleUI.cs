@@ -146,6 +146,11 @@ namespace Orange
 			throw new System.ArgumentException($"target with name \"{specifiedTarget}\" not found. Valid targets are: {validTargetsText}", "--target");
 		}
 
+		public override EnvironmentType GetEnvironmentType()
+		{
+			return EnvironmentType.Orange;
+		}
+
 		public override void ScrollLogToEnd()
 		{
 		}

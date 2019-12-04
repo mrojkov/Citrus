@@ -4,19 +4,19 @@ namespace Lime
 	{
 		private WidgetContext widgetContext;
 
-		protected internal override void Start()
+		public override void Start()
 		{
 			widgetContext = Manager.ServiceProvider.RequireService<WidgetContext>();
 		}
 
-		protected internal override void Stop()
+		public override void Stop(NodeManager manager)
 		{
 			widgetContext = null;
 		}
 
-		protected internal override void Update(float delta)
+		public override void Update(float delta)
 		{
-			widgetContext.GestureManager.Process();
+			widgetContext.GestureManager.Update(delta);
 		}
 	}
 }

@@ -4,29 +4,29 @@ namespace Lime
 {
 	public class BehaviorUpdateProcessor : NodeProcessor
 	{
-		private Type updateStageType;
+		public readonly Type UpdateStageType;
 
 		private BehaviorSystem behaviorSystem;
 		private BehaviorUpdateStage updateStage;
 
 		public BehaviorUpdateProcessor(Type updateStageType)
 		{
-			this.updateStageType = updateStageType;
+			UpdateStageType = updateStageType;
 		}
 
-		protected internal override void Start()
+		public override void Start()
 		{
 			behaviorSystem = Manager.ServiceProvider.RequireService<BehaviorSystem>();
-			updateStage = behaviorSystem.GetUpdateStage(updateStageType);
+			updateStage = behaviorSystem.GetUpdateStage(UpdateStageType);
 		}
 
-		protected internal override void Stop()
+		public override void Stop(NodeManager manager)
 		{
 			updateStage = null;
 			behaviorSystem = null;
 		}
 
-		protected internal override void Update(float delta)
+		public override void Update(float delta)
 		{
 			behaviorSystem.StartPendingBehaviors();
 			updateStage.Update(delta);

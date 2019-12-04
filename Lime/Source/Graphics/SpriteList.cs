@@ -180,7 +180,8 @@ namespace Lime
 
 			public Vector2 Size(float fontHeight)
 			{
-				return new Vector2(fontHeight / FontChar.Height * FontChar.Width, fontHeight);
+				var scale = fontHeight / FontChar.Height;
+				return new Vector2( scale * FontChar.PaddedWidth, fontHeight + scale * (2 * FontChar.Padding - FontChar.VerticalOffset));
 			}
 		}
 

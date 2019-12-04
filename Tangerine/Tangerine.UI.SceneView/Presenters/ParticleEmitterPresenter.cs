@@ -12,12 +12,13 @@ namespace Tangerine.UI.SceneView
 			if (Document.Current.PreviewScene) {
 				return;
 			}
-			SceneView.Instance.Frame.PrepareRendererState();
+			var sv = SceneView.Instance;
+			sv.Frame.PrepareRendererState();
 			if (emitter.Shape == EmitterShape.Custom && Document.Current.Container == emitter) {
 				emitter.DrawCustomShape(
 					ColorTheme.Current.SceneView.EmitterCustomShape,
 					ColorTheme.Current.SceneView.EmitterCustomShapeLine,
-					emitter.CalcTransitionToSpaceOf(SceneView.Instance.Frame));
+					emitter.LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame));
 			}
 		}
 	}

@@ -384,6 +384,12 @@ namespace Tangerine.UI.Timeline
 			var dg = new DragGesture(0);
 			dg.Recognized += () => {
 				var row = RowUnderMouse(dg.MousePressPosition);
+				// Have to turn off PreviewAnimation manually in order
+				// to provide the same behaviour whether widget is selected or not
+				// (PreviewAnimation is turned off when performing operation)
+				if (Document.Current.PreviewAnimation) {
+					Document.Current.TogglePreviewAnimation();
+				}
 				if (!row?.Selected ?? false) {
 					Document.Current.History.DoTransaction(() => {
 						ClearRowSelection.Perform();

@@ -403,6 +403,11 @@ namespace Orange
 			return platformPicker.SelectedTarget;
 		}
 
+		public override EnvironmentType GetEnvironmentType()
+		{
+			return EnvironmentType.Orange;
+		}
+
 		public override IPluginUIBuilder GetPluginUIBuilder()
 		{
 			return new PluginUIBuidler();

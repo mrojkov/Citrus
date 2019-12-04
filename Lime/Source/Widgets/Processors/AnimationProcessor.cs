@@ -22,15 +22,18 @@ namespace Lime
 			freeQueueNodes.Push(node);
 		}
 
-		protected override void Add(AnimationComponent component)
+		protected override void Add(AnimationComponent component, Node owner)
 		{
-			component.Processor = this;
-			component.Depth = GetNodeDepth(component.Owner);
+			component.AnimationAdded += OnAnimationAdded;
+			component.AnimationRemoved += OnAnimationRemoved;
+			component.AnimationRun += OnAnimationRun;
+			component.AnimationStopped += OnAnimationStopped;
+			component.Depth = GetNodeDepth(owner);
 			if (component.Depth >= currQueue.BucketCount) {
 				BucketQueue<Animation>.Resize(ref currQueue, component.Depth + 1);
 				BucketQueue<Animation>.Resize(ref nextQueue, component.Depth + 1);
 			}
-			if (component.Owner.GloballyFrozen) {
+			if (owner.GloballyFrozen) {
 				return;
 			}
 			foreach (var a in component.Animations) {
@@ -42,28 +45,43 @@ namespace Lime
 
 		protected override void Remove(AnimationComponent component, Node owner)
 		{
-			component.Processor = null;
+			component.AnimationAdded -= OnAnimationAdded;
+			component.AnimationRemoved -= OnAnimationRemoved;
+			component.AnimationRun -= OnAnimationRun;
+			component.AnimationStopped -= OnAnimationStopped;
 			component.Depth = -1;
 			foreach (var a in component.Animations) {
 				Deactivate(a);
 			}
 		}
 
-		internal void OnAnimationRun(Animation animation)
+		internal void OnAnimationAdded(AnimationComponent component, Animation animation)
+		{
+			if (animation.IsRunning) {
+				OnAnimationRun(component, animation);
+			}
+		}
+
+		internal void OnAnimationRemoved(AnimationComponent component, Animation animation)
+		{
+			OnAnimationStopped(component, animation);
+		}
+
+		internal void OnAnimationRun(AnimationComponent component, Animation animation)
 		{
 			if (!animation.OwnerNode.GloballyFrozen) {
 				Activate(animation);
 			}
 		}
 
-		internal void OnAnimationStopped(Animation animation)
+		internal void OnAnimationStopped(AnimationComponent component, Animation animation)
 		{
 			Deactivate(animation);
 		}
 
-		protected override void OnOwnerFrozenChanged(AnimationComponent component)
+		protected override void OnOwnerFrozenChanged(AnimationComponent component, Node owner)
 		{
-			if (component.Owner.GloballyFrozen) {
+			if (owner.GloballyFrozen) {
 				foreach (var a in component.Animations) {
 					Deactivate(a);
 				}
@@ -94,7 +112,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void Update(float delta)
+		public override void Update(float delta)
 		{
 			while (currQueue.Count > 0) {
 				var animation = currQueue.Dequeue().Value;

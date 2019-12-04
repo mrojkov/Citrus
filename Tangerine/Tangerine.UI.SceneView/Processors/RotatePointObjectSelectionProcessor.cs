@@ -19,10 +19,9 @@ namespace Tangerine.UI.SceneView
 				}
 				var selectedPointObjects = Document.Current.SelectedNodes().Editable().OfType<PointObject>().ToList();
 				if (selectedPointObjects.Count() > 1) {
-					Rectangle aabb;
-					Utils.CalcAABB(selectedPointObjects, Document.Current.Container.AsWidget, out aabb);
-					var hull = aabb.ToQuadrangle();
-					var expandedBoundsInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv.Frame) *
+					Utils.CalcHullAndPivot(selectedPointObjects, out var hull, out _);
+					hull = hull.Transform(Document.Current.Container.AsWidget.LocalToWorldTransform);
+					var expandedBoundsInSceneCoords = PointObjectsPresenter.ExpandAndTranslateToSpaceOf(hull, Document.Current.Container.AsWidget, sv) *
 						sv.Frame.CalcTransitionToSpaceOf(sv.Scene);
 					for (var i = 0; i < 4; i++) {
 						if (sv.HitTestControlPoint(expandedBoundsInSceneCoords[i])) {
@@ -40,7 +39,7 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Rotate(Quadrangle hull, List<PointObject> points)
 		{
 			using (Document.Current.History.BeginTransaction()) {
-				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var t = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 				hull *= Matrix32.Scaling(Vector2.One/ Document.Current.Container.AsWidget.Size);
 				var center = (hull.V1 + hull.V3) / 2;
 				var size = Document.Current.Container.AsWidget.Size;

@@ -44,8 +44,7 @@ namespace Tangerine.UI.SceneView
 
 		public static void RegisterGlobalCommands()
 		{
-			ConnectCommand(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler(false));
-			ConnectCommand(SceneViewCommands.PreviewAnimationWithTriggeringOfMarkers, new PreviewAnimationHandler(true));
+			ConnectCommand(SceneViewCommands.PreviewAnimation, new PreviewAnimationHandler());
 			ConnectCommand(SceneViewCommands.ResolutionChanger, new ResolutionChangerHandler());
 			ConnectCommand(SceneViewCommands.ResolutionReverceChanger, new ResolutionChangerHandler(isReverse: true));
 			ConnectCommand(SceneViewCommands.ResolutionOrientation, new ResolutionOrientationHandler());
@@ -76,6 +75,11 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
+		public Matrix32 CalcTransitionFromSceneSpace(Widget targetSpace)
+		{
+			return Scene.LocalToWorldTransform * targetSpace.LocalToWorldTransform.CalcInversed();
+		}
+
 		private static void TieWidgetsWithBones()
 		{
 			try {
@@ -95,15 +99,89 @@ namespace Tangerine.UI.SceneView
 			Core.Operations.UntieWidgetsFromBones.Perform(bones, widgets);
 		}
 
+		class ScenePresenter : IPresenter
+		{
+			private RenderChain renderChain = new RenderChain();
+			private Node content;
+
+			public ScenePresenter(Node content)
+			{
+				this.content = content;
+			}
+
+			public Lime.RenderObject GetRenderObject(Node node)
+			{
+				var w = (Widget)node;
+				var ro = RenderObjectPool<RenderObject>.Acquire();
+				try {
+					content.RenderChainBuilder?.AddToRenderChain(renderChain);
+					renderChain.GetRenderObjects(ro.SceneObjects);
+				} finally {
+					renderChain.Clear();
+				}
+				ro.LocalToWorldTransform = w.LocalToWorldTransform;
+				return ro;
+			}
+
+			public bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				var w = (Widget)node;
+				var p = args.Point;
+				try {
+					content.RenderChainBuilder?.AddToRenderChain(renderChain);
+					args.Point = w.LocalToWorldTransform.CalcInversed().TransformVector(args.Point);
+					return renderChain.HitTest(ref args);
+				} finally {
+					args.Point = p;
+					renderChain.Clear();
+				}
+			}
+
+			class RenderObject : Lime.RenderObject
+			{
+				public Matrix32 LocalToWorldTransform;
+				public RenderObjectList SceneObjects = new RenderObjectList();
+
+				public override void Render()
+				{
+					Renderer.PushState(RenderState.All);
+					Renderer.Transform2 = LocalToWorldTransform;
+					SceneObjects.Render();
+					Renderer.PopState();
+				}
+
+				protected override void OnRelease()
+				{
+					SceneObjects.Clear();
+					base.OnRelease();
+				}
+			}
+		}
+
+		[UpdateStage(typeof(PostLateUpdateStage))]
+		[NodeComponentDontSerialize]
+		private class SceneBehavior : BehaviorComponent
+		{
+			protected override void Update(float delta)
+			{
+				if (!Document.Current.PreviewAnimation) {
+					delta = 0.0f;
+				} else if (Document.Current.SlowMotion) {
+					delta *= 0.1f;
+				}
+				Document.Current.Manager.Update(delta);
+			}
+		}
+
 		public SceneView(Widget panelWidget)
 		{
 			this.Panel = panelWidget;
 			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
 			InputArea.Gestures.Add(DropFilesGesture = new DropFilesGesture());
-			Scene = new Widget {
-				Nodes = { Document.Current.RootNode }
-			};
+			Scene = new Widget();
+			Scene.Components.Add(new SceneBehavior());
+			Scene.PostPresenter = new ScenePresenter(Document.Current.RootNode);
 			Frame = new Widget {
 				Id = "SceneView",
 				Nodes = { InputArea, Scene }
@@ -112,8 +190,6 @@ namespace Tangerine.UI.SceneView
 			CreateProcessors();
 			CreatePresenters();
 			CreateFilesDropHandlers();
-			Scene.AddChangeWatcher(() => Document.Current.SlowMotion, v => AdjustSceneAnimationSpeed());
-			Scene.AddChangeWatcher(() => Document.Current.PreviewAnimation, v => AdjustSceneAnimationSpeed());
 			Frame.Awoke += CenterDocumentRoot;
 			OnCreate?.Invoke(this);
 		}
@@ -123,19 +199,6 @@ namespace Tangerine.UI.SceneView
 			DropFilesGesture.Recognized += new ImagesDropHandler(OnBeforeFilesDrop, FilesDropNodePostProcessor).Handle;
 			DropFilesGesture.Recognized += new AudiosDropHandler().Handle;
 			DropFilesGesture.Recognized += new ScenesDropHandler(OnBeforeFilesDrop, FilesDropNodePostProcessor).Handle;
-		}
-
-		private void AdjustSceneAnimationSpeed()
-		{
-			Scene.AnimationSpeed = GetRequiredSceneAnimationSpeed();
-		}
-
-		private float GetRequiredSceneAnimationSpeed()
-		{
-			if (Document.Current.PreviewAnimation) {
-				return Document.Current.SlowMotion ? 0.1f : 1.0f;
-			}
-			return 0.0f;
 		}
 
 		private void CenterDocumentRoot(Node node)
@@ -159,7 +222,7 @@ namespace Tangerine.UI.SceneView
 				Window.Current.Activate();
 				InputArea.SetFocus();
 			}
-			mousePositionOnFilesDrop = MousePosition * Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			mousePositionOnFilesDrop = MousePosition * Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 		}
 
 		private static void FilesDropNodePostProcessor(Node node)

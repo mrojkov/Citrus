@@ -39,6 +39,13 @@ namespace Tangerine.UI.Docking
 
 		private DockHierarchy() { }
 
+		public void InvalidateWindows()
+		{
+			foreach (var windowPlacement in VisibleWindowPlacements) {
+				windowPlacement.WindowWidget.Window.Invalidate();
+			}
+		}
+
 		public void Initialize(WindowPlacement main)
 		{
 			WindowPlacements.Add(main);

@@ -20,7 +20,8 @@ namespace Lime
 		internal BucketQueueNode<Animation> QueueNode;
 		internal double TimeInternal;
 		public Marker MarkerAhead;
-		public event Action Stopped;
+		public Action Stopped;
+		public Action AssuredStopped;
 		public string RunningMarkerId { get; set; }
 		public AnimationBezierEasingCalculator BezierEasingCalculator { get; private set; }
 		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
@@ -102,7 +103,11 @@ namespace Lime
 			set
 			{
 				if (isRunning != value) {
+					bool wasRunning = isRunning;
 					isRunning = value;
+					if (wasRunning) {
+						RaiseStopped();
+					}
 					if (isRunning) {
 						Load();
 					}
@@ -167,8 +172,12 @@ namespace Lime
 
 		public bool TryRun(string markerId = null, double animationTimeCorrection = 0)
 		{
+			bool wasRunning = IsRunning;
 			if (AnimationEngine.TryRunAnimation(this, markerId, animationTimeCorrection)) {
 				Stopped = null;
+				if (wasRunning) {
+					RaiseStopped();
+				}
 				return true;
 			}
 			return false;
@@ -188,9 +197,20 @@ namespace Lime
 			AnimationEngine.ApplyAnimatorsAndExecuteTriggers(this, Time, Time, false);
 		}
 
+		public void ScheduleAssuredStopped(Action onStopped, bool immediatelyInvokeIfStopped)
+		{
+			if (!IsRunning) {
+				if (immediatelyInvokeIfStopped) {
+					onStopped();
+				}
+				return;
+			}
+			AssuredStopped += onStopped;
+		}
+
 		internal void RaiseStopped()
 		{
-			Stopped?.Invoke();
+			AnimationEngine.RaiseStopped(this);
 		}
 
 		public int CalcDurationInFrames()

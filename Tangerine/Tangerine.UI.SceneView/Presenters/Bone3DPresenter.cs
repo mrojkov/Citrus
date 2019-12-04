@@ -32,7 +32,8 @@ namespace Tangerine.UI.SceneView
 				foreach (var sm in (node as Mesh3D).Submeshes) {
 					foreach (var bone in sm.Bones) {
 						Renderer.Flush();
-						var viewportToSceneFrame = GetCurrentViewport3D().CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+						var sv = SceneView.Instance;
+						var viewportToSceneFrame = GetCurrentViewport3D().LocalToWorldTransform * sv.CalcTransitionFromSceneSpace(sv.Frame);
 						var a = (Vector2)GetCurrentViewport3D().WorldToViewportPoint(bone.GlobalTransform.Translation) * viewportToSceneFrame;
 						var b = (Vector2)GetCurrentViewport3D().WorldToViewportPoint((bone.Parent as Node3D).GlobalTransform.Translation) * viewportToSceneFrame;
 						Renderer.DrawRound(a, 3, 10, Color4.Green);

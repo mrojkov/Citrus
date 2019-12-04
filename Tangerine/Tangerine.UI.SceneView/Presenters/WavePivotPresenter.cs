@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 					continue;
 				}
 
-				var transform = image.CalcTransitionToSpaceOf(node);
+				var transform = image.LocalToWorldTransform * SceneView.Instance.CalcTransitionFromSceneSpace(node);
 				var position = transform.TransformVector(component.Pivot * image.Size);
 				Renderer.DrawRound(position, Radius + Thickness, SegmentsCount, Color4.Red);
 				Renderer.DrawRound(position, Radius, SegmentsCount, Color4.White);

@@ -91,7 +91,7 @@ namespace Tangerine.UI.SceneView
 					return;
 
 				widget.PrepareRendererState();
-				var t = container.CalcTransitionToSpaceOf(widget);
+				var t = container.LocalToWorldTransform * sv.Scene.LocalToWorldTransform * widget.LocalToWorldTransform.CalcInversed();
 				var lineComponent = SceneView.Instance.Components.Get<LineSelectionComponent>();
 				foreach (var line in Ruler.Lines) {
 					if (line == lineComponent?.Line) continue;
@@ -181,7 +181,8 @@ namespace Tangerine.UI.SceneView
 			{
 				if (Document.Current.ExpositionMode || !ProjectUserPreferences.Instance.RulerVisible)
 					return;
-				var containerHull = Document.Current.RootNode.AsWidget.CalcHullInSpaceOf(canvas);
+
+				var containerHull = Document.Current.RootNode.AsWidget.CalcHull().Transform(sv.CalcTransitionFromSceneSpace(canvas));
 				canvas.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, canvas.Size, ColorTheme.Current.SceneView.RulerBackground);
 				var start = (RulerOrientation == RulerOrientation.Horizontal ? canvas.Size.Y : canvas.Size.X) * Vector2.One;

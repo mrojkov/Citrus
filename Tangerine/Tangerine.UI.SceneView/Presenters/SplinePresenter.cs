@@ -19,7 +19,6 @@ namespace Tangerine.UI.SceneView
 			) {
 				return;
 			}
-			SceneView.Instance.Frame.PrepareRendererState();
 			if (Document.Current.Container == spline.Parent || Document.Current.Container == spline || CoreUserPreferences.Instance.ShowSplinesGlobally) {
 				DrawSpline(spline);
 			}
@@ -28,11 +27,11 @@ namespace Tangerine.UI.SceneView
 		void DrawSpline(Spline spline)
 		{
 			float step = 7.0f / SceneView.Instance.Scene.Scale.X;
-			var xform = spline.CalcTransitionToSpaceOf(SceneView.Instance.Frame);
+			spline.PrepareRendererState();
 			Vector2? p = null;
 			foreach (var v in spline.CalcPoints(step)) {
 				if (p.HasValue) {
-					DrawColoredLine(p.Value * xform, v * xform, Color4.White, Color4.Black);
+					DrawColoredLine(p.Value, v, Color4.White, Color4.Black);
 				}
 				p = v;
 			}

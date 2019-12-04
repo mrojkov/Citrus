@@ -383,7 +383,7 @@ namespace Lime
 			if (list != null) {
 				for (int i = 0; i < length; i++) {
 					char ch = text[i + start];
-					if (ch != '\n' && ch != '\r' && font.Chars.Get(ch, fontHeight) != FontChar.Null)
+					if (ch != '\n' && ch != '\r' && font.CharSource.Get(ch, fontHeight) != FontChar.Null)
 						++j;
 				}
 			}
@@ -404,15 +404,17 @@ namespace Lime
 				} else if (ch == '\r') {
 					continue;
 				}
-				FontChar fontChar = font.Chars.Get(ch, fontHeight);
+				FontChar fontChar = font.CharSource.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					onDrawChar?.Invoke(i, position, Vector2.Down * fontHeight);
 					continue;
 				}
 				var scale = fontChar.Height != 0.0f ? fontHeight / fontChar.Height : 0.0f;
-				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing);
-				var size = new Vector2(scale * fontChar.Width, fontHeight - fontChar.VerticalOffset);
-				var charPosition = new Vector2(position.X, position.Y + fontChar.VerticalOffset);
+				// Pen Position + Bearing + Kerning gives a proper letter position
+				// but we have to subtract left padding in order to avoid extra spacing
+				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar) + halfLetterSpacing - fontChar.Padding);
+				var size = new Vector2(scale * fontChar.PaddedWidth, fontHeight + scale * (fontChar.PaddedHeight - fontChar.VerticalOffset));
+				var charPosition = new Vector2(position.X, position.Y + scale * (fontChar.VerticalOffset - fontChar.Padding));
 				if (font.RoundCoordinates) {
 					charPosition = new Vector2(charPosition.X.Round(), charPosition.Y.Round());
 				}
@@ -420,7 +422,9 @@ namespace Lime
 				chars[j].FontChar = fontChar;
 				chars[j].Position = charPosition;
 				++j;
-				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + halfLetterSpacing);
+				// We have to add left padding to get actual letter position
+				// Width + (Horizontal Advance - Bearing) will give a proper pen position for next letter
+				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + halfLetterSpacing + fontChar.Padding);
 				prevChar = fontChar;
 			}
 			list.Add(font, color, fontHeight, chars, tag);
@@ -442,8 +446,11 @@ namespace Lime
 			DrawTriangleFan(texture1, texture2, material, vertices, numVertices);
 		}
 
-		public static RenderBatch<Vertex> DrawTriangleFan(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
+			if (numVertices == 0) {
+				return;
+			}
 			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
@@ -456,7 +463,6 @@ namespace Lime
 			}
 			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
 			batch.LastVertex += numVertices;
-			return batch;
 		}
 
 		public static void DrawTriangleStrip(Vertex[] vertices, int numVertices)
@@ -475,8 +481,11 @@ namespace Lime
 			DrawTriangleStrip(texture1, texture2, material, vertices, numVertices);
 		}
 
-		public static RenderBatch<Vertex> DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
 		{
+			if (numVertices == 0) {
+				return;
+			}
 			var batch = DrawTrianglesHelper(texture1, texture2, material, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
@@ -490,7 +499,6 @@ namespace Lime
 			}
 			batch.LastVertex += numVertices;
 			batch.Mesh.DirtyFlags |= MeshDirtyFlags.Indices;
-			return batch;
 		}
 
 		private static RenderBatch<Vertex> DrawTrianglesHelper(ITexture texture1, ITexture texture2, IMaterial material, Vertex[] vertices, int numVertices)
@@ -1153,7 +1161,8 @@ namespace Lime
 		ColorFactor = 1 << 10,
 		World = 1 << 11,
 		View = 1 << 12,
-		Projection = 1 << 13
+		Projection = 1 << 13,
+		All = ~0
 	}
 
 	[YuzuCopyable]

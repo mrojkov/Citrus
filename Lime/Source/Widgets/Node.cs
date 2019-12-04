@@ -48,7 +48,7 @@ namespace Lime
 		ColorBit2 = 512,
 		ColorBit3 = 1024,
 		SceneNode = 2048,
-		SerializableMask = Hidden | Locked | Shown | ColorBit1 | ColorBit2 | ColorBit3
+		SerializableMask = Hidden | Locked | Shown | ColorBit1 | ColorBit2 | ColorBit3,
 	}
 
 	public delegate void UpdateHandler(float delta);
@@ -58,7 +58,7 @@ namespace Lime
 	/// </summary>
 	[YuzuDontGenerateDeserializer]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable
+	public abstract class Node : IDisposable, IAnimationHost, IFolderItem, IFolderContext, IRenderChainBuilder, IAnimable, ICloneable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -76,7 +76,6 @@ namespace Lime
 			Enabled = 1 << 9,
 			EffectiveAnimationSpeed = 1 << 10,
 			Frozen = 1 << 11,
-			FreezeInvisible = 1 << 12,
 			All = ~None
 		}
 
@@ -403,11 +402,13 @@ namespace Lime
 		/// <summary>
 		/// Markers of default animation.
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.Markers")]
 		public MarkerList Markers => DefaultAnimation.Markers;
 
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.IsRunning")]
 		public bool IsRunning
 		{
 			get => DefaultAnimation.IsRunning;
@@ -417,6 +418,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
+		[Obsolete("Use !DefaultAnimation.IsRunning")]
 		public bool IsStopped {
 			get => !IsRunning;
 			set => IsRunning = !value;
@@ -425,6 +427,7 @@ namespace Lime
 		/// <summary>
 		/// Gets or sets time of current frame of default animation (in milliseconds).
 		/// </summary>
+		[Obsolete("Use DefaultAnimation.Time")]
 		public double AnimationTime
 		{
 			get => DefaultAnimation.Time;
@@ -434,6 +437,7 @@ namespace Lime
 		/// <summary>
 		/// Get or sets the current animation frame.
 		/// </summary>
+		[Obsolete("Use AnimationUtils.SecondsToFrames(DefaultAnimation.Time)")]
 		public int AnimationFrame
 		{
 			get => AnimationUtils.SecondsToFrames(DefaultAnimation.Time);
@@ -541,6 +545,10 @@ namespace Lime
 		/// Gets or sets the value that's indicating if the node responds the mouse/touch events.
 		/// </summary>
 		public bool HitTestTarget;
+
+#if TANGERINE
+		public static bool TangerineFastForwardInProgress = false;
+#endif
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
@@ -693,6 +701,9 @@ namespace Lime
 				c.OnAfterNodeSerialization();
 			}
 		}
+
+		[YuzuAfterDeserialization]
+		public virtual void OnAfterDeserialization() { }
 
 		/// <summary>
 		/// Returns the <see cref="string"/> representation of this <see cref="Node"/>.
@@ -1170,6 +1181,13 @@ namespace Lime
 			}
 		}
 
+		object ICloneable.Clone()
+		{
+			var clone = Lime.InternalPersistence.Instance.Clone(this);
+			clone.NotifyOnBuilt();
+			return clone;
+		}
+
 		public static T CreateFromAssetBundle<T>(string path, T instance = null, InternalPersistence persistence = null, bool ignoreExternals = false) where T : Node
 		{
 			persistence = persistence ?? InternalPersistence.Instance;
@@ -1191,6 +1209,9 @@ namespace Lime
 		private static Node CreateFromAssetBundleHelper(string path, Node instance = null, InternalPersistence persistence = null, Stream stream = null, bool external = false, bool ignoreExternals = false)
 		{
 			if (SceneLoading?.Value?.Invoke(path, ref instance, external, ignoreExternals) ?? false) {
+				if (!external) {
+					instance.NotifyOnBuilt();
+				}
 				SceneLoaded?.Value?.Invoke(path, instance, external);
 				return instance;
 			}
@@ -1210,10 +1231,10 @@ namespace Lime
 						instance = persistence.ReadObject<Node>(fullPath, stream, instance);
 					}
 				}
-				if (!ignoreExternals) {
-					instance.LoadExternalScenes(persistence);
-				}
 				instance.Components.Add(new AssetBundlePathComponent(fullPath));
+				if (!ignoreExternals) {
+					instance.LoadExternalScenes(persistence, !external);
+				}
 			} finally {
 				scenesBeingLoaded.Value.Remove(fullPath);
 			}
@@ -1221,16 +1242,40 @@ namespace Lime
 			return instance;
 		}
 
-		public virtual void LoadExternalScenes(InternalPersistence persistence = null)
+		public void NotifyOnBuilt()
+		{
+			foreach (var n in Nodes) {
+				n.NotifyOnBuilt();
+			}
+			NotifyOnBuiltSuperficial();
+		}
+
+		public void NotifyOnBuiltSuperficial()
+		{
+			foreach (var c in Components) {
+				c.OnBuilt();
+			}
+			OnBuilt();
+		}
+
+		protected virtual void OnBuilt()
+		{
+		}
+
+		public virtual void LoadExternalScenes(InternalPersistence persistence = null, bool isExternalRoot = true)
 		{
 			persistence = persistence ?? InternalPersistence.Instance;
 			if (string.IsNullOrEmpty(ContentsPath)) {
 				foreach (var child in Nodes) {
-					child.LoadExternalScenes();
+					child.LoadExternalScenes(persistence, false);
 				}
 			} else if (ResolveScenePath(ContentsPath) != null) {
 				var content = CreateFromAssetBundleHelper(ContentsPath, null, persistence, external: true);
 				ReplaceContent(content);
+			}
+
+			if (isExternalRoot) {
+				NotifyOnBuilt();
 			}
 		}
 
@@ -1272,8 +1317,7 @@ namespace Lime
 				Nodes.Clear();
 				Nodes.AddRange(nodes);
 			}
-
-			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType)) {
+			if (nodeType != contentType && !contentType.IsSubclassOf(nodeType) && !nodeType.IsSubclassOf(contentType)) {
 				// Handle legacy case: Replace Button content by external Frame
 				if (nodeType == typeof(Button) && contentType == typeof(Frame)) {
 					Components.Remove(typeof(AssetBundlePathComponent));
@@ -1281,18 +1325,18 @@ namespace Lime
 					if (assetBundlePathComponent != null) {
 						Components.Add(Cloner.Clone(assetBundlePathComponent));
 					}
-					Components.Remove(typeof(AnimationComponent));
 				} else {
 					throw new Exception($"Can not replace {nodeType.FullName} content with {contentType.FullName}");
 				}
 			} else {
-				Components.Clear();
-				foreach (var c in content.Components) {
-					if (NodeComponent.IsSerializable(c.GetType())) {
-						Components.Add(Cloner.Clone(c));
-					}
+				foreach (var c in Components.Where(i => NodeComponent.IsSerializable(i.GetType())).ToList()) {
+					Components.Remove(c);
+				}
+				foreach (var c in content.Components.Where(i => NodeComponent.IsSerializable(i.GetType()))) {
+					Components.Add(Cloner.Clone(c));
 				}
 			}
+			Components.Remove<AnimationComponent>();
 			var animationComponent = content.Components.Get<AnimationComponent>();
 			if (animationComponent != null) {
 				var newAnimationComponent = new AnimationComponent();
@@ -1494,17 +1538,24 @@ namespace Lime
 			return Cloner.Clone(node);
 		}
 
-		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		public static Action<Node, float> AdvanceAnimationsRecursiveHook = DefaultAdvanceAnimationsRecursive;
+
+		private static void DefaultAdvanceAnimationsRecursive(Node node, float delta)
 		{
-			var c = node.Components.Get<AnimationComponent>();
+			var c = node.Components.AnimationComponent;
 			if (c != null) {
 				foreach (var a in c.Animations) {
 					a.Advance(delta);
 				}
 			}
 			foreach (var child in node.Nodes) {
-				AdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
+				DefaultAdvanceAnimationsRecursive(child, delta * child.AnimationSpeed);
 			}
+		}
+
+		public static void AdvanceAnimationsRecursive(this Node node, float delta)
+		{
+			AdvanceAnimationsRecursiveHook(node, delta);
 		}
 
 		private static void RegisterLegacyBehaviors(Node node)
@@ -1587,7 +1638,6 @@ namespace Lime
 	[NodeComponentDontSerialize]
 	public class AnimationComponent : NodeComponent
 	{
-		internal AnimationProcessor Processor;
 		internal int Depth = -1;
 
 		public AnimationCollection Animations { get; private set; }
@@ -1606,14 +1656,32 @@ namespace Lime
 			}
 		}
 
+		public event Action<AnimationComponent, Animation> AnimationAdded;
+
+		public event Action<AnimationComponent, Animation> AnimationRemoved;
+
+		public event Action<AnimationComponent, Animation> AnimationRun;
+
+		public event Action<AnimationComponent, Animation> AnimationStopped;
+
+		internal void OnAnimationAdded(Animation animation)
+		{
+			AnimationAdded?.Invoke(this, animation);
+		}
+
+		internal void OnAnimationRemoved(Animation animation)
+		{
+			AnimationRemoved?.Invoke(this, animation);
+		}
+
 		internal void OnAnimationRun(Animation animation)
 		{
-			Processor?.OnAnimationRun(animation);
+			AnimationRun?.Invoke(this, animation);
 		}
 
 		internal void OnAnimationStopped(Animation animation)
 		{
-			Processor?.OnAnimationStopped(animation);
+			AnimationStopped?.Invoke(this, animation);
 		}
 
 		public AnimationComponent()
@@ -1627,7 +1695,7 @@ namespace Lime
 	[UpdateBeforeBehavior(typeof(UpdatableNodeBehavior))]
 	public class BoneArrayUpdaterBehavior : BehaviorComponent
 	{
-		private bool attached;
+		private bool active = true;
 		private List<Bone> bones = new List<Bone>();
 		private bool needResort = false;
 
@@ -1649,17 +1717,6 @@ namespace Lime
 			CheckActivity();
 		}
 
-		protected internal override void Start()
-		{
-			attached = true;
-			CheckActivity();
-		}
-
-		protected internal override void Stop(Node owner)
-		{
-			attached = false;
-		}
-
 		protected internal override void Update(float delta)
 		{
 			if (needResort) {
@@ -1673,8 +1730,10 @@ namespace Lime
 
 		private void CheckActivity()
 		{
-			if (attached) {
-				if (bones.Count > 0) {
+			var activeNow = bones.Count > 0;
+			if (active != activeNow) {
+				active = activeNow;
+				if (active) {
 					Resume();
 				} else {
 					Suspend();

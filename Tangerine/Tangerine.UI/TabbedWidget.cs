@@ -18,11 +18,11 @@ namespace Tangerine.UI
 			{
 				if (tabBar != value) {
 					if (tabBar != null) {
-						tabBar.OnReorder -= TabBar_OnReorder;
+						tabBar.OnReordering -= TabBar_OnReordering;
 						tabBar.Unlink();
 					}
 					tabBar = value;
-					tabBar.OnReorder += TabBar_OnReorder;
+					tabBar.OnReordering += TabBar_OnReordering;
 					PlaceTabBarAndContent(barPlacement);
 				}
 			}
@@ -79,7 +79,7 @@ namespace Tangerine.UI
 			}
 		}
 
-		protected virtual void TabBar_OnReorder(TabBar.ReorderEventArgs args)
+		protected virtual void TabBar_OnReordering(TabBar.ReorderEventArgs args)
 		{
 			var item = Contents[args.IndexFrom];
 			Contents.RemoveAt(args.IndexFrom);

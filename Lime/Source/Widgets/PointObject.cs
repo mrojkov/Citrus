@@ -23,7 +23,7 @@ namespace Lime
 			set
 			{
 				if (position != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position = value;
 				}
 			}
@@ -34,7 +34,7 @@ namespace Lime
 			get => position.X;
 			set {
 				if (position.X != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position.X = value;
 				}
 			}
@@ -44,7 +44,7 @@ namespace Lime
 			get => position.Y;
 			set {
 				if (position.Y != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					position.Y = value;
 				}
 			}
@@ -60,42 +60,52 @@ namespace Lime
 			set
 			{
 				if (offset != value) {
-					DirtyMask |= DirtyFlags.LocalTransform | DirtyFlags.ParentBoundingRect;
+					DirtyMask |= DirtyFlags.LocalTransform;
 					offset = value;
 				}
 			}
 
 		}
-		
+
 		public Vector2 TransformedPosition
 		{
 			get
 			{
-				if (CleanDirtyFlags(DirtyFlags.LocalTransform | DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse)) {
-					RecalcTransformedPosition();
-				}
+				RecalcTransformedPositionIfNeeded();
 				return transformedPosition;
+			}
+		}
+
+		public void RecalcTransformedPositionIfNeeded()
+		{
+			if (CleanDirtyFlags(DirtyFlags.LocalTransform | DirtyFlags.GlobalTransform | DirtyFlags.GlobalTransformInverse)) {
+				RecalcTransformedPosition();
 			}
 		}
 
 		private void RecalcTransformedPosition()
 		{
+			var parentWidget = Parent?.AsWidget;
+			var prevTransformedPosition = transformedPosition;
 			transformedPosition = Offset;
-			if (Parent?.AsWidget != null) {
-				transformedPosition = Parent.AsWidget.Size * Position + Offset;
+			if (parentWidget != null) {
+				transformedPosition = parentWidget.Size * Position + Offset;
 			}
 			if (SkinningWeights != null && Parent?.Parent != null) {
 				BoneArray a = Parent.Parent.AsWidget.BoneArray;
-				Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
+				Matrix32 m1 = parentWidget.CalcLocalToParentTransform();
 				Matrix32 m2 = m1.CalcInversed();
 				transformedPosition = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(transformedPosition), SkinningWeights));
+			}
+			if (transformedPosition != prevTransformedPosition) {
+			 	parentWidget.ExpandBoundingRect(transformedPosition);
 			}
 		}
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
-			var matrix = Parent.AsWidget.CalcTransitionToSpaceOf(container);
-			return matrix.TransformVector(TransformedPosition);
+			var t = Parent.AsWidget.CalcTransitionToSpaceOf(container);
+			return t.TransformVector(TransformedPosition);
 		}
 
 		public override void AddToRenderChain(RenderChain chain)

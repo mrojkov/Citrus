@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +41,7 @@ namespace Tangerine.UI.SceneView
 							yield break;
 						}
 						var container = (Widget)Document.Current.Container;
-						var t = sv.Scene.CalcTransitionToSpaceOf(container);
+						var t = container.LocalToWorldTransform.CalcInversed();
 						var pos = Vector2.Zero;
 						if (container.Width.Abs() > Mathf.ZeroTolerance && container.Height.Abs() > Mathf.ZeroTolerance) {
 							pos = sv.MousePosition * t / container.Size;

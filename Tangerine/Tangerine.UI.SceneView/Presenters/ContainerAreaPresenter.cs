@@ -45,7 +45,7 @@ namespace Tangerine.UI.SceneView
 							SceneUserPreferences.Instance.AnimationPreviewBackground);
 					} else {
 						var root = Core.Document.Current.RootNode as Widget;
-						Renderer.Transform1 = root.LocalToWorldTransform;
+						Renderer.Transform1 = root.LocalToWorldTransform * SceneView.Instance.Scene.LocalToWorldTransform;
 						Renderer.DrawRect(Vector2.Zero, root.Size, RootWidgetBackgroundColor);
 					}
 				}
@@ -61,7 +61,8 @@ namespace Tangerine.UI.SceneView
 					var t1 = 1 / mtx.U.Length;
 					var t2 = 1 / mtx.V.Length;
 					Renderer.Transform1 = mtx;
-					var rect = (Core.Document.Current.Container as Widget).CalcAABBInSpaceOf(SceneView.Instance.Frame);
+					var sv = SceneView.Instance;
+					var rect = Document.Current.Container.AsWidget.CalcHull().Transform(sv.CalcTransitionFromSceneSpace(sv.Frame)).ToAABB();
 					Renderer.DrawLine(new Vector2(0, rect.A.Y), new Vector2(frame.Size.X, rect.A.Y), c, t1);
 					Renderer.DrawLine(new Vector2(0, rect.B.Y), new Vector2(frame.Size.X, rect.B.Y), c, t1);
 					Renderer.DrawLine(new Vector2(rect.A.X, 0), new Vector2(rect.A.X, frame.Size.Y), c, t2);
@@ -102,7 +103,7 @@ namespace Tangerine.UI.SceneView
 									if (widget.Components.Get<NodeCommandComponent>()?.Command.Checked ?? false) {
 										widget.Position = (Document.Current.RootNode.AsWidget.Position +
 											(Document.Current.RootNode.AsWidget.Size - widget.Size) / 2) *
-											Document.Current.RootNode.AsWidget.LocalToWorldTransform;
+											Document.Current.RootNode.AsWidget.LocalToWorldTransform * SceneView.Instance.Scene.LocalToWorldTransform;
 										widget.Scale = SceneView.Instance.Scene.Scale;
 										widget.RenderChainBuilder.AddToRenderChain(renderChain);
 									}
@@ -128,13 +129,14 @@ namespace Tangerine.UI.SceneView
 						if (!Document.Current.ResolutionPreview.Enabled) {
 							return;
 						}
-						var ctr = SceneView.Instance.Frame;
+						var sv = SceneView.Instance;
+						var ctr = sv.Frame;
 						var rootNode = Document.Current.RootNode as Widget;
 						if (ctr == null || rootNode == null) {
 							return;
 						}
 						ctr.PrepareRendererState();
-						var aabb = rootNode.CalcAABBInSpaceOf(ctr);
+						var aabb = rootNode.CalcHull().Transform(sv.CalcTransitionFromSceneSpace(ctr)).ToAABB();
 						var rectangles = new[] {
 							new Rectangle(Vector2.Zero, new Vector2(aabb.Left, ctr.Height)).Normalized,
 							new Rectangle(new Vector2(aabb.Left, 0), new Vector2(aabb.Right, aabb.Top)).Normalized,
@@ -153,7 +155,7 @@ namespace Tangerine.UI.SceneView
 
 		private void DrawRuler(Ruler ruler, Widget root)
 		{
-			var t = Document.Current.RootNode.AsWidget.CalcTransitionToSpaceOf(root);
+			var t = Document.Current.RootNode.AsWidget.LocalToWorldTransform * SceneView.Instance.CalcTransitionFromSceneSpace(root);
 			var size = Document.Current.RootNode.AsWidget.Size / 2;
 			foreach (var line in ruler.Lines) {
 				if (line.RulerOrientation == RulerOrientation.Vertical) {

@@ -16,18 +16,20 @@ namespace Tangerine.UI.Timeline.CompoundAnimations
 			Grid.OnPostRender += RenderCursor;
 			var input = Grid.RootWidget.Input;
 			while (true) {
-				if (input.IsKeyPressed(Key.Shift)) {
-					Window.Current.Invalidate();
-				}
-				if (input.WasMousePressed() && Document.Current.Animation.IsCompound && input.IsKeyPressed(Key.Shift)) {
-					input.ConsumeKey(Key.Mouse0);
-					using (Document.Current.History.BeginTransaction()) {
-						if (Grid.IsMouseOverRow()) {
-							var c = Grid.CellUnderMouse();
-							var track = Document.Current.Animation.Tracks[c.Y];
-							yield return DragRampTask(track, c.X);
+				if (Document.Current.Animation.IsCompound) {
+					if (input.IsKeyPressed(Key.Shift)) {
+						Window.Current.Invalidate();
+					}
+					if (input.WasMousePressed() && input.IsKeyPressed(Key.Shift)) {
+						input.ConsumeKey(Key.Mouse0);
+						using (Document.Current.History.BeginTransaction()) {
+							if (Grid.IsMouseOverRow()) {
+								var c = Grid.CellUnderMouse();
+								var track = Document.Current.Animation.Tracks[c.Y];
+								yield return DragRampTask(track, c.X);
+							}
+							Document.Current.History.CommitTransaction();
 						}
-						Document.Current.History.CommitTransaction();
 					}
 				}
 				yield return null;

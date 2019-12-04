@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.iOS", "..\..\..\Lemon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu.iOS", "..\..\..\Yuzu\Yuzu.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD31A2224C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.iOS", "..\..\..\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj", "{B956A746-3D0C-4378-926B-8A776846FFFA}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EmptyProject.Game", "..\EmptyProject.Game\EmptyProject.Game.shproj", "{E72754D5-6DF7-42F1-9E14-0EF4D1491621}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.GeneratedScenes.iOS", "..\EmptyProject.GeneratedScenes\EmptyProject.GeneratedScenes.iOS.csproj", "{DF52C768-5E17-4A26-AD77-4BDD41A2224C}"
@@ -77,18 +75,6 @@ Global
 		{DF52C768-5E17-4A26-AD77-4BDD31A2224C}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD31A2224C}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD31A2224C}.AppStore|iPhone.Build.0 = AppStore|iPhone
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Release|iPhone.Build.0 = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.AppStore|iPhone.ActiveCfg = Release|Any CPU
-		{B956A746-3D0C-4378-926B-8A776846FFFA}.AppStore|iPhone.Build.0 = Release|Any CPU
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Debug|iPhoneSimulator.Build.0 = Debug|iPhone
 		{DF52C768-5E17-4A26-AD77-4BDD41A2224C}.Release|iPhone.ActiveCfg = Release|iPhone

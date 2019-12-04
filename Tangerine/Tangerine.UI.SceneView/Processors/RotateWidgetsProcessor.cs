@@ -22,7 +22,7 @@ namespace Tangerine.UI.SceneView
 				Quadrangle hull;
 				Vector2 pivot;
 				IEnumerable<Widget> widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
-				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
+				if (Utils.CalcHullAndPivot(widgets, out hull, out pivot)) {
 					for (int i = 0; i < 4; i++) {
 						if (sv.HitTestControlPoint(hull[i])) {
 							Utils.ChangeCursorIfDefault(Cursors.Rotate);

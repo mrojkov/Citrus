@@ -1,4 +1,4 @@
-﻿#if false
+#if false
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,11 +104,11 @@ namespace Orange
 						fontChar.KerningPairs.Add(new KerningPair() { Char = prevChar, Kerning = kerning });
 					}
 				}
-				font.Chars.Add(fontChar);
+				font.CharSource.Add(fontChar);
 			}
 			AddFontTexture(font, pixels);
 			// Add the whitespace character
-			font.Chars.Add(new FontChar() {
+			font.CharSource.Add(new FontChar() {
 				Char = ' ',
 				Width = ((float)Height / 5).Round(),
 				Height = Height,

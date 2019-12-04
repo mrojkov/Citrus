@@ -19,16 +19,16 @@ namespace Lime
 			public List<KerningPair> KerningPairs;
 		}
 
-		public string KerningCharacters =
-			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"" +
-			"#$%&ˆ‘’“”´˜`'„()–—*+-÷~,.…/:;<>=?@[]\\^_¯{}|€‚ƒ‹›•§«»©®™¨°¿" +
-			"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿšœžŸŒŽŠ¡¢£¤¥µ¶ " +
-			"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯабвгдеёжзийклмнопрстуфхшщчцъьыэюя";
+		public static List<HashSet<char>> KerningPairCharsets = new List<HashSet<char>> {
+			new HashSet<char>("0123456789"),
+			new HashSet<char>("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅĀÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝabcdefghijklmnopqrstuvwxyzàáâãäåāæçèéêëìíîïðñòóôõöøùúûüýþÿšœž,.¿!?¡"),
+			new HashSet<char>("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХШЩЧЦЪЬЫЭЮЯабвгдеёжзийклмнопрстуфхшщчцъьыэюя,.!?"),
+		};
 
-		private Face face;
 		private Library library;
 		private int lastHeight;
-		private bool lcdSupported;
+		public bool LcdSupported { get; set; } = true;
+		public Face Face { get; internal set; }
 		/// <summary>
 		/// Workaround. DynamicFont incorrectly applies fontHeight when rasterizing the font,
 		/// so the visual font height for the same fontHeight will be different for different ttf files.
@@ -40,22 +40,22 @@ namespace Lime
 		public FontRenderer(byte[] fontData)
 		{
 			library = new Library();
-			face = library.NewMemoryFace(fontData, 0);
+			Face = library.NewMemoryFace(fontData, 0);
 #if SUBPIXEL_TEXT
-			lcdSupported = true;
+			LcdSupported = true;
 			try {
 				// can not use any other filtration to achive a windows like look, 
 				// becouse filtering creates wrong spacing between chars, and no visible way to correct it
 				library.SetLcdFilter(LcdFilter.None);
 			} catch (FreeTypeException) {
-				lcdSupported = false;
+				LcdSupported = false;
 			}
 #else
-			lcdSupported = false;
+			LcdSupported = false;
 #endif
 		}
 
-		private static float CalcPixelSize(Face face, int height)
+		public static float CalcPixelSize(Face face, int height)
 		{
 			// See http://www.freetype.org/freetype2/docs/tutorial/step2.html
 			// Chapter: Scaling Distances to Device Space
@@ -73,25 +73,25 @@ namespace Lime
 			if (lastHeight != height) {
 				lastHeight = height;
 				var pixelSize = (uint) Math.Abs(
-					CalcPixelSize(face, height).Round()
+					CalcPixelSize(Face, height).Round()
 				);
-				face.SetPixelSizes(pixelSize, pixelSize);
+				Face.SetPixelSizes(pixelSize, pixelSize);
 			}
 
-			var glyphIndex = face.GetCharIndex(@char);
+			var glyphIndex = Face.GetCharIndex(@char);
 			if (glyphIndex == 0) {
 				return null;
 			}
 
-			face.LoadGlyph(glyphIndex, LoadFlags.Default, lcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
-			face.Glyph.RenderGlyph(lcdSupported ? RenderMode.Lcd : RenderMode.Normal);
-			FTBitmap bitmap = face.Glyph.Bitmap;
+			Face.LoadGlyph(glyphIndex, LoadFlags.Default, LcdSupported ? LoadTarget.Lcd : LoadTarget.Normal);
+			Face.Glyph.RenderGlyph(LcdSupported ? RenderMode.Lcd : RenderMode.Normal);
+			FTBitmap bitmap = Face.Glyph.Bitmap;
 
-			var verticalOffset = height - face.Glyph.BitmapTop + face.Size.Metrics.Descender.Round();
-			var bearingX = (float) face.Glyph.Metrics.HorizontalBearingX;
+			var verticalOffset = height - Face.Glyph.BitmapTop + Face.Size.Metrics.Descender.Round();
+			var bearingX = (float) Face.Glyph.Metrics.HorizontalBearingX;
 			bool rgbIntensity = bitmap.PixelMode == PixelMode.Lcd || bitmap.PixelMode == PixelMode.VerticalLcd;
 			var glyph = new Glyph {
-				Pixels = bitmap.BufferData,
+				Pixels = char.IsWhiteSpace(@char) ? new byte[0] : bitmap.BufferData,
 				RgbIntensity = rgbIntensity,
 				Pitch = bitmap.Pitch,
 				Width = rgbIntensity ? bitmap.Width / 3 : bitmap.Width,
@@ -99,18 +99,23 @@ namespace Lime
 				VerticalOffset = verticalOffset,
 				ACWidths = new Vector2(
 					bearingX,
-					(float) face.Glyph.Metrics.HorizontalAdvance - (float) face.Glyph.Metrics.Width - bearingX
+					(float) Face.Glyph.Metrics.HorizontalAdvance - (float) Face.Glyph.Metrics.Width - bearingX
 				),
 			};
 			// Iterate through kerning pairs
-			foreach (var nextChar in KerningCharacters) {
-				var nextGlyphIndex = face.GetCharIndex(nextChar);
-				var kerning = (float)face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
-				if (kerning != 0) {
-					if (glyph.KerningPairs == null) {
-						glyph.KerningPairs = new List<KerningPair>();
+			foreach (var charset in KerningPairCharsets) {
+				if (!charset.Contains(@char)) {
+					continue;
+				}
+				foreach (var character in charset) {
+					var nextGlyphIndex = Face.GetCharIndex(character);
+					var kerning = (float)Face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
+					if (kerning != 0) {
+						if (glyph.KerningPairs == null) {
+							glyph.KerningPairs = new List<KerningPair>();
+						}
+						glyph.KerningPairs.Add(new KerningPair { Char = character, Kerning = kerning });
 					}
-					glyph.KerningPairs.Add(new KerningPair { Char = nextChar, Kerning = kerning });
 				}
 			}
 			return glyph;
@@ -118,7 +123,7 @@ namespace Lime
 
 		public bool ContainsGlyph(char code)
 		{
-			return face.GetCharIndex(code) != 0;
+			return Face.GetCharIndex(code) != 0;
 		}
 
 		public void Dispose()

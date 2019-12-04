@@ -39,7 +39,7 @@ namespace Tangerine.UI.SceneView
 
 		private IEnumerator<object> Drag(NineGridLine nineGridLine)
 		{
-			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+			var transform = Document.Current.Container.AsWidget.LocalToWorldTransform.CalcInversed();
 			var initMousePos = sv.MousePosition * transform;
 			var dir = nineGridLine.GetDirection();
 			float value = nineGridLine.Value;

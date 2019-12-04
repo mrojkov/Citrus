@@ -7,7 +7,7 @@ namespace Lime.Text
 {
 	class TextParser
 	{
-		private const char Nbsp = '�';
+		private const char Nbsp = '\u00A0';
 		public struct Fragment
 		{
 			public int Style;

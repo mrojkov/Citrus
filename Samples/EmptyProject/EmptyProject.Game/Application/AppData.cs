@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Lime;
 using Yuzu;
 
@@ -45,7 +45,7 @@ namespace EmptyProject.Application
 			Instance = null;
 			if (File.Exists(path)) {
 				try {
-					Instance = Serialization.ReadObjectFromFile<AppData>(path);
+					Instance = The.Persistence.ReadObjectFromFile<AppData>(path);
 				}
 				catch (System.Exception e) {
 					The.Log.Warn("Failed to load the application profile: {0}", e.Message);
@@ -64,7 +64,7 @@ namespace EmptyProject.Application
 			MusicVolume = AudioSystem.GetGroupVolume(AudioChannelGroup.Music);
 
 			try {
-				Serialization.WriteObjectToFile(GetDataFilePath(), this, Serialization.Format.Binary);
+				The.Persistence.WriteObjectToFile(GetDataFilePath(), this, Persistence.Format.Binary);
 			}
 			catch (System.Exception e) {
 				The.Log.Warn("AppData saving failed: {0}", e.Message);

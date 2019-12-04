@@ -85,17 +85,13 @@ namespace Orange
 				// Don't return early even if there's nothing modified since there may be stuff to delete
 				// Also, don't bother with loading ony usedBundles for now, just load all of them
 				AssetBundle.SetCurrent(new AggregateAssetBundle(cookingBundles.Select(bundleName => new PackedAssetBundle(The.Workspace.GetBundlePath(target.Platform, bundleName))).ToArray()), false);
-				var loadedScenes = new Dictionary<string, Node>();
-				foreach (var scene in scenesToCook) {
-					loadedScenes.Add(scene, Node.CreateFromAssetBundle(Path.ChangeExtension(scene, null)));
-				}
 				new ScenesCodeCooker(
 					The.Workspace.ProjectDirectory,
 					The.Workspace.GeneratedScenesPath,
 					The.Workspace.Title,
 					CookingRulesBuilder.MainBundleName,
 					sceneToBundleMap,
-					loadedScenes,
+					scenesToCook,
 					allScenes,
 					modifiedScenes,
 					cache

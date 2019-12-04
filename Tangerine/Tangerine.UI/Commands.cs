@@ -110,7 +110,6 @@ namespace Tangerine.UI
 	public static class SceneViewCommands
 	{
 		public static readonly ICommand PreviewAnimation = new Command("Preview Animation", new Shortcut(Key.F5));
-		public static readonly ICommand PreviewAnimationWithTriggeringOfMarkers = new Command("Preview Animation with Triggering of Markers", new Shortcut(Modifiers.Control, Key.F5));
 		public static readonly ICommand ResolutionChanger = new Command("Preview Next Resolution", new Shortcut(Key.F11));
 		public static readonly ICommand ResolutionReverceChanger = new Command("Preview Previous Resolution", new Shortcut(Modifiers.Shift, Key.F11));
 		public static readonly ICommand ResolutionOrientation = new Command("Preview Next Orientation", new Shortcut(Key.F12));

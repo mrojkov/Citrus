@@ -28,7 +28,7 @@ namespace Tangerine.Core
 		public bool IsDocumentModified { get; private set; }
 		public bool IsTransactionActive => transactionStartIndices.Count > 0;
 		public event Action<IOperation> PerformingOperation;
-		public event Action Changed;
+		public event Action DocumentChanged;
 
 		public static void AddOperationProcessorTypes(IEnumerable<Type> types)
 		{
@@ -72,8 +72,15 @@ namespace Tangerine.Core
 		public void CommitTransaction()
 		{
 			AssertTransaction();
+			var index = transactionStartIndices.Peek();
 			transactionStartIndices.Pop();
 			transactionStartIndices.Push(currentIndex);
+			for (int i = index; i < currentIndex; i++) {
+				if (operations[i].IsChangingDocument) {
+					OnDocumentChanged();
+					break;
+				}
+			}
 		}
 
 		public void RollbackTransaction()
@@ -85,7 +92,6 @@ namespace Tangerine.Core
 				for (; currentIndex > index; currentIndex--) {
 					Processors.Invert(operations[currentIndex - 1]);
 				}
-				OnChange();
 			}
 		}
 
@@ -110,7 +116,6 @@ namespace Tangerine.Core
 				currentIndex++;
 			}
 			Processors.Do(operation);
-			OnChange();
 		}
 
 		private void AssertTransaction()
@@ -134,7 +139,7 @@ namespace Tangerine.Core
 				}
 				s = GetTransactionStartIndex();
 			}
-			OnChange();
+			OnDocumentChanged();
 		}
 
 		public void Redo()
@@ -155,7 +160,7 @@ namespace Tangerine.Core
 				}
 				e = GetTransactionEndIndex();
 			}
-			OnChange();
+			OnDocumentChanged();
 		}
 
 		private int GetTransactionStartIndex()
@@ -185,19 +190,19 @@ namespace Tangerine.Core
 					break;
 				}
 			}
-			OnChange();
+			OnDocumentChanged();
 		}
 
 		public void ExternalModification()
 		{
 			saveIndex = -1;
-			OnChange();
+			OnDocumentChanged();
 		}
 
-		private void OnChange()
+		private void OnDocumentChanged()
 		{
 			RefreshModifiedStatus();
-			Changed?.Invoke();
+			DocumentChanged?.Invoke();
 			Application.InvalidateWindows();
 		}
 

@@ -9,7 +9,8 @@ namespace Lime
 	public interface IFont : IDisposable
 	{
 		string About { get; }
-		IFontCharSource Chars { get; }
+		float Spacing { get; }
+		IFontCharSource CharSource { get; }
 		void ClearCache();
 		bool RoundCoordinates { get; }
 	}
@@ -25,17 +26,23 @@ namespace Lime
 		[YuzuMember]
 		public string About { get; set; }
 		[YuzuMember]
-		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
-		public List<ITexture> Textures { get { return CharCollection.Textures; } }
+		public float Spacing { get; set; }
+		[YuzuMember]
+		public List<ITexture> Textures => CharCollection.Textures;
 		[YuzuMember]
 		public FontCharCollection CharCollection { get; private set; }
-		public IFontCharSource Chars { get { return CharCollection; } }
+		public IFontCharSource CharSource => CharCollection;
 		[YuzuMember]
 		public bool RoundCoordinates { get; set; } = false;
 
 		public Font()
 		{
 			CharCollection = new FontCharCollection();
+		}
+
+		public Font(FontCharCollection chars)
+		{
+			CharCollection = chars;
 		}
 
 		public void Dispose()
@@ -68,7 +75,7 @@ namespace Lime
 					prevChar = null;
 					continue;
 				}
-				var fontChar = font.Chars.Get(ch, fontHeight);
+				var fontChar = font.CharSource.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
@@ -88,21 +95,9 @@ namespace Lime
 
 		public readonly List<ITexture> Textures = new List<ITexture>();
 
-		int ICollection<FontChar>.Count
-		{
-			get
-			{
-				return charList.Count;
-			}
-		}
+		public int Count => charList.Count;
 
-		bool ICollection<FontChar>.IsReadOnly
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public bool IsReadOnly => false;
 
 		public bool Contains(char code)
 		{
@@ -125,50 +120,39 @@ namespace Lime
 		{
 		}
 
-		void ICollection<FontChar>.Add(FontChar item)
+		public void Add(FontChar item)
 		{
 			charMap[item.Char] = item;
 			charList.Add(item);
 		}
 
-		void ICollection<FontChar>.Clear()
+		public void Clear()
 		{
 			charList.Clear();
 			charMap.Clear();
 		}
 
-		bool ICollection<FontChar>.Contains(FontChar item)
-		{
-			return Contains(item.Char);
-		}
+		public bool Contains(FontChar item) => Contains(item.Char);
 
-		void ICollection<FontChar>.CopyTo(FontChar[] array, int arrayIndex)
-		{
-			charList.CopyTo(array, arrayIndex);
-		}
+		public void CopyTo(FontChar[] array, int arrayIndex) => charList.CopyTo(array, arrayIndex);
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return charList.GetEnumerator();
-		}
-
-		IEnumerator<FontChar> IEnumerable<FontChar>.GetEnumerator()
-		{
-			return charList.GetEnumerator();
-		}
-
-		bool ICollection<FontChar>.Remove(FontChar item)
+		public bool Remove(FontChar item)
 		{
 			charMap[item.Char] = null;
 			return charList.Remove(item);
 		}
+
+		public IEnumerator<FontChar> GetEnumerator() => charList.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
+	[YuzuCompact]
 	public struct KerningPair
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public char Char;
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Kerning;
 	}
 
@@ -225,7 +209,7 @@ namespace Lime
 		/// Mostly stores only negative offset which is useful for chars with diacritics.
 		/// </summary>
 		[YuzuMember]
-		public int VerticalOffset;
+		public float VerticalOffset;
 		/// <summary>
 		/// The null-character which denotes any missing character in a font
 		/// </summary>
@@ -236,9 +220,26 @@ namespace Lime
 		/// </summary>
 		public ITexture Texture;
 
+		/// <summary>
+		/// Padding from each side of glyph bounding box.
+		/// Should be used in proper character positioning because
+		/// glyph is rendered with padding.
+		/// </summary>
+		[YuzuMember]
+		public float Padding { get; set; } = 1;
+
+		/// <summary>
+		/// Width including padding from right and left.
+		/// </summary>
+		public float PaddedWidth => Width + 2 * Padding;
+		/// <summary>
+		/// Height including padding from bottom and top.
+		/// </summary>
+		public float PaddedHeight => Height + 2 * Padding;
+
 		public float Kerning(FontChar prevChar)
 		{
-			if (prevChar != null && prevChar.KerningPairs != null)
+			if (prevChar?.KerningPairs != null)
 				foreach (var pair in prevChar.KerningPairs) {
 					if (pair.Char == Char) {
 						return pair.Kerning;

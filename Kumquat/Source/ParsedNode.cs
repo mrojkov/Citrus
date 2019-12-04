@@ -26,6 +26,7 @@ namespace Kumquat
 		public readonly string ClassName;
 		public readonly string FieldName;
 		public readonly string ContentsPath;
+		public readonly bool IsInExternalScene;
 		public readonly List<string> Markers = new List<string>();
 		public readonly List<AnimationMarker> NamedMarkers = new List<AnimationMarker>();
 
@@ -40,11 +41,12 @@ namespace Kumquat
 			ClassName = parsedNode.ClassName;
 			FieldName = parsedNode.FieldName;
 			ContentsPath = parsedNode.ContentsPath;
+			IsInExternalScene = parsedNode.IsInExternalScene;
 			Markers = parsedNode.Markers;
 			NamedMarkers = parsedNode.NamedMarkers;
 		}
 
-		public ParsedNode(Node node, string name)
+		public ParsedNode(Node node, string name, bool isInExternalScene)
 		{
 			Id = node.Id;
 			Name = name;
@@ -53,6 +55,7 @@ namespace Kumquat
 			ClassName = name;
 			FieldName = "_" + name;
 			ContentsPath = AssetPath.CorrectSlashes(node.ContentsPath ?? "");
+			IsInExternalScene = isInExternalScene;
 
 			if (IsExternalScene) {
 				string externalName;

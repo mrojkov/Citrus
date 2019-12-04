@@ -38,29 +38,31 @@ namespace Tangerine.UI
 			return (value / step).Round() * step;
 		}
 
-		public static bool CalcHullAndPivot(IEnumerable<Widget> widgets, Widget canvas, out Quadrangle hull, out Vector2 pivot)
+		public static bool CalcHullAndPivot(IEnumerable<Node> nodes, out Quadrangle hull, out Vector2 pivot)
 		{
-			Widget first = null;
+			Node first = null;
 			var pivotsEqual = true;
 			var aabb = Rectangle.Empty;
 			pivot = Vector2.Zero;
 			hull = new Quadrangle();
 			float pivotTolerance = 1e-1f;
-			foreach (var widget in widgets) {
+			foreach (var node in nodes) {
+				if (!CalcHullAndPivot(node, out var currentHull, out var currentPivot))
+					continue;
+				var currentAABB = currentHull.ToAABB();
 				if (first == null) {
-					hull = widget.CalcHullInSpaceOf(canvas);
-					pivot = widget.CalcPositionInSpaceOf(canvas);
-					aabb = widget.CalcAABBInSpaceOf(canvas);
-					first = widget;
+					hull = currentHull;
+					pivot = currentPivot;
+					aabb = currentAABB;
+					first = node;
 				} else {
-					var t = widget.CalcAABBInSpaceOf(canvas);
 					aabb = aabb
-						.IncludingPoint(t.A)
-						.IncludingPoint(new Vector2(t.Right, t.Top))
-						.IncludingPoint(t.B)
-						.IncludingPoint(new Vector2(t.Left, t.Bottom));
+						.IncludingPoint(currentAABB.A)
+						.IncludingPoint(new Vector2(currentAABB.Right, currentAABB.Top))
+						.IncludingPoint(currentAABB.B)
+						.IncludingPoint(new Vector2(currentAABB.Left, currentAABB.Bottom));
 					hull = aabb.ToQuadrangle();
-					pivotsEqual &= Vector2.Distance(widget.CalcPositionInSpaceOf(canvas), pivot) <= pivotTolerance;
+					pivotsEqual &= Vector2.Distance(currentPivot, pivot) <= pivotTolerance;
 				}
 			}
 			if (first == null) {
@@ -72,29 +74,21 @@ namespace Tangerine.UI
 			return true;
 		}
 
-		public static bool CalcAABB(IEnumerable<Node> nodes, Widget canvas, out Rectangle aabb)
+		public static bool CalcHullAndPivot(Node node, out Quadrangle hull, out Vector2 pivot)
 		{
-			var result = false;
-			aabb = Rectangle.Empty;
-			foreach (var node in nodes) {
-				var widget = node as Widget;
-				if (widget != null) {
-					var t = widget.CalcAABBInSpaceOf(canvas);
-					aabb = !result ? t : aabb.
-						IncludingPoint(t.A).
-						IncludingPoint(new Vector2(t.Right, t.Top)).
-						IncludingPoint(t.B).
-						IncludingPoint(new Vector2(t.Left, t.Bottom));
-					result = true;
-				}
-				var po = node as PointObject;
-				if (po != null) {
-					var p = po.CalcPositionInSpaceOf(canvas);
-					aabb = result ? aabb.IncludingPoint(p) : new Rectangle(p, p);
-					result = true;
-				}
+			if (node is Widget w) {
+				hull = w.CalcHull();
+				pivot = w.GlobalPivotPosition;
+				return true;
 			}
-			return result;
+			if (node is PointObject p) {
+				pivot = p.Parent.AsWidget.LocalToWorldTransform.TransformVector(p.TransformedPosition);
+				hull.V1 = hull.V2 = hull.V3 = hull.V4 = pivot;
+				return true;
+			}
+			hull = default;
+			pivot = default;
+			return false;
 		}
 
 		public static Quadrangle CalcAABB(IEnumerable<PointObject> points, bool IncludeOffset = false)
