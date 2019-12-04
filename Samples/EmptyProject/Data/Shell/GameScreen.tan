@@ -1,61 +1,8 @@
 {
 	"class":"Lime.Frame, Lime",
 	"Anchors":15,
-	"Animations":[
-		{
-			"IsLegacy":true,
-			"Markers":[
-				{
-					"Action":1,
-					"Id":"",
-					"JumpTo":""
-				},
-				{
-					"Action":1,
-					"Frame":10,
-					"Id":"Tap",
-					"JumpTo":""
-				},
-				{
-					"Action":1,
-					"Frame":20,
-					"Id":"Click",
-					"JumpTo":""
-				},
-				{
-					"Action":1,
-					"Frame":30,
-					"Id":"LongTap",
-					"JumpTo":""
-				}
-			]
-		}
-	],
 	"Color":[4294967295],
 	"Nodes":[
-		{
-			"class":"Lime.Image, Lime",
-			"Animators":[
-				{
-					"class":"Lime.Color4Animator, Lime",
-					"ReadonlyKeys":[
-						[0,0,[4294967295]],
-						[10,0,[4278190335]],
-						[20,0,[4278255367]],
-						[30,0,[4278232575]]
-					],
-					"TargetProperty":"Color"
-				}
-			],
-			"Color":[4294967295],
-			"Id":"Image",
-			"Pivot":[0.5,0.5],
-			"Position":[227.33316,203.33342],
-			"Size":[248,241.33334],
-			"Texture":{
-				"class":"Lime.SerializableTexture, Lime"
-			}
-		},
 		{
 			"class":"Lime.Frame, Lime",
 			"Color":[4294967295],
