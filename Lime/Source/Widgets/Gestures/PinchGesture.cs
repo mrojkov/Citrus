@@ -71,7 +71,7 @@ namespace Lime
 		protected override bool CanStartDrag()
 		{
 			return
-				(MousePosition - MousePressPosition).SqrLength > DragThresholdSqr ||
+				(MousePosition - MousePressPosition).SqrLength > DragThreshold.Sqr() ||
 				TouchDistance != Vector2.Distance(Touch0, Touch1);
 		}
 	}

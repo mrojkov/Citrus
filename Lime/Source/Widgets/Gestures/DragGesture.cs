@@ -46,7 +46,7 @@ namespace Lime
 
 		private Vector2 previousMousePosition;
 		protected virtual Vector2 PreviousMousePosition => IsMotionInProgress() ? previousMotionStrategyPosition : previousMousePosition;
-		protected float DragThresholdSqr { get; }
+		protected float DragThreshold { get; set; }
 
 		/// <summary>
 		/// Occurs when dragged.
@@ -78,7 +78,7 @@ namespace Lime
 			ButtonIndex = buttonIndex;
 			Direction = direction;
 			Exclusive = exclusive;
-			DragThresholdSqr = dragThreshold.Sqr();
+			DragThreshold = dragThreshold;
 		}
 
 		public DragGesture(IMotionStrategy motionStrategy)
@@ -109,7 +109,7 @@ namespace Lime
 			return true;
 		}
 		protected virtual bool IsDragging() => Input.IsMousePressed(ButtonIndex);
-		protected virtual bool CanStartDrag() => (MousePosition - MousePressPosition).SqrLength > DragThresholdSqr;
+		protected virtual bool CanStartDrag() => (MousePosition - MousePressPosition).SqrLength > DragThreshold.Sqr();
 
 		protected internal override bool Cancel(Gesture sender = null)
 		{
