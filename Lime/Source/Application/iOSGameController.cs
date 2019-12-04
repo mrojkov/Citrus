@@ -57,7 +57,7 @@ namespace Lime
 		private void Initialize3DTouchOnTheLeftSideWorkaround()
 		{
 			System.Action<UILongPressGestureRecognizer> handler = (recognizer) => {
-				// If touch is registered with TouchesBegan do nothing, 
+				// If touch is registered with TouchesBegan do nothing,
 				// otherwise register Key.Mouse0 as pressed or not depending on the gesture state
 				if (activeTouches[0] == null) {
 					switch (recognizer.State) {
@@ -97,7 +97,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		private void ProcessTextInput()
 		{
 			input.TextInput = pendingTextInput;
@@ -399,7 +399,7 @@ namespace Lime
 
 		public override bool PrefersHomeIndicatorAutoHidden => false;
 
-		public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+		public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.All;
 
 		private class SoftKeyboard : ISoftKeyboard
 		{
@@ -430,7 +430,7 @@ namespace Lime
 			public float Height { get; internal set; }
 			public bool Supported { get { return true; } }
 		}
-		
+
 		private class CustomUITextView : UITextView
 		{
 			private readonly GameController controller;
@@ -450,7 +450,7 @@ namespace Lime
 				controller.pendingTextInput += '\b';
 			}
 		}
-		
+
 		private class TextViewDelegate : UITextViewDelegate
 		{
 			Input input;
