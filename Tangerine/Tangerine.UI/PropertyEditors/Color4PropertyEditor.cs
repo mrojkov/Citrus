@@ -38,7 +38,7 @@ namespace Tangerine.UI
 			});
 			ExpandableContent.AddNode(panel.Widget);
 			panel.Widget.Padding += new Thickness(right: 12.0f);
-			panel.Widget.LateTasks.Add(currentColor.Consume(v => {
+			panel.Widget.Components.GetOrAdd<LateConsumeBehaviour>().Add(currentColor.Consume(v => {
 				if (panel.Color != v.Value) {
 					panel.Color = v.Value;
 				}
@@ -155,12 +155,12 @@ namespace Tangerine.UI
 				Size = MinMaxSize = new Vector2(25, Theme.Metrics.DefaultButtonSize.Y);
 				var color = colorProvider.GetDataflow();
 				PostPresenter = new SyncDelegatePresenter<Widget>(widget => {
+					color.Poll();
 					var value = color.Value.Value;
 					widget.PrepareRendererState();
 					Renderer.DrawRect(Vector2.Zero, widget.Size, Color4.White);
 					Renderer.DrawRect(Vector2.Zero,
 						new Vector2(widget.Size.X / 2, widget.Size.Y), new Color4(value.ABGR | 0xFF000000));
-					color.Poll();
 					var checkSize = new Vector2(widget.Width / 4, widget.Height / 3);
 					for (int i = 0; i < 3; i++) {
 						var checkPos = new Vector2(widget.Width / 2 + ((i == 1) ? widget.Width / 4 : 0), i * checkSize.Y);

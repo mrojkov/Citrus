@@ -194,7 +194,6 @@ namespace Tangerine.UI.Timeline
 		void CreateProcessors()
 		{
 			RootWidget.LateTasks.Add(
-				ShowCurveEditorTask(),
 				new SlowMotionProcessor(),
 				new AnimationStretchProcessor(),
 				new OverviewScrollProcessor(),
@@ -211,9 +210,10 @@ namespace Tangerine.UI.Timeline
 				new RulerbarMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
 				new GridContextMenuProcessor(),
-				new CompoundAnimations.GridContextMenuProcessor(),
-				PanelTitleUpdater()
+				new CompoundAnimations.GridContextMenuProcessor()
 			);
+			RootWidget.Components.GetOrAdd<LateConsumeBehaviour>().Add(ShowCurveEditorTask());
+			RootWidget.Components.GetOrAdd<LateConsumeBehaviour>().Add(PanelTitleUpdater());
 		}
 
 		void UpdateTitle()
@@ -229,10 +229,10 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		ITaskProvider PanelTitleUpdater() =>
+		IConsumer PanelTitleUpdater() =>
 			new Property<Node>(() => Document.Current.Container).WhenChanged(_ => UpdateTitle());
 
-		ITaskProvider ShowCurveEditorTask()
+		IConsumer ShowCurveEditorTask()
 		{
 			var editCurvesProp = new Property<bool>(() => TimelineUserPreferences.Instance.EditCurves);
 			return new Property<Row>(FirstSelectedRow).Coalesce(editCurvesProp).WhenChanged(t => {

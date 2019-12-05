@@ -90,6 +90,7 @@ namespace Lime
 			textPresentersFeeder = new TextPresentersFeeder(this);
 			clickGesture = new ClickGesture();
 			Gestures.Add(clickGesture);
+			OnUpdate(0);
 		}
 
 		private IEnumerator<int> NormalState()

@@ -15,7 +15,7 @@ namespace Tangerine.Core
 	/// <summary>
 	/// Represents the poll-based stream of values.
 	/// </summary>
-	public interface IDataflow<out T> : IDisposable
+	public interface IDataflow<out T>
 	{
 		/// <summary>
 		/// Polls the dataflow.
@@ -104,88 +104,6 @@ namespace Tangerine.Core
 		}
 	}
 
-	public class EventflowProvider<T> : IDataflowProvider<T>
-	{
-		private readonly object obj;
-		private readonly string eventName;
-
-		public EventflowProvider(object obj, string eventName)
-		{
-			this.obj = obj;
-			this.eventName = eventName;
-		}
-
-		public IDataflow<T> GetDataflow() => new Eventflow<T>(obj, eventName);
-	}
-
-	public class Eventflow<T> : IDataflow<T>
-	{
-		private readonly List<T> queue = new List<T>();
-		private readonly EventInfo eventInfo;
-		private readonly Delegate @delegate;
-		private readonly object obj;
-		private bool disposed;
-
-		public T Value { get; private set; }
-		public bool GotValue { get; private set; }
-
-		public Eventflow(object obj, string eventName)
-		{
-			this.obj = obj;
-			eventInfo = obj.GetType().GetEvent(eventName);
-			if (eventInfo == null) {
-				throw new ArgumentException($"Unknown event {eventName} for type {obj.GetType()}");
-			}
-			@delegate = CreateDelegate(eventInfo, obj, eventName);
-			eventInfo.AddEventHandler(obj, @delegate);
-		}
-
-		public void Dispose()
-		{
-			if (disposed) {
-				throw new InvalidOperationException();
-			}
-			eventInfo.RemoveEventHandler(obj, @delegate);
-			disposed = true;
-		}
-
-		private Delegate CreateDelegate(EventInfo evt, object obj, string eventName)
-		{
-			var p = evt.EventHandlerType.GetMethod("Invoke").GetParameters();
-			if (p.Length == 1 && p[0].ParameterType == typeof(T)) {
-				return Delegate.CreateDelegate(evt.EventHandlerType, this, "EventHandler1");
-			}
-			if (p.Length == 2 && p[0].ParameterType == typeof(object) && p[1].ParameterType == typeof(T)) {
-				return Delegate.CreateDelegate(evt.EventHandlerType, this, "EventHandler2");
-			}
-			throw new ArgumentException();
-		}
-
-		private void EventHandler1(T value)
-		{
-			lock (queue) {
-				queue.Add(value);
-			}
-		}
-
-		private void EventHandler2(object sender, T value)
-		{
-			lock (queue) {
-				queue.Add(value);
-			}
-		}
-
-		public void Poll()
-		{
-			lock (queue) {
-				if ((GotValue = queue.Count > 0)) {
-					Value = queue[0];
-					queue.RemoveAt(0);
-				}
-			}
-		}
-	}
-
 	internal class PropertyDataflow<T> : IDataflow<T>
 	{
 		private readonly Func<T> getter;
@@ -203,8 +121,6 @@ namespace Tangerine.Core
 			Value = getter();
 			GotValue = true;
 		}
-
-		public void Dispose() { }
 	}
 
 	public struct CoalescedValue<T>
@@ -255,13 +171,6 @@ namespace Tangerine.Core
 			}
 			if (GotValue) {
 				Value = new CoalescedValue<T>(areAllEqual ? firstValue : defaultValue, areAllEqual);
-			}
-		}
-
-		public void Dispose()
-		{
-			foreach (var dataflow in dataflows) {
-				dataflow.Dispose();
 			}
 		}
 	}
@@ -359,11 +268,6 @@ namespace Tangerine.Core
 					Value = selector(arg.Value);
 				}
 			}
-
-			public void Dispose()
-			{
-				arg.Dispose();
-			}
 		}
 
 		private class CoalesceProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
@@ -388,12 +292,6 @@ namespace Tangerine.Core
 					Value = new Tuple<T1, T2>(arg1.Value, arg2.Value);
 				}
 			}
-
-			public void Dispose()
-			{
-				arg1.Dispose();
-				arg2.Dispose();
-			}
 		}
 
 		private class WhereProvider<T> : IDataflow<T>
@@ -416,11 +314,6 @@ namespace Tangerine.Core
 				if ((GotValue = arg.GotValue && predicate(arg.Value))) {
 					Value = arg.Value;
 				}
-			}
-
-			public void Dispose()
-			{
-				arg.Dispose();
 			}
 		}
 
@@ -450,11 +343,6 @@ namespace Tangerine.Core
 					}
 				}
 			}
-
-			public void Dispose()
-			{
-				arg.Dispose();
-			}
 		}
 
 		private class SkipProvider<T> : IDataflow<T>
@@ -480,11 +368,6 @@ namespace Tangerine.Core
 					Value = arg.Value;
 				}
 			}
-
-			public void Dispose()
-			{
-				arg.Dispose();
-			}
 		}
 
 		private class SameOrDefaultProvider<T> : IDataflow<T>
@@ -509,44 +392,6 @@ namespace Tangerine.Core
 				arg2.Poll();
 				if ((GotValue = arg1.GotValue || arg2.GotValue)) {
 					Value = EqualityComparer<T>.Default.Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
-				}
-			}
-
-			public void Dispose()
-			{
-				arg1.Dispose();
-				arg2.Dispose();
-			}
-		}
-
-		public class Consumer<T> : ITaskProvider
-		{
-			private readonly IDataflow<T> dataflow;
-			private readonly Action<T> action;
-
-			public Consumer(IDataflow<T> dataflow, Action<T> action)
-			{
-				this.dataflow = dataflow;
-				this.action = action;
-			}
-
-			public IEnumerator<object> Task()
-			{
-				try {
-					while (true) {
-						Execute();
-						yield return null;
-					}
-				} finally {
-					dataflow.Dispose();
-				}
-			}
-
-			private void Execute()
-			{
-				dataflow.Poll();
-				if (dataflow.GotValue) {
-					action(dataflow.Value);
 				}
 			}
 		}

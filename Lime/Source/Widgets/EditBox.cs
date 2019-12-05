@@ -48,6 +48,7 @@ namespace Lime
 			ScrollWidget = new Frame();
 			ScrollView = new ScrollView(ScrollWidget, ScrollDirection.Horizontal);
 			ScrollView.CanScroll = false;
+			ScrollView.Content.Layout = new StackLayout();
 			TextWidget = new SimpleText();
 			TextWidget.Height = Height;
 			ScrollView.Content.AddNode(TextWidget);

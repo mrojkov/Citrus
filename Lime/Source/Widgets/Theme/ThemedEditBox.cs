@@ -18,7 +18,7 @@ namespace Lime
 		{
 			var tw = eb.TextWidget;
 			ThemedSimpleText.Decorate(tw);
-			tw.ForceUncutText = false;
+			tw.ForceUncutText = true;
 			eb.MinSize = Theme.Metrics.DefaultEditBoxSize;
 			eb.MaxHeight = eb.MinHeight;
 			tw.Localizable = false;

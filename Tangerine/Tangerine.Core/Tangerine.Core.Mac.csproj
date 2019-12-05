@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -57,12 +57,12 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
-    <Folder Include="Operations\" />
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="Commands\OrangeCommands.cs" />
+    <Compile Include="Consumer.cs" />
     <Compile Include="GridSelection.cs" />
     <Compile Include="GridSpanList.cs" />
+    <Compile Include="NodeChangeWatcherExtensions.cs" />
     <Compile Include="Operations\RemoveKeyframeRange.cs" />
     <Compile Include="Operations\RenameAnimationProcessor.cs" />
     <Compile Include="Operations\RulerAction.cs" />
@@ -133,5 +133,8 @@
       <Project>{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}</Project>
       <Name>Orange.Mac</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 </Project>

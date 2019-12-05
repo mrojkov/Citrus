@@ -49,6 +49,7 @@
     <Compile Include="ClassAttributes.cs" />
     <Compile Include="Commands\OrangeCommands.cs" />
     <Compile Include="Components.cs" />
+    <Compile Include="Consumer.cs" />
     <Compile Include="CoreUserPreferences.cs" />
     <Compile Include="Document.Animation.cs" />
     <Compile Include="Document.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="IDataflow.cs" />
     <Compile Include="ITaskProvider.cs" />
     <Compile Include="KeyHandler.cs" />
+    <Compile Include="NodeChangeWatcherExtensions.cs" />
     <Compile Include="NodeCompositionValidator.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="Operation.cs" />
