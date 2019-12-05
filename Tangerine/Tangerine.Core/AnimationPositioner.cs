@@ -1,14 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Lime;
 
 namespace Tangerine.Core
 {
-	class BetterAnimationPositioner : IAnimationPositioner
+	public interface IAnimationPositioner
 	{
-		public bool CacheAnimationsStates { get; set; }
+		void SetAnimationFrame(Animation animation, int frame, bool animationMode, bool stopAnimations);
+	}
 
+	class AnimationPositioner : IAnimationPositioner
+	{
 		public void SetAnimationFrame(Animation animation, int frame, bool animationMode, bool stopAnimations)
 		{
 			Audio.GloballyEnable = false;

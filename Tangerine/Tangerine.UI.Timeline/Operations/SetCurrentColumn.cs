@@ -47,11 +47,6 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			class Backup { public int Column; }
 
-			public static bool CacheAnimationsStates
-			{
-				set { Document.CacheAnimationsStates = value; }
-			}
-
 			protected override void InternalRedo(SetCurrentColumn op)
 			{
 				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });

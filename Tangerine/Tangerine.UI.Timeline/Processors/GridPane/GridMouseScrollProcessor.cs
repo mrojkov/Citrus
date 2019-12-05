@@ -26,9 +26,7 @@ namespace Tangerine.UI.Timeline
 					}
 					if (!userPreferences.LockTimelineCursor) {
 						Core.Document.Current.History.DoTransaction(() => {
-							Document.CacheAnimationsStates = true;
 							Operations.SetCurrentColumn.Perform(RulerbarMouseScrollProcessor.CalcColumn(p.X));
-							Document.CacheAnimationsStates = false;
 						});
 					}
 					var rh = TimelineMetrics.DefaultRowHeight;

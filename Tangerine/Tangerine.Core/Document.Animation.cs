@@ -7,18 +7,9 @@ namespace Tangerine.Core
 {
 	public sealed partial class Document
 	{
-		private IAnimationPositioner compatAnimationPositioner = new CompatibilityAnimationPositioner();
-		private IAnimationPositioner betterAnimationPositioner = new BetterAnimationPositioner();
-		public IAnimationPositioner AnimationPositioner =>
-			CoreUserPreferences.Instance.UseBetterAnimationPositioner ? betterAnimationPositioner : compatAnimationPositioner;
+		private readonly IAnimationPositioner AnimationPositioner = new AnimationPositioner();
 
 		public bool SlowMotion { get; set; }
-
-		public static bool CacheAnimationsStates
-		{
-			get => Current.AnimationPositioner.CacheAnimationsStates;
-			set => Current.AnimationPositioner.CacheAnimationsStates = value;
-		}
 
 		public static void SetCurrentFrameToNode(Animation animation, int frameIndex, bool stopAnimations = true)
 		{
@@ -36,10 +27,8 @@ namespace Tangerine.Core
 					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
 				}
 				AudioSystem.StopAll();
-				AnimationPositioner.CacheAnimationsStates = true;
 				ForceAnimationUpdate();
 				ClearParticlesRecursive(Animation.OwnerNode);
-				AnimationPositioner.CacheAnimationsStates = false;
 			} else {
 				foreach (var node in RootNode.Descendants) {
 					if (node is ITangerinePreviewAnimationListener t) {

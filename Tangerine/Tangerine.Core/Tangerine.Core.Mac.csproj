@@ -59,9 +59,6 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
-    <Compile Include="AnimationPositioner\BetterAnimationPositioner.cs" />
-    <Compile Include="AnimationPositioner\CompatibilityAnimationPositioner.cs" />
-    <Compile Include="AnimationPositioner\IAnimationPositioner.cs" />
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="Commands\OrangeCommands.cs" />
     <Compile Include="GridSelection.cs" />
@@ -73,6 +70,7 @@
     <Compile Include="SceneCache.cs" />
     <Compile Include="SyncPresenters.cs" />
     <Compile Include="TangerinePersistence.cs" />
+    <Compile Include="AnimationPositioner.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimatorEditorState.cs" />
