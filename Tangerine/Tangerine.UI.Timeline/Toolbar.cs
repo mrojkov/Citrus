@@ -24,7 +24,6 @@ namespace Tangerine.UI.Timeline
 					CreateFolderButton(),
 					CreateCurveEditorButton(),
 					CreateTimelineCursorLockButton(),
-					CreateSwitchAnimationPositioner(),
 					CreateAnimationStretchButton(),
 					CreateSlowMotionButton(),
 					CreateFrameProgressionButton(),
@@ -207,16 +206,6 @@ namespace Tangerine.UI.Timeline
 			button.AddChangeWatcher(() => CoreUserPreferences.LockTimelineCursor, i => button.Checked = i);
 			button.Clicked += () => CoreUserPreferences.LockTimelineCursor = !CoreUserPreferences.LockTimelineCursor;
 			button.AddChangeWatcher(() => Document.Current.Animation.IsCompound, v => button.Visible = !v);
-			return button;
-		}
-
-		private ToolbarButton CreateSwitchAnimationPositioner()
-		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.RockNRoll")) { Tooltip = "Switch animation positioner" };
-			button.AddChangeWatcher(() => CoreUserPreferences.UseBetterAnimationPositioner, i => button.Checked = i);
-			button.Clicked += () => {
-				CoreUserPreferences.UseBetterAnimationPositioner = !CoreUserPreferences.UseBetterAnimationPositioner;
-			};
 			return button;
 		}
 

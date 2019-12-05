@@ -20,7 +20,6 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					yield return null;
-					SetCurrentColumn.Processor.CacheAnimationsStates = true;
 					using (Document.Current.History.BeginTransaction()) {
 						int initialCurrentColumn = CalcColumn(rulerWidget.LocalMousePosition().X);
 						Document.Current.AnimationFrame = initialCurrentColumn;
@@ -75,7 +74,6 @@ namespace Tangerine.UI.Timeline
 						}
 						Document.Current.History.CommitTransaction();
 						timeline.Ruler.MeasuredFrameDistance = 0;
-						SetCurrentColumn.Processor.CacheAnimationsStates = false;
 					}
 				}
 				yield return null;

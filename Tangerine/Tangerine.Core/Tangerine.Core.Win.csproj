@@ -42,9 +42,6 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnimationPositioner\BetterAnimationPositioner.cs" />
-    <Compile Include="AnimationPositioner\CompatibilityAnimationPositioner.cs" />
-    <Compile Include="AnimationPositioner\IAnimationPositioner.cs" />
     <Compile Include="AnimationTrackEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="AutosaveProcessor.cs" />
@@ -101,6 +98,7 @@
     <Compile Include="UserPreferences.cs" />
     <Compile Include="VersionedCollection.cs" />
     <Compile Include="WidgetExtensions.cs" />
+    <Compile Include="AnimationPositioner.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
