@@ -119,7 +119,7 @@ namespace Lime
 
 		private bool ShouldStop()
 		{
-			return !Continuous && (GetRoot() != WidgetContext.Current.Root || !((Parent as Widget)?.GloballyVisible ?? false));
+			return !Continuous && (Manager == null || !((Parent as Widget)?.GloballyVisible ?? false));
 		}
 
 		public bool IsPlaying()
