@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Text.RegularExpressions;
 using Lime;
 using Tangerine.Core.Components;
 
@@ -21,7 +20,7 @@ namespace Tangerine.Core
 		Fbx
 	}
 
-	public sealed partial class Document
+	public sealed class Document
 	{
 		public enum CloseAction
 		{
@@ -35,14 +34,15 @@ namespace Tangerine.Core
 		private readonly Dictionary<object, Row> rowCache = new Dictionary<object, Row>();
 		private readonly Dictionary<Node, Animation> selectedAnimationPerContainer = new Dictionary<Node, Animation>();
 		private readonly MemoryStream preloadedSceneStream = null;
+		private readonly IAnimationPositioner animationPositioner = new AnimationPositioner();
 		private static uint untitledCounter = 0;
 
 		public static readonly string[] AllowedFileTypes = { "tan", "t3d", "fbx" };
 		public delegate bool PathSelectorDelegate(out string path);
 
 		public DateTime LastWriteTime { get; private set; }
-
 		public bool Loaded { get; private set; } = true;
+		public bool SlowMotion { get; set; }
 
 		public static event Action<Document> AttachingViews;
 		public static Func<Document, CloseAction> CloseConfirmation;
@@ -640,6 +640,71 @@ namespace Tangerine.Core
 					}
 				});
 			}
+		}
+
+		public static void SetCurrentFrameToNode(Animation animation, int frameIndex, bool stopAnimations = true)
+		{
+			Current.animationPositioner.SetAnimationFrame(animation, frameIndex, CoreUserPreferences.Instance.AnimationMode, stopAnimations);
+		}
+
+		public void TogglePreviewAnimation()
+		{
+			if (PreviewAnimation) {
+				PreviewAnimation = false;
+				PreviewScene = false;
+				Animation.IsRunning = false;
+				StopAnimationRecursive(PreviewAnimationContainer);
+				if (!CoreUserPreferences.Instance.StopAnimationOnCurrentFrame) {
+					SetCurrentFrameToNode(Animation, PreviewAnimationBegin);
+				}
+				AudioSystem.StopAll();
+				ForceAnimationUpdate();
+				ClearParticlesRecursive(Animation.OwnerNode);
+			} else {
+				foreach (var node in RootNode.Descendants) {
+					if (node is ITangerinePreviewAnimationListener t) {
+						t.OnStart();
+					}
+				}
+				int savedAnimationFrame = AnimationFrame;
+				SetCurrentFrameToNode(Animation, AnimationFrame, stopAnimations: false);
+				PreviewScene = true;
+				PreviewAnimation = true;
+				Animation.IsRunning = PreviewAnimation;
+				PreviewAnimationBegin = savedAnimationFrame;
+				PreviewAnimationContainer = Container;
+			}
+			Application.InvalidateWindows();
+
+			void StopAnimationRecursive(Node node)
+			{
+				void StopAnimation(Node n)
+				{
+					foreach (var animation in n.Animations) {
+						animation.IsRunning = false;
+					}
+				}
+				StopAnimation(node);
+				foreach (var descendant in node.Descendants) {
+					StopAnimation(descendant);
+				}
+			}
+
+			void ClearParticlesRecursive(Node node)
+			{
+				if (node is ParticleEmitter emitter) {
+					emitter.ClearParticles();
+				}
+				foreach (var child in node.Nodes) {
+					ClearParticlesRecursive(child);
+				}
+			}
+		}
+		
+
+		public void ForceAnimationUpdate()
+		{
+			SetCurrentFrameToNode(Current.Animation, Current.AnimationFrame);
 		}
 	}
 }
