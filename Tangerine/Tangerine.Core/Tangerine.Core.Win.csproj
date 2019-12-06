@@ -51,7 +51,6 @@
     <Compile Include="Components.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="CoreUserPreferences.cs" />
-    <Compile Include="Document.Animation.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="DocumentPreview.cs" />
