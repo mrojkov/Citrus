@@ -50,6 +50,7 @@ namespace Lime
 				MaxTextureSize = config.TextureSize,
 			};
 			var missingCharacters = new List<char>();
+			var margin = new Vector2(config.Margin * .5f);
 			foreach (var charSet in config.CharSets) {
 				var fontPath = AssetPath.Combine(assetDirectory, charSet.Font);
 				if (!File.Exists(fontPath)) {
@@ -68,6 +69,7 @@ namespace Lime
 						missingCharacters.Add(c);
 						continue;
 					}
+					fontChar.ACWidths += margin;
 					if (config.IsSdf) {
 						fontChar.ACWidths *= config.SdfScale;
 						fontChar.Height *= config.SdfScale;

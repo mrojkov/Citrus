@@ -77,5 +77,10 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		public Size TextureSize { get; set; }
+		/// <summary>
+		/// Margin for each character
+		/// </summary>
+		[YuzuMember]
+		public float Margin { get; set; }
 	}
 }
