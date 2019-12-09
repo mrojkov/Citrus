@@ -340,8 +340,8 @@ namespace Tangerine
 
 		private IEnumerator<object> ExpandMarkers(AnimationRow ar)
 		{
-			(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
 			yield return null;
+			(ar["MarkersExpandButton"] as ThemedExpandButton).Expanded = true;
 		}
 
 		private void SyncSources(Model3DAttachmentMeta meta, Model3DAttachment attachment)
@@ -1150,7 +1150,7 @@ namespace Tangerine
 				}));
 
 				Nodes.Add(expandableContentWrapper);
-				expandableContentWrapper.AddChangeWatcher(
+				expandedButton.AddChangeWatcher(
 					() => expandedButton.Expanded,
 					(v) => expandableContentWrapper.Visible = v);
 				CompoundPresenter.Add(Presenters.StripePresenter);
@@ -1441,7 +1441,7 @@ namespace Tangerine
 
 				BuildList(source.Components, expandableContentWrapper);
 				Nodes.Add(expandableContentWrapper);
-				expandableContentWrapper.AddChangeWatcher(
+				expandedButton.AddChangeWatcher(
 					() => expandedButton.Expanded,
 					(v) => expandableContentWrapper.Visible = v);
 				CompoundPresenter.Add(Presenters.StripePresenter);
