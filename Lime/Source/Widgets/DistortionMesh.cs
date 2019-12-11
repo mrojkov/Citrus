@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Yuzu;
 
@@ -49,6 +50,72 @@ namespace Lime
 					AddSelfAndChildrenToRenderChain(chain, Layer);
 				}
 			}
+		}
+
+		protected internal override bool PartialHitTestByContents(ref HitTestArgs args)
+		{
+			Vector2 localPoint = LocalToWorldTransform.CalcInversed().TransformVector(args.Point);
+			Vector2 size = Size;
+			if (size.X < 0) {
+				localPoint.X = -localPoint.X;
+				size.X = -size.X;
+			}
+			if (size.Y < 0) {
+				localPoint.Y = -localPoint.Y;
+				size.Y = -size.Y;
+			}
+			for (int i = 0; i < (NumRows + 1) * NumCols; i++) {
+				if ((i + 1) % (NumCols + 1) == 0) {
+					continue;
+				}
+
+				var n1 = (DistortionMeshPoint)Nodes[i];
+				var n2 = (DistortionMeshPoint)Nodes[i + NumCols + 1];
+				var n3 = (DistortionMeshPoint)Nodes[i + NumCols + 2];
+				var n4 = (DistortionMeshPoint)Nodes[i + 1];
+				var v1 = (n1.TransformedPosition, n1.UV);
+				var v2 = (n2.TransformedPosition, n2.UV);
+				var v3 = (n3.TransformedPosition, n3.UV);
+				var v4 = (n4.TransformedPosition, n4.UV);
+				var center = (
+					(v1.TransformedPosition + v2.TransformedPosition + v3.TransformedPosition + v4.TransformedPosition) * .25f,
+					(v1.UV + v2.UV + v3.UV + v4.UV) * .25f
+				);
+				if (
+					HitTest(localPoint, v1, center, v2) || HitTest(localPoint, v2, center, v3) ||
+					HitTest(localPoint, v3, center, v4) || HitTest(localPoint, v4, center, v1)
+				) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private bool HitTest(Vector2 point, (Vector2 Position, Vector2 UV) v1, (Vector2 Position, Vector2 UV) v2, (Vector2 Position, Vector2 UV) v3)
+		{
+			if (
+				TryCalculateBarycentricCoordinates(point, v1.Position, v2.Position, v3.Position, out var w1, out var w2, out var w3) &&
+				w1 >= 0 && w2 >= 0 && w1 + w2 < 1
+			) {
+				var pointUV = w1 * v1.UV + w2 * v2.UV + w3 * v3.UV;
+				return !Texture.IsTransparentPixel(
+					(int)(Texture.ImageSize.Width * pointUV.X), (int)(Texture.ImageSize.Height * pointUV.Y));
+			}
+			return false;
+		}
+
+		private static bool TryCalculateBarycentricCoordinates(Vector2 point, Vector2 v1, Vector2 v2, Vector2 v3,
+			out float w1, out float w2, out float w3)
+		{
+			w1 = w2 = w3 = 0;
+			var det = ((v2.Y - v3.Y) * (v1.X - v3.X) + (v3.X - v2.X) * (v1.Y - v3.Y));
+			if (Math.Abs(det) < float.Epsilon) {
+				return false;
+			}
+			w1 = ((v2.Y - v3.Y) * (point.X - v3.X) + (v3.X - v2.X) * (point.Y - v3.Y)) / det;
+			w2 = ((v3.Y - v1.Y) * (point.X - v3.X) + (v1.X - v3.X) * (point.Y - v3.Y)) / det;
+			w3 = 1 - w1 - w2;
+			return true;
 		}
 
 		protected internal override Lime.RenderObject GetRenderObject()
