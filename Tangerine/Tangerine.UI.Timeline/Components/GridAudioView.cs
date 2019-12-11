@@ -20,7 +20,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			base.Render(widget);
 			Animator<AudioAction> actionAnimator;
-			if (!audio.Animators.TryFind("Action", out actionAnimator)) {
+			if (!audio.Animators.TryFind("Action", out actionAnimator, Document.Current.AnimationId)) {
 				return;
 			}
 			foreach (var key in actionAnimator.ReadonlyKeys) {
