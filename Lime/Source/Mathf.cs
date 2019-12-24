@@ -138,7 +138,7 @@ namespace Lime
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
 			int range = upperBound - lowerBound + 1;
-			x = ((x - lowerBound) % range);
+			x = (x - lowerBound) % range;
 			return x < 0 ? upperBound + 1 + x : lowerBound + x;
 		}
 
